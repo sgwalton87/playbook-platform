@@ -1,5 +1,6 @@
 "use client";
 
+import AppShell from "@/components/AppShell";
 import { rewardStore } from "@/lib/store";
 
 export default function StorePage() {
