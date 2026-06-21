@@ -11,6 +11,7 @@ const navItems = [
   { label: "Feed", href: "/feed", icon: "💬" },
   { label: "Courses", href: "/courses", icon: "📚" },
   { label: "Transcript", href: "/transcript", icon: "🎓" },
+  { label: "Certificates", href: "/certificates", icon: "🏅" },
   { label: "Notifications", href: "/notifications", icon: "🔔" },
   { label: "Connections", href: "/connections", icon: "🤝" },
   { label: "Mentorship", href: "/mentorship", icon: "🧭" },
@@ -33,11 +34,12 @@ export default function AppShell({
   const [loading, setLoading] = useState(true);
 
   const bg = "#f6f0e7";
-  const surface = "#ffffff";
-  const soft = "#fbf7f1";
+  const sidebar = "#0f172a";
+  const sidebarSoft = "#111827";
+  const sidebarLine = "rgba(255,255,255,.12)";
   const ink = "#100c0a";
-  const muted = "#6b5f55";
-  const line = "#ddd2c7";
+  const cream = "#f8f7f4";
+  const muted = "rgba(248,247,244,.58)";
   const accent = "#ff6a2c";
 
   useEffect(() => {
@@ -73,11 +75,8 @@ export default function AppShell({
   };
 
   const goPublicProfile = () => {
-    if (profile?.username) {
-      router.push(`/u/${profile.username}`);
-    } else {
-      router.push("/profile");
-    }
+    if (profile?.username) router.push(`/u/${profile.username}`);
+    else router.push("/profile");
   };
 
   if (loading) {
@@ -108,8 +107,9 @@ export default function AppShell({
 
       <aside
         style={{
-          borderRight: `1px solid ${line}`,
-          background: surface,
+          borderRight: `1px solid ${sidebarLine}`,
+          background: sidebar,
+          color: cream,
           padding: 22,
           position: "sticky",
           top: 0,
@@ -124,9 +124,9 @@ export default function AppShell({
             marginBottom: 18,
             padding: "11px 14px",
             borderRadius: 999,
-            border: `1px solid ${line}`,
-            background: soft,
-            color: ink,
+            border: `1px solid ${sidebarLine}`,
+            background: sidebarSoft,
+            color: cream,
             cursor: "pointer",
             fontWeight: 900,
             textAlign: "left",
@@ -140,8 +140,8 @@ export default function AppShell({
           style={{
             cursor: "pointer",
             marginBottom: 28,
-            background: soft,
-            border: `1px solid ${line}`,
+            background: sidebarSoft,
+            border: `1px solid ${sidebarLine}`,
             borderRadius: 22,
             padding: 16,
           }}
@@ -180,6 +180,7 @@ export default function AppShell({
                   lineHeight: 0.9,
                   margin: 0,
                   textTransform: "uppercase",
+                  color: cream,
                 }}
               >
                 Playbook
@@ -194,11 +195,11 @@ export default function AppShell({
             display: "flex",
             alignItems: "center",
             gap: 12,
-            border: `1px solid ${line}`,
+            border: `1px solid ${sidebarLine}`,
             borderRadius: 18,
             padding: 12,
             marginBottom: 24,
-            background: soft,
+            background: sidebarSoft,
             cursor: "pointer",
           }}
         >
@@ -209,7 +210,7 @@ export default function AppShell({
           />
 
           <div>
-            <strong>{profile?.first_name || "User"}</strong>
+            <strong style={{ color: cream }}>{profile?.first_name || "User"}</strong>
             <p style={{ margin: "4px 0 0", color: muted, fontSize: 12 }}>
               View public profile
             </p>
@@ -218,7 +219,8 @@ export default function AppShell({
 
         <nav style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {navItems.map((item) => {
-            const active = pathname === item.href;
+            const active =
+              pathname === item.href || pathname?.startsWith(`${item.href}/`);
 
             return (
               <button
@@ -231,7 +233,7 @@ export default function AppShell({
                   borderRadius: 14,
                   border: `1px solid ${active ? accent : "transparent"}`,
                   background: active ? accent : "transparent",
-                  color: ink,
+                  color: active ? "#100c0a" : cream,
                   cursor: "pointer",
                   fontWeight: 800,
                   display: "flex",
@@ -253,7 +255,7 @@ export default function AppShell({
             marginTop: 24,
             padding: "12px 14px",
             borderRadius: 14,
-            border: `1px solid ${line}`,
+            border: `1px solid ${sidebarLine}`,
             background: "transparent",
             color: muted,
             cursor: "pointer",
@@ -285,6 +287,7 @@ export default function AppShell({
               fontSize: 48,
               margin: 0,
               textTransform: "uppercase",
+              color: ink,
             }}
           >
             {title}

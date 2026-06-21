@@ -1,495 +1,232 @@
 "use client";
 
 import AppShell from "@/components/AppShell";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
-type Course = {
-  slug: string;
-  title: string;
-  pillar: string | null;
-  description: string | null;
-  xp_reward: number | null;
-  coin_reward: number | null;
-  is_available: boolean | null;
-  image_url?: string | null;
-  flagship_order?: number | null;
-};
-
-const FILTERS = ["All", "Flagship", "Leadership", "Finance", "Civic", "SEL", "College"];
-
-const surface = "#ffffff";
-const soft = "#fbf7f1";
-const ink = "#100c0a";
-const muted = "#6b5f55";
-const line = "#ddd2c7";
-const accent = "#ff6a2c";
-const mono = "'Space Mono', monospace";
-const anton = "'Anton', sans-serif";
+const FLAGSHIP = [
+  { id:"captains-mindset", title:"Captain's Mindset", pillar:"Leadership", color:"#F97316", emoji:"★", img:"https://images.unsplash.com/photo-1546519638405-a4c8b5bd3c5e?w=800&q=80", desc:"Lead by example on and off the court with proven captaincy frameworks.", modules:6 },
+  { id:"money-in-the-game", title:"Money in the Game", pillar:"Finance", color:"#3B82F6", emoji:"$", img:"https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=80", desc:"Budgeting, saving, and NIL fundamentals built for young athletes.", modules:8 },
+  { id:"mind-of-an-athlete", title:"Mind of an Athlete", pillar:"SEL", color:"#8B5CF6", emoji:"♥", img:"https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&q=80", desc:"Build resilience and manage pressure with social-emotional tools.", modules:5 },
+  { id:"community-leader", title:"Community Leader", pillar:"Civic", color:"#10B981", emoji:"✓", img:"https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80", desc:"Youth-led projects and advocacy for leaders who create change.", modules:6, comingSoon:true },
+];
 
 export default function CoursesPage() {
   const router = useRouter();
-
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [filter, setFilter] = useState("All");
+  const [progress, setProgress] = useState<Record<string,number>>({});
   const [loading, setLoading] = useState(true);
-  const [showAllCourses, setShowAllCourses] = useState(false);
 
   useEffect(() => {
-    const loadCourses = async () => {
-      const { data: userData } = await supabase.auth.getUser();
-
-      if (!userData.user) {
-        router.replace("/login");
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from("courses")
-        .select("*")
-        .not("slug", "is", null)
-        .order("flagship_order", { ascending: true, nullsFirst: false })
-        .order("created_at", { ascending: true });
-
-      if (error) {
-        alert(error.message);
-        setLoading(false);
-        return;
-      }
-
-      setCourses(data || []);
+    (async () => {
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) { router.replace("/login"); return; }
+      // Load saved progress from Supabase profiles table
+      const { data: p } = await supabase.from("profiles").select("course_progress").eq("id", u.user.id).single();
+      if (p?.course_progress) setProgress(p.course_progress);
       setLoading(false);
-    };
+    })();
+  }, []);
 
-    loadCourses();
-  }, [router]);
+  if (loading) return <div style={{ minHeight:"100vh", background:"#F8F7F4", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'Space Mono', monospace", fontSize:12, color:"#94A3B8" }}>Loading courses…</div>;
 
-  const flagshipCourses = useMemo(
-    () =>
-      courses
-        .filter((course) => course.pillar === "Flagship")
-        .sort((a, b) => (a.flagship_order || 999) - (b.flagship_order || 999)),
-    [courses]
-  );
-
-  const otherCourses = useMemo(
-    () =>
-      courses.filter(
-        (course) => course.pillar !== "Flagship" || !course.flagship_order
-      ),
-    [courses]
-  );
-
-  const filteredOtherCourses =
-    filter === "All"
-      ? otherCourses
-      : courses.filter((course) => course.pillar === filter);
-
-  if (loading) {
-    return (
-      <AppShell title="Courses">
-        <p>Loading courses...</p>
-      </AppShell>
-    );
-  }
+  const inProgress = FLAGSHIP.filter(c => progress[c.id] > 0 && progress[c.id] < c.modules && !c.comingSoon);
+  const totalXP = FLAGSHIP.reduce((acc, c) => acc + (progress[c.id] || 0) * 50, 0);
 
   return (
     <AppShell title="Courses">
-      <div style={{ display: "grid", gap: 24 }}>
-        <section
-          style={{
-            background: surface,
-            border: `1px solid ${line}`,
-            borderRadius: 28,
-            padding: 30,
-          }}
-        >
-          <p
-            style={{
-              fontFamily: mono,
-              fontSize: 11,
-              letterSpacing: "0.16em",
-              textTransform: "uppercase",
-              color: accent,
-              margin: "0 0 8px",
-            }}
-          >
-            Playbook Learning Pathway
-          </p>
+      <div style={{ fontFamily:"'Hanken Grotesk', system-ui, sans-serif", color:"#0F172A" }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+        ::selection{background:#F97316;color:#fff;}
+        .pb-card:hover{border-color:#F97316!important;transform:translateY(-3px);}
+        img{display:block;}
+      `}</style>
 
-          <h1
-            style={{
-              fontFamily: anton,
-              fontSize: "clamp(38px,5vw,64px)",
-              lineHeight: 0.92,
-              margin: 0,
-              color: ink,
-              textTransform: "uppercase",
-            }}
-          >
-            Start with the <span style={{ color: accent }}>Flagship Five</span>
-          </h1>
+      <div style={{ padding:"32px 36px", maxWidth:1060 }}>
+        <p style={{ fontFamily:"'Space Mono', monospace", fontSize:10, letterSpacing:"0.2em", textTransform:"uppercase", color:"#F97316", marginBottom:6 }}>The library</p>
+        <h1 style={{ fontFamily:"Anton, sans-serif", fontWeight:400, fontSize:"clamp(32px,4vw,48px)", textTransform:"uppercase", color:"#0F172A", lineHeight:.95, marginBottom:20 }}>Course Library</h1>
 
-          <p style={{ color: muted, marginTop: 14, maxWidth: 760, lineHeight: 1.6 }}>
-            These five courses are the core Playbook pathway for scholar-athletes:
-            college readiness, leadership, social-emotional growth, NIL readiness,
-            and civic voice.
-          </p>
+        {/* Stats */}
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:10, marginBottom:20 }}>
+          {[
+            { icon:"📚", label:"Available", value:FLAGSHIP.filter(c=>!c.comingSoon).length },
+            { icon:"⚡", label:"In progress", value:inProgress.length },
+            { icon:"✅", label:"Completed", value:FLAGSHIP.filter(c=>progress[c.id]===c.modules&&!c.comingSoon).length },
+            { icon:"🎓", label:"Certificates", value:FLAGSHIP.filter(c=>progress[c.id]===c.modules&&!c.comingSoon).length },
+          ].map(({ icon, label, value }) => (
+            <div key={label} style={{ background:"#fff", border:"1px solid #E2E8F0", borderRadius:14, padding:"14px 16px", display:"flex", alignItems:"center", gap:12 }}>
+              <div style={{ fontSize:22 }}>{icon}</div>
+              <div>
+                <div style={{ fontFamily:"'Space Mono', monospace", fontSize:9, letterSpacing:"0.12em", textTransform:"uppercase", color:"#94A3B8", marginBottom:3 }}>{label}</div>
+                <div style={{ fontFamily:"Anton, sans-serif", fontSize:26, fontWeight:400, color:"#0F172A", lineHeight:1 }}>{value}</div>
+              </div>
+            </div>
+          ))}
+        </div>
 
-          <button
-            onClick={() => router.push("/transcript")}
-            style={{
-              marginTop: 18,
-              background: accent,
-              color: ink,
-              border: `1px solid ${accent}`,
-              borderRadius: 999,
-              padding: "12px 18px",
-              fontWeight: 900,
-              cursor: "pointer",
-            }}
-          >
-            View My Transcript →
-          </button>
-        </section>
-
-        <section
-          style={{
-            background: surface,
-            border: `1px solid ${line}`,
-            borderRadius: 28,
-            padding: 24,
-          }}
-        >
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-              gap: 18,
-            }}
-          >
-            {flagshipCourses.map((course) => (
-              <article
-                key={course.slug}
-                onClick={() =>
-                  course.is_available && router.push(`/courses/${course.slug}`)
-                }
-                style={{
-                  border: `1px solid ${line}`,
-                  borderRadius: 24,
-                  overflow: "hidden",
-                  background: soft,
-                  cursor: course.is_available ? "pointer" : "default",
-                  opacity: course.is_available ? 1 : 0.55,
-                }}
-              >
-                <div
-                  style={{
-                    height: 180,
-                    position: "relative",
-                    background: "#ddd2c7",
-                    overflow: "hidden",
-                  }}
-                >
-                  {course.image_url && (
-                    <img
-                      src={course.image_url}
-                      alt={course.title}
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                        display: "block",
-                      }}
-                    />
-                  )}
-
-                  <div
-                    style={{
-                      position: "absolute",
-                      inset: 0,
-                      background:
-                        "linear-gradient(180deg, rgba(16,12,10,0.05), rgba(16,12,10,0.55))",
-                    }}
-                  />
-
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: 14,
-                      left: 14,
-                      background: accent,
-                      color: ink,
-                      width: 46,
-                      height: 46,
-                      borderRadius: 999,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontFamily: anton,
-                      fontSize: 24,
-                    }}
-                  >
-                    {course.flagship_order}
-                  </div>
-
-                  <span
-                    style={{
-                      position: "absolute",
-                      bottom: 14,
-                      left: 14,
-                      fontFamily: mono,
-                      fontSize: 10,
-                      fontWeight: 900,
-                      letterSpacing: "0.1em",
-                      textTransform: "uppercase",
-                      background: "#ffffff",
-                      color: ink,
-                      padding: "6px 10px",
-                      borderRadius: 999,
-                    }}
-                  >
-                    Flagship Course
-                  </span>
-                </div>
-
-                <div style={{ padding: 20 }}>
-                  <h2
-                    style={{
-                      fontFamily: anton,
-                      textTransform: "uppercase",
-                      fontSize: 28,
-                      lineHeight: 0.95,
-                      margin: "0 0 10px",
-                      color: ink,
-                    }}
-                  >
-                    {course.title}
-                  </h2>
-
-                  <p style={{ color: muted, lineHeight: 1.55, minHeight: 70 }}>
-                    {course.description}
-                  </p>
-
-                  <div
-                    style={{
-                      borderTop: `1px solid ${line}`,
-                      paddingTop: 14,
-                      display: "flex",
-                      justifyContent: "space-between",
-                      fontFamily: mono,
-                      fontSize: 11,
-                      color: muted,
-                    }}
-                  >
-                    <span>⚡ {course.xp_reward || 0} XP</span>
-                    <span>💰 {course.coin_reward || 0} coins</span>
-                  </div>
-
-                  <p style={{ color: accent, fontWeight: 900, marginBottom: 0 }}>
-                    Open Course →
-                  </p>
-                </div>
-              </article>
+        {/* Reward banner */}
+        <div style={{ background:"#0F172A", borderRadius:18, padding:"22px 26px", marginBottom:24, display:"flex", alignItems:"center", gap:20, flexWrap:"wrap" }}>
+          <div style={{ width:48, height:48, borderRadius:12, background:"#F97316"+"22", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, flexShrink:0 }}>⭐</div>
+          <div style={{ flex:1 }}>
+            <div style={{ fontFamily:"'Space Mono', monospace", fontSize:10, letterSpacing:"0.16em", textTransform:"uppercase", color:"#F97316", marginBottom:5 }}>How rewards work</div>
+            <h3 style={{ fontFamily:"Anton, sans-serif", fontWeight:400, fontSize:"clamp(16px,2.5vw,22px)", textTransform:"uppercase", color:"#F8F7F4", lineHeight:1, marginBottom:6 }}>Each module earns XP + coins</h3>
+            <p style={{ fontSize:13, color:"rgba(248,247,244,.5)", lineHeight:1.6 }}>Complete a full course to unlock a <span style={{ color:"#F97316", fontWeight:600 }}>certificate card</span> — collectible, shareable, validated by Playbook Series Inc.</p>
+          </div>
+          <div style={{ display:"flex", gap:8 }}>
+            {[{ icon:"⚡", label:"+50 XP", sub:"per module" },{ icon:"💰", label:"+10 coins", sub:"per module" },{ icon:"🎓", label:"Certificate", sub:"on completion" }].map(r => (
+              <div key={r.label} style={{ background:"rgba(255,255,255,.06)", border:"1px solid rgba(255,255,255,.09)", borderRadius:10, padding:"10px 12px", textAlign:"center" }}>
+                <div style={{ fontSize:18, marginBottom:4 }}>{r.icon}</div>
+                <div style={{ fontFamily:"'Space Mono', monospace", fontSize:10, fontWeight:700, color:"#F97316" }}>{r.label}</div>
+                <div style={{ fontFamily:"'Space Mono', monospace", fontSize:8, color:"rgba(255,255,255,.3)", marginTop:2 }}>{r.sub}</div>
+              </div>
             ))}
           </div>
+        </div>
 
-          <div style={{ marginTop: 24, display: "flex", justifyContent: "center" }}>
-            <button
-              onClick={() => setShowAllCourses(true)}
-              style={{
-                background: accent,
-                color: ink,
-                border: `1px solid ${accent}`,
-                borderRadius: 999,
-                padding: "14px 22px",
-                fontWeight: 900,
-                cursor: "pointer",
-              }}
-            >
-              Browse All Courses ↓
-            </button>
+        {/* In progress strip */}
+        {inProgress.length > 0 && (
+          <div style={{ marginBottom:22 }}>
+            <p style={{ fontFamily:"'Space Mono', monospace", fontSize:10, letterSpacing:"0.14em", textTransform:"uppercase", color:"#94A3B8", marginBottom:10 }}>Continue where you left off</p>
+            {inProgress.map(c => {
+              const done = progress[c.id] || 0;
+              const pct = Math.round((done / c.modules) * 100);
+              return (
+                <div key={c.id} onClick={() => router.push(`/courses/${c.id}`)}
+                  style={{ display:"flex", alignItems:"center", gap:14, background:"#fff", border:"1.5px solid #E2E8F0", borderRadius:14, padding:"14px 18px", cursor:"pointer", marginBottom:8, transition:"border-color 0.15s" }}>
+                  <div style={{ width:52, height:52, borderRadius:10, overflow:"hidden", flexShrink:0 }}>
+                    <img src={c.img} alt={c.title} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                  </div>
+                  <div style={{ flex:1 }}>
+                    <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:5 }}>
+                      <span style={{ fontSize:14, fontWeight:700, color:"#0F172A" }}>{c.title}</span>
+                      <span style={{ fontFamily:"'Space Mono', monospace", fontSize:9, fontWeight:700, letterSpacing:"0.06em", textTransform:"uppercase", background:c.color+"18", color:c.color, padding:"2px 7px", borderRadius:999 }}>{c.pillar}</span>
+                    </div>
+                    <div style={{ background:"#E2E8F0", borderRadius:999, height:5, overflow:"hidden", marginBottom:4 }}>
+                      <div style={{ background:c.color, height:"100%", width:`${pct}%`, borderRadius:999, transition:"width 0.4s ease" }} />
+                    </div>
+                    <div style={{ fontFamily:"'Space Mono', monospace", fontSize:10, color:"#94A3B8" }}>{done}/{c.modules} modules · {pct}% · +{done*50} XP earned</div>
+                  </div>
+                  <button onClick={e => { e.stopPropagation(); router.push(`/courses/${c.id}`); }}
+                    style={{ fontFamily:"'Space Mono', monospace", fontSize:10, fontWeight:700, letterSpacing:"0.05em", textTransform:"uppercase", background:"#F97316", color:"#fff", border:"none", borderRadius:999, padding:"9px 16px", cursor:"pointer", flexShrink:0 }}>
+                    Continue →
+                  </button>
+                </div>
+              );
+            })}
           </div>
-        </section>
+        )}
 
-        {showAllCourses && (
-          <section
+        {/* Flagship courses */}
+        <div style={{ marginBottom:20 }}>
+          <p
             style={{
-              background: surface,
-              border: `1px solid ${line}`,
-              borderRadius: 28,
-              padding: 24,
+              fontFamily:"'Space Mono', monospace",
+              fontSize:11,
+              letterSpacing:"0.18em",
+              textTransform:"uppercase",
+              color:"#F97316",
+              marginBottom:8,
+              fontWeight:700,
             }}
           >
-            <h2
-              style={{
-                fontFamily: anton,
-                textTransform: "uppercase",
-                fontSize: 38,
-                margin: "0 0 18px",
-                color: ink,
-              }}
-            >
-              All Courses
-            </h2>
+            Playbook Signature Curriculum
+          </p>
 
-            <div
-              style={{
-                display: "flex",
-                gap: 8,
-                marginBottom: 20,
-                flexWrap: "wrap",
-              }}
-            >
-              {FILTERS.map((item) => (
-                <button
-                  key={item}
-                  onClick={() => setFilter(item)}
-                  style={{
-                    fontFamily: mono,
-                    fontSize: 11,
-                    fontWeight: 700,
-                    letterSpacing: "0.06em",
-                    textTransform: "uppercase",
-                    background: filter === item ? accent : "transparent",
-                    color: filter === item ? ink : muted,
-                    border: `1px solid ${filter === item ? accent : line}`,
-                    borderRadius: 999,
-                    padding: "8px 16px",
-                    cursor: "pointer",
-                  }}
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
+          <h2
+            style={{
+              fontFamily:"Anton, sans-serif",
+              fontWeight:400,
+              fontSize:"clamp(28px,4vw,42px)",
+              textTransform:"uppercase",
+              color:"#0F172A",
+              lineHeight:0.95,
+              margin:0,
+            }}
+          >
+            Flagship Courses
+          </h2>
 
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-                gap: 16,
-              }}
-            >
-              {filteredOtherCourses.map((course) => (
-                <div
-                  key={course.slug}
-                  onClick={() =>
-                    course.is_available &&
-                    router.push(`/courses/${course.slug}`)
-                  }
-                  style={{
-                    background: surface,
-                    border: `1px solid ${line}`,
-                    borderRadius: 18,
-                    overflow: "hidden",
-                    cursor: course.is_available ? "pointer" : "default",
-                    opacity: course.is_available ? 1 : 0.5,
-                  }}
-                >
-                  <div
-                    style={{
-                      height: 130,
-                      background: soft,
-                      borderBottom: `1px solid ${line}`,
-                      position: "relative",
-                      overflow: "hidden",
-                    }}
-                  >
-                    {course.image_url ? (
-                      <img
-                        src={course.image_url}
-                        alt={course.title}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
-                      />
-                    ) : (
-                      <div
-                        style={{
-                          height: "100%",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          color: muted,
-                          fontWeight: 900,
-                        }}
-                      >
-                        Playbook Course
+          <p
+            style={{
+              color:"#64748B",
+              marginTop:8,
+              maxWidth:700,
+              lineHeight:1.6,
+            }}
+          >
+            The core Playbook experience designed for scholar-athletes,
+            future leaders, and college-bound students.
+          </p>
+        </div>
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(2,1fr)", gap:16, marginBottom:24 }}>
+          {FLAGSHIP.map(c => {
+            const done = progress[c.id] || 0;
+            const pct = Math.round((done / c.modules) * 100);
+            const isComplete = done === c.modules;
+            return (
+              <div key={c.id} className={c.comingSoon ? "" : "pb-card"}
+                onClick={() => !c.comingSoon && router.push(`/courses/${c.id}`)}
+                style={{ background:"#fff", border:`1.5px solid ${isComplete ? c.color+"44" : "#E2E8F0"}`, borderRadius:18, overflow:"hidden", transition:"all 0.2s", cursor:c.comingSoon?"default":"pointer", opacity:c.comingSoon?0.6:1 }}>
+                {/* Photo */}
+                <div style={{ position:"relative", height:160, overflow:"hidden" }}>
+                  <img src={c.img} alt={c.title} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                  <div style={{ position:"absolute", inset:0, background:"linear-gradient(180deg,transparent 40%,rgba(15,23,42,.75) 100%)" }} />
+                  <span style={{ position:"absolute", top:12, left:12, fontFamily:"'Space Mono', monospace", fontSize:9, fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", background:c.color, color:"#fff", padding:"4px 10px", borderRadius:999 }}>{c.pillar}</span>
+                  {c.comingSoon && <span style={{ position:"absolute", top:12, right:12, fontFamily:"'Space Mono', monospace", fontSize:9, fontWeight:700, background:"rgba(15,23,42,.8)", color:"#94A3B8", padding:"4px 10px", borderRadius:999 }}>Coming soon</span>}
+                  {isComplete && <span style={{ position:"absolute", top:12, right:12, fontFamily:"'Space Mono', monospace", fontSize:9, fontWeight:700, background:"#10B981", color:"#fff", padding:"4px 10px", borderRadius:999 }}>✓ Complete</span>}
+                  {!c.comingSoon && !isComplete && done > 0 && (
+                    <span style={{ position:"absolute", bottom:12, right:12, fontFamily:"'Space Mono', monospace", fontSize:9, fontWeight:700, background:"rgba(249,115,22,.9)", color:"#fff", padding:"3px 8px", borderRadius:999 }}>+50 XP/module</span>
+                  )}
+                </div>
+                {/* Body */}
+                <div style={{ padding:"16px 18px 18px" }}>
+                  <h3 style={{ fontFamily:"Anton, sans-serif", fontWeight:400, fontSize:22, textTransform:"uppercase", color:"#0F172A", marginBottom:6 }}>{c.title}</h3>
+                  <p style={{ fontSize:13, lineHeight:1.6, color:"#64748B", marginBottom:12 }}>{c.desc}</p>
+                  {done > 0 && (
+                    <div style={{ marginBottom:12 }}>
+                      <div style={{ background:"#E2E8F0", borderRadius:999, height:5, overflow:"hidden" }}>
+                        <div style={{ background:c.color, height:"100%", width:`${pct}%`, borderRadius:999 }} />
                       </div>
-                    )}
-
-                    <span
-                      style={{
-                        position: "absolute",
-                        top: 12,
-                        left: 12,
-                        fontFamily: mono,
-                        fontSize: 10,
-                        fontWeight: 700,
-                        textTransform: "uppercase",
-                        background: accent,
-                        color: ink,
-                        padding: "4px 10px",
-                        borderRadius: 999,
-                      }}
-                    >
-                      {course.pillar || "Course"}
-                    </span>
-                  </div>
-
-                  <div style={{ padding: 20 }}>
-                    <h3
-                      style={{
-                        fontFamily: anton,
-                        fontSize: 24,
-                        margin: "0 0 8px",
-                        textTransform: "uppercase",
-                        color: ink,
-                      }}
-                    >
-                      {course.title}
-                    </h3>
-
-                    <p style={{ color: muted, lineHeight: 1.5 }}>
-                      {course.description}
-                    </p>
-
-                    <div
-                      style={{
-                        borderTop: `1px solid ${line}`,
-                        marginTop: 16,
-                        paddingTop: 14,
-                        display: "flex",
-                        justifyContent: "space-between",
-                        color: muted,
-                        fontFamily: mono,
-                        fontSize: 11,
-                      }}
-                    >
-                      <span>⚡ {course.xp_reward || 0} XP</span>
-                      <span>💰 {course.coin_reward || 0} coins</span>
                     </div>
-
-                    <p
-                      style={{
-                        color: accent,
-                        fontWeight: 900,
-                        marginBottom: 0,
-                      }}
-                    >
-                      {course.is_available ? "Open Course →" : "Coming Soon"}
-                    </p>
+                  )}
+                  <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", borderTop:"1px solid #E2E8F0", paddingTop:12 }}>
+                    <div>
+                      <span style={{ fontFamily:"'Space Mono', monospace", fontSize:10, color:"#94A3B8" }}>{c.modules} modules</span>
+                      {!c.comingSoon && <span style={{ fontFamily:"'Space Mono', monospace", fontSize:10, color:"#F97316", marginLeft:10 }}>+{c.modules*50} XP total</span>}
+                    </div>
+                    {!c.comingSoon && (
+                      <span style={{ fontSize:13, fontWeight:700, color:"#F97316" }}>
+                        {done===0?"Start →":isComplete?"Review →":`${pct}% done →`}
+                      </span>
+                    )}
                   </div>
                 </div>
-              ))}
-            </div>
-          </section>
-        )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Bottom CTA */}
+        <div style={{ background:"#0F172A", borderRadius:18, padding:"24px 28px", display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:16 }}>
+          <div>
+            <div style={{ fontFamily:"'Space Mono', monospace", fontSize:10, letterSpacing:"0.16em", textTransform:"uppercase", color:"#F97316", marginBottom:8 }}>Complete the full library</div>
+            <h3 style={{ fontFamily:"Anton, sans-serif", fontWeight:400, fontSize:"clamp(18px,3vw,28px)", textTransform:"uppercase", color:"#F8F7F4", lineHeight:1 }}>Earn all 4 certificate cards</h3>
+          </div>
+          <div style={{ display:"flex", gap:10 }}>
+            <button onClick={() => router.push("/certificates")}
+              style={{ fontFamily:"'Space Mono', monospace", fontSize:11, fontWeight:700, letterSpacing:"0.05em", textTransform:"uppercase", background:"#F97316", color:"#fff", border:"none", borderRadius:999, padding:"12px 20px", cursor:"pointer" }}>
+              View certificates →
+            </button>
+            <button onClick={() => router.push("/transcript")}
+              style={{ fontFamily:"'Space Mono', monospace", fontSize:11, fontWeight:700, letterSpacing:"0.05em", textTransform:"uppercase", background:"transparent", color:"rgba(248,247,244,.55)", border:"1px solid rgba(255,255,255,.15)", borderRadius:999, padding:"12px 20px", cursor:"pointer" }}>
+              My transcript
+            </button>
+          </div>
+        </div>
       </div>
+    </div>
     </AppShell>
   );
 }

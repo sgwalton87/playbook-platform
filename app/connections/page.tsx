@@ -1,6 +1,5 @@
 "use client";
 
-import AppShell from "@/components/AppShell";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";

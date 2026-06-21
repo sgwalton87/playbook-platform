@@ -1,9 +1,9 @@
 "use client";
 
-import AppShell from "@/components/AppShell";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import ThemeToggle from "@/components/ThemeToggle";
 import ProfileAvatar from "@/components/ProfileAvatar";
 import { checkBadges } from "@/lib/badges";
 
@@ -14,6 +14,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
 
   const [avatarUrl, setAvatarUrl] = useState("");
   const [bio, setBio] = useState("");
@@ -42,18 +43,17 @@ export default function ProfilePage() {
   const [youtube, setYoutube] = useState("");
   const [highlightReelUrl, setHighlightReelUrl] = useState("");
 
-  const surface = "#ffffff";
-  const soft = "#fbf7f1";
-  const ink = "#100c0a";
-  const muted = "#6b5f55";
-  const line = "#ddd2c7";
-  const accent = "#ff6a2c";
+  useEffect(() => {
+    const loadTheme = () => {
+      const saved = localStorage.getItem("playbook-theme");
+      if (saved === "light" || saved === "dark") setTheme(saved);
+    };
 
-  const inputGrid = {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-    gap: 14,
-  };
+    loadTheme();
+    window.addEventListener("playbook-theme-change", loadTheme);
+
+    return () => window.removeEventListener("playbook-theme-change", loadTheme);
+  }, []);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -76,6 +76,7 @@ export default function ProfilePage() {
       }
 
       setProfile(profileData);
+
       setAvatarUrl(profileData.avatar_url || "");
       setBio(profileData.bio || "");
       setLocation(profileData.location || "");
@@ -235,20 +236,41 @@ export default function ProfilePage() {
     alert("Profile saved!");
   };
 
-  if (loading) {
-    return (
-      <AppShell title="Profile">
-        <p>Loading profile...</p>
-      </AppShell>
-    );
-  }
+  if (loading) return <div style={{ padding: 24 }}>Loading profile...</div>;
+
+  const dark = theme === "dark";
+  const bg = dark ? "#100c0a" : "#f6f0e7";
+  const surface = dark ? "#1a1512" : "#ffffff";
+  const ink = dark ? "#f6f0e7" : "#100c0a";
+  const muted = dark ? "#a89a8b" : "#6b5f55";
+  const line = dark ? "#332a22" : "#ddd2c7";
+  const accent = "#ff6a2c";
+
+  const inputGrid = {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+    gap: 14,
+  };
 
   return (
-    <AppShell title="Profile">
+    <main
+      style={{
+        minHeight: "100vh",
+        background: bg,
+        color: ink,
+        padding: 28,
+        fontFamily: "'Hanken Grotesk', system-ui, sans-serif",
+      }}
+    >
+      <ThemeToggle />
+
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap');
+        * { box-sizing: border-box; }
+
         input, textarea {
           width: 100%;
-          background: ${soft};
+          background: ${dark ? "#100c0a" : "#f6f0e7"};
           color: ${ink};
           border: 1px solid ${line};
           border-radius: 12px;
@@ -288,121 +310,153 @@ export default function ProfilePage() {
         }
       `}</style>
 
-      <div style={{ display: "grid", gap: 24 }}>
-        <section
+      <header style={{ marginBottom: 32 }}>
+        <p
           style={{
-            background: surface,
-            border: `1px solid ${line}`,
-            borderRadius: 24,
-            padding: 28,
+            color: accent,
+            fontFamily: "'Space Mono', monospace",
+            fontSize: 11,
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-            <ProfileAvatar
-              src={avatarUrl}
-              name={`${profile?.first_name || ""} ${profile?.last_name || ""}`}
-              size={96}
-            />
+          Scholar-Athlete Profile
+        </p>
 
-            <div>
-              <h2 style={{ margin: 0, fontSize: 32, color: ink }}>
-                {profile?.first_name} {profile?.last_name}
-              </h2>
+        <h1
+          style={{
+            fontFamily: "'Anton', sans-serif",
+            fontSize: 52,
+            margin: 0,
+            textTransform: "uppercase",
+          }}
+        >
+          Profile
+        </h1>
+      </header>
 
-              <p style={{ color: muted, margin: "8px 0 0" }}>
-                {school || "School not added"} · {sport || "Sport not added"}
-              </p>
-
-              <p style={{ color: muted, margin: "6px 0 0", fontSize: 13 }}>
-                XP: {profile?.xp ?? 0} · Level: {profile?.level ?? 1} · Coins:{" "}
-                {profile?.coin_balance ?? 0}
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <section style={{ background: surface, border: `1px solid ${line}`, borderRadius: 24, padding: 24 }}>
-          <h3>Profile Picture</h3>
-          <input
-            type="file"
-            accept="image/*"
-            disabled={uploading}
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) uploadAvatar(file);
-            }}
+      <section
+        style={{
+          background: surface,
+          border: `1px solid ${line}`,
+          borderRadius: 24,
+          padding: 28,
+          marginBottom: 24,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
+          <ProfileAvatar
+            src={avatarUrl}
+            name={`${profile?.first_name || ""} ${profile?.last_name || ""}`}
+            size={96}
           />
 
-          {uploading && <p style={{ color: muted }}>Uploading photo...</p>}
+          <div>
+            <h2 style={{ margin: 0, fontSize: 32 }}>
+              {profile?.first_name} {profile?.last_name}
+            </h2>
 
-          <label>Bio</label>
-          <textarea
-            placeholder="Tell the Playbook community about yourself..."
-            value={bio}
-            onChange={(e) => setBio(e.target.value)}
-          />
+            <p style={{ color: muted, margin: "8px 0 0" }}>
+              {school || "School not added"} · {sport || "Sport not added"}
+            </p>
 
-          <div style={inputGrid}>
-            <div>
-              <label>City</label>
-              <input value={location} onChange={(e) => setLocation(e.target.value)} />
-            </div>
-
-            <div>
-              <label>School</label>
-              <input value={school} onChange={(e) => setSchool(e.target.value)} />
-            </div>
-
-            <div>
-              <label>Sport</label>
-              <input value={sport} onChange={(e) => setSport(e.target.value)} />
-            </div>
+            <p style={{ color: muted, margin: "6px 0 0", fontSize: 13 }}>
+              XP: {profile?.xp ?? 0} · Level: {profile?.level ?? 1} · Coins:{" "}
+              {profile?.coin_balance ?? 0}
+            </p>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section style={{ background: surface, border: `1px solid ${line}`, borderRadius: 24, padding: 24 }}>
-          <h3>Athlete Profile</h3>
+      <section
+        style={{
+          background: surface,
+          border: `1px solid ${line}`,
+          borderRadius: 24,
+          padding: 24,
+          marginBottom: 24,
+        }}
+      >
+        <h3>Profile Picture</h3>
+        <input
+          type="file"
+          accept="image/*"
+          disabled={uploading}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) uploadAvatar(file);
+          }}
+        />
 
-          <div style={inputGrid}>
-            <div><label>Position</label><input value={position} onChange={(e) => setPosition(e.target.value)} /></div>
-            <div><label>Height</label><input value={height} onChange={(e) => setHeight(e.target.value)} /></div>
-            <div><label>Weight</label><input value={weight} onChange={(e) => setWeight(e.target.value)} /></div>
-            <div><label>Dominant Hand</label><input value={dominantHand} onChange={(e) => setDominantHand(e.target.value)} /></div>
-            <div><label>Jersey Number</label><input value={jerseyNumber} onChange={(e) => setJerseyNumber(e.target.value)} /></div>
-            <div><label>Travel Team</label><input value={travelTeam} onChange={(e) => setTravelTeam(e.target.value)} /></div>
-            <div><label>Club Team</label><input value={clubTeam} onChange={(e) => setClubTeam(e.target.value)} /></div>
-            <div><label>Coach Name</label><input value={coachName} onChange={(e) => setCoachName(e.target.value)} /></div>
-            <div><label>Coach Email</label><input value={coachEmail} onChange={(e) => setCoachEmail(e.target.value)} /></div>
-          </div>
-        </section>
+        {uploading && <p style={{ color: muted }}>Uploading photo...</p>}
 
-        <section style={{ background: surface, border: `1px solid ${line}`, borderRadius: 24, padding: 24 }}>
-          <h3>Academic Profile</h3>
+        <label>Bio</label>
+        <textarea
+          placeholder="Tell the Playbook community about yourself..."
+          value={bio}
+          onChange={(e) => setBio(e.target.value)}
+        />
 
-          <div style={inputGrid}>
-            <div><label>SAT Score</label><input value={satScore} onChange={(e) => setSatScore(e.target.value)} /></div>
-            <div><label>ACT Score</label><input value={actScore} onChange={(e) => setActScore(e.target.value)} /></div>
-            <div><label>Intended Major</label><input value={intendedMajor} onChange={(e) => setIntendedMajor(e.target.value)} /></div>
-            <div><label>Dream School</label><input value={dreamSchool} onChange={(e) => setDreamSchool(e.target.value)} /></div>
-          </div>
-        </section>
-
-        <section style={{ background: surface, border: `1px solid ${line}`, borderRadius: 24, padding: 24 }}>
-          <h3>Social + Recruiting Links</h3>
-
-          <div style={inputGrid}>
-            <div><label>Instagram</label><input value={instagram} onChange={(e) => setInstagram(e.target.value)} /></div>
-            <div><label>TikTok</label><input value={tiktok} onChange={(e) => setTiktok(e.target.value)} /></div>
-            <div><label>Hudl</label><input value={hudl} onChange={(e) => setHudl(e.target.value)} /></div>
-            <div><label>YouTube</label><input value={youtube} onChange={(e) => setYoutube(e.target.value)} /></div>
-            <div><label>Highlight Reel URL</label><input value={highlightReelUrl} onChange={(e) => setHighlightReelUrl(e.target.value)} /></div>
+        <div style={inputGrid}>
+          <div>
+            <label>City</label>
+            <input value={location} onChange={(e) => setLocation(e.target.value)} />
           </div>
 
-          <button onClick={saveProfile} disabled={saving || uploading}>
-            {saving ? "Saving..." : "Save Profile"}
-          </button>
-        </section>
-      </div>
-    </AppShell>
+          <div>
+            <label>School</label>
+            <input value={school} onChange={(e) => setSchool(e.target.value)} />
+          </div>
+
+          <div>
+            <label>Sport</label>
+            <input value={sport} onChange={(e) => setSport(e.target.value)} />
+          </div>
+        </div>
+      </section>
+
+      <section style={{ background: surface, border: `1px solid ${line}`, borderRadius: 24, padding: 24, marginBottom: 24 }}>
+        <h3>Athlete Profile</h3>
+
+        <div style={inputGrid}>
+          <div><label>Position</label><input value={position} onChange={(e) => setPosition(e.target.value)} /></div>
+          <div><label>Height</label><input value={height} onChange={(e) => setHeight(e.target.value)} /></div>
+          <div><label>Weight</label><input value={weight} onChange={(e) => setWeight(e.target.value)} /></div>
+          <div><label>Dominant Hand</label><input value={dominantHand} onChange={(e) => setDominantHand(e.target.value)} /></div>
+          <div><label>Jersey Number</label><input value={jerseyNumber} onChange={(e) => setJerseyNumber(e.target.value)} /></div>
+          <div><label>Travel Team</label><input value={travelTeam} onChange={(e) => setTravelTeam(e.target.value)} /></div>
+          <div><label>Club Team</label><input value={clubTeam} onChange={(e) => setClubTeam(e.target.value)} /></div>
+          <div><label>Coach Name</label><input value={coachName} onChange={(e) => setCoachName(e.target.value)} /></div>
+          <div><label>Coach Email</label><input value={coachEmail} onChange={(e) => setCoachEmail(e.target.value)} /></div>
+        </div>
+      </section>
+
+      <section style={{ background: surface, border: `1px solid ${line}`, borderRadius: 24, padding: 24, marginBottom: 24 }}>
+        <h3>Academic Profile</h3>
+
+        <div style={inputGrid}>
+          <div><label>SAT Score</label><input value={satScore} onChange={(e) => setSatScore(e.target.value)} /></div>
+          <div><label>ACT Score</label><input value={actScore} onChange={(e) => setActScore(e.target.value)} /></div>
+          <div><label>Intended Major</label><input value={intendedMajor} onChange={(e) => setIntendedMajor(e.target.value)} /></div>
+          <div><label>Dream School</label><input value={dreamSchool} onChange={(e) => setDreamSchool(e.target.value)} /></div>
+        </div>
+      </section>
+
+      <section style={{ background: surface, border: `1px solid ${line}`, borderRadius: 24, padding: 24 }}>
+        <h3>Social + Recruiting Links</h3>
+
+        <div style={inputGrid}>
+          <div><label>Instagram</label><input value={instagram} onChange={(e) => setInstagram(e.target.value)} /></div>
+          <div><label>TikTok</label><input value={tiktok} onChange={(e) => setTiktok(e.target.value)} /></div>
+          <div><label>Hudl</label><input value={hudl} onChange={(e) => setHudl(e.target.value)} /></div>
+          <div><label>YouTube</label><input value={youtube} onChange={(e) => setYoutube(e.target.value)} /></div>
+          <div><label>Highlight Reel URL</label><input value={highlightReelUrl} onChange={(e) => setHighlightReelUrl(e.target.value)} /></div>
+        </div>
+
+        <button onClick={saveProfile} disabled={saving || uploading}>
+          {saving ? "Saving..." : "Save Profile"}
+        </button>
+      </section>
+    </main>
   );
 }

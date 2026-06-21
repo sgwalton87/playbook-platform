@@ -1,5 +1,9 @@
 import AppShell from "@/components/AppShell";
 
-export default function EventsLayout({ children }: { children: React.ReactNode }) {
-  return <AppShell title="Events">{children}</AppShell>;
+export default function SectionLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return <AppShell>{children}</AppShell>;
 }
