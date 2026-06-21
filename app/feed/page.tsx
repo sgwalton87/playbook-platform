@@ -1,492 +1,242 @@
 "use client";
-
-import AppShell from "@/components/AppShell";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
-type Post = {
-  id: string;
-  author: string;
-  initials: string;
-  avatarColor: string;
-  role: string;
-  time: string;
-  content: string;
-  pillar: string;
-  pillarColor: string;
-  likes: number;
-  comments: number;
-  liked: boolean;
-};
-
-const SAMPLE_POSTS: Post[] = [
-  {
-    id: "1",
-    author: "Coach J. Reed",
-    initials: "JR",
-    avatarColor: "#ff6a2c",
-    role: "Founder & ED",
-    time: "1 hour ago",
-    content:
-      "Leadership isn't about being in charge. It's about taking care of those in your charge. Every captain on and off the court knows this. What does leadership mean to you today?",
-    pillar: "Leadership",
-    pillarColor: "#ff6a2c",
-    likes: 24,
-    comments: 6,
-    liked: false,
-  },
-  {
-    id: "2",
-    author: "Stephisha W.",
-    initials: "SW",
-    avatarColor: "#1D9E75",
-    role: "Scholar-Athlete",
-    time: "3 hours ago",
-    content:
-      "Just completed Module 3 of Captain's Mindset. The section on accountability hit different. If you haven't started it yet — run it.",
-    pillar: "Leadership",
-    pillarColor: "#ff6a2c",
-    likes: 18,
-    comments: 4,
-    liked: true,
-  },
-  {
-    id: "3",
-    author: "M. Alvarez",
-    initials: "MA",
-    avatarColor: "#378ADD",
-    role: "Head of Curriculum",
-    time: "Yesterday",
-    content:
-      "New financial literacy module dropping next week: Credit & Debt 101. We built it specifically for athletes thinking about NIL deals. Stay ready.",
-    pillar: "Finance",
-    pillarColor: "#1D9E75",
-    likes: 41,
-    comments: 12,
-    liked: false,
-  },
+const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",blue:"#3B82F6",green:"#10B981",purple:"#8B5CF6",mono:"'Space Mono', monospace",sans:"'Hanken Grotesk', system-ui, sans-serif",anton:"'Anton', sans-serif"};
+const SAMPLE_POSTS=[
+{id:"1",author:"Coach J. Reed",initials:"JR",color:T.orange,img:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&q=80",role:"Founder & ED",time:"1 hour ago",content:"Leadership isn't about being in charge. It's about taking care of those in your charge.",pillar:"Leadership",pillarColor:T.orange,coverImg:"https://images.unsplash.com/photo-1546519638405-a4c8b5bd3c5e?w=800&q=80",likes:24,comments:6,liked:false},
+{id:"2",author:"Stephisha W.",initials:"SW",color:T.orange,img:null,role:"Scholar-Athlete",time:"3 hours ago",content:"Just completed Module 3 of Captain's Mindset. The accountability section hit different. Run it.",pillar:"Leadership",pillarColor:T.orange,coverImg:null,likes:18,comments:4,liked:true},
+{id:"3",author:"M. Alvarez",initials:"MA",color:T.blue,img:"https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&q=80",role:"Head of Curriculum",time:"Yesterday",content:"New financial literacy module dropping next week: Credit and Debt 101. Built specifically for athletes thinking about NIL deals.",pillar:"Finance",pillarColor:T.blue,coverImg:"https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=80",likes:41,comments:12,liked:false},
+{id:"4",author:"T. Okafor",initials:"TO",color:T.green,img:"https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&q=80",role:"Community Lead",time:"2 days ago",content:"Shoutout to the 12 scholars who showed up to the civic engagement workshop. Y'all are what this platform is built for.",pillar:"Civic",pillarColor:T.green,coverImg:"https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80",likes:33,comments:8,liked:false},
 ];
-
-const surface = "#1a1512";
-const surface2 = "#241c16";
-const ink = "#f6f0e7";
-const muted = "#a89a8b";
-const faint = "#6f6151";
-const line = "#332a22";
-const accent = "#ff6a2c";
-const onaccent = "#170a04";
-const mono = "'Space Mono', monospace";
-const anton = "'Anton', sans-serif";
+const INIT_GALLERY=["https://images.unsplash.com/photo-1546519638405-a4c8b5bd3c5e?w=400&q=80","https://images.unsplash.com/photo-1526232761682-d26e03ac148e?w=400&q=80","https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&q=80","https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&q=80","https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&q=80","https://images.unsplash.com/photo-1519861531473-9200262188bf?w=400&q=80"];
+const FILTERS=["All","Leadership","Finance","Civic","SEL"];
+const LEADERS=[{name:"Jordan M.",initials:"JM",color:T.green,img:"https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&q=80",xp:890,rank:1},{name:"Aisha T.",initials:"AT",color:T.blue,img:"https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&q=80",xp:760,rank:2},{name:"Marcus D.",initials:"MD",color:T.purple,img:null,xp:640,rank:3},{name:"You",initials:"SW",color:T.orange,img:null,xp:340,rank:4}];
 
 export default function FeedPage() {
-  const router = useRouter();
+  const router=useRouter();
+  const postFileRef=useRef<HTMLInputElement>(null);
+  const galleryFileRef=useRef<HTMLInputElement>(null);
+  const [posts,setPosts]=useState(SAMPLE_POSTS as any[]);
+  const [filter,setFilter]=useState("All");
+  const [newPost,setNewPost]=useState("");
+  const [userName,setUserName]=useState("Scholar");
+  const [userInitials,setUserInitials]=useState("S");
+  const [tab,setTab]=useState<"feed"|"gallery">("feed");
+  const [pendingPhoto,setPendingPhoto]=useState<string|null>(null);
+  const [gallery,setGallery]=useState<string[]>(INIT_GALLERY);
+  const [lightbox,setLightbox]=useState<string|null>(null);
+  const [authed,setAuthed]=useState(false);
 
-  const [posts, setPosts] = useState<Post[]>(SAMPLE_POSTS);
-  const [filter, setFilter] = useState("All");
-  const [newPost, setNewPost] = useState("");
-  const [authed, setAuthed] = useState(false);
-  const [userName, setUserName] = useState("Scholar");
-
-  const FILTERS = ["All", "Leadership", "Finance", "Civic", "SEL"];
-
-  useEffect(() => {
-    supabase.auth.getUser().then(async ({ data }) => {
-      if (!data.user) {
-        router.replace("/login");
-        return;
-      }
-
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("first_name")
-        .eq("id", data.user.id)
-        .single();
-
-      if (profile?.first_name) setUserName(profile.first_name);
-
+  useEffect(()=>{
+    supabase.auth.getUser().then(async({data})=>{
+      if(!data.user){router.replace("/login");return;}
+      const{data:p}=await supabase.from("profiles").select("first_name,full_name").eq("id",data.user.id).single();
+      const name=p?.full_name||p?.first_name||"Scholar";
+      setUserName(p?.first_name||"Scholar");
+      setUserInitials(name.split(" ").map((n:string)=>n[0]).join("").toUpperCase().slice(0,2));
       setAuthed(true);
     });
-  }, [router]);
+  },[]);
 
-  const toggleLike = (id: string) => {
-    setPosts((p) =>
-      p.map((post) =>
-        post.id === id
-          ? {
-              ...post,
-              liked: !post.liked,
-              likes: post.liked ? post.likes - 1 : post.likes + 1,
-            }
-          : post
-      )
-    );
+  const handlePostFileSelect=(e:React.ChangeEvent<HTMLInputElement>)=>{
+    const f=e.target.files?.[0];
+    if(!f)return;
+    const url=URL.createObjectURL(f);
+    setPendingPhoto(url);
   };
 
-  const handlePost = () => {
-    if (!newPost.trim()) return;
-
-    const post: Post = {
-      id: Date.now().toString(),
-      author: userName,
-      initials: userName.slice(0, 2).toUpperCase(),
-      avatarColor: accent,
-      role: "Scholar-Athlete",
-      time: "Just now",
-      content: newPost,
-      pillar: "SEL",
-      pillarColor: "#D4537E",
-      likes: 0,
-      comments: 0,
-      liked: false,
-    };
-
-    setPosts([post, ...posts]);
+  const handlePost=()=>{
+    if(!newPost.trim()&&!pendingPhoto)return;
+    const p:any={id:Date.now().toString(),author:userName,initials:userInitials,color:T.orange,img:null,role:"Scholar-Athlete",time:"Just now",content:newPost,pillar:"SEL",pillarColor:T.purple,coverImg:pendingPhoto||null,likes:0,comments:0,liked:false};
+    setPosts(prev=>[p,...prev]);
+    if(pendingPhoto)setGallery(prev=>[pendingPhoto,...prev]);
     setNewPost("");
+    setPendingPhoto(null);
+    if(postFileRef.current)postFileRef.current.value="";
   };
 
-  const filtered =
-    filter === "All" ? posts : posts.filter((p) => p.pillar === filter);
+  const handleGalleryUpload=(e:React.ChangeEvent<HTMLInputElement>)=>{
+    const f=e.target.files?.[0];
+    if(!f)return;
+    const url=URL.createObjectURL(f);
+    setGallery(prev=>[url,...prev]);
+    if(galleryFileRef.current)galleryFileRef.current.value="";
+  };
 
-  if (!authed) {
-    return <div style={{ padding: 24 }}>Loading feed...</div>;
-  }
+  const toggleLike=(id:string)=>setPosts(p=>p.map(post=>post.id===id?{...post,liked:!post.liked,likes:post.liked?post.likes-1:post.likes+1}:post));
+  const filtered=filter==="All"?posts:posts.filter(p=>p.pillar===filter);
 
-  return (
-    <AppShell title="Feed">
+  if(!authed)return<div style={{minHeight:"100vh",background:T.cream,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:T.mono,fontSize:12,color:T.faint}}>Loading...</div>;
+
+  return(
+    <div style={{minHeight:"100vh",background:T.cream,fontFamily:T.sans,color:T.ink}}>
       <style>{`
-        textarea { resize: none; }
-        textarea::placeholder { color: ${faint}; }
+        @import url('https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+        ::selection{background:${T.orange};color:#fff;}
+        .pb-post:hover{border-color:${T.orange}!important;}
+        .pb-like:hover{color:${T.orange}!important;}
+        .pb-gal:hover{opacity:.8!important;transform:scale(1.03);}
+        .pb-upload:hover{border-color:${T.orange}!important;background:${T.orangeL}!important;}
+        textarea{resize:none;}textarea::placeholder{color:${T.faint};}textarea:focus{border-color:${T.orange}!important;outline:none;}
       `}</style>
 
-      <main
-        style={{
-          maxWidth: 1100,
-          display: "grid",
-          gridTemplateColumns: "1fr 300px",
-          gap: 24,
-        }}
-      >
-        <div>
-          <div style={{ marginBottom: 24 }}>
-            <p
-              style={{
-                fontFamily: mono,
-                fontSize: 11,
-                letterSpacing: "0.16em",
-                textTransform: "uppercase",
-                color: accent,
-                marginBottom: 8,
-              }}
-            >
-              The network
-            </p>
+      {lightbox&&(
+        <div onClick={()=>setLightbox(null)} style={{position:"fixed",inset:0,zIndex:9999,background:"rgba(0,0,0,.93)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>
+          <img src={lightbox} alt="" referrerPolicy="no-referrer" style={{maxWidth:"90vw",maxHeight:"90vh",objectFit:"contain",borderRadius:12}}/>
+          <button onClick={()=>setLightbox(null)} style={{position:"absolute",top:20,right:24,background:"rgba(255,255,255,.15)",border:"none",color:"#fff",fontSize:20,cursor:"pointer",borderRadius:"50%",width:40,height:40}}>✕</button>
+        </div>
+      )}
 
-            <h1
-              style={{
-                fontFamily: anton,
-                fontWeight: 400,
-                fontSize: "clamp(32px,4vw,48px)",
-                lineHeight: 0.95,
-                textTransform: "uppercase",
-                color: ink,
-                marginBottom: 20,
-              }}
-            >
-              Activity feed
-            </h1>
+      <div style={{padding:"32px 36px",maxWidth:1080}}>
+        <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.2em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>The network</p>
+        <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:"clamp(32px,4vw,48px)",textTransform:"uppercase",color:T.ink,lineHeight:.95,marginBottom:20}}>Activity Feed</h1>
 
-            <div
-              style={{
-                background: surface,
-                border: `1px solid ${line}`,
-                borderRadius: 16,
-                padding: "16px 18px",
-                marginBottom: 20,
-              }}
-            >
-              <div style={{ display: "flex", gap: 12 }}>
-                <div
-                  style={{
-                    width: 38,
-                    height: 38,
-                    borderRadius: "50%",
-                    background: accent,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontFamily: anton,
-                    fontSize: 14,
-                    color: onaccent,
-                    flexShrink: 0,
-                  }}
-                >
-                  {userName.slice(0, 2).toUpperCase()}
+        <div style={{display:"flex",gap:8,marginBottom:20}}>
+          {(["feed","gallery"]as const).map(t=>(
+            <button key={t} onClick={()=>setTab(t)} style={{fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:tab===t?T.navy:"transparent",color:tab===t?"#F8F7F4":T.muted,border:`1.5px solid ${tab===t?T.navy:T.line}`,borderRadius:999,padding:"9px 20px",cursor:"pointer",transition:"all 0.15s"}}>
+              {t==="feed"?"📣 Feed":`📸 Gallery (${gallery.length})`}
+            </button>
+          ))}
+        </div>
+
+        {tab==="feed"&&(
+          <div style={{display:"grid",gridTemplateColumns:"1fr 280px",gap:20}}>
+            <div>
+              <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:18,padding:"18px 20px",marginBottom:16}}>
+                <div style={{display:"flex",gap:12,alignItems:"flex-start",marginBottom:12}}>
+                  <div style={{width:40,height:40,borderRadius:"50%",background:T.orange,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:T.anton,fontSize:15,color:"#fff",flexShrink:0}}>{userInitials}</div>
+                  <textarea value={newPost} onChange={e=>setNewPost(e.target.value)} placeholder="Share something with the network..." rows={3} style={{flex:1,background:T.surface2,border:`1.5px solid ${T.line}`,borderRadius:12,padding:"10px 14px",fontSize:14,color:T.ink,fontFamily:T.sans,transition:"border-color 0.15s",width:"100%"}}/>
                 </div>
-
-                <div style={{ flex: 1 }}>
-                  <textarea
-                    value={newPost}
-                    onChange={(e) => setNewPost(e.target.value)}
-                    placeholder="Share something with the network..."
-                    rows={3}
-                    style={{
-                      width: "100%",
-                      background: surface2,
-                      border: `1px solid ${line}`,
-                      borderRadius: 10,
-                      padding: "10px 14px",
-                      fontSize: 14,
-                      color: ink,
-                      fontFamily: "inherit",
-                      outline: "none",
-                      marginBottom: 10,
-                    }}
-                  />
-
-                  <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                    <button
-                      onClick={handlePost}
-                      style={{
-                        fontFamily: mono,
-                        fontSize: 11,
-                        fontWeight: 700,
-                        letterSpacing: "0.05em",
-                        textTransform: "uppercase",
-                        background: newPost.trim() ? accent : line,
-                        color: newPost.trim() ? onaccent : faint,
-                        border: "none",
-                        borderRadius: 999,
-                        padding: "10px 20px",
-                        cursor: newPost.trim() ? "pointer" : "default",
-                      }}
-                    >
-                      Post to feed
-                    </button>
+                {pendingPhoto&&(
+                  <div style={{position:"relative",marginBottom:12,borderRadius:12,overflow:"hidden",maxHeight:220}}>
+                    <img src={pendingPhoto} alt="Preview" style={{width:"100%",objectFit:"cover",display:"block",maxHeight:220}}/>
+                    <button onClick={()=>{setPendingPhoto(null);if(postFileRef.current)postFileRef.current.value="";}} style={{position:"absolute",top:8,right:8,background:"rgba(0,0,0,.6)",border:"none",color:"#fff",borderRadius:"50%",width:28,height:28,cursor:"pointer",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
                   </div>
+                )}
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                  <label className="pb-upload" style={{display:"flex",alignItems:"center",gap:8,fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",color:pendingPhoto?T.orange:T.muted,background:pendingPhoto?T.orangeL:T.surface2,border:`1.5px solid ${pendingPhoto?T.orange:T.line}`,borderRadius:999,padding:"9px 16px",cursor:"pointer",transition:"all 0.15s"}}>
+                    📷 {pendingPhoto?"Photo attached":"Add photo"}
+                    <input ref={postFileRef} type="file" accept="image/*" onChange={handlePostFileSelect} style={{display:"none"}}/>
+                  </label>
+                  <button onClick={handlePost} disabled={!newPost.trim()&&!pendingPhoto} style={{fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",background:(newPost.trim()||pendingPhoto)?T.orange:T.line,color:(newPost.trim()||pendingPhoto)?"#fff":T.faint,border:"none",borderRadius:999,padding:"10px 22px",cursor:(newPost.trim()||pendingPhoto)?"pointer":"default",transition:"all 0.15s"}}>Post →</button>
                 </div>
+              </div>
+
+              <div style={{display:"flex",gap:6,marginBottom:16,flexWrap:"wrap"}}>
+                {FILTERS.map(f=>(
+                  <button key={f} onClick={()=>setFilter(f)} style={{fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:filter===f?T.navy:"transparent",color:filter===f?"#F8F7F4":T.muted,border:`1.5px solid ${filter===f?T.navy:T.line}`,borderRadius:999,padding:"7px 14px",cursor:"pointer",transition:"all 0.15s"}}>{f}</button>
+                ))}
+              </div>
+
+              <div style={{display:"flex",flexDirection:"column",gap:12}}>
+                {filtered.map(post=>(
+                  <div key={post.id} className="pb-post" style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:18,overflow:"hidden",transition:"border-color 0.15s"}}>
+                    {post.coverImg&&(
+                      <div style={{position:"relative",maxHeight:280,overflow:"hidden",cursor:"pointer"}} onClick={()=>setLightbox(post.coverImg)}>
+                        <img src={post.coverImg} alt="" referrerPolicy="no-referrer" style={{width:"100%",objectFit:"cover",display:"block",maxHeight:280}}/>
+                        <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,transparent 50%,rgba(15,23,42,.6) 100%)"}}/>
+                        <span style={{position:"absolute",bottom:12,left:14,fontFamily:T.mono,fontSize:9,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",background:post.pillarColor,color:"#fff",padding:"3px 9px",borderRadius:999}}>{post.pillar}</span>
+                      </div>
+                    )}
+                    <div style={{padding:"16px 18px"}}>
+                      <div style={{display:"flex",gap:10,alignItems:"flex-start",marginBottom:10}}>
+                        <div style={{width:40,height:40,borderRadius:"50%",background:post.color,overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:T.anton,fontSize:15,color:"#fff"}}>
+                          {post.img?<img src={post.img} alt={post.author} referrerPolicy="no-referrer" style={{width:"100%",height:"100%",objectFit:"cover"}}/>:post.initials}
+                        </div>
+                        <div style={{flex:1}}>
+                          <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+                            <span style={{fontSize:14,fontWeight:700,color:T.ink}}>{post.author}</span>
+                            {!post.coverImg&&<span style={{fontFamily:T.mono,fontSize:9,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",background:post.pillarColor+"18",color:post.pillarColor,padding:"2px 7px",borderRadius:999}}>{post.pillar}</span>}
+                          </div>
+                          <div style={{fontFamily:T.mono,fontSize:10,color:T.faint,marginTop:2}}>{post.role} · {post.time}</div>
+                        </div>
+                      </div>
+                      {post.content&&<p style={{fontSize:15,lineHeight:1.65,color:T.ink,marginBottom:14}}>{post.content}</p>}
+                      <div style={{display:"flex",gap:16,borderTop:`1px solid ${T.line}`,paddingTop:12}}>
+                        <button onClick={()=>toggleLike(post.id)} className="pb-like" style={{display:"flex",alignItems:"center",gap:6,fontFamily:T.mono,fontSize:11,fontWeight:700,background:"transparent",border:"none",color:post.liked?T.orange:T.faint,cursor:"pointer",padding:0,transition:"color 0.15s"}}>{post.liked?"♥":"♡"} {post.likes}</button>
+                        <button style={{display:"flex",alignItems:"center",gap:6,fontFamily:T.mono,fontSize:11,fontWeight:700,background:"transparent",border:"none",color:T.faint,cursor:"pointer",padding:0}}>💬 {post.comments}</button>
+                        {post.coverImg&&<button onClick={()=>setLightbox(post.coverImg)} style={{display:"flex",alignItems:"center",gap:6,fontFamily:T.mono,fontSize:11,fontWeight:700,background:"transparent",border:"none",color:T.faint,cursor:"pointer",padding:0,marginLeft:"auto"}}>🔍 View</button>}
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
-            <div
-              style={{
-                display: "flex",
-                gap: 8,
-                marginBottom: 16,
-                flexWrap: "wrap",
-              }}
-            >
-              {FILTERS.map((f) => (
-                <button
-                  key={f}
-                  onClick={() => setFilter(f)}
-                  style={{
-                    fontFamily: mono,
-                    fontSize: 11,
-                    fontWeight: 700,
-                    letterSpacing: "0.06em",
-                    textTransform: "uppercase",
-                    background: filter === f ? accent : "transparent",
-                    color: filter === f ? onaccent : muted,
-                    border: `1px solid ${filter === f ? accent : line}`,
-                    borderRadius: 999,
-                    padding: "7px 14px",
-                    cursor: "pointer",
-                  }}
-                >
-                  {f}
-                </button>
+            <div style={{display:"flex",flexDirection:"column",gap:14}}>
+              <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:16,padding:"16px 18px"}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+                  <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.12em",textTransform:"uppercase",color:T.muted}}>Photo gallery</p>
+                  <button onClick={()=>setTab("gallery")} style={{fontFamily:T.mono,fontSize:9,fontWeight:700,color:T.orange,background:"none",border:"none",cursor:"pointer",letterSpacing:"0.06em",textTransform:"uppercase"}}>See all →</button>
+                </div>
+                <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:4,marginBottom:10}}>
+                  {gallery.slice(0,6).map((img,i)=>(
+                    <div key={i} onClick={()=>setLightbox(img)} style={{aspectRatio:"1",borderRadius:8,overflow:"hidden",cursor:"pointer"}}>
+                      <img src={img} alt="" referrerPolicy="no-referrer" className="pb-gal" style={{width:"100%",height:"100%",objectFit:"cover",display:"block",transition:"all 0.2s"}}/>
+                    </div>
+                  ))}
+                </div>
+                <label style={{display:"flex",alignItems:"center",justifyContent:"center",gap:6,fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",background:T.surface2,border:`1px solid ${T.line}`,borderRadius:10,padding:"9px",cursor:"pointer",transition:"all 0.15s",width:"100%"}}>
+                  📷 Add to gallery
+                  <input type="file" accept="image/*" onChange={handleGalleryUpload} style={{display:"none"}}/>
+                </label>
+              </div>
+
+              <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:16,padding:"16px 18px"}}>
+                <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.12em",textTransform:"uppercase",color:T.muted,marginBottom:14}}>Top scholars</p>
+                {LEADERS.map((l,i)=>(
+                  <div key={l.name} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 0",borderBottom:i<LEADERS.length-1?`1px solid ${T.line}`:"none"}}>
+                    <span style={{fontFamily:T.mono,fontSize:11,color:l.rank<=3?T.orange:T.faint,width:18,fontWeight:700}}>{l.rank<=3?["🥇","🥈","🥉"][l.rank-1]:`#${l.rank}`}</span>
+                    <div style={{width:30,height:30,borderRadius:"50%",background:l.color,overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:700,color:"#fff",flexShrink:0}}>
+                      {l.img?<img src={l.img} alt={l.name} referrerPolicy="no-referrer" style={{width:"100%",height:"100%",objectFit:"cover"}}/>:l.initials}
+                    </div>
+                    <div style={{flex:1}}>
+                      <div style={{fontSize:12,fontWeight:600,color:l.name==="You"?T.orange:T.ink}}>{l.name}</div>
+                      <div style={{fontFamily:T.mono,fontSize:10,color:T.faint}}>{l.xp} XP</div>
+                    </div>
+                  </div>
+                ))}
+                <button onClick={()=>router.push("/leaderboard")} style={{width:"100%",marginTop:12,fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",background:"transparent",border:`1px solid ${T.line}`,color:T.muted,borderRadius:10,padding:"9px",cursor:"pointer"}}>Full leaderboard →</button>
+              </div>
+
+              <div style={{background:T.navy,borderRadius:16,padding:"16px 18px"}}>
+                <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.12em",textTransform:"uppercase",color:T.orange,marginBottom:12}}>Quick links</p>
+                {[{l:"My dashboard",p:"/dashboard"},{l:"Course library",p:"/courses"},{l:"Mentorship",p:"/mentorship"},{l:"My profile",p:"/profile"}].map(({l,p})=>(
+                  <button key={l} onClick={()=>router.push(p)} style={{display:"block",width:"100%",textAlign:"left",fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.04em",textTransform:"uppercase",background:"transparent",border:"none",color:"rgba(248,247,244,.45)",cursor:"pointer",padding:"8px 0",borderBottom:"1px solid rgba(255,255,255,.07)"}}>{l} →</button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {tab==="gallery"&&(
+          <div>
+            <label className="pb-upload" style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:10,background:T.surface,border:`2px dashed ${T.line}`,borderRadius:18,padding:"36px 24px",marginBottom:24,cursor:"pointer",transition:"all 0.2s",textAlign:"center"}}>
+              <div style={{fontSize:40}}>📸</div>
+              <div style={{fontFamily:T.anton,fontSize:22,textTransform:"uppercase",color:T.ink}}>Add to your gallery</div>
+              <div style={{fontFamily:T.mono,fontSize:11,color:T.muted}}>Upload from your photo library · JPG, PNG, WEBP</div>
+              <div style={{fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:T.orange,color:"#fff",borderRadius:999,padding:"11px 24px",marginTop:4}}>Choose from library</div>
+              <input ref={galleryFileRef} type="file" accept="image/*" onChange={handleGalleryUpload} style={{display:"none"}}/>
+            </label>
+
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
+              <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.14em",textTransform:"uppercase",color:T.muted}}>{gallery.length} photos</p>
+              <button onClick={()=>setTab("feed")} style={{fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",background:"transparent",border:`1px solid ${T.line}`,color:T.muted,borderRadius:999,padding:"7px 14px",cursor:"pointer"}}>← Back to feed</button>
+            </div>
+
+            <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12}}>
+              {gallery.map((img,i)=>(
+                <div key={i} onClick={()=>setLightbox(img)} style={{aspectRatio:"1",borderRadius:14,overflow:"hidden",cursor:"pointer",background:T.line}}>
+                  <img src={img} alt={`Photo ${i+1}`} referrerPolicy="no-referrer" className="pb-gal" style={{width:"100%",height:"100%",objectFit:"cover",display:"block",transition:"all 0.2s"}}/>
+                </div>
               ))}
             </div>
           </div>
-
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            {filtered.map((post) => (
-              <div
-                key={post.id}
-                style={{
-                  background: surface,
-                  border: `1px solid ${line}`,
-                  borderRadius: 18,
-                  padding: "20px 22px",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    gap: 12,
-                    alignItems: "flex-start",
-                    marginBottom: 14,
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 42,
-                      height: 42,
-                      borderRadius: "50%",
-                      background: post.avatarColor,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontFamily: anton,
-                      fontSize: 16,
-                      color: onaccent,
-                      flexShrink: 0,
-                    }}
-                  >
-                    {post.initials}
-                  </div>
-
-                  <div style={{ flex: 1 }}>
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 10,
-                        flexWrap: "wrap",
-                      }}
-                    >
-                      <span style={{ fontSize: 14, fontWeight: 700 }}>
-                        {post.author}
-                      </span>
-
-                      <span
-                        style={{
-                          fontFamily: mono,
-                          fontSize: 9,
-                          fontWeight: 700,
-                          letterSpacing: "0.08em",
-                          textTransform: "uppercase",
-                          color: post.pillarColor,
-                          background: surface2,
-                          padding: "2px 7px",
-                          borderRadius: 999,
-                        }}
-                      >
-                        {post.pillar}
-                      </span>
-                    </div>
-
-                    <div
-                      style={{
-                        fontFamily: mono,
-                        fontSize: 10,
-                        color: faint,
-                        marginTop: 2,
-                      }}
-                    >
-                      {post.role} · {post.time}
-                    </div>
-                  </div>
-                </div>
-
-                <p
-                  style={{
-                    fontSize: 15,
-                    lineHeight: 1.65,
-                    color: ink,
-                    marginBottom: 16,
-                  }}
-                >
-                  {post.content}
-                </p>
-
-                <div
-                  style={{
-                    display: "flex",
-                    gap: 16,
-                    borderTop: `1px solid ${line}`,
-                    paddingTop: 14,
-                  }}
-                >
-                  <button
-                    onClick={() => toggleLike(post.id)}
-                    style={{
-                      background: "transparent",
-                      border: "none",
-                      color: post.liked ? accent : faint,
-                      cursor: "pointer",
-                      padding: 0,
-                      fontFamily: mono,
-                      fontWeight: 700,
-                    }}
-                  >
-                    {post.liked ? "♥" : "♡"} {post.likes}
-                  </button>
-
-                  <button
-                    style={{
-                      background: "transparent",
-                      border: "none",
-                      color: faint,
-                      cursor: "pointer",
-                      padding: 0,
-                      fontFamily: mono,
-                      fontWeight: 700,
-                    }}
-                  >
-                    💬 {post.comments}
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <aside style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div
-            style={{
-              background: surface,
-              border: `1px solid ${line}`,
-              borderRadius: 16,
-              padding: "18px 20px",
-            }}
-          >
-            <p
-              style={{
-                fontFamily: mono,
-                fontSize: 11,
-                letterSpacing: "0.12em",
-                textTransform: "uppercase",
-                color: muted,
-                marginBottom: 14,
-              }}
-            >
-              Quick links
-            </p>
-
-            {[
-              { label: "Dashboard", path: "/dashboard" },
-              { label: "Courses", path: "/courses" },
-              { label: "Mentorship", path: "/mentorship" },
-              { label: "Profile", path: "/profile" },
-            ].map(({ label, path }) => (
-              <button
-                key={label}
-                onClick={() => router.push(path)}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  textAlign: "left",
-                  fontFamily: mono,
-                  fontSize: 11,
-                  fontWeight: 700,
-                  letterSpacing: "0.04em",
-                  textTransform: "uppercase",
-                  background: "transparent",
-                  border: "none",
-                  color: muted,
-                  cursor: "pointer",
-                  padding: "9px 0",
-                  borderBottom: `1px solid ${line}`,
-                }}
-              >
-                {label} →
-              </button>
-            ))}
-          </div>
-        </aside>
-      </main>
-    </AppShell>
+        )}
+      </div>
+    </div>
   );
 }
