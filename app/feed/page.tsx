@@ -4,53 +4,106 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
 const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",blue:"#3B82F6",green:"#10B981",purple:"#8B5CF6",mono:"'Space Mono', monospace",sans:"'Hanken Grotesk', system-ui, sans-serif",anton:"'Anton', sans-serif"};
-const SAMPLE_POSTS=[
-{id:"1",author:"Coach J. Reed",initials:"JR",color:T.orange,img:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&q=80",role:"Founder & ED",time:"1 hour ago",content:"Leadership isn't about being in charge. It's about taking care of those in your charge.",pillar:"Leadership",pillarColor:T.orange,coverImg:"https://images.unsplash.com/photo-1546519638405-a4c8b5bd3c5e?w=800&q=80",likes:24,comments:6,liked:false},
-{id:"2",author:"Stephisha W.",initials:"SW",color:T.orange,img:null,role:"Scholar-Athlete",time:"3 hours ago",content:"Just completed Module 3 of Captain's Mindset. The accountability section hit different. Run it.",pillar:"Leadership",pillarColor:T.orange,coverImg:null,likes:18,comments:4,liked:true},
-{id:"3",author:"M. Alvarez",initials:"MA",color:T.blue,img:"https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&q=80",role:"Head of Curriculum",time:"Yesterday",content:"New financial literacy module dropping next week: Credit and Debt 101. Built specifically for athletes thinking about NIL deals.",pillar:"Finance",pillarColor:T.blue,coverImg:"https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=80",likes:41,comments:12,liked:false},
-{id:"4",author:"T. Okafor",initials:"TO",color:T.green,img:"https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&q=80",role:"Community Lead",time:"2 days ago",content:"Shoutout to the 12 scholars who showed up to the civic engagement workshop. Y'all are what this platform is built for.",pillar:"Civic",pillarColor:T.green,coverImg:"https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80",likes:33,comments:8,liked:false},
-];
-const INIT_GALLERY=["https://images.unsplash.com/photo-1546519638405-a4c8b5bd3c5e?w=400&q=80","https://images.unsplash.com/photo-1526232761682-d26e03ac148e?w=400&q=80","https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&q=80","https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&q=80","https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&q=80","https://images.unsplash.com/photo-1519861531473-9200262188bf?w=400&q=80"];
 const FILTERS=["All","Leadership","Finance","Civic","SEL"];
 const LEADERS=[{name:"Jordan M.",initials:"JM",color:T.green,img:"https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&q=80",xp:890,rank:1},{name:"Aisha T.",initials:"AT",color:T.blue,img:"https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&q=80",xp:760,rank:2},{name:"Marcus D.",initials:"MD",color:T.purple,img:null,xp:640,rank:3},{name:"You",initials:"SW",color:T.orange,img:null,xp:340,rank:4}];
+const INIT_GALLERY=["https://images.unsplash.com/photo-1546519638405-a4c8b5bd3c5e?w=400&q=80","https://images.unsplash.com/photo-1526232761682-d26e03ac148e?w=400&q=80","https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&q=80","https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&q=80"];
 
 export default function FeedPage() {
   const router=useRouter();
   const postFileRef=useRef<HTMLInputElement>(null);
   const galleryFileRef=useRef<HTMLInputElement>(null);
-  const [posts,setPosts]=useState(SAMPLE_POSTS as any[]);
+  const [posts,setPosts]=useState<any[]>([]);
   const [filter,setFilter]=useState("All");
   const [newPost,setNewPost]=useState("");
   const [userName,setUserName]=useState("Scholar");
   const [userInitials,setUserInitials]=useState("S");
+  const [userId,setUserId]=useState<string|null>(null);
   const [tab,setTab]=useState<"feed"|"gallery">("feed");
   const [pendingPhoto,setPendingPhoto]=useState<string|null>(null);
   const [gallery,setGallery]=useState<string[]>(INIT_GALLERY);
   const [lightbox,setLightbox]=useState<string|null>(null);
-  const [authed,setAuthed]=useState(false);
+  const [loading,setLoading]=useState(true);
 
   useEffect(()=>{
-    supabase.auth.getUser().then(async({data})=>{
-      if(!data.user){router.replace("/login");return;}
-      const{data:p}=await supabase.from("profiles").select("first_name,full_name").eq("id",data.user.id).single();
+    (async()=>{
+      const{data:u}=await supabase.auth.getUser();
+      if(!u.user){router.replace("/login");return;}
+      setUserId(u.user.id);
+      const{data:p}=await supabase.from("profiles").select("first_name,full_name").eq("id",u.user.id).single();
       const name=p?.full_name||p?.first_name||"Scholar";
       setUserName(p?.first_name||"Scholar");
       setUserInitials(name.split(" ").map((n:string)=>n[0]).join("").toUpperCase().slice(0,2));
-      setAuthed(true);
-    });
+
+      // Try loading from 'posts' table first, then 'feed_posts', then 'activities'
+      let loaded=false;
+      for(const table of ["posts","feed_posts","activities"]){
+        const{data,error}=await supabase.from(table).select("*").order("created_at",{ascending:false}).limit(50);
+        if(!error&&data&&data.length>0){
+          setPosts(data.map((post:any)=>({
+            id:post.id,
+            author:post.author_name||post.full_name||name,
+            initials:post.author_initials||(post.author_name||name).split(" ").map((n:string)=>n[0]).join("").toUpperCase().slice(0,2),
+            color:T.orange,
+            img:post.author_img||post.avatar_url||null,
+            role:post.author_role||post.role||"Scholar-Athlete",
+            time:new Date(post.created_at).toLocaleDateString(),
+            content:post.content||post.body||post.text||"",
+            pillar:post.pillar||post.category||"Leadership",
+            pillarColor:post.pillar==="Finance"?T.blue:post.pillar==="Civic"?T.green:post.pillar==="SEL"?T.purple:T.orange,
+            coverImg:post.image_url||post.cover_img||post.photo_url||null,
+            likes:post.likes||post.like_count||0,
+            comments:post.comments||post.comment_count||0,
+            liked:false,
+          })));
+          loaded=true;
+          break;
+        }
+      }
+      if(!loaded){
+        // No posts table found — show empty state
+        setPosts([]);
+      }
+      setLoading(false);
+    })();
   },[]);
 
   const handlePostFileSelect=(e:React.ChangeEvent<HTMLInputElement>)=>{
     const f=e.target.files?.[0];
     if(!f)return;
-    const url=URL.createObjectURL(f);
-    setPendingPhoto(url);
+    setPendingPhoto(URL.createObjectURL(f));
   };
 
-  const handlePost=()=>{
+  const handlePost=async()=>{
     if(!newPost.trim()&&!pendingPhoto)return;
-    const p:any={id:Date.now().toString(),author:userName,initials:userInitials,color:T.orange,img:null,role:"Scholar-Athlete",time:"Just now",content:newPost,pillar:"SEL",pillarColor:T.purple,coverImg:pendingPhoto||null,likes:0,comments:0,liked:false};
-    setPosts(prev=>[p,...prev]);
+    const newEntry:any={
+      id:Date.now().toString(),
+      author:userName,
+      initials:userInitials,
+      color:T.orange,
+      img:null,
+      role:"Scholar-Athlete",
+      time:"Just now",
+      content:newPost,
+      pillar:"Leadership",
+      pillarColor:T.orange,
+      coverImg:pendingPhoto||null,
+      likes:0,
+      comments:0,
+      liked:false,
+    };
+    // Try to save to Supabase posts table
+    if(userId){
+      await supabase.from("posts").insert({
+        user_id:userId,
+        author_name:userName,
+        content:newPost,
+        pillar:"Leadership",
+        image_url:null,
+        likes:0,
+        comments:0,
+      }).select();
+    }
+    setPosts(prev=>[newEntry,...prev]);
     if(pendingPhoto)setGallery(prev=>[pendingPhoto,...prev]);
     setNewPost("");
     setPendingPhoto(null);
@@ -60,15 +113,14 @@ export default function FeedPage() {
   const handleGalleryUpload=(e:React.ChangeEvent<HTMLInputElement>)=>{
     const f=e.target.files?.[0];
     if(!f)return;
-    const url=URL.createObjectURL(f);
-    setGallery(prev=>[url,...prev]);
+    setGallery(prev=>[URL.createObjectURL(f),...prev]);
     if(galleryFileRef.current)galleryFileRef.current.value="";
   };
 
   const toggleLike=(id:string)=>setPosts(p=>p.map(post=>post.id===id?{...post,liked:!post.liked,likes:post.liked?post.likes-1:post.likes+1}:post));
   const filtered=filter==="All"?posts:posts.filter(p=>p.pillar===filter);
 
-  if(!authed)return<div style={{minHeight:"100vh",background:T.cream,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:T.mono,fontSize:12,color:T.faint}}>Loading...</div>;
+  if(loading)return<div style={{minHeight:"100vh",background:T.cream,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:T.mono,fontSize:12,color:T.faint}}>Loading feed...</div>;
 
   return(
     <div style={{minHeight:"100vh",background:T.cream,fontFamily:T.sans,color:T.ink}}>
@@ -131,39 +183,47 @@ export default function FeedPage() {
                 ))}
               </div>
 
-              <div style={{display:"flex",flexDirection:"column",gap:12}}>
-                {filtered.map(post=>(
-                  <div key={post.id} className="pb-post" style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:18,overflow:"hidden",transition:"border-color 0.15s"}}>
-                    {post.coverImg&&(
-                      <div style={{position:"relative",maxHeight:280,overflow:"hidden",cursor:"pointer"}} onClick={()=>setLightbox(post.coverImg)}>
-                        <img src={post.coverImg} alt="" referrerPolicy="no-referrer" style={{width:"100%",objectFit:"cover",display:"block",maxHeight:280}}/>
-                        <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,transparent 50%,rgba(15,23,42,.6) 100%)"}}/>
-                        <span style={{position:"absolute",bottom:12,left:14,fontFamily:T.mono,fontSize:9,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",background:post.pillarColor,color:"#fff",padding:"3px 9px",borderRadius:999}}>{post.pillar}</span>
-                      </div>
-                    )}
-                    <div style={{padding:"16px 18px"}}>
-                      <div style={{display:"flex",gap:10,alignItems:"flex-start",marginBottom:10}}>
-                        <div style={{width:40,height:40,borderRadius:"50%",background:post.color,overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:T.anton,fontSize:15,color:"#fff"}}>
-                          {post.img?<img src={post.img} alt={post.author} referrerPolicy="no-referrer" style={{width:"100%",height:"100%",objectFit:"cover"}}/>:post.initials}
+              {filtered.length===0?(
+                <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:16,padding:"48px 24px",textAlign:"center"}}>
+                  <div style={{fontSize:36,marginBottom:14}}>📣</div>
+                  <h3 style={{fontFamily:T.anton,fontSize:20,textTransform:"uppercase",color:T.ink,marginBottom:8}}>Nothing here yet</h3>
+                  <p style={{fontFamily:T.mono,fontSize:11,color:T.faint}}>Be the first to post something to the network.</p>
+                </div>
+              ):(
+                <div style={{display:"flex",flexDirection:"column",gap:12}}>
+                  {filtered.map(post=>(
+                    <div key={post.id} className="pb-post" style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:18,overflow:"hidden",transition:"border-color 0.15s"}}>
+                      {post.coverImg&&(
+                        <div style={{position:"relative",maxHeight:280,overflow:"hidden",cursor:"pointer"}} onClick={()=>setLightbox(post.coverImg)}>
+                          <img src={post.coverImg} alt="" referrerPolicy="no-referrer" style={{width:"100%",objectFit:"cover",display:"block",maxHeight:280}}/>
+                          <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,transparent 50%,rgba(15,23,42,.6) 100%)"}}/>
+                          <span style={{position:"absolute",bottom:12,left:14,fontFamily:T.mono,fontSize:9,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",background:post.pillarColor,color:"#fff",padding:"3px 9px",borderRadius:999}}>{post.pillar}</span>
                         </div>
-                        <div style={{flex:1}}>
-                          <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
-                            <span style={{fontSize:14,fontWeight:700,color:T.ink}}>{post.author}</span>
-                            {!post.coverImg&&<span style={{fontFamily:T.mono,fontSize:9,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",background:post.pillarColor+"18",color:post.pillarColor,padding:"2px 7px",borderRadius:999}}>{post.pillar}</span>}
+                      )}
+                      <div style={{padding:"16px 18px"}}>
+                        <div style={{display:"flex",gap:10,alignItems:"flex-start",marginBottom:10}}>
+                          <div style={{width:40,height:40,borderRadius:"50%",background:post.color,overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:T.anton,fontSize:15,color:"#fff"}}>
+                            {post.img?<img src={post.img} alt={post.author} referrerPolicy="no-referrer" style={{width:"100%",height:"100%",objectFit:"cover"}}/>:post.initials}
                           </div>
-                          <div style={{fontFamily:T.mono,fontSize:10,color:T.faint,marginTop:2}}>{post.role} · {post.time}</div>
+                          <div style={{flex:1}}>
+                            <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+                              <span style={{fontSize:14,fontWeight:700,color:T.ink}}>{post.author}</span>
+                              {!post.coverImg&&<span style={{fontFamily:T.mono,fontSize:9,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",background:post.pillarColor+"18",color:post.pillarColor,padding:"2px 7px",borderRadius:999}}>{post.pillar}</span>}
+                            </div>
+                            <div style={{fontFamily:T.mono,fontSize:10,color:T.faint,marginTop:2}}>{post.role} · {post.time}</div>
+                          </div>
                         </div>
-                      </div>
-                      {post.content&&<p style={{fontSize:15,lineHeight:1.65,color:T.ink,marginBottom:14}}>{post.content}</p>}
-                      <div style={{display:"flex",gap:16,borderTop:`1px solid ${T.line}`,paddingTop:12}}>
-                        <button onClick={()=>toggleLike(post.id)} className="pb-like" style={{display:"flex",alignItems:"center",gap:6,fontFamily:T.mono,fontSize:11,fontWeight:700,background:"transparent",border:"none",color:post.liked?T.orange:T.faint,cursor:"pointer",padding:0,transition:"color 0.15s"}}>{post.liked?"♥":"♡"} {post.likes}</button>
-                        <button style={{display:"flex",alignItems:"center",gap:6,fontFamily:T.mono,fontSize:11,fontWeight:700,background:"transparent",border:"none",color:T.faint,cursor:"pointer",padding:0}}>💬 {post.comments}</button>
-                        {post.coverImg&&<button onClick={()=>setLightbox(post.coverImg)} style={{display:"flex",alignItems:"center",gap:6,fontFamily:T.mono,fontSize:11,fontWeight:700,background:"transparent",border:"none",color:T.faint,cursor:"pointer",padding:0,marginLeft:"auto"}}>🔍 View</button>}
+                        {post.content&&<p style={{fontSize:15,lineHeight:1.65,color:T.ink,marginBottom:14}}>{post.content}</p>}
+                        <div style={{display:"flex",gap:16,borderTop:`1px solid ${T.line}`,paddingTop:12}}>
+                          <button onClick={()=>toggleLike(post.id)} className="pb-like" style={{display:"flex",alignItems:"center",gap:6,fontFamily:T.mono,fontSize:11,fontWeight:700,background:"transparent",border:"none",color:post.liked?T.orange:T.faint,cursor:"pointer",padding:0,transition:"color 0.15s"}}>{post.liked?"♥":"♡"} {post.likes}</button>
+                          <button style={{display:"flex",alignItems:"center",gap:6,fontFamily:T.mono,fontSize:11,fontWeight:700,background:"transparent",border:"none",color:T.faint,cursor:"pointer",padding:0}}>💬 {post.comments}</button>
+                          {post.coverImg&&<button onClick={()=>setLightbox(post.coverImg)} style={{display:"flex",alignItems:"center",gap:6,fontFamily:T.mono,fontSize:11,fontWeight:700,background:"transparent",border:"none",color:T.faint,cursor:"pointer",padding:0,marginLeft:"auto"}}>🔍 View</button>}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div style={{display:"flex",flexDirection:"column",gap:14}}>
@@ -179,7 +239,7 @@ export default function FeedPage() {
                     </div>
                   ))}
                 </div>
-                <label style={{display:"flex",alignItems:"center",justifyContent:"center",gap:6,fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",background:T.surface2,border:`1px solid ${T.line}`,borderRadius:10,padding:"9px",cursor:"pointer",transition:"all 0.15s",width:"100%"}}>
+                <label style={{display:"flex",alignItems:"center",justifyContent:"center",gap:6,fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",background:T.surface2,border:`1px solid ${T.line}`,borderRadius:10,padding:"9px",cursor:"pointer",width:"100%"}}>
                   📷 Add to gallery
                   <input type="file" accept="image/*" onChange={handleGalleryUpload} style={{display:"none"}}/>
                 </label>
@@ -217,16 +277,14 @@ export default function FeedPage() {
             <label className="pb-upload" style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:10,background:T.surface,border:`2px dashed ${T.line}`,borderRadius:18,padding:"36px 24px",marginBottom:24,cursor:"pointer",transition:"all 0.2s",textAlign:"center"}}>
               <div style={{fontSize:40}}>📸</div>
               <div style={{fontFamily:T.anton,fontSize:22,textTransform:"uppercase",color:T.ink}}>Add to your gallery</div>
-              <div style={{fontFamily:T.mono,fontSize:11,color:T.muted}}>Upload from your photo library · JPG, PNG, WEBP</div>
+              <div style={{fontFamily:T.mono,fontSize:11,color:T.muted}}>Upload from your photo library</div>
               <div style={{fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:T.orange,color:"#fff",borderRadius:999,padding:"11px 24px",marginTop:4}}>Choose from library</div>
               <input ref={galleryFileRef} type="file" accept="image/*" onChange={handleGalleryUpload} style={{display:"none"}}/>
             </label>
-
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
               <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.14em",textTransform:"uppercase",color:T.muted}}>{gallery.length} photos</p>
               <button onClick={()=>setTab("feed")} style={{fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",background:"transparent",border:`1px solid ${T.line}`,color:T.muted,borderRadius:999,padding:"7px 14px",cursor:"pointer"}}>← Back to feed</button>
             </div>
-
             <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12}}>
               {gallery.map((img,i)=>(
                 <div key={i} onClick={()=>setLightbox(img)} style={{aspectRatio:"1",borderRadius:14,overflow:"hidden",cursor:"pointer",background:T.line}}>
