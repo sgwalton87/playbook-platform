@@ -1,7 +1,9 @@
-export default function FeedLayout({
+import AppShell from "@/components/AppShell";
+
+export default function SectionLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return <AppShell>{children}</AppShell>;
 }
