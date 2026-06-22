@@ -1,7 +1,4 @@
-export default function CertificatesLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return <>{children}</>;
+import AppShell from "@/components/AppShell";
+export default function SectionLayout({ children }: { children: React.ReactNode }) {
+  return <AppShell>{children}</AppShell>;
 }
