@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabaseClient";
 const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",blue:"#3B82F6",green:"#10B981",purple:"#8B5CF6",mono:"'Space Mono', monospace",sans:"'Hanken Grotesk', system-ui, sans-serif",anton:"'Anton', sans-serif"};
 const FILTERS=["All","Leadership","Finance","Civic","SEL"];
 const LEADERS=[{name:"Jordan M.",initials:"JM",color:T.green,img:"https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&q=80",xp:890,rank:1},{name:"Aisha T.",initials:"AT",color:T.blue,img:"https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&q=80",xp:760,rank:2},{name:"Marcus D.",initials:"MD",color:T.purple,img:null,xp:640,rank:3},{name:"You",initials:"SW",color:T.orange,img:null,xp:340,rank:4}];
-const SUPABASE_URL="https://oexgxnybeixwadgtdtzp.supabase.co";
+const SURL="https://oexgxnybeixwadgtdtzp.supabase.co";
 
 export default function FeedPage() {
   const router=useRouter();
@@ -16,7 +16,7 @@ export default function FeedPage() {
   const [filter,setFilter]=useState("All");
   const [newPost,setNewPost]=useState("");
   const [userName,setUserName]=useState("Scholar");
-  const [userInitials,setUserInitials]=useState("S");
+  const [userInitials,setUserInitials]=useState("SW");
   const [userId,setUserId]=useState<string|null>(null);
   const [tab,setTab]=useState<"feed"|"gallery">("feed");
   const [pendingPhoto,setPendingPhoto]=useState<string|null>(null);
@@ -32,30 +32,46 @@ export default function FeedPage() {
       if(!u.user){router.replace("/login");return;}
       setUserId(u.user.id);
 
-      // Load profile
+      // Load profile separately — no join
       const{data:p}=await supabase.from("profiles").select("first_name,full_name").eq("id",u.user.id).single();
-      const name=p?.full_name||p?.first_name||"Scholar";
-      setUserName(p?.first_name||"Scholar");
+      const name=p?.full_name||p?.first_name||"Stephisha";
+      setUserName(p?.first_name||"Stephisha");
       setUserInitials(name.split(" ").map((n:string)=>n[0]).join("").toUpperCase().slice(0,2));
 
-      // Load posts using actual column names: author_id, body, image_url, like_count, comment_count
-      const{data:dbPosts}=await supabase
+      // Load all posts — no join, load author names separately
+      const{data:dbPosts,error:postsError}=await supabase
         .from("posts")
-        .select("*, profiles(first_name, full_name)")
+        .select("id,author_id,body,image_url,like_count,comment_count,created_at")
         .order("created_at",{ascending:false})
         .limit(50);
 
+      if(postsError)console.error("Posts error:",postsError);
+
       if(dbPosts&&dbPosts.length>0){
+        // Get unique author ids and fetch their names
+        const authorIds=[...new Set(dbPosts.map((p:any)=>p.author_id))];
+        const{data:authorProfiles}=await supabase
+          .from("profiles")
+          .select("id,first_name,full_name")
+          .in("id",authorIds);
+
+        const profileMap:Record<string,string>={};
+        authorProfiles?.forEach((ap:any)=>{
+          profileMap[ap.id]=ap.full_name||ap.first_name||"Scholar";
+        });
+
         setPosts(dbPosts.map((post:any)=>{
-          const authorName=post.profiles?.full_name||post.profiles?.first_name||"Scholar";
+          const authorName=profileMap[post.author_id]||"Scholar";
+          const initials=authorName.split(" ").map((n:string)=>n[0]).join("").toUpperCase().slice(0,2);
+          const d=new Date(post.created_at);
+          const timeStr=d.toLocaleDateString("en-US",{month:"short",day:"numeric"});
           return{
             id:post.id,
             author:authorName,
-            initials:authorName.split(" ").map((n:string)=>n[0]).join("").toUpperCase().slice(0,2),
-            color:T.orange,
-            img:null,
+            initials,
+            color:post.author_id===u.user.id?T.orange:T.blue,
             role:"Scholar-Athlete",
-            time:new Date(post.created_at).toLocaleDateString(),
+            time:timeStr,
             content:post.body||"",
             pillar:"Leadership",
             pillarColor:T.orange,
@@ -68,10 +84,11 @@ export default function FeedPage() {
         }));
       }
 
-      // Load gallery from Supabase Storage
-      const{data:files}=await supabase.storage.from("photos").list("gallery",{limit:100,sortBy:{column:"created_at",order:"desc"}});
+      // Load gallery
+      const{data:files,error:galleryError}=await supabase.storage.from("photos").list("gallery",{limit:100,sortBy:{column:"created_at",order:"desc"}});
+      if(galleryError)console.error("Gallery error:",galleryError);
       if(files&&files.length>0){
-        setGallery(files.filter(f=>f.name!==".emptyFolderPlaceholder").map(f=>`${SUPABASE_URL}/storage/v1/object/public/photos/gallery/${f.name}`));
+        setGallery(files.filter((f:any)=>f.name!==".emptyFolderPlaceholder").map((f:any)=>`${SURL}/storage/v1/object/public/photos/gallery/${f.name}`));
       }
 
       setLoading(false);
@@ -80,67 +97,47 @@ export default function FeedPage() {
 
   const uploadPhoto=async(photoFile:File,folder:string):Promise<string|null>=>{
     const ext=photoFile.name.split(".").pop()||"jpg";
-    const filename=`${folder}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-    const{error}=await supabase.storage.from("photos").upload(filename,photoFile,{cacheControl:"3600",upsert:false});
-    if(error){console.error("Upload error:",error);return null;}
-    return`${SUPABASE_URL}/storage/v1/object/public/photos/${filename}`;
+    const filename=`${folder}/${Date.now()}.${ext}`;
+    const{data,error}=await supabase.storage.from("photos").upload(filename,photoFile,{cacheControl:"3600",upsert:true});
+    if(error){console.error("Upload error:",error.message);return null;}
+    return`${SURL}/storage/v1/object/public/photos/${filename}`;
   };
 
   const handlePostFileSelect=(e:React.ChangeEvent<HTMLInputElement>)=>{
-    const f=e.target.files?.[0];
-    if(!f)return;
-    setPendingFile(f);
-    setPendingPhoto(URL.createObjectURL(f));
+    const f=e.target.files?.[0];if(!f)return;
+    setPendingFile(f);setPendingPhoto(URL.createObjectURL(f));
   };
 
   const handlePost=async()=>{
-    if(!newPost.trim()&&!pendingPhoto)return;
+    if(!newPost.trim()&&!pendingFile)return;
     setUploading(true);
     let imageUrl:string|null=null;
-
     if(pendingFile){
       imageUrl=await uploadPhoto(pendingFile,"feed");
       if(imageUrl)setGallery(prev=>[imageUrl!,...prev]);
     }
-
-    // Save using correct column names: author_id, body, image_url, like_count, comment_count
-    const{data:saved}=await supabase.from("posts").insert({
+    const{data:saved,error}=await supabase.from("posts").insert({
       author_id:userId,
       body:newPost,
       image_url:imageUrl,
       like_count:0,
       comment_count:0,
     }).select().single();
-
-    const newEntry:any={
+    if(error)console.error("Post error:",error.message);
+    setPosts(prev=>[{
       id:saved?.id||Date.now().toString(),
-      author:userName,
-      initials:userInitials,
-      color:T.orange,
-      img:null,
-      role:"Scholar-Athlete",
-      time:"Just now",
-      content:newPost,
-      pillar:"Leadership",
-      pillarColor:T.orange,
-      coverImg:imageUrl,
-      likes:0,
-      comments:0,
-      liked:false,
-      isOwn:true,
-    };
-
-    setPosts(prev=>[newEntry,...prev]);
-    setNewPost("");
-    setPendingPhoto(null);
-    setPendingFile(null);
+      author:userName,initials:userInitials,color:T.orange,
+      role:"Scholar-Athlete",time:"Just now",
+      content:newPost,pillar:"Leadership",pillarColor:T.orange,
+      coverImg:imageUrl,likes:0,comments:0,liked:false,isOwn:true,
+    },...prev]);
+    setNewPost("");setPendingPhoto(null);setPendingFile(null);
     if(postFileRef.current)postFileRef.current.value="";
     setUploading(false);
   };
 
   const handleGalleryUpload=async(e:React.ChangeEvent<HTMLInputElement>)=>{
-    const f=e.target.files?.[0];
-    if(!f)return;
+    const f=e.target.files?.[0];if(!f)return;
     setUploading(true);
     const url=await uploadPhoto(f,"gallery");
     if(url)setGallery(prev=>[url,...prev]);
@@ -148,7 +145,7 @@ export default function FeedPage() {
     setUploading(false);
   };
 
-  const toggleLike=(id:string)=>setPosts(p=>p.map(post=>post.id===id?{...post,liked:!post.liked,likes:post.liked?post.likes-1:post.likes+1}:post));
+  const toggleLike=(id:string)=>setPosts(p=>p.map(x=>x.id===id?{...x,liked:!x.liked,likes:x.liked?x.likes-1:x.likes+1}:x));
   const filtered=filter==="All"?posts:posts.filter(p=>p.pillar===filter);
 
   if(loading)return<div style={{minHeight:"100vh",background:T.cream,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:T.mono,fontSize:12,color:T.faint}}>Loading feed...</div>;
@@ -234,9 +231,7 @@ export default function FeedPage() {
                       )}
                       <div style={{padding:"16px 18px"}}>
                         <div style={{display:"flex",gap:10,alignItems:"flex-start",marginBottom:10}}>
-                          <div style={{width:40,height:40,borderRadius:"50%",background:post.color,overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:T.anton,fontSize:15,color:"#fff"}}>
-                            {post.img?<img src={post.img} alt={post.author} style={{width:"100%",height:"100%",objectFit:"cover"}}/>:post.initials}
-                          </div>
+                          <div style={{width:40,height:40,borderRadius:"50%",background:post.color,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:T.anton,fontSize:15,color:"#fff"}}>{post.initials}</div>
                           <div style={{flex:1}}>
                             <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
                               <span style={{fontSize:14,fontWeight:700,color:T.ink}}>{post.author}</span>
