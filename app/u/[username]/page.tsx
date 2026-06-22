@@ -5,8 +5,32 @@ import { supabase } from "@/lib/supabaseClient";
 import ProfileAvatar from "@/components/ProfileAvatar";
 import { checkBadges } from "@/lib/badges";
 
-const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",blue:"#3B82F6",green:"#10B981",purple:"#8B5CF6",mono:"'Space Mono', monospace",sans:"'Hanken Grotesk', system-ui, sans-serif",anton:"'Anton', sans-serif"};
+const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",blue:"#3B82F6",green:"#10B981",amber:"#F59E0B",purple:"#8B5CF6",mono:"'Space Mono', monospace",sans:"'Hanken Grotesk', system-ui, sans-serif",anton:"'Anton', sans-serif"};
 const SURL="https://oexgxnybeixwadgtdtzp.supabase.co";
+
+const CERT_META:Record<string,{color:string;era:string;rarity:string;rarityColor:string;gradient:string}>={
+  "captains-mindset":{color:T.orange,era:"ERA 1/4",rarity:"UNCOMMON",rarityColor:T.orange,gradient:"linear-gradient(135deg,#F59E0B,#F97316,#8B5CF6,#3B82F6)"},
+  "money-in-the-game":{color:T.blue,era:"ERA 2/4",rarity:"COMMON",rarityColor:"#94A3B8",gradient:"linear-gradient(135deg,#3B82F6,#8B5CF6,#10B981,#3B82F6)"},
+  "mind-of-an-athlete":{color:T.purple,era:"ERA 3/4",rarity:"UNCOMMON",rarityColor:T.orange,gradient:"linear-gradient(135deg,#8B5CF6,#EC4899,#3B82F6,#8B5CF6)"},
+  "community-leader":{color:T.green,era:"ERA 4/4",rarity:"RARE",rarityColor:T.amber,gradient:"linear-gradient(135deg,#10B981,#3B82F6,#F59E0B,#10B981)"},
+};
+
+function SmallCertCard({cert}:{cert:any}) {
+  const meta=CERT_META[cert.course_slug]||{color:T.orange,era:"ERA 1/4",rarity:"UNCOMMON",rarityColor:T.orange,gradient:"linear-gradient(135deg,#F59E0B,#F97316,#8B5CF6,#3B82F6)"};
+  return(
+    <div style={{position:"relative",borderRadius:12,padding:2,background:meta.gradient,boxShadow:"0 8px 24px rgba(0,0,0,.2)",width:120,flexShrink:0}}>
+      <div style={{background:T.navy,borderRadius:10,padding:"12px 10px",minHeight:160,display:"flex",flexDirection:"column",alignItems:"center"}}>
+        <div style={{display:"flex",justifyContent:"space-between",width:"100%",marginBottom:8}}>
+          <span style={{fontFamily:T.mono,fontSize:7,color:"rgba(255,255,255,.4)",letterSpacing:"0.1em"}}>{meta.era}</span>
+          <span style={{fontFamily:T.mono,fontSize:7,background:meta.rarityColor,color:meta.rarity==="COMMON"?"#0F172A":"#fff",padding:"1px 5px",borderRadius:3,fontWeight:700}}>{meta.rarity}</span>
+        </div>
+        <div style={{width:40,height:40,borderRadius:"50%",background:"rgba(255,255,255,.06)",border:`2px solid ${meta.color}`,boxShadow:`0 0 12px ${meta.color}44`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,marginBottom:8}}>🎓</div>
+        <div style={{fontFamily:T.anton,fontSize:9,color:meta.color,textTransform:"uppercase",textAlign:"center",letterSpacing:"0.04em",marginBottom:3,lineHeight:1.2}}>{cert.certificate_name}</div>
+        <div style={{fontFamily:T.mono,fontSize:7,color:"rgba(255,255,255,.25)",marginTop:"auto",paddingTop:6,borderTop:"1px solid rgba(255,255,255,.08)",width:"100%",textAlign:"center",letterSpacing:"0.06em"}}>PLAYBOOK VALIDATED</div>
+      </div>
+    </div>
+  );
+}
 
 export default function PublicProfilePage() {
   const router=useRouter();
@@ -63,7 +87,11 @@ export default function PublicProfilePage() {
       .on("postgres_changes",{event:"INSERT",schema:"public",table:"feed_posts",filter:`user_id=eq.${profile.id}`},(payload)=>{
         setPosts(curr=>curr.some(p=>p.id===payload.new.id)?curr:[payload.new,...curr]);
         if(payload.new.image_url)setGallery(prev=>[payload.new.image_url,...prev]);
-      }).subscribe();
+      })
+      .on("postgres_changes",{event:"INSERT",schema:"public",table:"certificates",filter:`user_id=eq.${profile.id}`},(payload)=>{
+        setCertificates(curr=>curr.some(c=>c.id===payload.new.id)?curr:[payload.new,...curr]);
+      })
+      .subscribe();
     return()=>{supabase.removeChannel(channel);};
   },[profile?.id]);
 
@@ -86,15 +114,8 @@ export default function PublicProfilePage() {
     if(viewerId!==profile.id){alert("You can only post from your own profile.");return;}
     setPosting(true);
     let imageUrl:string|null=null;
-    if(pendingFile){
-      imageUrl=await uploadPhoto(pendingFile,"feed");
-      if(imageUrl)setGallery(prev=>[imageUrl!,...prev]);
-    }
-    const{data,error}=await supabase.from("feed_posts").insert({
-      user_id:viewerId,post_type:"text",
-      title:newPost.trim()?"Community Post":null,
-      body:newPost.trim(),image_url:imageUrl,visibility:"public",
-    }).select("*").single();
+    if(pendingFile){imageUrl=await uploadPhoto(pendingFile,"feed");if(imageUrl)setGallery(prev=>[imageUrl!,...prev]);}
+    const{data,error}=await supabase.from("feed_posts").insert({user_id:viewerId,post_type:"text",title:newPost.trim()?"Community Post":null,body:newPost.trim(),image_url:imageUrl,visibility:"public"}).select("*").single();
     if(error){alert(error.message);setPosting(false);return;}
     if(data)setPosts(curr=>curr.some(p=>p.id===data.id)?curr:[data,...curr]);
     setNewPost("");setPendingPhoto(null);setPendingFile(null);
@@ -106,38 +127,22 @@ export default function PublicProfilePage() {
     const f=e.target.files?.[0];if(!f)return;
     setUploading(true);
     const url=await uploadPhoto(f,"gallery");
-    if(url){
-      setGallery(prev=>[url,...prev]);
-      await supabase.from("feed_posts").insert({user_id:viewerId,post_type:"photo",body:"",image_url:url,visibility:"public"});
-    }
+    if(url){setGallery(prev=>[url,...prev]);await supabase.from("feed_posts").insert({user_id:viewerId,post_type:"photo",body:"",image_url:url,visibility:"public"});}
     if(galleryFileRef.current)galleryFileRef.current.value="";
     setUploading(false);
   };
 
   if(loading)return<div style={{minHeight:"100vh",background:T.cream,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:T.mono,fontSize:12,color:T.faint}}>Loading profile...</div>;
   if(!profile)return<div style={{padding:40,fontFamily:T.sans}}><h2>Profile not found</h2><button onClick={()=>router.push("/dashboard")}>Back</button></div>;
-
   const isOwn=viewerId===profile.id;
 
   return(
     <div style={{minHeight:"100vh",background:T.cream,fontFamily:T.sans,color:T.ink,padding:"32px 36px",maxWidth:900,margin:"0 auto"}}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
-        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-        ::selection{background:${T.orange};color:#fff;}
-        .pb-post:hover{border-color:${T.orange}!important;}
-        .pb-gal:hover{opacity:.8!important;transform:scale(1.03);}
-        textarea{resize:vertical;}textarea::placeholder{color:${T.faint};}textarea:focus{border-color:${T.orange}!important;outline:none;}
-      `}</style>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}::selection{background:${T.orange};color:#fff;}.pb-post:hover{border-color:${T.orange}!important;}.pb-gal:hover{opacity:.8!important;transform:scale(1.03);}textarea{resize:vertical;}textarea::placeholder{color:${T.faint};}textarea:focus{border-color:${T.orange}!important;outline:none;}.pb-cert-sm{transition:transform 0.2s;}.pb-cert-sm:hover{transform:translateY(-6px) rotate(-1deg);}`}</style>
 
-      {lightbox&&(
-        <div onClick={()=>setLightbox(null)} style={{position:"fixed",inset:0,zIndex:9999,background:"rgba(0,0,0,.93)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>
-          <img src={lightbox} alt="" style={{maxWidth:"90vw",maxHeight:"90vh",objectFit:"contain",borderRadius:12}}/>
-          <button onClick={()=>setLightbox(null)} style={{position:"absolute",top:20,right:24,background:"rgba(255,255,255,.15)",border:"none",color:"#fff",fontSize:20,cursor:"pointer",borderRadius:"50%",width:40,height:40}}>✕</button>
-        </div>
-      )}
+      {lightbox&&(<div onClick={()=>setLightbox(null)} style={{position:"fixed",inset:0,zIndex:9999,background:"rgba(0,0,0,.93)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}><img src={lightbox} alt="" style={{maxWidth:"90vw",maxHeight:"90vh",objectFit:"contain",borderRadius:12}}/><button onClick={()=>setLightbox(null)} style={{position:"absolute",top:20,right:24,background:"rgba(255,255,255,.15)",border:"none",color:"#fff",fontSize:20,cursor:"pointer",borderRadius:"50%",width:40,height:40}}>✕</button></div>)}
 
-      {/* 1 — Profile hero */}
+      {/* 1 — Hero */}
       <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:20,padding:"24px 28px",marginBottom:14,display:"flex",alignItems:"center",gap:20,flexWrap:"wrap",position:"relative",overflow:"hidden"}}>
         <div style={{position:"absolute",top:0,right:0,width:200,height:"100%",background:`linear-gradient(90deg,transparent,${T.orangeL})`,pointerEvents:"none"}}/>
         <ProfileAvatar src={profile?.avatar_url} name={`${profile?.first_name||""} ${profile?.last_name||""}`} size={80}/>
@@ -149,7 +154,7 @@ export default function PublicProfilePage() {
         <button onClick={()=>router.push("/dashboard")} style={{fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",background:"transparent",border:`1.5px solid ${T.line}`,color:T.muted,borderRadius:999,padding:"9px 16px",cursor:"pointer"}}>← Dashboard</button>
       </div>
 
-      {/* 2 — Stats bar */}
+      {/* 2 — Stats */}
       <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:10,marginBottom:14}}>
         {[{icon:"⚡",label:"XP",value:profile?.xp??0},{icon:"💰",label:"Coins",value:profile?.coin_balance??0},{icon:"🎓",label:"Certs",value:certificates.length},{icon:"🏅",label:"Badges",value:badges.length},{icon:"💬",label:"Posts",value:posts.length}].map(({icon,label,value})=>(
           <div key={label} style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:14,padding:"14px 14px"}}>
@@ -188,15 +193,33 @@ export default function PublicProfilePage() {
         </div>
       </div>
 
-      {/* 5 — Certificates */}
+      {/* 5 — Certificates — SMALL collectible cards */}
       <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:20,padding:"20px 24px",marginBottom:14}}>
-        <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.14em",textTransform:"uppercase",color:T.muted,marginBottom:12}}>Certificates</p>
-        {certificates.length>0?certificates.map(cert=>(
-          <div key={cert.id} style={{background:T.surface2,border:`1px solid ${T.line}`,borderRadius:12,padding:"12px 16px",marginBottom:10}}>
-            <div style={{fontSize:14,fontWeight:700,color:T.ink}}>🎓 {cert.certificate_name}</div>
-            <div style={{fontFamily:T.mono,fontSize:10,color:T.muted,marginTop:4}}>Earned {cert.issued_at?new Date(cert.issued_at).toLocaleDateString():""}</div>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
+          <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.14em",textTransform:"uppercase",color:T.muted}}>Certificates</p>
+          {certificates.length>0&&<button onClick={()=>router.push("/certificates")} style={{fontFamily:T.mono,fontSize:9,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",color:T.orange,background:"none",border:"none",cursor:"pointer"}}>View all →</button>}
+        </div>
+        {certificates.length>0?(
+          <div style={{display:"flex",gap:14,flexWrap:"wrap"}}>
+            {certificates.map(cert=>(
+              <div key={cert.id} className="pb-cert-sm" onClick={()=>router.push("/certificates")} style={{cursor:"pointer"}}>
+                <SmallCertCard cert={cert}/>
+                <div style={{marginTop:8,textAlign:"center"}}>
+                  <div style={{fontFamily:T.mono,fontSize:8,color:T.muted,letterSpacing:"0.06em",textTransform:"uppercase"}}>{cert.certificate_name}</div>
+                  <div style={{fontFamily:T.mono,fontSize:7,color:T.faint,marginTop:2}}>{new Date(cert.issued_at).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}</div>
+                </div>
+              </div>
+            ))}
           </div>
-        )):<p style={{fontSize:13,color:T.faint}}>No certificates yet.</p>}
+        ):(
+          <div style={{display:"flex",alignItems:"center",gap:14}}>
+            <div style={{fontSize:28}}>🔒</div>
+            <div>
+              <p style={{fontSize:13,color:T.faint,lineHeight:1.6}}>No certificates yet. Complete a course to earn your first collectible card.</p>
+              <button onClick={()=>router.push("/courses")} style={{marginTop:8,fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",background:T.orange,color:"#fff",border:"none",borderRadius:999,padding:"8px 14px",cursor:"pointer"}}>Go to courses →</button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 6 — Feed + Gallery LAST */}
@@ -214,8 +237,7 @@ export default function PublicProfilePage() {
             <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:18,padding:"18px 20px",marginBottom:16}}>
               <div style={{display:"flex",gap:12,alignItems:"flex-start",marginBottom:12}}>
                 <ProfileAvatar src={profile?.avatar_url} name={`${profile?.first_name||""}`} size={40}/>
-                <textarea value={newPost} onChange={e=>setNewPost(e.target.value)} placeholder="Post something to your public community feed..." rows={3}
-                  style={{flex:1,background:T.surface2,border:`1.5px solid ${T.line}`,borderRadius:12,padding:"10px 14px",fontSize:14,color:T.ink,fontFamily:T.sans,transition:"border-color 0.15s",width:"100%"}}/>
+                <textarea value={newPost} onChange={e=>setNewPost(e.target.value)} placeholder="Post something to your public community feed..." rows={3} style={{flex:1,background:T.surface2,border:`1.5px solid ${T.line}`,borderRadius:12,padding:"10px 14px",fontSize:14,color:T.ink,fontFamily:T.sans,transition:"border-color 0.15s",width:"100%"}}/>
               </div>
               {pendingPhoto&&(
                 <div style={{position:"relative",marginBottom:12,borderRadius:12,overflow:"hidden",maxHeight:220}}>
@@ -228,28 +250,19 @@ export default function PublicProfilePage() {
                   📷 {pendingPhoto?"Photo attached":"Add photo"}
                   <input ref={postFileRef} type="file" accept="image/*" onChange={handleFileSelect} style={{display:"none"}}/>
                 </label>
-                <button onClick={createPost} disabled={posting||(!newPost.trim()&&!pendingFile)}
-                  style={{fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",background:(newPost.trim()||pendingFile)&&!posting?T.orange:T.line,color:(newPost.trim()||pendingFile)&&!posting?"#fff":T.faint,border:"none",borderRadius:999,padding:"10px 22px",cursor:(newPost.trim()||pendingFile)&&!posting?"pointer":"default",transition:"all 0.15s"}}>
+                <button onClick={createPost} disabled={posting||(!newPost.trim()&&!pendingFile)} style={{fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",background:(newPost.trim()||pendingFile)&&!posting?T.orange:T.line,color:(newPost.trim()||pendingFile)&&!posting?"#fff":T.faint,border:"none",borderRadius:999,padding:"10px 22px",cursor:(newPost.trim()||pendingFile)&&!posting?"pointer":"default",transition:"all 0.15s"}}>
                   {posting?"Posting...":"Post →"}
                 </button>
               </div>
             </div>
           )}
           {posts.length===0?(
-            <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:16,padding:"48px 24px",textAlign:"center"}}>
-              <div style={{fontSize:36,marginBottom:14}}>📣</div>
-              <p style={{fontFamily:T.mono,fontSize:12,color:T.faint}}>No public posts yet.</p>
-            </div>
+            <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:16,padding:"48px 24px",textAlign:"center"}}><div style={{fontSize:36,marginBottom:14}}>📣</div><p style={{fontFamily:T.mono,fontSize:12,color:T.faint}}>No public posts yet.</p></div>
           ):(
             <div style={{display:"flex",flexDirection:"column",gap:12}}>
               {posts.map(post=>(
                 <div key={post.id} className="pb-post" style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:18,overflow:"hidden",transition:"border-color 0.15s"}}>
-                  {post.image_url&&(
-                    <div style={{position:"relative",maxHeight:280,overflow:"hidden",cursor:"pointer"}} onClick={()=>setLightbox(post.image_url)}>
-                      <img src={post.image_url} alt="" style={{width:"100%",objectFit:"cover",display:"block",maxHeight:280}}/>
-                      <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,transparent 50%,rgba(15,23,42,.5) 100%)"}}/>
-                    </div>
-                  )}
+                  {post.image_url&&(<div style={{position:"relative",maxHeight:280,overflow:"hidden",cursor:"pointer"}} onClick={()=>setLightbox(post.image_url)}><img src={post.image_url} alt="" style={{width:"100%",objectFit:"cover",display:"block",maxHeight:280}}/><div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,transparent 50%,rgba(15,23,42,.5) 100%)"}}/></div>)}
                   <div style={{padding:"16px 18px"}}>
                     <div style={{display:"flex",gap:10,alignItems:"flex-start",marginBottom:10}}>
                       <ProfileAvatar src={profile?.avatar_url} name={`${profile?.first_name||""}`} size={38}/>
@@ -263,7 +276,7 @@ export default function PublicProfilePage() {
                     <div style={{display:"flex",gap:16,borderTop:`1px solid ${T.line}`,paddingTop:12}}>
                       <span style={{fontFamily:T.mono,fontSize:11,color:T.faint}}>♡ {post.like_count||0}</span>
                       <span style={{fontFamily:T.mono,fontSize:11,color:T.faint}}>💬 {post.comment_count||0}</span>
-                      {post.image_url&&<button onClick={()=>setLightbox(post.image_url)} style={{fontFamily:T.mono,fontSize:11,fontWeight:700,background:"transparent",border:"none",color:T.faint,cursor:"pointer",padding:0,marginLeft:"auto"}}>🔍 View photo</button>}
+                      {post.image_url&&<button onClick={()=>setLightbox(post.image_url)} style={{fontFamily:T.mono,fontSize:11,fontWeight:700,background:"transparent",border:"none",color:T.faint,cursor:"pointer",padding:0,marginLeft:"auto"}}>🔍 View</button>}
                     </div>
                   </div>
                 </div>
@@ -290,10 +303,7 @@ export default function PublicProfilePage() {
             <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.14em",textTransform:"uppercase",color:T.muted}}>{gallery.length} photos</p>
           </div>
           {gallery.length===0?(
-            <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:16,padding:"48px 24px",textAlign:"center"}}>
-              <div style={{fontSize:36,marginBottom:14}}>📷</div>
-              <p style={{fontFamily:T.mono,fontSize:12,color:T.faint}}>No photos yet.</p>
-            </div>
+            <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:16,padding:"48px 24px",textAlign:"center"}}><div style={{fontSize:36,marginBottom:14}}>📷</div><p style={{fontFamily:T.mono,fontSize:12,color:T.faint}}>No photos yet.</p></div>
           ):(
             <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12}}>
               {gallery.map((img,i)=>(
