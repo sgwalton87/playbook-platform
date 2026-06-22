@@ -99,10 +99,85 @@ export default function CourseModulePage() {
     }
   };
 
+  const fireConfetti = async () => {
+    const confetti = (await import("canvas-confetti")).default;
+
+    confetti({
+      particleCount: 160,
+      spread: 95,
+      origin: { y: 0.6 },
+    });
+
+    setTimeout(() => {
+      confetti({
+        particleCount: 90,
+        spread: 120,
+        origin: { y: 0.7 },
+      });
+    }, 250);
+  };
+
   const claimCert=async()=>{
-    if(!userId)return;
+    if(!userId || !course)return;
+
     setClaimed(true);
-    setToast("🏆 Certificate added to your profile and transcript!");
+
+    await fireConfetti();
+
+    const allModules = course.modules.map((m:any)=>m.id);
+
+    const { error: progressError } = await supabase
+      .from("course_progress")
+      .upsert(
+        {
+          user_id: userId,
+          course_slug: slug,
+          completed_modules: allModules,
+          completed: true,
+          completed_at: new Date().toISOString(),
+        },
+        { onConflict: "user_id,course_slug" }
+      );
+
+    if(progressError){
+      alert(progressError.message);
+      setClaimed(false);
+      return;
+    }
+
+    const { data: existingCert } = await supabase
+      .from("certificates")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("course_slug", slug)
+      .maybeSingle();
+
+    if(!existingCert){
+      const { error: certError } = await supabase
+        .from("certificates")
+        .insert({
+          user_id: userId,
+          course_slug: slug,
+          certificate_name: `${course.title} Certificate`,
+          issued_at: new Date().toISOString(),
+        });
+
+      if(certError){
+        alert(certError.message);
+        setClaimed(false);
+        return;
+      }
+    }
+
+    await supabase.from("feed_posts").insert({
+      user_id: userId,
+      post_type: "course_completed",
+      title: `🎓 Completed ${course.title}`,
+      body: `Certificate unlocked for ${course.title}.`,
+      visibility: "public",
+    });
+
+    setToast("🏆 Certificate added to your profile, transcript, and certificate vault!");
     setTimeout(()=>router.push("/certificates"),2500);
   };
 
