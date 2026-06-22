@@ -1,329 +1,322 @@
 "use client";
-
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import ProfileAvatar from "@/components/ProfileAvatar";
 import { checkBadges } from "@/lib/badges";
 
-const surface = "#ffffff";
-const soft = "#fbf7f1";
-const ink = "#100c0a";
-const muted = "#6b5f55";
-const line = "#ddd2c7";
-const accent = "#ff6a2c";
+const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",blue:"#3B82F6",green:"#10B981",purple:"#8B5CF6",mono:"'Space Mono', monospace",sans:"'Hanken Grotesk', system-ui, sans-serif",anton:"'Anton', sans-serif"};
+const SURL="https://oexgxnybeixwadgtdtzp.supabase.co";
 
 export default function PublicProfilePage() {
-  const router = useRouter();
-  const params = useParams();
-  const username = params?.username as string;
+  const router=useRouter();
+  const params=useParams();
+  const username=params?.username as string;
+  const postFileRef=useRef<HTMLInputElement>(null);
+  const galleryFileRef=useRef<HTMLInputElement>(null);
 
-  const [viewerId, setViewerId] = useState("");
-  const [profile, setProfile] = useState<any>(null);
-  const [badges, setBadges] = useState<any[]>([]);
-  const [certificates, setCertificates] = useState<any[]>([]);
-  const [posts, setPosts] = useState<any[]>([]);
-  const [newPost, setNewPost] = useState("");
-  const [posting, setPosting] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [viewerId,setViewerId]=useState("");
+  const [profile,setProfile]=useState<any>(null);
+  const [badges,setBadges]=useState<any[]>([]);
+  const [certificates,setCertificates]=useState<any[]>([]);
+  const [posts,setPosts]=useState<any[]>([]);
+  const [gallery,setGallery]=useState<string[]>([]);
+  const [newPost,setNewPost]=useState("");
+  const [posting,setPosting]=useState(false);
+  const [loading,setLoading]=useState(true);
+  const [lightbox,setLightbox]=useState<string|null>(null);
+  const [pendingPhoto,setPendingPhoto]=useState<string|null>(null);
+  const [pendingFile,setPendingFile]=useState<File|null>(null);
+  const [tab,setTab]=useState<"feed"|"gallery">("feed");
+  const [uploading,setUploading]=useState(false);
 
-  useEffect(() => {
-    const loadProfile = async () => {
-      const { data: userData } = await supabase.auth.getUser();
-      if (userData.user) setViewerId(userData.user.id);
+  useEffect(()=>{
+    (async()=>{
+      const{data:userData}=await supabase.auth.getUser();
+      if(userData.user)setViewerId(userData.user.id);
 
-      const { data: profileData, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .ilike("username", username)
-        .maybeSingle();
+      const{data:profileData,error}=await supabase.from("profiles").select("*").ilike("username",username).maybeSingle();
+      if(error||!profileData){setLoading(false);return;}
 
-      if (error || !profileData) {
-        setLoading(false);
-        return;
-      }
+      const[{data:certData},{data:badgeData},{data:feedData}]=await Promise.all([
+        supabase.from("certificates").select("*").eq("user_id",profileData.id).order("issued_at",{ascending:false}),
+        supabase.from("user_badges").select("id,awarded_at,badges(id,name,description,image_url)").eq("user_id",profileData.id).order("awarded_at",{ascending:false}),
+        supabase.from("feed_posts").select("*").eq("user_id",profileData.id).or("visibility.eq.public,visibility.is.null").order("created_at",{ascending:false}).limit(50),
+      ]);
 
-      const { data: certificateData } = await supabase
-        .from("certificates")
-        .select("*")
-        .eq("user_id", profileData.id)
-        .order("issued_at", { ascending: false });
-
-      const { data: badgeData } = await supabase
-        .from("user_badges")
-        .select(`id, awarded_at, badges (id, name, description, image_url)`)
-        .eq("user_id", profileData.id)
-        .order("awarded_at", { ascending: false });
-
-      const { data: feedData } = await supabase
-        .from("feed_posts")
-        .select("*")
-        .eq("user_id", profileData.id)
-        .or("visibility.eq.public,visibility.is.null")
-        .order("created_at", { ascending: false })
-        .limit(25);
-
-      const profileBadges = checkBadges(profileData);
-
-      const combinedBadges = [
-        ...profileBadges.map((name: string) => ({
-          id: `profile-${name}`,
-          displayName: name,
-        })),
-        ...(badgeData || []).map((item: any) => ({
-          id: item.id,
-          displayName: item.badges?.name,
-        })),
-      ].filter((badge) => badge.displayName);
+      const profileBadges=checkBadges(profileData);
+      const combinedBadges=[
+        ...profileBadges.map((name:string)=>({id:`profile-${name}`,displayName:name})),
+        ...(badgeData||[]).map((item:any)=>({id:item.id,displayName:item.badges?.name})),
+      ].filter(b=>b.displayName);
 
       setProfile(profileData);
-      setCertificates(certificateData || []);
+      setCertificates(certData||[]);
       setBadges(combinedBadges);
-      setPosts(feedData || []);
+      setPosts(feedData||[]);
+
+      // Load gallery — photos from feed_posts + storage
+      const photoPostUrls=(feedData||[]).filter((p:any)=>p.image_url).map((p:any)=>p.image_url);
+      const{data:files}=await supabase.storage.from("photos").list("gallery",{limit:100,sortBy:{column:"created_at",order:"desc"}});
+      const storageUrls=(files||[]).filter((f:any)=>f.name!==".emptyFolderPlaceholder").map((f:any)=>`${SURL}/storage/v1/object/public/photos/gallery/${f.name}`);
+      setGallery([...photoPostUrls,...storageUrls]);
+
       setLoading(false);
-    };
+    })();
+  },[username]);
 
-    loadProfile();
-  }, [username]);
+  // Realtime new posts
+  useEffect(()=>{
+    if(!profile?.id)return;
+    const channel=supabase.channel(`public-profile-${profile.id}`)
+      .on("postgres_changes",{event:"INSERT",schema:"public",table:"feed_posts",filter:`user_id=eq.${profile.id}`},(payload)=>{
+        setPosts(curr=>curr.some(p=>p.id===payload.new.id)?curr:[payload.new,...curr]);
+        if(payload.new.image_url)setGallery(prev=>[payload.new.image_url,...prev]);
+      }).subscribe();
+    return()=>{supabase.removeChannel(channel);};
+  },[profile?.id]);
 
-  useEffect(() => {
-    if (!profile?.id) return;
+  const uploadPhoto=async(photoFile:File,folder:string):Promise<string|null>=>{
+    const ext=photoFile.name.split(".").pop()||"jpg";
+    const filename=`${folder}/${Date.now()}.${ext}`;
+    const{error}=await supabase.storage.from("photos").upload(filename,photoFile,{cacheControl:"3600",upsert:true});
+    if(error){console.error(error.message);return null;}
+    return`${SURL}/storage/v1/object/public/photos/${filename}`;
+  };
 
-    const channel = supabase
-      .channel(`public-profile-feed-${profile.id}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "feed_posts",
-          filter: `user_id=eq.${profile.id}`,
-        },
-        (payload) => {
-          setPosts((current) => {
-            if (current.some((post) => post.id === payload.new.id)) {
-              return current;
-            }
+  const handleFileSelect=(e:React.ChangeEvent<HTMLInputElement>)=>{
+    const f=e.target.files?.[0];if(!f)return;
+    setPendingFile(f);setPendingPhoto(URL.createObjectURL(f));
+  };
 
-            return [payload.new, ...current];
-          });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [profile?.id]);
-
-  const createPost = async () => {
-    if (!newPost.trim() || !viewerId || !profile?.id) return;
-
-    if (viewerId !== profile.id) {
-      alert("You can only post from your own public profile.");
-      return;
-    }
-
+  const createPost=async()=>{
+    if(!newPost.trim()&&!pendingFile)return;
+    if(!viewerId||!profile?.id)return;
+    if(viewerId!==profile.id){alert("You can only post from your own profile.");return;}
     setPosting(true);
-
-    const { data, error } = await supabase
-      .from("feed_posts")
-      .insert({
-        user_id: viewerId,
-        post_type: "text",
-        title: "Community Post",
-        body: newPost.trim(),
-        visibility: "public",
-      })
-      .select("*")
-      .single();
-
-    if (error) {
-      alert(error.message);
-      setPosting(false);
-      return;
+    let imageUrl:string|null=null;
+    if(pendingFile){
+      imageUrl=await uploadPhoto(pendingFile,"feed");
+      if(imageUrl)setGallery(prev=>[imageUrl!,...prev]);
     }
-
-    if (data) {
-      setPosts((current) => {
-        if (current.some((post) => post.id === data.id)) return current;
-        return [data, ...current];
-      });
-    }
-
-    setNewPost("");
+    const{data,error}=await supabase.from("feed_posts").insert({
+      user_id:viewerId,post_type:"text",
+      title:newPost.trim()?"Community Post":null,
+      body:newPost.trim(),image_url:imageUrl,visibility:"public",
+    }).select("*").single();
+    if(error){alert(error.message);setPosting(false);return;}
+    if(data)setPosts(curr=>curr.some(p=>p.id===data.id)?curr:[data,...curr]);
+    setNewPost("");setPendingPhoto(null);setPendingFile(null);
+    if(postFileRef.current)postFileRef.current.value="";
     setPosting(false);
   };
 
-  if (loading) return <p>Loading profile...</p>;
+  const handleGalleryUpload=async(e:React.ChangeEvent<HTMLInputElement>)=>{
+    const f=e.target.files?.[0];if(!f)return;
+    setUploading(true);
+    const url=await uploadPhoto(f,"gallery");
+    if(url){
+      setGallery(prev=>[url,...prev]);
+      await supabase.from("feed_posts").insert({user_id:viewerId,post_type:"photo",body:"",image_url:url,visibility:"public"});
+    }
+    if(galleryFileRef.current)galleryFileRef.current.value="";
+    setUploading(false);
+  };
 
-  if (!profile) {
-    return (
-      <section style={{ background: surface, border: `1px solid ${line}`, borderRadius: 24, padding: 28 }}>
-        <h2 style={{ marginTop: 0 }}>Profile not found</h2>
-        <button onClick={() => router.push("/dashboard")}>Back to Dashboard</button>
-      </section>
-    );
-  }
+  if(loading)return<div style={{minHeight:"100vh",background:T.cream,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:T.mono,fontSize:12,color:T.faint}}>Loading profile...</div>;
+  if(!profile)return<div style={{padding:40,fontFamily:T.sans}}><h2>Profile not found</h2><button onClick={()=>router.push("/dashboard")}>Back</button></div>;
 
-  const isOwnProfile = viewerId === profile.id;
+  const isOwn=viewerId===profile.id;
 
-  return (
-    <div style={{ display: "grid", gap: 24 }}>
-      <section style={{ background: surface, border: `1px solid ${line}`, borderRadius: 28, padding: 30 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 22, flexWrap: "wrap" }}>
-          <ProfileAvatar
-            src={profile?.avatar_url}
-            name={`${profile?.first_name || ""} ${profile?.last_name || ""}`}
-            size={120}
-          />
+  return(
+    <div style={{minHeight:"100vh",background:T.cream,fontFamily:T.sans,color:T.ink,padding:"32px 36px",maxWidth:900,margin:"0 auto"}}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+        ::selection{background:${T.orange};color:#fff;}
+        .pb-post:hover{border-color:${T.orange}!important;}
+        .pb-gal:hover{opacity:.8!important;transform:scale(1.03);}
+        textarea{resize:vertical;}textarea::placeholder{color:${T.faint};}textarea:focus{border-color:${T.orange}!important;outline:none;}
+      `}</style>
 
-          <div>
-            <h2 style={{ margin: 0, fontSize: 38, color: ink }}>
-              {profile?.first_name} {profile?.last_name}
-            </h2>
-
-            <p style={{ color: muted, margin: "8px 0 0" }}>@{profile?.username}</p>
-
-            <p style={{ color: muted, margin: "8px 0 0" }}>
-              {profile?.school || "School not listed"} · {profile?.sport || "Sport not listed"}
-            </p>
-
-            <p style={{ color: muted, margin: "8px 0 0" }}>
-              {profile?.location || "Location not listed"}
-            </p>
-          </div>
+      {lightbox&&(
+        <div onClick={()=>setLightbox(null)} style={{position:"fixed",inset:0,zIndex:9999,background:"rgba(0,0,0,.93)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>
+          <img src={lightbox} alt="" style={{maxWidth:"90vw",maxHeight:"90vh",objectFit:"contain",borderRadius:12}}/>
+          <button onClick={()=>setLightbox(null)} style={{position:"absolute",top:20,right:24,background:"rgba(255,255,255,.15)",border:"none",color:"#fff",fontSize:20,cursor:"pointer",borderRadius:"50%",width:40,height:40}}>✕</button>
         </div>
-      </section>
+      )}
 
-      <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 16 }}>
-        {[
-          ["⚡ XP", profile?.xp ?? 0],
-          ["💰 Coins", profile?.coin_balance ?? 0],
-          ["🎓 Certificates", certificates.length],
-          ["🏅 Badges", badges.length],
-          ["💬 Posts", posts.length],
-        ].map(([label, value]) => (
-          <div key={label} style={{ background: surface, border: `1px solid ${line}`, borderRadius: 20, padding: 20 }}>
-            <p style={{ color: muted, margin: 0 }}>{label}</p>
-            <h3 style={{ margin: "8px 0 0", fontSize: 26, color: ink }}>{value}</h3>
+      {/* Profile hero */}
+      <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:20,padding:"24px 28px",marginBottom:16,display:"flex",alignItems:"center",gap:20,flexWrap:"wrap",position:"relative",overflow:"hidden"}}>
+        <div style={{position:"absolute",top:0,right:0,width:200,height:"100%",background:`linear-gradient(90deg,transparent,${T.orangeL})`,pointerEvents:"none"}}/>
+        <ProfileAvatar src={profile?.avatar_url} name={`${profile?.first_name||""} ${profile?.last_name||""}`} size={80}/>
+        <div style={{flex:1}}>
+          <h2 style={{fontFamily:T.anton,fontWeight:400,fontSize:32,textTransform:"uppercase",color:T.ink,lineHeight:1,marginBottom:6}}>{profile?.first_name} {profile?.last_name}</h2>
+          <p style={{fontFamily:T.mono,fontSize:11,color:T.orange,marginBottom:4}}>@{profile?.username}</p>
+          <p style={{fontSize:13,color:T.muted}}>{profile?.school||"School not listed"} · {profile?.sport||"Sport not listed"}</p>
+        </div>
+        <button onClick={()=>router.push("/dashboard")} style={{fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",background:"transparent",border:`1.5px solid ${T.line}`,color:T.muted,borderRadius:999,padding:"9px 16px",cursor:"pointer"}}>← Dashboard</button>
+      </div>
+
+      {/* Stats */}
+      <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:10,marginBottom:16}}>
+        {[{icon:"⚡",label:"XP",value:profile?.xp??0},{icon:"💰",label:"Coins",value:profile?.coin_balance??0},{icon:"🎓",label:"Certs",value:certificates.length},{icon:"🏅",label:"Badges",value:badges.length},{icon:"💬",label:"Posts",value:posts.length}].map(({icon,label,value})=>(
+          <div key={label} style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:14,padding:"14px 14px"}}>
+            <div style={{fontSize:20,marginBottom:6}}>{icon}</div>
+            <div style={{fontFamily:T.mono,fontSize:9,letterSpacing:"0.1em",textTransform:"uppercase",color:T.muted,marginBottom:3}}>{label}</div>
+            <div style={{fontFamily:T.anton,fontSize:26,fontWeight:400,color:T.ink,lineHeight:1}}>{value}</div>
           </div>
         ))}
-      </section>
+      </div>
 
-      <section style={{ background: surface, border: `1px solid ${line}`, borderRadius: 24, padding: 24 }}>
-        <h3 style={{ color: ink, marginTop: 0 }}>Community Feed</h3>
+      {/* Feed + Gallery tabs */}
+      <div style={{display:"flex",gap:8,marginBottom:16}}>
+        {(["feed","gallery"]as const).map(t=>(
+          <button key={t} onClick={()=>setTab(t)} style={{fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:tab===t?T.navy:"transparent",color:tab===t?"#F8F7F4":T.muted,border:`1.5px solid ${tab===t?T.navy:T.line}`,borderRadius:999,padding:"9px 18px",cursor:"pointer",transition:"all 0.15s"}}>
+            {t==="feed"?`📣 Posts (${posts.length})`:`📸 Gallery (${gallery.length})`}
+          </button>
+        ))}
+      </div>
 
-        {isOwnProfile && (
-          <div style={{ display: "flex", gap: 14, alignItems: "flex-start", marginBottom: 22 }}>
-            <ProfileAvatar
-              src={profile?.avatar_url}
-              name={`${profile?.first_name || ""} ${profile?.last_name || ""}`}
-              size={48}
-            />
-
-            <div style={{ flex: 1 }}>
-              <textarea
-                value={newPost}
-                onChange={(e) => setNewPost(e.target.value)}
-                placeholder="Post something to your public community feed..."
-                rows={4}
-                style={{
-                  width: "100%",
-                  background: soft,
-                  border: `1px solid ${line}`,
-                  borderRadius: 14,
-                  padding: 14,
-                  color: ink,
-                  fontFamily: "inherit",
-                  resize: "vertical",
-                }}
-              />
-
-              <button
-                onClick={createPost}
-                disabled={posting || !newPost.trim()}
-                style={{
-                  marginTop: 12,
-                  background: newPost.trim() ? accent : line,
-                  color: ink,
-                  border: "none",
-                  borderRadius: 999,
-                  padding: "12px 18px",
-                  fontWeight: 900,
-                  cursor: newPost.trim() ? "pointer" : "default",
-                }}
-              >
-                {posting ? "Posting..." : "Post to Public Feed"}
-              </button>
+      {/* FEED TAB */}
+      {tab==="feed"&&(
+        <div>
+          {/* Compose — only own profile */}
+          {isOwn&&(
+            <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:18,padding:"18px 20px",marginBottom:16}}>
+              <div style={{display:"flex",gap:12,alignItems:"flex-start",marginBottom:12}}>
+                <ProfileAvatar src={profile?.avatar_url} name={`${profile?.first_name||""}`} size={40}/>
+                <textarea value={newPost} onChange={e=>setNewPost(e.target.value)} placeholder="Post something to your public community feed..." rows={3}
+                  style={{flex:1,background:T.surface2,border:`1.5px solid ${T.line}`,borderRadius:12,padding:"10px 14px",fontSize:14,color:T.ink,fontFamily:T.sans,transition:"border-color 0.15s",width:"100%"}}/>
+              </div>
+              {pendingPhoto&&(
+                <div style={{position:"relative",marginBottom:12,borderRadius:12,overflow:"hidden",maxHeight:220}}>
+                  <img src={pendingPhoto} alt="Preview" style={{width:"100%",objectFit:"cover",display:"block",maxHeight:220}}/>
+                  <button onClick={()=>{setPendingPhoto(null);setPendingFile(null);if(postFileRef.current)postFileRef.current.value="";}} style={{position:"absolute",top:8,right:8,background:"rgba(0,0,0,.6)",border:"none",color:"#fff",borderRadius:"50%",width:28,height:28,cursor:"pointer",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
+                </div>
+              )}
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                <label style={{display:"flex",alignItems:"center",gap:8,fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",color:pendingPhoto?T.orange:T.muted,background:pendingPhoto?T.orangeL:T.surface2,border:`1.5px solid ${pendingPhoto?T.orange:T.line}`,borderRadius:999,padding:"9px 16px",cursor:"pointer",transition:"all 0.15s"}}>
+                  📷 {pendingPhoto?"Photo attached":"Add photo"}
+                  <input ref={postFileRef} type="file" accept="image/*" onChange={handleFileSelect} style={{display:"none"}}/>
+                </label>
+                <button onClick={createPost} disabled={posting||(!newPost.trim()&&!pendingFile)}
+                  style={{fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",background:(newPost.trim()||pendingFile)&&!posting?T.orange:T.line,color:(newPost.trim()||pendingFile)&&!posting?"#fff":T.faint,border:"none",borderRadius:999,padding:"10px 22px",cursor:(newPost.trim()||pendingFile)&&!posting?"pointer":"default",transition:"all 0.15s"}}>
+                  {posting?"Posting...":"Post →"}
+                </button>
+              </div>
             </div>
+          )}
+
+          {posts.length===0?(
+            <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:16,padding:"48px 24px",textAlign:"center"}}>
+              <div style={{fontSize:36,marginBottom:14}}>📣</div>
+              <p style={{fontFamily:T.mono,fontSize:12,color:T.faint}}>No public posts yet.</p>
+            </div>
+          ):(
+            <div style={{display:"flex",flexDirection:"column",gap:12}}>
+              {posts.map(post=>(
+                <div key={post.id} className="pb-post" style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:18,overflow:"hidden",transition:"border-color 0.15s"}}>
+                  {post.image_url&&(
+                    <div style={{position:"relative",maxHeight:280,overflow:"hidden",cursor:"pointer"}} onClick={()=>setLightbox(post.image_url)}>
+                      <img src={post.image_url} alt="" style={{width:"100%",objectFit:"cover",display:"block",maxHeight:280}}/>
+                      <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,transparent 50%,rgba(15,23,42,.5) 100%)"}}/>
+                    </div>
+                  )}
+                  <div style={{padding:"16px 18px"}}>
+                    <div style={{display:"flex",gap:10,alignItems:"flex-start",marginBottom:10}}>
+                      <ProfileAvatar src={profile?.avatar_url} name={`${profile?.first_name||""}`} size={38}/>
+                      <div>
+                        <div style={{fontSize:14,fontWeight:700,color:T.ink}}>{profile?.first_name} {profile?.last_name}</div>
+                        <div style={{fontFamily:T.mono,fontSize:10,color:T.faint}}>@{profile?.username} · {new Date(post.created_at).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}</div>
+                      </div>
+                    </div>
+                    {post.title&&<div style={{fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>{post.title}</div>}
+                    {post.body&&<p style={{fontSize:15,lineHeight:1.65,color:T.ink,marginBottom:14}}>{post.body}</p>}
+                    <div style={{display:"flex",gap:16,borderTop:`1px solid ${T.line}`,paddingTop:12}}>
+                      <span style={{fontFamily:T.mono,fontSize:11,color:T.faint}}>♡ {post.like_count||0}</span>
+                      <span style={{fontFamily:T.mono,fontSize:11,color:T.faint}}>💬 {post.comment_count||0}</span>
+                      {post.image_url&&<button onClick={()=>setLightbox(post.image_url)} style={{fontFamily:T.mono,fontSize:11,fontWeight:700,background:"transparent",border:"none",color:T.faint,cursor:"pointer",padding:0,marginLeft:"auto"}}>🔍 View photo</button>}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* GALLERY TAB */}
+      {tab==="gallery"&&(
+        <div>
+          {isOwn&&(
+            <label style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:10,background:T.surface,border:`2px dashed ${T.line}`,borderRadius:18,padding:"32px 24px",marginBottom:20,cursor:"pointer",textAlign:"center"}}>
+              {uploading?<div style={{fontFamily:T.mono,fontSize:13,color:T.orange}}>Uploading...</div>:<>
+                <div style={{fontSize:36}}>📸</div>
+                <div style={{fontFamily:T.anton,fontSize:20,textTransform:"uppercase",color:T.ink}}>Add to your gallery</div>
+                <div style={{fontFamily:T.mono,fontSize:11,color:T.muted}}>Upload from your photo library</div>
+                <div style={{fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:T.orange,color:"#fff",borderRadius:999,padding:"10px 22px",marginTop:4}}>Choose from library</div>
+              </>}
+              <input ref={galleryFileRef} type="file" accept="image/*" onChange={handleGalleryUpload} style={{display:"none"}}/>
+            </label>
+          )}
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
+            <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.14em",textTransform:"uppercase",color:T.muted}}>{gallery.length} photos</p>
           </div>
-        )}
+          {gallery.length===0?(
+            <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:16,padding:"48px 24px",textAlign:"center"}}>
+              <div style={{fontSize:36,marginBottom:14}}>📷</div>
+              <p style={{fontFamily:T.mono,fontSize:12,color:T.faint}}>No photos yet.</p>
+            </div>
+          ):(
+            <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12}}>
+              {gallery.map((img,i)=>(
+                <div key={i} onClick={()=>setLightbox(img)} style={{aspectRatio:"1",borderRadius:14,overflow:"hidden",cursor:"pointer",background:T.line}}>
+                  <img src={img} alt={`Photo ${i+1}`} className="pb-gal" style={{width:"100%",height:"100%",objectFit:"cover",display:"block",transition:"all 0.2s"}}/>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
-        {posts.length > 0 ? (
-          posts.map((post) => (
-            <article key={post.id} style={{ borderTop: `1px solid ${line}`, padding: "16px 0" }}>
-              {post.title && <strong>{post.title}</strong>}
-
-              <p style={{ color: ink, lineHeight: 1.6 }}>{post.body}</p>
-
-              <p style={{ color: muted, fontSize: 13, marginBottom: 0 }}>
-                {post.created_at ? new Date(post.created_at).toLocaleString() : ""}
-              </p>
-            </article>
-          ))
-        ) : (
-          <p style={{ color: muted }}>No public community posts yet.</p>
-        )}
-      </section>
-
-      <section style={{ background: surface, border: `1px solid ${line}`, borderRadius: 24, padding: 24 }}>
-        <h3 style={{ color: ink, marginTop: 0 }}>Certificates</h3>
-
-        {certificates.length > 0 ? certificates.map((cert) => (
-          <div key={cert.id} style={{ background: soft, border: `1px solid ${line}`, borderRadius: 18, padding: 16, marginBottom: 12 }}>
-            <strong>🎓 {cert.certificate_name}</strong>
-            <p style={{ color: muted, marginBottom: 0 }}>
-              Earned {cert.issued_at ? new Date(cert.issued_at).toLocaleDateString() : ""}
-            </p>
+      {/* Certificates */}
+      <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:20,padding:"20px 24px",marginTop:16}}>
+        <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.14em",textTransform:"uppercase",color:T.muted,marginBottom:14}}>Certificates</p>
+        {certificates.length>0?certificates.map(cert=>(
+          <div key={cert.id} style={{background:T.surface2,border:`1px solid ${T.line}`,borderRadius:12,padding:"12px 16px",marginBottom:10}}>
+            <div style={{fontSize:14,fontWeight:700,color:T.ink}}>🎓 {cert.certificate_name}</div>
+            <div style={{fontFamily:T.mono,fontSize:10,color:T.muted,marginTop:4}}>Earned {cert.issued_at?new Date(cert.issued_at).toLocaleDateString():""}</div>
           </div>
-        )) : <p style={{ color: muted }}>No certificates yet.</p>}
-      </section>
+        )):<p style={{fontSize:13,color:T.faint}}>No certificates yet.</p>}
+      </div>
 
-      <section style={{ background: surface, border: `1px solid ${line}`, borderRadius: 24, padding: 24 }}>
-        <h3 style={{ color: ink, marginTop: 0 }}>Badges</h3>
-
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-          {badges.length > 0 ? badges.map((badge) => (
-            <span key={badge.id} style={{ border: `1px solid ${line}`, borderRadius: 999, padding: "8px 12px", background: soft, color: ink, fontWeight: 900 }}>
-              🏅 {badge.displayName}
-            </span>
-          )) : <p style={{ color: muted }}>No badges yet.</p>}
+      {/* Badges */}
+      <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:20,padding:"20px 24px",marginTop:16}}>
+        <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.14em",textTransform:"uppercase",color:T.muted,marginBottom:14}}>Badges</p>
+        <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+          {badges.length>0?badges.map(badge=>(
+            <span key={badge.id} style={{fontFamily:T.mono,fontSize:10,fontWeight:700,padding:"6px 12px",borderRadius:999,background:T.orangeL,border:`1px solid ${T.orange}22`,color:T.orange}}>🏅 {badge.displayName}</span>
+          )):<p style={{fontSize:13,color:T.faint}}>No badges yet.</p>}
         </div>
-      </section>
+      </div>
 
-      <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 18 }}>
-        <div style={{ background: surface, border: `1px solid ${line}`, borderRadius: 24, padding: 24 }}>
-          <h3 style={{ color: ink }}>About</h3>
-          <p style={{ color: muted, lineHeight: 1.6 }}>{profile?.bio || "No bio added yet."}</p>
+      {/* About + Academics */}
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginTop:16}}>
+        <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:20,padding:"20px 24px"}}>
+          <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.14em",textTransform:"uppercase",color:T.muted,marginBottom:14}}>About</p>
+          <p style={{fontSize:13,color:T.muted,lineHeight:1.65}}>{profile?.bio||"No bio added yet."}</p>
         </div>
-
-        <div style={{ background: surface, border: `1px solid ${line}`, borderRadius: 24, padding: 24 }}>
-          <h3 style={{ color: ink }}>Academics</h3>
-          <p style={{ color: muted }}>GPA: {profile?.gpa || "-"}</p>
-          <p style={{ color: muted }}>SAT: {profile?.sat_score || "-"}</p>
-          <p style={{ color: muted }}>ACT: {profile?.act_score || "-"}</p>
-          <p style={{ color: muted }}>Dream School: {profile?.dream_school || "-"}</p>
+        <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:20,padding:"20px 24px"}}>
+          <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.14em",textTransform:"uppercase",color:T.muted,marginBottom:14}}>Academics</p>
+          {[["GPA",profile?.gpa],["SAT",profile?.sat_score],["ACT",profile?.act_score],["Dream School",profile?.dream_school]].map(([l,v])=>(
+            <div key={l} style={{display:"flex",justifyContent:"space-between",padding:"6px 0",borderBottom:`1px solid ${T.line}`}}>
+              <span style={{fontSize:12,color:T.muted}}>{l}</span>
+              <span style={{fontSize:12,fontWeight:600,color:T.ink}}>{v||"—"}</span>
+            </div>
+          ))}
         </div>
-
-        <div style={{ background: surface, border: `1px solid ${line}`, borderRadius: 24, padding: 24 }}>
-          <h3 style={{ color: ink }}>Team + Coach</h3>
-          <p style={{ color: muted }}>Travel Team: {profile?.travel_team || "-"}</p>
-          <p style={{ color: muted }}>Club Team: {profile?.club_team || "-"}</p>
-          <p style={{ color: muted }}>Coach: {profile?.coach_name || "-"}</p>
-          <p style={{ color: muted }}>Coach Email: {profile?.coach_email || "-"}</p>
-        </div>
-      </section>
+      </div>
     </div>
   );
 }
