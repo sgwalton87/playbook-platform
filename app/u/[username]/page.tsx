@@ -14,7 +14,6 @@ export default function PublicProfilePage() {
   const username=params?.username as string;
   const postFileRef=useRef<HTMLInputElement>(null);
   const galleryFileRef=useRef<HTMLInputElement>(null);
-
   const [viewerId,setViewerId]=useState("");
   const [profile,setProfile]=useState<any>(null);
   const [badges,setBadges]=useState<any[]>([]);
@@ -34,38 +33,30 @@ export default function PublicProfilePage() {
     (async()=>{
       const{data:userData}=await supabase.auth.getUser();
       if(userData.user)setViewerId(userData.user.id);
-
       const{data:profileData,error}=await supabase.from("profiles").select("*").ilike("username",username).maybeSingle();
       if(error||!profileData){setLoading(false);return;}
-
       const[{data:certData},{data:badgeData},{data:feedData}]=await Promise.all([
         supabase.from("certificates").select("*").eq("user_id",profileData.id).order("issued_at",{ascending:false}),
         supabase.from("user_badges").select("id,awarded_at,badges(id,name,description,image_url)").eq("user_id",profileData.id).order("awarded_at",{ascending:false}),
         supabase.from("feed_posts").select("*").eq("user_id",profileData.id).or("visibility.eq.public,visibility.is.null").order("created_at",{ascending:false}).limit(50),
       ]);
-
       const profileBadges=checkBadges(profileData);
       const combinedBadges=[
         ...profileBadges.map((name:string)=>({id:`profile-${name}`,displayName:name})),
         ...(badgeData||[]).map((item:any)=>({id:item.id,displayName:item.badges?.name})),
       ].filter(b=>b.displayName);
-
       setProfile(profileData);
       setCertificates(certData||[]);
       setBadges(combinedBadges);
       setPosts(feedData||[]);
-
-      // Load gallery — photos from feed_posts + storage
       const photoPostUrls=(feedData||[]).filter((p:any)=>p.image_url).map((p:any)=>p.image_url);
       const{data:files}=await supabase.storage.from("photos").list("gallery",{limit:100,sortBy:{column:"created_at",order:"desc"}});
       const storageUrls=(files||[]).filter((f:any)=>f.name!==".emptyFolderPlaceholder").map((f:any)=>`${SURL}/storage/v1/object/public/photos/gallery/${f.name}`);
       setGallery([...photoPostUrls,...storageUrls]);
-
       setLoading(false);
     })();
   },[username]);
 
-  // Realtime new posts
   useEffect(()=>{
     if(!profile?.id)return;
     const channel=supabase.channel(`public-profile-${profile.id}`)
@@ -146,8 +137,8 @@ export default function PublicProfilePage() {
         </div>
       )}
 
-      {/* Profile hero */}
-      <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:20,padding:"24px 28px",marginBottom:16,display:"flex",alignItems:"center",gap:20,flexWrap:"wrap",position:"relative",overflow:"hidden"}}>
+      {/* 1 — Profile hero */}
+      <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:20,padding:"24px 28px",marginBottom:14,display:"flex",alignItems:"center",gap:20,flexWrap:"wrap",position:"relative",overflow:"hidden"}}>
         <div style={{position:"absolute",top:0,right:0,width:200,height:"100%",background:`linear-gradient(90deg,transparent,${T.orangeL})`,pointerEvents:"none"}}/>
         <ProfileAvatar src={profile?.avatar_url} name={`${profile?.first_name||""} ${profile?.last_name||""}`} size={80}/>
         <div style={{flex:1}}>
@@ -158,8 +149,8 @@ export default function PublicProfilePage() {
         <button onClick={()=>router.push("/dashboard")} style={{fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",background:"transparent",border:`1.5px solid ${T.line}`,color:T.muted,borderRadius:999,padding:"9px 16px",cursor:"pointer"}}>← Dashboard</button>
       </div>
 
-      {/* Stats */}
-      <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:10,marginBottom:16}}>
+      {/* 2 — Stats bar */}
+      <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:10,marginBottom:14}}>
         {[{icon:"⚡",label:"XP",value:profile?.xp??0},{icon:"💰",label:"Coins",value:profile?.coin_balance??0},{icon:"🎓",label:"Certs",value:certificates.length},{icon:"🏅",label:"Badges",value:badges.length},{icon:"💬",label:"Posts",value:posts.length}].map(({icon,label,value})=>(
           <div key={label} style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:14,padding:"14px 14px"}}>
             <div style={{fontSize:20,marginBottom:6}}>{icon}</div>
@@ -169,7 +160,46 @@ export default function PublicProfilePage() {
         ))}
       </div>
 
-      {/* Feed + Gallery tabs */}
+      {/* 3 — About + Academics */}
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
+        <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:20,padding:"20px 24px"}}>
+          <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.14em",textTransform:"uppercase",color:T.muted,marginBottom:12}}>About</p>
+          <p style={{fontSize:13,color:T.muted,lineHeight:1.65}}>{profile?.bio||"No bio added yet."}</p>
+          {profile?.location&&<p style={{fontSize:12,color:T.faint,marginTop:8}}>📍 {profile.location}</p>}
+        </div>
+        <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:20,padding:"20px 24px"}}>
+          <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.14em",textTransform:"uppercase",color:T.muted,marginBottom:12}}>Academics</p>
+          {[["GPA",profile?.gpa],["SAT",profile?.sat_score],["ACT",profile?.act_score],["Dream School",profile?.dream_school],["Coach",profile?.coach_name],["Travel Team",profile?.travel_team]].map(([l,v])=>(
+            <div key={l} style={{display:"flex",justifyContent:"space-between",padding:"6px 0",borderBottom:`1px solid ${T.line}`}}>
+              <span style={{fontSize:12,color:T.muted}}>{l}</span>
+              <span style={{fontSize:12,fontWeight:600,color:T.ink}}>{v||"—"}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 4 — Badges */}
+      <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:20,padding:"20px 24px",marginBottom:14}}>
+        <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.14em",textTransform:"uppercase",color:T.muted,marginBottom:12}}>Badges</p>
+        <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+          {badges.length>0?badges.map(badge=>(
+            <span key={badge.id} style={{fontFamily:T.mono,fontSize:10,fontWeight:700,padding:"6px 12px",borderRadius:999,background:T.orangeL,border:`1px solid ${T.orange}22`,color:T.orange}}>🏅 {badge.displayName}</span>
+          )):<p style={{fontSize:13,color:T.faint}}>No badges yet.</p>}
+        </div>
+      </div>
+
+      {/* 5 — Certificates */}
+      <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:20,padding:"20px 24px",marginBottom:14}}>
+        <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.14em",textTransform:"uppercase",color:T.muted,marginBottom:12}}>Certificates</p>
+        {certificates.length>0?certificates.map(cert=>(
+          <div key={cert.id} style={{background:T.surface2,border:`1px solid ${T.line}`,borderRadius:12,padding:"12px 16px",marginBottom:10}}>
+            <div style={{fontSize:14,fontWeight:700,color:T.ink}}>🎓 {cert.certificate_name}</div>
+            <div style={{fontFamily:T.mono,fontSize:10,color:T.muted,marginTop:4}}>Earned {cert.issued_at?new Date(cert.issued_at).toLocaleDateString():""}</div>
+          </div>
+        )):<p style={{fontSize:13,color:T.faint}}>No certificates yet.</p>}
+      </div>
+
+      {/* 6 — Feed + Gallery LAST */}
       <div style={{display:"flex",gap:8,marginBottom:16}}>
         {(["feed","gallery"]as const).map(t=>(
           <button key={t} onClick={()=>setTab(t)} style={{fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:tab===t?T.navy:"transparent",color:tab===t?"#F8F7F4":T.muted,border:`1.5px solid ${tab===t?T.navy:T.line}`,borderRadius:999,padding:"9px 18px",cursor:"pointer",transition:"all 0.15s"}}>
@@ -178,10 +208,8 @@ export default function PublicProfilePage() {
         ))}
       </div>
 
-      {/* FEED TAB */}
       {tab==="feed"&&(
         <div>
-          {/* Compose — only own profile */}
           {isOwn&&(
             <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:18,padding:"18px 20px",marginBottom:16}}>
               <div style={{display:"flex",gap:12,alignItems:"flex-start",marginBottom:12}}>
@@ -207,7 +235,6 @@ export default function PublicProfilePage() {
               </div>
             </div>
           )}
-
           {posts.length===0?(
             <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:16,padding:"48px 24px",textAlign:"center"}}>
               <div style={{fontSize:36,marginBottom:14}}>📣</div>
@@ -246,7 +273,6 @@ export default function PublicProfilePage() {
         </div>
       )}
 
-      {/* GALLERY TAB */}
       {tab==="gallery"&&(
         <div>
           {isOwn&&(
@@ -279,44 +305,6 @@ export default function PublicProfilePage() {
           )}
         </div>
       )}
-
-      {/* Certificates */}
-      <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:20,padding:"20px 24px",marginTop:16}}>
-        <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.14em",textTransform:"uppercase",color:T.muted,marginBottom:14}}>Certificates</p>
-        {certificates.length>0?certificates.map(cert=>(
-          <div key={cert.id} style={{background:T.surface2,border:`1px solid ${T.line}`,borderRadius:12,padding:"12px 16px",marginBottom:10}}>
-            <div style={{fontSize:14,fontWeight:700,color:T.ink}}>🎓 {cert.certificate_name}</div>
-            <div style={{fontFamily:T.mono,fontSize:10,color:T.muted,marginTop:4}}>Earned {cert.issued_at?new Date(cert.issued_at).toLocaleDateString():""}</div>
-          </div>
-        )):<p style={{fontSize:13,color:T.faint}}>No certificates yet.</p>}
-      </div>
-
-      {/* Badges */}
-      <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:20,padding:"20px 24px",marginTop:16}}>
-        <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.14em",textTransform:"uppercase",color:T.muted,marginBottom:14}}>Badges</p>
-        <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
-          {badges.length>0?badges.map(badge=>(
-            <span key={badge.id} style={{fontFamily:T.mono,fontSize:10,fontWeight:700,padding:"6px 12px",borderRadius:999,background:T.orangeL,border:`1px solid ${T.orange}22`,color:T.orange}}>🏅 {badge.displayName}</span>
-          )):<p style={{fontSize:13,color:T.faint}}>No badges yet.</p>}
-        </div>
-      </div>
-
-      {/* About + Academics */}
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginTop:16}}>
-        <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:20,padding:"20px 24px"}}>
-          <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.14em",textTransform:"uppercase",color:T.muted,marginBottom:14}}>About</p>
-          <p style={{fontSize:13,color:T.muted,lineHeight:1.65}}>{profile?.bio||"No bio added yet."}</p>
-        </div>
-        <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:20,padding:"20px 24px"}}>
-          <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.14em",textTransform:"uppercase",color:T.muted,marginBottom:14}}>Academics</p>
-          {[["GPA",profile?.gpa],["SAT",profile?.sat_score],["ACT",profile?.act_score],["Dream School",profile?.dream_school]].map(([l,v])=>(
-            <div key={l} style={{display:"flex",justifyContent:"space-between",padding:"6px 0",borderBottom:`1px solid ${T.line}`}}>
-              <span style={{fontSize:12,color:T.muted}}>{l}</span>
-              <span style={{fontSize:12,fontWeight:600,color:T.ink}}>{v||"—"}</span>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }
