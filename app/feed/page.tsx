@@ -32,63 +32,57 @@ export default function FeedPage() {
       if(!u.user){router.replace("/login");return;}
       setUserId(u.user.id);
 
-      // Load profile separately — no join
       const{data:p}=await supabase.from("profiles").select("first_name,full_name").eq("id",u.user.id).single();
-      const name=p?.full_name||p?.first_name||"Stephisha";
-      setUserName(p?.first_name||"Stephisha");
+      const name=p?.full_name||p?.first_name||"Scholar";
+      setUserName(p?.first_name||"Scholar");
       setUserInitials(name.split(" ").map((n:string)=>n[0]).join("").toUpperCase().slice(0,2));
 
-      // Load all posts — no join, load author names separately
-      const{data:dbPosts,error:postsError}=await supabase
-        .from("posts")
-        .select("id,author_id,body,image_url,like_count,comment_count,created_at")
+      // Load from feed_posts — the real table
+      const{data:dbPosts,error}=await supabase
+        .from("feed_posts")
+        .select("id,user_id,post_type,title,body,image_url,media_url,created_at,visibility")
+        .eq("visibility","public")
         .order("created_at",{ascending:false})
         .limit(50);
 
-      if(postsError)console.error("Posts error:",postsError);
+      if(error)console.error("Feed error:",error.message);
 
       if(dbPosts&&dbPosts.length>0){
-        // Get unique author ids and fetch their names
-        const authorIds=[...new Set(dbPosts.map((p:any)=>p.author_id))];
-        const{data:authorProfiles}=await supabase
-          .from("profiles")
-          .select("id,first_name,full_name")
-          .in("id",authorIds);
-
+        const authorIds=[...new Set(dbPosts.map((p:any)=>p.user_id))];
+        const{data:authorProfiles}=await supabase.from("profiles").select("id,first_name,full_name").in("id",authorIds);
         const profileMap:Record<string,string>={};
-        authorProfiles?.forEach((ap:any)=>{
-          profileMap[ap.id]=ap.full_name||ap.first_name||"Scholar";
-        });
+        authorProfiles?.forEach((ap:any)=>{profileMap[ap.id]=ap.full_name||ap.first_name||"Scholar";});
 
         setPosts(dbPosts.map((post:any)=>{
-          const authorName=profileMap[post.author_id]||"Scholar";
+          const authorName=profileMap[post.user_id]||"Scholar";
           const initials=authorName.split(" ").map((n:string)=>n[0]).join("").toUpperCase().slice(0,2);
           const d=new Date(post.created_at);
-          const timeStr=d.toLocaleDateString("en-US",{month:"short",day:"numeric"});
+          const timeStr=d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})+" · "+d.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"});
+          const imgUrl=post.image_url||post.media_url||null;
           return{
-            id:post.id,
-            author:authorName,
-            initials,
-            color:post.author_id===u.user.id?T.orange:T.blue,
-            role:"Scholar-Athlete",
-            time:timeStr,
+            id:post.id,author:authorName,initials,
+            color:post.user_id===u.user.id?T.orange:T.blue,
+            role:"Scholar-Athlete",time:timeStr,
+            title:post.title||null,
             content:post.body||"",
-            pillar:"Leadership",
-            pillarColor:T.orange,
-            coverImg:post.image_url||null,
-            likes:post.like_count||0,
-            comments:post.comment_count||0,
-            liked:false,
-            isOwn:post.author_id===u.user.id,
+            pillar:"Leadership",pillarColor:T.orange,
+            coverImg:imgUrl,likes:0,comments:0,liked:false,
+            isOwn:post.user_id===u.user.id,
           };
         }));
       }
 
-      // Load gallery
-      const{data:files,error:galleryError}=await supabase.storage.from("photos").list("gallery",{limit:100,sortBy:{column:"created_at",order:"desc"}});
-      if(galleryError)console.error("Gallery error:",galleryError);
+      // Load gallery from Supabase Storage
+      const{data:files}=await supabase.storage.from("photos").list("gallery",{limit:100,sortBy:{column:"created_at",order:"desc"}});
       if(files&&files.length>0){
         setGallery(files.filter((f:any)=>f.name!==".emptyFolderPlaceholder").map((f:any)=>`${SURL}/storage/v1/object/public/photos/gallery/${f.name}`));
+      }
+
+      // Also pull feed post images into gallery
+      const{data:photoPosts}=await supabase.from("feed_posts").select("image_url,media_url").not("image_url","is",null).limit(50);
+      if(photoPosts){
+        const photoUrls=photoPosts.map((p:any)=>p.image_url||p.media_url).filter(Boolean);
+        if(photoUrls.length>0)setGallery(prev=>[...photoUrls,...prev]);
       }
 
       setLoading(false);
@@ -98,7 +92,7 @@ export default function FeedPage() {
   const uploadPhoto=async(photoFile:File,folder:string):Promise<string|null>=>{
     const ext=photoFile.name.split(".").pop()||"jpg";
     const filename=`${folder}/${Date.now()}.${ext}`;
-    const{data,error}=await supabase.storage.from("photos").upload(filename,photoFile,{cacheControl:"3600",upsert:true});
+    const{error}=await supabase.storage.from("photos").upload(filename,photoFile,{cacheControl:"3600",upsert:true});
     if(error){console.error("Upload error:",error.message);return null;}
     return`${SURL}/storage/v1/object/public/photos/${filename}`;
   };
@@ -112,25 +106,33 @@ export default function FeedPage() {
     if(!newPost.trim()&&!pendingFile)return;
     setUploading(true);
     let imageUrl:string|null=null;
+
     if(pendingFile){
       imageUrl=await uploadPhoto(pendingFile,"feed");
+      // Also save to gallery folder
       if(imageUrl)setGallery(prev=>[imageUrl!,...prev]);
     }
-    const{data:saved,error}=await supabase.from("posts").insert({
-      author_id:userId,
+
+    // Save to feed_posts with correct columns
+    const{data:saved,error}=await supabase.from("feed_posts").insert({
+      user_id:userId,
+      post_type:"text",
       body:newPost,
       image_url:imageUrl,
-      like_count:0,
-      comment_count:0,
+      visibility:"public",
     }).select().single();
+
     if(error)console.error("Post error:",error.message);
+
     setPosts(prev=>[{
       id:saved?.id||Date.now().toString(),
       author:userName,initials:userInitials,color:T.orange,
       role:"Scholar-Athlete",time:"Just now",
-      content:newPost,pillar:"Leadership",pillarColor:T.orange,
+      title:null,content:newPost,
+      pillar:"Leadership",pillarColor:T.orange,
       coverImg:imageUrl,likes:0,comments:0,liked:false,isOwn:true,
     },...prev]);
+
     setNewPost("");setPendingPhoto(null);setPendingFile(null);
     if(postFileRef.current)postFileRef.current.value="";
     setUploading(false);
@@ -140,7 +142,14 @@ export default function FeedPage() {
     const f=e.target.files?.[0];if(!f)return;
     setUploading(true);
     const url=await uploadPhoto(f,"gallery");
-    if(url)setGallery(prev=>[url,...prev]);
+    if(url){
+      setGallery(prev=>[url,...prev]);
+      // Also save as a photo post to feed_posts
+      await supabase.from("feed_posts").insert({
+        user_id:userId,post_type:"photo",
+        body:"",image_url:url,visibility:"public",
+      });
+    }
     if(galleryFileRef.current)galleryFileRef.current.value="";
     setUploading(false);
   };
@@ -235,12 +244,12 @@ export default function FeedPage() {
                           <div style={{flex:1}}>
                             <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
                               <span style={{fontSize:14,fontWeight:700,color:T.ink}}>{post.author}</span>
-                              <span style={{fontFamily:T.mono,fontSize:9,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",background:post.pillarColor+"18",color:post.pillarColor,padding:"2px 7px",borderRadius:999}}>{post.pillar}</span>
                               {post.isOwn&&<span style={{fontFamily:T.mono,fontSize:9,color:T.faint}}>· you</span>}
                             </div>
                             <div style={{fontFamily:T.mono,fontSize:10,color:T.faint,marginTop:2}}>{post.role} · {post.time}</div>
                           </div>
                         </div>
+                        {post.title&&<div style={{fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>{post.title}</div>}
                         {post.content&&<p style={{fontSize:15,lineHeight:1.65,color:T.ink,marginBottom:14}}>{post.content}</p>}
                         <div style={{display:"flex",gap:16,borderTop:`1px solid ${T.line}`,paddingTop:12}}>
                           <button onClick={()=>toggleLike(post.id)} className="pb-like" style={{display:"flex",alignItems:"center",gap:6,fontFamily:T.mono,fontSize:11,fontWeight:700,background:"transparent",border:"none",color:post.liked?T.orange:T.faint,cursor:"pointer",padding:0,transition:"color 0.15s"}}>{post.liked?"♥":"♡"} {post.likes}</button>
