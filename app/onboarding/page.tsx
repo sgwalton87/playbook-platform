@@ -1,33 +1,84 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
-const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",blue:"#3B82F6",green:"#10B981",purple:"#8B5CF6",amber:"#F59E0B",mono:"'Space Mono', monospace",sans:"'Hanken Grotesk', system-ui, sans-serif",anton:"'Anton', sans-serif"};
-const STEPS=["School & Location","Athletic Profile","Background","Your Pillars"];
-const SPORTS=["Basketball","Football","Soccer","Track & Field","Baseball","Softball","Swimming","Volleyball","Tennis","Cross Country","Wrestling","Lacrosse","Golf","Gymnastics","Cheer","Dance","Other"];
+const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",blue:"#3B82F6",blueL:"#EFF6FF",green:"#10B981",purple:"#8B5CF6",amber:"#F59E0B",mono:"'Space Mono', monospace",sans:"'Hanken Grotesk', system-ui, sans-serif",anton:"'Anton', sans-serif"};
+const SPORT_CONFIG:Record<string,{label:string;options:string[]}>={
+  "Basketball":{label:"Position",options:["Point Guard","Shooting Guard","Small Forward","Power Forward","Center","Guard","Forward","Guard-Forward","Forward-Center"]},
+  "Football":{label:"Position",options:["Quarterback","Running Back","Fullback","Wide Receiver","Tight End","Offensive Lineman","Defensive End","Defensive Tackle","Linebacker","Cornerback","Safety","Kicker","Punter","Returner"]},
+  "Soccer":{label:"Position",options:["Goalkeeper","Center Back","Right Back","Left Back","Defensive Midfielder","Central Midfielder","Attacking Midfielder","Right Winger","Left Winger","Striker","Forward"]},
+  "Baseball":{label:"Position",options:["Pitcher","Catcher","First Base","Second Base","Third Base","Shortstop","Left Field","Center Field","Right Field","Designated Hitter","Utility"]},
+  "Softball":{label:"Position",options:["Pitcher","Catcher","First Base","Second Base","Third Base","Shortstop","Left Field","Center Field","Right Field","Designated Player","Utility"]},
+  "Track & Field":{label:"Event",options:["100m","200m","400m","800m","1500m","Mile","5000m","10000m","110m Hurdles","100m Hurdles","400m Hurdles","3000m Steeplechase","4x100m Relay","4x400m Relay","High Jump","Pole Vault","Long Jump","Triple Jump","Shot Put","Discus","Hammer Throw","Javelin","Heptathlon","Decathlon","Cross Country","Race Walk"]},
+  "Swimming":{label:"Event",options:["50m Freestyle","100m Freestyle","200m Freestyle","400m Freestyle","800m Freestyle","1500m Freestyle","100m Backstroke","200m Backstroke","100m Breaststroke","200m Breaststroke","100m Butterfly","200m Butterfly","200m IM","400m IM","4x100m Relay","4x200m Relay","4x100m Medley Relay","Open Water"]},
+  "Volleyball":{label:"Position",options:["Setter","Outside Hitter","Middle Blocker","Opposite Hitter","Libero","Defensive Specialist","Serving Specialist"]},
+  "Tennis":{label:"Specialty",options:["Singles","Doubles","Mixed Doubles","All-around"]},
+  "Cross Country":{label:"Distance",options:["5K","6K","8K","10K","All distances"]},
+  "Wrestling":{label:"Weight class",options:["106 lbs","113 lbs","120 lbs","126 lbs","132 lbs","138 lbs","144 lbs","150 lbs","157 lbs","165 lbs","175 lbs","190 lbs","215 lbs","285 lbs"]},
+  "Lacrosse":{label:"Position",options:["Attack","Midfield","Defense","Goalkeeper","FOGO (Face-off)"]},
+  "Golf":{label:"Format",options:["Stroke play","Match play","Team format","All formats"]},
+  "Gymnastics":{label:"Event",options:["All-around","Floor Exercise","Vault","Uneven Bars","Balance Beam","Pommel Horse","Still Rings","Parallel Bars","High Bar","Trampoline","Rhythmic"]},
+  "Cheer":{label:"Specialty",options:["Tumbling","Stunting","Jumps","Dance","Flyer","Base","Back Spot","All-around"]},
+  "Dance":{label:"Style",options:["Hip Hop","Jazz","Contemporary","Ballet","Pom","Kick","Lyrical","Tap","Ballroom","Competitive All-Star"]},
+  "Other":{label:"Position / Event",options:[]},
+};
+const SPORTS=Object.keys(SPORT_CONFIG);
+const CA_DISTRICTS=["Abc Unified","Acalanes Union High","Adelanto Elementary","Alhambra Unified","Alisal Union Elementary","Alta Loma Elementary","Anaheim Elementary","Anaheim Union High","Antelope Valley Union High","Apple Valley Unified","Arcadia Unified","Azusa Unified","Bakersfield City Elementary","Baldwin Park Unified","Bassett Unified","Beaumont Unified","Berkeley Unified","Beverly Hills Unified","Brentwood Union Elementary","Burbank Unified","Cabrillo Unified","Cajon Valley Union","Calexico Unified","Campbell Union High","Capistrano Unified","Castro Valley Unified","Chaffey Joint Union High","Chino Valley Unified","Chula Vista Elementary","Claremont Unified","Colton Joint Unified","Compton Unified","Conejo Valley Unified","Corona-Norco Unified","Coronado Unified","Covina-Valley Unified","Culver City Unified","Cupertino Union Elementary","Davis Joint Unified","Del Norte County Unified","Desert Sands Unified","Downey Unified","Duarte Unified","East Side Union High","El Monte City Elementary","El Monte Union High","El Rancho Unified","Elk Grove Unified","Escondido Union High","Etiwanda Elementary","Fontana Unified","Fremont Union High","Fresno Unified","Fullerton Joint Union High","Garden Grove Unified","Gilroy Unified","Glendale Unified","Glendora Unified","Grant Joint Union High","Grossmont Union High","Hacienda La Puente Unified","Hawthorne Elementary","Hayward Unified","Hemet Unified","Huntington Beach Union High","Inglewood Unified","Irvine Unified","Jurupa Unified","Kings Canyon Joint Unified","La Mesa-Spring Valley","Laguna Beach Unified","Lake Elsinore Unified","Lancaster Elementary","Las Virgenes Unified","Lodi Unified","Lompoc Unified","Long Beach Unified","Los Angeles Unified","Los Banos Unified","Lynwood Unified","Manteca Unified","Madera Unified","Menifee Union","Merced Union High","Modesto City High","Monrovia Unified","Montebello Unified","Monterey Peninsula Unified","Moorpark Unified","Moreno Valley Unified","Morgan Hill Unified","Mount Diablo Unified","Murrieta Valley Unified","Napa Valley Unified","Newport-Mesa Unified","Norwalk-La Mirada Unified","Novato Unified","Oakland Unified","Oceanside Unified","Ontario-Montclair Elementary","Orange Unified","Oxnard Union High","Palm Springs Unified","Palmdale Elementary","Palo Alto Unified","Paramount Unified","Pasadena Unified","Perris Union High","Pittsburg Unified","Placentia-Yorba Linda Unified","Pomona Unified","Poway Unified","Redlands Unified","Redondo Beach Unified","Rialto Unified","Riverside Unified","Sacramento City Unified","Saddleback Valley Unified","Salinas Union High","San Bernardino City Unified","San Diego Unified","San Francisco Unified","San Jose Unified","San Juan Unified","San Lorenzo Unified","San Marcos Unified","San Mateo Union High","Santa Ana Unified","Santa Barbara High","Santa Clara Unified","Santa Maria Joint Union High","Santa Monica-Malibu Unified","Sequoia Union High","Simi Valley Unified","Stockton Unified","Sunnyvale Elementary","Sweetwater Union High","Temecula Valley Unified","Tracy Joint Unified","Turlock Unified","Tustin Unified","Ukiah Unified","Vacaville Unified","Val Verde Unified","Vallejo City Unified","Victor Valley Union High","Visalia Unified","Vista Unified","Walnut Valley Unified","West Contra Costa Unified","West Covina Unified","Whittier Union High","William S. Hart Union High","Woodland Joint Unified","Yucaipa-Calimesa Joint Unified","Other (not listed)"];
+const CA_CITIES=["Alameda","Antioch","Berkeley","Brentwood","Compton","Concord","Daly City","Davis","East Palo Alto","El Monte","Elk Grove","Escondido","Fontana","Fremont","Fresno","Fullerton","Garden Grove","Glendale","Hayward","Huntington Beach","Inglewood","Irvine","Lancaster","Long Beach","Los Angeles","Modesto","Moreno Valley","Oakland","Oceanside","Ontario","Orange","Oxnard","Palmdale","Pasadena","Pomona","Rancho Cucamonga","Richmond","Riverside","Roseville","Sacramento","Salinas","San Bernardino","San Diego","San Francisco","San Jose","Santa Ana","Santa Clara","Santa Clarita","Santa Rosa","Simi Valley","Stockton","Sunnyvale","Thousand Oaks","Torrance","Vallejo","Victorville","Visalia","Other"];
 const GRADES=["6th Grade","7th Grade","8th Grade","9th Grade","10th Grade","11th Grade","12th Grade","College Freshman","College Sophomore","College Junior","College Senior"];
 const RACES=["Black / African American","Hispanic / Latino","White","Asian","Native American / Alaska Native","Native Hawaiian / Pacific Islander","Two or more races","Prefer not to say"];
 const GENDERS=["Male","Female","Non-binary","Prefer not to say"];
 const INCOME=["Under $25,000","$25,000–$49,999","$50,000–$74,999","$75,000–$99,999","$100,000+","Prefer not to say"];
 const TEAM_LEVELS=["Middle School","Junior Varsity (JV)","Varsity","Club / AAU","Travel Team","College","Semi-Pro","Professional"];
 const PILLARS=[{key:"leadership",label:"Leadership",icon:"★",desc:"Captaincy, accountability, leading on and off the court"},{key:"finance",label:"Financial Literacy",icon:"$",desc:"Budgeting, NIL basics, building wealth"},{key:"civic",label:"Civic Engagement",icon:"✓",desc:"Youth advocacy, community projects, making change"},{key:"sel",label:"Social-Emotional Learning",icon:"♥",desc:"Mental wellness, resilience, identity beyond sport"}];
-const CA_CITIES=["Alameda","Antioch","Berkeley","Brentwood","Compton","Concord","Daly City","Davis","East Palo Alto","El Monte","Elk Grove","Escondido","Fontana","Fremont","Fresno","Fullerton","Garden Grove","Glendale","Hayward","Huntington Beach","Inglewood","Irvine","Lancaster","Long Beach","Los Angeles","Modesto","Moreno Valley","Oakland","Oceanside","Ontario","Orange","Oxnard","Palmdale","Pasadena","Pomona","Rancho Cucamonga","Richmond","Riverside","Roseville","Sacramento","Salinas","San Bernardino","San Diego","San Francisco","San Jose","Santa Ana","Santa Clara","Santa Clarita","Santa Rosa","Simi Valley","Stockton","Sunnyvale","Thousand Oaks","Torrance","Vallejo","Victorville","Visalia","Other"];
+const STEPS=["School & Location","Athletic Profile","Background","Your Pillars"];
 
-function CitySearch({value,onChange}:{value:string;onChange:(v:string)=>void}) {
+function SearchDropdown({options,value,onChange,placeholder,onAddNew}:{options:string[];value:string;onChange:(v:string)=>void;placeholder:string;onAddNew?:(v:string)=>void}) {
   const [query,setQuery]=useState(value);
   const [open,setOpen]=useState(false);
-  const filtered=CA_CITIES.filter(c=>c.toLowerCase().includes(query.toLowerCase())).slice(0,8);
+  const filtered=options.filter(o=>o.toLowerCase().includes(query.toLowerCase())).slice(0,10);
+  const showAdd=onAddNew&&query.length>2&&!options.some(o=>o.toLowerCase()===query.toLowerCase());
   return(
     <div style={{position:"relative"}}>
-      <input value={query} onChange={e=>{setQuery(e.target.value);onChange(e.target.value);setOpen(true);}} onFocus={()=>setOpen(true)} onBlur={()=>setTimeout(()=>setOpen(false),150)} placeholder="Start typing your city..." style={{width:"100%",background:T.surface,border:`1.5px solid ${T.line}`,borderRadius:10,padding:"12px 14px",fontSize:14,color:T.ink,fontFamily:T.sans,outline:"none"}}/>
-      {open&&query.length>0&&filtered.length>0&&(
-        <div style={{position:"absolute",top:"100%",left:0,right:0,background:T.surface,border:`1px solid ${T.line}`,borderRadius:10,zIndex:100,overflow:"hidden",boxShadow:"0 4px 20px rgba(0,0,0,.1)",marginTop:4}}>
-          {filtered.map(c=>(
-            <div key={c} onMouseDown={()=>{setQuery(c);onChange(c);setOpen(false);}} style={{padding:"11px 14px",fontSize:14,color:T.ink,cursor:"pointer",borderBottom:`1px solid ${T.line}`}} onMouseEnter={e=>(e.currentTarget.style.background=T.orangeL)} onMouseLeave={e=>(e.currentTarget.style.background="transparent")}>{c}</div>
+      <input value={query} onChange={e=>{setQuery(e.target.value);onChange(e.target.value);setOpen(true);}} onFocus={()=>setOpen(true)} onBlur={()=>setTimeout(()=>setOpen(false),200)} placeholder={placeholder} style={{width:"100%",background:T.surface,border:`1.5px solid ${T.line}`,borderRadius:10,padding:"12px 14px",fontSize:14,color:T.ink,fontFamily:T.sans,outline:"none"}}/>
+      {open&&(filtered.length>0||showAdd)&&(
+        <div style={{position:"absolute",top:"100%",left:0,right:0,background:T.surface,border:`1px solid ${T.line}`,borderRadius:10,zIndex:200,overflow:"hidden",boxShadow:"0 4px 20px rgba(0,0,0,.12)",marginTop:4,maxHeight:260,overflowY:"auto"}}>
+          {filtered.map(o=>(
+            <div key={o} onMouseDown={()=>{setQuery(o);onChange(o);setOpen(false);}} style={{padding:"11px 14px",fontSize:14,color:T.ink,cursor:"pointer",borderBottom:`1px solid ${T.line}`}} onMouseEnter={e=>(e.currentTarget.style.background=T.orangeL)} onMouseLeave={e=>(e.currentTarget.style.background="transparent")}>{o}</div>
           ))}
+          {showAdd&&<div onMouseDown={()=>{onChange(query);onAddNew!(query);setOpen(false);}} style={{padding:"11px 14px",fontSize:14,color:T.orange,cursor:"pointer",fontWeight:700,background:T.orangeL,borderTop:`1px solid ${T.line}`}}>+ Add "{query}"</div>}
         </div>
       )}
+    </div>
+  );
+}
+
+function UsernameField({value,onChange,onStatusChange}:{value:string;onChange:(v:string)=>void;onStatusChange:(s:"idle"|"taken"|"available")=>void}) {
+  const [status,setStatus]=useState<"idle"|"checking"|"taken"|"available">("idle");
+  const debounceRef=useState<NodeJS.Timeout|null>(null);
+  const check=useCallback(async(val:string)=>{
+    if(!val||val.length<3){setStatus("idle");onStatusChange("idle");return;}
+    setStatus("checking");
+    const{data}=await supabase.from("profiles").select("id").ilike("username",val.replace("@","").toLowerCase()).maybeSingle();
+    const s=data?"taken":"available";
+    setStatus(s);onStatusChange(s);
+  },[onStatusChange]);
+  const handleChange=(val:string)=>{
+    onChange(val);
+    if(debounceRef[0])clearTimeout(debounceRef[0]);
+    debounceRef[1](setTimeout(()=>check(val),600));
+  };
+  const clean=value.replace("@","");
+  return(
+    <div>
+      <div style={{position:"relative"}}>
+        <input value={value} onChange={e=>handleChange(e.target.value)} placeholder="@yourhandle" style={{width:"100%",background:T.surface,border:`1.5px solid ${status==="taken"?"#DC2626":status==="available"?T.green:T.line}`,borderRadius:10,padding:"12px 14px",fontSize:14,color:T.ink,fontFamily:T.sans,outline:"none"}}/>
+        {status==="checking"&&<span style={{position:"absolute",right:14,top:"50%",transform:"translateY(-50%)",fontFamily:T.mono,fontSize:10,color:T.faint}}>checking…</span>}
+      </div>
+      {status==="available"&&<p style={{fontFamily:T.mono,fontSize:10,color:T.green,marginTop:6,fontWeight:700}}>✓ @{clean} is available!</p>}
+      {status==="taken"&&<p style={{fontFamily:T.mono,fontSize:10,color:"#DC2626",marginTop:6,fontWeight:700}}>✗ @{clean} is already taken — try another</p>}
+      {value.length>0&&value.length<3&&<p style={{fontFamily:T.mono,fontSize:10,color:T.faint,marginTop:6}}>Username must be at least 3 characters</p>}
     </div>
   );
 }
@@ -36,51 +87,25 @@ function VideoGate({onComplete}:{onComplete:()=>void}) {
   const [progress,setProgress]=useState(0);
   const [done,setDone]=useState(false);
   const [countdown,setCountdown]=useState(3);
-
-  useEffect(()=>{
-    // Simulate video progress — replace with real video when available
-    const interval=setInterval(()=>{
-      setProgress(p=>{
-        if(p>=100){clearInterval(interval);setDone(true);return 100;}
-        return p+2;
-      });
-    },1000);
-    return()=>clearInterval(interval);
-  },[]);
-
-  useEffect(()=>{
-    if(!done)return;
-    if(countdown<=0){onComplete();return;}
-    const t=setTimeout(()=>setCountdown(c=>c-1),1000);
-    return()=>clearTimeout(t);
-  },[done,countdown,onComplete]);
-
+  useEffect(()=>{const i=setInterval(()=>setProgress(p=>{if(p>=100){clearInterval(i);setDone(true);return 100;}return p+2;}),1000);return()=>clearInterval(i);},[]);
+  useEffect(()=>{if(!done)return;if(countdown<=0){onComplete();return;}const t=setTimeout(()=>setCountdown(c=>c-1),1000);return()=>clearTimeout(t);},[done,countdown,onComplete]);
   return(
     <div style={{position:"fixed",inset:0,zIndex:9999,background:T.navy,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:40}}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&display=swap');`}</style>
       <div style={{width:80,height:80,borderRadius:20,background:T.orange,display:"flex",alignItems:"center",justifyContent:"center",marginBottom:32}}><span style={{fontFamily:"Anton,sans-serif",fontSize:44,color:"#fff"}}>P</span></div>
-      {!done?(
-        <>
-          <p style={{fontFamily:T.mono,fontSize:11,letterSpacing:"0.18em",textTransform:"uppercase",color:T.orange,marginBottom:16}}>Welcome to Playbook Series Inc.</p>
-          <h1 style={{fontFamily:"Anton,sans-serif",fontWeight:400,fontSize:"clamp(32px,5vw,56px)",textTransform:"uppercase",color:"#F8F7F4",textAlign:"center",lineHeight:.95,marginBottom:40}}>Your journey<br/><span style={{color:T.orange}}>starts now.</span></h1>
-          <div style={{width:"100%",maxWidth:400}}>
-            <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}>
-              <span style={{fontFamily:T.mono,fontSize:11,color:"rgba(248,247,244,.5)"}}>Intro video</span>
-              <span style={{fontFamily:T.mono,fontSize:11,color:T.orange,fontWeight:700}}>{progress}%</span>
-            </div>
-            <div style={{background:"rgba(255,255,255,.1)",borderRadius:999,height:4,overflow:"hidden"}}>
-              <div style={{background:T.orange,height:"100%",width:`${progress}%`,borderRadius:999,transition:"width 0.5s linear"}}/>
-            </div>
-            <p style={{fontFamily:T.mono,fontSize:10,color:"rgba(248,247,244,.3)",textAlign:"center",marginTop:12}}>Please watch the full intro to continue</p>
-          </div>
-        </>
-      ):(
-        <>
-          <h2 style={{fontFamily:"Anton,sans-serif",fontWeight:400,fontSize:"clamp(28px,4vw,48px)",textTransform:"uppercase",color:"#F8F7F4",textAlign:"center",lineHeight:.95,marginBottom:16}}>Welcome to the<br/><span style={{color:T.orange}}>network!</span></h2>
-          <p style={{fontFamily:T.mono,fontSize:12,color:"rgba(255,255,255,.5)",letterSpacing:"0.06em"}}>Building your profile in {countdown}…</p>
-          <div style={{marginTop:20,width:48,height:48,borderRadius:"50%",border:`3px solid ${T.orange}`,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontFamily:"Anton,sans-serif",fontSize:22,color:T.orange}}>{countdown}</span></div>
-        </>
-      )}
+      {!done?(<>
+        <p style={{fontFamily:T.mono,fontSize:11,letterSpacing:"0.18em",textTransform:"uppercase",color:T.orange,marginBottom:16}}>Welcome to Playbook Series Inc.</p>
+        <h1 style={{fontFamily:"Anton,sans-serif",fontWeight:400,fontSize:"clamp(32px,5vw,56px)",textTransform:"uppercase",color:"#F8F7F4",textAlign:"center",lineHeight:.95,marginBottom:40}}>Your journey<br/><span style={{color:T.orange}}>starts now.</span></h1>
+        <div style={{width:"100%",maxWidth:400}}>
+          <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}><span style={{fontFamily:T.mono,fontSize:11,color:"rgba(248,247,244,.5)"}}>Intro video</span><span style={{fontFamily:T.mono,fontSize:11,color:T.orange,fontWeight:700}}>{progress}%</span></div>
+          <div style={{background:"rgba(255,255,255,.1)",borderRadius:999,height:4,overflow:"hidden"}}><div style={{background:T.orange,height:"100%",width:`${progress}%`,borderRadius:999,transition:"width 0.5s linear"}}/></div>
+          <p style={{fontFamily:T.mono,fontSize:10,color:"rgba(248,247,244,.3)",textAlign:"center",marginTop:12}}>Please watch the full intro to continue</p>
+        </div>
+      </>):(<>
+        <h2 style={{fontFamily:"Anton,sans-serif",fontWeight:400,fontSize:"clamp(28px,4vw,48px)",textTransform:"uppercase",color:"#F8F7F4",textAlign:"center",lineHeight:.95,marginBottom:16}}>Welcome to the<br/><span style={{color:T.orange}}>network!</span></h2>
+        <p style={{fontFamily:T.mono,fontSize:12,color:"rgba(255,255,255,.5)",letterSpacing:"0.06em"}}>Building your profile in {countdown}…</p>
+        <div style={{marginTop:20,width:48,height:48,borderRadius:"50%",border:`3px solid ${T.orange}`,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontFamily:"Anton,sans-serif",fontSize:22,color:T.orange}}>{countdown}</span></div>
+      </>)}
     </div>
   );
 }
@@ -93,49 +118,36 @@ export default function OnboardingPage() {
   const [userId,setUserId]=useState<string|null>(null);
   const [xpEarned,setXpEarned]=useState(0);
   const [toast,setToast]=useState<string|null>(null);
-  const [school,setSchool]=useState("");
-  const [grade,setGrade]=useState("");
-  const [gpa,setGpa]=useState("");
-  const [city,setCity]=useState("");
-  const [zipCode,setZipCode]=useState("");
-  const [state,setState]=useState("CA");
-  const [district,setDistrict]=useState("");
-  const [gradYear,setGradYear]=useState("");
-  const [dreamSchool,setDreamSchool]=useState("");
-  const [ell,setEll]=useState(false);
-  const [sport,setSport]=useState("");
-  const [position,setPosition]=useState("");
-  const [jersey,setJersey]=useState("");
-  const [height,setHeight]=useState("");
-  const [weight,setWeight]=useState("");
-  const [teamLevel,setTeamLevel]=useState("");
-  const [travelTeam,setTravelTeam]=useState("");
-  const [coachName,setCoachName]=useState("");
-  const [coachEmail,setCoachEmail]=useState("");
-  const [gender,setGender]=useState("");
-  const [race,setRace]=useState("");
-  const [householdIncome,setHouseholdIncome]=useState("");
-  const [firstGen,setFirstGen]=useState(false);
-  const [freeLunch,setFreeLunch]=useState(false);
-  const [migrant,setMigrant]=useState(false);
-  const [fosterYouth,setFosterYouth]=useState(false);
-  const [unhoused,setUnhoused]=useState(false);
-  const [iep,setIep]=useState(false);
-  const [bio,setBio]=useState("");
-  const [pillars,setPillars]=useState<string[]>([]);
-  const [username,setUsername]=useState("");
+  const [districtOptions,setDistrictOptions]=useState<string[]>(CA_DISTRICTS);
+  const [cityOptions,setCityOptions]=useState<string[]>(CA_CITIES);
+  const [school,setSchool]=useState("");const [grade,setGrade]=useState("");const [gpa,setGpa]=useState("");const [city,setCity]=useState("");const [zipCode,setZipCode]=useState("");const [usState,setUsState]=useState("CA");const [district,setDistrict]=useState("");const [gradYear,setGradYear]=useState("");const [dreamSchool,setDreamSchool]=useState("");const [ell,setEll]=useState(false);
+  const [sport,setSport]=useState("");const [position,setPosition]=useState("");const [jersey,setJersey]=useState("");const [height,setHeight]=useState("");const [weight,setWeight]=useState("");const [teamLevel,setTeamLevel]=useState("");const [travelTeam,setTravelTeam]=useState("");const [coachName,setCoachName]=useState("");const [coachEmail,setCoachEmail]=useState("");
+  const [gender,setGender]=useState("");const [race,setRace]=useState("");const [householdIncome,setHouseholdIncome]=useState("");const [firstGen,setFirstGen]=useState(false);const [freeLunch,setFreeLunch]=useState(false);const [migrant,setMigrant]=useState(false);const [fosterYouth,setFosterYouth]=useState(false);const [unhoused,setUnhoused]=useState(false);const [iep,setIep]=useState(false);const [bio,setBio]=useState("");
+  const [pillars,setPillars]=useState<string[]>([]);const [username,setUsername]=useState("");const [usernameStatus,setUsernameStatus]=useState<"idle"|"taken"|"available">("idle");
 
   useEffect(()=>{
     supabase.auth.getUser().then(async({data})=>{
       if(!data.user){router.replace("/login");return;}
       setUserId(data.user.id);
-      const{data:p}=await supabase.from("profiles").select("onboarded,username,first_name").eq("id",data.user.id).single();
+      const{data:p}=await supabase.from("profiles").select("onboarded,username").eq("id",data.user.id).single();
       if(p?.onboarded){router.replace("/dashboard");return;}
       if(p?.username)setUsername(p.username);
+      const{data:custom}=await supabase.from("custom_options").select("category,value");
+      if(custom){
+        const d=custom.filter((c:any)=>c.category==="district").map((c:any)=>c.value);
+        const ci=custom.filter((c:any)=>c.category==="city").map((c:any)=>c.value);
+        if(d.length)setDistrictOptions(prev=>[...new Set([...prev,...d])]);
+        if(ci.length)setCityOptions(prev=>[...new Set([...prev,...ci])]);
+      }
     });
   },[]);
 
   useEffect(()=>{if(!toast)return;const t=setTimeout(()=>setToast(null),3500);return()=>clearTimeout(t);},[toast]);
+
+  const addCustomOption=async(category:string,value:string)=>{
+    if(!userId||!value.trim())return;
+    await supabase.from("custom_options").upsert({category,value:value.trim(),added_by:userId},{onConflict:"category,value"});
+  };
 
   const awardXP=async(xp:number,label:string)=>{
     if(!userId)return;
@@ -146,39 +158,36 @@ export default function OnboardingPage() {
   };
 
   const handleNext=async()=>{
-    const xpMap=[50,75,100,125];
-    const labels=["School & Location","Athletic Profile","Background","Your Pillars"];
-    await awardXP(xpMap[step],labels[step]);
-    if(step<3)setStep(s=>s+1);
+    const xpMap=[50,75,100,125];const labels=["School & Location","Athletic Profile","Background","Your Pillars"];
+    await awardXP(xpMap[step],labels[step]);setStep(s=>s+1);
   };
 
   const handleSave=async()=>{
     if(!userId)return;
+    if(usernameStatus==="taken"){setToast("Please choose a different username.");return;}
     setSaving(true);
     await supabase.from("profiles").update({
-      username:username.replace("@","")||null,
-      school,grade,gpa:gpa||null,city,zip_code:zipCode,state,
+      username:username.replace("@","").toLowerCase()||null,
+      school,grade,gpa:gpa||null,city,zip_code:zipCode,state:usState,
       school_district:district,grad_year:gradYear,dream_school:dreamSchool,
       english_language_learner:ell,sport,position,jersey,height,weight,
-      team_level:teamLevel,travel_team:travelTeam,
-      coach_name:coachName,coach_email:coachEmail,
-      gender,race,household_income:householdIncome,
-      first_generation:firstGen,free_reduced_lunch:freeLunch,
-      migrant_student:migrant,foster_youth:fosterYouth,
+      team_level:teamLevel,travel_team:travelTeam,coach_name:coachName,coach_email:coachEmail,
+      gender,race,household_income:householdIncome,first_generation:firstGen,
+      free_reduced_lunch:freeLunch,migrant_student:migrant,foster_youth:fosterYouth,
       unhoused,has_iep:iep,bio,pillars,onboarded:true,
     }).eq("id",userId);
     setSaving(false);
     router.replace("/dashboard");
   };
 
+  const sportConfig=sport&&SPORT_CONFIG[sport]?SPORT_CONFIG[sport]:null;
   if(phase==="video")return<VideoGate onComplete={()=>setPhase("data")}/>;
 
   const inp={width:"100%",background:T.surface,border:`1.5px solid ${T.line}`,borderRadius:10,padding:"12px 14px",fontSize:14,color:T.ink,fontFamily:T.sans,outline:"none",transition:"border-color 0.15s"} as React.CSSProperties;
-  const sel={...inp,cursor:"pointer"} as React.CSSProperties;
+  const sel={...inp,cursor:"pointer",appearance:"none" as const} as React.CSSProperties;
   const lbl={fontFamily:T.mono,fontSize:10,letterSpacing:"0.12em",textTransform:"uppercase" as const,color:T.muted,display:"block",marginBottom:6};
   const chk=(active:boolean)=>({display:"flex",alignItems:"center",gap:10,padding:"11px 14px",borderRadius:10,border:`1.5px solid ${active?T.orange:T.line}`,background:active?T.orangeL:"transparent",cursor:"pointer",transition:"all 0.12s",fontSize:13,color:active?T.orange:T.ink} as React.CSSProperties);
-
-  const canProceed=[school.trim()&&grade&&city.trim(),sport,true,pillars.length>0][step];
+  const canProceed=[school.trim()&&grade&&city.trim(),sport,true,pillars.length>0&&username.length>=3&&usernameStatus!=="taken"][step];
 
   return(
     <div style={{minHeight:"100vh",background:T.cream,fontFamily:T.sans,color:T.ink,display:"flex",alignItems:"center",justifyContent:"center",padding:"40px 20px"}}>
@@ -191,12 +200,7 @@ export default function OnboardingPage() {
           <div><div style={{fontFamily:T.anton,fontSize:16,color:T.ink}}>PLAYBOOK</div><div style={{fontFamily:T.mono,fontSize:7,letterSpacing:"0.3em",color:T.orange}}>SERIES INC.</div></div>
         </div>
         <div style={{display:"grid",gridTemplateColumns:`repeat(${STEPS.length},1fr)`,gap:6,marginBottom:24}}>
-          {STEPS.map((s,i)=>(
-            <div key={s}>
-              <div style={{height:3,borderRadius:999,background:i<=step?T.orange:T.line,transition:"background 0.2s"}}/>
-              <div style={{fontFamily:T.mono,fontSize:9,letterSpacing:"0.1em",textTransform:"uppercase",color:i===step?T.orange:T.faint,marginTop:5}}>{s}</div>
-            </div>
-          ))}
+          {STEPS.map((s,i)=>(<div key={s}><div style={{height:3,borderRadius:999,background:i<=step?T.orange:T.line,transition:"background 0.2s"}}/><div style={{fontFamily:T.mono,fontSize:9,letterSpacing:"0.1em",textTransform:"uppercase",color:i===step?T.orange:T.faint,marginTop:5}}>{s}</div></div>))}
         </div>
         <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:20,padding:"28px 26px"}}>
           <div style={{background:T.surface2,borderRadius:8,padding:"8px 14px",marginBottom:18,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
@@ -204,104 +208,100 @@ export default function OnboardingPage() {
             <span style={{fontFamily:T.mono,fontSize:12,fontWeight:700,color:T.orange}}>+{[50,75,100,125][step]} XP</span>
           </div>
 
-          {step===0&&(
-            <div>
-              <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>Step 1 of 4</p>
-              <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink,marginBottom:18,lineHeight:1}}>School & Location</h1>
-              <div style={{marginBottom:14}}><label style={lbl}>School name *</label><input style={inp} placeholder="Lincoln High School" value={school} onChange={e=>setSchool(e.target.value)}/></div>
-              <div style={{marginBottom:14}}><label style={lbl}>School district</label><input style={inp} placeholder="Oakland Unified School District" value={district} onChange={e=>setDistrict(e.target.value)}/></div>
-              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
-                <div><label style={lbl}>Grade *</label><select style={sel} value={grade} onChange={e=>setGrade(e.target.value)}><option value="">Select grade...</option>{GRADES.map(g=><option key={g}>{g}</option>)}</select></div>
-                <div><label style={lbl}>Grad year</label><select style={sel} value={gradYear} onChange={e=>setGradYear(e.target.value)}><option value="">Select year...</option>{Array.from({length:10},(_,i)=>(new Date().getFullYear()+i).toString()).map(y=><option key={y}>{y}</option>)}</select></div>
-              </div>
-              <div style={{marginBottom:14}}><label style={lbl}>City *</label><CitySearch value={city} onChange={setCity}/></div>
-              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
-                <div><label style={lbl}>State</label><select style={sel} value={state} onChange={e=>setState(e.target.value)}>{["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"].map(s=><option key={s}>{s}</option>)}</select></div>
-                <div><label style={lbl}>ZIP code</label><input style={inp} placeholder="94601" value={zipCode} onChange={e=>setZipCode(e.target.value)}/></div>
-              </div>
-              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
-                <div><label style={lbl}>GPA</label><input style={inp} placeholder="3.5" value={gpa} onChange={e=>setGpa(e.target.value)}/></div>
-                <div><label style={lbl}>Dream school</label><input style={inp} placeholder="Howard University" value={dreamSchool} onChange={e=>setDreamSchool(e.target.value)}/></div>
-              </div>
-              <div onClick={()=>setEll(!ell)} style={chk(ell)}><div style={{width:20,height:20,borderRadius:5,border:`2px solid ${ell?T.orange:T.line}`,background:ell?T.orange:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{ell&&<span style={{color:"#fff",fontSize:12}}>✓</span>}</div>I am an English Language Learner (ELL)</div>
+          {step===0&&(<div>
+            <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>Step 1 of 4</p>
+            <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink,marginBottom:18,lineHeight:1}}>School & Location</h1>
+            <div style={{marginBottom:14}}><label style={lbl}>School name *</label><input style={inp} placeholder="Lincoln High School" value={school} onChange={e=>setSchool(e.target.value)}/></div>
+            <div style={{marginBottom:14}}><label style={lbl}>School district</label><SearchDropdown options={districtOptions} value={district} onChange={setDistrict} placeholder="Search CA districts or type yours..." onAddNew={v=>{setDistrictOptions(p=>[...new Set([...p,v])]);addCustomOption("district",v);}}/></div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
+              <div><label style={lbl}>Grade *</label><select style={sel} value={grade} onChange={e=>setGrade(e.target.value)}><option value="">Select grade...</option>{GRADES.map(g=><option key={g}>{g}</option>)}</select></div>
+              <div><label style={lbl}>Grad year</label><select style={sel} value={gradYear} onChange={e=>setGradYear(e.target.value)}><option value="">Select year...</option>{Array.from({length:10},(_,i)=>(new Date().getFullYear()+i).toString()).map(y=><option key={y}>{y}</option>)}</select></div>
             </div>
-          )}
-
-          {step===1&&(
-            <div>
-              <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>Step 2 of 4</p>
-              <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink,marginBottom:18,lineHeight:1}}>Athletic Profile</h1>
-              <div style={{marginBottom:14}}><label style={lbl}>Primary sport *</label><select style={sel} value={sport} onChange={e=>setSport(e.target.value)}><option value="">Select your sport...</option>{SPORTS.map(s=><option key={s}>{s}</option>)}</select></div>
-              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
-                <div><label style={lbl}>Position</label><input style={inp} placeholder="Point Guard" value={position} onChange={e=>setPosition(e.target.value)}/></div>
-                <div><label style={lbl}>Jersey #</label><input style={inp} placeholder="11" value={jersey} onChange={e=>setJersey(e.target.value)}/></div>
-              </div>
-              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
-                <div><label style={lbl}>Height</label><input style={inp} placeholder='5&apos;11"' value={height} onChange={e=>setHeight(e.target.value)}/></div>
-                <div><label style={lbl}>Weight (lbs)</label><input style={inp} placeholder="155" value={weight} onChange={e=>setWeight(e.target.value)}/></div>
-              </div>
-              <div style={{marginBottom:14}}><label style={lbl}>Team level</label><select style={sel} value={teamLevel} onChange={e=>setTeamLevel(e.target.value)}><option value="">Select level...</option>{TEAM_LEVELS.map(l=><option key={l}>{l}</option>)}</select></div>
-              <div style={{marginBottom:14}}><label style={lbl}>Travel / Club team</label><input style={inp} placeholder="Oakland Soldiers" value={travelTeam} onChange={e=>setTravelTeam(e.target.value)}/></div>
-              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
-                <div><label style={lbl}>Coach name</label><input style={inp} placeholder="Coach Smith" value={coachName} onChange={e=>setCoachName(e.target.value)}/></div>
-                <div><label style={lbl}>Coach email</label><input type="email" style={inp} placeholder="coach@school.edu" value={coachEmail} onChange={e=>setCoachEmail(e.target.value)}/></div>
-              </div>
+            <div style={{marginBottom:14}}><label style={lbl}>City *</label><SearchDropdown options={cityOptions} value={city} onChange={setCity} placeholder="Start typing your city..." onAddNew={v=>{setCityOptions(p=>[...new Set([...p,v])]);addCustomOption("city",v);}}/></div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
+              <div><label style={lbl}>State</label><select style={sel} value={usState} onChange={e=>setUsState(e.target.value)}>{["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"].map(s=><option key={s}>{s}</option>)}</select></div>
+              <div><label style={lbl}>ZIP code</label><input style={inp} placeholder="94601" value={zipCode} onChange={e=>setZipCode(e.target.value)}/></div>
             </div>
-          )}
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
+              <div><label style={lbl}>GPA</label><input style={inp} placeholder="3.5" value={gpa} onChange={e=>setGpa(e.target.value)}/></div>
+              <div><label style={lbl}>Dream school</label><input style={inp} placeholder="Howard University" value={dreamSchool} onChange={e=>setDreamSchool(e.target.value)}/></div>
+            </div>
+            <div onClick={()=>setEll(!ell)} style={chk(ell)}><div style={{width:20,height:20,borderRadius:5,border:`2px solid ${ell?T.orange:T.line}`,background:ell?T.orange:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{ell&&<span style={{color:"#fff",fontSize:12}}>✓</span>}</div>I am an English Language Learner (ELL)</div>
+          </div>)}
 
-          {step===2&&(
-            <div>
-              <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>Step 3 of 4</p>
-              <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink,marginBottom:10,lineHeight:1}}>Background</h1>
-              <div style={{background:"#EFF6FF",borderRadius:10,padding:"12px 14px",fontSize:12,color:T.muted,lineHeight:1.6,marginBottom:18,borderLeft:`3px solid ${T.blue}`}}>🔒 Private and only used to secure funding for scholars like you. Never shared publicly.</div>
-              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
-                <div><label style={lbl}>Gender</label><select style={sel} value={gender} onChange={e=>setGender(e.target.value)}><option value="">Select...</option>{GENDERS.map(g=><option key={g}>{g}</option>)}</select></div>
-                <div><label style={lbl}>Race / Ethnicity</label><select style={sel} value={race} onChange={e=>setRace(e.target.value)}><option value="">Select...</option>{RACES.map(r=><option key={r}>{r}</option>)}</select></div>
-              </div>
-              <div style={{marginBottom:18}}><label style={lbl}>Household income</label><select style={sel} value={householdIncome} onChange={e=>setHouseholdIncome(e.target.value)}><option value="">Select...</option>{INCOME.map(i=><option key={i}>{i}</option>)}</select></div>
-              <label style={lbl}>Check all that apply</label>
-              <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:14}}>
-                {[{label:"First-generation college student",val:firstGen,set:setFirstGen},{label:"Free or reduced-price lunch eligible",val:freeLunch,set:setFreeLunch},{label:"Migrant student",val:migrant,set:setMigrant},{label:"Foster youth / former foster care",val:fosterYouth,set:setFosterYouth},{label:"Experiencing housing instability",val:unhoused,set:setUnhoused},{label:"I have an IEP or 504 plan",val:iep,set:setIep}].map(({label,val,set})=>(
-                  <div key={label} onClick={()=>set(!val)} style={chk(val)}><div style={{width:20,height:20,borderRadius:5,border:`2px solid ${val?T.orange:T.line}`,background:val?T.orange:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"all 0.12s"}}>{val&&<span style={{color:"#fff",fontSize:12}}>✓</span>}</div><span>{label}</span></div>
+          {step===1&&(<div>
+            <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>Step 2 of 4</p>
+            <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink,marginBottom:18,lineHeight:1}}>Athletic Profile</h1>
+            <div style={{marginBottom:14}}>
+              <label style={lbl}>Primary sport *</label>
+              <div style={{display:"flex",flexWrap:"wrap",gap:7}}>
+                {SPORTS.map(s=>(
+                  <button key={s} onClick={()=>{setSport(s);setPosition("");}} style={{fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",padding:"7px 12px",borderRadius:999,border:`1.5px solid ${sport===s?T.orange:T.line}`,background:sport===s?T.orangeL:"transparent",color:sport===s?T.orange:T.muted,cursor:"pointer",transition:"all 0.12s"}}>{s}</button>
                 ))}
               </div>
-              <div><label style={lbl}>Bio (optional)</label><textarea value={bio} onChange={e=>setBio(e.target.value)} placeholder="Tell us about yourself..." rows={3} style={{...inp,resize:"vertical" as const}}/></div>
             </div>
-          )}
+            {sport&&sportConfig&&(<div style={{marginBottom:14}}>
+              <label style={lbl}>{sportConfig.label}{sportConfig.options.length>0?"":" (type yours)"}</label>
+              {sportConfig.options.length>0?(
+                <select style={sel} value={position} onChange={e=>setPosition(e.target.value)}><option value="">Select {sportConfig.label.toLowerCase()}...</option>{sportConfig.options.map(o=><option key={o}>{o}</option>)}<option value="Other">Other</option></select>
+              ):(
+                <input style={inp} placeholder={`Enter your ${sportConfig.label.toLowerCase()}`} value={position} onChange={e=>setPosition(e.target.value)}/>
+              )}
+            </div>)}
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
+              <div><label style={lbl}>Jersey #</label><input style={inp} placeholder="11" value={jersey} onChange={e=>setJersey(e.target.value)}/></div>
+              <div><label style={lbl}>Team level</label><select style={sel} value={teamLevel} onChange={e=>setTeamLevel(e.target.value)}><option value="">Select level...</option>{TEAM_LEVELS.map(l=><option key={l}>{l}</option>)}</select></div>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
+              <div><label style={lbl}>Height</label><input style={inp} placeholder='5&apos;11"' value={height} onChange={e=>setHeight(e.target.value)}/></div>
+              <div><label style={lbl}>Weight (lbs)</label><input style={inp} placeholder="155" value={weight} onChange={e=>setWeight(e.target.value)}/></div>
+            </div>
+            <div style={{marginBottom:14}}><label style={lbl}>Travel / Club team</label><input style={inp} placeholder="Oakland Soldiers" value={travelTeam} onChange={e=>setTravelTeam(e.target.value)}/></div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
+              <div><label style={lbl}>Coach name</label><input style={inp} placeholder="Coach Smith" value={coachName} onChange={e=>setCoachName(e.target.value)}/></div>
+              <div><label style={lbl}>Coach email</label><input type="email" style={inp} placeholder="coach@school.edu" value={coachEmail} onChange={e=>setCoachEmail(e.target.value)}/></div>
+            </div>
+          </div>)}
 
-          {step===3&&(
-            <div>
-              <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>Step 4 of 4</p>
-              <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink,marginBottom:10,lineHeight:1}}>Your Pillars</h1>
-              <p style={{fontSize:13,color:T.muted,marginBottom:20,lineHeight:1.6}}>Which pillars interest you most? We will personalize your dashboard and recommend courses based on your choices.</p>
-              <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:22}}>
-                {PILLARS.map(p=>{
-                  const active=pillars.includes(p.key);
-                  return(
-                    <div key={p.key} onClick={()=>setPillars(prev=>prev.includes(p.key)?prev.filter(x=>x!==p.key):[...prev,p.key])}
-                      style={{display:"flex",alignItems:"center",gap:14,padding:"14px 16px",borderRadius:12,border:`1.5px solid ${active?T.orange:T.line}`,background:active?T.orangeL:"transparent",cursor:"pointer",transition:"all 0.12s"}}>
-                      <div style={{width:36,height:36,borderRadius:9,background:active?T.orange:T.line,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,color:active?"#fff":T.muted,flexShrink:0,transition:"all 0.12s"}}>{p.icon}</div>
-                      <div style={{flex:1}}><div style={{fontSize:14,fontWeight:700,color:active?T.orange:T.ink}}>{p.label}</div><div style={{fontSize:12,color:T.muted,marginTop:2}}>{p.desc}</div></div>
-                      <div style={{width:22,height:22,borderRadius:6,border:`2px solid ${active?T.orange:T.line}`,background:active?T.orange:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{active&&<span style={{fontSize:12,color:"#fff"}}>✓</span>}</div>
-                    </div>
-                  );
-                })}
-              </div>
-              <div><label style={lbl}>Choose a username</label><input style={inp} placeholder="@yourhandle" value={username} onChange={e=>setUsername(e.target.value)}/></div>
+          {step===2&&(<div>
+            <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>Step 3 of 4</p>
+            <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink,marginBottom:10,lineHeight:1}}>Background</h1>
+            <div style={{background:T.blueL,borderRadius:10,padding:"12px 14px",fontSize:12,color:T.muted,lineHeight:1.6,marginBottom:18,borderLeft:`3px solid ${T.blue}`}}>🔒 Private and only used to secure funding for scholars like you. Never shared publicly.</div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
+              <div><label style={lbl}>Gender</label><select style={sel} value={gender} onChange={e=>setGender(e.target.value)}><option value="">Select...</option>{GENDERS.map(g=><option key={g}>{g}</option>)}</select></div>
+              <div><label style={lbl}>Race / Ethnicity</label><select style={sel} value={race} onChange={e=>setRace(e.target.value)}><option value="">Select...</option>{RACES.map(r=><option key={r}>{r}</option>)}</select></div>
             </div>
-          )}
+            <div style={{marginBottom:18}}><label style={lbl}>Household income</label><select style={sel} value={householdIncome} onChange={e=>setHouseholdIncome(e.target.value)}><option value="">Select...</option>{INCOME.map(i=><option key={i}>{i}</option>)}</select></div>
+            <label style={lbl}>Check all that apply</label>
+            <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:14}}>
+              {[{label:"First-generation college student",val:firstGen,set:setFirstGen},{label:"Free or reduced-price lunch eligible",val:freeLunch,set:setFreeLunch},{label:"Migrant student",val:migrant,set:setMigrant},{label:"Foster youth / former foster care",val:fosterYouth,set:setFosterYouth},{label:"Experiencing housing instability",val:unhoused,set:setUnhoused},{label:"I have an IEP or 504 plan",val:iep,set:setIep}].map(({label,val,set})=>(
+                <div key={label} onClick={()=>set(!val)} style={chk(val)}><div style={{width:20,height:20,borderRadius:5,border:`2px solid ${val?T.orange:T.line}`,background:val?T.orange:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{val&&<span style={{color:"#fff",fontSize:12}}>✓</span>}</div><span>{label}</span></div>
+              ))}
+            </div>
+            <div><label style={lbl}>Bio (optional)</label><textarea value={bio} onChange={e=>setBio(e.target.value)} placeholder="Tell us about yourself..." rows={3} style={{...inp,resize:"vertical" as const}}/></div>
+          </div>)}
+
+          {step===3&&(<div>
+            <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>Step 4 of 4</p>
+            <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink,marginBottom:10,lineHeight:1}}>Your Pillars</h1>
+            <p style={{fontSize:13,color:T.muted,marginBottom:20,lineHeight:1.6}}>Select what interests you most — we will suggest courses on your dashboard based on your choices.</p>
+            <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:22}}>
+              {PILLARS.map(p=>{
+                const active=pillars.includes(p.key);
+                return(<div key={p.key} onClick={()=>setPillars(prev=>prev.includes(p.key)?prev.filter(x=>x!==p.key):[...prev,p.key])} style={{display:"flex",alignItems:"center",gap:14,padding:"14px 16px",borderRadius:12,border:`1.5px solid ${active?T.orange:T.line}`,background:active?T.orangeL:"transparent",cursor:"pointer",transition:"all 0.12s"}}>
+                  <div style={{width:36,height:36,borderRadius:9,background:active?T.orange:T.line,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,color:active?"#fff":T.muted,flexShrink:0}}>{p.icon}</div>
+                  <div style={{flex:1}}><div style={{fontSize:14,fontWeight:700,color:active?T.orange:T.ink}}>{p.label}</div><div style={{fontSize:12,color:T.muted,marginTop:2}}>{p.desc}</div></div>
+                  <div style={{width:22,height:22,borderRadius:6,border:`2px solid ${active?T.orange:T.line}`,background:active?T.orange:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{active&&<span style={{fontSize:12,color:"#fff"}}>✓</span>}</div>
+                </div>);
+              })}
+            </div>
+            <div><label style={lbl}>Choose a username *</label><UsernameField value={username} onChange={setUsername} onStatusChange={setUsernameStatus}/></div>
+          </div>)}
 
           <div style={{display:"flex",gap:10,marginTop:24}}>
             {step>0&&<button onClick={()=>setStep(s=>s-1)} style={{fontFamily:T.mono,fontSize:12,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:"transparent",color:T.muted,border:`1.5px solid ${T.line}`,borderRadius:12,padding:"13px 20px",cursor:"pointer"}}>← Back</button>}
-            {step<3?(
-              <button onClick={handleNext} disabled={!canProceed} style={{flex:1,fontFamily:T.mono,fontSize:12,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:canProceed?T.orange:T.line,color:canProceed?"#fff":T.muted,border:"none",borderRadius:12,padding:"13px",cursor:canProceed?"pointer":"default",transition:"all 0.15s"}}>
-                Save & Continue +{[50,75,100,125][step]} XP →
-              </button>
-            ):(
-              <button onClick={handleSave} disabled={saving||pillars.length===0} style={{flex:1,fontFamily:T.mono,fontSize:12,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:saving||pillars.length===0?T.line:T.orange,color:saving||pillars.length===0?T.muted:"#fff",border:"none",borderRadius:12,padding:"13px",cursor:saving||pillars.length===0?"default":"pointer",transition:"all 0.15s"}}>
-                {saving?"Saving...":"Complete profile +125 XP →"}
-              </button>
-            )}
+            {step<3?(<button onClick={handleNext} disabled={!canProceed} style={{flex:1,fontFamily:T.mono,fontSize:12,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:canProceed?T.orange:T.line,color:canProceed?"#fff":T.muted,border:"none",borderRadius:12,padding:"13px",cursor:canProceed?"pointer":"default",transition:"all 0.15s"}}>Save & Continue +{[50,75,100,125][step]} XP →</button>
+            ):(<button onClick={handleSave} disabled={saving||pillars.length===0||username.length<3||usernameStatus==="taken"} style={{flex:1,fontFamily:T.mono,fontSize:12,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:saving||pillars.length===0||username.length<3||usernameStatus==="taken"?T.line:T.orange,color:saving||pillars.length===0||username.length<3||usernameStatus==="taken"?T.muted:"#fff",border:"none",borderRadius:12,padding:"13px",cursor:"pointer",transition:"all 0.15s"}}>{saving?"Saving...":"Complete profile +125 XP →"}</button>)}
           </div>
           <p style={{textAlign:"center",marginTop:12,fontSize:11,color:T.faint}}>You can update this anytime in your profile settings</p>
         </div>
