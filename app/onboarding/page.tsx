@@ -152,7 +152,7 @@ export default function OnboardingPage() {
   const awardXP=async(xp:number,label:string)=>{
     if(!userId)return;
     const{data:p}=await supabase.from("profiles").select("xp,coin_balance").eq("id",userId).single();
-    await supabase.from("profiles").update({xp:(p?.xp||0)+xp,coin_balance:(p?.coin_balance||0)+Math.floor(xp/5)}).eq("id",userId);
+    await supabase.from("profiles").upsert({id:userId,xp:(p?.xp||0)+xp,coin_balance:(p?.coin_balance||0)+Math.floor(xp/5)}).eq("id",userId);
     setXpEarned(prev=>prev+xp);
     setToast(`⚡ +${xp} XP earned for completing ${label}!`);
   };
@@ -166,7 +166,7 @@ export default function OnboardingPage() {
     if(!userId)return;
     if(usernameStatus==="taken"){setToast("Please choose a different username.");return;}
     setSaving(true);
-    await supabase.from("profiles").update({
+    await supabase.from("profiles").upsert({id:userId,
       username:username.replace("@","").toLowerCase()||null,
       school,grade,gpa:gpa||null,city,zip_code:zipCode,state:usState,
       school_district:district,grad_year:gradYear,dream_school:dreamSchool,
