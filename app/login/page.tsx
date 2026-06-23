@@ -1,315 +1,216 @@
 "use client";
-
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
+const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",blue:"#3B82F6",blueL:"#EFF6FF",green:"#10B981",purple:"#8B5CF6",mono:"'Space Mono', monospace",sans:"'Hanken Grotesk', system-ui, sans-serif",anton:"'Anton', sans-serif"};
+
+const ROLES=[
+  {key:"scholar",label:"Scholar",icon:"📖",desc:"A student focused on academic excellence",needsParent:true,needsEdu:false,needsAdmin:false},
+  {key:"scholar-athlete",label:"Scholar-Athlete",icon:"🏅",desc:"A student competing in sports while excelling academically",needsParent:true,needsEdu:false,needsAdmin:false},
+  {key:"transition-youth",label:"Transition-Aged Youth (18–24)",icon:"🚀",desc:"Young adults building careers and independence",needsParent:false,needsEdu:true,needsAdmin:false},
+  {key:"mentor",label:"K-12 Mentor / Counselor / Advisor",icon:"🧭",desc:"Educators and counselors supporting student growth",needsParent:false,needsEdu:true,needsAdmin:false},
+  {key:"coach",label:"Coach",icon:"🏆",desc:"Athletic coaches supporting scholar-athletes",needsParent:false,needsEdu:true,needsAdmin:true},
+  {key:"college-admin",label:"College Administrator",icon:"🎓",desc:"College staff and administrators",needsParent:false,needsEdu:true,needsAdmin:false},
+  {key:"other",label:"Other",icon:"✦",desc:"Community members and partners — requires special approval",needsParent:false,needsEdu:false,needsAdmin:true},
+];
+
 export default function LoginPage() {
-  const router = useRouter();
-  const [mode, setMode] = useState<"login" | "signup">("login");
-  const [username, setUsername] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const router=useRouter();
+  const [mode,setMode]=useState<"login"|"signup">("signup");
+  const [step,setStep]=useState<"role"|"details">("role");
+  const [selectedRole,setSelectedRole]=useState("");
+  const [email,setEmail]=useState("");
+  const [password,setPassword]=useState("");
+  const [firstName,setFirstName]=useState("");
+  const [lastName,setLastName]=useState("");
+  const [dob,setDob]=useState("");
+  const [parentEmail,setParentEmail]=useState("");
+  const [coachEmail,setCoachEmail]=useState("");
+  const [eduEmail,setEduEmail]=useState("");
+  const [otherReason,setOtherReason]=useState("");
+  const [loading,setLoading]=useState(false);
+  const [error,setError]=useState("");
 
-const handleLogin = async () => {
-  setLoading(true);
-  setError(null);
+  const getAge=(dobStr:string)=>{if(!dobStr)return null;return Math.floor((Date.now()-new Date(dobStr).getTime())/(1000*60*60*24*365.25));};
+  const age=getAge(dob);
+  const role=ROLES.find(r=>r.key===selectedRole);
+  const isUnder18=age!==null&&age<18;
+  const showParent=role?.needsParent&&isUnder18;
+  const needsEdu=role?.needsEdu;
+  const isEduEmail=(e:string)=>e.toLowerCase().endsWith(".edu");
+  const getVerificationStatus=()=>{
+    if(!role)return"approved";
+    if(!role.needsEdu&&!role.needsAdmin)return"approved";
+    if(role.needsEdu&&isEduEmail(email))return"approved";
+    if(role.needsEdu&&eduEmail&&isEduEmail(eduEmail))return"approved";
+    return"pending";
+  };
 
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-
-  if (error) {
-    setError(error.message);
-    setLoading(false);
-    return;
-  }
-
-  const { data } = await supabase.auth.getUser();
-  const user = data.user;
-
-  if (!user) return;
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  setLoading(false);
-
-  const isOnboarded =
-    profile?.first_name &&
-    profile?.last_name &&
-    profile?.gender &&
-    profile?.school &&
-    profile?.sport &&
-    profile?.location;
-
-  if (!isOnboarded) {
-    router.replace("/onboarding");
-  } else {
+  const handleLogin=async()=>{
+    setLoading(true);setError("");
+    const{error}=await supabase.auth.signInWithPassword({email,password});
+    if(error){setError(error.message);setLoading(false);return;}
     router.replace("/dashboard");
-  }
-};
+  };
 
-const handleSignUp = async () => {
-  setLoading(true);
-  setError(null);
-
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-  });
-
-  if (error) {
-    setError(error.message);
+  const handleSignup=async()=>{
+    if(!firstName.trim()||!email.trim()||!password.trim()||!selectedRole){setError("Please fill in all required fields.");return;}
+    if(password.length<6){setError("Password must be at least 6 characters.");return;}
+    if(!dob){setError("Date of birth is required.");return;}
+    if(age!==null&&age<11){setError("You must be at least 11 years old to join.");return;}
+    if(showParent&&!parentEmail&&!coachEmail){setError("A parent/guardian or coach email is required for students under 18.");return;}
+    if(needsEdu&&!isEduEmail(email)&&!eduEmail){setError("Please provide a .edu email address for verification.");return;}
+    if(needsEdu&&eduEmail&&!isEduEmail(eduEmail)){setError("Please enter a valid .edu email address.");return;}
+    setLoading(true);setError("");
+    const{data,error:signupError}=await supabase.auth.signUp({email,password});
+    if(signupError){setError(signupError.message);setLoading(false);return;}
+    if(!data.user){setError("Signup failed. Please try again.");setLoading(false);return;}
+    const verStatus=getVerificationStatus();
+    const now=new Date();
+    const expires=new Date(now.getTime()+14*24*60*60*1000);
+    await supabase.from("profiles").upsert({
+      id:data.user.id,first_name:firstName,last_name:lastName,
+      full_name:`${firstName} ${lastName}`.trim(),
+      role:selectedRole,verification_status:verStatus,
+      verification_requested_at:verStatus==="pending"?now.toISOString():null,
+      verification_expires_at:verStatus==="pending"?expires.toISOString():null,
+      verified_at:verStatus==="approved"?now.toISOString():null,
+      edu_email:eduEmail||null,date_of_birth:dob,onboarded:false,
+    });
+    if(verStatus==="pending"){
+      await supabase.from("pending_verifications").insert({
+        user_id:data.user.id,role:selectedRole,
+        full_name:`${firstName} ${lastName}`.trim(),
+        email,edu_email:eduEmail||null,reason:otherReason||null,
+        status:"pending",expires_at:expires.toISOString(),
+      });
+      await fetch("/api/notify-admin",{method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({type:"new_pending",userName:`${firstName} ${lastName}`.trim(),userEmail:email,role:selectedRole,eduEmail:eduEmail||null,reason:otherReason||null})});
+    }
+    if(isUnder18&&(parentEmail||coachEmail)){
+      await fetch("/api/notify-guardian",{method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({parentEmail:parentEmail||null,coachEmail:coachEmail||null,
+          studentName:`${firstName} ${lastName}`.trim(),studentAge:age,school:"",sport:""})});
+    }
     setLoading(false);
-    return;
-  }
+    router.replace("/onboarding");
+  };
 
-  const user = data.user;
+  const inputStyle={width:"100%",background:T.surface,border:`1.5px solid ${T.line}`,borderRadius:10,padding:"13px 14px",fontSize:14,color:T.ink,fontFamily:T.sans,outline:"none",transition:"border-color 0.15s"} as React.CSSProperties;
+  const labelStyle={fontFamily:T.mono,fontSize:10,letterSpacing:"0.12em",textTransform:"uppercase" as const,color:T.muted,display:"block",marginBottom:6};
 
-  if (!user) {
-    setError("No user returned from signup");
-    setLoading(false);
-    return;
-  }
-
-  // 🧠 CREATE PROFILE (source of truth)
-  await supabase.from("profiles").insert({
-    id: user.id,
-    first_name: "",
-    last_name: "",
-    gender: "",
-    school: "",
-    sport: "",
-    location: "",
-    date_of_birth: null,
-    grad_year: null,
-    gpa: null,
-
-    // 🎮 GAMIFICATION DEFAULTS
-    xp: 0,
-    level: 1,
-    coin_balance: 0,
-  });
-
-  setLoading(false);
-
-  router.replace("/onboarding");
-};
-
-  const bg = "#100c0a";
-  const surface = "#1a1512";
-  const ink = "#f6f0e7";
-  const muted = "#a89a8b";
-  const line = "#332a22";
-  const accent = "#ff6a2c";
-  const onaccent = "#170a04";
-  const mono = "'Space Mono', monospace";
-  const anton = "'Anton', sans-serif";
-
-  return (
-    <div style={{ minHeight: "100vh", background: bg, color: ink, fontFamily: "'Hanken Grotesk', system-ui, sans-serif", display: "flex", flexDirection: "column" }}>
-
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
-        * { box-sizing: border-box; }
-
-        /* ── Fix browser autofill white background ── */
-        input:-webkit-autofill,
-        input:-webkit-autofill:hover,
-        input:-webkit-autofill:focus,
-        input:-webkit-autofill:active {
-          -webkit-box-shadow: 0 0 0 999px #100c0a inset !important;
-          -webkit-text-fill-color: #f6f0e7 !important;
-          caret-color: #f6f0e7 !important;
-        }
-
-        .pb-input {
-          width: 100%;
-          background: #100c0a;
-          border: 1.5px solid #332a22;
-          border-radius: 12px;
-          padding: 14px 16px;
-          font-size: 15px;
-          color: #f6f0e7;
-          font-family: inherit;
-          outline: none;
-          margin-bottom: 16px;
-          display: block;
-          transition: border-color 0.15s;
-        }
-        .pb-input:focus { border-color: #ff6a2c; }
-        .pb-input::placeholder { color: #6f6151; }
-
-        @keyframes pbMarquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-
-        .pb-submit:hover { opacity: 0.88; }
-        .pb-toggle:hover { border-color: #ff6a2c !important; color: #ff6a2c !important; }
-
-        @media (max-width: 768px) {
-          .pb-split { grid-template-columns: 1fr !important; }
-          .pb-left-panel { display: none !important; }
-        }
-      `}</style>
-
-      {/* ── NAV ── */}
-      <header style={{ borderBottom: `1px solid ${line}`, padding: "14px 32px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
-        <div onClick={() => router.push("/")} style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/assets/pb-logo-framed.png" alt="Playbook" style={{ height: 44, width: "auto", borderRadius: 9 }} />
-          <span style={{ display: "flex", flexDirection: "column", lineHeight: 0.94 }}>
-            <span style={{ fontFamily: anton, fontSize: 17, letterSpacing: "0.02em", color: ink }}>PLAYBOOK</span>
-            <span style={{ fontFamily: mono, fontSize: 8, letterSpacing: "0.32em", color: accent }}>SERIES INC.</span>
-          </span>
+  return(
+    <div style={{minHeight:"100vh",background:T.cream,display:"flex",alignItems:"center",justifyContent:"center",padding:"40px 20px",fontFamily:T.sans}}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');*{box-sizing:border-box;margin:0;padding:0;}input:focus,select:focus,textarea:focus{border-color:${T.orange}!important;outline:none;}input::placeholder,textarea::placeholder{color:${T.faint};}.role-card:hover{border-color:${T.orange}!important;background:${T.orangeL}!important;}`}</style>
+      <div style={{width:"100%",maxWidth:520}}>
+        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:28,justifyContent:"center"}}>
+          <div style={{width:36,height:36,borderRadius:9,background:T.orange,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontFamily:T.anton,fontSize:20,color:"#fff"}}>P</span></div>
+          <div><div style={{fontFamily:T.anton,fontSize:18,color:T.ink}}>PLAYBOOK</div><div style={{fontFamily:T.mono,fontSize:7,letterSpacing:"0.3em",color:T.orange}}>SERIES INC.</div></div>
         </div>
-      </header>
-
-      {/* ── SPLIT LAYOUT ── */}
-      <div className="pb-split" style={{ flex: 1, display: "grid", gridTemplateColumns: "1fr 1fr" }}>
-
-        {/* ── LEFT PANEL — visual, like the hero ── */}
-        <div className="pb-left-panel" style={{ position: "relative", borderRight: `1px solid ${line}`, overflow: "hidden", minHeight: 500 }}>
-          {/* Background image */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="https://images.unsplash.com/photo-1543807535-eceef0bc6599?w=1200&q=80"
-            alt="Scholar-athletes"
-            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
-          />
-          {/* Gradient overlay */}
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, rgba(16,12,10,0.92) 0%, rgba(16,12,10,0.6) 100%)" }} />
-
-          {/* Content */}
-          <div style={{ position: "relative", padding: "clamp(32px,5vw,56px)", display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%" }}>
+        <div style={{display:"flex",background:T.surface2,borderRadius:12,padding:4,marginBottom:24,border:`1px solid ${T.line}`}}>
+          {(["signup","login"]as const).map(m=>(
+            <button key={m} onClick={()=>{setMode(m);setError("");setStep("role");}} style={{flex:1,fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:mode===m?T.orange:"transparent",color:mode===m?"#fff":T.muted,border:"none",borderRadius:9,padding:"11px",cursor:"pointer",transition:"all 0.15s"}}>
+              {m==="login"?"Log in":"Sign up free"}
+            </button>
+          ))}
+        </div>
+        <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:20,padding:"28px 26px"}}>
+          {mode==="login"&&(
             <div>
-              {/* Ticker strip */}
-              <div style={{ background: accent, color: onaccent, borderRadius: 999, padding: "6px 14px", display: "inline-block", fontFamily: anton, fontSize: 11, letterSpacing: "0.16em", marginBottom: 40 }}>
-                RUN IT! ★ SCHOLAR-ATHLETES
-              </div>
-
-              <div style={{ fontFamily: mono, fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: accent, marginBottom: 16, display: "flex", alignItems: "center", gap: 10 }}>
-                <span style={{ width: 20, height: 2, background: accent, display: "inline-block" }} />
-                The ed-tech solution
-              </div>
-              <h2 style={{ fontFamily: anton, fontWeight: 400, fontSize: "clamp(38px,4vw,64px)", lineHeight: 0.92, textTransform: "uppercase", color: ink, margin: "0 0 20px" }}>
-                Thrive on <span style={{ color: accent }}>&</span> off<br />the court.
-              </h2>
-              <p style={{ fontSize: 15, lineHeight: 1.6, color: muted, maxWidth: "30ch", margin: 0 }}>
-                The only platform combining social networking with e-learning to build the next generation of leaders.
-              </p>
+              <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink,marginBottom:20,lineHeight:1}}>Welcome back</h1>
+              <div style={{marginBottom:14}}><label style={labelStyle}>Email</label><input type="email" style={inputStyle} placeholder="you@email.com" value={email} onChange={e=>setEmail(e.target.value)}/></div>
+              <div style={{marginBottom:20}}><label style={labelStyle}>Password</label><input type="password" style={inputStyle} placeholder="••••••••" value={password} onChange={e=>setPassword(e.target.value)}/></div>
+              {error&&<p style={{fontSize:13,color:"#DC2626",marginBottom:14}}>{error}</p>}
+              <button onClick={handleLogin} disabled={loading} style={{width:"100%",fontFamily:T.mono,fontSize:12,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:T.orange,color:"#fff",border:"none",borderRadius:12,padding:"14px",cursor:"pointer"}}>{loading?"Logging in...":"Log in →"}</button>
             </div>
-
-            {/* Stats row at bottom */}
-            <div style={{ display: "flex", gap: 28, paddingTop: 40, borderTop: `1px solid ${line}` }}>
-              {[["4", "Core pillars"], ["1,200+", "Scholars"], ["92%", "More confident"]].map(([val, lbl]) => (
-                <div key={lbl}>
-                  <div style={{ fontFamily: anton, fontSize: 28, color: ink, lineHeight: 1 }}>{val}</div>
-                  <div style={{ fontFamily: mono, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: muted, marginTop: 4 }}>{lbl}</div>
+          )}
+          {mode==="signup"&&step==="role"&&(
+            <div>
+              <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink,marginBottom:6,lineHeight:1}}>Who are you?</h1>
+              <p style={{fontSize:13,color:T.muted,marginBottom:20,lineHeight:1.6}}>Select your role to get the right experience built for you.</p>
+              <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:20}}>
+                {ROLES.map(r=>(
+                  <div key={r.key} className="role-card" onClick={()=>setSelectedRole(r.key)}
+                    style={{display:"flex",alignItems:"center",gap:12,padding:"13px 16px",borderRadius:12,border:`1.5px solid ${selectedRole===r.key?T.orange:T.line}`,background:selectedRole===r.key?T.orangeL:"transparent",cursor:"pointer",transition:"all 0.12s"}}>
+                    <span style={{fontSize:22,flexShrink:0}}>{r.icon}</span>
+                    <div style={{flex:1}}>
+                      <div style={{fontSize:14,fontWeight:700,color:selectedRole===r.key?T.orange:T.ink}}>{r.label}</div>
+                      <div style={{fontSize:12,color:T.muted,marginTop:2}}>{r.desc}</div>
+                    </div>
+                    {(r.needsEdu||r.needsAdmin)&&(
+                      <span style={{fontFamily:T.mono,fontSize:9,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:r.needsEdu?T.blueL:T.orangeL,color:r.needsEdu?T.blue:T.orange,padding:"3px 8px",borderRadius:999,flexShrink:0,whiteSpace:"nowrap"as const}}>
+                        {r.needsEdu?".edu required":"Admin approval"}
+                      </span>
+                    )}
+                    <div style={{width:20,height:20,borderRadius:"50%",border:`2px solid ${selectedRole===r.key?T.orange:T.line}`,background:selectedRole===r.key?T.orange:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                      {selectedRole===r.key&&<span style={{color:"#fff",fontSize:11}}>✓</span>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <button onClick={()=>setStep("details")} disabled={!selectedRole} style={{width:"100%",fontFamily:T.mono,fontSize:12,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:selectedRole?T.orange:T.line,color:selectedRole?"#fff":T.muted,border:"none",borderRadius:12,padding:"14px",cursor:selectedRole?"pointer":"default",transition:"all 0.15s"}}>Continue →</button>
+            </div>
+          )}
+          {mode==="signup"&&step==="details"&&(
+            <div>
+              <button onClick={()=>setStep("role")} style={{fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",background:"transparent",border:"none",color:T.muted,cursor:"pointer",marginBottom:16,padding:0}}>← Change role</button>
+              <div style={{display:"flex",alignItems:"center",gap:10,background:T.orangeL,border:`1px solid ${T.orange}22`,borderRadius:10,padding:"10px 14px",marginBottom:20}}>
+                <span style={{fontSize:18}}>{role?.icon}</span>
+                <div>
+                  <div style={{fontSize:13,fontWeight:700,color:T.orange}}>{role?.label}</div>
+                  {(needsEdu||role?.needsAdmin)&&<div style={{fontFamily:T.mono,fontSize:9,color:T.muted,marginTop:2,letterSpacing:"0.06em"}}>VERIFICATION REQUIRED BEFORE FULL ACCESS</div>}
                 </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* ── RIGHT PANEL — form ── */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 32px" }}>
-          <div style={{ width: "100%", maxWidth: 400 }}>
-
-            {/* Eyebrow */}
-            <div style={{ fontFamily: mono, fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: accent, marginBottom: 12, display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ width: 20, height: 2, background: accent, display: "inline-block" }} />
-              {mode === "login" ? "Welcome back" : "Join the network"}
-            </div>
-
-            {/* Title */}
-            <h1 style={{ fontFamily: anton, fontWeight: 400, fontSize: "clamp(40px,5vw,58px)", lineHeight: 0.95, textTransform: "uppercase", color: ink, margin: "0 0 32px" }}>
-              {mode === "login"
-                ? <>Log <span style={{ color: accent }}>in</span></>
-                : <>Sign <span style={{ color: accent }}>up</span> free</>
-              }
-            </h1>
-
-            {/* Form card */}
-            <div style={{ background: surface, border: `1px solid ${line}`, borderRadius: 20, padding: "28px 24px" }}>
-
-              {mode === "signup" && (
-                <>
-                  <label style={{ fontFamily: mono, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: muted, display: "block", marginBottom: 6 }}>Username</label>
-                  <input className="pb-input" placeholder="yourhandle" value={username} onChange={(e) => setUsername(e.target.value)} />
-
-                  <label style={{ fontFamily: mono, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: muted, display: "block", marginBottom: 6 }}>Full Name</label>
-                  <input className="pb-input" placeholder="Your full name" value={fullName} onChange={(e) => setFullName(e.target.value)} />
-                </>
-              )}
-
-              <label style={{ fontFamily: mono, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: muted, display: "block", marginBottom: 6 }}>Email</label>
-              <input className="pb-input" placeholder="you@email.com" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-
-              <label style={{ fontFamily: mono, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: muted, display: "block", marginBottom: 6 }}>Password</label>
-              <input className="pb-input" placeholder="••••••••" type="password" value={password} onChange={(e) => setPassword(e.target.value)} style={{ marginBottom: 0 }} />
-
-              {/* Error */}
-              {error && (
-                <div style={{ background: "#2a0f0a", border: "1px solid #7a2a1a", borderRadius: 10, padding: "10px 14px", marginTop: 14, fontSize: 13, color: "#ff9980" }}>
-                  {error}
+              </div>
+              <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:26,textTransform:"uppercase",color:T.ink,marginBottom:18,lineHeight:1}}>Create your account</h1>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
+                <div><label style={labelStyle}>First name *</label><input style={inputStyle} placeholder="Stephisha" value={firstName} onChange={e=>setFirstName(e.target.value)}/></div>
+                <div><label style={labelStyle}>Last name</label><input style={inputStyle} placeholder="Walton" value={lastName} onChange={e=>setLastName(e.target.value)}/></div>
+              </div>
+              <div style={{marginBottom:14}}><label style={labelStyle}>Email *</label><input type="email" style={inputStyle} placeholder="you@email.com" value={email} onChange={e=>setEmail(e.target.value)}/></div>
+              <div style={{marginBottom:14}}><label style={labelStyle}>Password *</label><input type="password" style={inputStyle} placeholder="At least 6 characters" value={password} onChange={e=>setPassword(e.target.value)}/></div>
+              <div style={{marginBottom:14}}><label style={labelStyle}>Date of birth *</label><input type="date" style={inputStyle} value={dob} onChange={e=>setDob(e.target.value)}/></div>
+              {showParent&&(
+                <div style={{background:T.orangeL,border:`1.5px solid ${T.orange}44`,borderRadius:12,padding:"16px",marginBottom:14}}>
+                  <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.12em",textTransform:"uppercase",color:T.orange,marginBottom:4}}>Under 18 — required</p>
+                  <p style={{fontSize:13,color:T.muted,marginBottom:14,lineHeight:1.6}}>We will notify a parent/guardian or coach when your account is created.</p>
+                  <div style={{marginBottom:12}}><label style={labelStyle}>Parent / guardian email</label><input type="email" style={inputStyle} placeholder="parent@email.com" value={parentEmail} onChange={e=>setParentEmail(e.target.value)}/></div>
+                  <div><label style={labelStyle}>Coach email (optional)</label><input type="email" style={inputStyle} placeholder="coach@school.edu" value={coachEmail} onChange={e=>setCoachEmail(e.target.value)}/></div>
                 </div>
               )}
-
-              {/* Submit */}
-              <button className="pb-submit"
-                onClick={mode === "login" ? handleLogin : handleSignUp}
-                disabled={loading}
-                style={{ width: "100%", fontFamily: mono, fontSize: 13, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", background: loading ? line : accent, color: loading ? muted : onaccent, border: "none", borderRadius: 12, padding: "16px", cursor: loading ? "not-allowed" : "pointer", marginTop: 20, transition: "opacity 0.2s" }}>
-                {loading ? "Loading..." : mode === "login" ? "Log In →" : "Create Account →"}
+              {needsEdu&&!isEduEmail(email)&&(
+                <div style={{background:T.blueL,border:`1.5px solid ${T.blue}44`,borderRadius:12,padding:"16px",marginBottom:14}}>
+                  <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.12em",textTransform:"uppercase",color:T.blue,marginBottom:4}}>.edu verification required</p>
+                  <p style={{fontSize:13,color:T.muted,marginBottom:14,lineHeight:1.6}}>{selectedRole==="coach"?"Coaches without a .edu will be reviewed by our admin team.":"Your role requires a .edu email for verification."}</p>
+                  <div><label style={labelStyle}>.edu email address</label><input type="email" style={inputStyle} placeholder="yourname@school.edu" value={eduEmail} onChange={e=>setEduEmail(e.target.value)}/></div>
+                  {eduEmail&&isEduEmail(eduEmail)&&<p style={{fontFamily:T.mono,fontSize:10,color:T.green,marginTop:8,fontWeight:700}}>✓ .edu detected — you will be auto-approved!</p>}
+                </div>
+              )}
+              {needsEdu&&isEduEmail(email)&&(
+                <div style={{background:"#ECFDF5",border:`1px solid ${T.green}44`,borderRadius:10,padding:"12px 14px",marginBottom:14}}>
+                  <p style={{fontFamily:T.mono,fontSize:10,color:T.green,fontWeight:700}}>✓ .edu email detected — your account will be auto-approved!</p>
+                </div>
+              )}
+              {selectedRole==="other"&&(
+                <div style={{marginBottom:14}}>
+                  <label style={labelStyle}>Why are you joining? *</label>
+                  <textarea value={otherReason} onChange={e=>setOtherReason(e.target.value)} placeholder="Tell us about yourself and why you would like to join..." rows={3} style={{...inputStyle,resize:"vertical" as const}}/>
+                </div>
+              )}
+              {getVerificationStatus()==="pending"&&(
+                <div style={{background:T.surface2,borderRadius:10,padding:"12px 14px",marginBottom:14,borderLeft:`3px solid ${T.blue}`}}>
+                  <p style={{fontSize:12,color:T.muted,lineHeight:1.65}}>After signing up you will complete your profile, but full access is pending verification. If not verified within 14 days, your request will be cancelled.</p>
+                </div>
+              )}
+              {error&&<p style={{fontSize:13,color:"#DC2626",marginBottom:14}}>{error}</p>}
+              <button onClick={handleSignup} disabled={loading} style={{width:"100%",fontFamily:T.mono,fontSize:12,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:T.orange,color:"#fff",border:"none",borderRadius:12,padding:"14px",cursor:loading?"default":"pointer",opacity:loading?0.7:1,transition:"all 0.15s"}}>
+                {loading?"Creating account...":"Create account →"}
               </button>
-
-              {/* Divider */}
-              <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "18px 0" }}>
-                <div style={{ flex: 1, height: 1, background: line }} />
-                <span style={{ fontFamily: mono, fontSize: 10, color: muted, letterSpacing: "0.1em" }}>OR</span>
-                <div style={{ flex: 1, height: 1, background: line }} />
-              </div>
-
-              {/* Toggle */}
-              <button className="pb-toggle"
-                onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(null); }}
-                style={{ width: "100%", fontFamily: mono, fontSize: 12, fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase", background: "transparent", color: ink, border: `1.5px solid ${line}`, borderRadius: 12, padding: "14px", cursor: "pointer", transition: "border-color 0.15s, color 0.15s" }}>
-                {mode === "login" ? "No account? Sign up free" : "Already have an account? Log in"}
-              </button>
-
+              <p style={{textAlign:"center",marginTop:14,fontSize:12,color:T.faint,lineHeight:1.6}}>By signing up you agree to our Terms of Service. Student data is private and never sold.</p>
             </div>
-
-            {/* Forgot password */}
-            {mode === "login" && (
-              <p style={{ textAlign: "center", marginTop: 16 }}>
-                <span onClick={() => router.push("/reset-password")}
-                  style={{ fontFamily: mono, fontSize: 11, color: muted, letterSpacing: "0.06em", cursor: "pointer", textDecoration: "underline" }}>
-                  Forgot password?
-                </span>
-              </p>
-            )}
-
-            <p style={{ textAlign: "center", marginTop: 20, fontSize: 12, color: muted }}>
-              Free to join · scholar-athletes ages 11–18 · Oakland, CA
-            </p>
-
-          </div>
+          )}
         </div>
       </div>
-
-      {/* ── FOOTER ── */}
-      <div style={{ borderTop: `1px solid ${line}`, padding: "16px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
-        <span style={{ fontSize: 12, color: muted }}>© 2025 Playbook Series, Inc.</span>
-        <span style={{ fontFamily: mono, fontSize: 10, letterSpacing: "0.1em", color: accent }}>RUN IT! ★</span>
-      </div>
-
     </div>
   );
 }

@@ -5,10 +5,13 @@ import { supabase } from "@/lib/supabaseClient";
 
 const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",blue:"#3B82F6",green:"#10B981",amber:"#F59E0B",purple:"#8B5CF6",mono:"'Space Mono', monospace",sans:"'Hanken Grotesk', system-ui, sans-serif",anton:"'Anton', sans-serif"};
 const ALL=[
-  {slug:"captains-mindset",title:"Captain's Mindset",pillar:"Leadership",color:T.orange,era:"ERA 1/4",rarity:"UNCOMMON",rarityColor:T.orange,gradient:"linear-gradient(135deg,#F59E0B,#F97316,#8B5CF6,#3B82F6)"},
-  {slug:"money-in-the-game",title:"Money in the Game",pillar:"Finance",color:T.blue,era:"ERA 2/4",rarity:"COMMON",rarityColor:"#94A3B8",gradient:"linear-gradient(135deg,#3B82F6,#8B5CF6,#10B981,#3B82F6)"},
-  {slug:"mind-of-an-athlete",title:"Mind of an Athlete",pillar:"SEL",color:T.purple,era:"ERA 3/4",rarity:"UNCOMMON",rarityColor:T.orange,gradient:"linear-gradient(135deg,#8B5CF6,#EC4899,#3B82F6,#8B5CF6)"},
-  {slug:"community-leader",title:"Community Leader",pillar:"Civic",color:T.green,era:"ERA 4/4",rarity:"RARE",rarityColor:T.amber,gradient:"linear-gradient(135deg,#10B981,#3B82F6,#F59E0B,#10B981)"},
+  {slug:"college-application-playbook",title:"College Application Playbook",pillar:"College",color:T.blue,era:"ERA 1/5",rarity:"UNCOMMON",rarityColor:T.orange,gradient:"linear-gradient(135deg,#0EA5E9,#3B82F6,#8B5CF6,#10B981)"},
+  {slug:"captains-mindset",title:"Captain's Mindset",pillar:"Leadership",color:T.orange,era:"ERA 2/5",rarity:"UNCOMMON",rarityColor:T.orange,gradient:"linear-gradient(135deg,#F59E0B,#F97316,#8B5CF6,#3B82F6)"},
+  {slug:"social-emotional-foundations",title:"Social-Emotional Foundations",pillar:"SEL",color:T.purple,era:"ERA 3/5",rarity:"UNCOMMON",rarityColor:T.orange,gradient:"linear-gradient(135deg,#8B5CF6,#EC4899,#3B82F6,#8B5CF6)"},
+  {slug:"nil-readiness-for-athletes",title:"NIL Readiness for Athletes",pillar:"NIL",color:T.amber,era:"ERA 4/5",rarity:"RARE",rarityColor:T.amber,gradient:"linear-gradient(135deg,#F59E0B,#F97316,#10B981,#3B82F6)"},
+  {slug:"civic-engagement-for-young-leaders",title:"Civic Engagement for Young Leaders",pillar:"Civic",color:T.green,era:"ERA 5/5",rarity:"RARE",rarityColor:T.amber,gradient:"linear-gradient(135deg,#10B981,#3B82F6,#F59E0B,#10B981)"},
+  {slug:"money-in-the-game",title:"Money in the Game",pillar:"Finance",color:T.blue,era:"BONUS",rarity:"COMMON",rarityColor:"#94A3B8",gradient:"linear-gradient(135deg,#3B82F6,#8B5CF6,#10B981,#3B82F6)"},
+  {slug:"mind-of-an-athlete",title:"Mind of an Athlete",pillar:"SEL",color:T.purple,era:"BONUS",rarity:"UNCOMMON",rarityColor:T.orange,gradient:"linear-gradient(135deg,#8B5CF6,#EC4899,#3B82F6,#8B5CF6)"},
 ];
 
 function Card({cert,earned,size="lg"}:{cert:typeof ALL[0];earned:boolean;size?:"sm"|"lg"}) {
@@ -77,6 +80,19 @@ export default function CertificatesPage() {
             </div>
           ))}
         </div>
+        <div style={{marginTop:36,background:T.navy,borderRadius:20,padding:"24px 28px"}}>
+          <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:16}}>How certificates work</p>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:14}}>
+            {[{icon:"📚",title:"Complete a course",desc:"Finish all modules to unlock your certificate."},{icon:"🎓",title:"Claim your card",desc:"One click saves it to your profile transcript and public page instantly."},{icon:"✨",title:"Community sees it",desc:"Your achievement posts to the network automatically when you claim."}].map(({icon,title,desc})=>(
+              <div key={title} style={{background:"rgba(255,255,255,.05)",borderRadius:14,padding:"16px 14px"}}>
+                <div style={{fontSize:26,marginBottom:10}}>{icon}</div>
+                <div style={{fontSize:13,fontWeight:700,color:"#F8F7F4",marginBottom:6}}>{title}</div>
+                <div style={{fontSize:12,color:"rgba(248,247,244,.4)",lineHeight:1.65}}>{desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {earned.length>0?(
           <div style={{marginBottom:36}}>
             <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:20}}>
@@ -132,18 +148,6 @@ export default function CertificatesPage() {
             </div>
           </div>
         )}
-        <div style={{marginTop:36,background:T.navy,borderRadius:20,padding:"24px 28px"}}>
-          <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:16}}>How certificates work</p>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:14}}>
-            {[{icon:"📚",title:"Complete a course",desc:"Finish all modules to unlock your certificate."},{icon:"🎓",title:"Claim your card",desc:"One click saves it to your profile transcript and public page instantly."},{icon:"✨",title:"Community sees it",desc:"Your achievement posts to the network automatically when you claim."}].map(({icon,title,desc})=>(
-              <div key={title} style={{background:"rgba(255,255,255,.05)",borderRadius:14,padding:"16px 14px"}}>
-                <div style={{fontSize:26,marginBottom:10}}>{icon}</div>
-                <div style={{fontSize:13,fontWeight:700,color:"#F8F7F4",marginBottom:6}}>{title}</div>
-                <div style={{fontSize:12,color:"rgba(248,247,244,.4)",lineHeight:1.65}}>{desc}</div>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
     </div>
   );

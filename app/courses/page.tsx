@@ -6,10 +6,48 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
 const FLAGSHIP = [
+  { id:"college-application-playbook", title:"College Application Playbook", pillar:"College", color:"#0EA5E9", emoji:"🎓", img:"https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&q=80", desc:"Build your college list, prepare applications, connect FAFSA, CalKIDS, and scholarship milestones.", modules:6 },
   { id:"captains-mindset", title:"Captain's Mindset", pillar:"Leadership", color:"#F97316", emoji:"★", img:"https://images.unsplash.com/photo-1546519638405-a4c8b5bd3c5e?w=800&q=80", desc:"Lead by example on and off the court with proven captaincy frameworks.", modules:6 },
   { id:"money-in-the-game", title:"Money in the Game", pillar:"Finance", color:"#3B82F6", emoji:"$", img:"https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=80", desc:"Budgeting, saving, and NIL fundamentals built for young athletes.", modules:8 },
   { id:"mind-of-an-athlete", title:"Mind of an Athlete", pillar:"SEL", color:"#8B5CF6", emoji:"♥", img:"https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&q=80", desc:"Build resilience and manage pressure with social-emotional tools.", modules:5 },
   { id:"community-leader", title:"Community Leader", pillar:"Civic", color:"#10B981", emoji:"✓", img:"https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80", desc:"Youth-led projects and advocacy for leaders who create change.", modules:6, comingSoon:true },
+];
+
+
+const COMING_SOON = [
+  {
+    id:"social-emotional-foundations",
+    title:"Social-Emotional Foundations",
+    pillar:"SEL",
+    color:"#8B5CF6",
+    emoji:"♥",
+    img:"https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&q=80",
+    desc:"Build emotional intelligence, self-awareness, and resilience.",
+    modules:6,
+    comingSoon:true
+  },
+  {
+    id:"nil-readiness-for-athletes",
+    title:"NIL Readiness for Athletes",
+    pillar:"NIL",
+    color:"#F59E0B",
+    emoji:"💰",
+    img:"https://images.unsplash.com/photo-1556740749-887f6717d7e4?w=800&q=80",
+    desc:"Learn personal branding, NIL opportunities, contracts, and compliance.",
+    modules:6,
+    comingSoon:true
+  },
+  {
+    id:"civic-engagement-for-young-leaders",
+    title:"Civic Engagement for Young Leaders",
+    pillar:"Civic",
+    color:"#10B981",
+    emoji:"🏛️",
+    img:"https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80",
+    desc:"Develop advocacy skills and learn how to create change in your community.",
+    modules:6,
+    comingSoon:true
+  }
 ];
 
 export default function CoursesPage() {
@@ -21,9 +59,23 @@ export default function CoursesPage() {
     (async () => {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) { router.replace("/login"); return; }
-      // Load saved progress from Supabase profiles table
-      const { data: p } = await supabase.from("profiles").select("course_progress").eq("id", u.user.id).single();
-      if (p?.course_progress) setProgress(p.course_progress);
+      const { data: progressRows } = await supabase
+        .from("course_progress")
+        .select("course_slug, completed_modules, completed")
+        .eq("user_id", u.user.id);
+
+      const nextProgress: Record<string, number> = {};
+
+      (progressRows || []).forEach((row: any) => {
+        if (row.completed) {
+          const course = FLAGSHIP.find((c) => c.id === row.course_slug);
+          nextProgress[row.course_slug] = course?.modules || row.completed_modules?.length || 1;
+        } else {
+          nextProgress[row.course_slug] = row.completed_modules?.length || 0;
+        }
+      });
+
+      setProgress(nextProgress);
       setLoading(false);
     })();
   }, []);
@@ -208,11 +260,54 @@ export default function CoursesPage() {
           })}
         </div>
 
+
+        {/* Coming Soon Courses */}
+        <div style={{ marginTop:40, marginBottom:30 }}>
+          <p style={{ fontFamily:"'Space Mono', monospace", fontSize:10, letterSpacing:"0.16em", textTransform:"uppercase", color:"#94A3B8", marginBottom:8 }}>
+            Upcoming courses
+          </p>
+
+          <h2 style={{ fontFamily:"Anton, sans-serif", fontWeight:400, fontSize:"clamp(24px,3vw,36px)", textTransform:"uppercase", color:"#0F172A", marginBottom:18 }}>
+            Coming Soon
+          </h2>
+
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))", gap:18 }}>
+            {COMING_SOON.map((c) => (
+              <div key={c.id} style={{ background:"#fff", border:"1px solid #E2E8F0", borderRadius:18, overflow:"hidden", opacity:.9 }}>
+                <img src={c.img} alt={c.title} style={{ width:"100%", height:160, objectFit:"cover" }} />
+
+                <div style={{ padding:"16px 18px 18px" }}>
+                  <p style={{ fontFamily:"'Space Mono', monospace", fontSize:10, letterSpacing:"0.12em", textTransform:"uppercase", color:c.color, marginBottom:8 }}>
+                    Coming soon · {c.pillar}
+                  </p>
+
+                  <h3 style={{ fontFamily:"Anton, sans-serif", fontWeight:400, fontSize:22, textTransform:"uppercase", color:"#0F172A", marginBottom:6 }}>
+                    {c.title}
+                  </h3>
+
+                  <p style={{ fontSize:13, lineHeight:1.6, color:"#64748B", marginBottom:12 }}>
+                    {c.desc}
+                  </p>
+
+                  <div style={{ borderTop:"1px solid #E2E8F0", paddingTop:12, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                    <span style={{ fontFamily:"'Space Mono', monospace", fontSize:10, color:"#94A3B8" }}>
+                      {c.modules} modules
+                    </span>
+                    <span style={{ fontSize:13, fontWeight:700, color:"#94A3B8" }}>
+                      Locked 🔒
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Bottom CTA */}
         <div style={{ background:"#0F172A", borderRadius:18, padding:"24px 28px", display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:16 }}>
           <div>
-            <div style={{ fontFamily:"'Space Mono', monospace", fontSize:10, letterSpacing:"0.16em", textTransform:"uppercase", color:"#F97316", marginBottom:8 }}>Complete the full library</div>
-            <h3 style={{ fontFamily:"Anton, sans-serif", fontWeight:400, fontSize:"clamp(18px,3vw,28px)", textTransform:"uppercase", color:"#F8F7F4", lineHeight:1 }}>Earn all 4 certificate cards</h3>
+            <div style={{ fontFamily:"'Space Mono', monospace", fontSize:10, letterSpacing:"0.16em", textTransform:"uppercase", color:"#F97316", marginBottom:8 }}>Complete the flagship library</div>
+            <h3 style={{ fontFamily:"Anton, sans-serif", fontWeight:400, fontSize:"clamp(18px,3vw,28px)", textTransform:"uppercase", color:"#F8F7F4", lineHeight:1 }}>Earn all 5 certificate cards</h3>
           </div>
           <div style={{ display:"flex", gap:10 }}>
             <button onClick={() => router.push("/certificates")}

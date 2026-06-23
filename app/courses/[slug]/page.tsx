@@ -7,6 +7,14 @@ import { addReward } from "@/lib/gamification";
 const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",blue:"#3B82F6",green:"#10B981",amber:"#F59E0B",purple:"#8B5CF6",mono:"'Space Mono', monospace",sans:"'Hanken Grotesk', system-ui, sans-serif",anton:"'Anton', sans-serif"};
 
 const COURSES:Record<string,any>={
+  "college-application-playbook":{title:"College Application Playbook",pillar:"College",pillarColor:"#0EA5E9",img:"https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200&q=80",desc:"Build your college list, complete applications, connect FAFSA, CalKIDS, and scholarship milestones.",xpPerModule:50,coinsPerModule:10,modules:[
+    {id:1,title:"Build Your College List",duration:"15 min",type:"Planning",desc:"Identify reach, match, and safety schools that fit your goals."},
+    {id:2,title:"Create Your Application Accounts",duration:"20 min",type:"Action Step",desc:"Set up your college application portals and track login milestones."},
+    {id:3,title:"FAFSA and Financial Aid",duration:"18 min",type:"External Milestone",desc:"Visit fafsa.gov and prepare the documents needed for aid."},
+    {id:4,title:"CalKIDS and College Savings",duration:"14 min",type:"External Milestone",desc:"Visit calkids.org and check eligibility for college savings funds."},
+    {id:5,title:"Personal Statement Prep",duration:"22 min",type:"Writing Lab",desc:"Draft a personal statement that tells your story with clarity and purpose."},
+    {id:6,title:"Submit and Track Applications",duration:"20 min",type:"Final Project",desc:"Create your application tracker and complete your college readiness plan."},
+  ]},
   "captains-mindset":{title:"Captain's Mindset",pillar:"Leadership",pillarColor:"#F97316",img:"https://images.unsplash.com/photo-1546519638405-a4c8b5bd3c5e?w=1200&q=80",desc:"Lead by example on and off the court with proven captaincy frameworks.",xpPerModule:50,coinsPerModule:10,modules:[
     {id:1,title:"What Makes a Captain?",duration:"12 min",type:"Video + Reading",desc:"Explore the difference between a player and a leader. Understand what captaincy really demands."},
     {id:2,title:"Accountability Starts With You",duration:"15 min",type:"Video + Quiz",desc:"Real leaders hold themselves first. Learn the accountability frameworks used by elite sports teams."},
@@ -69,13 +77,20 @@ export default function CourseModulePage() {
       const{data:u}=await supabase.auth.getUser();
       if(!u.user){router.replace("/login");return;}
       setUserId(u.user.id);
-      // Load saved progress from Supabase
-      const{data:p}=await supabase.from("profiles").select("course_progress").eq("id",u.user.id).single();
-      if(p?.course_progress?.[slug]){
-        // Build array of completed module ids
-        const done=p.course_progress[slug];
-        setCompletedIds(Array.from({length:done},(_,i)=>i+1));
+      const { data: progressRow } = await supabase
+        .from("course_progress")
+        .select("completed_modules, completed")
+        .eq("user_id", u.user.id)
+        .eq("course_slug", slug)
+        .maybeSingle();
+
+      if (progressRow?.completed) {
+        setCompletedIds(course.modules.map((m:any) => m.id));
+        setClaimed(true);
+      } else if (progressRow?.completed_modules?.length) {
+        setCompletedIds(progressRow.completed_modules);
       }
+
       setAuthed(true);
     })();
   },[slug]);
@@ -86,10 +101,18 @@ export default function CourseModulePage() {
     if(!userId||completedIds.includes(moduleId))return;
     const newCompleted=[...completedIds,moduleId];
     setCompletedIds(newCompleted);
-    // Save to Supabase course_progress column
-    const{data:p}=await supabase.from("profiles").select("course_progress").eq("id",userId).single();
-    const existing=p?.course_progress||{};
-    await supabase.from("profiles").update({course_progress:{...existing,[slug]:newCompleted.length}}).eq("id",userId);
+    await supabase
+      .from("course_progress")
+      .upsert(
+        {
+          user_id: userId,
+          course_slug: slug,
+          completed_modules: newCompleted,
+          completed: newCompleted.length === course.modules.length,
+          completed_at: newCompleted.length === course.modules.length ? new Date().toISOString() : null,
+        },
+        { onConflict: "user_id,course_slug" }
+      );
     // Award XP and coins
     await addReward(userId,{coins:course.coinsPerModule,xp:course.xpPerModule});
     if(newCompleted.length===course.modules.length){
@@ -253,7 +276,7 @@ export default function CourseModulePage() {
                   Claim certificate → Profile
                 </button>
               ):(
-                <span style={{fontFamily:T.mono,fontSize:12,color:T.green,fontWeight:700}}>✓ Certificate claimed — redirecting…</span>
+                <span style={{fontFamily:T.mono,fontSize:12,color:T.green,fontWeight:700}}>✓ Certificate claimed</span>
               )}
             </div>
             <CertCard title={course.title} pillar={course.pillar} color={course.pillarColor}/>
@@ -297,7 +320,19 @@ export default function CourseModulePage() {
                             </button>
                           </div>
                         )}
-                        {done&&<div style={{fontFamily:T.mono,fontSize:10,color:T.green,fontWeight:700}}>✓ Completed · +{course.xpPerModule} XP earned</div>}
+                        {done&&(
+                          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
+                            <div style={{fontFamily:T.mono,fontSize:10,color:T.green,fontWeight:700}}>
+                              ✓ Completed · +{course.xpPerModule} XP earned
+                            </div>
+                            <button
+                              onClick={()=>setToast(`Reviewing Module ${mod.id}: ${mod.title}`)}
+                              style={{fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",background:T.surface2,color:T.ink,border:`1px solid ${T.line}`,borderRadius:999,padding:"8px 16px",cursor:"pointer"}}
+                            >
+                              Review module →
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
