@@ -1,272 +1,311 @@
 "use client";
-
-import { useEffect, useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
-import { addReward } from "@/lib/gamification";
-import { checkBadges } from "@/lib/badges";
-import { updateStreak } from "@/lib/streak";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-type Profile = {
-  first_name: string;
-  xp: number;
-  level: number;
-  coin_balance: number;
-};
+const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",blue:"#3B82F6",green:"#10B981",purple:"#8B5CF6",amber:"#F59E0B",mono:"'Space Mono', monospace",sans:"'Hanken Grotesk', system-ui, sans-serif",anton:"'Anton', sans-serif"};
+const STEPS=["School & Location","Athletic Profile","Background","Your Pillars"];
+const SPORTS=["Basketball","Football","Soccer","Track & Field","Baseball","Softball","Swimming","Volleyball","Tennis","Cross Country","Wrestling","Lacrosse","Golf","Gymnastics","Cheer","Dance","Other"];
+const GRADES=["6th Grade","7th Grade","8th Grade","9th Grade","10th Grade","11th Grade","12th Grade","College Freshman","College Sophomore","College Junior","College Senior"];
+const RACES=["Black / African American","Hispanic / Latino","White","Asian","Native American / Alaska Native","Native Hawaiian / Pacific Islander","Two or more races","Prefer not to say"];
+const GENDERS=["Male","Female","Non-binary","Prefer not to say"];
+const INCOME=["Under $25,000","$25,000–$49,999","$50,000–$74,999","$75,000–$99,999","$100,000+","Prefer not to say"];
+const TEAM_LEVELS=["Middle School","Junior Varsity (JV)","Varsity","Club / AAU","Travel Team","College","Semi-Pro","Professional"];
+const PILLARS=[{key:"leadership",label:"Leadership",icon:"★",desc:"Captaincy, accountability, leading on and off the court"},{key:"finance",label:"Financial Literacy",icon:"$",desc:"Budgeting, NIL basics, building wealth"},{key:"civic",label:"Civic Engagement",icon:"✓",desc:"Youth advocacy, community projects, making change"},{key:"sel",label:"Social-Emotional Learning",icon:"♥",desc:"Mental wellness, resilience, identity beyond sport"}];
+const CA_CITIES=["Alameda","Antioch","Berkeley","Brentwood","Compton","Concord","Daly City","Davis","East Palo Alto","El Monte","Elk Grove","Escondido","Fontana","Fremont","Fresno","Fullerton","Garden Grove","Glendale","Hayward","Huntington Beach","Inglewood","Irvine","Lancaster","Long Beach","Los Angeles","Modesto","Moreno Valley","Oakland","Oceanside","Ontario","Orange","Oxnard","Palmdale","Pasadena","Pomona","Rancho Cucamonga","Richmond","Riverside","Roseville","Sacramento","Salinas","San Bernardino","San Diego","San Francisco","San Jose","Santa Ana","Santa Clara","Santa Clarita","Santa Rosa","Simi Valley","Stockton","Sunnyvale","Thousand Oaks","Torrance","Vallejo","Victorville","Visalia","Other"];
 
-type ActivityItem = {
-  id: string;
-  text: string;
-  time: string;
-  initials: string;
-  color: string;
-};
-
-// ─── Constants ────────────────────────────────────────────────────────────────
-const COURSES = [
-  { id: "captains-mindset", icon: "★", name: "Captain's Mindset", pillar: "Leadership", modules: 6, done: 3 },
-  { id: "money-in-the-game", icon: "$", name: "Money in the Game", pillar: "Finance", modules: 8, done: 1 },
-  { id: "mind-of-an-athlete", icon: "♥", name: "Mind of an Athlete", pillar: "SEL", modules: 5, done: 0 },
-];
-
-const SAMPLE_ACTIVITY: ActivityItem[] = [
-  { id: "1", text: "You earned the Scholar badge", time: "2 hours ago", initials: "YOU", color: "#ff6a2c" },
-  { id: "2", text: "Coach Reed commented on your progress", time: "Yesterday", initials: "CR", color: "#1D9E75" },
-  { id: "3", text: "You completed Module 3 of Captain's Mindset", time: "2 days ago", initials: "YOU", color: "#ff6a2c" },
-];
-
-const bg = "#100c0a";
-const surface = "#1a1512";
-const surface2 = "#241c16";
-const ink = "#f6f0e7";
-const muted = "#a89a8b";
-const faint = "#6f6151";
-const line = "#332a22";
-const accent = "#ff6a2c";
-const onaccent = "#170a04";
-const mono = "'Space Mono', monospace";
-const anton = "'Anton', sans-serif";
-
-export default function DashboardPage() {
-  const router = useRouter();
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [toast, setToast] = useState<string | null>(null);
-  const [badges, setBadges] = useState<string[]>([]);
-  const [streak, setStreak] = useState(0);
-
-  useEffect(() => {
-    const load = async () => {
-      const { data: userData } = await supabase.auth.getUser();
-      const user = userData.user;
-      if (!user) return router.replace("/login");
-
-      const { data } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-
-      setProfile(data);
-
-      const s = await updateStreak(user.id);
-      setStreak(s);
-
-      await addReward(user.id, { coins: 10, xp: 20 });
-      setToast(`Day ${s} streak! +10 coins +20 XP`);
-
-      const newBadges = checkBadges(data);
-      setBadges(newBadges);
-
-      setLoading(false);
-    };
-    load();
-  }, []);
-
-  useEffect(() => {
-    if (!toast) return;
-    const t = setTimeout(() => setToast(null), 4000);
-    return () => clearTimeout(t);
-  }, [toast]);
-
-  const handleActionReward = async () => {
-    const { data: userData } = await supabase.auth.getUser();
-    const user = userData.user;
-    if (!user) return;
-    const updated = await addReward(user.id, { coins: 25, xp: 50 });
-    const newBadges = checkBadges(updated);
-    setBadges(newBadges);
-    setToast("+25 coins · +50 XP earned!");
-  };
-
-  if (loading) return (
-    <div style={{ minHeight: "100vh", background: bg, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: mono, fontSize: 12, letterSpacing: "0.1em", color: faint }}>
-      LOADING YOUR PLAYBOOK...
-    </div>
-  );
-
-  const xp = profile?.xp ?? 0;
-  const level = profile?.level ?? 1;
-  const coins = profile?.coin_balance ?? 0;
-  const xpForNext = level * 500;
-  const xpPct = Math.min(100, Math.round((xp / xpForNext) * 100));
-
-  return (
-    <div style={{ minHeight: "100vh", background: bg, color: ink, fontFamily: "'Hanken Grotesk', system-ui, sans-serif" }}>
-
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        .pb-nav-btn:hover { color: ${ink} !important; }
-        .pb-course-row:hover { border-color: ${accent} !important; cursor: pointer; }
-        .pb-action-btn:hover { opacity: 0.85; }
-      `}</style>
-
-      {/* TOAST */}
-      {toast && (
-        <div style={{ position: "fixed", top: 20, right: 20, zIndex: 100, background: accent, color: onaccent, padding: "12px 18px", borderRadius: 12, fontWeight: 700, fontSize: 13, fontFamily: mono, letterSpacing: "0.04em" }}>
-          {toast}
+function CitySearch({value,onChange}:{value:string;onChange:(v:string)=>void}) {
+  const [query,setQuery]=useState(value);
+  const [open,setOpen]=useState(false);
+  const filtered=CA_CITIES.filter(c=>c.toLowerCase().includes(query.toLowerCase())).slice(0,8);
+  return(
+    <div style={{position:"relative"}}>
+      <input value={query} onChange={e=>{setQuery(e.target.value);onChange(e.target.value);setOpen(true);}} onFocus={()=>setOpen(true)} onBlur={()=>setTimeout(()=>setOpen(false),150)} placeholder="Start typing your city..." style={{width:"100%",background:T.surface,border:`1.5px solid ${T.line}`,borderRadius:10,padding:"12px 14px",fontSize:14,color:T.ink,fontFamily:T.sans,outline:"none"}}/>
+      {open&&query.length>0&&filtered.length>0&&(
+        <div style={{position:"absolute",top:"100%",left:0,right:0,background:T.surface,border:`1px solid ${T.line}`,borderRadius:10,zIndex:100,overflow:"hidden",boxShadow:"0 4px 20px rgba(0,0,0,.1)",marginTop:4}}>
+          {filtered.map(c=>(
+            <div key={c} onMouseDown={()=>{setQuery(c);onChange(c);setOpen(false);}} style={{padding:"11px 14px",fontSize:14,color:T.ink,cursor:"pointer",borderBottom:`1px solid ${T.line}`}} onMouseEnter={e=>(e.currentTarget.style.background=T.orangeL)} onMouseLeave={e=>(e.currentTarget.style.background="transparent")}>{c}</div>
+          ))}
         </div>
       )}
+    </div>
+  );
+}
 
-      {/* NAV */}
-      <header style={{ background: surface, borderBottom: `1px solid ${line}`, padding: "13px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 50 }}>
-        <div onClick={() => router.push("/")} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
-          <span style={{ fontFamily: anton, fontSize: 18, color: ink, letterSpacing: "0.02em" }}>PLAYBOOK</span>
-          <span style={{ fontFamily: mono, fontSize: 8, letterSpacing: "0.3em", color: accent }}>SERIES INC.</span>
+function VideoGate({onComplete}:{onComplete:()=>void}) {
+  const [progress,setProgress]=useState(0);
+  const [done,setDone]=useState(false);
+  const [countdown,setCountdown]=useState(3);
+
+  useEffect(()=>{
+    // Simulate video progress — replace with real video when available
+    const interval=setInterval(()=>{
+      setProgress(p=>{
+        if(p>=100){clearInterval(interval);setDone(true);return 100;}
+        return p+2;
+      });
+    },1000);
+    return()=>clearInterval(interval);
+  },[]);
+
+  useEffect(()=>{
+    if(!done)return;
+    if(countdown<=0){onComplete();return;}
+    const t=setTimeout(()=>setCountdown(c=>c-1),1000);
+    return()=>clearTimeout(t);
+  },[done,countdown,onComplete]);
+
+  return(
+    <div style={{position:"fixed",inset:0,zIndex:9999,background:T.navy,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:40}}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&display=swap');`}</style>
+      <div style={{width:80,height:80,borderRadius:20,background:T.orange,display:"flex",alignItems:"center",justifyContent:"center",marginBottom:32}}><span style={{fontFamily:"Anton,sans-serif",fontSize:44,color:"#fff"}}>P</span></div>
+      {!done?(
+        <>
+          <p style={{fontFamily:T.mono,fontSize:11,letterSpacing:"0.18em",textTransform:"uppercase",color:T.orange,marginBottom:16}}>Welcome to Playbook Series Inc.</p>
+          <h1 style={{fontFamily:"Anton,sans-serif",fontWeight:400,fontSize:"clamp(32px,5vw,56px)",textTransform:"uppercase",color:"#F8F7F4",textAlign:"center",lineHeight:.95,marginBottom:40}}>Your journey<br/><span style={{color:T.orange}}>starts now.</span></h1>
+          <div style={{width:"100%",maxWidth:400}}>
+            <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}>
+              <span style={{fontFamily:T.mono,fontSize:11,color:"rgba(248,247,244,.5)"}}>Intro video</span>
+              <span style={{fontFamily:T.mono,fontSize:11,color:T.orange,fontWeight:700}}>{progress}%</span>
+            </div>
+            <div style={{background:"rgba(255,255,255,.1)",borderRadius:999,height:4,overflow:"hidden"}}>
+              <div style={{background:T.orange,height:"100%",width:`${progress}%`,borderRadius:999,transition:"width 0.5s linear"}}/>
+            </div>
+            <p style={{fontFamily:T.mono,fontSize:10,color:"rgba(248,247,244,.3)",textAlign:"center",marginTop:12}}>Please watch the full intro to continue</p>
+          </div>
+        </>
+      ):(
+        <>
+          <h2 style={{fontFamily:"Anton,sans-serif",fontWeight:400,fontSize:"clamp(28px,4vw,48px)",textTransform:"uppercase",color:"#F8F7F4",textAlign:"center",lineHeight:.95,marginBottom:16}}>Welcome to the<br/><span style={{color:T.orange}}>network!</span></h2>
+          <p style={{fontFamily:T.mono,fontSize:12,color:"rgba(255,255,255,.5)",letterSpacing:"0.06em"}}>Building your profile in {countdown}…</p>
+          <div style={{marginTop:20,width:48,height:48,borderRadius:"50%",border:`3px solid ${T.orange}`,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontFamily:"Anton,sans-serif",fontSize:22,color:T.orange}}>{countdown}</span></div>
+        </>
+      )}
+    </div>
+  );
+}
+
+export default function OnboardingPage() {
+  const router=useRouter();
+  const [phase,setPhase]=useState<"video"|"data">("video");
+  const [step,setStep]=useState(0);
+  const [saving,setSaving]=useState(false);
+  const [userId,setUserId]=useState<string|null>(null);
+  const [xpEarned,setXpEarned]=useState(0);
+  const [toast,setToast]=useState<string|null>(null);
+  const [school,setSchool]=useState("");
+  const [grade,setGrade]=useState("");
+  const [gpa,setGpa]=useState("");
+  const [city,setCity]=useState("");
+  const [zipCode,setZipCode]=useState("");
+  const [state,setState]=useState("CA");
+  const [district,setDistrict]=useState("");
+  const [gradYear,setGradYear]=useState("");
+  const [dreamSchool,setDreamSchool]=useState("");
+  const [ell,setEll]=useState(false);
+  const [sport,setSport]=useState("");
+  const [position,setPosition]=useState("");
+  const [jersey,setJersey]=useState("");
+  const [height,setHeight]=useState("");
+  const [weight,setWeight]=useState("");
+  const [teamLevel,setTeamLevel]=useState("");
+  const [travelTeam,setTravelTeam]=useState("");
+  const [coachName,setCoachName]=useState("");
+  const [coachEmail,setCoachEmail]=useState("");
+  const [gender,setGender]=useState("");
+  const [race,setRace]=useState("");
+  const [householdIncome,setHouseholdIncome]=useState("");
+  const [firstGen,setFirstGen]=useState(false);
+  const [freeLunch,setFreeLunch]=useState(false);
+  const [migrant,setMigrant]=useState(false);
+  const [fosterYouth,setFosterYouth]=useState(false);
+  const [unhoused,setUnhoused]=useState(false);
+  const [iep,setIep]=useState(false);
+  const [bio,setBio]=useState("");
+  const [pillars,setPillars]=useState<string[]>([]);
+  const [username,setUsername]=useState("");
+
+  useEffect(()=>{
+    supabase.auth.getUser().then(async({data})=>{
+      if(!data.user){router.replace("/login");return;}
+      setUserId(data.user.id);
+      const{data:p}=await supabase.from("profiles").select("onboarded,username,first_name").eq("id",data.user.id).single();
+      if(p?.onboarded){router.replace("/dashboard");return;}
+      if(p?.username)setUsername(p.username);
+    });
+  },[]);
+
+  useEffect(()=>{if(!toast)return;const t=setTimeout(()=>setToast(null),3500);return()=>clearTimeout(t);},[toast]);
+
+  const awardXP=async(xp:number,label:string)=>{
+    if(!userId)return;
+    const{data:p}=await supabase.from("profiles").select("xp,coin_balance").eq("id",userId).single();
+    await supabase.from("profiles").update({xp:(p?.xp||0)+xp,coin_balance:(p?.coin_balance||0)+Math.floor(xp/5)}).eq("id",userId);
+    setXpEarned(prev=>prev+xp);
+    setToast(`⚡ +${xp} XP earned for completing ${label}!`);
+  };
+
+  const handleNext=async()=>{
+    const xpMap=[50,75,100,125];
+    const labels=["School & Location","Athletic Profile","Background","Your Pillars"];
+    await awardXP(xpMap[step],labels[step]);
+    if(step<3)setStep(s=>s+1);
+  };
+
+  const handleSave=async()=>{
+    if(!userId)return;
+    setSaving(true);
+    await supabase.from("profiles").update({
+      username:username.replace("@","")||null,
+      school,grade,gpa:gpa||null,city,zip_code:zipCode,state,
+      school_district:district,grad_year:gradYear,dream_school:dreamSchool,
+      english_language_learner:ell,sport,position,jersey,height,weight,
+      team_level:teamLevel,travel_team:travelTeam,
+      coach_name:coachName,coach_email:coachEmail,
+      gender,race,household_income:householdIncome,
+      first_generation:firstGen,free_reduced_lunch:freeLunch,
+      migrant_student:migrant,foster_youth:fosterYouth,
+      unhoused,has_iep:iep,bio,pillars,onboarded:true,
+    }).eq("id",userId);
+    setSaving(false);
+    router.replace("/dashboard");
+  };
+
+  if(phase==="video")return<VideoGate onComplete={()=>setPhase("data")}/>;
+
+  const inp={width:"100%",background:T.surface,border:`1.5px solid ${T.line}`,borderRadius:10,padding:"12px 14px",fontSize:14,color:T.ink,fontFamily:T.sans,outline:"none",transition:"border-color 0.15s"} as React.CSSProperties;
+  const sel={...inp,cursor:"pointer"} as React.CSSProperties;
+  const lbl={fontFamily:T.mono,fontSize:10,letterSpacing:"0.12em",textTransform:"uppercase" as const,color:T.muted,display:"block",marginBottom:6};
+  const chk=(active:boolean)=>({display:"flex",alignItems:"center",gap:10,padding:"11px 14px",borderRadius:10,border:`1.5px solid ${active?T.orange:T.line}`,background:active?T.orangeL:"transparent",cursor:"pointer",transition:"all 0.12s",fontSize:13,color:active?T.orange:T.ink} as React.CSSProperties);
+
+  const canProceed=[school.trim()&&grade&&city.trim(),sport,true,pillars.length>0][step];
+
+  return(
+    <div style={{minHeight:"100vh",background:T.cream,fontFamily:T.sans,color:T.ink,display:"flex",alignItems:"center",justifyContent:"center",padding:"40px 20px"}}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');*{box-sizing:border-box;margin:0;padding:0;}input:focus,select:focus,textarea:focus{border-color:${T.orange}!important;outline:none;}input::placeholder,textarea::placeholder{color:${T.faint};}select{appearance:none;}`}</style>
+      {toast&&<div style={{position:"fixed",top:20,right:20,zIndex:9999,background:T.navy,color:"#F8F7F4",padding:"13px 18px",borderRadius:14,fontFamily:T.mono,fontSize:12,fontWeight:700,boxShadow:"0 8px 32px rgba(15,23,42,.35)"}}>{toast}</div>}
+      <div style={{width:"100%",maxWidth:560}}>
+        {xpEarned>0&&<div style={{background:T.navy,borderRadius:12,padding:"10px 18px",marginBottom:16,display:"flex",alignItems:"center",justifyContent:"space-between"}}><span style={{fontFamily:T.mono,fontSize:11,color:"rgba(248,247,244,.6)"}}>XP earned so far</span><span style={{fontFamily:T.anton,fontSize:22,color:T.orange}}>+{xpEarned} XP</span></div>}
+        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:24,justifyContent:"center"}}>
+          <div style={{width:34,height:34,borderRadius:8,background:T.orange,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontFamily:T.anton,fontSize:18,color:"#fff"}}>P</span></div>
+          <div><div style={{fontFamily:T.anton,fontSize:16,color:T.ink}}>PLAYBOOK</div><div style={{fontFamily:T.mono,fontSize:7,letterSpacing:"0.3em",color:T.orange}}>SERIES INC.</div></div>
         </div>
-        <nav style={{ display: "flex", gap: 6 }}>
-          {[
-            { label: "Home", path: "/dashboard" },
-            { label: "Profile", path: "/profile" },
-            { label: "Courses", path: "/courses" },
-            { label: "Notifications", path: "/notifications" },
-          ].map(({ label, path }) => (
-            <button key={label} onClick={() => router.push(path)}
-              className="pb-nav-btn"
-              style={{ fontFamily: mono, fontSize: 11, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", background: "transparent", border: "none", color: muted, cursor: "pointer", padding: "8px 12px", borderRadius: 8 }}>
-              {label}
-            </button>
+        <div style={{display:"grid",gridTemplateColumns:`repeat(${STEPS.length},1fr)`,gap:6,marginBottom:24}}>
+          {STEPS.map((s,i)=>(
+            <div key={s}>
+              <div style={{height:3,borderRadius:999,background:i<=step?T.orange:T.line,transition:"background 0.2s"}}/>
+              <div style={{fontFamily:T.mono,fontSize:9,letterSpacing:"0.1em",textTransform:"uppercase",color:i===step?T.orange:T.faint,marginTop:5}}>{s}</div>
+            </div>
           ))}
-          <button onClick={async () => { await supabase.auth.signOut(); router.replace("/"); }}
-            style={{ fontFamily: mono, fontSize: 11, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", background: "transparent", border: `1px solid ${line}`, color: muted, cursor: "pointer", padding: "8px 12px", borderRadius: 999 }}>
-            Log out
-          </button>
-        </nav>
-      </header>
-
-      <main style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 24px", display: "grid", gridTemplateColumns: "1fr 340px", gap: 24 }}>
-
-        {/* LEFT COLUMN */}
-        <div>
-
-          {/* Welcome */}
-          <div style={{ marginBottom: 28 }}>
-            <p style={{ fontFamily: mono, fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase", color: accent, marginBottom: 8 }}>Your playbook</p>
-            <h1 style={{ fontFamily: anton, fontWeight: 400, fontSize: "clamp(32px,4vw,48px)", lineHeight: 0.95, textTransform: "uppercase", color: ink }}>
-              Welcome back,<br /><span style={{ color: accent }}>{profile?.first_name || "Scholar"}</span>
-            </h1>
+        </div>
+        <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:20,padding:"28px 26px"}}>
+          <div style={{background:T.surface2,borderRadius:8,padding:"8px 14px",marginBottom:18,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+            <span style={{fontFamily:T.mono,fontSize:10,color:T.muted}}>Complete this step to earn</span>
+            <span style={{fontFamily:T.mono,fontSize:12,fontWeight:700,color:T.orange}}>+{[50,75,100,125][step]} XP</span>
           </div>
 
-          {/* Stat cards */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 20 }}>
-            {[
-              { label: "XP Earned", value: xp, highlight: true },
-              { label: "Coins", value: coins, highlight: false },
-              { label: "Day Streak", value: streak, highlight: false },
-            ].map(({ label, value, highlight }) => (
-              <div key={label} style={{ background: surface, border: `1px solid ${line}`, borderRadius: 16, padding: "18px 16px" }}>
-                <div style={{ fontFamily: anton, fontSize: 36, lineHeight: 1, color: highlight ? accent : ink }}>{value}</div>
-                <div style={{ fontFamily: mono, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: muted, marginTop: 6 }}>{label}</div>
+          {step===0&&(
+            <div>
+              <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>Step 1 of 4</p>
+              <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink,marginBottom:18,lineHeight:1}}>School & Location</h1>
+              <div style={{marginBottom:14}}><label style={lbl}>School name *</label><input style={inp} placeholder="Lincoln High School" value={school} onChange={e=>setSchool(e.target.value)}/></div>
+              <div style={{marginBottom:14}}><label style={lbl}>School district</label><input style={inp} placeholder="Oakland Unified School District" value={district} onChange={e=>setDistrict(e.target.value)}/></div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
+                <div><label style={lbl}>Grade *</label><select style={sel} value={grade} onChange={e=>setGrade(e.target.value)}><option value="">Select grade...</option>{GRADES.map(g=><option key={g}>{g}</option>)}</select></div>
+                <div><label style={lbl}>Grad year</label><select style={sel} value={gradYear} onChange={e=>setGradYear(e.target.value)}><option value="">Select year...</option>{Array.from({length:10},(_,i)=>(new Date().getFullYear()+i).toString()).map(y=><option key={y}>{y}</option>)}</select></div>
               </div>
-            ))}
-          </div>
-
-          {/* XP Progress bar */}
-          <div style={{ background: surface, border: `1px solid ${line}`, borderRadius: 16, padding: "18px 20px", marginBottom: 20 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 10 }}>
-              <span style={{ fontFamily: mono, fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", color: muted }}>Level {level} — Rising Star</span>
-              <span style={{ fontFamily: anton, fontSize: 15, color: accent }}>{xp} / {xpForNext} XP</span>
+              <div style={{marginBottom:14}}><label style={lbl}>City *</label><CitySearch value={city} onChange={setCity}/></div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
+                <div><label style={lbl}>State</label><select style={sel} value={state} onChange={e=>setState(e.target.value)}>{["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"].map(s=><option key={s}>{s}</option>)}</select></div>
+                <div><label style={lbl}>ZIP code</label><input style={inp} placeholder="94601" value={zipCode} onChange={e=>setZipCode(e.target.value)}/></div>
+              </div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
+                <div><label style={lbl}>GPA</label><input style={inp} placeholder="3.5" value={gpa} onChange={e=>setGpa(e.target.value)}/></div>
+                <div><label style={lbl}>Dream school</label><input style={inp} placeholder="Howard University" value={dreamSchool} onChange={e=>setDreamSchool(e.target.value)}/></div>
+              </div>
+              <div onClick={()=>setEll(!ell)} style={chk(ell)}><div style={{width:20,height:20,borderRadius:5,border:`2px solid ${ell?T.orange:T.line}`,background:ell?T.orange:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{ell&&<span style={{color:"#fff",fontSize:12}}>✓</span>}</div>I am an English Language Learner (ELL)</div>
             </div>
-            <div style={{ background: line, borderRadius: 999, height: 8, overflow: "hidden" }}>
-              <div style={{ background: accent, height: "100%", width: `${xpPct}%`, borderRadius: 999, transition: "width 0.6s ease" }} />
-            </div>
-            <p style={{ fontSize: 12, color: faint, marginTop: 8 }}>{xpForNext - xp} XP until Level {level + 1}</p>
-          </div>
+          )}
 
-          {/* Badges */}
-          {badges.length > 0 && (
-            <div style={{ background: surface, border: `1px solid ${line}`, borderRadius: 16, padding: "18px 20px", marginBottom: 20 }}>
-              <p style={{ fontFamily: mono, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: muted, marginBottom: 12 }}>Badges earned</p>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                {badges.map((b) => (
-                  <span key={b} style={{ fontSize: 12, fontWeight: 700, padding: "6px 14px", borderRadius: 999, background: surface2, border: `1px solid ${accent}`, color: accent }}>
-                    {b}
-                  </span>
-                ))}
+          {step===1&&(
+            <div>
+              <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>Step 2 of 4</p>
+              <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink,marginBottom:18,lineHeight:1}}>Athletic Profile</h1>
+              <div style={{marginBottom:14}}><label style={lbl}>Primary sport *</label><select style={sel} value={sport} onChange={e=>setSport(e.target.value)}><option value="">Select your sport...</option>{SPORTS.map(s=><option key={s}>{s}</option>)}</select></div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
+                <div><label style={lbl}>Position</label><input style={inp} placeholder="Point Guard" value={position} onChange={e=>setPosition(e.target.value)}/></div>
+                <div><label style={lbl}>Jersey #</label><input style={inp} placeholder="11" value={jersey} onChange={e=>setJersey(e.target.value)}/></div>
+              </div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
+                <div><label style={lbl}>Height</label><input style={inp} placeholder='5&apos;11"' value={height} onChange={e=>setHeight(e.target.value)}/></div>
+                <div><label style={lbl}>Weight (lbs)</label><input style={inp} placeholder="155" value={weight} onChange={e=>setWeight(e.target.value)}/></div>
+              </div>
+              <div style={{marginBottom:14}}><label style={lbl}>Team level</label><select style={sel} value={teamLevel} onChange={e=>setTeamLevel(e.target.value)}><option value="">Select level...</option>{TEAM_LEVELS.map(l=><option key={l}>{l}</option>)}</select></div>
+              <div style={{marginBottom:14}}><label style={lbl}>Travel / Club team</label><input style={inp} placeholder="Oakland Soldiers" value={travelTeam} onChange={e=>setTravelTeam(e.target.value)}/></div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
+                <div><label style={lbl}>Coach name</label><input style={inp} placeholder="Coach Smith" value={coachName} onChange={e=>setCoachName(e.target.value)}/></div>
+                <div><label style={lbl}>Coach email</label><input type="email" style={inp} placeholder="coach@school.edu" value={coachEmail} onChange={e=>setCoachEmail(e.target.value)}/></div>
               </div>
             </div>
           )}
 
-          {/* Action button */}
-          <button className="pb-action-btn" onClick={handleActionReward}
-            style={{ fontFamily: mono, fontSize: 12, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", background: accent, color: onaccent, border: "none", borderRadius: 999, padding: "14px 28px", cursor: "pointer", transition: "opacity 0.2s" }}>
-            Complete action (+25 coins · +50 XP)
-          </button>
+          {step===2&&(
+            <div>
+              <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>Step 3 of 4</p>
+              <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink,marginBottom:10,lineHeight:1}}>Background</h1>
+              <div style={{background:"#EFF6FF",borderRadius:10,padding:"12px 14px",fontSize:12,color:T.muted,lineHeight:1.6,marginBottom:18,borderLeft:`3px solid ${T.blue}`}}>🔒 Private and only used to secure funding for scholars like you. Never shared publicly.</div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
+                <div><label style={lbl}>Gender</label><select style={sel} value={gender} onChange={e=>setGender(e.target.value)}><option value="">Select...</option>{GENDERS.map(g=><option key={g}>{g}</option>)}</select></div>
+                <div><label style={lbl}>Race / Ethnicity</label><select style={sel} value={race} onChange={e=>setRace(e.target.value)}><option value="">Select...</option>{RACES.map(r=><option key={r}>{r}</option>)}</select></div>
+              </div>
+              <div style={{marginBottom:18}}><label style={lbl}>Household income</label><select style={sel} value={householdIncome} onChange={e=>setHouseholdIncome(e.target.value)}><option value="">Select...</option>{INCOME.map(i=><option key={i}>{i}</option>)}</select></div>
+              <label style={lbl}>Check all that apply</label>
+              <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:14}}>
+                {[{label:"First-generation college student",val:firstGen,set:setFirstGen},{label:"Free or reduced-price lunch eligible",val:freeLunch,set:setFreeLunch},{label:"Migrant student",val:migrant,set:setMigrant},{label:"Foster youth / former foster care",val:fosterYouth,set:setFosterYouth},{label:"Experiencing housing instability",val:unhoused,set:setUnhoused},{label:"I have an IEP or 504 plan",val:iep,set:setIep}].map(({label,val,set})=>(
+                  <div key={label} onClick={()=>set(!val)} style={chk(val)}><div style={{width:20,height:20,borderRadius:5,border:`2px solid ${val?T.orange:T.line}`,background:val?T.orange:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"all 0.12s"}}>{val&&<span style={{color:"#fff",fontSize:12}}>✓</span>}</div><span>{label}</span></div>
+                ))}
+              </div>
+              <div><label style={lbl}>Bio (optional)</label><textarea value={bio} onChange={e=>setBio(e.target.value)} placeholder="Tell us about yourself..." rows={3} style={{...inp,resize:"vertical" as const}}/></div>
+            </div>
+          )}
 
-        </div>
-
-        {/* RIGHT COLUMN */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-
-          {/* Continue learning */}
-          <div style={{ background: surface, border: `1px solid ${line}`, borderRadius: 16, padding: "18px 20px" }}>
-            <p style={{ fontFamily: mono, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: muted, marginBottom: 14 }}>Continue learning</p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {COURSES.map((c) => {
-                const pct = Math.round((c.done / c.modules) * 100);
-                return (
-                  <div key={c.id} className="pb-course-row"
-                    onClick={() => router.push(`/courses/${c.id}`)}
-                    style={{ display: "flex", alignItems: "center", gap: 12, background: surface2, border: `1px solid ${line}`, borderRadius: 12, padding: "12px 14px", transition: "border-color 0.15s" }}>
-                    <div style={{ width: 38, height: 38, borderRadius: 10, background: line, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{c.icon}</div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: ink, marginBottom: 3 }}>{c.name}</div>
-                      <div style={{ background: line, borderRadius: 999, height: 4, overflow: "hidden" }}>
-                        <div style={{ background: accent, height: "100%", width: `${pct}%`, borderRadius: 999 }} />
-                      </div>
-                      <div style={{ fontFamily: mono, fontSize: 10, color: faint, marginTop: 3 }}>{c.done}/{c.modules} modules · {pct}%</div>
+          {step===3&&(
+            <div>
+              <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>Step 4 of 4</p>
+              <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink,marginBottom:10,lineHeight:1}}>Your Pillars</h1>
+              <p style={{fontSize:13,color:T.muted,marginBottom:20,lineHeight:1.6}}>Which pillars interest you most? We will personalize your dashboard and recommend courses based on your choices.</p>
+              <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:22}}>
+                {PILLARS.map(p=>{
+                  const active=pillars.includes(p.key);
+                  return(
+                    <div key={p.key} onClick={()=>setPillars(prev=>prev.includes(p.key)?prev.filter(x=>x!==p.key):[...prev,p.key])}
+                      style={{display:"flex",alignItems:"center",gap:14,padding:"14px 16px",borderRadius:12,border:`1.5px solid ${active?T.orange:T.line}`,background:active?T.orangeL:"transparent",cursor:"pointer",transition:"all 0.12s"}}>
+                      <div style={{width:36,height:36,borderRadius:9,background:active?T.orange:T.line,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,color:active?"#fff":T.muted,flexShrink:0,transition:"all 0.12s"}}>{p.icon}</div>
+                      <div style={{flex:1}}><div style={{fontSize:14,fontWeight:700,color:active?T.orange:T.ink}}>{p.label}</div><div style={{fontSize:12,color:T.muted,marginTop:2}}>{p.desc}</div></div>
+                      <div style={{width:22,height:22,borderRadius:6,border:`2px solid ${active?T.orange:T.line}`,background:active?T.orange:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{active&&<span style={{fontSize:12,color:"#fff"}}>✓</span>}</div>
                     </div>
-                    <span style={{ fontSize: 14, color: accent, flexShrink: 0 }}>→</span>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
+              <div><label style={lbl}>Choose a username</label><input style={inp} placeholder="@yourhandle" value={username} onChange={e=>setUsername(e.target.value)}/></div>
             </div>
-            <button onClick={() => router.push("/courses")}
-              style={{ width: "100%", marginTop: 12, fontFamily: mono, fontSize: 11, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", background: "transparent", border: `1px solid ${line}`, color: muted, borderRadius: 10, padding: "10px", cursor: "pointer" }}>
-              View all courses →
-            </button>
-          </div>
+          )}
 
-          {/* Recent activity */}
-          <div style={{ background: surface, border: `1px solid ${line}`, borderRadius: 16, padding: "18px 20px" }}>
-            <p style={{ fontFamily: mono, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: muted, marginBottom: 14 }}>Recent activity</p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
-              {SAMPLE_ACTIVITY.map((a, i) => (
-                <div key={a.id} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "10px 0", borderBottom: i < SAMPLE_ACTIVITY.length - 1 ? `1px solid ${line}` : "none" }}>
-                  <div style={{ width: 32, height: 32, borderRadius: "50%", background: a.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, color: onaccent, flexShrink: 0 }}>{a.initials}</div>
-                  <div>
-                    <div style={{ fontSize: 13, color: ink, lineHeight: 1.4 }}>{a.text}</div>
-                    <div style={{ fontSize: 11, color: faint, marginTop: 3 }}>{a.time}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
+          <div style={{display:"flex",gap:10,marginTop:24}}>
+            {step>0&&<button onClick={()=>setStep(s=>s-1)} style={{fontFamily:T.mono,fontSize:12,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:"transparent",color:T.muted,border:`1.5px solid ${T.line}`,borderRadius:12,padding:"13px 20px",cursor:"pointer"}}>← Back</button>}
+            {step<3?(
+              <button onClick={handleNext} disabled={!canProceed} style={{flex:1,fontFamily:T.mono,fontSize:12,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:canProceed?T.orange:T.line,color:canProceed?"#fff":T.muted,border:"none",borderRadius:12,padding:"13px",cursor:canProceed?"pointer":"default",transition:"all 0.15s"}}>
+                Save & Continue +{[50,75,100,125][step]} XP →
+              </button>
+            ):(
+              <button onClick={handleSave} disabled={saving||pillars.length===0} style={{flex:1,fontFamily:T.mono,fontSize:12,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:saving||pillars.length===0?T.line:T.orange,color:saving||pillars.length===0?T.muted:"#fff",border:"none",borderRadius:12,padding:"13px",cursor:saving||pillars.length===0?"default":"pointer",transition:"all 0.15s"}}>
+                {saving?"Saving...":"Complete profile +125 XP →"}
+              </button>
+            )}
           </div>
-
+          <p style={{textAlign:"center",marginTop:12,fontSize:11,color:T.faint}}>You can update this anytime in your profile settings</p>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
