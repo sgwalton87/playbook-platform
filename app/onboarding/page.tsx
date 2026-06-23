@@ -130,7 +130,7 @@ export default function OnboardingPage() {
       if(!data.user){router.replace("/login");return;}
       setUserId(data.user.id);
       const{data:p}=await supabase.from("profiles").select("onboarded,username").eq("id",data.user.id).single();
-      if(p?.onboarded){router.replace("/dashboard");return;}
+      if(p?.onboarded){sessionStorage.setItem("pb_new_user","1");router.replace("/dashboard");return;}
       if(p?.username)setUsername(p.username);
       const{data:custom}=await supabase.from("custom_options").select("category,value");
       if(custom){
@@ -177,7 +177,7 @@ export default function OnboardingPage() {
       unhoused,has_iep:iep,bio,pillars,onboarded:true,
     }).eq("id",userId);
     setSaving(false);
-    router.replace("/dashboard");
+    sessionStorage.setItem("pb_new_user","1");router.replace("/dashboard");
   };
 
   const sportConfig=sport&&SPORT_CONFIG[sport]?SPORT_CONFIG[sport]:null;
