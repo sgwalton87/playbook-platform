@@ -311,6 +311,8 @@ const [recruitingInterest,setRecruitingInterest]=useState("");
   const [nilBrandInterests,setNilBrandInterests]=useState<string[]>([]);
   const [nilWorkedWithBrands,setNilWorkedWithBrands]=useState(false);
   const [nilDealTypes,setNilDealTypes]=useState<string[]>([]);
+  const [avatarUrl,setAvatarUrl]=useState("");
+  const [avatarUploading,setAvatarUploading]=useState(false);
 
 const [activityType,setActivityType]=useState("");
 const [activityName,setActivityName]=useState("");
@@ -440,6 +442,21 @@ if (p?.role) {
   setXpEarned(prev=>prev+xp);
   setToast(`⚡ +${xp} XP earned for completing ${label}!`);
 };
+
+  const handleAvatarUpload=async(e:React.ChangeEvent<HTMLInputElement>)=>{
+    const file=e.target.files?.[0];
+    if(!file||!userId)return;
+    setAvatarUploading(true);
+    const ext=file.name.split(".").pop();
+    const path=`${userId}/avatar.${ext}`;
+    const{error}=await supabase.storage.from("avatars").upload(path,file,{upsert:true});
+    if(!error){
+      const{data}=supabase.storage.from("avatars").getPublicUrl(path);
+      setAvatarUrl(data.publicUrl);
+      await supabase.from("profiles").update({avatar_url:data.publicUrl}).eq("id",userId);
+    }
+    setAvatarUploading(false);
+  };
 
   const handleNext=async()=>{
     const xpMap=[50,75,100,125];const labels=["School & Location","Athletic Profile","Background","Your Pillars"];
@@ -909,6 +926,21 @@ const canProceed = requiredByStep[currentStepName]
                   <div style={{width:22,height:22,borderRadius:6,border:`2px solid ${active?T.orange:T.line}`,background:active?T.orange:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{active&&<span style={{fontSize:12,color:"#fff"}}>✓</span>}</div>
                 </div>);
               })}
+            </div>
+            <div style={{marginBottom:22}}>
+              <label style={lbl}>Profile photo (optional)</label>
+              <div style={{display:"flex",alignItems:"center",gap:16}}>
+                <div style={{width:72,height:72,borderRadius:"50%",background:"#F1F5F9",border:"2px solid #E2E8F0",overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                  {avatarUrl?<img src={avatarUrl} alt="avatar" style={{width:"100%",height:"100%",objectFit:"cover"}}/>:<span style={{fontSize:28}}>👤</span>}
+                </div>
+                <div>
+                  <label style={{fontFamily:"'Space Mono',monospace",fontSize:11,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:"#0F172A",color:"#F8F7F4",border:"none",borderRadius:10,padding:"10px 16px",cursor:"pointer",display:"inline-block"}}>
+                    {avatarUploading?"Uploading...":"Upload photo"}
+                    <input type="file" accept="image/*" onChange={handleAvatarUpload} style={{display:"none"}} disabled={avatarUploading}/>
+                  </label>
+                  <p style={{fontSize:11,color:"#94A3B8",marginTop:6}}>JPG, PNG or GIF · Max 5MB</p>
+                </div>
+              </div>
             </div>
             <div><label style={lbl}>Choose a username *</label><UsernameField value={username} onChange={setUsername} onStatusChange={setUsernameStatus}/></div>
           </div>)}
