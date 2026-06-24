@@ -550,7 +550,7 @@ if (p?.role) {
 
 const sportConfig=sport&&SPORT_CONFIG[sport]?SPORT_CONFIG[sport]:null;
 
-if(phase==="video") {
+if(phase==="video" && false) {
   return <VideoGate onComplete={() => setPhase("data")} />;
 }
 
