@@ -320,6 +320,7 @@ const [collegeGoal,setCollegeGoal]=useState("");
 const [idealProfession,setIdealProfession]=useState("");
 const [desiredSalaryRange,setDesiredSalaryRange]=useState("");
 const [activities,setActivities]=useState<any[]>([]);
+const [careerOptions,setCareerOptions] = useState<any[]>([]);
 
 const isScholarAthlete = role === "scholar_athlete";
 
@@ -357,6 +358,17 @@ const steps = isScholarAthlete
   .select("onboarded,username,role,registration_type")
   .eq("id", data.user.id)
   .single();
+
+  const { data: careers } = await supabase
+  .from("careers")
+  .select("title")
+  .order("title");
+
+console.log("CAREERS LOADED:", careers?.length, careers?.slice(0, 5));
+
+if (careers) {
+  setCareerOptions(careers);
+}
 
 if (p?.onboarded) {
   router.replace("/dashboard");
@@ -489,46 +501,46 @@ if (p?.role) {
       description: activityDescription || null,
     });
   }
+  console.log({
+  dreamSchool,
+  idealProfession,
+  desiredSalaryRange
+});
 
-  await supabase.from("profiles").upsert({
+  const {error:saveErr}=await supabase.from("profiles").upsert({
     id:userId,
     username:username.replace("@","").toLowerCase()||null,
-    school,
-    grade,
+    school:school||null,
     gpa:gpa||null,
-    city,
-    zip_code:zipCode,
-    state:usState,
-    school_district:district,
-    grad_year:gradYear,
-    dream_school:dreamSchool,
+    zip_code:zipCode||null,
+    school_district:district||null,
+    grad_year:gradYear||null,
+    dream_school:dreamSchool||null,
+    ideal_profession:idealProfession||null,
+    desired_salary_range:desiredSalaryRange||null,
     english_language_learner:ell,
-    sport,
-    position,
-    jersey,
-    height,
-    weight,
-    team_level:teamLevel,
-    travel_team:travelTeam,
-    coach_name:coachName,
-    coach_email:coachEmail,
-    gender,
-    race,
-    household_income:householdIncome,
+    sport:sport||null,
+    position:position||null,
+    jersey_number:jersey||null,
+    height:height||null,
+    weight:weight||null,
+    team_level:teamLevel||null,
+    travel_team:travelTeam||null,
+    coach_name:coachName||null,
+    coach_email:coachEmail||null,
+    gender:gender||null,
+    household_income:householdIncome||null,
     first_generation:firstGen,
     free_reduced_lunch:freeLunch,
     migrant_student:migrant,
     foster_youth:fosterYouth,
-    unhoused,
+    unhoused:unhoused,
     has_iep:iep,
-    bio,
-    pillars,
-    high_school_team: highSchoolTeam || null,
-    athlete_email: athleteEmail || null,
-    highlight_video: highlightVideo || null,
-    recruiting_interest: recruitingInterest || null,
+    bio:bio||null,
+    pillars:pillars||[],
+    highlight_reel_url:highlightVideo||null,
     onboarded:true,
-  });
+  })
 
   setSaving(false);
   setPhase("creating");
@@ -633,7 +645,7 @@ const canProceed = requiredByStep[currentStepName]
           </div>
 
           {currentStepName==="School & Location"&&(<div>
-            <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>Step 1 of 4</p>
+            <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>Step {step + 1} of {steps.length}</p>
             <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink,marginBottom:18,lineHeight:1}}>School & Location</h1>
             <div style={{marginBottom:14}}><label style={lbl}>School name *</label><input style={inp} placeholder="Lincoln High School" value={school} onChange={e=>setSchool(e.target.value)}/></div>
             <div style={{marginBottom:14}}><label style={lbl}>School district</label><SearchDropdown options={districtOptions} value={district} onChange={setDistrict} placeholder="Search CA districts or type yours..." onAddNew={v=>{setDistrictOptions(p=>[...new Set([...p,v])]);addCustomOption("district",v);}}/></div>
@@ -654,7 +666,7 @@ const canProceed = requiredByStep[currentStepName]
           </div>)}
 
           {currentStepName==="Athletic Profile"&&isScholarAthlete&&(<div>
-            <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>Step 2 of 4</p>
+            <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>Step {step + 1} of {steps.length}</p>
             <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink,marginBottom:18,lineHeight:1}}>Athletic Profile</h1>
             <div style={{marginBottom:14}}>
               <label style={lbl}>Primary sport *</label>
@@ -701,7 +713,7 @@ const canProceed = requiredByStep[currentStepName]
           </div>)}
 
           {currentStepName==="Background"&&(<div>
-            <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>Step 3 of 4</p>
+            <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>Step {step + 1} of {steps.length}</p>
             <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink,marginBottom:10,lineHeight:1}}>Demographic Info<br/><span style={{color:T.orange}}>Optional, but important</span></h1>
             <div style={{background:T.blueL,borderRadius:10,padding:"12px 14px",fontSize:12,color:T.muted,lineHeight:1.6,marginBottom:18,borderLeft:`3px solid ${T.blue}`}}>🔒 This information helps keep the platform free, secure funding, and better support scholars. It is never shown publicly.</div>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
@@ -751,17 +763,29 @@ const canProceed = requiredByStep[currentStepName]
 
 
 {currentStepName==="College & Career Goals"&&(<div>
-  <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>College & Career Goals</p>
-  <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink,marginBottom:18,lineHeight:1}}>College & Career Goals</h1>
+  <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>
+    Step {step + 1} of {steps.length}
+  </p>
+
+  <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink,marginBottom:18,lineHeight:1}}>
+    College & Career Goals
+  </h1>
 
   <div style={{marginBottom:14}}>
     <label style={lbl}>Dream school / college goal *</label>
-    <input style={inp} placeholder="Howard University, UCLA, Laney College..." value={dreamSchool} onChange={e=>setDreamSchool(e.target.value)} />
+    <input style={inp} placeholder="Cal Berkeley" value={dreamSchool} onChange={e=>setDreamSchool(e.target.value)} />
   </div>
 
   <div style={{marginBottom:14}}>
     <label style={lbl}>Ideal profession</label>
-    <input style={inp} placeholder="Doctor, Engineer, Entrepreneur, Teacher..." value={idealProfession} onChange={e=>setIdealProfession(e.target.value)} />
+    <select style={sel} value={idealProfession} onChange={e=>setIdealProfession(e.target.value)}>
+      <option value="">Select ideal profession...</option>
+      {careerOptions.map((career:any)=>(
+        <option key={career.title} value={career.title}>
+          {career.title}
+        </option>
+      ))}
+    </select>
   </div>
 
   <div>
@@ -828,7 +852,7 @@ const canProceed = requiredByStep[currentStepName]
 </div>)}
 
 {currentStepName==="Your Pillars"&&(<div>
-            <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>Step 4 of 4</p>
+            <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>Step {step + 1} of {steps.length}</p>
             <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink,marginBottom:10,lineHeight:1}}>Your Pillars</h1>
             <p style={{fontSize:13,color:T.muted,marginBottom:20,lineHeight:1.6}}>Select what interests you most — we will suggest courses on your dashboard based on your choices.</p>
             <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:22}}>
