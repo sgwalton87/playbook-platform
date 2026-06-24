@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import CollegeSearch from "@/components/CollegeSearch";
 import Confetti from "react-confetti";
 
 const ONBOARDING_steps_BY_ROLE = {
@@ -119,20 +120,20 @@ const INCOME=["Under $25,000","$25,000–$49,999","$50,000–$74,999","$75,000�
 const TEAM_LEVELS=["Middle School","Junior Varsity (JV)","Varsity","Club / AAU","Travel Team","College","Semi-Pro","Professional"];
 const PILLARS=[{key:"leadership",label:"Leadership",icon:"★",desc:"Captaincy, accountability, leading on and off the court"},{key:"finance",label:"Financial Literacy",icon:"$",desc:"Budgeting, NIL basics, building wealth"},{key:"civic",label:"Civic Engagement",icon:"✓",desc:"Youth advocacy, community projects, making change"},{key:"sel",label:"Social-Emotional Learning",icon:"♥",desc:"Mental wellness, resilience, identity beyond sport"}];
 
-function SearchDropdown({options,value,onChange,placeholder,onAddNew}:{options:string[];value:string;onChange:(v:string)=>void;placeholder:string;onAddNew?:(v:string)=>void}) {
+function SearchDropdown({options,value,onChange,placeholder,onAddNew}:{options:string[];value:string;onChange: (schoolName: string, schoolId: string) => void;placeholder:string;onAddNew?:(v:string)=>void}) {
   const [query,setQuery]=useState(value);
   const [open,setOpen]=useState(false);
   const filtered=options.filter(o=>o.toLowerCase().includes(query.toLowerCase())).slice(0,10);
   const showAdd=onAddNew&&query.length>2&&!options.some(o=>o.toLowerCase()===query.toLowerCase());
   return(
     <div style={{position:"relative"}}>
-      <input value={query} onChange={e=>{setQuery(e.target.value);onChange(e.target.value);setOpen(true);}} onFocus={()=>setOpen(true)} onBlur={()=>setTimeout(()=>setOpen(false),200)} placeholder={placeholder} style={{width:"100%",background:T.surface,border:`1.5px solid ${T.line}`,borderRadius:10,padding:"12px 14px",fontSize:14,color:T.ink,fontFamily:T.sans,outline:"none"}}/>
+      <input value={query} onChange={e=>{setQuery(e.target.value);onChange(e.target.value, "");setOpen(true);}} onFocus={()=>setOpen(true)} onBlur={()=>setTimeout(()=>setOpen(false),200)} placeholder={placeholder} style={{width:"100%",background:T.surface,border:`1.5px solid ${T.line}`,borderRadius:10,padding:"12px 14px",fontSize:14,color:T.ink,fontFamily:T.sans,outline:"none"}}/>
       {open&&(filtered.length>0||showAdd)&&(
         <div style={{position:"absolute",top:"100%",left:0,right:0,background:T.surface,border:`1px solid ${T.line}`,borderRadius:10,zIndex:200,overflow:"hidden",boxShadow:"0 4px 20px rgba(0,0,0,.12)",marginTop:4,maxHeight:260,overflowY:"auto"}}>
           {filtered.map(o=>(
-            <div key={o} onMouseDown={()=>{setQuery(o);onChange(o);setOpen(false);}} style={{padding:"11px 14px",fontSize:14,color:T.ink,cursor:"pointer",borderBottom:`1px solid ${T.line}`}} onMouseEnter={e=>(e.currentTarget.style.background=T.orangeL)} onMouseLeave={e=>(e.currentTarget.style.background="transparent")}>{o}</div>
+            <div key={o} onMouseDown={()=>{setQuery(o);onChange(o, "");setOpen(false);}} style={{padding:"11px 14px",fontSize:14,color:T.ink,cursor:"pointer",borderBottom:`1px solid ${T.line}`}} onMouseEnter={e=>(e.currentTarget.style.background=T.orangeL)} onMouseLeave={e=>(e.currentTarget.style.background="transparent")}>{o}</div>
           ))}
-          {showAdd&&<div onMouseDown={()=>{onChange(query);onAddNew!(query);setOpen(false);}} style={{padding:"11px 14px",fontSize:14,color:T.orange,cursor:"pointer",fontWeight:700,background:T.orangeL,borderTop:`1px solid ${T.line}`}}>+ Add "{query}"</div>}
+          {showAdd&&<div onMouseDown={()=>{onChange(query, "");onAddNew!(query);setOpen(false);}} style={{padding:"11px 14px",fontSize:14,color:T.orange,cursor:"pointer",fontWeight:700,background:T.orangeL,borderTop:`1px solid ${T.line}`}}>+ Add "{query}"</div>}
         </div>
       )}
     </div>
@@ -292,7 +293,7 @@ export default function OnboardingPage() {
   const [toast,setToast]=useState<string|null>(null);
   const [districtOptions,setDistrictOptions]=useState<string[]>(CA_DISTRICTS);
   const [cityOptions,setCityOptions]=useState<string[]>(CA_CITIES);
-  const [school,setSchool]=useState("");const [grade,setGrade]=useState("");const [gpa,setGpa]=useState("");const [city,setCity]=useState("");const [zipCode,setZipCode]=useState("");const [usState,setUsState]=useState("CA");const [district,setDistrict]=useState("");const [gradYear,setGradYear]=useState("");const [dreamSchool,setDreamSchool]=useState("");const [ell,setEll]=useState(false);
+  const [school,setSchool]=useState("");const [grade,setGrade]=useState("");const [gpa,setGpa]=useState("");const [city,setCity]=useState("");const [zipCode,setZipCode]=useState("");const [usState,setUsState]=useState("CA");const [district,setDistrict]=useState("");const [gradYear,setGradYear]=useState("");const [ell,setEll]=useState(false);
   const [sport,setSport]=useState("");const [position,setPosition]=useState("");const [jersey,setJersey]=useState("");const [height,setHeight]=useState("");const [weight,setWeight]=useState("");const [teamLevel,setTeamLevel]=useState("");const [travelTeam,setTravelTeam]=useState("");const [coachName,setCoachName]=useState("");const [coachEmail,setCoachEmail]=useState("");
   const [gender,setGender]=useState("");const [race,setRace]=useState("");const [householdIncome,setHouseholdIncome]=useState("");const [firstGen,setFirstGen]=useState(false);const [freeLunch,setFreeLunch]=useState(false);const [migrant,setMigrant]=useState(false);const [fosterYouth,setFosterYouth]=useState(false);const [unhoused,setUnhoused]=useState(false);const [iep,setIep]=useState(false);const [bio,setBio]=useState("");
   const [pillars,setPillars]=useState<string[]>([]);const [username,setUsername]=useState("");const [usernameStatus,setUsernameStatus]=useState<"idle"|"taken"|"available">("idle");
@@ -332,6 +333,9 @@ const [idealProfession,setIdealProfession]=useState("");
 const [desiredSalaryRange,setDesiredSalaryRange]=useState("");
 const [activities,setActivities]=useState<any[]>([]);
 const [careerOptions,setCareerOptions] = useState<any[]>([]);
+
+const [dreamSchoolName, setDreamSchoolName] = useState("");
+const [dreamSchoolId, setDreamSchoolId] = useState("");
 
 const isScholarAthlete = role === "scholar-athlete";
 
@@ -527,7 +531,8 @@ if (p?.role) {
     });
   }
   console.log({
-  dreamSchool,
+  dreamSchoolName,
+dreamSchoolId,
   idealProfession,
   desiredSalaryRange
 });
@@ -540,7 +545,9 @@ if (p?.role) {
     zip_code:zipCode||null,
     school_district:district||null,
     grad_year:gradYear||null,
-    dream_school:dreamSchool||null,
+dream_school: dreamSchoolName,
+dream_school_name: dreamSchoolName,
+dream_school_id: dreamSchoolId || null,
     ideal_profession:idealProfession||null,
     desired_salary_range:desiredSalaryRange||null,
     english_language_learner:ell,
@@ -641,8 +648,7 @@ const requiredByStep: Record<string, () => boolean> = {
     !!householdIncome,
 
   "College & Career Goals": () =>
-    !!dreamSchool.trim(),
-
+!!dreamSchoolName.trim(),
   "Recruiting Profile": () => true,
 
   "Your Pillars": () =>
@@ -690,7 +696,14 @@ const canProceed = requiredByStep[currentStepName]
             </div>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
               <div><label style={lbl}>GPA</label><input style={inp} placeholder="3.5" value={gpa} onChange={e=>setGpa(e.target.value)}/></div>
-              <div><label style={lbl}>Dream school</label><input style={inp} placeholder="Howard University" value={dreamSchool} onChange={e=>setDreamSchool(e.target.value)}/></div>
+              <div><label style={lbl}>Dream school</label><CollegeSearch
+  value={dreamSchoolName}
+  onChange={(schoolName, schoolId) => {
+    setDreamSchoolName(schoolName);
+    setDreamSchoolId(schoolId || "");
+  }}
+/>
+</div>
             </div>
             <div onClick={()=>setEll(!ell)} style={chk(ell)}><div style={{width:20,height:20,borderRadius:5,border:`2px solid ${ell?T.orange:T.line}`,background:ell?T.orange:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{ell&&<span style={{color:"#fff",fontSize:12}}>✓</span>}</div>I am an English Language Learner (ELL)</div>
           </div>)}
@@ -834,9 +847,16 @@ const canProceed = requiredByStep[currentStepName]
   </h1>
 
   <div style={{marginBottom:14}}>
-    <label style={lbl}>Dream school / college goal *</label>
-    <input style={inp} placeholder="Cal Berkeley" value={dreamSchool} onChange={e=>setDreamSchool(e.target.value)} />
-  </div>
+  <label style={lbl}>Dream school / college goal *</label>
+
+  <CollegeSearch
+    value={dreamSchoolName}
+    onChange={(schoolName, schoolId) => {
+      setDreamSchoolName(schoolName);
+      setDreamSchoolId(schoolId || "");
+    }}
+  />
+</div>
 
   <div style={{marginBottom:14}}>
     <label style={lbl}>Ideal profession</label>

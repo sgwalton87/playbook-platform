@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabaseClient";
 import ThemeToggle from "@/components/ThemeToggle";
 import ProfileAvatar from "@/components/ProfileAvatar";
 import { checkBadges } from "@/lib/badges";
+import CollegeSearch from "@/components/CollegeSearch";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -36,6 +37,7 @@ export default function ProfilePage() {
   const [actScore, setActScore] = useState("");
   const [intendedMajor, setIntendedMajor] = useState("");
   const [dreamSchool, setDreamSchool] = useState("");
+  const [dreamSchoolId, setDreamSchoolId] = useState("");
 
   const [instagram, setInstagram] = useState("");
   const [tiktok, setTiktok] = useState("");
@@ -96,7 +98,7 @@ export default function ProfilePage() {
       setSatScore(profileData.sat_score || "");
       setActScore(profileData.act_score || "");
       setIntendedMajor(profileData.intended_major || "");
-      setDreamSchool(profileData.dream_school || "");
+      setDreamSchoolId(profileData.dream_school_id || "");
 
       setInstagram(profileData.instagram || "");
       setTiktok(profileData.tiktok || "");
@@ -186,6 +188,8 @@ export default function ProfilePage() {
       act_score: actScore,
       intended_major: intendedMajor,
       dream_school: dreamSchool,
+      dream_school_name: dreamSchool,
+      dream_school_id: dreamSchoolId || null,
       instagram,
       tiktok,
       hudl,
@@ -216,6 +220,8 @@ export default function ProfilePage() {
         act_score: actScore,
         intended_major: intendedMajor,
         dream_school: dreamSchool,
+        dream_school_name: dreamSchool,
+        dream_school_id: dreamSchoolId || null,
         instagram,
         tiktok,
         hudl,
@@ -438,7 +444,17 @@ export default function ProfilePage() {
           <div><label>SAT Score</label><input value={satScore} onChange={(e) => setSatScore(e.target.value)} /></div>
           <div><label>ACT Score</label><input value={actScore} onChange={(e) => setActScore(e.target.value)} /></div>
           <div><label>Intended Major</label><input value={intendedMajor} onChange={(e) => setIntendedMajor(e.target.value)} /></div>
-          <div><label>Dream School</label><input value={dreamSchool} onChange={(e) => setDreamSchool(e.target.value)} /></div>
+          <div>
+  <label>Dream School</label>
+
+  <CollegeSearch
+    value={dreamSchool}
+    onChange={(schoolName, schoolId) => {
+      setDreamSchool(schoolName);
+      setDreamSchoolId(schoolId || "");
+    }}
+  />
+</div>
         </div>
       </section>
 
