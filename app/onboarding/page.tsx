@@ -540,8 +540,10 @@ if (p?.role) {
     pillars:pillars||[],
     highlight_reel_url:highlightVideo||null,
     onboarded:true,
-  })
-
+    onboarding_complete:true,
+  });
+  if(saveErr){console.error("SAVE FAILED:",JSON.stringify(saveErr));alert("Save failed: "+saveErr.message);setSaving(false);return;}
+  console.log("SAVE SUCCESS");
   setSaving(false);
   setPhase("creating");
 };
