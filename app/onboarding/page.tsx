@@ -225,12 +225,10 @@ function ProfileCreation({ onComplete }: { onComplete: () => void }) {
       fontFamily: T.sans
     }}>
       <h1 style={{ fontFamily: T.anton, fontSize: 44 }}>
-        Creating Your Profile
+        Your profile is
       </h1>
-
-      <p style={{ fontFamily: T.mono, color: T.orange, marginTop: 12 }}>
-        Building your scholar dashboard...
-      </p>
+      <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:"clamp(28px,4vw,44px)",textTransform:"uppercase",color:T.orange,textAlign:"center",lineHeight:.95,marginBottom:12}}>being created.</h1>
+      <p style={{fontFamily:T.mono,fontSize:11,color:"rgba(248,247,244,.5)",letterSpacing:"0.1em"}}>Setting up your personalized dashboard...</p>
 
       <div style={{
         width: 280,
