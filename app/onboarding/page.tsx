@@ -15,6 +15,7 @@ const ONBOARDING_steps_BY_ROLE = {
   scholar_athlete: [
     "School & Location",
     "Athletic Profile",
+    "Recruiting Profile",
     "Academic Profile",
     "College Goals",
     "Your Pillars",
@@ -539,6 +540,17 @@ if (p?.role) {
     bio:bio||null,
     pillars:pillars||[],
     highlight_reel_url:highlightVideo||null,
+    athlete_email:athleteEmail||null,
+    recruiting_status:recruitingStatus||null,
+    desired_college_level:desiredCollegeLevel||null,
+    camps_attended:campsAttended||null,
+    nil_instagram:nilInstagram||null,
+    nil_tiktok:nilTiktok||null,
+    nil_twitter:nilTwitter||null,
+    nil_follower_range:nilFollowerRange||null,
+    nil_brand_interests:nilBrandInterests.length>0?nilBrandInterests:null,
+    nil_worked_with_brands:nilWorkedWithBrands,
+    nil_deal_types:nilDealTypes.length>0?nilDealTypes:null,
     onboarded:true,
     onboarding_complete:true,
   });
@@ -730,6 +742,38 @@ const canProceed = requiredByStep[currentStepName]
               ))}
             </div>
             <div><label style={lbl}>Bio (optional)</label><textarea value={bio} onChange={e=>setBio(e.target.value)} placeholder="Tell us about yourself..." rows={3} style={{...inp,resize:"vertical" as const}}/></div>
+          </div>)}
+
+          
+{currentStepName==="Recruiting Profile"&&isScholarAthlete&&(<div>
+            <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>Step {step + 1} of {steps.length}</p>
+            <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink,marginBottom:6,lineHeight:1}}>Recruiting <span style={{color:T.orange}}>Profile</span></h1>
+            <p style={{fontSize:13,color:T.muted,marginBottom:18,lineHeight:1.6}}>All fields are optional and can be updated anytime from your profile.</p>
+            <div style={{background:T.orangeL,border:`1px solid ${T.orange}22`,borderRadius:10,padding:"12px 14px",marginBottom:20,fontFamily:T.mono,fontSize:10,color:T.orange,letterSpacing:"0.06em",textTransform:"uppercase"}}>🏆 Recruiting Info</div>
+            <div style={{marginBottom:14}}><label style={lbl}>Recruiting status</label><select style={sel} value={recruitingStatus} onChange={e=>setRecruitingStatus(e.target.value)}><option value="">Select status...</option>{["Not started","Actively recruiting","Have offers","Committed","Signed NLI"].map(o=><option key={o}>{o}</option>)}</select></div>
+            <div style={{marginBottom:14}}><label style={lbl}>Desired college level</label><select style={sel} value={desiredCollegeLevel} onChange={e=>setDesiredCollegeLevel(e.target.value)}><option value="">Select level...</option>{["NCAA Division I","NCAA Division II","NCAA Division III","NAIA","JUCO / Community College","Any level","Not pursuing college athletics"].map(o=><option key={o}>{o}</option>)}</select></div>
+            <div style={{marginBottom:14}}><label style={lbl}>Athletic / recruiting email</label><input style={inp} type="email" placeholder="yourname@email.com" value={athleteEmail} onChange={e=>setAthleteEmail(e.target.value)}/></div>
+            <div style={{marginBottom:14}}><label style={lbl}>Highlight reel URL (Hudl, YouTube, etc.)</label><input style={inp} placeholder="https://hudl.com/v/..." value={highlightVideo} onChange={e=>setHighlightVideo(e.target.value)}/></div>
+            <div style={{marginBottom:20}}><label style={lbl}>Showcases / camps attended</label><input style={inp} placeholder="Nike EYBL, Under Armour Next..." value={campsAttended} onChange={e=>setCampsAttended(e.target.value)}/></div>
+            <div style={{background:T.orangeL,border:`1px solid ${T.orange}22`,borderRadius:10,padding:"12px 14px",marginBottom:20,fontFamily:T.mono,fontSize:10,color:T.orange,letterSpacing:"0.06em",textTransform:"uppercase"}}>💰 NIL Profile</div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:14,marginBottom:14}}>
+              <div><label style={lbl}>Instagram</label><input style={inp} placeholder="@handle" value={nilInstagram} onChange={e=>setNilInstagram(e.target.value)}/></div>
+              <div><label style={lbl}>TikTok</label><input style={inp} placeholder="@handle" value={nilTiktok} onChange={e=>setNilTiktok(e.target.value)}/></div>
+              <div><label style={lbl}>Twitter / X</label><input style={inp} placeholder="@handle" value={nilTwitter} onChange={e=>setNilTwitter(e.target.value)}/></div>
+            </div>
+            <div style={{marginBottom:14}}><label style={lbl}>Total followers (across platforms)</label><select style={sel} value={nilFollowerRange} onChange={e=>setNilFollowerRange(e.target.value)}><option value="">Select range...</option>{["Under 1,000","1,000–5,000","5,000–10,000","10,000–50,000","50,000–100,000","100,000+"].map(o=><option key={o}>{o}</option>)}</select></div>
+            <div style={{marginBottom:14}}>
+              <label style={lbl}>Brand interests / niche</label>
+              <div style={{display:"flex",flexWrap:"wrap",gap:7}}>{["Sports & fitness","Fashion & style","Food & nutrition","Gaming","Music","Education","Community & social impact","Lifestyle","Tech","Other"].map(interest=>{const active=nilBrandInterests.includes(interest);return <button key={interest} onClick={()=>setNilBrandInterests(prev=>prev.includes(interest)?prev.filter(x=>x!==interest):[...prev,interest])} style={{fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",padding:"7px 12px",borderRadius:999,border:`1.5px solid ${active?T.orange:T.line}`,background:active?T.orangeL:"transparent",color:active?T.orange:T.muted,cursor:"pointer",transition:"all 0.12s"}}>{interest}</button>;})}</div>
+            </div>
+            <div style={{marginBottom:14}}>
+              <label style={lbl}>Preferred deal types</label>
+              <div style={{display:"flex",flexWrap:"wrap",gap:7}}>{["Product gifting","Paid social post","Brand ambassador","Event appearance","Content creation","Licensing"].map(deal=>{const active=nilDealTypes.includes(deal);return <button key={deal} onClick={()=>setNilDealTypes(prev=>prev.includes(deal)?prev.filter(x=>x!==deal):[...prev,deal])} style={{fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",padding:"7px 12px",borderRadius:999,border:`1.5px solid ${active?T.orange:T.line}`,background:active?T.orangeL:"transparent",color:active?T.orange:T.muted,cursor:"pointer",transition:"all 0.12s"}}>{deal}</button>;})}</div>
+            </div>
+            <div onClick={()=>setNilWorkedWithBrands(!nilWorkedWithBrands)} style={{display:"flex",alignItems:"center",gap:10,padding:"11px 14px",borderRadius:10,border:`1.5px solid ${nilWorkedWithBrands?T.orange:T.line}`,background:nilWorkedWithBrands?T.orangeL:"transparent",cursor:"pointer",transition:"all 0.12s",fontSize:13,color:nilWorkedWithBrands?T.orange:T.ink}}>
+              <div style={{width:20,height:20,borderRadius:5,border:`2px solid ${nilWorkedWithBrands?T.orange:T.line}`,background:nilWorkedWithBrands?T.orange:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{nilWorkedWithBrands&&<span style={{color:"#fff",fontSize:12}}>✓</span>}</div>
+              I have previously worked with brands or sponsors
+            </div>
           </div>)}
 
           
