@@ -322,7 +322,7 @@ const [desiredSalaryRange,setDesiredSalaryRange]=useState("");
 const [activities,setActivities]=useState<any[]>([]);
 const [careerOptions,setCareerOptions] = useState<any[]>([]);
 
-const isScholarAthlete = role === "scholar_athlete";
+const isScholarAthlete = role === "scholar-athlete";
 
 const steps = isScholarAthlete
   ? [
