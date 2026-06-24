@@ -303,6 +303,16 @@ const [highSchoolTeam,setHighSchoolTeam]=useState("");
 const [athleteEmail,setAthleteEmail]=useState("");
 const [highlightVideo,setHighlightVideo]=useState("");
 const [recruitingInterest,setRecruitingInterest]=useState("");
+  const [recruitingStatus,setRecruitingStatus]=useState("");
+  const [desiredCollegeLevel,setDesiredCollegeLevel]=useState("");
+  const [campsAttended,setCampsAttended]=useState("");
+  const [nilInstagram,setNilInstagram]=useState("");
+  const [nilTiktok,setNilTiktok]=useState("");
+  const [nilTwitter,setNilTwitter]=useState("");
+  const [nilFollowerRange,setNilFollowerRange]=useState("");
+  const [nilBrandInterests,setNilBrandInterests]=useState<string[]>([]);
+  const [nilWorkedWithBrands,setNilWorkedWithBrands]=useState(false);
+  const [nilDealTypes,setNilDealTypes]=useState<string[]>([]);
 
 const [activityType,setActivityType]=useState("");
 const [activityName,setActivityName]=useState("");
@@ -423,8 +433,7 @@ if (p?.role) {
 
   await supabase
     .from("profiles")
-    .upsert({
-      id:userId,
+    .update({
       xp:(p?.xp||0)+xp,
       coin_balance:(p?.coin_balance||0)+Math.floor(xp/5)
     })
@@ -619,15 +628,7 @@ const requiredByStep: Record<string, () => boolean> = {
   "College & Career Goals": () =>
     !!dreamSchool.trim(),
 
-  "Recruiting Profile": () =>
-    !isScholarAthlete
-      ? true
-      : !!highSchoolTeam.trim() &&
-        !!coachName.trim() &&
-        !!coachEmail.trim() &&
-        !!athleteEmail.trim() &&
-        !!highlightVideo.trim() &&
-        !!recruitingInterest,
+  "Recruiting Profile": () => true,
 
   "Your Pillars": () =>
     pillars.length > 0 &&
@@ -750,8 +751,8 @@ const canProceed = requiredByStep[currentStepName]
             <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink,marginBottom:6,lineHeight:1}}>Recruiting <span style={{color:T.orange}}>Profile</span></h1>
             <p style={{fontSize:13,color:T.muted,marginBottom:18,lineHeight:1.6}}>All fields are optional and can be updated anytime from your profile.</p>
             <div style={{background:T.orangeL,border:`1px solid ${T.orange}22`,borderRadius:10,padding:"12px 14px",marginBottom:20,fontFamily:T.mono,fontSize:10,color:T.orange,letterSpacing:"0.06em",textTransform:"uppercase"}}>🏆 Recruiting Info</div>
-            <div style={{marginBottom:14}}><label style={lbl}>Recruiting status</label><select style={sel} value={recruitingStatus} onChange={e=>setRecruitingStatus(e.target.value)}><option value="">Select status...</option>{["Not started","Actively recruiting","Have offers","Committed","Signed NLI"].map(o=><option key={o}>{o}</option>)}</select></div>
-            <div style={{marginBottom:14}}><label style={lbl}>Desired college level</label><select style={sel} value={desiredCollegeLevel} onChange={e=>setDesiredCollegeLevel(e.target.value)}><option value="">Select level...</option>{["NCAA Division I","NCAA Division II","NCAA Division III","NAIA","JUCO / Community College","Any level","Not pursuing college athletics"].map(o=><option key={o}>{o}</option>)}</select></div>
+            <div style={{marginBottom:14}}><label style={lbl}>Recruiting status</label><select style={sel} value={recruitingStatus} onChange={e=>setRecruitingStatus(e.target.value)}><option value="">Select status...</option>{["Not started","Actively Being Recruited","Have Offers","Committed","Signed NLI","Transfer Student"].map(o=><option key={o}>{o}</option>)}</select></div>
+            <div style={{marginBottom:14}}><label style={lbl}>Desired college level</label><select style={sel} value={desiredCollegeLevel} onChange={e=>setDesiredCollegeLevel(e.target.value)}><option value="">Select level...</option>{["Professional - Stateside","Professional - Overseas","NCAA Division I","NCAA Division II","NCAA Division III","NAIA","JUCO / Community College","Any level","Not pursuing college athletics"].map(o=><option key={o}>{o}</option>)}</select></div>
             <div style={{marginBottom:14}}><label style={lbl}>Athletic / recruiting email</label><input style={inp} type="email" placeholder="yourname@email.com" value={athleteEmail} onChange={e=>setAthleteEmail(e.target.value)}/></div>
             <div style={{marginBottom:14}}><label style={lbl}>Highlight reel URL (Hudl, YouTube, etc.)</label><input style={inp} placeholder="https://hudl.com/v/..." value={highlightVideo} onChange={e=>setHighlightVideo(e.target.value)}/></div>
             <div style={{marginBottom:20}}><label style={lbl}>Showcases / camps attended</label><input style={inp} placeholder="Nike EYBL, Under Armour Next..." value={campsAttended} onChange={e=>setCampsAttended(e.target.value)}/></div>
