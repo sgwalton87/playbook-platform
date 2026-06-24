@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
-import CollegeSearch from "@/components/CollegeSearch";
+import CollegeSearch from "@/components/college/CollegeSearch";
 import Confetti from "react-confetti";
 
 const ONBOARDING_steps_BY_ROLE = {

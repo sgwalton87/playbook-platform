@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabaseClient";
 import ThemeToggle from "@/components/ThemeToggle";
 import ProfileAvatar from "@/components/ProfileAvatar";
 import { checkBadges } from "@/lib/badges";
-import CollegeSearch from "@/components/CollegeSearch";
+import CollegeSearch from "@/components/college/CollegeSearch";
 
 export default function ProfilePage() {
   const router = useRouter();
