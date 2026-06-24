@@ -2,7 +2,52 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import Confetti from "react-confetti";
 
+const ONBOARDING_steps_BY_ROLE = {
+  scholar: [
+    "School & Location",
+    "Academic Profile",
+    "College Goals",
+    "Your Pillars",
+  ],
+
+  scholar_athlete: [
+    "School & Location",
+    "Athletic Profile",
+    "Academic Profile",
+    "College Goals",
+    "Your Pillars",
+  ],
+
+  tay: [
+    "Background",
+    "Support Needs",
+    "Education Goals",
+    "Your Pillars",
+  ],
+
+  mentor: [
+    "Professional Profile",
+    "Mentorship Focus",
+    "Availability",
+    "Verification",
+  ],
+
+  coach: [
+    "Team / Organization",
+    "Athletic Focus",
+    "Students You Support",
+    "Verification",
+  ],
+
+  academic_advisor: [
+    "Organization",
+    "Caseload",
+    "Academic Focus",
+    "Verification",
+  ],
+};
 const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",blue:"#3B82F6",blueL:"#EFF6FF",green:"#10B981",purple:"#8B5CF6",amber:"#F59E0B",mono:"'Space Mono', monospace",sans:"'Hanken Grotesk', system-ui, sans-serif",anton:"'Anton', sans-serif"};
 const SPORT_CONFIG:Record<string,{label:string;options:string[]}>={
   "Basketball":{label:"Position",options:["Point Guard","Shooting Guard","Small Forward","Power Forward","Center","Guard","Forward","Guard-Forward","Forward-Center"]},
@@ -23,6 +68,46 @@ const SPORT_CONFIG:Record<string,{label:string;options:string[]}>={
   "Dance":{label:"Style",options:["Hip Hop","Jazz","Contemporary","Ballet","Pom","Kick","Lyrical","Tap","Ballroom","Competitive All-Star"]},
   "Other":{label:"Position / Event",options:[]},
 };
+
+const HEIGHTS = [
+  "4'8","4'9","4'10","4'11",
+  "5'0","5'1","5'2","5'3","5'4","5'5","5'6","5'7","5'8","5'9","5'10","5'11",
+  "6'0","6'1","6'2","6'3","6'4","6'5","6'6","6'7","6'8","6'9","6'10","6'11",
+  "7'0+"
+];
+
+const WEIGHTS = Array.from({ length: 211 }, (_, i) => `${90 + i} lbs`);
+
+const RECRUITING_INTEREST = [
+  "Actively being recruited",
+  "Interested in playing in college",
+  "Exploring options",
+  "Unsure"
+];
+
+
+const SALARY_RANGES = [
+  "Under $35,000",
+  "$35,000–$49,999",
+  "$50,000–$74,999",
+  "$75,000–$99,999",
+  "$100,000–$149,999",
+  "$150,000+"
+];
+
+const ACTIVITY_TYPES = [
+  "Club",
+  "Volunteer Work",
+  "Job",
+  "Internship",
+  "Leadership",
+  "Arts",
+  "Faith / Community Group",
+  "Family Responsibility",
+  "Award / Recognition",
+  "Other"
+];
+
 const SPORTS=Object.keys(SPORT_CONFIG);
 const CA_DISTRICTS=["Abc Unified","Acalanes Union High","Adelanto Elementary","Alhambra Unified","Alisal Union Elementary","Alta Loma Elementary","Anaheim Elementary","Anaheim Union High","Antelope Valley Union High","Apple Valley Unified","Arcadia Unified","Azusa Unified","Bakersfield City Elementary","Baldwin Park Unified","Bassett Unified","Beaumont Unified","Berkeley Unified","Beverly Hills Unified","Brentwood Union Elementary","Burbank Unified","Cabrillo Unified","Cajon Valley Union","Calexico Unified","Campbell Union High","Capistrano Unified","Castro Valley Unified","Chaffey Joint Union High","Chino Valley Unified","Chula Vista Elementary","Claremont Unified","Colton Joint Unified","Compton Unified","Conejo Valley Unified","Corona-Norco Unified","Coronado Unified","Covina-Valley Unified","Culver City Unified","Cupertino Union Elementary","Davis Joint Unified","Del Norte County Unified","Desert Sands Unified","Downey Unified","Duarte Unified","East Side Union High","El Monte City Elementary","El Monte Union High","El Rancho Unified","Elk Grove Unified","Escondido Union High","Etiwanda Elementary","Fontana Unified","Fremont Union High","Fresno Unified","Fullerton Joint Union High","Garden Grove Unified","Gilroy Unified","Glendale Unified","Glendora Unified","Grant Joint Union High","Grossmont Union High","Hacienda La Puente Unified","Hawthorne Elementary","Hayward Unified","Hemet Unified","Huntington Beach Union High","Inglewood Unified","Irvine Unified","Jurupa Unified","Kings Canyon Joint Unified","La Mesa-Spring Valley","Laguna Beach Unified","Lake Elsinore Unified","Lancaster Elementary","Las Virgenes Unified","Lodi Unified","Lompoc Unified","Long Beach Unified","Los Angeles Unified","Los Banos Unified","Lynwood Unified","Manteca Unified","Madera Unified","Menifee Union","Merced Union High","Modesto City High","Monrovia Unified","Montebello Unified","Monterey Peninsula Unified","Moorpark Unified","Moreno Valley Unified","Morgan Hill Unified","Mount Diablo Unified","Murrieta Valley Unified","Napa Valley Unified","Newport-Mesa Unified","Norwalk-La Mirada Unified","Novato Unified","Oakland Unified","Oceanside Unified","Ontario-Montclair Elementary","Orange Unified","Oxnard Union High","Palm Springs Unified","Palmdale Elementary","Palo Alto Unified","Paramount Unified","Pasadena Unified","Perris Union High","Pittsburg Unified","Placentia-Yorba Linda Unified","Pomona Unified","Poway Unified","Redlands Unified","Redondo Beach Unified","Rialto Unified","Riverside Unified","Sacramento City Unified","Saddleback Valley Unified","Salinas Union High","San Bernardino City Unified","San Diego Unified","San Francisco Unified","San Jose Unified","San Juan Unified","San Lorenzo Unified","San Marcos Unified","San Mateo Union High","Santa Ana Unified","Santa Barbara High","Santa Clara Unified","Santa Maria Joint Union High","Santa Monica-Malibu Unified","Sequoia Union High","Simi Valley Unified","Stockton Unified","Sunnyvale Elementary","Sweetwater Union High","Temecula Valley Unified","Tracy Joint Unified","Turlock Unified","Tustin Unified","Ukiah Unified","Vacaville Unified","Val Verde Unified","Vallejo City Unified","Victor Valley Union High","Visalia Unified","Vista Unified","Walnut Valley Unified","West Contra Costa Unified","West Covina Unified","Whittier Union High","William S. Hart Union High","Woodland Joint Unified","Yucaipa-Calimesa Joint Unified","Other (not listed)"];
 const CA_CITIES=["Alameda","Antioch","Berkeley","Brentwood","Compton","Concord","Daly City","Davis","East Palo Alto","El Monte","Elk Grove","Escondido","Fontana","Fremont","Fresno","Fullerton","Garden Grove","Glendale","Hayward","Huntington Beach","Inglewood","Irvine","Lancaster","Long Beach","Los Angeles","Modesto","Moreno Valley","Oakland","Oceanside","Ontario","Orange","Oxnard","Palmdale","Pasadena","Pomona","Rancho Cucamonga","Richmond","Riverside","Roseville","Sacramento","Salinas","San Bernardino","San Diego","San Francisco","San Jose","Santa Ana","Santa Clara","Santa Clarita","Santa Rosa","Simi Valley","Stockton","Sunnyvale","Thousand Oaks","Torrance","Vallejo","Victorville","Visalia","Other"];
@@ -32,7 +117,6 @@ const GENDERS=["Male","Female","Non-binary","Prefer not to say"];
 const INCOME=["Under $25,000","$25,000–$49,999","$50,000–$74,999","$75,000–$99,999","$100,000+","Prefer not to say"];
 const TEAM_LEVELS=["Middle School","Junior Varsity (JV)","Varsity","Club / AAU","Travel Team","College","Semi-Pro","Professional"];
 const PILLARS=[{key:"leadership",label:"Leadership",icon:"★",desc:"Captaincy, accountability, leading on and off the court"},{key:"finance",label:"Financial Literacy",icon:"$",desc:"Budgeting, NIL basics, building wealth"},{key:"civic",label:"Civic Engagement",icon:"✓",desc:"Youth advocacy, community projects, making change"},{key:"sel",label:"Social-Emotional Learning",icon:"♥",desc:"Mental wellness, resilience, identity beyond sport"}];
-const STEPS=["School & Location","Athletic Profile","Background","Your Pillars"];
 
 function SearchDropdown({options,value,onChange,placeholder,onAddNew}:{options:string[];value:string;onChange:(v:string)=>void;placeholder:string;onAddNew?:(v:string)=>void}) {
   const [query,setQuery]=useState(value);
@@ -110,10 +194,99 @@ function VideoGate({onComplete}:{onComplete:()=>void}) {
   );
 }
 
+function ProfileCreation({ onComplete }: { onComplete: () => void }) {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const i = setInterval(() => {
+      setProgress((p) => {
+        if (p >= 100) {
+          clearInterval(i);
+          setTimeout(onComplete, 700);
+          return 100;
+        }
+        return p + 5;
+      });
+    }, 120);
+
+    return () => clearInterval(i);
+  }, [onComplete]);
+
+  return (
+    <div style={{
+      minHeight: "100vh",
+      background: T.navy,
+      color: "#fff",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      flexDirection: "column",
+      fontFamily: T.sans
+    }}>
+      <h1 style={{ fontFamily: T.anton, fontSize: 44 }}>
+        Creating Your Profile
+      </h1>
+
+      <p style={{ fontFamily: T.mono, color: T.orange, marginTop: 12 }}>
+        Building your scholar dashboard...
+      </p>
+
+      <div style={{
+        width: 280,
+        height: 8,
+        background: "rgba(255,255,255,.15)",
+        borderRadius: 999,
+        marginTop: 24,
+        overflow: "hidden"
+      }}>
+        <div style={{
+          width: `${progress}%`,
+          height: "100%",
+          background: T.orange,
+          transition: "width .2s"
+        }} />
+      </div>
+
+      <p style={{ fontFamily: T.mono, marginTop: 12 }}>
+        {progress}%
+      </p>
+    </div>
+  );
+}
+
+function SuccessScreen({ onDone }: { onDone: () => void }) {
+  useEffect(() => {
+    const t = setTimeout(onDone, 2200);
+    return () => clearTimeout(t);
+  }, [onDone]);
+
+  return (
+    <div style={{
+      minHeight: "100vh",
+      background: T.cream,
+      color: T.ink,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      flexDirection: "column",
+      fontFamily: T.sans
+    }}>
+      <Confetti />
+
+      <h1 style={{ fontFamily: T.anton, fontSize: 48 }}>
+        Profile Created!
+      </h1>
+
+      <p style={{ fontFamily: T.mono, color: T.orange }}>
+        Welcome to Playbook.
+      </p>
+    </div>
+  );
+}
+
 export default function OnboardingPage() {
   const router=useRouter();
-  const [phase,setPhase]=useState<"video"|"data">("video");
-  const [step,setStep]=useState(0);
+  const [phase,setPhase]=useState<"video"|"data"|"creating"|"success">("video");  const [step,setStep]=useState(0);
   const [saving,setSaving]=useState(false);
   const [userId,setUserId]=useState<string|null>(null);
   const [xpEarned,setXpEarned]=useState(0);
@@ -124,24 +297,101 @@ export default function OnboardingPage() {
   const [sport,setSport]=useState("");const [position,setPosition]=useState("");const [jersey,setJersey]=useState("");const [height,setHeight]=useState("");const [weight,setWeight]=useState("");const [teamLevel,setTeamLevel]=useState("");const [travelTeam,setTravelTeam]=useState("");const [coachName,setCoachName]=useState("");const [coachEmail,setCoachEmail]=useState("");
   const [gender,setGender]=useState("");const [race,setRace]=useState("");const [householdIncome,setHouseholdIncome]=useState("");const [firstGen,setFirstGen]=useState(false);const [freeLunch,setFreeLunch]=useState(false);const [migrant,setMigrant]=useState(false);const [fosterYouth,setFosterYouth]=useState(false);const [unhoused,setUnhoused]=useState(false);const [iep,setIep]=useState(false);const [bio,setBio]=useState("");
   const [pillars,setPillars]=useState<string[]>([]);const [username,setUsername]=useState("");const [usernameStatus,setUsernameStatus]=useState<"idle"|"taken"|"available">("idle");
+  const [role,setRole]=useState("scholar");
+const [highSchoolTeam,setHighSchoolTeam]=useState("");
+const [athleteEmail,setAthleteEmail]=useState("");
+const [highlightVideo,setHighlightVideo]=useState("");
+const [recruitingInterest,setRecruitingInterest]=useState("");
 
-  useEffect(()=>{
-    supabase.auth.getUser().then(async({data})=>{
-      if(!data.user){router.replace("/login");return;}
-      setUserId(data.user.id);
-      const{data:p}=await supabase.from("profiles").select("onboarded,username").eq("id",data.user.id).single();
-      if(p?.onboarded){sessionStorage.setItem("pb_new_user","1");router.replace("/dashboard");return;}
-      if(p?.username)setUsername(p.username);
-      const{data:custom}=await supabase.from("custom_options").select("category,value");
-      if(custom){
-        const d=custom.filter((c:any)=>c.category==="district").map((c:any)=>c.value);
-        const ci=custom.filter((c:any)=>c.category==="city").map((c:any)=>c.value);
-        if(d.length)setDistrictOptions(prev=>[...new Set([...prev,...d])]);
-        if(ci.length)setCityOptions(prev=>[...new Set([...prev,...ci])]);
+const [activityType,setActivityType]=useState("");
+const [activityName,setActivityName]=useState("");
+const [activityRole,setActivityRole]=useState("");
+const [activityOrg,setActivityOrg]=useState("");
+const [activityHours,setActivityHours]=useState("");
+const [activityDescription,setActivityDescription]=useState("");
+
+const [weightedGpa,setWeightedGpa]=useState("");
+const [unweightedGpa,setUnweightedGpa]=useState("");
+const [currentMath,setCurrentMath]=useState("");
+const [currentEnglish,setCurrentEnglish]=useState("");
+const [currentScience,setCurrentScience]=useState("");
+
+const [collegeGoal,setCollegeGoal]=useState("");
+const [idealProfession,setIdealProfession]=useState("");
+const [desiredSalaryRange,setDesiredSalaryRange]=useState("");
+const [activities,setActivities]=useState<any[]>([]);
+
+const isScholarAthlete = role === "scholar_athlete";
+
+const steps = isScholarAthlete
+  ? [
+      "School & Location",
+      "Athletic Profile",
+      "Academic Profile",
+      "Background",
+      "College & Career Goals",
+      "Recruiting Profile",
+      "Activities & Service",
+      "Your Pillars",
+    ]
+  : [
+      "School & Location",
+      "Academic Profile",
+      "Background",
+      "College & Career Goals",
+      "Activities & Service",
+      "Your Pillars",
+    ];
+
+ useEffect(() => {
+  supabase.auth.getUser().then(async ({ data }) => {
+    if (!data.user) {
+      router.replace("/login");
+      return;
+    }
+
+    setUserId(data.user.id);
+
+    const { data: p } = await supabase
+  .from("profiles")
+  .select("onboarded,username,role,registration_type")
+  .eq("id", data.user.id)
+  .single();
+
+if (p?.onboarded) {
+  router.replace("/dashboard");
+  return;
+}
+
+if (p?.username) setUsername(p.username);
+
+if (p?.role) {
+  setRole(p.role);
+}
+
+    const { data: custom } = await supabase
+      .from("custom_options")
+      .select("category,value");
+
+    if (custom) {
+      const d = custom
+        .filter((c: any) => c.category === "district")
+        .map((c: any) => c.value);
+
+      const ci = custom
+        .filter((c: any) => c.category === "city")
+        .map((c: any) => c.value);
+
+      if (d.length) {
+        setDistrictOptions((prev) => [...new Set([...prev, ...d])]);
       }
-    });
-  },[]);
 
+      if (ci.length) {
+        setCityOptions((prev) => [...new Set([...prev, ...ci])]);
+      }
+    }
+  });
+}, [router]);
   useEffect(()=>{if(!toast)return;const t=setTimeout(()=>setToast(null),3500);return()=>clearTimeout(t);},[toast]);
 
   const addCustomOption=async(category:string,value:string)=>{
@@ -150,45 +400,219 @@ export default function OnboardingPage() {
   };
 
   const awardXP=async(xp:number,label:string)=>{
-    if(!userId)return;
-    const{data:p}=await supabase.from("profiles").select("xp,coin_balance").eq("id",userId).single();
-    await supabase.from("profiles").upsert({id:userId,xp:(p?.xp||0)+xp,coin_balance:(p?.coin_balance||0)+Math.floor(xp/5)}).eq("id",userId);
-    setXpEarned(prev=>prev+xp);
-    setToast(`⚡ +${xp} XP earned for completing ${label}!`);
-  };
+  if(!userId)return;
+
+  const {data:p}=await supabase
+    .from("profiles")
+    .select("xp,coin_balance")
+    .eq("id",userId)
+    .single();
+
+  await supabase
+    .from("profiles")
+    .upsert({
+      id:userId,
+      xp:(p?.xp||0)+xp,
+      coin_balance:(p?.coin_balance||0)+Math.floor(xp/5)
+    })
+    .eq("id",userId);
+
+  setXpEarned(prev=>prev+xp);
+  setToast(`⚡ +${xp} XP earned for completing ${label}!`);
+};
 
   const handleNext=async()=>{
     const xpMap=[50,75,100,125];const labels=["School & Location","Athletic Profile","Background","Your Pillars"];
     await awardXP(xpMap[step],labels[step]);setStep(s=>s+1);
   };
 
-  const handleSave=async()=>{
-    if(!userId)return;
-    if(usernameStatus==="taken"){setToast("Please choose a different username.");return;}
-    setSaving(true);
-    await supabase.from("profiles").upsert({id:userId,
-      username:username.replace("@","").toLowerCase()||null,
-      school,grade,gpa:gpa||null,city,zip_code:zipCode,state:usState,
-      school_district:district,grad_year:gradYear,dream_school:dreamSchool,
-      english_language_learner:ell,sport,position,jersey,height,weight,
-      team_level:teamLevel,travel_team:travelTeam,coach_name:coachName,coach_email:coachEmail,
-      gender,race,household_income:householdIncome,first_generation:firstGen,
-      free_reduced_lunch:freeLunch,migrant_student:migrant,foster_youth:fosterYouth,
-      unhoused,has_iep:iep,bio,pillars,onboarded:true,
-    }).eq("id",userId);
-    setSaving(false);
-    sessionStorage.setItem("pb_new_user","1");router.replace("/dashboard");
+
+  const addActivity=()=>{
+    if(!activityType || !activityName.trim()){
+      setToast("Add an activity type and name first.");
+      return;
+    }
+
+    setActivities(prev=>[
+      ...prev,
+      {
+        activity_type:activityType,
+        activity_name:activityName.trim(),
+        role_title:activityRole || null,
+        organization:activityOrg || null,
+        total_hours:activityHours ? Number(activityHours) : null,
+        description:activityDescription || null,
+      }
+    ]);
+
+    setActivityType("");
+    setActivityName("");
+    setActivityRole("");
+    setActivityOrg("");
+    setActivityHours("");
+    setActivityDescription("");
+
+    setToast("Activity added. You can add another or continue.");
   };
 
-  const sportConfig=sport&&SPORT_CONFIG[sport]?SPORT_CONFIG[sport]:null;
-  if(phase==="video")return<VideoGate onComplete={()=>setPhase("data")}/>;
+  const handleSave=async()=>{
+  if(!userId)return;
+
+  if(usernameStatus==="taken"){
+    setToast("Please choose a different username.");
+    return;
+  }
+
+  setSaving(true);
+
+  if (travelTeam.trim()) {
+    await supabase.from("club_teams").upsert(
+      {
+        name: travelTeam.trim(),
+        sport,
+        city,
+        state: usState,
+        created_by: userId,
+      },
+      { onConflict: "name" }
+    );
+  }
+
+  if (activityType && activityName.trim()) {
+    await supabase.from("student_activities").insert({
+      student_id: userId,
+      activity_type: activityType,
+      activity_name: activityName.trim(),
+      role_title: activityRole || null,
+      organization: activityOrg || null,
+      total_hours: activityHours ? Number(activityHours) : null,
+      description: activityDescription || null,
+    });
+  }
+
+  await supabase.from("profiles").upsert({
+    id:userId,
+    username:username.replace("@","").toLowerCase()||null,
+    school,
+    grade,
+    gpa:gpa||null,
+    city,
+    zip_code:zipCode,
+    state:usState,
+    school_district:district,
+    grad_year:gradYear,
+    dream_school:dreamSchool,
+    english_language_learner:ell,
+    sport,
+    position,
+    jersey,
+    height,
+    weight,
+    team_level:teamLevel,
+    travel_team:travelTeam,
+    coach_name:coachName,
+    coach_email:coachEmail,
+    gender,
+    race,
+    household_income:householdIncome,
+    first_generation:firstGen,
+    free_reduced_lunch:freeLunch,
+    migrant_student:migrant,
+    foster_youth:fosterYouth,
+    unhoused,
+    has_iep:iep,
+    bio,
+    pillars,
+    high_school_team: highSchoolTeam || null,
+    athlete_email: athleteEmail || null,
+    highlight_video: highlightVideo || null,
+    recruiting_interest: recruitingInterest || null,
+    onboarded:true,
+  });
+
+  setSaving(false);
+  setPhase("creating");
+};
+
+const sportConfig=sport&&SPORT_CONFIG[sport]?SPORT_CONFIG[sport]:null;
+
+if(phase==="video") {
+  return <VideoGate onComplete={() => setPhase("data")} />;
+}
+
+if(phase==="creating") {
+  return (
+    <ProfileCreation
+      onComplete={() => setPhase("success")}
+    />
+  );
+}
+
+if(phase==="success") {
+  return (
+    <SuccessScreen
+  onDone={() => {
+    sessionStorage.setItem("pb_profile_created", "1");
+    router.replace("/dashboard");
+  }}
+/>
+  );
+}
 
   const inp={width:"100%",background:T.surface,border:`1.5px solid ${T.line}`,borderRadius:10,padding:"12px 14px",fontSize:14,color:T.ink,fontFamily:T.sans,outline:"none",transition:"border-color 0.15s"} as React.CSSProperties;
   const sel={...inp,cursor:"pointer",appearance:"none" as const} as React.CSSProperties;
   const lbl={fontFamily:T.mono,fontSize:10,letterSpacing:"0.12em",textTransform:"uppercase" as const,color:T.muted,display:"block",marginBottom:6};
   const chk=(active:boolean)=>({display:"flex",alignItems:"center",gap:10,padding:"11px 14px",borderRadius:10,border:`1.5px solid ${active?T.orange:T.line}`,background:active?T.orangeL:"transparent",cursor:"pointer",transition:"all 0.12s",fontSize:13,color:active?T.orange:T.ink} as React.CSSProperties);
-  const canProceed=[school.trim()&&grade&&city.trim(),sport,true,pillars.length>0&&username.length>=3&&usernameStatus!=="taken"][step];
+  const currentStepName = steps[step];
 
+const requiredByStep: Record<string, () => boolean> = {
+  "School & Location": () =>
+    !!school.trim() &&
+    !!district.trim() &&
+    !!grade &&
+    !!gradYear &&
+    !!city.trim() &&
+    !!zipCode.trim() &&
+    !!usState,
+
+  "Athletic Profile": () =>
+    isScholarAthlete && !!sport &&
+        !!position &&
+        !!height &&
+        !!weight &&
+        !!travelTeam.trim(),
+
+  "Academic Profile": () =>
+    !!gpa.trim(),
+
+  "Background": () =>
+    !!gender &&
+    !!race &&
+    !!householdIncome,
+
+  "College & Career Goals": () =>
+    !!dreamSchool.trim(),
+
+  "Recruiting Profile": () =>
+    !isScholarAthlete
+      ? true
+      : !!highSchoolTeam.trim() &&
+        !!coachName.trim() &&
+        !!coachEmail.trim() &&
+        !!athleteEmail.trim() &&
+        !!highlightVideo.trim() &&
+        !!recruitingInterest,
+
+  "Your Pillars": () =>
+    pillars.length > 0 &&
+    username.length >= 3 &&
+    usernameStatus !== "taken",
+};
+
+const canProceed = requiredByStep[currentStepName]
+  ? requiredByStep[currentStepName]()
+  : true;
+  
   return(
     <div style={{minHeight:"100vh",background:T.cream,fontFamily:T.sans,color:T.ink,display:"flex",alignItems:"center",justifyContent:"center",padding:"40px 20px"}}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');*{box-sizing:border-box;margin:0;padding:0;}input:focus,select:focus,textarea:focus{border-color:${T.orange}!important;outline:none;}input::placeholder,textarea::placeholder{color:${T.faint};}select{appearance:none;}`}</style>
@@ -199,8 +623,8 @@ export default function OnboardingPage() {
           <div style={{width:34,height:34,borderRadius:8,background:T.orange,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontFamily:T.anton,fontSize:18,color:"#fff"}}>P</span></div>
           <div><div style={{fontFamily:T.anton,fontSize:16,color:T.ink}}>PLAYBOOK</div><div style={{fontFamily:T.mono,fontSize:7,letterSpacing:"0.3em",color:T.orange}}>SERIES INC.</div></div>
         </div>
-        <div style={{display:"grid",gridTemplateColumns:`repeat(${STEPS.length},1fr)`,gap:6,marginBottom:24}}>
-          {STEPS.map((s,i)=>(<div key={s}><div style={{height:3,borderRadius:999,background:i<=step?T.orange:T.line,transition:"background 0.2s"}}/><div style={{fontFamily:T.mono,fontSize:9,letterSpacing:"0.1em",textTransform:"uppercase",color:i===step?T.orange:T.faint,marginTop:5}}>{s}</div></div>))}
+        <div style={{display:"grid",gridTemplateColumns:`repeat(${steps.length},1fr)`,gap:6,marginBottom:24}}>
+          {steps.map((s,i)=>(<div key={s}><div style={{height:3,borderRadius:999,background:i<=step?T.orange:T.line,transition:"background 0.2s"}}/><div style={{fontFamily:T.mono,fontSize:9,letterSpacing:"0.1em",textTransform:"uppercase",color:i===step?T.orange:T.faint,marginTop:5}}>{s}</div></div>))}
         </div>
         <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:20,padding:"28px 26px"}}>
           <div style={{background:T.surface2,borderRadius:8,padding:"8px 14px",marginBottom:18,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
@@ -208,7 +632,7 @@ export default function OnboardingPage() {
             <span style={{fontFamily:T.mono,fontSize:12,fontWeight:700,color:T.orange}}>+{[50,75,100,125][step]} XP</span>
           </div>
 
-          {step===0&&(<div>
+          {currentStepName==="School & Location"&&(<div>
             <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>Step 1 of 4</p>
             <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink,marginBottom:18,lineHeight:1}}>School & Location</h1>
             <div style={{marginBottom:14}}><label style={lbl}>School name *</label><input style={inp} placeholder="Lincoln High School" value={school} onChange={e=>setSchool(e.target.value)}/></div>
@@ -229,7 +653,7 @@ export default function OnboardingPage() {
             <div onClick={()=>setEll(!ell)} style={chk(ell)}><div style={{width:20,height:20,borderRadius:5,border:`2px solid ${ell?T.orange:T.line}`,background:ell?T.orange:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{ell&&<span style={{color:"#fff",fontSize:12}}>✓</span>}</div>I am an English Language Learner (ELL)</div>
           </div>)}
 
-          {step===1&&(<div>
+          {currentStepName==="Athletic Profile"&&isScholarAthlete&&(<div>
             <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>Step 2 of 4</p>
             <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink,marginBottom:18,lineHeight:1}}>Athletic Profile</h1>
             <div style={{marginBottom:14}}>
@@ -253,8 +677,21 @@ export default function OnboardingPage() {
               <div><label style={lbl}>Team level</label><select style={sel} value={teamLevel} onChange={e=>setTeamLevel(e.target.value)}><option value="">Select level...</option>{TEAM_LEVELS.map(l=><option key={l}>{l}</option>)}</select></div>
             </div>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
-              <div><label style={lbl}>Height</label><input style={inp} placeholder='5&apos;11"' value={height} onChange={e=>setHeight(e.target.value)}/></div>
-              <div><label style={lbl}>Weight (lbs)</label><input style={inp} placeholder="155" value={weight} onChange={e=>setWeight(e.target.value)}/></div>
+              <div>
+  <label style={lbl}>Height *</label>
+  <select style={sel} value={height} onChange={e=>setHeight(e.target.value)}>
+    <option value="">Select height...</option>
+    {HEIGHTS.map(h=><option key={h}>{h}</option>)}
+  </select>
+</div>
+
+<div>
+  <label style={lbl}>Weight *</label>
+  <select style={sel} value={weight} onChange={e=>setWeight(e.target.value)}>
+    <option value="">Select weight...</option>
+    {WEIGHTS.map(w=><option key={w}>{w}</option>)}
+  </select>
+</div>
             </div>
             <div style={{marginBottom:14}}><label style={lbl}>Travel / Club team</label><input style={inp} placeholder="Oakland Soldiers" value={travelTeam} onChange={e=>setTravelTeam(e.target.value)}/></div>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
@@ -263,10 +700,10 @@ export default function OnboardingPage() {
             </div>
           </div>)}
 
-          {step===2&&(<div>
+          {currentStepName==="Background"&&(<div>
             <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>Step 3 of 4</p>
-            <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink,marginBottom:10,lineHeight:1}}>Background</h1>
-            <div style={{background:T.blueL,borderRadius:10,padding:"12px 14px",fontSize:12,color:T.muted,lineHeight:1.6,marginBottom:18,borderLeft:`3px solid ${T.blue}`}}>🔒 Private and only used to secure funding for scholars like you. Never shared publicly.</div>
+            <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink,marginBottom:10,lineHeight:1}}>Demographic Info<br/><span style={{color:T.orange}}>Optional, but important</span></h1>
+            <div style={{background:T.blueL,borderRadius:10,padding:"12px 14px",fontSize:12,color:T.muted,lineHeight:1.6,marginBottom:18,borderLeft:`3px solid ${T.blue}`}}>🔒 This information helps keep the platform free, secure funding, and better support scholars. It is never shown publicly.</div>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
               <div><label style={lbl}>Gender</label><select style={sel} value={gender} onChange={e=>setGender(e.target.value)}><option value="">Select...</option>{GENDERS.map(g=><option key={g}>{g}</option>)}</select></div>
               <div><label style={lbl}>Race / Ethnicity</label><select style={sel} value={race} onChange={e=>setRace(e.target.value)}><option value="">Select...</option>{RACES.map(r=><option key={r}>{r}</option>)}</select></div>
@@ -281,7 +718,116 @@ export default function OnboardingPage() {
             <div><label style={lbl}>Bio (optional)</label><textarea value={bio} onChange={e=>setBio(e.target.value)} placeholder="Tell us about yourself..." rows={3} style={{...inp,resize:"vertical" as const}}/></div>
           </div>)}
 
-          {step===3&&(<div>
+          
+{currentStepName==="Academic Profile"&&(<div>
+  <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>Academic Profile</p>
+  <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink,marginBottom:18,lineHeight:1}}>Academic Profile</h1>
+
+  <div style={{marginBottom:14}}>
+    <label style={lbl}>Weighted GPA *</label>
+    <input style={inp} placeholder="4.1" value={weightedGpa} onChange={e=>setWeightedGpa(e.target.value)} />
+  </div>
+
+  <div style={{marginBottom:14}}>
+    <label style={lbl}>Unweighted GPA *</label>
+    <input style={inp} placeholder="3.5" value={unweightedGpa} onChange={e=>setUnweightedGpa(e.target.value)} />
+  </div>
+
+  <div style={{marginBottom:14}}>
+    <label style={lbl}>Current Math *</label>
+    <input style={inp} placeholder="Algebra II, Geometry, Pre-Calculus..." value={currentMath} onChange={e=>setCurrentMath(e.target.value)} />
+  </div>
+
+  <div style={{marginBottom:14}}>
+    <label style={lbl}>Current English *</label>
+    <input style={inp} placeholder="English 10, AP Lang..." value={currentEnglish} onChange={e=>setCurrentEnglish(e.target.value)} />
+  </div>
+
+  <div>
+    <label style={lbl}>Current Science *</label>
+    <input style={inp} placeholder="Biology, Chemistry, Physics..." value={currentScience} onChange={e=>setCurrentScience(e.target.value)} />
+  </div>
+</div>)}
+
+
+{currentStepName==="College & Career Goals"&&(<div>
+  <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>College & Career Goals</p>
+  <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink,marginBottom:18,lineHeight:1}}>College & Career Goals</h1>
+
+  <div style={{marginBottom:14}}>
+    <label style={lbl}>Dream school / college goal *</label>
+    <input style={inp} placeholder="Howard University, UCLA, Laney College..." value={dreamSchool} onChange={e=>setDreamSchool(e.target.value)} />
+  </div>
+
+  <div style={{marginBottom:14}}>
+    <label style={lbl}>Ideal profession</label>
+    <input style={inp} placeholder="Doctor, Engineer, Entrepreneur, Teacher..." value={idealProfession} onChange={e=>setIdealProfession(e.target.value)} />
+  </div>
+
+  <div>
+    <label style={lbl}>Desired annual salary</label>
+    <select style={sel} value={desiredSalaryRange} onChange={e=>setDesiredSalaryRange(e.target.value)}>
+      <option value="">Select salary range...</option>
+      {SALARY_RANGES.map(r=><option key={r}>{r}</option>)}
+    </select>
+  </div>
+</div>)}
+
+
+{currentStepName==="Activities & Service"&&(<div>
+  <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>Optional</p>
+  <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink,marginBottom:10,lineHeight:1}}>Activities & Service</h1>
+
+  <p style={{fontSize:13,color:T.muted,marginBottom:18,lineHeight:1.6}}>
+    Add clubs, extracurriculars, volunteer work, jobs, internships, awards, or leadership roles.
+  </p>
+
+  <div style={{marginBottom:14}}>
+    <label style={lbl}>Activity type</label>
+    <select style={sel} value={activityType} onChange={e=>setActivityType(e.target.value)}>
+      <option value="">Select...</option>
+      {ACTIVITY_TYPES.map(a=><option key={a}>{a}</option>)}
+    </select>
+  </div>
+
+  <div style={{marginBottom:14}}>
+    <label style={lbl}>Activity name</label>
+    <input style={inp} placeholder="Student Government, Food Bank, Internship..." value={activityName} onChange={e=>setActivityName(e.target.value)} />
+  </div>
+
+  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
+    <div>
+      <label style={lbl}>Role / title</label>
+      <input style={inp} placeholder="President, Volunteer, Intern..." value={activityRole} onChange={e=>setActivityRole(e.target.value)} />
+    </div>
+    <div>
+      <label style={lbl}>Organization</label>
+      <input style={inp} placeholder="School, nonprofit, company..." value={activityOrg} onChange={e=>setActivityOrg(e.target.value)} />
+    </div>
+  </div>
+
+  <div style={{marginBottom:14}}>
+    <label style={lbl}>Total hours</label>
+    <input style={inp} placeholder="25" value={activityHours} onChange={e=>setActivityHours(e.target.value)} />
+  </div>
+
+  <div>
+    <label style={lbl}>Description</label>
+    <textarea rows={3} style={{...inp,resize:"vertical" as const}} placeholder="What did you do?" value={activityDescription} onChange={e=>setActivityDescription(e.target.value)} />
+  </div>
+
+  <button type="button" onClick={addActivity} style={{marginTop:14,width:"100%",fontFamily:T.mono,fontSize:12,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:T.navy,color:"#fff",border:"none",borderRadius:12,padding:"13px",cursor:"pointer"}}>
+    + Add Activity
+  </button>
+
+  {activities.length>0&&(
+    <div style={{marginTop:14,fontSize:12,color:T.muted}}>
+      {activities.length} activit{activities.length===1?"y":"ies"} added.
+    </div>
+  )}
+</div>)}
+
+{currentStepName==="Your Pillars"&&(<div>
             <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>Step 4 of 4</p>
             <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink,marginBottom:10,lineHeight:1}}>Your Pillars</h1>
             <p style={{fontSize:13,color:T.muted,marginBottom:20,lineHeight:1.6}}>Select what interests you most — we will suggest courses on your dashboard based on your choices.</p>
@@ -300,8 +846,8 @@ export default function OnboardingPage() {
 
           <div style={{display:"flex",gap:10,marginTop:24}}>
             {step>0&&<button onClick={()=>setStep(s=>s-1)} style={{fontFamily:T.mono,fontSize:12,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:"transparent",color:T.muted,border:`1.5px solid ${T.line}`,borderRadius:12,padding:"13px 20px",cursor:"pointer"}}>← Back</button>}
-            {step<3?(<button onClick={handleNext} disabled={!canProceed} style={{flex:1,fontFamily:T.mono,fontSize:12,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:canProceed?T.orange:T.line,color:canProceed?"#fff":T.muted,border:"none",borderRadius:12,padding:"13px",cursor:canProceed?"pointer":"default",transition:"all 0.15s"}}>Save & Continue +{[50,75,100,125][step]} XP →</button>
-            ):(<button onClick={handleSave} disabled={saving||pillars.length===0||username.length<3||usernameStatus==="taken"} style={{flex:1,fontFamily:T.mono,fontSize:12,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:saving||pillars.length===0||username.length<3||usernameStatus==="taken"?T.line:T.orange,color:saving||pillars.length===0||username.length<3||usernameStatus==="taken"?T.muted:"#fff",border:"none",borderRadius:12,padding:"13px",cursor:"pointer",transition:"all 0.15s"}}>{saving?"Saving...":"Complete profile +125 XP →"}</button>)}
+            {step < steps.length - 1?(<button onClick={handleNext} disabled={!canProceed} style={{flex:1,fontFamily:T.mono,fontSize:12,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:canProceed?T.orange:T.line,color:canProceed?"#fff":T.muted,border:"none",borderRadius:12,padding:"13px",cursor:canProceed?"pointer":"default",transition:"all 0.15s"}}>Save & Continue +{[50,75,100,125][step]} XP →</button>
+            ):(<button onClick={handleSave} disabled={saving||!canProceed} style={{flex:1,fontFamily:T.mono,fontSize:12,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:saving||pillars.length===0||username.length<3||usernameStatus==="taken"?T.line:T.orange,color:saving||pillars.length===0||username.length<3||usernameStatus==="taken"?T.muted:"#fff",border:"none",borderRadius:12,padding:"13px",cursor:"pointer",transition:"all 0.15s"}}>{saving?"Saving...":"Complete profile +125 XP →"}</button>)}
           </div>
           <p style={{textAlign:"center",marginTop:12,fontSize:11,color:T.faint}}>You can update this anytime in your profile settings</p>
         </div>

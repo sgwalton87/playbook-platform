@@ -10,11 +10,15 @@ export default function BadgesPage() {
     const load = async () => {
       const { data } = await supabase.auth.getUser();
 
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("badges")
-        .eq("id", data.user.id)
-        .single();
+if (!data.user) {
+  return;
+}
+
+const { data: profile } = await supabase
+  .from("profiles")
+  .select("badges")
+  .eq("id", data.user.id)
+  .single();
 
       setBadges(profile?.badges || []);
     };
