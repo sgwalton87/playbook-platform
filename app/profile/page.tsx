@@ -18,7 +18,12 @@ const COLLEGE_LEVELS=["NCAA Division I","NCAA Division II","NCAA Division III","
 const FOLLOWER_RANGES=["Under 1,000","1,000–5,000","5,000–10,000","10,000–50,000","50,000–100,000","100,000+"];
 const BRAND_INTERESTS=["Sports & fitness","Fashion & style","Food & nutrition","Gaming","Music","Education","Community & social impact","Lifestyle","Tech","Other"];
 const DEAL_TYPES=["Product gifting","Paid social post","Brand ambassador","Event appearance","Content creation","Licensing"];
-const PILLARS=[{key:"leadership",label:"Leadership",icon:"★"},{key:"finance",label:"Financial Literacy",icon:"$"},{key:"civic",label:"Civic Engagement",icon:"✓"},{key:"sel",label:"Social-Emotional Learning",icon:"♥"}];
+const PILLARS=[
+  {key:"leadership",label:"Leadership",icon:"★",color:"#F97316",desc:"Develop your voice, build your team, and lead on and off the field. Captaincy, accountability, communication, and leaving a legacy."},
+  {key:"finance",label:"Financial Literacy",icon:"$",color:"#3B82F6",desc:"Learn to budget, save, invest, and understand NIL basics. Build generational wealth starting from your first paycheck."},
+  {key:"civic",label:"Civic Engagement",icon:"✓",color:"#10B981",desc:"Create change in your community through youth advocacy, service projects, and understanding your power as a citizen."},
+  {key:"sel",label:"Social-Emotional Learning",icon:"♥",color:"#8B5CF6",desc:"Strengthen your mental health, resilience, and identity beyond sport. Tools to manage pressure, build relationships, and thrive."},
+];
 const MAJOR_FIELDS=["Accounting","Aerospace Engineering","African American Studies","Agriculture","Anthropology","Architecture","Art & Design","Biology","Business Administration","Chemistry","Civil Engineering","Communications","Computer Science","Criminal Justice","Data Science","Early Childhood Education","Economics","Education","Electrical Engineering","English Literature","Environmental Science","Fashion Design","Film & Media Studies","Finance","Forensic Science","Graphic Design","Health Sciences","History","Hospitality Management","Human Development","Information Technology","International Relations","Journalism","Kinesiology / Sports Science","Law (Pre-Law)","Liberal Arts","Marketing","Mathematics","Mechanical Engineering","Medicine (Pre-Med)","Music","Neuroscience","Nursing","Nutrition & Dietetics","Philosophy","Physical Therapy","Physics","Political Science","Psychology","Public Health","Public Policy","Real Estate","Social Work","Sociology","Software Engineering","Sports Management","Theater Arts","Urban Planning","Veterinary Science (Pre-Vet)","Other / Undecided"];
 
 const inp:React.CSSProperties={width:"100%",background:T.surface,border:`1.5px solid ${T.line}`,borderRadius:10,padding:"11px 13px",fontSize:14,color:T.ink,fontFamily:"'Hanken Grotesk',system-ui,sans-serif",outline:"none"};
@@ -410,7 +415,22 @@ export default function ProfilePage() {
         {activeSection==="social"&&(
           <div style={{background:T.surface,border:`0.5px solid ${T.line}`,borderRadius:16,padding:"22px"}}>
             <h2 style={{fontFamily:T.anton,fontWeight:400,fontSize:20,textTransform:"uppercase",color:T.ink,marginBottom:4}}>Social Media</h2>
-            <p style={{fontSize:12,color:T.muted,marginBottom:18}}>Your public social media handles</p>
+            <p style={{fontSize:12,color:T.muted,marginBottom:18}}>Your public social media handles — these appear on your public profile</p>
+
+            {/* Saved handles display */}
+            {(instagram||tiktok||twitter||hudl||youtube)&&(
+              <div style={{background:T.navy,borderRadius:12,padding:"14px 16px",marginBottom:20}}>
+                <div style={{fontFamily:T.mono,fontSize:10,color:"rgba(248,247,244,.4)",letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:10}}>Connected accounts</div>
+                <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+                  {instagram&&<a href={`https://instagram.com/${instagram.replace("@","")}`} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:6,background:"rgba(255,255,255,.08)",borderRadius:999,padding:"6px 12px",textDecoration:"none"}}><span style={{fontSize:14}}>📸</span><span style={{fontFamily:T.mono,fontSize:11,color:"#F8F7F4",fontWeight:700}}>{instagram}</span></a>}
+                  {tiktok&&<a href={`https://tiktok.com/${tiktok.replace("@","")}`} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:6,background:"rgba(255,255,255,.08)",borderRadius:999,padding:"6px 12px",textDecoration:"none"}}><span style={{fontSize:14}}>🎵</span><span style={{fontFamily:T.mono,fontSize:11,color:"#F8F7F4",fontWeight:700}}>{tiktok}</span></a>}
+                  {twitter&&<a href={`https://twitter.com/${twitter.replace("@","")}`} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:6,background:"rgba(255,255,255,.08)",borderRadius:999,padding:"6px 12px",textDecoration:"none"}}><span style={{fontSize:14}}>🐦</span><span style={{fontFamily:T.mono,fontSize:11,color:"#F8F7F4",fontWeight:700}}>{twitter}</span></a>}
+                  {hudl&&<a href={hudl} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:6,background:"rgba(255,255,255,.08)",borderRadius:999,padding:"6px 12px",textDecoration:"none"}}><span style={{fontSize:14}}>🎬</span><span style={{fontFamily:T.mono,fontSize:11,color:"#F8F7F4",fontWeight:700}}>Hudl</span></a>}
+                  {youtube&&<a href={youtube} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:6,background:"rgba(255,255,255,.08)",borderRadius:999,padding:"6px 12px",textDecoration:"none"}}><span style={{fontSize:14}}>▶️</span><span style={{fontFamily:T.mono,fontSize:11,color:"#F8F7F4",fontWeight:700}}>YouTube</span></a>}
+                </div>
+              </div>
+            )}
+
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
               <div><label style={lbl}>Instagram</label><input style={inp} value={instagram} onChange={e=>setInstagram(e.target.value)} placeholder="@handle"/></div>
               <div><label style={lbl}>TikTok</label><input style={inp} value={tiktok} onChange={e=>setTiktok(e.target.value)} placeholder="@handle"/></div>
@@ -427,17 +447,30 @@ export default function ProfilePage() {
         {activeSection==="pillars"&&(
           <div style={{background:T.surface,border:`0.5px solid ${T.line}`,borderRadius:16,padding:"22px"}}>
             <h2 style={{fontFamily:T.anton,fontWeight:400,fontSize:20,textTransform:"uppercase",color:T.ink,marginBottom:4}}>Your Pillars</h2>
-            <p style={{fontSize:12,color:T.muted,marginBottom:18}}>Select the areas that interest you most — these drive your course suggestions</p>
-            <div style={{display:"flex",flexDirection:"column",gap:10}}>
-              {PILLARS.map(p=>{const a=pillars.includes(p.key);return(
+            <p style={{fontSize:12,color:T.muted,marginBottom:20}}>Select the areas that interest you most — your dashboard and courses will be personalized around your choices.</p>
+            <div style={{display:"flex",flexDirection:"column",gap:12}}>
+              {PILLARS.map((p:any)=>{const a=pillars.includes(p.key);return(
                 <div key={p.key} onClick={()=>setPillars(prev=>prev.includes(p.key)?prev.filter(x=>x!==p.key):[...prev,p.key])}
-                  style={{display:"flex",alignItems:"center",gap:14,padding:"14px 16px",borderRadius:12,border:`1.5px solid ${a?T.orange:T.line}`,background:a?T.orangeL:"transparent",cursor:"pointer",transition:"all 0.12s"}}>
-                  <div style={{width:36,height:36,borderRadius:9,background:a?T.orange:T.line,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,color:a?"#fff":T.muted,flexShrink:0}}>{p.icon}</div>
-                  <div style={{flex:1,fontSize:14,fontWeight:700,color:a?T.orange:T.ink}}>{p.label}</div>
-                  <div style={{width:22,height:22,borderRadius:6,border:`2px solid ${a?T.orange:T.line}`,background:a?T.orange:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{a&&<span style={{fontSize:12,color:"#fff"}}>✓</span>}</div>
+                  style={{display:"flex",gap:14,padding:"16px 18px",borderRadius:14,border:`1.5px solid ${a?p.color:T.line}`,background:a?p.color+"0f":"transparent",cursor:"pointer",transition:"all 0.15s"}}>
+                  <div style={{width:44,height:44,borderRadius:11,background:a?p.color:T.surface2,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,color:a?"#fff":T.muted,flexShrink:0,transition:"all 0.15s"}}>{p.icon}</div>
+                  <div style={{flex:1}}>
+                    <div style={{fontSize:15,fontWeight:700,color:a?p.color:T.ink,marginBottom:4}}>{p.label}</div>
+                    <div style={{fontSize:12,color:T.muted,lineHeight:1.6}}>{p.desc}</div>
+                  </div>
+                  <div style={{width:24,height:24,borderRadius:7,border:`2px solid ${a?p.color:T.line}`,background:a?p.color:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,marginTop:2,transition:"all 0.15s"}}>{a&&<span style={{fontSize:13,color:"#fff"}}>✓</span>}</div>
                 </div>
               );})}
             </div>
+            {pillars.length>0&&(
+              <div style={{marginTop:16,background:T.navy,borderRadius:12,padding:"12px 16px"}}>
+                <div style={{fontFamily:T.mono,fontSize:10,color:"rgba(248,247,244,.5)",letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:8}}>Your selected pillars</div>
+                <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+                  {pillars.map(k=>{const p=PILLARS.find((x:any)=>x.key===k);if(!p)return null;return(
+                    <span key={k} style={{background:(p as any).color,color:"#fff",borderRadius:999,padding:"4px 12px",fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase"}}>{(p as any).icon} {(p as any).label}</span>
+                  );})}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
