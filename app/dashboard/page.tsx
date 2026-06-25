@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { AG_COURSES, AG_SUBJECT_NAMES } from "@/lib/agCourses";
 
 const T={navy:"#0F172A",navy2:"#1E293B",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",blue:"#3B82F6",blueL:"#EFF6FF",green:"#10B981",greenL:"#ECFDF5",purple:"#8B5CF6",purpleL:"#EDE9FE",amber:"#F59E0B",amberL:"#FFFBEB",red:"#E24B4A",teal:"#0F6E56",tealL:"#E1F5EE",mono:"'Space Mono',monospace",sans:"'Hanken Grotesk',system-ui,sans-serif",anton:"'Anton',sans-serif"};
 
@@ -120,7 +121,8 @@ export default function DashboardPage(){
 
   const updateAG=async(subject:string,field:string,value:any)=>{
     const updated=agProgress.map(a=>a.subject===subject?{...a,[field]:value}:a);
-    setAgProgress(updated);
+    setAgProgress([...updated]);
+    setAgKey(k=>k+1);
     await supabase.from("ag_progress").update({[field]:value,updated_at:new Date().toISOString()}).eq("user_id",profile.id).eq("subject",subject);
   };
 
@@ -336,21 +338,72 @@ export default function DashboardPage(){
                               <div style={{fontSize:9,color:T.faint}}>{prog?`${Number(prog.years_completed)}/${Number(prog.years_required)}yr`:"0yr"}</div>
                             </div>
                             {isEditing&&(
-                              <div style={{position:"absolute",zIndex:100,background:T.surface,border:`1.5px solid ${T.orange}`,borderRadius:10,padding:"12px 14px",width:200,boxShadow:"0 8px 24px rgba(0,0,0,.12)",marginTop:4}}>
-                                <div style={{fontSize:12,fontWeight:700,color:T.ink,marginBottom:8}}>{s.key} — {s.name}</div>
-                                <div style={{fontSize:11,color:T.muted,marginBottom:6}}>Years completed</div>
-                                <div style={{display:"flex",gap:4,marginBottom:8,flexWrap:"wrap"}}>
-                                  {Array.from({length:s.required+1},(_,i)=>i).map(n=>(
-                                    <button key={n} onClick={()=>{updateAG(s.key,"years_completed",n);if(n===s.required)updateAG(s.key,"in_progress",false);}} style={{width:32,height:32,borderRadius:7,border:`1.5px solid ${Number(prog?.years_completed)===n?T.orange:T.line}`,background:Number(prog?.years_completed)===n?T.orangeL:"transparent",fontFamily:T.mono,fontSize:12,fontWeight:700,color:Number(prog?.years_completed)===n?T.orange:T.muted,cursor:"pointer"}}>{n}</button>
-                                  ))}
-                                </div>
-                                <div onClick={()=>updateAG(s.key,"in_progress",!prog?.in_progress)} style={{display:"flex",alignItems:"center",gap:6,cursor:"pointer",marginBottom:8}}>
-                                  <div style={{width:16,height:16,borderRadius:4,border:`1.5px solid ${prog?.in_progress?T.orange:T.line}`,background:prog?.in_progress?T.orange:"transparent",display:"flex",alignItems:"center",justifyContent:"center"}}>
-                                    {prog?.in_progress&&<span style={{color:"#fff",fontSize:10}}>✓</span>}
+                              <div style={{position:"fixed",inset:0,zIndex:200,background:"rgba(15,23,42,.5)",display:"flex",alignItems:"center",justifyContent:"center",padding:20}} onClick={()=>setEditingAG(null)}>
+                                <div style={{background:T.surface,borderRadius:16,padding:"20px",width:"100%",maxWidth:480,boxShadow:"0 16px 48px rgba(0,0,0,.2)",maxHeight:"80vh",overflowY:"auto"}} onClick={e=>e.stopPropagation()}>
+                                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
+                                    <div>
+                                      <div style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.12em",textTransform:"uppercase",color:T.orange,marginBottom:2}}>Category {s.key}</div>
+                                      <div style={{fontSize:15,fontWeight:700,color:T.ink}}>{s.name}</div>
+                                    </div>
+                                    <button onClick={()=>setEditingAG(null)} style={{background:T.surface2,border:"none",borderRadius:999,width:28,height:28,cursor:"pointer",fontSize:14,color:T.muted}}>✕</button>
                                   </div>
-                                  <span style={{fontSize:11,color:T.muted}}>Currently in progress</span>
+
+                                  <div style={{marginBottom:14}}>
+                                    <div style={{fontSize:11,fontWeight:700,color:T.muted,marginBottom:8,textTransform:"uppercase",letterSpacing:"0.08em",fontFamily:T.mono}}>Years completed ({s.required} required)</div>
+                                    <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+                                      {Array.from({length:Math.max(s.required,4)+1},(_,i)=>i*0.5).filter(n=>n<=Math.max(s.required,4)).map(n=>(
+                                        <button key={n} onClick={()=>{updateAG(s.key,"years_completed",n);}} 
+                                          style={{minWidth:40,height:36,borderRadius:8,border:`1.5px solid ${Number(prog?.years_completed)===n?T.orange:T.line}`,background:Number(prog?.years_completed)===n?T.orangeL:"transparent",fontFamily:T.mono,fontSize:12,fontWeight:700,color:Number(prog?.years_completed)===n?T.orange:T.muted,cursor:"pointer",padding:"0 8px"}}>
+                                          {n}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  </div>
+
+                                  <div style={{marginBottom:14}}>
+                                    <div onClick={()=>updateAG(s.key,"in_progress",!prog?.in_progress)} style={{display:"flex",alignItems:"center",gap:8,cursor:"pointer",padding:"10px 12px",borderRadius:9,border:`1.5px solid ${prog?.in_progress?T.orange:T.line}`,background:prog?.in_progress?T.orangeL:"transparent"}}>
+                                      <div style={{width:18,height:18,borderRadius:4,border:`1.5px solid ${prog?.in_progress?T.orange:T.line}`,background:prog?.in_progress?T.orange:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                                        {prog?.in_progress&&<span style={{color:"#fff",fontSize:11}}>✓</span>}
+                                      </div>
+                                      <span style={{fontSize:13,color:prog?.in_progress?T.orange:T.muted}}>Currently taking a course in this category</span>
+                                    </div>
+                                  </div>
+
+                                  <div style={{marginBottom:14}}>
+                                    <div style={{fontSize:11,fontWeight:700,color:T.muted,marginBottom:8,textTransform:"uppercase",letterSpacing:"0.08em",fontFamily:T.mono}}>Courses taken</div>
+                                    <div style={{display:"flex",flexWrap:"wrap",gap:5,marginBottom:8}}>
+                                      {(prog?.courses_taken||[]).map((c:string)=>(
+                                        <span key={c} style={{display:"flex",alignItems:"center",gap:4,background:T.navy,color:"#F8F7F4",borderRadius:999,padding:"4px 10px",fontSize:11,fontWeight:600}}>
+                                          {c}
+                                          <button onClick={()=>{const updated=(prog?.courses_taken||[]).filter((x:string)=>x!==c);updateAG(s.key,"courses_taken",updated);}} style={{background:"none",border:"none",color:"rgba(248,247,244,.5)",cursor:"pointer",fontSize:12,padding:0,marginLeft:2}}>✕</button>
+                                        </span>
+                                      ))}
+                                    </div>
+                                    <select onChange={e=>{if(!e.target.value)return;const cur=prog?.courses_taken||[];if(!cur.includes(e.target.value)){updateAG(s.key,"courses_taken",[...cur,e.target.value]);}e.target.value="";}}
+                                      style={{width:"100%",background:T.surface,border:`1.5px solid ${T.line}`,borderRadius:9,padding:"10px 12px",fontSize:13,color:T.ink,fontFamily:T.sans,outline:"none",cursor:"pointer"}}>
+                                      <option value="">+ Add a course...</option>
+                                      {(AG_COURSES[s.key]||[]).filter((c:string)=>!(prog?.courses_taken||[]).includes(c)).map((c:string)=>(
+                                        <option key={c} value={c}>{c}</option>
+                                      ))}
+                                      <option value="__other__">Other (type below)</option>
+                                    </select>
+                                  </div>
+
+                                  <div style={{marginBottom:14}}>
+                                    <div style={{fontSize:11,fontWeight:700,color:T.muted,marginBottom:8,textTransform:"uppercase",letterSpacing:"0.08em",fontFamily:T.mono}}>Current course (in progress)</div>
+                                    <select value={prog?.current_course||""} onChange={e=>updateAG(s.key,"current_course",e.target.value||null)}
+                                      style={{width:"100%",background:T.surface,border:`1.5px solid ${T.line}`,borderRadius:9,padding:"10px 12px",fontSize:13,color:T.ink,fontFamily:T.sans,outline:"none",cursor:"pointer"}}>
+                                      <option value="">None / not in progress</option>
+                                      {(AG_COURSES[s.key]||[]).map((c:string)=>(
+                                        <option key={c} value={c}>{c}</option>
+                                      ))}
+                                    </select>
+                                  </div>
+
+                                  <button onClick={()=>setEditingAG(null)} style={{fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:T.orange,color:"#fff",border:"none",borderRadius:12,padding:"12px",cursor:"pointer",width:"100%"}}>
+                                    Save & close →
+                                  </button>
                                 </div>
-                                <button onClick={()=>setEditingAG(null)} style={{fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",background:T.navy,color:"#fff",border:"none",borderRadius:999,padding:"6px 12px",cursor:"pointer",width:"100%"}}>Done</button>
                               </div>
                             )}
                           </div>

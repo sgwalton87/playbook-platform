@@ -1,254 +1,234 @@
 "use client";
-
-import AppShell from "@/components/AppShell";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import AppShell from "@/components/AppShell";
+import { AG_SUBJECT_NAMES, AG_REQUIREMENTS } from "@/lib/agCourses";
 
-const surface = "#ffffff";
-const soft = "#fbf7f1";
-const ink = "#100c0a";
-const muted = "#6b5f55";
-const line = "#ddd2c7";
-const accent = "#ff6a2c";
+const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",green:"#10B981",greenL:"#ECFDF5",amber:"#F59E0B",red:"#E24B4A",mono:"'Space Mono',monospace",sans:"'Hanken Grotesk',system-ui,sans-serif",anton:"'Anton',sans-serif"};
 
 export default function TranscriptPage() {
+  const router = useRouter();
   const [profile, setProfile] = useState<any>(null);
-  const [completedCourses, setCompletedCourses] = useState<any[]>([]);
+  const [agProgress, setAgProgress] = useState<any[]>([]);
   const [certificates, setCertificates] = useState<any[]>([]);
-  const [badges, setBadges] = useState<any[]>([]);
+  const [activities, setActivities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadTranscript = async () => {
-      const { data: userData } = await supabase.auth.getUser();
-
-      if (!userData.user) {
-        setLoading(false);
-        return;
-      }
-
-      const userId = userData.user.id;
-
-      const { data: profileData } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", userId)
-        .single();
-
-      const { data: progressData } = await supabase
-        .from("course_progress")
-        .select(`
-          *,
-          courses (
-            title,
-            pillar
-          )
-        `)
-        .eq("user_id", userId)
-        .eq("completed", true)
-        .order("completed_at", { ascending: false });
-
-      const { data: certificateData } = await supabase
-        .from("certificates")
-        .select("*")
-        .eq("user_id", userId)
-        .order("issued_at", { ascending: false });
-
-      const { data: badgeData } = await supabase
-        .from("user_badges")
-        .select(`
-          id,
-          awarded_at,
-          badges (
-            name,
-            description
-          )
-        `)
-        .eq("user_id", userId)
-        .order("awarded_at", { ascending: false });
-
-      setProfile(profileData);
-      setCompletedCourses(progressData || []);
-      setCertificates(certificateData || []);
-      setBadges(badgeData || []);
+    (async () => {
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) { router.replace("/login"); return; }
+      const [{ data: p }, { data: ag }, { data: certs }, { data: acts }] = await Promise.all([
+        supabase.from("profiles").select("*").eq("id", u.user.id).single(),
+        supabase.from("ag_progress").select("*").eq("user_id", u.user.id).order("subject"),
+        supabase.from("certificates").select("*").eq("user_id", u.user.id),
+        supabase.from("student_activities").select("*").eq("student_id", u.user.id),
+      ]);
+      setProfile(p);
+      setAgProgress((ag||[]).map((a:any)=>({...a,years_completed:Number(a.years_completed),years_required:Number(a.years_required)})));
+      setCertificates(certs||[]);
+      setActivities(acts||[]);
       setLoading(false);
-    };
-
-    loadTranscript();
+    })();
   }, []);
 
-  if (loading) {
-    return (
-      <AppShell title="Transcript">
-        <p>Loading transcript...</p>
-      </AppShell>
-    );
-  }
+  if (loading) return <AppShell><div style={{padding:40,fontFamily:T.mono,fontSize:12,color:T.faint}}>Loading transcript...</div></AppShell>;
+
+  const agDone = agProgress.filter(a => a.years_completed >= a.years_required).length;
 
   return (
-    <AppShell title="Transcript">
-      <div style={{ display: "grid", gap: 24 }}>
-        <section
-          style={{
-            background: surface,
-            border: `1px solid ${line}`,
-            borderRadius: 28,
-            padding: 28,
-          }}
-        >
-          <p
-            style={{
-              color: accent,
-              textTransform: "uppercase",
-              letterSpacing: "0.16em",
-              fontWeight: 900,
-              fontSize: 12,
-              marginTop: 0,
-            }}
-          >
-            Official Playbook Record
-          </p>
+    <AppShell>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');*,*::before,*::after{box-sizing:border-box;}@media print{.no-print{display:none!important;}.print-page{padding:0!important;}}`}</style>
+      <div style={{maxWidth:800,margin:"0 auto",padding:"28px 32px",fontFamily:T.sans}} className="print-page">
 
-          <h1 style={{ margin: 0, color: ink, fontSize: 42 }}>
-            {profile?.first_name} {profile?.last_name}
-          </h1>
+        {/* Header actions */}
+        <div className="no-print" style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:24}}>
+          <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink}}>Academic Transcript</h1>
+          <button onClick={()=>window.print()} style={{fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:T.navy,color:"#fff",border:"none",borderRadius:12,padding:"10px 20px",cursor:"pointer"}}>🖨 Print / Save PDF</button>
+        </div>
 
-          <p style={{ color: muted, marginTop: 8 }}>
-            Courses completed, certificates earned, badges unlocked, XP, and coins.
-          </p>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
-              gap: 14,
-              marginTop: 22,
-            }}
-          >
+        {/* School header */}
+        <div style={{background:T.navy,borderRadius:16,padding:"24px 28px",marginBottom:20,color:"#F8F7F4"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+            <div>
+              <div style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.18em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>Official Academic Record</div>
+              <h2 style={{fontFamily:T.anton,fontWeight:400,fontSize:32,textTransform:"uppercase",lineHeight:.95,marginBottom:4}}>{profile?.full_name||`${profile?.first_name||""} ${profile?.last_name||""}`.trim()||"Student"}</h2>
+              <div style={{fontSize:13,color:"rgba(248,247,244,.6)"}}>{profile?.school||"School not set"} · Class of {profile?.grad_year||"—"}</div>
+            </div>
+            <div style={{textAlign:"right"}}>
+              <div style={{fontSize:12,color:"rgba(248,247,244,.5)",marginBottom:4}}>Cumulative GPA</div>
+              <div style={{fontFamily:T.anton,fontSize:36,color:T.orange,lineHeight:1}}>{profile?.weighted_gpa||profile?.gpa||"—"}</div>
+              <div style={{fontSize:11,color:"rgba(248,247,244,.4)"}}>Weighted</div>
+            </div>
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:10,marginTop:16}}>
             {[
-              ["⚡ XP", profile?.xp ?? 0],
-              ["💰 Coins", profile?.coin_balance ?? 0],
-              ["📚 Completed", completedCourses.length],
-              ["🎓 Certificates", certificates.length],
-              ["🏅 Badges", badges.length],
-            ].map(([label, value]) => (
-              <div
-                key={label}
-                style={{
-                  background: soft,
-                  border: `1px solid ${line}`,
-                  borderRadius: 18,
-                  padding: 18,
-                }}
-              >
-                <p style={{ color: muted, margin: 0 }}>{label}</p>
-                <h2 style={{ margin: "8px 0 0", color: ink }}>{value}</h2>
+              {label:"Student ID",val:profile?.id?.slice(0,8).toUpperCase()||"—"},
+              {label:"Date of Birth",val:profile?.date_of_birth?new Date(profile.date_of_birth).toLocaleDateString("en",{month:"short",day:"numeric",year:"numeric"}):"—"},
+              {label:"District",val:profile?.school_district||"—"},
+              {label:"A-G Status",val:`${agDone}/7 complete`},
+            ].map(({label,val})=>(
+              <div key={label} style={{background:"rgba(255,255,255,.07)",borderRadius:8,padding:"8px 10px"}}>
+                <div style={{fontFamily:T.mono,fontSize:9,color:"rgba(248,247,244,.4)",textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:2}}>{label}</div>
+                <div style={{fontSize:12,fontWeight:600}}>{val}</div>
               </div>
             ))}
           </div>
-        </section>
+        </div>
 
-        <section
-          style={{
-            background: surface,
-            border: `1px solid ${line}`,
-            borderRadius: 24,
-            padding: 24,
-          }}
-        >
-          <h2 style={{ marginTop: 0 }}>Completed Courses</h2>
-
-          {completedCourses.length > 0 ? (
-            completedCourses.map((item) => (
-              <div
-                key={item.id}
-                style={{
-                  borderBottom: `1px solid ${line}`,
-                  padding: "14px 0",
-                }}
-              >
-                <strong>{item.courses?.title || item.course_slug}</strong>
-                <p style={{ color: muted, marginBottom: 0 }}>
-                  {item.courses?.pillar || "Course"} · Completed{" "}
-                  {item.completed_at
-                    ? new Date(item.completed_at).toLocaleDateString()
-                    : ""}
-                </p>
-              </div>
-            ))
-          ) : (
-            <p style={{ color: muted }}>No completed courses yet.</p>
-          )}
-        </section>
-
-        <section
-          style={{
-            background: surface,
-            border: `1px solid ${line}`,
-            borderRadius: 24,
-            padding: 24,
-          }}
-        >
-          <h2 style={{ marginTop: 0 }}>Certificates</h2>
-
-          {certificates.length > 0 ? (
-            certificates.map((cert) => (
-              <div
-                key={cert.id}
-                style={{
-                  background: soft,
-                  border: `1px solid ${line}`,
-                  borderRadius: 18,
-                  padding: 16,
-                  marginBottom: 12,
-                }}
-              >
-                <strong>🎓 {cert.certificate_name}</strong>
-                <p style={{ color: muted, marginBottom: 0 }}>
-                  Earned{" "}
-                  {cert.issued_at
-                    ? new Date(cert.issued_at).toLocaleDateString()
-                    : ""}
-                </p>
-              </div>
-            ))
-          ) : (
-            <p style={{ color: muted }}>No certificates yet.</p>
-          )}
-        </section>
-
-        <section
-          style={{
-            background: surface,
-            border: `1px solid ${line}`,
-            borderRadius: 24,
-            padding: 24,
-          }}
-        >
-          <h2 style={{ marginTop: 0 }}>Badges</h2>
-
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-            {badges.length > 0 ? (
-              badges.map((item) => (
-                <span
-                  key={item.id}
-                  style={{
-                    border: `1px solid ${line}`,
-                    borderRadius: 999,
-                    padding: "8px 12px",
-                    background: soft,
-                    color: ink,
-                    fontWeight: 900,
-                  }}
-                >
-                  🏅 {item.badges?.name}
-                </span>
-              ))
-            ) : (
-              <p style={{ color: muted }}>No badges earned yet.</p>
-            )}
+        {/* A-G Education Section */}
+        <div style={{marginBottom:24}}>
+          <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
+            <div style={{flex:1,height:1,background:T.line}}/>
+            <span style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.muted,padding:"0 12px"}}>A-G Education Requirements</span>
+            <div style={{flex:1,height:1,background:T.line}}/>
           </div>
-        </section>
+
+          {agProgress.length===0?(
+            <div style={{background:T.surface2,borderRadius:12,padding:"20px",textAlign:"center",color:T.muted,fontSize:13}}>
+              No A-G data yet. <a href="/dashboard" style={{color:T.orange}}>Update your A-G progress on the dashboard →</a>
+            </div>
+          ):(
+            <div style={{border:`0.5px solid ${T.line}`,borderRadius:12,overflow:"hidden"}}>
+              <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+                <thead>
+                  <tr style={{background:T.navy,color:"#F8F7F4"}}>
+                    <th style={{padding:"10px 14px",textAlign:"left",fontFamily:T.mono,fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:700,width:30}}>Cat.</th>
+                    <th style={{padding:"10px 14px",textAlign:"left",fontFamily:T.mono,fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:700}}>Subject Area</th>
+                    <th style={{padding:"10px 14px",textAlign:"left",fontFamily:T.mono,fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:700}}>Courses Completed</th>
+                    <th style={{padding:"10px 14px",textAlign:"center",fontFamily:T.mono,fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:700,width:80}}>Years</th>
+                    <th style={{padding:"10px 14px",textAlign:"center",fontFamily:T.mono,fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:700,width:80}}>Required</th>
+                    <th style={{padding:"10px 14px",textAlign:"center",fontFamily:T.mono,fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:700,width:80}}>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {["A","B","C","D","E","F","G"].map((key,i)=>{
+                    const prog = agProgress.find(a=>a.subject===key);
+                    const required = AG_REQUIREMENTS[key]||1;
+                    const completed = prog?.years_completed||0;
+                    const done = completed >= required;
+                    const inProg = prog?.in_progress && !done;
+                    const courses = prog?.courses_taken||[];
+                    const currentCourse = prog?.current_course;
+                    return(
+                      <tr key={key} style={{borderBottom:`0.5px solid ${T.line}`,background:i%2===0?T.surface:T.surface2}}>
+                        <td style={{padding:"12px 14px",fontFamily:T.mono,fontWeight:700,fontSize:15,color:done?T.green:inProg?T.amber:T.muted}}>{key}</td>
+                        <td style={{padding:"12px 14px",fontWeight:600,color:T.ink}}>{AG_SUBJECT_NAMES[key]}</td>
+                        <td style={{padding:"12px 14px",color:T.muted,fontSize:12}}>
+                          {courses.length>0?(
+                            <div style={{display:"flex",flexWrap:"wrap",gap:4}}>
+                              {courses.map((c:string)=>(
+                                <span key={c} style={{background:T.navy,color:"#F8F7F4",borderRadius:999,padding:"2px 8px",fontSize:11,fontWeight:500}}>{c}</span>
+                              ))}
+                              {currentCourse&&<span style={{background:T.orangeL,color:T.orange,borderRadius:999,padding:"2px 8px",fontSize:11,fontWeight:500,border:`1px solid ${T.orange}33`}}>{currentCourse} (in progress)</span>}
+                            </div>
+                          ):(
+                            <span style={{color:T.faint,fontStyle:"italic"}}>
+                              {inProg&&currentCourse?currentCourse+" (in progress)":"No courses logged yet"}
+                            </span>
+                          )}
+                        </td>
+                        <td style={{padding:"12px 14px",textAlign:"center",fontFamily:T.mono,fontWeight:700,fontSize:14,color:done?T.green:inProg?T.amber:T.ink}}>{completed}</td>
+                        <td style={{padding:"12px 14px",textAlign:"center",fontFamily:T.mono,fontSize:13,color:T.muted}}>{required}</td>
+                        <td style={{padding:"12px 14px",textAlign:"center"}}>
+                          {done?(
+                            <span style={{background:T.greenL,color:T.green,borderRadius:999,padding:"3px 10px",fontSize:11,fontWeight:700,fontFamily:T.mono}}>✓ Met</span>
+                          ):inProg?(
+                            <span style={{background:T.orangeL,color:T.amber,borderRadius:999,padding:"3px 10px",fontSize:11,fontWeight:700,fontFamily:T.mono}}>In progress</span>
+                          ):(
+                            <span style={{background:T.surface2,color:T.faint,borderRadius:999,padding:"3px 10px",fontSize:11,fontWeight:700,fontFamily:T.mono}}>Needed</span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+                <tfoot>
+                  <tr style={{background:T.surface2,borderTop:`1px solid ${T.line}`}}>
+                    <td colSpan={3} style={{padding:"10px 14px",fontFamily:T.mono,fontSize:11,fontWeight:700,color:T.ink}}>TOTAL A-G COMPLETION</td>
+                    <td style={{padding:"10px 14px",textAlign:"center",fontFamily:T.mono,fontWeight:700,color:T.orange}}>{agProgress.reduce((sum,a)=>sum+Number(a.years_completed),0)}</td>
+                    <td style={{padding:"10px 14px",textAlign:"center",fontFamily:T.mono,color:T.muted}}>15</td>
+                    <td style={{padding:"10px 14px",textAlign:"center"}}>
+                      <span style={{fontFamily:T.mono,fontSize:11,fontWeight:700,color:agDone===7?T.green:T.amber}}>{agDone}/7 met</span>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          )}
+        </div>
+
+        {/* Playbook Certificates */}
+        {certificates.length>0&&(
+          <div style={{marginBottom:24}}>
+            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
+              <div style={{flex:1,height:1,background:T.line}}/>
+              <span style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.muted,padding:"0 12px"}}>Playbook Certifications</span>
+              <div style={{flex:1,height:1,background:T.line}}/>
+            </div>
+            <div style={{border:`0.5px solid ${T.line}`,borderRadius:12,overflow:"hidden"}}>
+              <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+                <thead>
+                  <tr style={{background:T.navy,color:"#F8F7F4"}}>
+                    <th style={{padding:"10px 14px",textAlign:"left",fontFamily:T.mono,fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:700}}>Certificate</th>
+                    <th style={{padding:"10px 14px",textAlign:"left",fontFamily:T.mono,fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:700}}>Issued</th>
+                    <th style={{padding:"10px 14px",textAlign:"center",fontFamily:T.mono,fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:700}}>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {certificates.map((c:any,i:number)=>(
+                    <tr key={c.id} style={{borderBottom:`0.5px solid ${T.line}`,background:i%2===0?T.surface:T.surface2}}>
+                      <td style={{padding:"12px 14px",fontWeight:600,color:T.ink}}>{c.certificate_name||c.course_slug}</td>
+                      <td style={{padding:"12px 14px",color:T.muted,fontFamily:T.mono,fontSize:12}}>{c.issued_at?new Date(c.issued_at).toLocaleDateString("en",{month:"long",day:"numeric",year:"numeric"}):"—"}</td>
+                      <td style={{padding:"12px 14px",textAlign:"center"}}><span style={{background:T.greenL,color:T.green,borderRadius:999,padding:"3px 10px",fontSize:11,fontWeight:700,fontFamily:T.mono}}>✓ Earned</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Activities */}
+        {activities.length>0&&(
+          <div style={{marginBottom:24}}>
+            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
+              <div style={{flex:1,height:1,background:T.line}}/>
+              <span style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.muted,padding:"0 12px"}}>Activities & Experience</span>
+              <div style={{flex:1,height:1,background:T.line}}/>
+            </div>
+            <div style={{border:`0.5px solid ${T.line}`,borderRadius:12,overflow:"hidden"}}>
+              <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+                <thead>
+                  <tr style={{background:T.navy,color:"#F8F7F4"}}>
+                    <th style={{padding:"10px 14px",textAlign:"left",fontFamily:T.mono,fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:700}}>Activity</th>
+                    <th style={{padding:"10px 14px",textAlign:"left",fontFamily:T.mono,fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:700}}>Type</th>
+                    <th style={{padding:"10px 14px",textAlign:"left",fontFamily:T.mono,fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:700}}>Organization</th>
+                    <th style={{padding:"10px 14px",textAlign:"center",fontFamily:T.mono,fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:700}}>Hours</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {activities.map((a:any,i:number)=>(
+                    <tr key={a.id} style={{borderBottom:`0.5px solid ${T.line}`,background:i%2===0?T.surface:T.surface2}}>
+                      <td style={{padding:"12px 14px",fontWeight:600,color:T.ink}}>{a.activity_name}</td>
+                      <td style={{padding:"12px 14px",color:T.muted,textTransform:"capitalize"}}>{a.activity_type}</td>
+                      <td style={{padding:"12px 14px",color:T.muted}}>{a.organization||"—"}</td>
+                      <td style={{padding:"12px 14px",textAlign:"center",fontFamily:T.mono,fontWeight:700,color:T.ink}}>{a.total_hours||"—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Footer */}
+        <div style={{borderTop:`0.5px solid ${T.line}`,paddingTop:16,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+          <div style={{fontFamily:T.mono,fontSize:10,color:T.faint}}>Generated by Playbook Series Inc. · playbookseriesinc.org</div>
+          <div style={{fontFamily:T.mono,fontSize:10,color:T.faint}}>{new Date().toLocaleDateString("en",{month:"long",day:"numeric",year:"numeric"})}</div>
+        </div>
+
       </div>
     </AppShell>
   );
