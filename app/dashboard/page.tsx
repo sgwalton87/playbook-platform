@@ -70,6 +70,7 @@ export default function DashboardPage(){
   const [uploadingTranscript,setUploadingTranscript]=useState(false);
   const [transcriptResult,setTranscriptResult]=useState<string|null>(null);
   const [agKey,setAgKey]=useState(0);
+  const [agKey,setAgKey]=useState(0);
 
   useEffect(()=>{
     (async()=>{
@@ -150,6 +151,7 @@ export default function DashboardPage(){
       if(refreshed.data){
         const normalized=refreshed.data.map((a:any)=>({...a,years_completed:Number(a.years_completed),years_required:Number(a.years_required)}));
         setAgProgress([...normalized]);
+        setAgKey(k=>k+1);
         setAgKey(k=>k+1);
       }
       if(data.agUpdates>0){
