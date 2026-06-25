@@ -69,6 +69,7 @@ export default function DashboardPage(){
   const [editingAG,setEditingAG]=useState<string|null>(null);
   const [uploadingTranscript,setUploadingTranscript]=useState(false);
   const [transcriptResult,setTranscriptResult]=useState<string|null>(null);
+  const [agKey,setAgKey]=useState(0);
 
   useEffect(()=>{
     (async()=>{
@@ -149,6 +150,7 @@ export default function DashboardPage(){
       if(refreshed.data){
         const normalized=refreshed.data.map((a:any)=>({...a,years_completed:Number(a.years_completed),years_required:Number(a.years_required)}));
         setAgProgress([...normalized]);
+        setAgKey(k=>k+1);
       }
       if(data.agUpdates>0){
         setTranscriptResult(`Transcript parsed! Updated ${data.agUpdates} A-G subjects.`);
@@ -316,7 +318,7 @@ export default function DashboardPage(){
                       <div><div style={{fontFamily:T.anton,fontSize:36,color:T.ink,lineHeight:1}}>{profile?.unweighted_gpa||"—"}</div><div style={{fontSize:10,color:T.muted,marginTop:2}}>Unweighted</div></div>
                     </div>
                     {cardTitle("A-G requirements",`${agDone}/${agTotal} subjects`)}
-                    <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:5}}>
+                    <div key={agKey} style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:5}}>
                       {AG_SUBJECTS.map(s=>{
                         const prog=agProgress.find(a=>a.subject===s.key);
                         const done=prog&&Number(prog.years_completed)>=Number(prog.years_required);
