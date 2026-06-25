@@ -7,6 +7,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import ProfileAvatar from "@/components/ProfileAvatar";
 import { checkBadges } from "@/lib/badges";
 import CollegeSearch from "@/components/college/CollegeSearch";
+import AGTracker from "@/components/ag/AGTracker";
 
 export default function ProfilePage() {
   const router = useRouter();

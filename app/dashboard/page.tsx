@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Confetti from "react-confetti";
 import { supabase } from "@/lib/supabaseClient";
+import AGTracker from "@/components/ag/AGTracker";
 
 const T = {
   navy: "#0F172A",
@@ -129,6 +130,10 @@ export default function DashboardPage() {
           <DashboardCard title="Applications" value="0 schools" status="College tracker" />
           <DashboardCard title="Playbook Coins" value={profile?.coin_balance ?? 0} status="Rewards" />
         </div>
+
+        <Panel title="A–G Progress Tracker">
+  <AGTracker />
+</Panel>
 
         <div style={{
           display: "grid",
