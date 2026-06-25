@@ -125,8 +125,10 @@ export default function DashboardPage(){
 
   const handleTranscriptUpload=async(e:React.ChangeEvent<HTMLInputElement>)=>{
     const file=e.target.files?.[0];
+    console.log("File selected:",file?.name,file?.type,file?.size);
     if(!file)return;
     setUploadingTranscript(true);
+    console.log("Profile ID:",profile?.id);
     setTranscriptResult(null);
     try{
       const base64=await new Promise<string>((res,rej)=>{
@@ -142,7 +144,8 @@ export default function DashboardPage(){
         body:JSON.stringify({base64,mediaType,userId:profile.id}),
       });
       const data=await response.json();
-      if(data.agUpdates){
+      console.log("Parse response:",JSON.stringify(data));
+      if(data.agUpdates||data.agUpdates===0){
         const refreshed=await supabase.from("ag_progress").select("*").eq("user_id",profile.id);
         if(refreshed.data)setAgProgress(refreshed.data);
         setTranscriptResult(`Transcript parsed! Updated ${data.agUpdates} A-G subjects.`);

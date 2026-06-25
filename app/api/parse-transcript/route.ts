@@ -69,9 +69,11 @@ export async function POST(req: NextRequest) {
 
     let parsed: Record<string, any> = {};
     try {
-      const match = text.match(/\{[\s\S]*\}/);
-      if (!match) throw new Error("No JSON");
-      parsed = JSON.parse(match[0]);
+      const jsonBlock = text.match(/```json([\s\S]*?)```/);
+      const rawJson = jsonBlock ? jsonBlock[1].trim() : text.match(/\{[\s\S]*\}/)?.[0];
+      if (!rawJson) throw new Error("No JSON found");
+      parsed = JSON.parse(rawJson);
+      console.log("Parsed AG data:", JSON.stringify(parsed));
     } catch {
       return NextResponse.json({ message: "Could not read transcript. Click each subject to update manually." });
     }
