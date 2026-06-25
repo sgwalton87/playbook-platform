@@ -146,7 +146,10 @@ export default function DashboardPage(){
       const data=await response.json();
       console.log("Parse response:",JSON.stringify(data));
       const refreshed=await supabase.from("ag_progress").select("*").eq("user_id",profile.id);
-      if(refreshed.data)setAgProgress(refreshed.data);
+      if(refreshed.data){
+        const normalized=refreshed.data.map((a:any)=>({...a,years_completed:Number(a.years_completed),years_required:Number(a.years_required)}));
+        setAgProgress([...normalized]);
+      }
       if(data.agUpdates>0){
         setTranscriptResult(`Transcript parsed! Updated ${data.agUpdates} A-G subjects.`);
       } else {
