@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
     for (const s of AG_SUBJECTS) {
       const val = parsed[s.key];
       if (val !== undefined) {
-        const { error } = await supabase
+        const { error, data: updateData } = await supabase
           .from("ag_progress")
           .update({
             years_completed: Number(val.years_completed) || 0,
@@ -95,7 +95,9 @@ export async function POST(req: NextRequest) {
             updated_at: new Date().toISOString(),
           })
           .eq("user_id", userId)
-          .eq("subject", s.key);
+          .eq("subject", s.key)
+          .select();
+        console.log(`Update ${s.key}:`, error||"ok", updateData);
         if (!error) agUpdates++;
       }
     }
