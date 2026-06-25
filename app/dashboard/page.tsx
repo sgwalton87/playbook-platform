@@ -105,6 +105,44 @@ export default function DashboardPage(){
   const streak=profile?.streak||1;
   const name=profile?.first_name||"Scholar";
   const isAthlete=profile?.role==="scholar-athlete";
+
+  const updateAG=async(subject:string,field:string,value:any)=>{
+    const updated=agProgress.map(a=>a.subject===subject?{...a,[field]:value}:a);
+    setAgProgress(updated);
+    await supabase.from("ag_progress").update({[field]:value,updated_at:new Date().toISOString()}).eq("user_id",profile.id).eq("subject",subject);
+  };
+
+  const handleTranscriptUpload=async(e:React.ChangeEvent<HTMLInputElement>)=>{
+    const file=e.target.files?.[0];
+    if(!file)return;
+    setUploadingTranscript(true);
+    setTranscriptResult(null);
+    try{
+      const base64=await new Promise<string>((res,rej)=>{
+        const reader=new FileReader();
+        reader.onload=()=>res((reader.result as string).split(",")[1]);
+        reader.onerror=rej;
+        reader.readAsDataURL(file);
+      });
+      const mediaType=file.type==="application/pdf"?"application/pdf":file.type as any;
+      const response=await fetch("/api/parse-transcript",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({base64,mediaType,userId:profile.id}),
+      });
+      const data=await response.json();
+      if(data.agUpdates){
+        const refreshed=await supabase.from("ag_progress").select("*").eq("user_id",profile.id);
+        if(refreshed.data)setAgProgress(refreshed.data);
+        setTranscriptResult(`Transcript parsed! Updated ${data.agUpdates} A-G subjects.`);
+      } else {
+        setTranscriptResult(data.message||"Transcript processed — please review your A-G progress below.");
+      }
+    }catch(err){
+      setTranscriptResult("Upload failed. Please try again or update manually.");
+    }
+    setUploadingTranscript(false);
+  };
   const agDone=agProgress.filter(a=>Number(a.years_completed)>=Number(a.years_required)).length;
   const agTotal=AG_SUBJECTS.length;
   const readiness=Math.round(((agDone/agTotal)*0.3+(xp>500?0.2:xp/500*0.2)+(profile?.dream_school?0.1:0)+(profile?.gpa?0.15:0)+(profile?.bio?0.1:0)+(profile?.avatar_url?0.15:0))*100);
@@ -266,21 +304,52 @@ export default function DashboardPage(){
                         const prog=agProgress.find(a=>a.subject===s.key);
                         const done=prog&&Number(prog.years_completed)>=Number(prog.years_required);
                         const inProg=prog&&prog.in_progress&&!done;
+                        const isEditing=editingAG===s.key;
                         return(
-                          <div key={s.key} style={{border:`0.5px solid ${T.line}`,borderRadius:7,padding:"6px 7px",textAlign:"center"}}>
-                            <div style={{fontSize:13,fontWeight:700,color:T.ink,marginBottom:2}}>{s.key}</div>
-                            <div style={{background:T.line,borderRadius:999,height:3,overflow:"hidden",marginBottom:3}}>
-                              <div style={{background:done?T.green:inProg?T.amber:T.line,height:"100%",width:prog?`${Math.min((Number(prog.years_completed)/Number(prog.years_required))*100,100)}%`:"0%",borderRadius:999}}/>
+                          <div key={s.key}>
+                            <div onClick={()=>setEditingAG(isEditing?null:s.key)}
+                              style={{border:`1.5px solid ${done?T.green:inProg?T.amber:T.line}`,borderRadius:7,padding:"6px 7px",textAlign:"center",cursor:"pointer",transition:"all 0.15s",background:done?T.greenL:inProg?T.amberL:"transparent"}}>
+                              <div style={{fontSize:13,fontWeight:700,color:done?T.green:T.ink,marginBottom:2}}>{s.key}</div>
+                              <div style={{background:T.line,borderRadius:999,height:3,overflow:"hidden",marginBottom:3}}>
+                                <div style={{background:done?T.green:inProg?T.amber:T.line,height:"100%",width:prog?`${Math.min((Number(prog.years_completed)/Number(prog.years_required))*100,100)}%`:"0%",borderRadius:999}}/>
+                              </div>
+                              <div style={{fontSize:9,color:T.faint}}>{prog?`${Number(prog.years_completed)}/${Number(prog.years_required)}yr`:"0yr"}</div>
                             </div>
-                            <div style={{fontSize:9,color:T.faint}}>{prog?`${Number(prog.years_completed)}/${Number(prog.years_required)}yr`:"0yr"}</div>
+                            {isEditing&&(
+                              <div style={{position:"absolute",zIndex:100,background:T.surface,border:`1.5px solid ${T.orange}`,borderRadius:10,padding:"12px 14px",width:200,boxShadow:"0 8px 24px rgba(0,0,0,.12)",marginTop:4}}>
+                                <div style={{fontSize:12,fontWeight:700,color:T.ink,marginBottom:8}}>{s.key} — {s.name}</div>
+                                <div style={{fontSize:11,color:T.muted,marginBottom:6}}>Years completed</div>
+                                <div style={{display:"flex",gap:4,marginBottom:8,flexWrap:"wrap"}}>
+                                  {Array.from({length:s.required+1},(_,i)=>i).map(n=>(
+                                    <button key={n} onClick={()=>{updateAG(s.key,"years_completed",n);if(n===s.required)updateAG(s.key,"in_progress",false);}} style={{width:32,height:32,borderRadius:7,border:`1.5px solid ${Number(prog?.years_completed)===n?T.orange:T.line}`,background:Number(prog?.years_completed)===n?T.orangeL:"transparent",fontFamily:T.mono,fontSize:12,fontWeight:700,color:Number(prog?.years_completed)===n?T.orange:T.muted,cursor:"pointer"}}>{n}</button>
+                                  ))}
+                                </div>
+                                <div onClick={()=>updateAG(s.key,"in_progress",!prog?.in_progress)} style={{display:"flex",alignItems:"center",gap:6,cursor:"pointer",marginBottom:8}}>
+                                  <div style={{width:16,height:16,borderRadius:4,border:`1.5px solid ${prog?.in_progress?T.orange:T.line}`,background:prog?.in_progress?T.orange:"transparent",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                                    {prog?.in_progress&&<span style={{color:"#fff",fontSize:10}}>✓</span>}
+                                  </div>
+                                  <span style={{fontSize:11,color:T.muted}}>Currently in progress</span>
+                                </div>
+                                <button onClick={()=>setEditingAG(null)} style={{fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",background:T.navy,color:"#fff",border:"none",borderRadius:999,padding:"6px 12px",cursor:"pointer",width:"100%"}}>Done</button>
+                              </div>
+                            )}
                           </div>
                         );
                       })}
+                    </div>
                     </div>
                     <div style={{marginTop:10,display:"flex",gap:10,fontSize:10}}>
                       {[{color:T.green,label:"Complete"},{color:T.amber,label:"In progress"},{color:T.line,label:"Not started"}].map(({color,label})=>(
                         <div key={label} style={{display:"flex",alignItems:"center",gap:4}}><div style={{width:8,height:8,borderRadius:2,background:color}}/><span style={{color:T.muted}}>{label}</span></div>
                       ))}
+                    </div>
+                    <div style={{marginTop:12,borderTop:`0.5px solid ${T.line}`,paddingTop:12}}>
+                      <div style={{fontSize:11,color:T.muted,marginBottom:8}}>Click any subject to update manually, or upload your transcript to auto-fill.</div>
+                      <label style={{display:"flex",alignItems:"center",gap:8,fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",background:uploadingTranscript?T.surface2:T.navy,color:uploadingTranscript?T.muted:"#fff",border:"none",borderRadius:999,padding:"8px 14px",cursor:uploadingTranscript?"default":"pointer",width:"100%",justifyContent:"center"}}>
+                        {uploadingTranscript?"Analyzing transcript...":"📄 Upload transcript (PDF or image)"}
+                        <input type="file" accept=".pdf,image/*" onChange={handleTranscriptUpload} style={{display:"none"}} disabled={uploadingTranscript}/>
+                      </label>
+                      {transcriptResult&&<div style={{marginTop:8,fontSize:11,color:T.green,fontWeight:600,textAlign:"center"}}>{transcriptResult}</div>}
                     </div>
                   </>)}
                 </div>
