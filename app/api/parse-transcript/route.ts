@@ -2,16 +2,21 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 const AG_SUBJECTS = [
-  { key: "A", name: "History / Social Science", required: 2 },
-  { key: "B", name: "English", required: 4 },
-  { key: "C", name: "Math", required: 3 },
-  { key: "D", name: "Lab Science", required: 2 },
-  { key: "E", name: "Language Other Than English", required: 2 },
-  { key: "F", name: "Visual & Performing Arts", required: 1 },
-  { key: "G", name: "Elective", required: 1 },
+  { key: "A", required: 2 },
+  { key: "B", required: 4 },
+  { key: "C", required: 3 },
+  { key: "D", required: 2 },
+  { key: "E", required: 2 },
+  { key: "F", required: 1 },
+  { key: "G", required: 1 },
 ];
 
-const PROMPT = "You are analyzing a student transcript to extract California A-G course completion data.\n\nLook at all courses listed and categorize them:\n- A = History/Social Science (US History, World History, Government, Economics)\n- B = English (English 9-12, Literature, Composition)\n- C = Math (Algebra 1+, Geometry, Algebra 2, Pre-Calc, Calculus, Statistics)\n- D = Lab Science (Biology, Chemistry, Physics, Environmental Science)\n- E = Language Other Than English (Spanish, French, Mandarin, etc.)\n- F = Visual & Performing Arts (Art, Music, Drama, Dance, Film, Photography)\n- G = College-prep Elective (Personal Finance, Psychology, additional approved courses)\n\nCount each year-long course (1 credit) as 1.0, each semester course (0.5 credit) as 0.5.\nIf a course is currently in progress, set in_progress to true.\n\nRespond with ONLY valid JSON, no explanation, no markdown backticks:\n{\"A\":{\"years_completed\":0,\"in_progress\":false},\"B\":{\"years_completed\":0,\"in_progress\":false},\"C\":{\"years_completed\":0,\"in_progress\":false},\"D\":{\"years_completed\":0,\"in_progress\":false},\"E\":{\"years_completed\":0,\"in_progress\":false},\"F\":{\"years_completed\":0,\"in_progress\":false},\"G\":{\"years_completed\":0,\"in_progress\":false}}";
+const PROMPT = [
+  "Analyze this student transcript and extract California A-G completion data.",
+  "A=History/Social Science, B=English, C=Math, D=Lab Science, E=World Language, F=Arts, G=Elective.",
+  "Count 1-credit courses as 1.0, 0.5-credit as 0.5. Mark in_progress=true if currently taking.",
+  'Return ONLY valid JSON like: {"A":{"years_completed":2,"in_progress":false},"B":{"years_completed":3,"in_progress":true},"C":{"years_completed":2,"in_progress":false},"D":{"years_completed":1,"in_progress":false},"E":{"years_completed":2,"in_progress":false},"F":{"years_completed":1,"in_progress":false},"G":{"years_completed":1,"in_progress":false}}',
+].join(" ");
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,11 +26,15 @@ export async function POST(req: NextRequest) {
     }
 
     const isImage = mediaType.startsWith("image/");
-    const contentBlock = isImage
-      ? { type: "image", source: { type: "base64", media_type: mediaType, data: base64 } }
-      : { type: "document", source: { type: "base64", media_type: "application/pdf", data: base64 } };
+    const sourceBlock = isImage
+      ? { type: "base64", media_type: mediaType, data: base64 }
+      : { type: "base64", media_type: "application/pdf", data: base64 };
 
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+    const contentBlock = isImage
+      ? { type: "image", source: sourceBlock }
+      : { type: "document", source: sourceBlock };
+
+    const apiResponse = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -35,32 +44,36 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         model: "claude-sonnet-4-6",
         max_tokens: 1000,
-        messages: [{
-          role: "user",
-          content: [contentBlock, { type: "text", text: PROMPT }],
-        }],
+        messages: [
+          {
+            role: "user",
+            content: [
+              contentBlock,
+              { type: "text", text: PROMPT },
+            ],
+          },
+        ],
       }),
     });
 
-    const data = await response.json();
-    console.log("Claude raw response:", JSON.stringify(data));
+    const data = await apiResponse.json();
+    console.log("Claude response:", JSON.stringify(data).slice(0, 500));
 
     if (data.error) {
       console.error("Claude API error:", data.error);
-      return NextResponse.json({ message: "AI service error. Please update manually." });
+      return NextResponse.json({ message: "AI error. Please update manually." });
     }
 
     const text = data.content?.[0]?.text || "";
     console.log("Claude text:", text);
 
-    let parsed: any = {};
+    let parsed: Record<string, any> = {};
     try {
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) throw new Error("No JSON found in response");
-      parsed = JSON.parse(jsonMatch[0]);
-    } catch (e) {
-      console.error("JSON parse error:", e, "Raw:", text);
-      return NextResponse.json({ message: "Could not read transcript. Please click each A-G subject to update manually." });
+      const match = text.match(/\{[\s\S]*\}/);
+      if (!match) throw new Error("No JSON");
+      parsed = JSON.parse(match[0]);
+    } catch {
+      return NextResponse.json({ message: "Could not read transcript. Click each subject to update manually." });
     }
 
     const supabase = createClient(
@@ -69,25 +82,25 @@ export async function POST(req: NextRequest) {
     );
 
     let agUpdates = 0;
-    for (const subject of AG_SUBJECTS) {
-      const val = parsed[subject.key];
+    for (const s of AG_SUBJECTS) {
+      const val = parsed[s.key];
       if (val !== undefined) {
         const { error } = await supabase
           .from("ag_progress")
           .update({
-            years_completed: val.years_completed || 0,
-            in_progress: val.in_progress || false,
+            years_completed: Number(val.years_completed) || 0,
+            in_progress: Boolean(val.in_progress),
             updated_at: new Date().toISOString(),
           })
           .eq("user_id", userId)
-          .eq("subject", subject.key);
+          .eq("subject", s.key);
         if (!error) agUpdates++;
       }
     }
 
     return NextResponse.json({ agUpdates, parsed });
   } catch (err) {
-    console.error("Transcript parse error:", err);
+    console.error("Error:", err);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
