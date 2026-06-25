@@ -331,7 +331,8 @@ export default function DashboardPage(){
                           <div key={s.key}>
                             <div onClick={()=>setEditingAG(isEditing?null:s.key)}
                               style={{border:`1.5px solid ${done?T.green:inProg?T.amber:T.line}`,borderRadius:7,padding:"6px 7px",textAlign:"center",cursor:"pointer",transition:"all 0.15s",background:done?T.greenL:inProg?T.amberL:"transparent"}}>
-                              <div style={{fontSize:13,fontWeight:700,color:done?T.green:T.ink,marginBottom:2}}>{s.key}</div>
+                              <div style={{fontSize:13,fontWeight:700,color:done?T.green:T.ink,marginBottom:1}}>{s.key}</div>
+                              <div style={{fontSize:8,color:done?T.green:T.faint,marginBottom:3,lineHeight:1.2,fontFamily:T.mono}}>{s.name.split("/")[0].trim()}</div>
                               <div style={{background:T.line,borderRadius:999,height:3,overflow:"hidden",marginBottom:3}}>
                                 <div style={{background:done?T.green:inProg?T.amber:T.line,height:"100%",width:prog?`${Math.min((Number(prog.years_completed)/Number(prog.years_required))*100,100)}%`:"0%",borderRadius:999}}/>
                               </div>
