@@ -70,7 +70,6 @@ export default function DashboardPage(){
   const [uploadingTranscript,setUploadingTranscript]=useState(false);
   const [transcriptResult,setTranscriptResult]=useState<string|null>(null);
   const [agKey,setAgKey]=useState(0);
-  const [agKey,setAgKey]=useState(0);
 
   useEffect(()=>{
     (async()=>{
