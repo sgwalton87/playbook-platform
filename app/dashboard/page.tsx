@@ -145,9 +145,9 @@ export default function DashboardPage(){
       });
       const data=await response.json();
       console.log("Parse response:",JSON.stringify(data));
-      if(data.agUpdates||data.agUpdates===0){
-        const refreshed=await supabase.from("ag_progress").select("*").eq("user_id",profile.id);
-        if(refreshed.data)setAgProgress(refreshed.data);
+      const refreshed=await supabase.from("ag_progress").select("*").eq("user_id",profile.id);
+      if(refreshed.data)setAgProgress(refreshed.data);
+      if(data.agUpdates>0){
         setTranscriptResult(`Transcript parsed! Updated ${data.agUpdates} A-G subjects.`);
       } else {
         setTranscriptResult(data.message||"Transcript processed — please review your A-G progress below.");
