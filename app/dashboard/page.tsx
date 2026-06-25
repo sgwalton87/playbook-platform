@@ -58,6 +58,17 @@ export default function DashboardPage(){
   const [agProgress,setAgProgress]=useState<any[]>([]);
   const [collegeList,setCollegeList]=useState<any[]>([]);
   const [deadlines,setDeadlines]=useState<any[]>([]);
+  const [activities,setActivities]=useState<any[]>([]);
+  const [certificates,setCertificates]=useState<any[]>([]);
+  const [showAddActivity,setShowAddActivity]=useState(false);
+  const [newActivityType,setNewActivityType]=useState("");
+  const [newActivityName,setNewActivityName]=useState("");
+  const [newActivityHours,setNewActivityHours]=useState("");
+  const [newActivityOrg,setNewActivityOrg]=useState("");
+  const [addingActivity,setAddingActivity]=useState(false);
+  const [editingAG,setEditingAG]=useState<string|null>(null);
+  const [uploadingTranscript,setUploadingTranscript]=useState(false);
+  const [transcriptResult,setTranscriptResult]=useState<string|null>(null);
 
   useEffect(()=>{
     (async()=>{
@@ -336,7 +347,6 @@ export default function DashboardPage(){
                           </div>
                         );
                       })}
-                    </div>
                     </div>
                     <div style={{marginTop:10,display:"flex",gap:10,fontSize:10}}>
                       {[{color:T.green,label:"Complete"},{color:T.amber,label:"In progress"},{color:T.line,label:"Not started"}].map(({color,label})=>(
