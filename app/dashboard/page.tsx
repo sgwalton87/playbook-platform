@@ -105,7 +105,7 @@ export default function DashboardPage(){
   const streak=profile?.streak||1;
   const name=profile?.first_name||"Scholar";
   const isAthlete=profile?.role==="scholar-athlete";
-  const agDone=agProgress.filter(a=>a.years_completed>=a.years_required).length;
+  const agDone=agProgress.filter(a=>Number(a.years_completed)>=Number(a.years_required)).length;
   const agTotal=AG_SUBJECTS.length;
   const readiness=Math.round(((agDone/agTotal)*0.3+(xp>500?0.2:xp/500*0.2)+(profile?.dream_school?0.1:0)+(profile?.gpa?0.15:0)+(profile?.bio?0.1:0)+(profile?.avatar_url?0.15:0))*100);
 
@@ -264,15 +264,15 @@ export default function DashboardPage(){
                     <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:5}}>
                       {AG_SUBJECTS.map(s=>{
                         const prog=agProgress.find(a=>a.subject===s.key);
-                        const done=prog&&prog.years_completed>=prog.years_required;
+                        const done=prog&&Number(prog.years_completed)>=Number(prog.years_required);
                         const inProg=prog&&prog.in_progress&&!done;
                         return(
                           <div key={s.key} style={{border:`0.5px solid ${T.line}`,borderRadius:7,padding:"6px 7px",textAlign:"center"}}>
                             <div style={{fontSize:13,fontWeight:700,color:T.ink,marginBottom:2}}>{s.key}</div>
                             <div style={{background:T.line,borderRadius:999,height:3,overflow:"hidden",marginBottom:3}}>
-                              <div style={{background:done?T.green:inProg?T.amber:T.line,height:"100%",width:prog?`${Math.min((prog.years_completed/prog.years_required)*100,100)}%`:"0%",borderRadius:999}}/>
+                              <div style={{background:done?T.green:inProg?T.amber:T.line,height:"100%",width:prog?`${Math.min((Number(prog.years_completed)/Number(prog.years_required))*100,100)}%`:"0%",borderRadius:999}}/>
                             </div>
-                            <div style={{fontSize:9,color:T.faint}}>{prog?`${prog.years_completed}/${prog.years_required}yr`:"0yr"}</div>
+                            <div style={{fontSize:9,color:T.faint}}>{prog?`${Number(prog.years_completed)}/${Number(prog.years_required)}yr`:"0yr"}</div>
                           </div>
                         );
                       })}
@@ -453,14 +453,54 @@ export default function DashboardPage(){
                   </>)}
                   {card(<>
                     {cardTitle("Experience tracker")}
-                    <div style={{display:"flex",flexDirection:"column",gap:8}}>
-                      {[{label:"Resume",status:"Not started",color:T.red},{label:"Internships",status:"0 logged",color:T.red},{label:"Volunteer hours",status:"Add hours",color:T.amber},{label:"Certifications",status:`${profile?.badges?.length||0} earned`,color:T.green}].map(({label,status,color})=>(
-                        <div key={label} style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                    <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:12}}>
+                      {[
+                        {label:"Internships",val:activities.filter(a=>a.activity_type==="internship").length,unit:"logged",color:activities.filter(a=>a.activity_type==="internship").length>0?T.green:T.red},
+                        {label:"Volunteer hours",val:activities.filter(a=>a.activity_type==="volunteer").reduce((sum:number,a:any)=>sum+(Number(a.total_hours)||0),0),unit:"hrs",color:activities.filter(a=>a.activity_type==="volunteer").length>0?T.green:T.amber},
+                        {label:"Clubs & activities",val:activities.filter(a=>a.activity_type==="club"||a.activity_type==="extracurricular").length,unit:"logged",color:activities.filter(a=>a.activity_type==="club"||a.activity_type==="extracurricular").length>0?T.green:T.amber},
+                        {label:"Certifications",val:certificates.length,unit:"earned",color:certificates.length>0?T.green:T.red},
+                      ].map(({label,val,unit,color})=>(
+                        <div key={label} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"6px 0",borderBottom:`0.5px solid ${T.line}`}}>
                           <span style={{fontSize:13,color:T.ink}}>{label}</span>
-                          <span style={{fontSize:11,color,fontWeight:700}}>{status}</span>
+                          <span style={{fontSize:12,fontWeight:700,color}}>{val} {unit}</span>
                         </div>
                       ))}
                     </div>
+                    {activities.length>0&&(
+                      <div style={{marginBottom:12}}>
+                        {activities.slice(0,3).map((a:any)=>(
+                          <div key={a.id} style={{fontSize:11,color:T.muted,padding:"4px 0",borderBottom:`0.5px solid ${T.line}`}}>
+                            <span style={{fontWeight:600,color:T.ink}}>{a.activity_name}</span>
+                            {a.organization&&<span> · {a.organization}</span>}
+                            {a.total_hours&&<span> · {a.total_hours}hrs</span>}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <button onClick={()=>setShowAddActivity(!showAddActivity)} style={{fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",background:showAddActivity?T.surface2:T.navy,color:showAddActivity?T.muted:"#fff",border:`1px solid ${T.line}`,borderRadius:999,padding:"8px 14px",cursor:"pointer",width:"100%",marginBottom:showAddActivity?10:0}}>
+                      {showAddActivity?"Cancel":"+ Add experience"}
+                    </button>
+                    {showAddActivity&&(
+                      <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                        <select value={newActivityType} onChange={e=>setNewActivityType(e.target.value)} style={{width:"100%",background:T.surface,border:`1.5px solid ${T.line}`,borderRadius:8,padding:"9px 12px",fontSize:13,color:T.ink,fontFamily:T.sans,outline:"none"}}>
+                          <option value="">Activity type...</option>
+                          {["internship","volunteer","club","extracurricular","job","award","leadership","other"].map(t=><option key={t} value={t}>{t.charAt(0).toUpperCase()+t.slice(1)}</option>)}
+                        </select>
+                        <input placeholder="Activity name *" value={newActivityName} onChange={e=>setNewActivityName(e.target.value)} style={{width:"100%",background:T.surface,border:`1.5px solid ${T.line}`,borderRadius:8,padding:"9px 12px",fontSize:13,color:T.ink,fontFamily:T.sans,outline:"none"}}/>
+                        <input placeholder="Organization (optional)" value={newActivityOrg} onChange={e=>setNewActivityOrg(e.target.value)} style={{width:"100%",background:T.surface,border:`1.5px solid ${T.line}`,borderRadius:8,padding:"9px 12px",fontSize:13,color:T.ink,fontFamily:T.sans,outline:"none"}}/>
+                        <input placeholder="Total hours (optional)" type="number" value={newActivityHours} onChange={e=>setNewActivityHours(e.target.value)} style={{width:"100%",background:T.surface,border:`1.5px solid ${T.line}`,borderRadius:8,padding:"9px 12px",fontSize:13,color:T.ink,fontFamily:T.sans,outline:"none"}}/>
+                        <button disabled={addingActivity||!newActivityName.trim()||!newActivityType} onClick={async()=>{
+                          if(!newActivityName.trim()||!newActivityType||!profile?.id)return;
+                          setAddingActivity(true);
+                          const{data}=await supabase.from("student_activities").insert({student_id:profile.id,activity_type:newActivityType,activity_name:newActivityName.trim(),organization:newActivityOrg||null,total_hours:newActivityHours?Number(newActivityHours):null}).select().single();
+                          if(data)setActivities((prev:any[])=>[data,...prev]);
+                          setNewActivityType("");setNewActivityName("");setNewActivityOrg("");setNewActivityHours("");
+                          setShowAddActivity(false);setAddingActivity(false);
+                        }} style={{fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",background:T.orange,color:"#fff",border:"none",borderRadius:999,padding:"9px 14px",cursor:"pointer",width:"100%",opacity:addingActivity||!newActivityName.trim()||!newActivityType?0.6:1}}>
+                          {addingActivity?"Saving...":"Save experience →"}
+                        </button>
+                      </div>
+                    )}
                   </>)}
                 </div>
                 {card(<>
@@ -538,15 +578,19 @@ export default function DashboardPage(){
                     </div>
                   </>)}
                   {card(<>
-                    {cardTitle("Quick links")}
-                    <div style={{display:"flex",flexDirection:"column",gap:0}}>
-                      {[{icon:"📣",label:"Activity feed",path:"/feed"},{icon:"💬",label:"Messages",path:"/messages"},{icon:"🏆",label:"Leaderboard",path:"/leaderboard"},{icon:"🎓",label:"Certificates",path:"/certificates"},{icon:"📅",label:"Events",path:"/events"},{icon:"🏅",label:"Badges",path:"/badges"}].map(({icon,label,path})=>(
-                        <button key={label} onClick={()=>router.push(path)} style={{display:"flex",alignItems:"center",gap:10,width:"100%",padding:"9px 0",background:"none",border:"none",borderBottom:`0.5px solid ${T.line}`,cursor:"pointer",fontFamily:T.sans,fontSize:13,color:T.ink,textAlign:"left"}}>
-                          <span style={{fontSize:16}}>{icon}</span>
-                          <span style={{flex:1,fontWeight:500}}>{label}</span>
-                          <span style={{color:T.orange,fontSize:13}}>→</span>
-                        </button>
-                      ))}
+                    {cardTitle("Recent activity")}
+                    <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                      <div style={{fontSize:12,color:T.muted,textAlign:"center",padding:"16px 0"}}>
+                        <div style={{fontSize:24,marginBottom:8}}>📣</div>
+                        <div style={{marginBottom:10}}>Join the conversation</div>
+                        <div style={{display:"flex",gap:8,justifyContent:"center",flexWrap:"wrap"}}>
+                          {[{icon:"📣",label:"Feed",path:"/feed"},{icon:"💬",label:"Messages",path:"/messages"},{icon:"🏆",label:"Leaderboard",path:"/leaderboard"},{icon:"📅",label:"Events",path:"/events"}].map(({icon,label,path})=>(
+                            <button key={label} onClick={()=>router.push(path)} style={{fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",background:T.navy,color:"#fff",border:"none",borderRadius:999,padding:"7px 12px",cursor:"pointer"}}>
+                              {icon} {label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </>)}
                 </div>
