@@ -81,7 +81,7 @@ export default function DashboardPage(){
       // Load AG progress
       const{data:ag}=await supabase.from("ag_progress").select("*").eq("user_id",u.user.id);
       if(ag&&ag.length>0){
-        setAgProgress(ag);
+        setAgProgress(ag.map((a:any)=>({...a,years_completed:Number(a.years_completed),years_required:Number(a.years_required)})));
       } else {
         // Seed default AG rows
         const defaults=AG_SUBJECTS.map(s=>({user_id:u.user.id,subject:s.key,subject_name:s.name,years_required:s.required,years_completed:0,in_progress:false}));
