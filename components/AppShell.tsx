@@ -115,7 +115,7 @@ export default function AppShell({children,title="Playbook"}:{children:React.Rea
         </div>
       </aside>
 
-      <main style={{marginLeft:W,flex:1,minHeight:"100vh",transition:"margin-left 0.22s cubic-bezier(.4,0,.2,1)",overflow:"hidden"}}>
+      <main style={{marginLeft:W,flex:1,minHeight:"100vh",transition:"margin-left 0.22s cubic-bezier(.4,0,.2,1)",overflow:"hidden",padding:"0"}}>
         {children}
       </main>
     </div>
