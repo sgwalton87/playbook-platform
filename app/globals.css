@@ -31,9 +31,11 @@ html, body {
 .app-main {
   flex: 1;
   min-width: 0;
-  padding: 32px;
-  overflow: visible;
+  padding: 28px 32px;
+  overflow-x: hidden;
+  overflow-y: auto;
   min-height: 100vh;
+  box-sizing: border-box;
 }
 
 @media (max-width: 768px) {
