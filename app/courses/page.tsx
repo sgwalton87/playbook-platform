@@ -85,7 +85,7 @@ export default function CoursesPage() {
   const totalXP = FLAGSHIP.reduce((acc, c) => acc + (progress[c.id] || 0) * 50, 0);
 
   return (
-    <AppShell title="Courses">
+    <>
       <div style={{ fontFamily:"'Hanken Grotesk', system-ui, sans-serif", color:"#0F172A" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
