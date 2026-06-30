@@ -40,8 +40,101 @@ export default function TranscriptPage() {
   return (
     <AppShell>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');*,*::before,*::after{box-sizing:border-box;}@media print{.no-print{display:none!important;}.print-page{padding:0!important;}}`}</style>
-      <div style={{maxWidth:800,margin:"0 auto",padding:"28px 32px",fontFamily:T.sans}} className="print-page">
+      <div style={{display:"grid",gridTemplateColumns:"260px 1fr",gap:24,alignItems:"start",fontFamily:T.sans}} className="print-page">
 
+        {/* LEFT SIDEBAR — Stats + Tips */}
+        <div className="no-print" style={{display:"flex",flexDirection:"column",gap:14,position:"sticky",top:32}}>
+
+          {/* Readiness score */}
+          <div style={{background:T.navy,borderRadius:16,padding:"18px 16px",color:"#F8F7F4"}}>
+            <div style={{fontFamily:T.mono,fontSize:9,letterSpacing:"0.14em",textTransform:"uppercase",color:"rgba(248,247,244,.4)",marginBottom:10}}>College readiness</div>
+            <div style={{fontFamily:T.anton,fontSize:52,color:agDone===7?T.green:T.orange,lineHeight:1,marginBottom:4}}>{Math.round((agDone/7)*100)}%</div>
+            <div style={{fontSize:12,color:"rgba(248,247,244,.5)",marginBottom:12}}>{agDone}/7 A-G subjects met</div>
+            <div style={{background:"rgba(255,255,255,.1)",borderRadius:999,height:6,overflow:"hidden"}}>
+              <div style={{background:agDone===7?T.green:T.orange,height:"100%",width:`${Math.round((agDone/7)*100)}%`,borderRadius:999}}/>
+            </div>
+          </div>
+
+          {/* Key stats */}
+          <div style={{background:T.surface,border:`0.5px solid ${T.line}`,borderRadius:14,padding:"16px"}}>
+            <div style={{fontFamily:T.mono,fontSize:9,letterSpacing:"0.14em",textTransform:"uppercase",color:T.muted,marginBottom:12}}>Academic stats</div>
+            <div style={{display:"flex",flexDirection:"column",gap:10}}>
+              {[
+                {label:"Weighted GPA",val:profile?.weighted_gpa||profile?.gpa||"—",color:T.green},
+                {label:"Unweighted GPA",val:profile?.unweighted_gpa||"—",color:T.blue},
+                {label:"SAT Score",val:profile?.sat_score||"—",color:T.purple},
+                {label:"ACT Score",val:profile?.act_score||"—",color:T.amber},
+                {label:"Grad year",val:profile?.grad_year||"—",color:T.orange},
+              ].map(({label,val,color})=>(
+                <div key={label} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px 0",borderBottom:`0.5px solid ${T.line}`}}>
+                  <span style={{fontSize:12,color:T.muted}}>{label}</span>
+                  <span style={{fontFamily:T.mono,fontSize:13,fontWeight:700,color}}>{val}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* UC/CSU requirements */}
+          <div style={{background:T.surface,border:`0.5px solid ${T.line}`,borderRadius:14,padding:"16px"}}>
+            <div style={{fontFamily:T.mono,fontSize:9,letterSpacing:"0.14em",textTransform:"uppercase",color:T.muted,marginBottom:12}}>UC/CSU A-G Requirements</div>
+            <div style={{display:"flex",flexDirection:"column",gap:7}}>
+              {[
+                {letter:"A",name:"History",req:2,years:agProgress.find(a=>a.subject==="A")?.years_completed||0},
+                {letter:"B",name:"English",req:4,years:agProgress.find(a=>a.subject==="B")?.years_completed||0},
+                {letter:"C",name:"Math",req:3,years:agProgress.find(a=>a.subject==="C")?.years_completed||0},
+                {letter:"D",name:"Science",req:2,years:agProgress.find(a=>a.subject==="D")?.years_completed||0},
+                {letter:"E",name:"Language",req:2,years:agProgress.find(a=>a.subject==="E")?.years_completed||0},
+                {letter:"F",name:"Arts",req:1,years:agProgress.find(a=>a.subject==="F")?.years_completed||0},
+                {letter:"G",name:"Elective",req:1,years:agProgress.find(a=>a.subject==="G")?.years_completed||0},
+              ].map(({letter,name,req,years})=>{
+                const done=Number(years)>=req;
+                const pct=Math.min((Number(years)/req)*100,100);
+                return(
+                  <div key={letter}>
+                    <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}>
+                      <span style={{fontSize:11,color:T.ink}}><strong style={{color:done?T.green:T.orange}}>{letter}</strong> — {name}</span>
+                      <span style={{fontFamily:T.mono,fontSize:10,color:done?T.green:T.muted}}>{Number(years)}/{req}yr</span>
+                    </div>
+                    <div style={{background:T.line,borderRadius:999,height:4,overflow:"hidden"}}>
+                      <div style={{background:done?T.green:T.orange,height:"100%",width:`${pct}%`,borderRadius:999}}/>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Tips */}
+          <div style={{background:T.orangeL,border:`0.5px solid #FED7AA`,borderRadius:14,padding:"16px"}}>
+            <div style={{fontFamily:T.mono,fontSize:9,letterSpacing:"0.14em",textTransform:"uppercase",color:T.orange,marginBottom:10}}>💡 Tips for success</div>
+            <div style={{display:"flex",flexDirection:"column",gap:8}}>
+              {[
+                agDone<7?"Complete all A-G requirements to qualify for UC and CSU admission.":null,
+                !profile?.gpa?"Add your GPA on your profile to strengthen your application.":null,
+                !profile?.dream_school?"Set your dream school to track application deadlines.":null,
+                !profile?.sat_score?"Consider taking the SAT/ACT — many schools are test-optional but scores can help.":null,
+                "Request transcripts early — colleges need official copies from your school.",
+                "A-G courses must be completed with a C or better to count.",
+              ].filter(Boolean).slice(0,4).map((tip,i)=>(
+                <div key={i} style={{display:"flex",gap:8,fontSize:11,color:"#7C2D12",lineHeight:1.5}}>
+                  <span style={{flexShrink:0}}>→</span><span>{tip}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Dream school */}
+          {profile?.dream_school&&(
+            <div style={{background:T.navy,borderRadius:14,padding:"16px"}}>
+              <div style={{fontFamily:T.mono,fontSize:9,letterSpacing:"0.14em",textTransform:"uppercase",color:"rgba(248,247,244,.4)",marginBottom:8}}>Dream school</div>
+              <div style={{fontSize:14,fontWeight:700,color:"#F8F7F4",marginBottom:4}}>🎓 {profile.dream_school}</div>
+              {profile?.intended_major&&<div style={{fontSize:12,color:"rgba(248,247,244,.5)"}}>Intended major: {profile.intended_major}</div>}
+            </div>
+          )}
+        </div>
+
+        {/* RIGHT — Transcript */}
+        <div>
         {/* Header actions */}
         <div className="no-print" style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:24}}>
           <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink}}>Academic Transcript</h1>
@@ -229,6 +322,7 @@ export default function TranscriptPage() {
           <div style={{fontFamily:T.mono,fontSize:10,color:T.faint}}>{new Date().toLocaleDateString("en",{month:"long",day:"numeric",year:"numeric"})}</div>
         </div>
 
+      </div>
       </div>
     </AppShell>
   );
