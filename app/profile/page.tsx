@@ -169,7 +169,7 @@ export default function ProfilePage() {
 
   return(
     <>
-      <div style={{padding:"28px 32px",boxSizing:"border-box"}}}>
+      <div style={{padding:"28px 32px",boxSizing:"border-box"}}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}input:focus,select:focus,textarea:focus{border-color:${T.orange}!important;outline:none;}input::placeholder,textarea::placeholder{color:${T.faint};}select{appearance:none;}.tog:hover{border-color:${T.orange}!important;}`}</style>
       <div style={{}}>
 
