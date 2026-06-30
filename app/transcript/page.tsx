@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
-import AppShell from "@/components/AppShell";
 import { AG_SUBJECT_NAMES, AG_REQUIREMENTS } from "@/lib/agCourses";
 
 const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",green:"#10B981",greenL:"#ECFDF5",amber:"#F59E0B",red:"#E24B4A",blue:"#3B82F6",purple:"#8B5CF6",mono:"'Space Mono',monospace",sans:"'Hanken Grotesk',system-ui,sans-serif",anton:"'Anton',sans-serif"};
@@ -33,12 +32,12 @@ export default function TranscriptPage() {
     })();
   }, []);
 
-  if (loading) return <AppShell><div style={{padding:"28px 32px",fontFamily:T.mono,fontSize:12,color:T.faint}}>Loading transcript...</div></AppShell>;
+  if (loading) return <><div style={{padding:"28px 32px",fontFamily:T.mono,fontSize:12,color:T.faint}}>Loading transcript...</div></>;
 
   const agDone = agProgress.filter(a => a.years_completed >= a.years_required).length;
 
   return (
-    <AppShell>
+    <>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');*,*::before,*::after{box-sizing:border-box;}@media print{.no-print{display:none!important;}}`}</style>
       <div style={{display:"flex",gap:24,alignItems:"flex-start",width:"100%"}}>
 
@@ -220,6 +219,6 @@ export default function TranscriptPage() {
           </div>
         </div>
       </div>
-    </AppShell>
+    </>
   );
 }

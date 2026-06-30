@@ -2,7 +2,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
-import AppShell from "@/components/AppShell";
 import CollegeSearch from "@/components/CollegeSearch";
 
 const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",blue:"#3B82F6",green:"#10B981",purple:"#8B5CF6",amber:"#F59E0B",mono:"'Space Mono',monospace",sans:"'Hanken Grotesk',system-ui,sans-serif",anton:"'Anton',sans-serif"};
@@ -150,7 +149,7 @@ export default function ProfilePage() {
     setSaving(false);setSaved(true);setTimeout(()=>setSaved(false),3000);
   },[profile?.id,firstName,lastName,bio,gender,dob,favoriteQuote,school,grade,district,gradYear,weightedGpa,unweightedGpa,city,zipCode,ell,dreamSchool,satScore,actScore,intendedMajor,collegeList,sport,position,height,weight,jerseyNumber,teamLevel,travelTeam,coachName,coachEmail,highlightReelUrl,recruitingStatus,desiredCollegeLevel,athleteEmail,campsAttended,nilInstagram,nilTiktok,nilTwitter,nilFollowerRange,nilBrandInterests,nilWorkedWithBrands,nilDealTypes,instagram,tiktok,twitter,hudl,youtube,pillars,race,householdIncome,firstGen,freeLunch,migrant,fosterYouth,unhoused,iep]);
 
-  if(loading)return<AppShell><div style={{padding:40,fontFamily:"'Space Mono',monospace",fontSize:12,color:T.faint}}>Loading profile...</div></AppShell>;
+  if(loading)return<><div style={{padding:40,fontFamily:"'Space Mono',monospace",fontSize:12,color:T.faint}}>Loading profile...</div></>;
 
   const isAthlete=profile?.role==="scholar-athlete";
 
@@ -169,7 +168,7 @@ export default function ProfilePage() {
   };
 
   return(
-    <AppShell>
+    <>
       <div style={{padding:"28px 32px",boxSizing:"border-box"}}}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}input:focus,select:focus,textarea:focus{border-color:${T.orange}!important;outline:none;}input::placeholder,textarea::placeholder{color:${T.faint};}select{appearance:none;}.tog:hover{border-color:${T.orange}!important;}`}</style>
       <div style={{}}>
@@ -511,6 +510,6 @@ export default function ProfilePage() {
         </div>
       </div>
       </div>
-    </AppShell>
+    </>
   );
 }
