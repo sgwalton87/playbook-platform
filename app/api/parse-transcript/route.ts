@@ -12,10 +12,12 @@ const AG_SUBJECTS = [
 ];
 
 const PROMPT = [
-  "Analyze this student transcript and extract California A-G completion data.",
-  "A=History/Social Science, B=English, C=Math, D=Lab Science, E=World Language, F=Arts, G=Elective.",
-  "Count 1-credit courses as 1.0, 0.5-credit as 0.5. Mark in_progress=true if currently taking.",
-  'Return ONLY valid JSON like: {"A":{"years_completed":2,"in_progress":false},"B":{"years_completed":3,"in_progress":true},"C":{"years_completed":2,"in_progress":false},"D":{"years_completed":1,"in_progress":false},"E":{"years_completed":2,"in_progress":false},"F":{"years_completed":1,"in_progress":false},"G":{"years_completed":1,"in_progress":false}}',
+  "Analyze this student transcript and extract California A-G course completion data.",
+  "Categorize each course: A=History/Social Science, B=English, C=Math(Algebra1+), D=Lab Science, E=World Language, F=Visual/Performing Arts, G=College-prep Elective.",
+  "Count 1-credit year-long courses as 1.0, 0.5-credit semester courses as 0.5.",
+  "Mark in_progress=true if the course appears to be current semester.",
+  "For courses_taken, list the actual course names from the transcript for each category.",
+  'Return ONLY valid JSON with no explanation: {"A":{"years_completed":2,"in_progress":false,"courses_taken":["U.S. History","World History"]},"B":{"years_completed":4,"in_progress":false,"courses_taken":["English 9","English 10","English 11","English 12"]},"C":{"years_completed":3,"in_progress":false,"courses_taken":["Algebra I","Geometry","Algebra II"]},"D":{"years_completed":2,"in_progress":false,"courses_taken":["Biology","Chemistry"]},"E":{"years_completed":2,"in_progress":false,"courses_taken":["Spanish I","Spanish II"]},"F":{"years_completed":1,"in_progress":false,"courses_taken":["Art I"]},"G":{"years_completed":1,"in_progress":false,"courses_taken":["Personal Finance"]}}',
 ].join(" ");
 
 export async function POST(req: NextRequest) {
@@ -92,6 +94,7 @@ export async function POST(req: NextRequest) {
           .update({
             years_completed: Number(val.years_completed) || 0,
             in_progress: Boolean(val.in_progress),
+            courses_taken: Array.isArray(val.courses_taken) ? val.courses_taken : [],
             updated_at: new Date().toISOString(),
           })
           .eq("user_id", userId)

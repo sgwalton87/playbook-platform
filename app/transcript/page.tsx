@@ -40,7 +40,7 @@ export default function TranscriptPage() {
   return (
     <AppShell>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');*,*::before,*::after{box-sizing:border-box;}@media print{.no-print{display:none!important;}.print-page{padding:0!important;}}`}</style>
-      <div style={{display:"grid",gridTemplateColumns:"260px 1fr",gap:24,alignItems:"start",fontFamily:T.sans}} className="print-page">
+      <div style={{display:"grid",gridTemplateColumns:"280px 1fr",gap:20,alignItems:"start",fontFamily:T.sans,width:"100%"}} className="print-page">
 
         {/* LEFT SIDEBAR — Stats + Tips */}
         <div className="no-print" style={{display:"flex",flexDirection:"column",gap:14,position:"sticky",top:32}}>
