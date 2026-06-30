@@ -225,8 +225,7 @@ export default function DashboardPage(){
           </div>
         </div>
       )}
-
-      <div style={{maxWidth:1080,padding:"28px 32px"}}>
+      <div style={{maxWidth:1080,margin:"0 auto",padding:"32px 32px"}}>
 
         {/* Navy header */}
         <div style={{background:T.navy,borderRadius:16,padding:"18px 22px",marginBottom:12}}>

@@ -13,3 +13,31 @@ input {
   border: 1px solid #ddd;
   border-radius: 6px;
 }
+/* App shell global layout fix */
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.app-main {
+  flex: 1;
+  min-width: 0;
+  padding: 32px;
+  overflow: visible;
+  min-height: 100vh;
+}
+
+@media (max-width: 768px) {
+  .app-main {
+    padding: 20px;
+  }
+}
