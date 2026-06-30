@@ -45,6 +45,15 @@ export default function TranscriptPage() {
         {/* LEFT SIDEBAR — Stats + Tips */}
         <div className="no-print" style={{display:"flex",flexDirection:"column",gap:14,position:"sticky",top:32}}>
 
+          {/* Dream school */}
+          {profile?.dream_school&&(
+            <div style={{background:T.navy,borderRadius:14,padding:"16px"}}> 
+              <div style={{fontFamily:T.mono,fontSize:9,letterSpacing:"0.14em",textTransform:"uppercase",color:"rgba(248,247,244,.4)",marginBottom:8}}>Dream school</div>
+              <div style={{fontSize:14,fontWeight:700,color:"#F8F7F4",marginBottom:4}}>🎓 {profile.dream_school}</div>
+              {profile?.intended_major&&<div style={{fontSize:12,color:"rgba(248,247,244,.5)"}}>Intended major: {profile.intended_major}</div>}
+            </div>
+          )}
+
           {/* Readiness score */}
           <div style={{background:T.navy,borderRadius:16,padding:"18px 16px",color:"#F8F7F4"}}>
             <div style={{fontFamily:T.mono,fontSize:9,letterSpacing:"0.14em",textTransform:"uppercase",color:"rgba(248,247,244,.4)",marginBottom:10}}>College readiness</div>
@@ -123,14 +132,7 @@ export default function TranscriptPage() {
             </div>
           </div>
 
-          {/* Dream school */}
-          {profile?.dream_school&&(
-            <div style={{background:T.navy,borderRadius:14,padding:"16px"}}>
-              <div style={{fontFamily:T.mono,fontSize:9,letterSpacing:"0.14em",textTransform:"uppercase",color:"rgba(248,247,244,.4)",marginBottom:8}}>Dream school</div>
-              <div style={{fontSize:14,fontWeight:700,color:"#F8F7F4",marginBottom:4}}>🎓 {profile.dream_school}</div>
-              {profile?.intended_major&&<div style={{fontSize:12,color:"rgba(248,247,244,.5)"}}>Intended major: {profile.intended_major}</div>}
-            </div>
-          )}
+
         </div>
 
         {/* RIGHT — Transcript */}
