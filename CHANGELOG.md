@@ -335,3 +335,16 @@ Added historical record of major milestones:
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Transcript Intelligence Knowledge Graph
+
+## Added
+
+- Course Ontology
+- Course Graph
+- Transcript Analyzer
+- Academic DNA
+- Opportunity signal extraction
+- Transcript Knowledge Graph tests

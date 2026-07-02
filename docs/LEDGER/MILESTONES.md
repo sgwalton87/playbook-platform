@@ -136,3 +136,9 @@ Playbook is evolving into Playbook OS™: a lifelong achievement operating syste
 
 - Archivist v2 ship cycle completed.
 
+
+## 2026-07-02 11:40
+- **decision**: Academic Intelligence v2 became the canonical implementation. Legacy engine converted into a compatibility wrapper.
+
+## 2026-07-02 11:41
+- **innovation**: Introduced compatibility-layer architecture to allow subsystem evolution without breaking dependent code.

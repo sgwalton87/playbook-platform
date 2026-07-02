@@ -37,3 +37,6 @@ Playbook is evolving into Playbook OS™: a lifelong achievement operating syste
 
 ## 2026-07-02 10:55
 - Decision: Adopted npm run ship as the canonical end-of-sprint documentation and validation workflow.
+
+## 2026-07-02 11:40
+- Decision: Academic Intelligence v2 became the canonical implementation. Legacy engine converted into a compatibility wrapper.

@@ -191,3 +191,9 @@ Added modular academic intelligence architecture for transcripts, GPA, A-G progr
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Transcript Intelligence Knowledge Graph
+
+Added foundational transcript intelligence that maps courses to skills, majors, careers, opportunities, A-G requirements, and Academic DNA.

@@ -59,3 +59,5 @@ export function buildAcademicIntelligence(courses: any[] = []) {
     missingSignals: report.gaps,
   };
 }
+
+export * from "./transcript";
