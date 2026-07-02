@@ -248,3 +248,16 @@ All passing.
 - Development event logging script
 - npm logging commands
 
+
+---
+
+# Alpha 0.8 — Academic Intelligence
+
+## Added
+
+- Academic Engine
+- Academic Repository
+- TranscriptImported event handler
+- CourseCompleted event handler
+- Academic Engine unit test
+

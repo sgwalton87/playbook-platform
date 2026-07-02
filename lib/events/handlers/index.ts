@@ -4,3 +4,4 @@ export * from "./portfolio";
 export * from "./timeline";
 export * from "./opportunities";
 export * from "./compass";
+export * from "./academic";

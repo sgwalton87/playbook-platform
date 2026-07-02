@@ -5,6 +5,7 @@ import {
   registerTimelineHandlers,
   registerOpportunityHandlers,
   registerCompassHandlers,
+  registerAcademicHandlers,
 } from "./handlers";
 
 let registered = false;
@@ -18,6 +19,7 @@ export function registerPlaybookEventHandlers() {
   registerTimelineHandlers();
   registerOpportunityHandlers();
   registerCompassHandlers();
+  registerAcademicHandlers();
 
   registered = true;
 }
