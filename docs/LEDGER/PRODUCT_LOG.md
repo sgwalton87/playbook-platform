@@ -58,3 +58,6 @@ Playbook is evolving into Playbook OS™: a lifelong achievement operating syste
 
 ## 2026-07-02 11:35
 - Commit recorded: Restore Academic Intelligence compatibility types
+
+## 2026-07-02 11:38
+- Commit recorded: Fix Academic Intelligence legacy engine wrapper
