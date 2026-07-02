@@ -1,4 +1,6 @@
 "use client";
+
+import TodaysGuidanceCard from "@/components/dashboard/TodaysGuidanceCard";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
@@ -833,3 +835,6 @@ export default function DashboardPage(){
     </div>
   );
 }
+
+
+<TodaysGuidanceCard />

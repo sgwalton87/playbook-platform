@@ -270,3 +270,9 @@ Added Compass Core phases 1-5: reasoning, recommendations, next steps, goals, ex
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Intelligence Experience Integration
+
+Surfaced Compass and Opportunity Graph across dashboard, profile, and navigation.

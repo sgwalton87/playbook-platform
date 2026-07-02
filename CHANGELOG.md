@@ -452,3 +452,15 @@ Added historical record of major milestones:
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Intelligence Experience Integration
+
+## Added
+
+- Opportunity Marketplace navigation entry
+- Today's Guidance dashboard section
+- Opportunity Graph section on Scholar profile
+- Marketplace link from Scholar Record
+- Subtle fade-up animation for intelligence cards

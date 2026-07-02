@@ -1,4 +1,6 @@
 "use client";
+
+import ScholarOpportunityGraphSection from "@/components/scholar/ScholarOpportunityGraphSection";
 import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
@@ -167,6 +169,8 @@ export default function PublicProfilePage() {
       <ScholarRecordDashboard record={scholarRecord} />
 
       <TrustScoreCard record={scholarRecord} />
+
+      <ScholarOpportunityGraphSection />
 
       <PortfolioEngine record={scholarRecord} />
 
