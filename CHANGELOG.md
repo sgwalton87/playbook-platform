@@ -234,3 +234,17 @@ All passing.
 - Engines own business logic.
 - Repositories own persistence.
 
+
+---
+
+# Documentation Memory System
+
+## Added
+
+- Daily Logs
+- Founder’s Journal
+- Company History
+- ADRs
+- Development event logging script
+- npm logging commands
+

@@ -9,7 +9,10 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "log:event": "bash scripts/log-dev-event.sh",
+    "log:build-pass": "bash scripts/log-dev-event.sh 'Build passed and tests reviewed.'",
+    "log:sprint": "bash scripts/log-dev-event.sh 'Sprint milestone completed.'"
   },
   "dependencies": {
     "@stripe/stripe-js": "^9.8.0",
