@@ -6,6 +6,7 @@ import ProfileAvatar from "@/components/ProfileAvatar";
 import { checkBadges } from "@/lib/badges";
 import ProfileHero from "@/components/profile/ProfileHero";
 import ProfileStats from "@/components/profile/ProfileStats";
+import AboutCard from "@/components/profile/AboutCard";
 
 const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",blue:"#3B82F6",green:"#10B981",amber:"#F59E0B",purple:"#8B5CF6",mono:"'Space Mono', monospace",sans:"'Hanken Grotesk', system-ui, sans-serif",anton:"'Anton', sans-serif"};
 const SURL="https://oexgxnybeixwadgtdtzp.supabase.co";
@@ -161,11 +162,7 @@ export default function PublicProfilePage() {
 
       {/* 3 — About + Academics */}
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
-        <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:20,padding:"20px 24px"}}>
-          <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.14em",textTransform:"uppercase",color:T.muted,marginBottom:12}}>About</p>
-          <p style={{fontSize:13,color:T.muted,lineHeight:1.65}}>{profile?.bio||"No bio added yet."}</p>
-          {profile?.location&&<p style={{fontSize:12,color:T.faint,marginTop:8}}>📍 {profile.location}</p>}
-        </div>
+        <AboutCard profile={profile} />
         <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:20,padding:"20px 24px"}}>
           <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.14em",textTransform:"uppercase",color:T.muted,marginBottom:12}}>Academics</p>
           {[["GPA",profile?.gpa],["SAT",profile?.sat_score],["ACT",profile?.act_score],["Dream School",profile?.dream_school],["Coach",profile?.coach_name],["Travel Team",profile?.travel_team]].map(([l,v])=>(
