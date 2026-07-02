@@ -12,3 +12,6 @@
 
 ## 2026-07-02 11:40
 - Decision: Academic Intelligence v2 became the canonical implementation. Legacy engine converted into a compatibility wrapper.
+
+## 2026-07-02 11:58
+- Decision: Opportunity Graph will use ontology-driven matching before external opportunity marketplace integrations.

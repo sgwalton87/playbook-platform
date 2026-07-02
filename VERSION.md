@@ -204,3 +204,9 @@ Added foundational transcript intelligence that maps courses to skills, majors, 
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Opportunity Graph Foundation
+
+Added Opportunity Graph foundation that connects Academic DNA to scholarships, mentors, careers, NIL readiness, healthcare pathways, STEM pathways, and other opportunity signals.

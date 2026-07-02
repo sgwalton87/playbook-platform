@@ -355,3 +355,16 @@ Added historical record of major milestones:
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Opportunity Graph Foundation
+
+## Added
+
+- Opportunity Ontology
+- Opportunity Matcher
+- Opportunity Graph Engine
+- Opportunity Graph Repository
+- TranscriptImported Opportunity Graph event handler
+- Opportunity Graph tests

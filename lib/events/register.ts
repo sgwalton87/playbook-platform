@@ -6,6 +6,7 @@ import {
   registerOpportunityHandlers,
   registerCompassHandlers,
   registerAcademicHandlers,
+  registerOpportunityGraphHandlers,
 } from "./handlers";
 
 let registered = false;
@@ -20,6 +21,7 @@ export function registerPlaybookEventHandlers() {
   registerOpportunityHandlers();
   registerCompassHandlers();
   registerAcademicHandlers();
+  registerOpportunityGraphHandlers();
 
   registered = true;
 }
