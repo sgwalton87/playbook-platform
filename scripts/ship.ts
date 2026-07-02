@@ -3,7 +3,7 @@ import { runArchivist } from "../lib/archivist/ArchivistEngine";
 
 function run(cmd: string) {
   console.log(`\n$ ${cmd}`);
-  execSync(cmd, { stdio: "inherit" });
+  execSync(cmd, { stdio: "inherit", env: { ...process.env, PLAYBOOK_ARCHIVIST_RUNNING: "1" } });
 }
 
 console.log("=====================================");
