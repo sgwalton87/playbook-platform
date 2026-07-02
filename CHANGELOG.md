@@ -416,3 +416,10 @@ Added historical record of major milestones:
 - Save opportunity state
 - Application status tracking
 - Marketplace UI test
+
+## 2026-07-02 12:19
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

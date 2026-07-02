@@ -243,3 +243,10 @@ Added student-facing Opportunity Graph card for matched opportunities, reasons, 
 # Opportunity Marketplace UI
 
 Added student-facing marketplace experience for browsing, saving, filtering, and tracking opportunity matches.
+
+## 2026-07-02 12:19
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
