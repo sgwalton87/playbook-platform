@@ -243,3 +243,19 @@ If the answer is no, it should not be part of the core graph.
 - District analytics graph
 - Opportunity graph
 - Compass AI memory graph
+
+---
+
+## Next Architecture Sprint
+
+The next sprint introduces Engine and Repository layers.
+
+Current temporary flow:
+
+Event → Handler → Supabase
+
+Target production flow:
+
+Event → Handler → Engine → Repository → Supabase
+
+This keeps business logic separate from persistence and prepares Playbook for AI agents, background jobs, and future database portability.

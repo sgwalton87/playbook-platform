@@ -69,3 +69,23 @@ All notable changes to the Playbook Platform are documented here.
 - TrustScoreCard component
 - Trust Engine unit tests
 - Trust Layer architecture note
+
+---
+
+# Alpha 0.6 — Playbook Graph + Event Bus
+
+## Added
+
+- Playbook Graph architecture
+- Playbook Graph v1.0 Supabase migration
+- Achievement + Evidence workflow
+- Playbook Event Bus
+- Event handler registry
+- Timeline, Trust, Portfolio, Opportunity, and Compass event reactions
+- Supabase mocks for event handler tests
+
+## Next
+
+- Add Engine layer
+- Add Repository layer
+- Refactor event handlers away from direct Supabase writes

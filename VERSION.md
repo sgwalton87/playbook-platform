@@ -52,3 +52,22 @@ Integrate the Scholar Record and Portfolio Engine into the live public profile e
 
 Core engine language is moving toward Playbook Record™ internally, with Scholar Record™ remaining the learner-facing view.
 
+
+---
+
+## Latest Milestone
+
+Alpha 0.6 — Playbook Graph + Event Bus
+
+## Completed Today
+
+- Playbook Graph v1.0
+- Supabase migration live
+- Trust Layer foundation
+- Achievement + Evidence workflow
+- Event Bus foundation
+- Event handlers connected to core engines
+
+## Next Sprint
+
+Engine and Repository architecture.
