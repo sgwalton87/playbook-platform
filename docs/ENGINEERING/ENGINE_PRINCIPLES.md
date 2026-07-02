@@ -214,3 +214,13 @@ Persistence belongs inside Repositories.
 
 Never place business logic directly inside UI components or event handlers.
 
+
+---
+
+# Archivist v2 Principle
+
+Playbook maintains its own living memory.
+
+The Archivist analyzes code changes, categorizes platform progress, updates operational logs, and prepares ship reports.
+
+This mirrors the Playbook Record™ philosophy: meaningful progress should never disappear.

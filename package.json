@@ -18,8 +18,8 @@
     "log:innovation": "bash scripts/log-innovation.sh",
     "log:why-not": "bash scripts/log-why-not.sh",
     "ledger": "bash scripts/playbook-ledger.sh",
-    "ship": "bash scripts/playbook-archivist.sh",
-    "archivist": "bash scripts/playbook-archivist.sh"
+    "ship": "tsx scripts/ship.ts",
+    "archivist": "tsx scripts/ship.ts"
   },
   "dependencies": {
     "@stripe/stripe-js": "^9.8.0",
@@ -46,6 +46,7 @@
     "eslint-config-next": "16.2.9",
     "jsdom": "^29.1.1",
     "tailwindcss": "^4",
+    "tsx": "^4.22.5",
     "typescript": "^5",
     "vitest": "^4.1.9"
   }
