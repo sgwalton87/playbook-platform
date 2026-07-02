@@ -8,6 +8,7 @@ import ProfileHero from "@/components/profile/ProfileHero";
 import ProfileStats from "@/components/profile/ProfileStats";
 import AboutCard from "@/components/profile/AboutCard";
 import ScholarRecordDashboard from "@/components/scholar/ScholarRecordDashboard";
+import PortfolioEngine from "@/components/portfolio/PortfolioEngine";
 import { buildScholarRecord } from "@/lib/scholar";
 
 const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",blue:"#3B82F6",green:"#10B981",amber:"#F59E0B",purple:"#8B5CF6",mono:"'Space Mono', monospace",sans:"'Hanken Grotesk', system-ui, sans-serif",anton:"'Anton', sans-serif"};
@@ -163,6 +164,8 @@ export default function PublicProfilePage() {
       />
 
       <ScholarRecordDashboard record={scholarRecord} />
+
+      <PortfolioEngine record={scholarRecord} />
 
       <ProfileStats
         profile={profile}
