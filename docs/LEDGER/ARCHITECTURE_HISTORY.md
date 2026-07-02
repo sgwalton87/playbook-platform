@@ -86,3 +86,10 @@ Playbook is evolving into Playbook OS™: a lifelong achievement operating syste
 
 ## 2026-07-02 11:58
 - Architecture decision: Opportunity Graph will use ontology-driven matching before external opportunity marketplace integrations.
+
+## 2026-07-02 11:59
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

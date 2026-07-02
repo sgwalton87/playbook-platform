@@ -64,3 +64,6 @@ Playbook is evolving into Playbook OS™: a lifelong achievement operating syste
 
 ## 2026-07-02 11:49
 - Commit recorded: Add Transcript Intelligence Knowledge Graph
+
+## 2026-07-02 11:58
+- Commit recorded: Add Opportunity Graph foundation
