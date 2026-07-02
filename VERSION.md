@@ -395,3 +395,10 @@ Sentinel monitors platform health.
 # Documentation Intelligence
 
 Added Doc Governor as Playbook's documentation intelligence system.
+
+## 2026-07-02 16:34
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

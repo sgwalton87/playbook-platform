@@ -589,3 +589,10 @@ Cartographer now runs during npm run ship.
 - Empty / thin doc detection
 - Duplicate topic candidate detection
 - Ship workflow integration
+
+## 2026-07-02 16:34
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
