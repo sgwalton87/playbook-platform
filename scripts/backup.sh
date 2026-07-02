@@ -13,11 +13,11 @@ if [ ! -f "$FILE" ]; then
   exit 1
 fi
 
-mkdir -p scripts/backups
+mkdir -p .playbook-backups
 
 STAMP=$(date +"%Y%m%d_%H%M%S")
 
-DEST="scripts/backups/${STAMP}_$(basename "$FILE")"
+DEST=".playbook-backups/${STAMP}_$(basename "$FILE")"
 
 cp "$FILE" "$DEST"
 
