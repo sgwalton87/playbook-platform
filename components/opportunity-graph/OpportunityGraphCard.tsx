@@ -1,6 +1,7 @@
 "use client";
 
-import { buildOpportunityGraphFromAcademicDNA } from "@/lib/opportunity-graph";
+import { matchOpportunitiesFromSignals } from "@/lib/opportunity-graph";
+import { buildAcademicDNA } from "@/lib/academic-intelligence";
 import { useMemo } from "react";
 
 type Props = {
@@ -9,10 +10,17 @@ type Props = {
 
 export default function OpportunityGraphCard({ courses = [] }: Props) {
   const report = useMemo(() => {
-    return buildOpportunityGraphFromAcademicDNA({ courses });
+    const dna = buildAcademicDNA(courses);
+
+    return matchOpportunitiesFromSignals({
+      skills: dna.strengths,
+      majors: dna.interests,
+      careers: dna.careerSignals,
+      opportunities: dna.opportunitySignals,
+    });
   }, [courses]);
 
-  const matches = "then" in report ? [] : report.matches;
+  const matches = report.matches || [];
 
   return (
     <section style={{background:"#fff",border:"1px solid #E2E8F0",borderRadius:20,padding:24,marginBottom:14}}>
@@ -31,7 +39,7 @@ export default function OpportunityGraphCard({ courses = [] }: Props) {
         </div>
 
         <div style={{fontFamily:"'Anton', sans-serif",fontSize:42,color:"#F97316",lineHeight:1}}>
-          {"then" in report ? 0 : report.score}%
+          {report.score}%
         </div>
       </div>
 
