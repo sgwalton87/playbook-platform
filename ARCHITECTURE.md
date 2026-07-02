@@ -135,3 +135,20 @@ The Scholar Record™ is the learner-facing view of that record.
 
 Future role-aware views include Scholar-Athlete Record™, Educator Record™, Coach Record™, Mentor Record™, Organization Record™, and Alumni Record™.
 
+
+---
+
+## Trust Layer
+
+The Trust Layer measures the strength of the Playbook Record.
+
+It evaluates:
+
+- Activity
+- Achievement
+- Evidence
+- Verification
+- Outcomes
+- Impact
+
+The Trust Engine powers trust scores, verified opportunities, recommendation workflows, Evidence Packs, and Compass AI.

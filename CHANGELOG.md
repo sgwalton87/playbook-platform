@@ -58,3 +58,14 @@ All notable changes to the Playbook Platform are documented here.
 - Integrate ScholarRecordDashboard into public profile
 - Build PortfolioEngine orchestrator
 - Connect DNA and Opportunity scores to Scholar Record
+
+---
+
+# Trust Layer
+
+## Added
+
+- Trust Engine foundation
+- TrustScoreCard component
+- Trust Engine unit tests
+- Trust Layer architecture note
