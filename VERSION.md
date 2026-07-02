@@ -224,3 +224,9 @@ Added Opportunity Graph foundation that connects Academic DNA to scholarships, m
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Opportunity Graph UI
+
+Added student-facing Opportunity Graph card for matched opportunities, reasons, scores, and next steps.

@@ -382,3 +382,15 @@ Added historical record of major milestones:
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Opportunity Graph UI
+
+## Added
+
+- OpportunityGraphCard component
+- Opportunity match score display
+- Opportunity reasons
+- Opportunity next steps
+- Opportunity Graph UI unit test
