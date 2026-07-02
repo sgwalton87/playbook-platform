@@ -28,3 +28,12 @@ Playbook is evolving into Playbook OS™: a lifelong achievement operating syste
 
 ## 2026-07-02 10:48
 - Rejected path: Rejected manual-only documentation updates because the founder cannot maintain every log by hand.
+
+## 2026-07-02 10:49
+- Decision: Adopted Event → Handler → Engine → Repository → Database.
+
+## 2026-07-02 10:49
+- Rejected path: Did not keep Supabase writes directly inside event handlers.
+
+## 2026-07-02 10:55
+- Decision: Adopted npm run ship as the canonical end-of-sprint documentation and validation workflow.

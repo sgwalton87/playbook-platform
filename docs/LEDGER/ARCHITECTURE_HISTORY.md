@@ -25,3 +25,9 @@ Playbook is evolving into Playbook OS™: a lifelong achievement operating syste
 
 ## 2026-07-02 10:48
 - Architecture decision: All suggested log-style documents should be updated through the central Playbook ledger script instead of manually maintained.
+
+## 2026-07-02 10:49
+- Architecture decision: Adopted Event → Handler → Engine → Repository → Database.
+
+## 2026-07-02 10:55
+- Architecture decision: Adopted npm run ship as the canonical end-of-sprint documentation and validation workflow.

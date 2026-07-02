@@ -17,7 +17,9 @@
     "log:decision": "bash scripts/log-decision.sh",
     "log:innovation": "bash scripts/log-innovation.sh",
     "log:why-not": "bash scripts/log-why-not.sh",
-    "ledger": "bash scripts/playbook-ledger.sh"
+    "ledger": "bash scripts/playbook-ledger.sh",
+    "ship": "bash scripts/playbook-archivist.sh",
+    "archivist": "bash scripts/playbook-archivist.sh"
   },
   "dependencies": {
     "@stripe/stripe-js": "^9.8.0",

@@ -22,3 +22,9 @@ Playbook is evolving into Playbook OS™: a lifelong achievement operating syste
 
 ## 2026-07-02 10:48
 - Original concept / innovation: Created automatic documentation memory system for logs, releases, decisions, innovations, why-nots, milestones, and ledgers.
+
+## 2026-07-02 10:49
+- Original concept / innovation: Playbook Graph connects achievements, evidence, trust, timeline, opportunities, and Compass AI.
+
+## 2026-07-02 10:55
+- Original concept / innovation: Created Playbook Archivist with npm run ship.
