@@ -1,5 +1,16 @@
 import type { IntelligenceReport } from "@/lib/intelligence";
 
+export type CourseSubject =
+  | "english"
+  | "math"
+  | "science"
+  | "history"
+  | "language"
+  | "arts"
+  | "college_prep"
+  | "elective"
+  | "unknown";
+
 export type AGCategory = "A" | "B" | "C" | "D" | "E" | "F" | "G";
 
 export interface AcademicCourse {
