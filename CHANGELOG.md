@@ -290,3 +290,20 @@ Added historical record of major milestones:
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Alpha 0.8 — Academic Intelligence v2
+
+## Added
+
+- Unified IntelligenceReport shape
+- Academic Intelligence Report
+- Transcript Intelligence module
+- GPA Intelligence module
+- A-G Intelligence module
+- Graduation Intelligence module
+- Academic Readiness module
+- Academic Recommendations module
+- Academic Intelligence unit tests
+

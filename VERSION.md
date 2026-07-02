@@ -155,3 +155,11 @@ The repository now includes a backfilled historical record of Playbook platform 
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Alpha 0.8
+
+## Academic Intelligence v2
+
+Added modular academic intelligence architecture for transcripts, GPA, A-G progress, graduation progress, readiness, and recommendations.

@@ -1,32 +1,23 @@
-export type CourseSubject =
-  | "english"
-  | "math"
-  | "science"
-  | "history"
-  | "language"
-  | "arts"
-  | "college_prep"
-  | "elective"
-  | "unknown";
+import type { IntelligenceReport } from "@/lib/intelligence";
 
-export interface ParsedCourse {
-  id: string;
+export type AGCategory = "A" | "B" | "C" | "D" | "E" | "F" | "G";
+
+export interface AcademicCourse {
+  id?: string;
   name: string;
-  grade?: string | number;
-  credits?: number;
+  subject: string;
+  gradeLevel?: number;
+  credits: number;
+  grade?: string;
   term?: string;
-  year?: string | number;
-  subject: CourseSubject;
-  agCategory?: string;
-  passed?: boolean;
+  agCategory?: AGCategory;
+  completed: boolean;
 }
 
-export interface AcademicIntelligenceReport {
-  courses: ParsedCourse[];
-  totalCredits: number;
-  passedCredits: number;
-  agProgress: Record<string, number>;
+export interface AcademicReport extends IntelligenceReport {
+  gpa: number;
+  creditsEarned: number;
   graduationProgress: number;
+  agProgress: number;
   collegeReadiness: number;
-  missingSignals: string[];
 }
