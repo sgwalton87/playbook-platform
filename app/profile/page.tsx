@@ -307,7 +307,7 @@ export default function ProfilePage() {
 
             <div>
               <label style={lbl}>🌟 Dream school (#1)</label>
-              <CollegeSearch value={dreamSchool} onChange={setDreamSchool} placeholder="Search your dream school..."/>
+              <CollegeSearch value={dreamSchool} onChange={setDreamSchool}/>
             </div>
 
             <div style={{marginTop:20,padding:"16px",background:T.surface2,borderRadius:12}}>
@@ -321,7 +321,6 @@ export default function ProfilePage() {
                       <CollegeSearch
                         value={val}
                         onChange={v=>{const updated=[...collegeList];updated[i]=v;setCollegeList(updated);}}
-                        placeholder={`Search school #${i+2}...`}
                       />
                     </div>
                     {val&&<button onClick={()=>{const updated=[...collegeList];updated[i]="";setCollegeList(updated);}} style={{background:"none",border:"none",color:T.faint,cursor:"pointer",fontSize:16,padding:"0 4px"}}>✕</button>}

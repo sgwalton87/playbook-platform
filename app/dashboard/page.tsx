@@ -506,8 +506,21 @@ export default function DashboardPage(){
                   {collegeList.length>0?(
                     <div style={{display:"flex",flexDirection:"column",gap:7}}>
                       {collegeList.map(c=>{
-                        const typeColor={reach:T.amber,match:T.blue,safety:T.green,dream:T.orange}[c.college_type]||T.muted;
-                        const typeLabel={reach:"Reach",match:"Match",safety:"Safety",dream:"Dream"}[c.college_type]||c.college_type;
+                        const collegeType = String(c.college_type ?? "") as "reach" | "match" | "safety" | "dream";
+
+                        const typeColor = {
+                          reach: T.amber,
+                          match: T.blue,
+                          safety: T.green,
+                          dream: T.orange,
+                        }[collegeType] ?? T.muted;
+
+                        const typeLabel = {
+                          reach: "Reach",
+                          match: "Match",
+                          safety: "Safety",
+                          dream: "Dream",
+                        }[collegeType] ?? collegeType;
                         return(
                           <div key={c.id} style={{display:"flex",alignItems:"center",gap:10,padding:"9px 12px",border:`0.5px solid ${T.line}`,borderRadius:9}}>
                             <span style={{fontFamily:T.mono,fontSize:10,fontWeight:700,padding:"2px 8px",borderRadius:999,background:typeColor+"18",color:typeColor}}>{typeLabel}</span>
