@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabaseClient";
+import { emitEvent } from "@/lib/events";
 
 export async function ensurePlaybookRecord(profileId: string) {
   const existing = await supabase
@@ -98,6 +99,18 @@ export async function createAchievementWithEvidence({
     verified: false,
     created_by: profileId,
     updated_by: profileId,
+  });
+
+  await emitEvent({
+    type: "AchievementCreated",
+    payload: {
+      profileId,
+      recordId: record.id,
+      achievementId: achievement.id,
+      title,
+      category,
+    },
+    source: "achievement_workflow",
   });
 
   return achievement;

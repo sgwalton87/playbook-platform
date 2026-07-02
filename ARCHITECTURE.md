@@ -152,3 +152,22 @@ It evaluates:
 - Impact
 
 The Trust Engine powers trust scores, verified opportunities, recommendation workflows, Evidence Packs, and Compass AI.
+
+---
+
+## Playbook Event Bus™
+
+The Event Bus allows engines to react to meaningful changes without directly coupling to each other.
+
+Current event flow:
+
+Achievement Created  
+↓  
+Event Bus  
+↓  
+Timeline Engine  
+Trust Engine  
+Portfolio Engine  
+Opportunity Engine  
+Compass AI
+
