@@ -515,3 +515,10 @@ Added historical record of major milestones:
 ## Milestone
 
 Playbook Intelligence OS Alpha 1.0 architecture is now organized around a canonical SDK.
+
+## 2026-07-02 13:43
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

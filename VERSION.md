@@ -339,3 +339,10 @@ Added foundational design system for Playbook Intelligence OS experience.
 ## Added
 
 - Playbook SDK
+
+## 2026-07-02 13:43
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

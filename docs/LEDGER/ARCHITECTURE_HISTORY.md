@@ -145,3 +145,10 @@ Playbook is evolving into Playbook OS™: a lifelong achievement operating syste
 
 ## 2026-07-02 13:41
 - Architecture decision: Created Playbook SDK as the canonical internal interface for Playbook Intelligence OS.
+
+## 2026-07-02 13:43
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

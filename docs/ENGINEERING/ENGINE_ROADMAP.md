@@ -186,3 +186,10 @@ The Playbook SDK now provides the canonical internal interface for:
 - UI primitives
 
 Future engines should register through the SDK.
+
+## 2026-07-02 13:43
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
