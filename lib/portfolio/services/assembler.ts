@@ -1,5 +1,7 @@
 import { supabase } from "@/lib/supabaseClient";
 import { mapProfileToPortfolio } from "./profile";
+import { buildPortfolioIntelligence } from "./intelligence";
+import { buildScholarRecord } from "../scholar-record";
 
 export async function getPortfolioByUsername(username: string) {
   const { data: profileData, error } = await supabase
@@ -20,12 +22,29 @@ export async function getPortfolioByUsername(username: string) {
       supabase.from("student_activities").select("*").eq("student_id", profileData.id).order("created_at", { ascending: false }),
     ]);
 
-  return {
+  const portfolio = mapProfileToPortfolio(profileData);
+
+  const intelligence = buildPortfolioIntelligence({
     rawProfile: profileData,
-    portfolio: mapProfileToPortfolio(profileData),
+    portfolio,
+    certificates: certData || [],
+    badges: badgeData || [],
+    posts: feedData || [],
+    activities: activityData || [],
+  });
+
+  const assembled = {
+    rawProfile: profileData,
+    portfolio,
+    intelligence,
     certificates: certData || [],
     badgeRows: badgeData || [],
     posts: feedData || [],
     activities: activityData || [],
+  };
+
+  return {
+    ...assembled,
+    scholarRecord: buildScholarRecord(assembled),
   };
 }

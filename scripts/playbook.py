@@ -337,6 +337,255 @@ export async function getPortfolioByUsername(username: string) {
 
     log("✅ Portfolio Assembler created.")
 
+
+def create_portfolio_intelligence():
+    log("🧠 Creating Portfolio Intelligence services...")
+
+    files = {
+        "lib/portfolio/services/stats.ts": """export function calculatePortfolioStats({ rawProfile, certificates = [], badges = [], posts = [], activities = [] }: any) {
+  const xp = Number(rawProfile?.xp ?? 0);
+  const coins = Number(rawProfile?.coin_balance ?? 0);
+
+  return {
+    xp,
+    coins,
+    level: Math.max(1, Math.floor(xp / 500) + 1),
+    certificateCount: certificates.length,
+    badgeCount: badges.length,
+    postCount: posts.length,
+    activityCount: activities.length,
+  };
+}
+""",
+        "lib/portfolio/services/completion.ts": """export function calculatePortfolioCompletion(portfolio: any) {
+  const checks = [
+    portfolio?.identity?.avatarUrl,
+    portfolio?.identity?.bannerUrl,
+    portfolio?.identity?.bio,
+    portfolio?.identity?.school,
+    portfolio?.identity?.grade,
+    portfolio?.identity?.graduationYear,
+    portfolio?.academics?.weightedGpa || portfolio?.academics?.unweightedGpa,
+    portfolio?.academics?.dreamSchool,
+    portfolio?.career?.idealProfession,
+    portfolio?.career?.desiredSalaryRange,
+    (portfolio?.pillars || []).length > 0,
+  ];
+
+  const completed = checks.filter(Boolean).length;
+  const total = checks.length;
+
+  return {
+    completed,
+    total,
+    percent: Math.round((completed / total) * 100),
+  };
+}
+""",
+        "lib/portfolio/services/dna.ts": """export function calculatePortfolioDNA({ portfolio, certificates = [], activities = [] }: any) {
+  const pillars = portfolio?.pillars || [];
+
+  return {
+    leadership: score([
+      pillars.includes("leadership"),
+      activities.some((a: any) => Boolean(a.role_title)),
+    ]),
+    financialLiteracy: score([
+      pillars.includes("finance"),
+      certificates.some((c: any) => String(c.course_slug || c.certificate_name || "").toLowerCase().includes("money")),
+    ]),
+    communityImpact: score([
+      pillars.includes("civic"),
+      activities.some((a: any) => String(a.activity_type || "").toLowerCase().includes("volunteer")),
+    ]),
+    wellness: score([pillars.includes("sel")]),
+    careerReadiness: score([
+      Boolean(portfolio?.career?.idealProfession),
+      Boolean(portfolio?.career?.desiredSalaryRange),
+    ]),
+    collegeReadiness: score([
+      Boolean(portfolio?.academics?.dreamSchool),
+      Boolean(portfolio?.academics?.weightedGpa || portfolio?.academics?.unweightedGpa),
+    ]),
+  };
+}
+
+function score(values: boolean[]) {
+  return values.length ? Math.round((values.filter(Boolean).length / values.length) * 100) : 0;
+}
+""",
+        "lib/portfolio/services/intelligence.ts": """import { calculatePortfolioStats } from "./stats";
+import { calculatePortfolioCompletion } from "./completion";
+import { calculatePortfolioDNA } from "./dna";
+
+export function buildPortfolioIntelligence(input: any) {
+  return {
+    stats: calculatePortfolioStats(input),
+    completion: calculatePortfolioCompletion(input.portfolio),
+    dna: calculatePortfolioDNA(input),
+  };
+}
+""",
+    }
+
+    for filename, content in files.items():
+        path = ROOT / filename
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(content)
+        log(f"✅ Created {filename}")
+
+    assembler = ROOT / "lib/portfolio/services/assembler.ts"
+    text = assembler.read_text()
+
+    if 'import { buildPortfolioIntelligence } from "./intelligence";' not in text:
+        text = text.replace(
+            'import { mapProfileToPortfolio } from "./profile";',
+            'import { mapProfileToPortfolio } from "./profile";\nimport { buildPortfolioIntelligence } from "./intelligence";'
+        )
+
+    old = """  return {
+    rawProfile: profileData,
+    portfolio: mapProfileToPortfolio(profileData),
+    certificates: certData || [],
+    badgeRows: badgeData || [],
+    posts: feedData || [],
+    activities: activityData || [],
+  };"""
+
+    new = """  const portfolio = mapProfileToPortfolio(profileData);
+
+  const intelligence = buildPortfolioIntelligence({
+    rawProfile: profileData,
+    portfolio,
+    certificates: certData || [],
+    badges: badgeData || [],
+    posts: feedData || [],
+    activities: activityData || [],
+  });
+
+  return {
+    rawProfile: profileData,
+    portfolio,
+    intelligence,
+    certificates: certData || [],
+    badgeRows: badgeData || [],
+    posts: feedData || [],
+    activities: activityData || [],
+  };"""
+
+    if old in text:
+        text = text.replace(old, new)
+
+    assembler.write_text(text)
+
+    index = ROOT / "lib/portfolio/index.ts"
+    idx = index.read_text()
+    for line in [
+        'export * from "./services/stats";',
+        'export * from "./services/completion";',
+        'export * from "./services/dna";',
+        'export * from "./services/intelligence";',
+    ]:
+        if line not in idx:
+            idx += line + "\\n"
+    index.write_text(idx)
+
+    log("🧠 Portfolio Intelligence complete.")
+
+
+def create_scholar_record():
+    log("🎓 Creating Scholar Record model...")
+
+    files = {
+        "lib/portfolio/scholar-record.ts": """import { buildPortfolioAIContext } from "./services/ai";
+import { generateResumeDraft } from "./services/resume";
+import { createRecommendationContext } from "./services/recommendation";
+import { getOpportunitySignals } from "./services/opportunity";
+
+export function buildScholarRecord(assembled: any) {
+  const portfolio = assembled.portfolio;
+
+  return {
+    id: portfolio.identity.id,
+    rawProfile: assembled.rawProfile,
+
+    portfolio,
+
+    identity: portfolio.identity,
+    academics: portfolio.academics,
+    career: portfolio.career,
+    athletics: portfolio.athletics,
+    pillars: portfolio.pillars,
+
+    certificates: assembled.certificates || [],
+    badges: assembled.badgeRows || [],
+    activities: assembled.activities || [],
+    posts: assembled.posts || [],
+
+    intelligence: assembled.intelligence,
+
+    resumeDraft: generateResumeDraft(portfolio),
+    recommendationContext: createRecommendationContext(portfolio),
+    opportunitySignals: getOpportunitySignals(portfolio),
+    aiContext: buildPortfolioAIContext(portfolio),
+  };
+}
+""",
+    }
+
+    for filename, content in files.items():
+        path = ROOT / filename
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(content)
+        log(f"✅ Created {filename}")
+
+    assembler = ROOT / "lib/portfolio/services/assembler.ts"
+    text = assembler.read_text()
+
+    if 'import { buildScholarRecord } from "../scholar-record";' not in text:
+        text = text.replace(
+            'import { buildPortfolioIntelligence } from "./intelligence";',
+            'import { buildPortfolioIntelligence } from "./intelligence";\nimport { buildScholarRecord } from "../scholar-record";'
+        )
+
+    old = """  return {
+    rawProfile: profileData,
+    portfolio,
+    intelligence,
+    certificates: certData || [],
+    badgeRows: badgeData || [],
+    posts: feedData || [],
+    activities: activityData || [],
+  };"""
+
+    new = """  const assembled = {
+    rawProfile: profileData,
+    portfolio,
+    intelligence,
+    certificates: certData || [],
+    badgeRows: badgeData || [],
+    posts: feedData || [],
+    activities: activityData || [],
+  };
+
+  return {
+    ...assembled,
+    scholarRecord: buildScholarRecord(assembled),
+  };"""
+
+    if old in text:
+        text = text.replace(old, new)
+
+    assembler.write_text(text)
+
+    index = ROOT / "lib/portfolio/index.ts"
+    idx = index.read_text()
+    if 'export * from "./scholar-record";' not in idx:
+        idx += 'export * from "./scholar-record";\n'
+    index.write_text(idx)
+
+    log("🎓 Scholar Record complete.")
+
 def help_text():
     print("""
 Playbook Builder
@@ -371,6 +620,12 @@ def main():
 
     elif args[0] == "patch" and len(args) > 1 and args[1] == "portfolio-assembler":
         create_portfolio_assembler()
+
+    elif args[0] == "patch" and len(args) > 1 and args[1] == "portfolio-intelligence":
+        create_portfolio_intelligence()
+
+    elif args[0] == "patch" and len(args) > 1 and args[1] == "scholar-record":
+        create_scholar_record()
 
     else:
         help_text()
