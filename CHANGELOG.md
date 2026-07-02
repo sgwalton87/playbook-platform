@@ -348,3 +348,10 @@ Added historical record of major milestones:
 - Academic DNA
 - Opportunity signal extraction
 - Transcript Knowledge Graph tests
+
+## 2026-07-02 11:49
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

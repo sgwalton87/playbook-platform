@@ -197,3 +197,10 @@ Added modular academic intelligence architecture for transcripts, GPA, A-G progr
 # Transcript Intelligence Knowledge Graph
 
 Added foundational transcript intelligence that maps courses to skills, majors, careers, opportunities, A-G requirements, and Academic DNA.
+
+## 2026-07-02 11:49
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
