@@ -430,3 +430,18 @@ Added historical record of major milestones:
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Compass Core Phases 1-5
+
+## Added
+
+- Compass Reasoning Engine
+- Compass Recommendation Engine
+- Compass Next Step Engine
+- Compass Goal Engine
+- Compass Explainability
+- Compass Core UI card
+- Compass page
+- Compass tests

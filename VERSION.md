@@ -257,3 +257,9 @@ Added student-facing marketplace experience for browsing, saving, filtering, and
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Compass Core
+
+Added Compass Core phases 1-5: reasoning, recommendations, next steps, goals, explainability, and UI.
