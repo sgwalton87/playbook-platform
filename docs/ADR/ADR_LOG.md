@@ -15,3 +15,6 @@
 
 ## 2026-07-02 11:58
 - Decision: Opportunity Graph will use ontology-driven matching before external opportunity marketplace integrations.
+
+## 2026-07-02 13:41
+- Decision: Created Playbook SDK as the canonical internal interface for Playbook Intelligence OS.

@@ -493,3 +493,25 @@ Added historical record of major milestones:
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Playbook SDK
+
+## Added
+
+- Internal Playbook SDK
+- Academic SDK exports
+- Opportunity SDK exports
+- Compass SDK exports
+- Trust SDK exports
+- Record SDK exports
+- Timeline SDK exports
+- Events SDK exports
+- Repository SDK exports
+- Graph SDK exports
+- UI SDK exports
+
+## Milestone
+
+Playbook Intelligence OS Alpha 1.0 architecture is now organized around a canonical SDK.

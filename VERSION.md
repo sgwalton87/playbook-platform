@@ -296,3 +296,46 @@ Added foundational design system for Playbook Intelligence OS experience.
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Playbook Intelligence OS Alpha 1.0
+
+## Core Platform
+
+- Playbook Constitution
+- Playbook Bible
+- Engineering Principles
+- Architecture documentation
+- Design System
+- Living documentation and Archivist
+
+## Intelligence Layer
+
+- Academic Intelligence
+- Transcript Knowledge Graph
+- Academic DNA
+- Opportunity Graph
+- Opportunity Marketplace
+- Compass Core
+
+## Intelligence Infrastructure
+
+- Event Bus
+- Engine Layer
+- Repository Layer
+- Trust Layer
+- Playbook Graph
+- Scholar Record
+
+## Experience Layer
+
+- Dashboard guidance
+- Opportunity Marketplace navigation
+- Scholar Record opportunity recommendations
+- Compass surfaced in the UI
+- Design language documented
+
+## Added
+
+- Playbook SDK

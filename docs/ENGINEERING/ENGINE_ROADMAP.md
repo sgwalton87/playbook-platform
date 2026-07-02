@@ -167,3 +167,22 @@ Organization AI Agent
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Playbook SDK Milestone
+
+The Playbook SDK now provides the canonical internal interface for:
+
+- Academic Intelligence
+- Opportunity Graph
+- Compass
+- Trust
+- Playbook Record
+- Timeline
+- Events
+- Repositories
+- Graphs
+- UI primitives
+
+Future engines should register through the SDK.
