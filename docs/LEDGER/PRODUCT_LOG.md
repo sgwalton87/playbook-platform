@@ -52,3 +52,6 @@ Playbook is evolving into Playbook OS™: a lifelong achievement operating syste
 
 ## 2026-07-02 11:27
 - Commit recorded: Fix Academic Intelligence compatibility exports
+
+## 2026-07-02 11:30
+- Commit recorded: Restore Academic Intelligence CourseSubject type
