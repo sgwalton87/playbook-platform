@@ -259,3 +259,33 @@ Target production flow:
 Event → Handler → Engine → Repository → Supabase
 
 This keeps business logic separate from persistence and prepares Playbook for AI agents, background jobs, and future database portability.
+
+---
+
+# Engine Coverage
+
+Current engines connected to the Playbook Graph™
+
+✓ Timeline Engine
+
+✓ Trust Engine
+
+✓ Opportunity Engine
+
+✓ Portfolio Engine
+
+✓ Compass Engine
+
+---
+
+## Upcoming Engines
+
+- Academic Intelligence
+- Transcript Intelligence
+- Athlete Intelligence
+- NIL Readiness
+- FAFSA Intelligence
+- Resume Intelligence
+- Verification Engine
+- Scholar Vault Engine
+

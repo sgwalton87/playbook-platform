@@ -71,3 +71,45 @@ Alpha 0.6 — Playbook Graph + Event Bus
 ## Next Sprint
 
 Engine and Repository architecture.
+
+---
+
+# Alpha 0.7
+
+Status
+
+Stable
+
+---
+
+## Completed
+
+- Playbook Graph™
+- Living Evidence™
+- Trust Layer™
+- Achievement Workflow™
+- Playbook Event Bus™
+- Timeline Engine™
+- Trust Engine™
+- Opportunity Engine™
+- Portfolio Engine™
+- Compass Engine™
+- Repository Layer™
+
+---
+
+## Platform Status
+
+Playbook now operates as an event-driven operating system.
+
+---
+
+## Next Version
+
+Alpha 0.8
+
+- Academic Intelligence
+- Transcript Intelligence
+- Verification Network
+- Repository Expansion
+

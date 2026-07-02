@@ -185,3 +185,32 @@ Every feature should strengthen one or more of the following:
 - Resume Intelligence
 - Athlete Intelligence
 - Compass AI
+
+---
+
+# Principle 7
+
+Event
+
+↓
+
+Handler
+
+↓
+
+Engine
+
+↓
+
+Repository
+
+↓
+
+Database
+
+Business logic belongs inside Engines.
+
+Persistence belongs inside Repositories.
+
+Never place business logic directly inside UI components or event handlers.
+
