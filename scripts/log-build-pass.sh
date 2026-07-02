@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 set -e
-
 npm test
 bash scripts/build.sh
-
-bash scripts/log-dev-event.sh "Tests and production build passed."
-
-echo "✅ Tests and build passed."
+bash scripts/log-ledger-event.sh build-pass "Tests and production build passed."
