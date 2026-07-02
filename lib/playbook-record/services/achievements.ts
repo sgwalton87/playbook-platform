@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabaseClient";
 import { emitEvent } from "@/lib/events";
+import { registerPlaybookEventHandlers } from "@/lib/events";
 
 export async function ensurePlaybookRecord(profileId: string) {
   const existing = await supabase
@@ -41,6 +42,8 @@ export async function createAchievementWithEvidence({
   evidenceUrl?: string;
   reflection?: string;
 }) {
+  registerPlaybookEventHandlers();
+
   const record = await ensurePlaybookRecord(profileId);
 
   const achievementRes = await supabase
