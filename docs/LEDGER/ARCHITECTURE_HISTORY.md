@@ -19,3 +19,9 @@ Playbook is evolving into Playbook OS™: a lifelong achievement operating syste
 ## Last Updated
 
 2026-07-02
+
+## 2026-07-02 10:43
+- Architecture decision: Adopted Engine → Repository architecture
+
+## 2026-07-02 10:48
+- Architecture decision: All suggested log-style documents should be updated through the central Playbook ledger script instead of manually maintained.

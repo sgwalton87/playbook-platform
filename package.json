@@ -11,8 +11,13 @@
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "log:event": "bash scripts/log-dev-event.sh",
-    "log:build-pass": "bash scripts/log-dev-event.sh 'Build passed and tests reviewed.'",
-    "log:sprint": "bash scripts/log-dev-event.sh 'Sprint milestone completed.'"
+    "log:build-pass": "bash scripts/log-build-pass.sh",
+    "log:sprint": "bash scripts/log-sprint.sh",
+    "log:release": "bash scripts/log-release.sh",
+    "log:decision": "bash scripts/log-decision.sh",
+    "log:innovation": "bash scripts/log-innovation.sh",
+    "log:why-not": "bash scripts/log-why-not.sh",
+    "ledger": "bash scripts/playbook-ledger.sh"
   },
   "dependencies": {
     "@stripe/stripe-js": "^9.8.0",

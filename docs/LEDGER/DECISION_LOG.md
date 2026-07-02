@@ -19,3 +19,12 @@ Playbook is evolving into Playbook OS™: a lifelong achievement operating syste
 ## Last Updated
 
 2026-07-02
+
+## 2026-07-02 10:43
+- Decision: Adopted Engine → Repository architecture
+
+## 2026-07-02 10:48
+- Decision: All suggested log-style documents should be updated through the central Playbook ledger script instead of manually maintained.
+
+## 2026-07-02 10:48
+- Rejected path: Rejected manual-only documentation updates because the founder cannot maintain every log by hand.
