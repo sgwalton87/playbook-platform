@@ -1,4 +1,13 @@
 import type { ScholarRecord } from "./types";
+import {
+  buildIdentity,
+  buildAcademics,
+  buildAthletics,
+  buildLeadership,
+  buildService,
+  buildCareer,
+  buildAchievements,
+} from "./modules";
 
 function score(values: any[]) {
   if (!values.length) return 0;
@@ -18,21 +27,30 @@ export function buildScholarRecord({
   activities?: any[];
   posts?: any[];
 }): ScholarRecord {
-  const fullName =
-    profile?.full_name ||
-    [profile?.first_name, profile?.last_name].filter(Boolean).join(" ");
+  const identity = buildIdentity(profile);
+  const academics = buildAcademics(profile);
+  const athletics = buildAthletics(profile);
+  const career = buildCareer(profile);
+  const leadership = buildLeadership(badges, activities);
+  const service = buildService(activities);
+  const achievements = buildAchievements({
+    certificates,
+    badges,
+    activities,
+    posts,
+  });
 
   const academicReadiness = score([
-    profile?.school,
-    profile?.grade,
-    profile?.gpa || profile?.weighted_gpa || profile?.unweighted_gpa,
-    profile?.dream_school,
-    profile?.sat_score || profile?.act_score,
+    identity.school,
+    identity.grade,
+    academics.gpa || academics.weightedGpa || academics.unweightedGpa,
+    academics.dreamSchool,
+    academics.sat || academics.act,
   ]);
 
   const careerReadiness = score([
-    profile?.ideal_profession,
-    profile?.desired_salary_range,
+    career.idealProfession,
+    career.desiredSalaryRange,
     certificates.length > 0,
     activities.length > 0,
   ]);
@@ -44,67 +62,37 @@ export function buildScholarRecord({
   ]);
 
   const portfolioCompletion = score([
-    profile?.avatar_url,
-    profile?.first_name,
-    profile?.last_name,
-    profile?.username,
-    profile?.school,
+    identity.avatarUrl,
+    identity.firstName,
+    identity.lastName,
+    identity.username,
+    identity.school,
     profile?.bio,
-    profile?.dream_school,
-    profile?.ideal_profession,
+    academics.dreamSchool,
+    career.idealProfession,
     certificates.length > 0,
     badges.length > 0,
   ]);
 
   const opportunityReadiness = Math.round(
-    (academicReadiness + careerReadiness + leadershipReadiness + portfolioCompletion) / 4
+    (academicReadiness +
+      careerReadiness +
+      leadershipReadiness +
+      portfolioCompletion) /
+      4
   );
 
   return {
-    id: profile?.id,
-    username: profile?.username,
-    role: profile?.role,
+    id: identity.id,
+    username: identity.username,
+    role: identity.role,
 
-    identity: {
-      firstName: profile?.first_name,
-      lastName: profile?.last_name,
-      fullName,
-      avatarUrl: profile?.avatar_url,
-      school: profile?.school,
-      grade: profile?.grade,
-      graduationYear: profile?.graduation_year || profile?.grad_year,
-    },
+    identity,
+    academics,
+    career,
+    athletics,
 
-    academics: {
-      gpa: profile?.gpa,
-      weightedGpa: profile?.weighted_gpa,
-      unweightedGpa: profile?.unweighted_gpa,
-      dreamSchool: profile?.dream_school,
-      intendedMajor: profile?.intended_major,
-      satScore: profile?.sat_score,
-      actScore: profile?.act_score,
-    },
-
-    career: {
-      idealProfession: profile?.ideal_profession,
-      desiredSalaryRange: profile?.desired_salary_range,
-    },
-
-    athletics: {
-      sport: profile?.sport,
-      position: profile?.position,
-      coachName: profile?.coach_name,
-      travelTeam: profile?.travel_team,
-      recruitingStatus: profile?.recruiting_status || profile?.recruiting_interest,
-      highlightVideo: profile?.highlight_video || profile?.highlight_reel_url,
-    },
-
-    achievements: {
-      certificates,
-      badges,
-      activities,
-      posts,
-    },
+    achievements,
 
     readiness: {
       portfolioCompletion,
@@ -113,5 +101,12 @@ export function buildScholarRecord({
       opportunityReadiness,
       leadershipReadiness,
     },
+
+    // Engine extensions
+    leadership,
+    service,
+  } as ScholarRecord & {
+    leadership: any;
+    service: any;
   };
 }
