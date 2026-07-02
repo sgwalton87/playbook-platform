@@ -486,3 +486,10 @@ Added historical record of major milestones:
 - Empty state guidance
 - Dashboard patterns
 - Animation guidelines
+
+## 2026-07-02 13:34
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

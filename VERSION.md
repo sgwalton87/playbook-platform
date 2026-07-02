@@ -289,3 +289,10 @@ Surfaced Compass and Opportunity Graph across dashboard, profile, and navigation
 # Playbook Design System
 
 Added foundational design system for Playbook Intelligence OS experience.
+
+## 2026-07-02 13:34
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
