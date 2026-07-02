@@ -32,3 +32,20 @@ export interface AcademicReport extends IntelligenceReport {
   agProgress: number;
   collegeReadiness: number;
 }
+
+
+/**
+ * Backward-compatible types for Academic Intelligence v1.
+ * Older engines/tests still import these names.
+ */
+export interface ParsedCourse extends AcademicCourse {}
+
+export interface AcademicIntelligenceReport {
+  courses: ParsedCourse[];
+  totalCredits: number;
+  passedCredits: number;
+  agProgress: Record<string, number> | number;
+  graduationProgress: number;
+  collegeReadiness: number;
+  missingSignals: string[];
+}
