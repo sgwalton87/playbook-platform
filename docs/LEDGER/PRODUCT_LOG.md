@@ -31,3 +31,6 @@ Playbook is evolving into Playbook OS™: a lifelong achievement operating syste
 
 ## 2026-07-02 10:49
 - Sprint update: Completed Academic Intelligence foundation.
+
+## 2026-07-02 10:56
+- Commit recorded: Add Playbook Archivist ship workflow
