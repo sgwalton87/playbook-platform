@@ -45,3 +45,10 @@ Integrate the Scholar Record and Portfolio Engine into the live public profile e
 3. Replace placeholder PortfolioDNA values with Scholar Record calculations
 4. Replace placeholder OpportunityMeter values with Scholar Record readiness
 5. Begin Timeline Engine
+
+---
+
+## Architecture Direction
+
+Core engine language is moving toward Playbook Record™ internally, with Scholar Record™ remaining the learner-facing view.
+

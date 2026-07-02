@@ -125,3 +125,13 @@ Scholar-Athlete support must include academic eligibility, recruiting readiness,
 
 The NIL preparation layer includes personal brand development, financial literacy, contract awareness, compliance awareness, media kit readiness, social media professionalism, and opportunity tracking.
 
+---
+
+## Playbook Record Architecture
+
+The internal canonical engine is the Playbook Record™.
+
+The Scholar Record™ is the learner-facing view of that record.
+
+Future role-aware views include Scholar-Athlete Record™, Educator Record™, Coach Record™, Mentor Record™, Organization Record™, and Alumni Record™.
+
