@@ -549,3 +549,22 @@ Cartographer now runs during npm run ship.
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Sentinel + Playbook OS Master Index
+
+## Added
+
+- Playbook Sentinel
+- Platform health report
+- Sentinel npm scripts
+- Sentinel integration into npm run ship
+- Playbook OS master index
+
+## Core Services
+
+- Compass
+- Archivist
+- Cartographer
+- Sentinel

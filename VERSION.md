@@ -368,3 +368,17 @@ Compass guides what should happen next.
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Sentinel
+
+Added Sentinel as the fourth Playbook OS core service.
+
+Compass guides the future.
+
+Archivist remembers the past.
+
+Cartographer maps the present.
+
+Sentinel monitors platform health.

@@ -15,6 +15,7 @@ run("bash scripts/build.sh");
 
 runArchivist();
 run("npm run cartographer");
+run("npm run sentinel");
 
 run("git add .");
 
