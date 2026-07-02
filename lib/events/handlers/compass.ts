@@ -1,11 +1,22 @@
 import { onEvent } from "../bus";
+import { supabase } from "@/lib/supabaseClient";
 
 export function registerCompassHandlers() {
   onEvent("AchievementCreated", async (event) => {
-    console.info("[Compass AI] Generate guidance after achievement", event.payload);
-  });
+    const { recordId, profileId, title } = event.payload || {};
+    if (!recordId) return;
 
-  onEvent("OpportunityUnlocked", async (event) => {
-    console.info("[Compass AI] Explain unlocked opportunity", event.payload);
+    await supabase.from("opportunity_matches").insert({
+      record_id: recordId,
+      opportunity_type: "mentorship",
+      title: "Compass guidance",
+      description: `Compass AI noticed "${title}". Add evidence and request verification to increase trust.`,
+      readiness_score: 10,
+      reasons: ["New achievement detected"],
+      next_steps: ["Attach evidence", "Write a reflection", "Request verification"],
+      status: "recommended",
+      created_by: profileId,
+      updated_by: profileId,
+    });
   });
 }
