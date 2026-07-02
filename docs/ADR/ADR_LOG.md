@@ -27,3 +27,6 @@
 
 ## 2026-07-02 16:33
 - Decision: Documentation should be governed by Doc Governor before creating new roadmap, vision, milestone, or strategy files.
+
+## 2026-07-02 16:50
+- Decision: Documentation lifecycle now uses metadata, ownership, status, canonical state, and auto-update rules.

@@ -189,3 +189,6 @@ Playbook is evolving into Playbook OS™: a lifelong achievement operating syste
 
 - Archivist v2 ship cycle completed.
 
+
+## 2026-07-02 16:50
+- Architecture decision: Documentation lifecycle now uses metadata, ownership, status, canonical state, and auto-update rules.

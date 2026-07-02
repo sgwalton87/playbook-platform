@@ -11,33 +11,54 @@ function groupBy<T>(items: T[], getKey: (item: T) => string) {
 
 export function runDocGovernor() {
   const docs = scanDocs();
-  const byCategory = groupBy(docs, doc => doc.category);
-  const emptyDocs = docs.filter(doc => doc.isEmpty);
-  const generatedDocs = docs.filter(doc => doc.isGenerated);
-  const humanDocs = docs.filter(doc => !doc.isGenerated);
+  const byType = groupBy(docs, doc => doc.metadata.doc_type);
 
-  const duplicateCandidates = Object.entries(byCategory)
+  const thinDocs = docs.filter(doc => doc.isThin);
+  const generatedDocs = docs.filter(doc => doc.isGenerated);
+  const frozenDocs = docs.filter(doc => doc.isFrozen);
+  const canonicalDocs = docs.filter(doc => doc.isCanonical);
+
+  const duplicateCandidates = Object.entries(byType)
     .filter(([, items]) => items.length > 3)
-    .map(([category, items]) => ({
-      category,
+    .map(([docType, items]) => ({
+      docType,
       count: items.length,
+      canonical: items.filter(item => item.isCanonical).map(item => item.file),
       files: items.map(item => item.file),
     }));
 
-  const healthPenalty =
-    emptyDocs.length * 2 +
-    duplicateCandidates.length * 3;
+  const staleDocs = docs.filter(doc => {
+    if (doc.isGenerated || doc.isFrozen) return false;
+    const ageDays = Math.floor((Date.now() - doc.modifiedAt.getTime()) / (1000 * 60 * 60 * 24));
+    return ageDays > 90;
+  });
 
-  const healthScore = Math.max(0, Math.min(100, 100 - healthPenalty));
+  const metadataScore = Math.round((docs.filter(doc => doc.metadata.title && doc.metadata.owner).length / Math.max(1, docs.length)) * 100);
+  const thinScore = Math.max(0, 100 - thinDocs.length * 2);
+  const duplicateScore = Math.max(0, 100 - duplicateCandidates.length * 5);
+  const staleScore = Math.max(0, 100 - staleDocs.length * 2);
+  const canonicalScore = Math.round((canonicalDocs.length / Math.max(1, docs.length)) * 100);
+
+  const healthScore = Math.round(
+    (metadataScore + thinScore + duplicateScore + staleScore + canonicalScore) / 5
+  );
 
   return {
-    totalDocs: docs.length,
-    generatedDocs: generatedDocs.length,
-    humanDocs: humanDocs.length,
-    emptyDocs,
-    duplicateCandidates,
-    byCategory,
-    healthScore,
     docs,
+    byType,
+    thinDocs,
+    generatedDocs,
+    frozenDocs,
+    canonicalDocs,
+    duplicateCandidates,
+    staleDocs,
+    scores: {
+      overall: healthScore,
+      metadata: metadataScore,
+      thinDocs: thinScore,
+      duplicateRisk: duplicateScore,
+      staleDocs: staleScore,
+      canonicalCoverage: canonicalScore,
+    },
   };
 }

@@ -603,3 +603,17 @@ Cartographer now runs during npm run ship.
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Doc Governor v2
+
+## Added
+
+- YAML-style front matter parsing
+- Document metadata inference
+- Smarter health scoring
+- Documentation Registry
+- Merge Recommendations
+- Stale documentation detection
+- Documentation Lifecycle guide

@@ -333,3 +333,9 @@ Playbook is evolving into Playbook OS™: a lifelong achievement operating syste
 
 - Archivist v2 ship cycle completed.
 
+
+## 2026-07-02 16:50
+- **innovation**: Doc Governor v2 turns Playbook docs into a governed knowledge system.
+
+## 2026-07-02 16:50
+- **decision**: Documentation lifecycle now uses metadata, ownership, status, canonical state, and auto-update rules.
