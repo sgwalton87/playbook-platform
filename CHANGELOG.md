@@ -464,3 +464,10 @@ Added historical record of major milestones:
 - Opportunity Graph section on Scholar profile
 - Marketplace link from Scholar Record
 - Subtle fade-up animation for intelligence cards
+
+## 2026-07-02 12:36
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
