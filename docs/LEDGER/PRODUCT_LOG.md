@@ -43,3 +43,6 @@ Playbook is evolving into Playbook OS™: a lifelong achievement operating syste
 
 ## 2026-07-02 11:10
 - Commit recorded: Archivist v2 ship update
+
+## 2026-07-02 11:12
+- Commit recorded: Fix Archivist post-commit ledger loop
