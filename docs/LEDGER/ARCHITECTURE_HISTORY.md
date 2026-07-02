@@ -152,3 +152,6 @@ Playbook is evolving into Playbook OS™: a lifelong achievement operating syste
 
 - Archivist v2 ship cycle completed.
 
+
+## 2026-07-02 16:10
+- Architecture decision: Alpha 1.0 architecture snapshot is frozen; current architecture documents are generated automatically.

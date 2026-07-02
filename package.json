@@ -19,7 +19,9 @@
     "log:why-not": "bash scripts/log-why-not.sh",
     "ledger": "bash scripts/playbook-ledger.sh",
     "ship": "tsx scripts/ship.ts",
-    "archivist": "tsx scripts/ship.ts"
+    "archivist": "tsx scripts/ship.ts",
+    "cartographer": "tsx scripts/cartographer.ts",
+    "map": "tsx scripts/cartographer.ts"
   },
   "dependencies": {
     "@stripe/stripe-js": "^9.8.0",

@@ -522,3 +522,23 @@ Playbook Intelligence OS Alpha 1.0 architecture is now organized around a canoni
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Cartographer v1
+
+## Added
+
+- Playbook Cartographer
+- Current Architecture auto-generation
+- Engine Catalog
+- Repository Catalog
+- Event Catalog
+- Component Catalog
+- System Map
+- Data Model
+- Alpha 1.0 frozen architecture snapshot
+
+## Automation
+
+Cartographer now runs during npm run ship.

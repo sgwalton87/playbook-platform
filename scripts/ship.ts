@@ -14,6 +14,7 @@ run("npm test");
 run("bash scripts/build.sh");
 
 runArchivist();
+run("npm run cartographer");
 
 run("git add .");
 

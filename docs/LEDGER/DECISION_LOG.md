@@ -46,3 +46,6 @@ Playbook is evolving into Playbook OS™: a lifelong achievement operating syste
 
 ## 2026-07-02 13:41
 - Decision: Created Playbook SDK as the canonical internal interface for Playbook Intelligence OS.
+
+## 2026-07-02 16:10
+- Decision: Alpha 1.0 architecture snapshot is frozen; current architecture documents are generated automatically.
