@@ -1,6 +1,6 @@
 "use client";
 
-import { matchOpportunitiesFromSignals } from "@/lib/opportunity-graph";
+import { matchOpportunitiesFromSignals } from "@/lib/opportunity-graph/matching/OpportunityMatcher";
 import { buildAcademicDNA } from "@/lib/academic-intelligence";
 import { useMemo } from "react";
 
