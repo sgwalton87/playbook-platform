@@ -307,3 +307,10 @@ Added historical record of major milestones:
 - Academic Recommendations module
 - Academic Intelligence unit tests
 
+
+## 2026-07-02 11:27
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

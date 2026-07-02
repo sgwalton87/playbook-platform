@@ -63,3 +63,13 @@ Playbook is evolving into Playbook OS™: a lifelong achievement operating syste
 
 ## 2026-07-02 11:21
 - Commit recorded: Build Academic Intelligence v2 foundation
+
+## 2026-07-02 11:27
+- Commit recorded: Fix Academic Intelligence compatibility exports
+
+## 2026-07-02 11:27
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
