@@ -100,8 +100,8 @@ export function inferDocMetadata(file: string, content: string): DocMetadata {
     doc_type: String(parsed.metadata.doc_type || inferredType),
     owner: (parsed.metadata.owner as any) || owner,
     status: (parsed.metadata.status as any) || status,
-    canonical: parsed.metadata.canonical ?? status === "canonical" || status === "frozen",
-    auto_update: parsed.metadata.auto_update ?? owner !== "human",
+    canonical: parsed.metadata.canonical ?? (status === "canonical" || status === "frozen"),
+    auto_update: parsed.metadata.auto_update ?? (owner !== "human"),
     lifecycle: (parsed.metadata.lifecycle as any) || (status === "deprecated" ? "deprecated" : "active"),
   };
 }

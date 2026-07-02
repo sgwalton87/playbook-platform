@@ -415,3 +415,10 @@ Added Doc Governor as Playbook's documentation intelligence system.
 # Doc Governor v2
 
 Upgraded Documentation Intelligence with metadata, registry, merge recommendations, stale detection, and lifecycle governance.
+
+## 2026-07-02 16:52
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
