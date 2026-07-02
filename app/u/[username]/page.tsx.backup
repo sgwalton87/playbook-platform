@@ -4,8 +4,6 @@ import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import ProfileAvatar from "@/components/ProfileAvatar";
 import { checkBadges } from "@/lib/badges";
-import ProfileHero from "@/components/profile/ProfileHero";
-import ProfileStats from "@/components/profile/ProfileStats";
 
 const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",blue:"#3B82F6",green:"#10B981",amber:"#F59E0B",purple:"#8B5CF6",mono:"'Space Mono', monospace",sans:"'Hanken Grotesk', system-ui, sans-serif",anton:"'Anton', sans-serif"};
 const SURL="https://oexgxnybeixwadgtdtzp.supabase.co";
@@ -147,17 +145,28 @@ export default function PublicProfilePage() {
 
       {lightbox&&(<div onClick={()=>setLightbox(null)} style={{position:"fixed",inset:0,zIndex:9999,background:"rgba(0,0,0,.93)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}><img src={lightbox} alt="" style={{maxWidth:"90vw",maxHeight:"90vh",objectFit:"contain",borderRadius:12}}/><button onClick={()=>setLightbox(null)} style={{position:"absolute",top:20,right:24,background:"rgba(255,255,255,.15)",border:"none",color:"#fff",fontSize:20,cursor:"pointer",borderRadius:"50%",width:40,height:40}}>✕</button></div>)}
 
-      <ProfileHero
-        profile={profile}
-        router={router}
-      />
+      {/* 1 — Hero */}
+      <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:20,padding:"24px 28px",marginBottom:14,display:"flex",alignItems:"center",gap:20,flexWrap:"wrap",position:"relative",overflow:"hidden"}}>
+        <div style={{position:"absolute",top:0,right:0,width:200,height:"100%",background:`linear-gradient(90deg,transparent,${T.orangeL})`,pointerEvents:"none"}}/>
+        <div style={{padding:4,borderRadius:"50%",background:`linear-gradient(135deg,${T.orange},${T.purple})`,boxShadow:"0 14px 35px rgba(15,23,42,.18)"}}><ProfileAvatar src={profile?.avatar_url} name={`${profile?.first_name||""} ${profile?.last_name||""}`} size={112}/></div>
+        <div style={{flex:1}}>
+          <h2 style={{fontFamily:T.anton,fontWeight:400,fontSize:32,textTransform:"uppercase",color:T.ink,lineHeight:1,marginBottom:6}}>{profile?.first_name} {profile?.last_name}</h2>
+          <p style={{fontFamily:T.mono,fontSize:11,color:T.orange,marginBottom:4}}>@{profile?.username}</p>
+          <p style={{fontSize:13,color:T.muted}}>{profile?.school||"School not listed"} · {profile?.sport||"Sport not listed"}</p>
+        </div>
+        <button onClick={()=>router.push("/dashboard")} style={{fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",background:"transparent",border:`1.5px solid ${T.line}`,color:T.muted,borderRadius:999,padding:"9px 16px",cursor:"pointer"}}>← Dashboard</button>
+      </div>
 
-      <ProfileStats
-        profile={profile}
-        certificates={certificates}
-        badges={badges}
-        posts={posts}
-      />
+      {/* 2 — Stats */}
+      <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:10,marginBottom:14}}>
+        {[{icon:"⚡",label:"XP",value:profile?.xp??0},{icon:"💰",label:"Coins",value:profile?.coin_balance??0},{icon:"🎓",label:"Certs",value:certificates.length},{icon:"🏅",label:"Badges",value:badges.length},{icon:"💬",label:"Posts",value:posts.length}].map(({icon,label,value})=>(
+          <div key={label} style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:14,padding:"14px 14px"}}>
+            <div style={{fontSize:20,marginBottom:6}}>{icon}</div>
+            <div style={{fontFamily:T.mono,fontSize:9,letterSpacing:"0.1em",textTransform:"uppercase",color:T.muted,marginBottom:3}}>{label}</div>
+            <div style={{fontFamily:T.anton,fontSize:26,fontWeight:400,color:T.ink,lineHeight:1}}>{value}</div>
+          </div>
+        ))}
+      </div>
 
       {/* 3 — About + Academics */}
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>

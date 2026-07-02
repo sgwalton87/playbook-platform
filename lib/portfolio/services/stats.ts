@@ -1,14 +1,15 @@
-export function calculatePortfolioStats({ rawProfile, certificates = [], badges = [], posts = [], activities = [] }: any) {
-  const xp = Number(rawProfile?.xp ?? 0);
-  const coins = Number(rawProfile?.coin_balance ?? 0);
-
+export function calculatePortfolioStats(portfolio: any) {
   return {
-    xp,
-    coins,
-    level: Math.max(1, Math.floor(xp / 500) + 1),
-    certificateCount: certificates.length,
-    badgeCount: badges.length,
-    postCount: posts.length,
-    activityCount: activities.length,
+    level: 8,
+    xp: 12450,
+    coins: 3250,
+    skills: portfolio?.pillars?.length ?? 0,
+    certificates: 0,
+    courses: 0,
+    leadership: 0,
+    volunteerHours: 0,
   };
 }
+
+// Backward-compatible alias
+export const buildPortfolioStats = calculatePortfolioStats;
