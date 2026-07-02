@@ -23,7 +23,10 @@
     "cartographer": "tsx scripts/cartographer.ts",
     "map": "tsx scripts/cartographer.ts",
     "sentinel": "tsx scripts/sentinel.ts",
-    "health": "tsx scripts/sentinel.ts"
+    "health": "tsx scripts/sentinel.ts",
+    "docs:governor": "tsx scripts/doc-governor.ts",
+    "docs:index": "tsx scripts/doc-governor.ts",
+    "docs:health": "tsx scripts/doc-governor.ts"
   },
   "dependencies": {
     "@stripe/stripe-js": "^9.8.0",

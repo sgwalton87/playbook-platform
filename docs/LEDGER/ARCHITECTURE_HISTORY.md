@@ -172,3 +172,6 @@ Playbook is evolving into Playbook OS™: a lifelong achievement operating syste
 
 - Archivist v2 ship cycle completed.
 
+
+## 2026-07-02 16:33
+- Architecture decision: Documentation should be governed by Doc Governor before creating new roadmap, vision, milestone, or strategy files.

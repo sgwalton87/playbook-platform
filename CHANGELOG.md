@@ -575,3 +575,17 @@ Cartographer now runs during npm run ship.
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Documentation Intelligence
+
+## Added
+
+- Doc Governor
+- Documentation scanner
+- Documentation index
+- Documentation health report
+- Empty / thin doc detection
+- Duplicate topic candidate detection
+- Ship workflow integration

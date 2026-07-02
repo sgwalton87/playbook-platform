@@ -24,3 +24,6 @@
 
 ## 2026-07-02 16:19
 - Decision: Playbook OS now has four core services: Compass, Archivist, Cartographer, and Sentinel.
+
+## 2026-07-02 16:33
+- Decision: Documentation should be governed by Doc Governor before creating new roadmap, vision, milestone, or strategy files.

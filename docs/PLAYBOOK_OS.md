@@ -165,3 +165,15 @@ Focus:
 - Verification Network
 - Beautiful Intelligence Experience
 - Production readiness
+
+---
+
+## Documentation Intelligence
+
+### Doc Governor
+
+Doc Governor manages the health of Playbook documentation.
+
+It scans documentation, identifies empty or thin docs, detects duplicate topic candidates, generates a documentation index, and produces a documentation health report.
+
+Doc Governor helps the team decide what to merge, delete, preserve, or regenerate.
