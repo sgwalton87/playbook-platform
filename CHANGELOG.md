@@ -39,3 +39,22 @@ All notable changes to the Playbook Platform are documented here.
 - FeedModule
 - GalleryModule
 - PortfolioEngine
+
+---
+
+# Alpha 0.4
+
+## Added
+
+- Scholar Record Engine
+- Modular Scholar Record modules
+- ScholarRecordDashboard
+- Scholar Record unit tests
+- Vitest alias configuration
+- VERSION.md
+
+## Next
+
+- Integrate ScholarRecordDashboard into public profile
+- Build PortfolioEngine orchestrator
+- Connect DNA and Opportunity scores to Scholar Record
