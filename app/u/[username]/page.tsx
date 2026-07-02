@@ -7,6 +7,8 @@ import { checkBadges } from "@/lib/badges";
 import ProfileHero from "@/components/profile/ProfileHero";
 import ProfileStats from "@/components/profile/ProfileStats";
 import AboutCard from "@/components/profile/AboutCard";
+import ScholarRecordSummary from "@/components/scholar/ScholarRecordSummary";
+import { buildScholarRecord } from "@/lib/scholar";
 
 const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",blue:"#3B82F6",green:"#10B981",amber:"#F59E0B",purple:"#8B5CF6",mono:"'Space Mono', monospace",sans:"'Hanken Grotesk', system-ui, sans-serif",anton:"'Anton', sans-serif"};
 const SURL="https://oexgxnybeixwadgtdtzp.supabase.co";
@@ -141,6 +143,13 @@ export default function PublicProfilePage() {
   if(loading)return<div style={{minHeight:"100vh",background:T.cream,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:T.mono,fontSize:12,color:T.faint}}>Loading profile...</div>;
   if(!profile)return<div style={{padding:40,fontFamily:T.sans}}><h2>Profile not found</h2><button onClick={()=>router.push("/dashboard")}>Back</button></div>;
   const isOwn=viewerId===profile.id;
+  const scholarRecord=buildScholarRecord({
+    profile,
+    certificates,
+    badges,
+    activities,
+    posts,
+  });
 
   return(
     <div style={{minHeight:"100vh",background:T.cream,fontFamily:T.sans,color:T.ink,padding:"32px 36px",maxWidth:900,margin:"0 auto"}}>
@@ -152,6 +161,8 @@ export default function PublicProfilePage() {
         profile={profile}
         router={router}
       />
+
+      <ScholarRecordSummary record={scholarRecord} />
 
       <ProfileStats
         profile={profile}
