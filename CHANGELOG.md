@@ -401,3 +401,18 @@ Added historical record of major milestones:
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Opportunity Marketplace UI
+
+## Added
+
+- Opportunity Marketplace page
+- Opportunity filtering
+- Opportunity cards
+- Match explanations
+- Next steps
+- Save opportunity state
+- Application status tracking
+- Marketplace UI test
