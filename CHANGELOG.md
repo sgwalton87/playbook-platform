@@ -394,3 +394,10 @@ Added historical record of major milestones:
 - Opportunity reasons
 - Opportunity next steps
 - Opportunity Graph UI unit test
+
+## 2026-07-02 12:11
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
