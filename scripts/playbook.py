@@ -289,6 +289,54 @@ export function isVerified(status?: VerificationStatus) {
 
     log("🎓 Portfolio Engine scaffold complete.")
 
+
+def create_portfolio_assembler():
+    log("🎓 Creating Portfolio Assembler...")
+
+    path = ROOT / "lib/portfolio/services/assembler.ts"
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    path.write_text("""import { supabase } from "@/lib/supabaseClient";
+import { mapProfileToPortfolio } from "./profile";
+
+export async function getPortfolioByUsername(username: string) {
+  const { data: profileData, error } = await supabase
+    .from("profiles")
+    .select("*")
+    .ilike("username", username)
+    .maybeSingle();
+
+  if (error || !profileData) {
+    return null;
+  }
+
+  const [{ data: certData }, { data: badgeData }, { data: feedData }, { data: activityData }] =
+    await Promise.all([
+      supabase.from("certificates").select("*").eq("user_id", profileData.id).order("issued_at", { ascending: false }),
+      supabase.from("user_badges").select("id,awarded_at,badges(id,name,description,image_url)").eq("user_id", profileData.id).order("awarded_at", { ascending: false }),
+      supabase.from("feed_posts").select("*").eq("user_id", profileData.id).or("visibility.eq.public,visibility.is.null").order("created_at", { ascending: false }).limit(50),
+      supabase.from("student_activities").select("*").eq("student_id", profileData.id).order("created_at", { ascending: false }),
+    ]);
+
+  return {
+    rawProfile: profileData,
+    portfolio: mapProfileToPortfolio(profileData),
+    certificates: certData || [],
+    badgeRows: badgeData || [],
+    posts: feedData || [],
+    activities: activityData || [],
+  };
+}
+""")
+
+    index = ROOT / "lib/portfolio/index.ts"
+    idx = index.read_text()
+    if 'export * from "./services/assembler";' not in idx:
+        idx += 'export * from "./services/assembler";\n'
+        index.write_text(idx)
+
+    log("✅ Portfolio Assembler created.")
+
 def help_text():
     print("""
 Playbook Builder
@@ -320,6 +368,9 @@ def main():
 
     elif args[0] == "engine" and len(args) > 1 and args[1] == "portfolio":
         create_portfolio_engine()
+
+    elif args[0] == "patch" and len(args) > 1 and args[1] == "portfolio-assembler":
+        create_portfolio_assembler()
 
     else:
         help_text()
