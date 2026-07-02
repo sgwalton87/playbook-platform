@@ -306,13 +306,15 @@ alter table public.scholar_vault_items enable row level security;
 
 -- Basic owner policies
 
-create policy if not exists "Users can manage own playbook records"
+drop policy if exists "Users can manage own playbook records" on public.playbook_records;
+create policy "Users can manage own playbook records"
 on public.playbook_records
 for all
 using (profile_id = auth.uid())
 with check (profile_id = auth.uid());
 
-create policy if not exists "Users can manage own achievements"
+drop policy if exists "Users can manage own achievements" on public.achievements;
+create policy "Users can manage own achievements"
 on public.achievements
 for all
 using (
@@ -330,7 +332,8 @@ with check (
   )
 );
 
-create policy if not exists "Users can manage own evidence"
+drop policy if exists "Users can manage own evidence" on public.evidence;
+create policy "Users can manage own evidence"
 on public.evidence
 for all
 using (
@@ -350,7 +353,8 @@ with check (
   )
 );
 
-create policy if not exists "Users can manage own verifications"
+drop policy if exists "Users can manage own verifications" on public.verifications;
+create policy "Users can manage own verifications"
 on public.verifications
 for all
 using (
@@ -370,7 +374,8 @@ with check (
   )
 );
 
-create policy if not exists "Users can manage own reflections"
+drop policy if exists "Users can manage own reflections" on public.reflections;
+create policy "Users can manage own reflections"
 on public.reflections
 for all
 using (
@@ -390,7 +395,8 @@ with check (
   )
 );
 
-create policy if not exists "Users can manage own outcomes"
+drop policy if exists "Users can manage own outcomes" on public.outcomes;
+create policy "Users can manage own outcomes"
 on public.outcomes
 for all
 using (
@@ -410,7 +416,8 @@ with check (
   )
 );
 
-create policy if not exists "Users can manage own evidence packs"
+drop policy if exists "Users can manage own evidence packs" on public.evidence_packs;
+create policy "Users can manage own evidence packs"
 on public.evidence_packs
 for all
 using (
@@ -430,7 +437,8 @@ with check (
   )
 );
 
-create policy if not exists "Users can manage own timeline events"
+drop policy if exists "Users can manage own timeline events" on public.timeline_events;
+create policy "Users can manage own timeline events"
 on public.timeline_events
 for all
 using (
@@ -448,7 +456,8 @@ with check (
   )
 );
 
-create policy if not exists "Users can manage own opportunity matches"
+drop policy if exists "Users can manage own opportunity matches" on public.opportunity_matches;
+create policy "Users can manage own opportunity matches"
 on public.opportunity_matches
 for all
 using (
@@ -466,7 +475,8 @@ with check (
   )
 );
 
-create policy if not exists "Users can manage own trust reports"
+drop policy if exists "Users can manage own trust reports" on public.trust_reports;
+create policy "Users can manage own trust reports"
 on public.trust_reports
 for all
 using (
@@ -484,7 +494,8 @@ with check (
   )
 );
 
-create policy if not exists "Users can manage own vault items"
+drop policy if exists "Users can manage own vault items" on public.scholar_vault_items;
+create policy "Users can manage own vault items"
 on public.scholar_vault_items
 for all
 using (
