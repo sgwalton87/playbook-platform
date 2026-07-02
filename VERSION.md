@@ -382,3 +382,10 @@ Archivist remembers the past.
 Cartographer maps the present.
 
 Sentinel monitors platform health.
+
+## 2026-07-02 16:21
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

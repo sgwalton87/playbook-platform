@@ -297,3 +297,13 @@ Playbook is evolving into Playbook OS™: a lifelong achievement operating syste
 
 ## 2026-07-02 16:19
 - **decision**: Playbook OS now has four core services: Compass, Archivist, Cartographer, and Sentinel.
+
+## 2026-07-02 16:20
+- **commit**: Add Sentinel and Playbook OS master index
+
+## 2026-07-02 16:21
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
