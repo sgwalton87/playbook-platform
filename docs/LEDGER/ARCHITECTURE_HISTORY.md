@@ -31,3 +31,10 @@ Playbook is evolving into Playbook OS™: a lifelong achievement operating syste
 
 ## 2026-07-02 10:55
 - Architecture decision: Adopted npm run ship as the canonical end-of-sprint documentation and validation workflow.
+
+## 2026-07-02 11:10
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

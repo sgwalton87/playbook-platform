@@ -276,3 +276,10 @@ Added historical record of major milestones:
 - Event Bus
 - Engine + Repository architecture
 - Academic Intelligence foundation
+
+## 2026-07-02 11:10
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
