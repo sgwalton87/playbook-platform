@@ -542,3 +542,10 @@ Playbook Intelligence OS Alpha 1.0 architecture is now organized around a canoni
 ## Automation
 
 Cartographer now runs during npm run ship.
+
+## 2026-07-02 16:12
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

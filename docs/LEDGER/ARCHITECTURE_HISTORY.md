@@ -155,3 +155,10 @@ Playbook is evolving into Playbook OS™: a lifelong achievement operating syste
 
 ## 2026-07-02 16:10
 - Architecture decision: Alpha 1.0 architecture snapshot is frozen; current architecture documents are generated automatically.
+
+## 2026-07-02 16:12
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

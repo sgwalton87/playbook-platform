@@ -361,3 +361,10 @@ Archivist records what happened.
 Cartographer maps what exists.
 
 Compass guides what should happen next.
+
+## 2026-07-02 16:12
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
