@@ -878,3 +878,15 @@ Alpha 1.0 Complete
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Playbook OS Beta 2.5 Polish Sprint
+
+## Added
+
+- Shared empty state component
+- Shared loading component
+- Shared error state component
+- Polish checklist
+- Polish tests
