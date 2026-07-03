@@ -36,6 +36,8 @@ Files:
 - docs/COMPANY/OPERATING_SYSTEM.md
 - docs/COMPANY/README.md
 - docs/DATABASE_BLUEPRINT.md
+- docs/DEPRECATED/OLD_DATA_MODEL.md
+- docs/DEPRECATED/SPRINTS_README.md
 - docs/DOCUMENTATION/CANONICAL_DOCS.md
 - docs/DOCUMENTATION/CLEANUP_PLAN.md
 - docs/DOCUMENTATION/DOCUMENTATION_HEALTH.md
@@ -96,7 +98,6 @@ Files:
 - docs/WHY_NOT.md
 - docs/WHY_NOTS/README.md
 - docs/sprints/ALPHA_0.6_PLAYBOOK_GRAPH_AND_EVENT_BUS.md
-- docs/sprints/README.md
 
 ## architecture
 
@@ -106,17 +107,14 @@ Confidence: High
 
 Files:
 - docs/AI_ARCHITECTURE.md
-- docs/ENGINEERING/ARCHITECTURE.md
+- docs/DEPRECATED/ENGINEERING_ARCHITECTURE.md
 - docs/ENGINE_ARCHITECTURE.md
 - docs/LEDGER/ARCHITECTURE_HISTORY.md
 - docs/MOBILE_ARCHITECTURE.md
 - docs/architecture/COMPONENT_CATALOG.md
 - docs/architecture/CURRENT_ARCHITECTURE.md
-- docs/architecture/DATA_MODEL.md
 - docs/architecture/ENGINE_CATALOG.md
-- docs/architecture/EVENT_CATALOG.md
 - docs/architecture/PLAYBOOK_OS_ALPHA_1.md
-- docs/architecture/REPOSITORY_CATALOG.md
 - docs/architecture/SENTINEL_REPORT.md
 - docs/architecture/SYSTEM_MAP.md
 
@@ -128,9 +126,9 @@ Confidence: High
 
 Files:
 - docs/CHANGELOG.md
+- docs/DEPRECATED/RELEASES_README.md
 - docs/LEDGER/RELEASE_HISTORY.md
 - docs/releases/ALPHA_0.1.md
-- docs/releases/README.md
 - docs/releases/RELEASE_LOG.md
 
 ## design
@@ -140,6 +138,7 @@ Recommendation: merge related content into docs/DESIGN/PLAYBOOK_DESIGN_SYSTEM.md
 Confidence: High
 
 Files:
+- docs/DEPRECATED/DESIGN_SYSTEM.md
 - docs/DESIGN/ANIMATION_GUIDELINES.md
 - docs/DESIGN/COLORS.md
 - docs/DESIGN/COMPONENT_LIBRARY.md
@@ -148,7 +147,24 @@ Files:
 - docs/DESIGN/MOTION.md
 - docs/DESIGN/PLAYBOOK_DESIGN_SYSTEM.md
 - docs/DESIGN/TYPOGRAPHY.md
-- docs/DESIGN_SYSTEM.md
+
+## ledger
+
+Recommendation: merge related content into Review manually
+
+Confidence: High
+
+Files:
+- docs/DEPRECATED/OLD_EVENT_CATALOG.md
+- docs/DEPRECATED/OLD_REPOSITORY_CATALOG.md
+- docs/HISTORY/DAILY_LOGS/2026-07-02.md
+- docs/LEDGER/ENGINEERING_LOG.md
+- docs/LEDGER/FOUNDER_JOURNAL.md
+- docs/LEDGER/INTELLECTUAL_PROPERTY.md
+- docs/LEDGER/MILESTONES.md
+- docs/LEDGER/PRODUCT_LOG.md
+- docs/PLAYBOOK_MASTER_LEDGER.md
+- docs/sprints/SPRINT_LOG.md
 
 ## roadmap
 
@@ -193,20 +209,4 @@ Files:
 - docs/HISTORY/FOUNDERS_JOURNAL/Volume_3_Building_the_OS.md
 - docs/HISTORY/PLAYBOOK_HISTORY.md
 - docs/PLAYBOOK_HISTORY.md
-
-## ledger
-
-Recommendation: merge related content into Review manually
-
-Confidence: High
-
-Files:
-- docs/HISTORY/DAILY_LOGS/2026-07-02.md
-- docs/LEDGER/ENGINEERING_LOG.md
-- docs/LEDGER/FOUNDER_JOURNAL.md
-- docs/LEDGER/INTELLECTUAL_PROPERTY.md
-- docs/LEDGER/MILESTONES.md
-- docs/LEDGER/PRODUCT_LOG.md
-- docs/PLAYBOOK_MASTER_LEDGER.md
-- docs/sprints/SPRINT_LOG.md
 

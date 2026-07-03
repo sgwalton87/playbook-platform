@@ -48,3 +48,19 @@ Doc Governor should eventually:
 - ignore generated docs
 - score thin docs differently from intentional index files
 - produce merge recommendations
+
+
+---
+
+# Cleanup Pass
+
+Moved duplicate or superseded documentation into docs/DEPRECATED.
+
+Canonical docs remain:
+
+- docs/PLAYBOOK_OS.md
+- docs/PRODUCT_ROADMAP.md
+- docs/VISION/VISION.md
+- docs/DESIGN/PLAYBOOK_DESIGN_SYSTEM.md
+- docs/ARCHITECTURE/CURRENT_ARCHITECTURE.md
+- docs/ARCHITECTURE/PLAYBOOK_OS_ALPHA_1.md
