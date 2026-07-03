@@ -37,3 +37,6 @@
 
 ## 2026-07-02 16:50
 - Innovation: Doc Governor v2 turns Playbook docs into a governed knowledge system.
+
+## 2026-07-02 17:16
+- Innovation: Playbook Home transforms the dashboard into a living intelligence experience.

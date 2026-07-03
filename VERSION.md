@@ -443,3 +443,9 @@ Upgraded Documentation Intelligence with metadata, registry, merge recommendatio
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Beta 1.0 — Learner Intelligence
+
+Added Playbook Home and the flagship learner intelligence experience foundation.
