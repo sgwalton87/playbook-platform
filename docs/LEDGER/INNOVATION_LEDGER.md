@@ -48,3 +48,9 @@ Shared polish components created to make Playbook OS feel more consistent and pr
 **Type:** innovation
 
 Playbook now allows every level of the scholar support system to interact with one trusted learner intelligence layer.
+
+## 2026-07-03T21:23:48.795Z
+
+**Type:** innovation
+
+Added Mentor OS and role-specific intelligence experiences around the scholar support system.

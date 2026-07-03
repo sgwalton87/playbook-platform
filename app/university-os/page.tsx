@@ -1,7 +1,7 @@
 "use client";
 
-import RoleOSDashboard from "@/components/role-os/RoleOSDashboard";
+import RoleDashboardExperience from "@/components/role-os/dashboards/RoleDashboardExperience";
 
 export default function UniversityOSPage() {
-  return <RoleOSDashboard role="university" />;
+  return <RoleDashboardExperience role="university" />;
 }

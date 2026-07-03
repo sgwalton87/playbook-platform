@@ -180,3 +180,19 @@ Products:
 
 Principle:
 Every role gets a unique experience while remaining connected to the same Scholar Record, Trust Layer, Compass, Oracle, and Opportunity Graph.
+
+---
+
+# Beta 3 — Role OS Expansion
+
+Status: Foundation expanded
+
+Added:
+- Family OS
+- Educator OS
+- Mentor OS
+- District OS
+- University OS
+- Employer OS
+
+Each experience answers a different support question while remaining connected to the same Scholar Record.

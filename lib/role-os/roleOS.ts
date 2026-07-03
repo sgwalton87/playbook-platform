@@ -4,7 +4,8 @@ export type PlaybookRoleOS =
   | "educator"
   | "district"
   | "university"
-  | "employer";
+  | "employer"
+  | "mentor";
 
 export function getRoleOS(role: PlaybookRoleOS) {
   const systems = {
@@ -56,6 +57,14 @@ export function getRoleOS(role: PlaybookRoleOS) {
       primaryAction: "View Talent Pipeline",
       href: "/employer-os",
     },
+    mentor: {
+      title: "Mentor OS",
+      audience: "Mentor / Trusted Adult",
+      headline: "Know who you are helping and what they need next.",
+      focus: ["Weekly Check-ins", "Scholar Goals", "Opportunity Coaching", "Encouragement"],
+      primaryAction: "Open Mentor View",
+      href: "/mentor-os",
+    },
   };
 
   return systems[role];
@@ -69,5 +78,6 @@ export function getAllRoleOS() {
     getRoleOS("district"),
     getRoleOS("university"),
     getRoleOS("employer"),
+    getRoleOS("mentor"),
   ];
 }

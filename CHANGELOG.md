@@ -941,3 +941,17 @@ Playbook now supports unique experiences for every role around the scholar.
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Full Role OS Experiences
+
+## Added
+
+- Rich Family OS dashboard
+- Rich Educator OS dashboard
+- Rich District OS dashboard
+- Rich University OS dashboard
+- Rich Employer OS dashboard
+- Mentor OS
+- Role-specific metrics, actions, insights, and questions

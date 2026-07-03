@@ -625,3 +625,9 @@ Added the first multi-role operating system layer for families, educators, distr
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Playbook OS Beta 3
+
+Expanded role-based operating systems into richer, role-specific support experiences.
