@@ -23,6 +23,7 @@ const nav = [
   ["University OS", "/university-os"],
   ["District OS", "/district-os"],
   ["Educator OS", "/educator-os"],
+  ["Support Network", "/support-network"],
   ["Workflows", "/workflows"],
   ["Action Routing", "/action-routing"],
   ["Collaboration Layer", "/collaboration"],

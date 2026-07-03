@@ -1019,3 +1019,14 @@ Playbook now supports unique experiences for every role around the scholar.
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Support Network Map
+
+## Added
+
+- Scholar-centered support network map
+- Seven role support nodes
+- Shared Scholar Record center
+- Support network tests

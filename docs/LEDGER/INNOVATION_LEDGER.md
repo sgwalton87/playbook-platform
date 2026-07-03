@@ -72,3 +72,9 @@ Playbook now routes one scholar signal into role-specific actions for every supp
 **Type:** innovation
 
 Playbook now tracks coordinated support progress across every scholar support role.
+
+## 2026-07-03T21:46:52.493Z
+
+**Type:** innovation
+
+Playbook now visualizes the full support ecosystem around one scholar-owned record.
