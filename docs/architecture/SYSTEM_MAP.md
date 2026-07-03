@@ -43,6 +43,7 @@ Playbook SDK
 - app/record/page.tsx
 - app/reset-password/page.tsx
 - app/store/page.tsx
+- app/studio/page.tsx
 - app/transcript/page.tsx
 - app/u/[username]/page.tsx
 
@@ -76,4 +77,5 @@ Playbook SDK
 - tests/unit/oracle/oracle.test.ts
 - tests/unit/scholar-record.test.ts
 - tests/unit/smoke.test.ts
+- tests/unit/studio/studio.test.tsx
 - tests/unit/trust-engine.test.ts
