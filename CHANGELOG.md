@@ -890,3 +890,10 @@ Alpha 1.0 Complete
 - Shared error state component
 - Polish checklist
 - Polish tests
+
+## 2026-07-03 13:43
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

@@ -598,3 +598,10 @@ Added platform operations to Playbook Studio, including architecture, documentat
 # Playbook OS Beta 2.5
 
 Added polish foundation for loading states, empty states, error states, and launch-readiness tracking.
+
+## 2026-07-03 13:43
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
