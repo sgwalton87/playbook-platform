@@ -712,3 +712,19 @@ Cartographer now runs during npm run ship.
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# First Complete User Journey
+
+## Added
+
+- Journey demo page
+- Onboarding to Home walkthrough
+- Transcript Intelligence step
+- Academic DNA step
+- Opportunity Graph save interaction
+- Compass briefing step
+- Oracle answer step
+- Evidence-to-Trust step
+- Playbook Home completion step
