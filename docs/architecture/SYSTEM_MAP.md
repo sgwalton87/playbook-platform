@@ -16,6 +16,7 @@ Playbook SDK
 
 ## Detected Pages
 
+- app/action-routing/page.tsx
 - app/admin/page.tsx
 - app/auth/callback/page.tsx
 - app/badges/page.tsx
@@ -83,6 +84,7 @@ Playbook SDK
 - tests/unit/academic/transcript-knowledge-graph.test.ts
 - tests/unit/academic-engine.test.ts
 - tests/unit/academic-intelligence.test.ts
+- tests/unit/action-routing/action-routing.test.tsx
 - tests/unit/collaboration/collaboration.test.tsx
 - tests/unit/compass/compass-core.test.ts
 - tests/unit/demo/demo-mode.test.tsx

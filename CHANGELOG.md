@@ -993,3 +993,10 @@ Playbook now supports unique experiences for every role around the scholar.
 - Action Routing Center
 - Action routing tests
 - Shared opportunity-to-role support workflow
+
+## 2026-07-03 14:42
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
