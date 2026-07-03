@@ -86,3 +86,18 @@ Includes:
 - Opportunity Galaxy
 - Growth Journey
 - Compass Daily Briefing
+
+---
+
+# Beta 1.1-1.5 — Learner Intelligence Experience
+
+Status: Foundation complete
+
+Includes:
+- Playbook Home
+- Living Dashboard direction
+- Academic DNA visualization
+- Scholar Genome
+- Opportunity Galaxy
+- Growth Journey
+- Compass Daily Briefing

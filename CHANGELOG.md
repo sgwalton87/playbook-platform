@@ -677,3 +677,17 @@ Cartographer now runs during npm run ship.
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Beta 1.1-1.5 Learner Intelligence Experience
+
+## Added
+
+- Playbook Home
+- Compass Daily Briefing
+- Academic DNA visualization
+- Scholar Genome
+- Opportunity Galaxy
+- Growth Journey
+- Beautiful Intelligence experience foundation
