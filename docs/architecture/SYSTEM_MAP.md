@@ -65,6 +65,7 @@ Playbook SDK
 - tests/unit/opportunity-graph/opportunity-graph-card.test.tsx
 - tests/unit/opportunity-graph/opportunity-graph.test.ts
 - tests/unit/opportunity-marketplace/opportunity-marketplace.test.tsx
+- tests/unit/oracle/oracle.test.ts
 - tests/unit/scholar-record.test.ts
 - tests/unit/smoke.test.ts
 - tests/unit/trust-engine.test.ts
