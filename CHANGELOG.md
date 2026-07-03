@@ -962,3 +962,15 @@ Playbook now supports unique experiences for every role around the scholar.
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Role OS Collaboration Layer
+
+## Added
+
+- Shared opportunity collaboration plan
+- Role-specific support actions
+- Scholar, Family, Educator, Mentor, District, University, and Employer collaboration views
+- Collaboration Layer page
+- Collaboration tests

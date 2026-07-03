@@ -54,3 +54,9 @@ Playbook now allows every level of the scholar support system to interact with o
 **Type:** innovation
 
 Added Mentor OS and role-specific intelligence experiences around the scholar support system.
+
+## 2026-07-03T21:35:06.910Z
+
+**Type:** innovation
+
+One scholar opportunity can now create role-specific actions across the full support ecosystem.

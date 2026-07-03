@@ -196,3 +196,18 @@ Added:
 - Employer OS
 
 Each experience answers a different support question while remaining connected to the same Scholar Record.
+
+---
+
+# Role OS Collaboration Layer
+
+Status: Foundation complete
+
+One scholar opportunity can now generate unique actions for:
+- Scholar
+- Family
+- Educator
+- Mentor
+- District
+- University
+- Employer

@@ -638,3 +638,9 @@ Expanded role-based operating systems into richer, role-specific support experie
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Role OS Collaboration Layer
+
+Added shared-opportunity collaboration across the full scholar support system.
