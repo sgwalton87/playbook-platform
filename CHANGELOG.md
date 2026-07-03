@@ -751,3 +751,10 @@ Cartographer now runs during npm run ship.
 - Oracle explanation demo
 - Scholar Record evidence demo
 - Presentation path links
+
+## 2026-07-03 01:57
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

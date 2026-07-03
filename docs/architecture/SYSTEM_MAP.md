@@ -25,6 +25,7 @@ Playbook SDK
 - app/courses/[slug]/page.tsx
 - app/courses/page.tsx
 - app/dashboard/page.tsx
+- app/demo/page.tsx
 - app/events/page.tsx
 - app/feed/page.tsx
 - app/home/page.tsx
@@ -62,6 +63,7 @@ Playbook SDK
 - tests/unit/academic-engine.test.ts
 - tests/unit/academic-intelligence.test.ts
 - tests/unit/compass/compass-core.test.ts
+- tests/unit/demo/demo-mode.test.tsx
 - tests/unit/event-handlers.test.ts
 - tests/unit/events.test.ts
 - tests/unit/home/playbook-home.test.tsx
