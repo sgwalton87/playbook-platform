@@ -6,7 +6,7 @@ describe("Role OS routing", () => {
     expect(getRoleDestination("family")).toBe("/family-os");
   });
 
-  it("has six signup role options", () => {
-    expect(roleOptions.length).toBe(6);
+  it("has seven signup role options", () => {
+    expect(roleOptions.length).toBe(7);
   });
 });

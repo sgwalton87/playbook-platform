@@ -4,7 +4,7 @@ import RoleOSDashboard from "@/components/role-os/RoleOSDashboard";
 
 describe("Multi-Role Playbook OS", () => {
   it("returns all role operating systems", () => {
-    expect(getAllRoleOS().length).toBe(6);
+    expect(getAllRoleOS().length).toBe(7);
   });
 
   it("returns Family OS", () => {
