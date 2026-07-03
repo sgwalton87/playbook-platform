@@ -540,3 +540,9 @@ Added Archivist v3 Unified Ledger Engine and upgraded Demo Mode into a keynote-s
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Living Scholar Experience
+
+Added flagship Beta 2 Living Scholar Experience.

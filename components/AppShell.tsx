@@ -7,6 +7,7 @@ import ProfileAvatar from "@/components/ProfileAvatar";
 const NAV=[
   {label:"Demo",href:"/demo",icon:"🎤"},
   {label:"Journey",href:"/journey",icon:"🚀"},
+  {label:"Living Scholar",href:"/living-scholar",icon:"🌱"},
   {label:"Home",href:"/home",icon:"✨"},
   {label:"Dashboard",href:"/dashboard",icon:"🏠"},
   {label:"Profile",href:"/profile",icon:"👤"},

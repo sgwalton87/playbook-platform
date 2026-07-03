@@ -795,3 +795,17 @@ Alpha 1.0 Complete
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Living Scholar Experience
+
+## Added
+
+- Morning Brief
+- Living Academic DNA visualizer
+- Opportunity Galaxy
+- Scholar Timeline
+- Oracle Copilot
+- Daily Growth Score
+- Living Scholar page

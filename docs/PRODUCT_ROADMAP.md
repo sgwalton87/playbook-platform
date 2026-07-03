@@ -109,3 +109,17 @@ Includes:
 Status: Foundation complete
 
 Demo Mode gives Playbook a presentation-ready fictional learner journey for investors, districts, grants, partners, and early adopters.
+
+---
+
+# Beta 2 — Living Scholar Experience
+
+Status: Foundation complete
+
+Includes:
+- Morning Brief
+- Academic DNA
+- Opportunity Galaxy
+- Scholar Timeline
+- Oracle Copilot
+- Growth Score
