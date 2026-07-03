@@ -46,6 +46,7 @@ Playbook SDK
 - app/profile/page.tsx
 - app/record/page.tsx
 - app/reset-password/page.tsx
+- app/role-select/page.tsx
 - app/store/page.tsx
 - app/studio/architecture/page.tsx
 - app/studio/demo-director/page.tsx
@@ -93,6 +94,7 @@ Playbook SDK
 - tests/unit/oracle/oracle.test.ts
 - tests/unit/polish/polish.test.ts
 - tests/unit/role-os/role-os.test.ts
+- tests/unit/role-os/role-routes.test.ts
 - tests/unit/scholar-record.test.ts
 - tests/unit/smoke.test.ts
 - tests/unit/studio/studio-operations.test.ts

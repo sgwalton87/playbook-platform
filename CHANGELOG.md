@@ -934,3 +934,10 @@ Playbook now supports unique experiences for every role around the scholar.
 - Role OS routing helper
 - Signup/onboarding routing toward role-based OS experiences
 - Scholar, Family, Educator, District, University, and Employer role cards
+
+## 2026-07-03 14:12
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
