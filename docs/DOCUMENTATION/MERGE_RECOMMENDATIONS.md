@@ -32,6 +32,7 @@ Confidence: High
 Files:
 - docs/ADVISORY/README.md
 - docs/ARCHIVIST/SHIP_2026-07-02.md
+- docs/ARCHIVIST/SHIP_2026-07-03.md
 - docs/BOARD/README.md
 - docs/COMPANY/OPERATING_SYSTEM.md
 - docs/COMPANY/README.md
@@ -113,8 +114,11 @@ Files:
 - docs/MOBILE_ARCHITECTURE.md
 - docs/architecture/COMPONENT_CATALOG.md
 - docs/architecture/CURRENT_ARCHITECTURE.md
+- docs/architecture/DATA_MODEL.md
 - docs/architecture/ENGINE_CATALOG.md
+- docs/architecture/EVENT_CATALOG.md
 - docs/architecture/PLAYBOOK_OS_ALPHA_1.md
+- docs/architecture/REPOSITORY_CATALOG.md
 - docs/architecture/SENTINEL_REPORT.md
 - docs/architecture/SYSTEM_MAP.md
 
@@ -158,6 +162,7 @@ Files:
 - docs/DEPRECATED/OLD_EVENT_CATALOG.md
 - docs/DEPRECATED/OLD_REPOSITORY_CATALOG.md
 - docs/HISTORY/DAILY_LOGS/2026-07-02.md
+- docs/HISTORY/DAILY_LOGS/2026-07-03.md
 - docs/LEDGER/ENGINEERING_LOG.md
 - docs/LEDGER/FOUNDER_JOURNAL.md
 - docs/LEDGER/INTELLECTUAL_PROPERTY.md
