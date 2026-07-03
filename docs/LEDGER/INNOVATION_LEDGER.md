@@ -60,3 +60,9 @@ Added Mentor OS and role-specific intelligence experiences around the scholar su
 **Type:** innovation
 
 One scholar opportunity can now create role-specific actions across the full support ecosystem.
+
+## 2026-07-03T21:39:19.749Z
+
+**Type:** innovation
+
+Playbook now routes one scholar signal into role-specific actions for every support role.

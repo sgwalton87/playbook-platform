@@ -981,3 +981,15 @@ Playbook now supports unique experiences for every role around the scholar.
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Role OS Action Routing
+
+## Added
+
+- Role-specific notifications
+- Role-specific action labels
+- Action Routing Center
+- Action routing tests
+- Shared opportunity-to-role support workflow

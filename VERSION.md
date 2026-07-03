@@ -651,3 +651,9 @@ Added shared-opportunity collaboration across the full scholar support system.
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Role OS Action Routing
+
+Added coordinated action routing across scholar support roles.
