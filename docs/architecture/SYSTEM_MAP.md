@@ -37,6 +37,7 @@ Playbook SDK
 - app/leaderboard/page.tsx
 - app/living-scholar/page.tsx
 - app/login/page.tsx
+- app/mentor-os/page.tsx
 - app/mentorship/page.tsx
 - app/notifications/page.tsx
 - app/onboarding/page.tsx
@@ -93,6 +94,7 @@ Playbook SDK
 - tests/unit/opportunity-marketplace/opportunity-marketplace.test.tsx
 - tests/unit/oracle/oracle.test.ts
 - tests/unit/polish/polish.test.ts
+- tests/unit/role-os/role-dashboard-experience.test.tsx
 - tests/unit/role-os/role-os.test.ts
 - tests/unit/role-os/role-routes.test.ts
 - tests/unit/scholar-record.test.ts
