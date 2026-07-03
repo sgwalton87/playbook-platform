@@ -63,6 +63,7 @@ Playbook SDK
 - app/studio/simulator/page.tsx
 - app/studio/system-map/page.tsx
 - app/studio/themes/page.tsx
+- app/support-network/page.tsx
 - app/transcript/page.tsx
 - app/u/[username]/page.tsx
 - app/university-os/page.tsx
@@ -107,5 +108,6 @@ Playbook SDK
 - tests/unit/studio/studio-operations.test.ts
 - tests/unit/studio/studio-tools.test.ts
 - tests/unit/studio/studio.test.tsx
+- tests/unit/support-network/support-network.test.tsx
 - tests/unit/trust-engine.test.ts
 - tests/unit/workflows/support-workflow.test.tsx
