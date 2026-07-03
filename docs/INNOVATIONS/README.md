@@ -46,3 +46,6 @@
 
 ## 2026-07-02 17:45
 - Innovation: Playbook can now demonstrate the full learner intelligence loop end-to-end.
+
+## 2026-07-03 01:55
+- Innovation: Demo Mode turns Playbook Intelligence OS into a guided presentation experience.

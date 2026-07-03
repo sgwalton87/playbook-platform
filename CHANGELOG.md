@@ -735,3 +735,19 @@ Cartographer now runs during npm run ship.
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Demo Mode
+
+## Added
+
+- Presentation-ready Demo Mode
+- Fictional learner profile
+- District / investor talk track
+- Academic DNA demo
+- Opportunity Graph demo
+- Compass briefing demo
+- Oracle explanation demo
+- Scholar Record evidence demo
+- Presentation path links

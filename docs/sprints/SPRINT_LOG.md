@@ -24,3 +24,6 @@
 
 ## 2026-07-02 17:45
 - Sprint update: Built first complete user journey from onboarding to Playbook Home.
+
+## 2026-07-03 01:55
+- Sprint update: Built Demo Mode for investor and district presentations.

@@ -101,3 +101,11 @@ Includes:
 - Opportunity Galaxy
 - Growth Journey
 - Compass Daily Briefing
+
+---
+
+# Demo Mode
+
+Status: Foundation complete
+
+Demo Mode gives Playbook a presentation-ready fictional learner journey for investors, districts, grants, partners, and early adopters.

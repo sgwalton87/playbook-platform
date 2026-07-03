@@ -496,3 +496,9 @@ Added end-to-end learner journey from onboarding to Playbook Home.
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Demo Mode
+
+Added presentation-ready Demo Mode for investor meetings, district presentations, grant demos, and partner walkthroughs.
