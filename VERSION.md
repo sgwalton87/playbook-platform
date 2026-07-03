@@ -462,3 +462,10 @@ Added Playbook Home and the flagship learner intelligence experience foundation.
 # Beta 1.0 — Learner Intelligence
 
 Added Playbook Home and the flagship learner intelligence experience foundation.
+
+## 2026-07-03 17:23
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
