@@ -18,3 +18,9 @@ Archivist v3 unified ledger engine created to replace fragmented logging scripts
 **Type:** innovation
 
 Living Scholar turns Playbook OS intelligence into a daily learner experience.
+
+## 2026-07-03T18:50:27.074Z
+
+**Type:** innovation
+
+Playbook Studio separates builder operations from learner experience.

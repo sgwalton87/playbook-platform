@@ -553,3 +553,9 @@ Added flagship Beta 2 Living Scholar Experience.
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Playbook Studio Epic I
+
+Added Playbook Studio foundation as the operating console for Playbook OS.

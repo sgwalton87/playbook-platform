@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabaseClient";
 import ProfileAvatar from "@/components/ProfileAvatar";
 
 const NAV=[
+  {label:"Studio",href:"/studio",icon:"🛠"},
   {label:"Demo",href:"/demo",icon:"🎤"},
   {label:"Journey",href:"/journey",icon:"🚀"},
   {label:"Living Scholar",href:"/living-scholar",icon:"🌱"},
