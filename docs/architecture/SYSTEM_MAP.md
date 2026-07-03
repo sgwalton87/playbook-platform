@@ -26,7 +26,11 @@ Playbook SDK
 - app/courses/page.tsx
 - app/dashboard/page.tsx
 - app/demo/page.tsx
+- app/district-os/page.tsx
+- app/educator-os/page.tsx
+- app/employer-os/page.tsx
 - app/events/page.tsx
+- app/family-os/page.tsx
 - app/feed/page.tsx
 - app/home/page.tsx
 - app/journey/page.tsx
@@ -57,6 +61,7 @@ Playbook SDK
 - app/studio/themes/page.tsx
 - app/transcript/page.tsx
 - app/u/[username]/page.tsx
+- app/university-os/page.tsx
 
 ## Detected Migrations
 
@@ -87,6 +92,7 @@ Playbook SDK
 - tests/unit/opportunity-marketplace/opportunity-marketplace.test.tsx
 - tests/unit/oracle/oracle.test.ts
 - tests/unit/polish/polish.test.ts
+- tests/unit/role-os/role-os.test.ts
 - tests/unit/scholar-record.test.ts
 - tests/unit/smoke.test.ts
 - tests/unit/studio/studio-operations.test.ts
