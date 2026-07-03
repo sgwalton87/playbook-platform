@@ -974,3 +974,10 @@ Playbook now supports unique experiences for every role around the scholar.
 - Scholar, Family, Educator, Mentor, District, University, and Employer collaboration views
 - Collaboration Layer page
 - Collaboration tests
+
+## 2026-07-03 14:38
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

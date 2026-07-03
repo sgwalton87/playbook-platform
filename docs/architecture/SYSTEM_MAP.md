@@ -20,6 +20,7 @@ Playbook SDK
 - app/auth/callback/page.tsx
 - app/badges/page.tsx
 - app/certificates/page.tsx
+- app/collaboration/page.tsx
 - app/compass/page.tsx
 - app/connections/page.tsx
 - app/courses/[slug]/page.tsx
@@ -82,6 +83,7 @@ Playbook SDK
 - tests/unit/academic/transcript-knowledge-graph.test.ts
 - tests/unit/academic-engine.test.ts
 - tests/unit/academic-intelligence.test.ts
+- tests/unit/collaboration/collaboration.test.tsx
 - tests/unit/compass/compass-core.test.ts
 - tests/unit/demo/demo-mode.test.tsx
 - tests/unit/event-handlers.test.ts
