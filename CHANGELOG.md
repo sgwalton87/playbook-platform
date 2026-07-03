@@ -1000,3 +1000,15 @@ Playbook now supports unique experiences for every role around the scholar.
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Role OS Support Workflow Tracker
+
+## Added
+
+- Shared support workflow
+- Role task completion tracking
+- Workflow progress score
+- Workflow page
+- Workflow tests
