@@ -533,3 +533,10 @@ Alpha 1.0 Complete
 # Beta 2
 
 Added Archivist v3 Unified Ledger Engine and upgraded Demo Mode into a keynote-style presentation experience.
+
+## 2026-07-03 11:00
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

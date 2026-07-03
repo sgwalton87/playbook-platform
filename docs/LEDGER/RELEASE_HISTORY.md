@@ -364,3 +364,13 @@ Playbook is evolving into Playbook OS™: a lifelong achievement operating syste
 **Type:** release
 
 Alpha 1.0 Complete
+
+## 2026-07-03 10:59
+- Commit recorded: Build Archivist v3 and Demo Mode keynote flow
+
+## 2026-07-03 11:00
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

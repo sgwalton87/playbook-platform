@@ -274,3 +274,10 @@ Playbook is evolving into Playbook OS™: a lifelong achievement operating syste
 **Type:** architecture
 
 Alpha Architecture finalized and frozen before Beta 2.
+
+## 2026-07-03 11:00
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

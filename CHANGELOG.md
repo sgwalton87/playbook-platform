@@ -788,3 +788,10 @@ Alpha 1.0 Complete
 - log:milestone, log:architecture, and log:demo scripts
 - Demo Mode keynote presentation flow
 - Slide-based district and investor walkthrough
+
+## 2026-07-03 11:00
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
