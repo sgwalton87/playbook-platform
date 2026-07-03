@@ -163,3 +163,20 @@ Includes:
 - SDK Explorer
 - Theme Manager
 - System Map
+
+---
+
+# Playbook OS Beta 3 — Multi-Role Intelligence
+
+Status: Foundation started
+
+Products:
+- Learner OS
+- Family OS
+- Educator OS
+- District OS
+- University OS
+- Employer OS
+
+Principle:
+Every role gets a unique experience while remaining connected to the same Scholar Record, Trust Layer, Compass, Oracle, and Opportunity Graph.

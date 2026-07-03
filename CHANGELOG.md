@@ -897,3 +897,22 @@ Alpha 1.0 Complete
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Multi-Role Playbook OS
+
+## Added
+
+- Learner OS model
+- Family OS
+- Educator OS
+- District OS
+- University OS
+- Employer OS
+- Shared Role OS dashboard
+- Role OS tests
+
+## Platform Shift
+
+Playbook now supports unique experiences for every role around the scholar.

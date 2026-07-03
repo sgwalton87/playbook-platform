@@ -605,3 +605,9 @@ Added polish foundation for loading states, empty states, error states, and laun
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Multi-Role Playbook OS
+
+Added the first multi-role operating system layer for families, educators, districts, universities, employers, and learners.
