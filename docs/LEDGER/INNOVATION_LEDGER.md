@@ -30,3 +30,9 @@ Playbook Studio separates builder operations from learner experience.
 **Type:** innovation
 
 Studio now lets builders simulate learners, inspect intelligence, monitor events, and query Oracle.
+
+## 2026-07-03T20:29:38.858Z
+
+**Type:** innovation
+
+Studio now includes architecture, documentation, release, SDK, theme, and system map operations.

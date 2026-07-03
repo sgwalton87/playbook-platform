@@ -579,3 +579,9 @@ Added Studio intelligence tools for demos, simulation, inspection, event monitor
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Playbook Studio Epic III
+
+Added platform operations to Playbook Studio, including architecture, documentation, release, SDK, theme, and system map tools.

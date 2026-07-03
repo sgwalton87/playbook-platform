@@ -857,3 +857,17 @@ Alpha 1.0 Complete
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Playbook Studio Epic III
+
+## Added
+
+- Architecture Viewer
+- Documentation Center
+- Release Manager
+- SDK Explorer
+- Theme Manager
+- System Map
+- Studio Operations tests

@@ -149,3 +149,17 @@ Includes:
 - Intelligence Inspector
 - Event Monitor
 - Oracle Console
+
+---
+
+# Playbook Studio Epic III
+
+Status: Foundation complete
+
+Includes:
+- Architecture Viewer
+- Documentation Center
+- Release Manager
+- SDK Explorer
+- Theme Manager
+- System Map
