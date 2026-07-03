@@ -27,6 +27,7 @@ Playbook SDK
 - app/dashboard/page.tsx
 - app/events/page.tsx
 - app/feed/page.tsx
+- app/home/page.tsx
 - app/leaderboard/page.tsx
 - app/login/page.tsx
 - app/mentorship/page.tsx
@@ -62,6 +63,7 @@ Playbook SDK
 - tests/unit/compass/compass-core.test.ts
 - tests/unit/event-handlers.test.ts
 - tests/unit/events.test.ts
+- tests/unit/home/playbook-home.test.tsx
 - tests/unit/opportunity-graph/opportunity-graph-card.test.tsx
 - tests/unit/opportunity-graph/opportunity-graph.test.ts
 - tests/unit/opportunity-marketplace/opportunity-marketplace.test.tsx
