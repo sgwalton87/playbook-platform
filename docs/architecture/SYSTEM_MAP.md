@@ -31,6 +31,7 @@ Playbook SDK
 - app/home/page.tsx
 - app/journey/page.tsx
 - app/leaderboard/page.tsx
+- app/living-scholar/page.tsx
 - app/login/page.tsx
 - app/mentorship/page.tsx
 - app/notifications/page.tsx
@@ -68,6 +69,7 @@ Playbook SDK
 - tests/unit/events.test.ts
 - tests/unit/home/playbook-home.test.tsx
 - tests/unit/journey/first-journey.test.tsx
+- tests/unit/living-scholar/living-scholar.test.tsx
 - tests/unit/opportunity-graph/opportunity-graph-card.test.tsx
 - tests/unit/opportunity-graph/opportunity-graph.test.ts
 - tests/unit/opportunity-marketplace/opportunity-marketplace.test.tsx
