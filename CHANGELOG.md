@@ -1012,3 +1012,10 @@ Playbook now supports unique experiences for every role around the scholar.
 - Workflow progress score
 - Workflow page
 - Workflow tests
+
+## 2026-07-03 14:46
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

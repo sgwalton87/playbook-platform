@@ -66,6 +66,7 @@ Playbook SDK
 - app/transcript/page.tsx
 - app/u/[username]/page.tsx
 - app/university-os/page.tsx
+- app/workflows/page.tsx
 
 ## Detected Migrations
 
@@ -107,3 +108,4 @@ Playbook SDK
 - tests/unit/studio/studio-tools.test.ts
 - tests/unit/studio/studio.test.tsx
 - tests/unit/trust-engine.test.ts
+- tests/unit/workflows/support-workflow.test.tsx
