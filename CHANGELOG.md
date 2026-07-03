@@ -638,3 +638,14 @@ Cartographer now runs during npm run ship.
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Oracle Query Engine
+
+## Added
+
+- Oracle query classifier
+- Oracle answer engine
+- Academic, opportunity, trust, and record query support
+- Oracle tests
