@@ -837,3 +837,16 @@ Alpha 1.0 Complete
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Playbook Studio Epic II
+
+## Added
+
+- Demo Director
+- Learner Simulator
+- Intelligence Inspector
+- Event Monitor
+- Oracle Console
+- Studio Intelligence Tools tests

@@ -24,3 +24,9 @@ Living Scholar turns Playbook OS intelligence into a daily learner experience.
 **Type:** innovation
 
 Playbook Studio separates builder operations from learner experience.
+
+## 2026-07-03T18:59:38.346Z
+
+**Type:** innovation
+
+Studio now lets builders simulate learners, inspect intelligence, monitor events, and query Oracle.

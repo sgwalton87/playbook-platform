@@ -136,3 +136,16 @@ Includes:
 - System health
 - Quick actions
 - Studio navigation
+
+---
+
+# Playbook Studio Epic II
+
+Status: Foundation complete
+
+Includes:
+- Demo Director
+- Learner Simulator
+- Intelligence Inspector
+- Event Monitor
+- Oracle Console

@@ -109,3 +109,22 @@ Playbook Studio separates builder operations from learner experience.
 Updated:
 - docs/LEDGER/INNOVATION_LEDGER.md
 - docs/LEDGER/PRODUCT_LOG.md
+
+## 2026-07-03T18:59:36.590Z
+
+**PRODUCT**
+
+Playbook Studio Epic II added intelligence tools.
+
+Updated:
+- docs/LEDGER/PRODUCT_LOG.md
+
+## 2026-07-03T18:59:38.346Z
+
+**INNOVATION**
+
+Studio now lets builders simulate learners, inspect intelligence, monitor events, and query Oracle.
+
+Updated:
+- docs/LEDGER/INNOVATION_LEDGER.md
+- docs/LEDGER/PRODUCT_LOG.md
