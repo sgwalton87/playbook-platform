@@ -32,58 +32,88 @@ export default function PlaybookHome({ courses = demoCourses, name = "Scholar" }
   ];
 
   return (
-    <main style={{minHeight:"100vh",background:"#F8F7F4",padding:32,fontFamily:"system-ui, sans-serif"}}>
-      <div style={{maxWidth:1180,margin:"0 auto",display:"grid",gap:18}}>
+    <main style={page}>
+      <div style={shell}>
         <section style={hero}>
-          <p style={mono}>Playbook Home</p>
-          <h1 style={title}>Good morning, {name}. 👋</h1>
-          <p style={sub}>Compass found {compass.recommendations.length} recommendations, {opportunities.matches.length} opportunity matches, and {dna.confidence}% Academic DNA confidence.</p>
-          <div style={{display:"flex",gap:10,flexWrap:"wrap",marginTop:18}}>
+          <div>
+            <p style={eyebrow}>Playbook Home</p>
+            <h1 style={heroTitle}>Good morning, {name}. 👋</h1>
+            <p style={heroSub}>
+              Compass found {compass.recommendations.length} recommendations, {opportunities.matches.length} opportunity matches, and {dna.confidence}% Academic DNA confidence.
+            </p>
+          </div>
+
+          <div style={heroActions}>
             <Link href="/opportunities" style={primaryBtn}>Open Marketplace →</Link>
             <Link href="/compass" style={secondaryBtn}>Ask Compass</Link>
           </div>
         </section>
 
-        <section style={grid2}>
-          <Card label="Compass Daily Briefing" title={compass.headline} score={compass.score}>
+        <section style={topGrid}>
+          <Card icon="☀️" label="Compass Daily Briefing" title={compass.headline} meta={`Score: ${compass.score}%`}>
             <p style={body}>{compass.summary}</p>
-            <ul style={list}>
-              {compass.nextActions.slice(0,4).map(action => <li key={action}>{action}</li>)}
-            </ul>
+            <div style={checkList}>
+              {compass.nextActions.slice(0,4).map(action => (
+                <div key={action} style={checkItem}><span style={check}>✓</span>{action}</div>
+              ))}
+            </div>
           </Card>
 
-          <Card label="Academic DNA" title="Strength signals" score={dna.confidence}>
+          <Card icon="🧬" label="Academic DNA" title="Your top strength signals" meta={`Confidence: ${dna.confidence}%`}>
             {dna.strengths.slice(0,6).map((s, i) => <Meter key={s} label={s} value={Math.max(58, 92 - i * 7)} />)}
+          </Card>
+
+          <Card icon="♟️" label="Scholar Genome" title="Whole learner profile" meta="Overall: 84%">
+            {genome.map(([label, value]) => <Meter key={label as string} label={label as string} value={value as number} />)}
           </Card>
         </section>
 
         <section style={grid2}>
-          <Card label="Scholar Genome" title="Whole learner profile" score={84}>
-            {genome.map(([label, value]) => <Meter key={label as string} label={label as string} value={value as number} />)}
-          </Card>
-
-          <Card label="Opportunity Galaxy" title="Your active orbit" score={opportunities.score}>
+          <Card icon="🌌" label="Opportunity Galaxy" title="Your active orbit" meta={`Match score: ${opportunities.score}%`}>
             <div style={galaxy}>
+              <div style={orbitOne} />
+              <div style={orbitTwo} />
               <div style={you}>YOU</div>
               {opportunities.matches.slice(0,6).map((m, i) => (
-                <Link key={m.opportunity.id} href="/opportunities" style={{...star, transform:`rotate(${i*58}deg) translate(115px) rotate(-${i*58}deg)`}}>
+                <Link key={m.opportunity.id} href="/opportunities" style={{...star, transform:`rotate(${i*58}deg) translate(118px) rotate(-${i*58}deg)`}}>
                   {m.opportunity.type.replace("_"," ")}
                 </Link>
               ))}
             </div>
           </Card>
+
+          <Card icon="🧭" label="Growth Journey" title="Your story is building" meta="Progress: 91%">
+            <div style={journey}>
+              {["Transcript", "Academic DNA", "Opportunity", "Compass", "Next Step"].map((item, i) => (
+                <div key={item} style={journeyStep}>
+                  <div style={journeyDot}>{i < 4 ? "✓" : ""}</div>
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
+            <p style={encouragement}>Keep going. You're building something powerful.</p>
+          </Card>
         </section>
 
-        <Card label="Growth Journey" title="Your story is building" score={91}>
-          <div style={timeline}>
-            {["Transcript", "Academic DNA", "Opportunity Match", "Compass Guidance", "Next Step"].map(item => (
-              <div key={item} style={step}>
-                <div style={dot} />
-                <strong>{item}</strong>
-              </div>
-            ))}
-          </div>
-        </Card>
+        <section style={grid2}>
+          <Card icon="⭐" label="Recent Opportunities" title="Recommended for you" meta="View all →">
+            <div style={{display:"grid",gap:10}}>
+              {opportunities.matches.slice(0,3).map(match => (
+                <Link key={match.opportunity.id} href="/opportunities" style={miniOpp}>
+                  <strong>{match.opportunity.title}</strong>
+                  <span>{match.score}% match</span>
+                </Link>
+              ))}
+            </div>
+          </Card>
+
+          <Card icon="🔎" label="Oracle" title="Ask Playbook anything" meta="Coming alive">
+            <div style={askBox}>
+              <span>Why did my Opportunity Score increase?</span>
+              <Link href="/compass" style={askBtn}>Ask →</Link>
+            </div>
+          </Card>
+        </section>
       </div>
     </main>
   );
@@ -93,49 +123,70 @@ function scoreFrom(values:string[], key:string) {
   return values.some(v => v.toLowerCase().includes(key)) ? 92 : 68;
 }
 
-function Card({ label, title, score, children }: any) {
+function Card({ icon, label, title, meta, children }: any) {
   return (
     <section style={card}>
-      <div style={{display:"flex",justifyContent:"space-between",gap:16}}>
-        <div>
-          <p style={mono}>{label}</p>
-          <h2 style={cardTitle}>{title}</h2>
+      <div style={cardHead}>
+        <div style={{display:"flex",gap:10,alignItems:"center"}}>
+          <div style={iconBubble}>{icon}</div>
+          <div>
+            <p style={cardLabel}>{label}</p>
+            <h2 style={cardTitle}>{title}</h2>
+          </div>
         </div>
-        <div style={scoreStyle}>{score}%</div>
+        <div style={metaStyle}>{meta}</div>
       </div>
-      <div style={{marginTop:14}}>{children}</div>
+      <div style={{marginTop:16}}>{children}</div>
     </section>
   );
 }
 
 function Meter({ label, value }: { label:string; value:number }) {
   return (
-    <div style={{marginBottom:10}}>
-      <div style={{display:"flex",justifyContent:"space-between",fontSize:12,color:"#64748B",marginBottom:5}}>
+    <div style={{marginBottom:13}}>
+      <div style={meterTop}>
         <span>{label}</span><strong>{value}%</strong>
       </div>
-      <div style={{height:8,background:"#E2E8F0",borderRadius:999,overflow:"hidden"}}>
-        <div style={{height:"100%",width:`${value}%`,background:"#F97316",borderRadius:999,transition:"width .45s ease"}} />
+      <div style={meterTrack}>
+        <div style={{...meterFill,width:`${value}%`}} />
       </div>
     </div>
   );
 }
 
-const hero={background:"#0F172A",color:"#fff",borderRadius:28,padding:30,animation:"fadeUp .45s ease both"} as React.CSSProperties;
-const card={background:"#fff",border:"1px solid #E2E8F0",borderRadius:24,padding:22,animation:"fadeUp .45s ease both"} as React.CSSProperties;
-const grid2={display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(320px,1fr))",gap:18};
-const mono={fontSize:11,letterSpacing:"0.14em",textTransform:"uppercase",color:"#94A3B8",fontWeight:900};
-const title={fontSize:46,lineHeight:1,margin:"8px 0"};
-const sub={fontSize:15,color:"#CBD5E1",lineHeight:1.6,maxWidth:740};
-const cardTitle={fontSize:25,lineHeight:1.1,color:"#0F172A",margin:"6px 0"};
-const body={fontSize:14,color:"#64748B",lineHeight:1.6};
-const list={fontSize:13,color:"#64748B",lineHeight:1.6,margin:"10px 0 0 18px"};
-const scoreStyle={fontSize:40,fontWeight:950,color:"#F97316",lineHeight:1};
-const primaryBtn={background:"#F97316",color:"#fff",borderRadius:999,padding:"11px 15px",fontWeight:900,textDecoration:"none",fontSize:13};
-const secondaryBtn={background:"#fff",color:"#0F172A",borderRadius:999,padding:"11px 15px",fontWeight:900,textDecoration:"none",fontSize:13};
-const galaxy={height:270,position:"relative",display:"grid",placeItems:"center",overflow:"hidden"} as React.CSSProperties;
-const you={width:78,height:78,borderRadius:999,background:"#0F172A",color:"#fff",display:"grid",placeItems:"center",fontWeight:950};
-const star={position:"absolute",fontSize:11,background:"#FFF7ED",color:"#F97316",border:"1px solid #FED7AA",borderRadius:999,padding:"8px 10px",fontWeight:900,textDecoration:"none"} as React.CSSProperties;
-const timeline={display:"flex",gap:14,flexWrap:"wrap",alignItems:"center"} as React.CSSProperties;
-const step={display:"flex",alignItems:"center",gap:8,color:"#0F172A",fontSize:13} as React.CSSProperties;
-const dot={width:12,height:12,borderRadius:999,background:"#10B981",boxShadow:"0 0 0 5px #D1FAE5"};
+const page: React.CSSProperties = {minHeight:"100vh",background:"#F8F7F4",padding:32,fontFamily:"system-ui, sans-serif"};
+const shell: React.CSSProperties = {maxWidth:1240,margin:"0 auto",display:"grid",gap:18};
+const hero: React.CSSProperties = {display:"flex",justifyContent:"space-between",alignItems:"flex-end",gap:24,background:"linear-gradient(135deg,#FFFFFF,#FFF7ED)",border:"1px solid #E2E8F0",borderRadius:30,padding:30,boxShadow:"0 18px 45px rgba(15,23,42,.06)",animation:"fadeUp .45s ease both"};
+const eyebrow: React.CSSProperties = {fontSize:12,letterSpacing:"0.16em",textTransform:"uppercase",color:"#F97316",fontWeight:950,margin:0};
+const heroTitle: React.CSSProperties = {fontSize:52,lineHeight:1,margin:"14px 0 10px",color:"#0F172A",letterSpacing:"-0.04em"};
+const heroSub: React.CSSProperties = {fontSize:17,color:"#475569",lineHeight:1.55,maxWidth:760,margin:0};
+const heroActions: React.CSSProperties = {display:"flex",gap:10,flexWrap:"wrap"};
+const primaryBtn: React.CSSProperties = {background:"#F97316",color:"#fff",borderRadius:12,padding:"13px 18px",fontWeight:900,textDecoration:"none",fontSize:14,boxShadow:"0 12px 24px rgba(249,115,22,.25)"};
+const secondaryBtn: React.CSSProperties = {background:"#fff",color:"#0F172A",border:"1px solid #E2E8F0",borderRadius:12,padding:"13px 18px",fontWeight:900,textDecoration:"none",fontSize:14};
+const topGrid: React.CSSProperties = {display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(310px,1fr))",gap:18};
+const grid2: React.CSSProperties = {display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(360px,1fr))",gap:18};
+const card: React.CSSProperties = {background:"#fff",border:"1px solid #E2E8F0",borderRadius:24,padding:24,boxShadow:"0 18px 45px rgba(15,23,42,.06)",animation:"fadeUp .45s ease both"};
+const cardHead: React.CSSProperties = {display:"flex",justifyContent:"space-between",gap:14,alignItems:"flex-start"};
+const iconBubble: React.CSSProperties = {width:34,height:34,borderRadius:999,background:"#FFF7ED",display:"grid",placeItems:"center",fontSize:18};
+const cardLabel: React.CSSProperties = {fontSize:11,color:"#64748B",fontWeight:950,textTransform:"uppercase",letterSpacing:".11em",margin:0};
+const cardTitle: React.CSSProperties = {fontSize:21,lineHeight:1.15,color:"#0F172A",margin:"5px 0 0"};
+const metaStyle: React.CSSProperties = {fontSize:12,color:"#2563EB",fontWeight:900,whiteSpace:"nowrap"};
+const body: React.CSSProperties = {fontSize:14,color:"#475569",lineHeight:1.55};
+const checkList: React.CSSProperties = {display:"grid",gap:8,marginTop:14};
+const checkItem: React.CSSProperties = {display:"flex",gap:9,alignItems:"center",fontSize:13,color:"#0F172A"};
+const check: React.CSSProperties = {width:18,height:18,borderRadius:999,background:"#10B981",color:"#fff",display:"grid",placeItems:"center",fontSize:12,fontWeight:900};
+const meterTop: React.CSSProperties = {display:"flex",justifyContent:"space-between",fontSize:13,color:"#334155",marginBottom:6};
+const meterTrack: React.CSSProperties = {height:7,background:"#E2E8F0",borderRadius:999,overflow:"hidden"};
+const meterFill: React.CSSProperties = {height:"100%",background:"#F97316",borderRadius:999,transition:"width .45s ease"};
+const galaxy: React.CSSProperties = {height:280,position:"relative",display:"grid",placeItems:"center",overflow:"hidden"};
+const orbitOne: React.CSSProperties = {position:"absolute",width:160,height:160,border:"1px dashed #CBD5E1",borderRadius:999};
+const orbitTwo: React.CSSProperties = {position:"absolute",width:240,height:240,border:"1px dashed #E2E8F0",borderRadius:999};
+const you: React.CSSProperties = {width:74,height:74,borderRadius:999,background:"#0F172A",color:"#fff",display:"grid",placeItems:"center",fontWeight:950,zIndex:2,boxShadow:"0 20px 40px rgba(15,23,42,.25)"};
+const star: React.CSSProperties = {position:"absolute",fontSize:11,background:"#FFF7ED",color:"#F97316",border:"1px solid #FED7AA",borderRadius:999,padding:"8px 10px",fontWeight:900,textDecoration:"none",zIndex:3};
+const journey: React.CSSProperties = {display:"flex",justifyContent:"space-between",gap:10,alignItems:"flex-start",padding:"32px 8px 18px",position:"relative"};
+const journeyStep: React.CSSProperties = {display:"grid",gap:8,justifyItems:"center",fontSize:12,color:"#0F172A",fontWeight:800,textAlign:"center",flex:1};
+const journeyDot: React.CSSProperties = {width:30,height:30,borderRadius:999,border:"3px solid #10B981",background:"#fff",color:"#10B981",display:"grid",placeItems:"center",fontWeight:900};
+const encouragement: React.CSSProperties = {textAlign:"center",color:"#059669",fontWeight:800,marginTop:8};
+const miniOpp: React.CSSProperties = {display:"flex",justifyContent:"space-between",gap:12,textDecoration:"none",color:"#0F172A",border:"1px solid #E2E8F0",borderRadius:14,padding:12,fontSize:13};
+const askBox: React.CSSProperties = {display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,border:"1px solid #E2E8F0",borderRadius:16,padding:14,color:"#475569",fontSize:14};
+const askBtn: React.CSSProperties = {background:"#0F172A",color:"#fff",borderRadius:999,padding:"9px 12px",textDecoration:"none",fontWeight:900,fontSize:12};
