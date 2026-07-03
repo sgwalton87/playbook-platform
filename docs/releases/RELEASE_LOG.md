@@ -72,3 +72,15 @@ Alpha 0.2 begins with:
 
 ## 2026-07-02 13:47
 - Build passed: Pre-push tests and build passed.
+
+## 2026-07-03 10:45
+- Release milestone: Alpha 1.0 Complete
+
+## 2026-07-03 10:47
+- Release milestone: Playbook development event logged.
+
+## 2026-07-03 10:47
+- Release milestone: Alpha 1.0 Complete
+
+## 2026-07-03 10:48
+- Release milestone: Alpha 1.0 Complete

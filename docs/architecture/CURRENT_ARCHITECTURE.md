@@ -73,3 +73,9 @@ Compass Guidance
 - Compass UI
 - Design System
 
+
+## 2026-07-03T17:56:29.770Z
+
+**Type:** architecture
+
+Alpha Architecture finalized and frozen before Beta 2.

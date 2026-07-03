@@ -17,7 +17,7 @@
     "log:decision": "bash scripts/log-decision.sh",
     "log:innovation": "bash scripts/log-innovation.sh",
     "log:why-not": "bash scripts/log-why-not.sh",
-    "ledger": "bash scripts/playbook-ledger.sh",
+    "ledger": "tsx scripts/ledger.ts",
     "ship": "tsx scripts/ship.ts",
     "archivist": "tsx scripts/ship.ts",
     "cartographer": "tsx scripts/cartographer.ts",
@@ -27,7 +27,10 @@
     "docs:governor": "tsx scripts/doc-governor.ts",
     "docs:index": "tsx scripts/doc-governor.ts",
     "docs:health": "tsx scripts/doc-governor.ts",
-    "docs:consolidate": "tsx scripts/docs-consolidate.ts"
+    "docs:consolidate": "tsx scripts/docs-consolidate.ts",
+    "log:milestone": "tsx scripts/ledger.ts milestone",
+    "log:architecture": "tsx scripts/ledger.ts architecture",
+    "log:demo": "tsx scripts/ledger.ts demo"
   },
   "dependencies": {
     "@stripe/stripe-js": "^9.8.0",

@@ -509,3 +509,27 @@ Added presentation-ready Demo Mode for investor meetings, district presentations
 
 - Archivist v2 ship cycle completed.
 
+
+## 2026-07-03 10:45
+- Release update: Alpha 1.0 Complete
+
+## 2026-07-03 10:47
+- Release update: Playbook development event logged.
+
+## 2026-07-03 10:47
+- Release update: Alpha 1.0 Complete
+
+## 2026-07-03 10:48
+- Release update: Alpha 1.0 Complete
+
+## 2026-07-03T17:56:30.448Z
+
+**Type:** release
+
+Alpha 1.0 Complete
+
+---
+
+# Beta 2
+
+Added Archivist v3 Unified Ledger Engine and upgraded Demo Mode into a keynote-style presentation experience.

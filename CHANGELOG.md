@@ -758,3 +758,33 @@ Cartographer now runs during npm run ship.
 
 - Archivist v2 ship cycle completed.
 
+
+## 2026-07-03 10:45
+- Release: Alpha 1.0 Complete
+
+## 2026-07-03 10:47
+- Release: Playbook development event logged.
+
+## 2026-07-03 10:47
+- Release: Alpha 1.0 Complete
+
+## 2026-07-03 10:48
+- Release: Alpha 1.0 Complete
+
+## 2026-07-03T17:56:30.448Z
+
+**Type:** release
+
+Alpha 1.0 Complete
+
+---
+
+# Beta 2 — Archivist v3 and Demo Mode
+
+## Added
+
+- Unified Ledger Engine
+- npm run ledger command
+- log:milestone, log:architecture, and log:demo scripts
+- Demo Mode keynote presentation flow
+- Slide-based district and investor walkthrough
