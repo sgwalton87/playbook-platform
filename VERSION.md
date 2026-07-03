@@ -489,3 +489,10 @@ Added Playbook Home and the flagship learner intelligence experience foundation.
 # First Complete User Journey
 
 Added end-to-end learner journey from onboarding to Playbook Home.
+
+## 2026-07-03 17:48
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
