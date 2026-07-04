@@ -1664,3 +1664,10 @@ Playbook now helps scholars turn their record, evidence, achievements, support n
 - Central menu link
 - Restored homepage content with unified design
 - Route shell tests
+
+## 2026-07-04 14:30
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

@@ -844,3 +844,6 @@ Recovered unified App Shell across internal pages.
 **Type:** innovation
 
 Playbook now maintains persistent navigation and a consistent shell across the internal platform experience.
+
+## 2026-07-04 14:28
+- Commit recorded: Recover unified app shell navigation

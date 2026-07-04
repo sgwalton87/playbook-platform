@@ -990,3 +990,13 @@ Alpha 1.0 Complete — Intelligence OS foundation finished.
 
 - Archivist v2 ship cycle completed.
 
+
+## 2026-07-04 14:28
+- **commit**: Recover unified app shell navigation
+
+## 2026-07-04 14:30
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

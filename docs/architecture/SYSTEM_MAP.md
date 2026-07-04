@@ -110,6 +110,7 @@ Playbook SDK
 - tests/unit/academic-engine.test.ts
 - tests/unit/academic-intelligence.test.ts
 - tests/unit/action-routing/action-routing.test.tsx
+- tests/unit/app-shell/app-shell.test.ts
 - tests/unit/beta-completion/beta31-checklist.test.ts
 - tests/unit/beta-hardening/beta31-routes.test.ts
 - tests/unit/collaboration/collaboration.test.tsx
