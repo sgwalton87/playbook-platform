@@ -1255,3 +1255,10 @@ Playbook OS now has foundational intelligence engines that can coordinate events
 - Invitation email template
 - Onboarding sender for support-network invitations
 - Support reply-to address
+
+## 2026-07-04 01:10
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
