@@ -778,3 +778,6 @@ Playbook now has a more consistent visual language across key platform surfaces.
 
 ## 2026-07-04 04:16
 - Commit recorded: Refactor core surfaces onto unified Playbook primitives
+
+## 2026-07-04 04:36
+- Commit recorded: Fix unified Role OS template compatibility

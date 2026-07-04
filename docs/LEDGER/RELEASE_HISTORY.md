@@ -790,3 +790,13 @@ Alpha 1.0 Complete
 
 ## 2026-07-04 04:16
 - Commit recorded: Refactor core surfaces onto unified Playbook primitives
+
+## 2026-07-04 04:36
+- Commit recorded: Fix unified Role OS template compatibility
+
+## 2026-07-04 04:38
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
