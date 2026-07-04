@@ -1214,3 +1214,10 @@ Added persistent coin ledger foundation, reward event processing, reward balance
 Status: Foundation complete
 
 Added reward integrity, role tours, contextual help, Store v2 redemption, fulfillment, brand partner catalog, and NIL/store campaign workflow foundations.
+
+## 2026-07-04 16:44
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
