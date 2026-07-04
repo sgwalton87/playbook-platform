@@ -10,6 +10,7 @@ const nav = [
   ["Scholar Network", "/scholar-network"],
   ["Network Intelligence", "/network-intelligence"],
   ["Visual QA", "/studio/visual-qa"],
+  ["Beta 3.4 Audit", "/studio/beta-34-audit"],
   ["Beta 3.4", "/studio/beta-34"],
   ["Beta 3.3 Complete", "/studio/beta-33"],
   ["Beta 3.1 Checklist", "/studio/beta-31"],

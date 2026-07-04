@@ -28,6 +28,7 @@ Playbook SDK
 - app/courses/[slug]/page.tsx
 - app/courses/page.tsx
 - app/dashboard/page.tsx
+- app/demo/founder-case-study/page.tsx
 - app/demo/page.tsx
 - app/district-os/page.tsx
 - app/economy/page.tsx
@@ -73,6 +74,7 @@ Playbook SDK
 - app/studio/architecture/page.tsx
 - app/studio/beta-33/page.tsx
 - app/studio/beta-34/page.tsx
+- app/studio/beta-34-audit/page.tsx
 - app/studio/demo-director/page.tsx
 - app/studio/docs/page.tsx
 - app/studio/events/page.tsx
@@ -129,15 +131,18 @@ Playbook SDK
 - tests/unit/beta-hardening/beta31-routes.test.ts
 - tests/unit/beta33-journey/beta33-journey.test.ts
 - tests/unit/beta34/beta34.test.tsx
+- tests/unit/beta34-audit/beta34-audit.test.ts
 - tests/unit/collaboration/collaboration.test.tsx
 - tests/unit/compass/compass-core.test.ts
 - tests/unit/demo/demo-mode.test.tsx
+- tests/unit/demo-case-study/founder-case-study.test.tsx
 - tests/unit/design-system/design-system.test.tsx
 - tests/unit/economy/economy-arc.test.tsx
 - tests/unit/email/email.test.ts
 - tests/unit/event-handlers.test.ts
 - tests/unit/event-notifications/event-notifications.test.ts
 - tests/unit/events.test.ts
+- tests/unit/full-site/full-site-routes.test.ts
 - tests/unit/gamification/gamification-v2.test.tsx
 - tests/unit/home/playbook-home.test.tsx
 - tests/unit/intelligence-automation/intelligence-automation.test.ts
