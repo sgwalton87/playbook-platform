@@ -1425,3 +1425,28 @@ Playbook OS now has foundational intelligence engines that can coordinate events
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Playbook OS Beta 3.1 — Connected Ecosystem Complete
+
+## Completed
+
+- Multi-Role Playbook OS experiences
+- Relationship-aware permissions
+- Scholar support invitations
+- Invitation delivery foundation
+- Authentication handoff
+- Invitation identity validation
+- Relationship persistence
+- Correct Role OS routing
+- Scholar Network Dashboard
+- Free-text direct messaging
+- Support Network group threads
+- Shared Actions
+- Inbox v2 conversation model
+- Mail Gateway foundation
+- Compass Network Intelligence
+- Network blockers and recommendations
+- Notifications Center
+- Beta 3.1 route hardening

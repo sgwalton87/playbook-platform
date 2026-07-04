@@ -915,3 +915,15 @@ Added a true conversation inbox model for Playbook support network messaging.
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Playbook OS Beta 3.1 — Connected Ecosystem Complete
+
+Status: Complete
+
+Playbook now connects the scholar and their support ecosystem through role-specific operating experiences, relationship-aware permissions, invitations, authentication handoff, persisted relationships, free-text messaging, shared actions, network intelligence, and unified notifications.
+
+The next active development phase is:
+
+Playbook OS Beta 3.2 — Notifications + Intelligence Automation

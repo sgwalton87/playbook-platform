@@ -192,3 +192,9 @@ Playbook now has a user-facing free-flowing inbox connected to support network m
 **Type:** innovation
 
 Playbook Inbox now supports conversation threads, unread state, action attachments, and inbound email conversation bridging.
+
+## 2026-07-04T10:04:22.414Z
+
+**Type:** innovation
+
+Playbook now connects the scholar support ecosystem through relationships, permissions, invitations, messaging, shared actions, network intelligence, and unified notifications.
