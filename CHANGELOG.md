@@ -1188,3 +1188,10 @@ Playbook OS now has foundational intelligence engines that can coordinate events
 - PermissionGate component
 - Role-to-relationship mapping
 - Permission-aware actions inside Role OS dashboards
+
+## 2026-07-04 00:21
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

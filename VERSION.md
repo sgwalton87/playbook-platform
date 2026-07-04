@@ -757,3 +757,10 @@ Added relationship-aware permissions and access visualization.
 
 - Archivist v2 ship cycle completed.
 
+
+## 2026-07-04 00:21
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

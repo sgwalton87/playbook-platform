@@ -105,6 +105,7 @@ Playbook SDK
 - tests/unit/opportunity-graph/opportunity-graph.test.ts
 - tests/unit/opportunity-marketplace/opportunity-marketplace.test.tsx
 - tests/unit/oracle/oracle.test.ts
+- tests/unit/permissions/permission-gate.test.tsx
 - tests/unit/permissions/permissions.test.tsx
 - tests/unit/polish/polish.test.ts
 - tests/unit/role-intelligence/role-intelligence.test.tsx
