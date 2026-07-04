@@ -804,3 +804,9 @@ Added the operational foundation for delivering and accepting scholar support ne
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Playbook OS Beta 3.x — Connected Ecosystem
+
+Added relationship persistence, invitation handoff foundation, support network messaging, and shared actions.

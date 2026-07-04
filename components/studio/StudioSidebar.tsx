@@ -7,6 +7,7 @@ const nav = [
   ["Health", "/studio#health"],
   ["Documentation", "/studio#documentation"],
   ["Architecture", "/studio#architecture"],
+  ["Support Messages", "/support-messages"],
   ["Invitations", "/studio/invitations"],
   ["Permissions", "/permissions"],
   ["Role Intelligence", "/role-intelligence"],

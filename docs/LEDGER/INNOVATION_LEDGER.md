@@ -144,3 +144,9 @@ Support network invitations now generate secure tokens, persist invitation recor
 **Type:** innovation
 
 Invitation emails now send from Playbook Onboarding and route replies to Playbook Support.
+
+## 2026-07-04T08:30:27.512Z
+
+**Type:** innovation
+
+Playbook now connects invitations, support relationships, free-text messaging, shared actions, and OS routing into one scholar-centered ecosystem.

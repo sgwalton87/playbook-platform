@@ -1269,3 +1269,16 @@ Playbook OS now has foundational intelligence engines that can coordinate events
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Connected Ecosystem Sprint
+
+## Added
+
+- Support relationship persistence model
+- Invitation acceptance relationship creation
+- Support messages
+- Shared actions
+- Support Network Messaging UI
+- Free-text support network DMs
