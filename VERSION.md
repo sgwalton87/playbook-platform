@@ -744,3 +744,9 @@ Added role-aware recommendations and scenarios across the Playbook support ecosy
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Role OS Permissions
+
+Added relationship-aware permissions and access visualization.

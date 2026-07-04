@@ -114,3 +114,9 @@ Recommendations and scenarios now adapt by role across the full scholar support 
 **Type:** innovation
 
 Each Role OS now displays intelligence tailored to that role's relationship to the scholar.
+
+## 2026-07-04T07:08:41.734Z
+
+**Type:** innovation
+
+Playbook now models support relationships with explicit permissions and access boundaries.

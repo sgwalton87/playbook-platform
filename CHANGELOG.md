@@ -1159,3 +1159,15 @@ Playbook OS now has foundational intelligence engines that can coordinate events
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Role OS Permissions + Relationship Graph
+
+## Added
+
+- Relationship permissions
+- Permission checking
+- Relationship graph
+- Permissions page
+- Permissions tests
