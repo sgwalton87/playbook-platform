@@ -126,3 +126,9 @@ Playbook now models support relationships with explicit permissions and access b
 **Type:** innovation
 
 Role OS experiences now reveal or lock actions based on relationship permissions.
+
+## 2026-07-04T07:26:36.911Z
+
+**Type:** innovation
+
+Scholars can now invite family, mentors, educators, universities, and employers into role-specific OS experiences.

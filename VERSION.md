@@ -764,3 +764,9 @@ Added relationship-aware permissions and access visualization.
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Role Invitations
+
+Added invitation workflow for connecting support roles to a scholar.

@@ -1195,3 +1195,16 @@ Playbook OS now has foundational intelligence engines that can coordinate events
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Role Invitations
+
+## Added
+
+- Scholar support invitations
+- Relationship-aware invite records
+- Permissions attached to invitations
+- Pending, accepted, and declined states
+- Destination routing by relationship
+- Studio Invitations page

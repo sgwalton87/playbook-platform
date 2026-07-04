@@ -493,3 +493,15 @@ Role OS experiences now reveal or lock actions based on relationship permissions
 
 ## 2026-07-04 00:19
 - Commit recorded: Connect permissions to Role OS
+
+## 2026-07-04T07:26:35.648Z
+
+**Type:** product
+
+Built Role Invitations for the scholar support network.
+
+## 2026-07-04T07:26:36.911Z
+
+**Type:** innovation
+
+Scholars can now invite family, mentors, educators, universities, and employers into role-specific OS experiences.

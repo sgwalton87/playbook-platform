@@ -441,3 +441,22 @@ Role OS experiences now reveal or lock actions based on relationship permissions
 Updated:
 - docs/LEDGER/INNOVATION_LEDGER.md
 - docs/LEDGER/PRODUCT_LOG.md
+
+## 2026-07-04T07:26:35.648Z
+
+**PRODUCT**
+
+Built Role Invitations for the scholar support network.
+
+Updated:
+- docs/LEDGER/PRODUCT_LOG.md
+
+## 2026-07-04T07:26:36.911Z
+
+**INNOVATION**
+
+Scholars can now invite family, mentors, educators, universities, and employers into role-specific OS experiences.
+
+Updated:
+- docs/LEDGER/INNOVATION_LEDGER.md
+- docs/LEDGER/PRODUCT_LOG.md
