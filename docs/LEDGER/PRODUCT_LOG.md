@@ -658,3 +658,6 @@ Playbook Inbox now supports conversation threads, unread state, action attachmen
 
 ## 2026-07-04 02:47
 - Commit recorded: Build Inbox v2 conversation model
+
+## 2026-07-04 03:00
+- Commit recorded: Build Notifications v2 and hardening checks
