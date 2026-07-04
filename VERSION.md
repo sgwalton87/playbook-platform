@@ -895,3 +895,9 @@ Connected Ecosystem now includes invitations, email delivery foundation, auth ha
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Inbox v2
+
+Added a true conversation inbox model for Playbook support network messaging.

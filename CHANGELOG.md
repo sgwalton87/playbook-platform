@@ -1396,3 +1396,18 @@ Playbook OS now has foundational intelligence engines that can coordinate events
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Inbox v2
+
+## Added
+
+- Conversation thread model
+- Inbox conversation list
+- Active thread view
+- Unread counts
+- Timestamps foundation
+- Shared Action message attachments
+- Mail Gateway conversation bridge
+- `/messages/[threadId]` route

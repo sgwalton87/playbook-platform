@@ -643,3 +643,15 @@ Playbook now has a user-facing free-flowing inbox connected to support network m
 
 ## 2026-07-04 02:32
 - Commit recorded: Add Playbook Inbox
+
+## 2026-07-04T09:45:25.177Z
+
+**Type:** product
+
+Built Inbox v2 conversation model.
+
+## 2026-07-04T09:45:26.042Z
+
+**Type:** innovation
+
+Playbook Inbox now supports conversation threads, unread state, action attachments, and inbound email conversation bridging.

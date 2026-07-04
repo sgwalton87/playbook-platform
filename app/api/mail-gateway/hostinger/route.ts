@@ -5,6 +5,7 @@ import {
   buildSupportMessageRecord,
   suggestActionUpdateFromMessage,
 } from "@/lib/support-network-live/server";
+import { bridgeMailToConversation } from "@/lib/messages";
 
 export async function POST(req: NextRequest) {
   const secret = req.headers.get("x-playbook-mail-secret");
@@ -60,11 +61,20 @@ export async function POST(req: NextRequest) {
 
   const suggestedActionUpdate = suggestActionUpdateFromMessage(routed.body);
 
+  const conversationBridge = bridgeMailToConversation({
+    scholarId: relationship.scholar_id,
+    senderEmail: routed.senderEmail,
+    senderRole: relationship.relationship,
+    subject: routed.subject,
+    body: routed.body,
+  });
+
   return NextResponse.json({
     ok: true,
     routed,
     persisted: true,
     message,
     suggestedActionUpdate,
+    conversationBridge,
   });
 }

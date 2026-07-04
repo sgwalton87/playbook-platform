@@ -1,0 +1,303 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import {
+  buildConversationMessage,
+  getDemoConversationMessages,
+  getDemoConversations,
+} from "@/lib/messages";
+
+export default function InboxV2() {
+  const conversations = useMemo(() => getDemoConversations(), []);
+  const [activeId, setActiveId] = useState(conversations[0].id);
+  const [body, setBody] = useState("");
+  const [messagesByThread, setMessagesByThread] = useState<Record<string, any[]>>({
+    "support-network": getDemoConversationMessages("support-network"),
+    family: getDemoConversationMessages("family"),
+    mentor: getDemoConversationMessages("mentor"),
+    "fafsa-action": getDemoConversationMessages("fafsa-action"),
+  });
+
+  const activeConversation = conversations.find((c) => c.id === activeId) || conversations[0];
+  const messages = messagesByThread[activeId] || [];
+
+  function sendMessage() {
+    if (!body.trim()) return;
+
+    const message = buildConversationMessage({
+      conversationId: activeId,
+      senderRole: "scholar",
+      senderName: "Maya",
+      body,
+    });
+
+    setMessagesByThread({
+      ...messagesByThread,
+      [activeId]: [message, ...messages],
+    });
+
+    setBody("");
+  }
+
+  return (
+    <main style={page}>
+      <section style={hero}>
+        <p style={eyebrow}>Playbook Inbox v2</p>
+        <h1 style={title}>A real inbox for the scholar support system.</h1>
+        <p style={sub}>
+          Direct messages, support-network threads, shared-action conversations, unread states, and email replies can live here.
+        </p>
+      </section>
+
+      <section style={shell}>
+        <aside style={sidebar}>
+          <p style={eyebrow}>Conversations</p>
+
+          {conversations.map((conversation) => (
+            <button
+              key={conversation.id}
+              onClick={() => setActiveId(conversation.id)}
+              style={{
+                ...threadButton,
+                borderColor: activeId === conversation.id ? "#F97316" : "#E2E8F0",
+              }}
+            >
+              <div style={threadTop}>
+                <strong>{conversation.title}</strong>
+                {conversation.unreadCount > 0 && (
+                  <span style={unread}>{conversation.unreadCount}</span>
+                )}
+              </div>
+              <p style={preview}>{conversation.lastMessage}</p>
+              <small style={kind}>{conversation.kind.replaceAll("_", " ")}</small>
+            </button>
+          ))}
+        </aside>
+
+        <section style={thread}>
+          <div style={threadHeader}>
+            <div>
+              <p style={eyebrow}>{activeConversation.kind.replaceAll("_", " ")}</p>
+              <h2 style={threadTitle}>{activeConversation.title}</h2>
+              <p style={participants}>{activeConversation.participants.join(" • ")}</p>
+            </div>
+          </div>
+
+          <div style={composer}>
+            <textarea
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              placeholder="Write a message..."
+              style={textarea}
+            />
+            <button onClick={sendMessage} style={send}>Send</button>
+          </div>
+
+          <div style={messageList}>
+            {messages.map((message) => (
+              <article key={message.id} style={messageCard}>
+                <div style={messageTop}>
+                  <strong>{message.senderName}</strong>
+                  <span style={source}>{message.source}</span>
+                </div>
+                <p style={messageBody}>{message.body}</p>
+
+                {message.actionId && (
+                  <div style={attachment}>
+                    Attached action: {message.actionId.replaceAll("-", " ")}
+                  </div>
+                )}
+              </article>
+            ))}
+          </div>
+        </section>
+      </section>
+    </main>
+  );
+}
+
+const page: React.CSSProperties = {
+  minHeight: "100vh",
+  background: "#F8F7F4",
+  padding: 32,
+  fontFamily: "system-ui, sans-serif",
+};
+
+const hero: React.CSSProperties = {
+  maxWidth: 1180,
+  margin: "0 auto 18px",
+  background: "#0F172A",
+  color: "#fff",
+  borderRadius: 30,
+  padding: 34,
+};
+
+const eyebrow: React.CSSProperties = {
+  fontSize: 11,
+  letterSpacing: ".14em",
+  textTransform: "uppercase",
+  fontWeight: 950,
+  color: "#F97316",
+  margin: 0,
+};
+
+const title: React.CSSProperties = {
+  fontSize: 50,
+  lineHeight: 1,
+  margin: "12px 0",
+};
+
+const sub: React.CSSProperties = {
+  color: "#CBD5E1",
+  fontSize: 17,
+  lineHeight: 1.6,
+};
+
+const shell: React.CSSProperties = {
+  maxWidth: 1180,
+  margin: "0 auto",
+  display: "grid",
+  gridTemplateColumns: "330px 1fr",
+  gap: 16,
+};
+
+const sidebar: React.CSSProperties = {
+  background: "#fff",
+  border: "1px solid #E2E8F0",
+  borderRadius: 24,
+  padding: 18,
+  boxShadow: "0 16px 40px rgba(15,23,42,.06)",
+  height: "fit-content",
+};
+
+const threadButton: React.CSSProperties = {
+  width: "100%",
+  textAlign: "left",
+  background: "#fff",
+  border: "2px solid #E2E8F0",
+  borderRadius: 16,
+  padding: 14,
+  marginTop: 12,
+  cursor: "pointer",
+};
+
+const threadTop: React.CSSProperties = {
+  display: "flex",
+  justifyContent: "space-between",
+  gap: 10,
+  color: "#0F172A",
+};
+
+const unread: React.CSSProperties = {
+  background: "#F97316",
+  color: "#fff",
+  borderRadius: 999,
+  padding: "3px 7px",
+  fontSize: 11,
+  fontWeight: 950,
+};
+
+const preview: React.CSSProperties = {
+  color: "#64748B",
+  fontSize: 13,
+  lineHeight: 1.45,
+};
+
+const kind: React.CSSProperties = {
+  color: "#94A3B8",
+  textTransform: "uppercase",
+  fontSize: 10,
+  fontWeight: 900,
+};
+
+const thread: React.CSSProperties = {
+  background: "#fff",
+  border: "1px solid #E2E8F0",
+  borderRadius: 24,
+  padding: 22,
+  boxShadow: "0 16px 40px rgba(15,23,42,.06)",
+};
+
+const threadHeader: React.CSSProperties = {
+  borderBottom: "1px solid #E2E8F0",
+  paddingBottom: 16,
+  marginBottom: 16,
+};
+
+const threadTitle: React.CSSProperties = {
+  color: "#0F172A",
+  fontSize: 32,
+  margin: "8px 0",
+};
+
+const participants: React.CSSProperties = {
+  color: "#64748B",
+  margin: 0,
+};
+
+const composer: React.CSSProperties = {
+  display: "grid",
+  gap: 10,
+  marginBottom: 16,
+};
+
+const textarea: React.CSSProperties = {
+  width: "100%",
+  boxSizing: "border-box",
+  minHeight: 100,
+  border: "1px solid #E2E8F0",
+  borderRadius: 16,
+  padding: 14,
+};
+
+const send: React.CSSProperties = {
+  width: "fit-content",
+  background: "#F97316",
+  color: "#fff",
+  border: "none",
+  borderRadius: 999,
+  padding: "10px 14px",
+  fontWeight: 950,
+  cursor: "pointer",
+};
+
+const messageList: React.CSSProperties = {
+  display: "grid",
+  gap: 12,
+};
+
+const messageCard: React.CSSProperties = {
+  background: "#F8FAFC",
+  border: "1px solid #E2E8F0",
+  borderRadius: 16,
+  padding: 14,
+};
+
+const messageTop: React.CSSProperties = {
+  display: "flex",
+  justifyContent: "space-between",
+  color: "#0F172A",
+};
+
+const source: React.CSSProperties = {
+  background: "#E2E8F0",
+  borderRadius: 999,
+  padding: "4px 7px",
+  fontSize: 11,
+  fontWeight: 900,
+};
+
+const messageBody: React.CSSProperties = {
+  color: "#334155",
+  lineHeight: 1.55,
+};
+
+const attachment: React.CSSProperties = {
+  background: "#FFF7ED",
+  border: "1px solid #FED7AA",
+  color: "#9A3412",
+  borderRadius: 12,
+  padding: 10,
+  fontSize: 12,
+  fontWeight: 850,
+};

@@ -631,3 +631,22 @@ Playbook now has a user-facing free-flowing inbox connected to support network m
 Updated:
 - docs/LEDGER/INNOVATION_LEDGER.md
 - docs/LEDGER/PRODUCT_LOG.md
+
+## 2026-07-04T09:45:25.177Z
+
+**PRODUCT**
+
+Built Inbox v2 conversation model.
+
+Updated:
+- docs/LEDGER/PRODUCT_LOG.md
+
+## 2026-07-04T09:45:26.042Z
+
+**INNOVATION**
+
+Playbook Inbox now supports conversation threads, unread state, action attachments, and inbound email conversation bridging.
+
+Updated:
+- docs/LEDGER/INNOVATION_LEDGER.md
+- docs/LEDGER/PRODUCT_LOG.md
