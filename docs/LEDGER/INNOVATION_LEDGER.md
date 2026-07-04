@@ -168,3 +168,9 @@ Playbook can now resume invite tokens through auth, activate support relationshi
 **Type:** innovation
 
 Playbook can now coordinate free-text DMs, shared actions, and inbound email replies around real support relationships.
+
+## 2026-07-04T09:13:36.272Z
+
+**Type:** innovation
+
+Playbook can now reason across support relationships, messages, shared actions, invitations, blockers, and role-specific next steps.
