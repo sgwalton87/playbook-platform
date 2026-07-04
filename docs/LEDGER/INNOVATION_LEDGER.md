@@ -90,3 +90,9 @@ Playbook now has an intelligence core for orchestration, timeline, relationships
 **Type:** innovation
 
 Playbook can now recommend actions, run scenarios, calculate impact, and explain why it matters.
+
+## 2026-07-04T06:34:23.046Z
+
+**Type:** innovation
+
+Playbook can now show recommendations, simulate scenarios, preview impact, and explain why actions matter.

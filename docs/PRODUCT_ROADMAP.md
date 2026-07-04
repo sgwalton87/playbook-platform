@@ -227,3 +227,16 @@ Includes:
 
 Purpose:
 Turn Playbook from role-based dashboards into a coordinated intelligence network.
+
+---
+
+# Recommendation + Scenario Experience
+
+Status: Foundation complete
+
+Includes:
+- Recommendation Center
+- Scenario Lab
+- Impact Preview
+- Explanation Panel
+- Studio and Living Scholar links

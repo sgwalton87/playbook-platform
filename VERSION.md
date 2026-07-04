@@ -698,3 +698,9 @@ Added foundational intelligence engines for orchestration, timelines, relationsh
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Intelligence Platform UI
+
+Added user-facing Recommendation Center and Scenario Lab.

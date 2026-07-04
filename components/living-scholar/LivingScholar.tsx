@@ -19,6 +19,8 @@ export default function LivingScholar() {
       <div style={shell}>
         <MorningBrief brief={experience.morningBrief} />
 
+        <a href="/intelligence-platform" style={{display:"inline-flex",background:"#F97316",color:"#fff",borderRadius:999,padding:"10px 13px",fontWeight:900,textDecoration:"none",width:"fit-content"}}>Open Recommendation + Scenario Lab →</a>
+
         <section style={grid3}>
           <GrowthScore score={experience.growthScore} />
           <AcademicDNAVisualizer dna={experience.dna} />
