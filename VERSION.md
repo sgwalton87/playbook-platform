@@ -1168,3 +1168,10 @@ Playbook now includes an Opportunity Application Toolkit that helps scholars cre
 Next active development phase:
 
 Playbook OS Beta 3.4 — Guided Experience + Gamification Economy
+
+## 2026-07-04 16:08
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
