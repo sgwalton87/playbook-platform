@@ -886,3 +886,13 @@ Alpha 1.0 Complete
 
 ## 2026-07-04 15:21
 - Commit recorded: Fix portfolio PDF response body
+
+## 2026-07-04 15:34
+- Commit recorded: Build Beta 3.3 persistence and workflow activation
+
+## 2026-07-04 15:37
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

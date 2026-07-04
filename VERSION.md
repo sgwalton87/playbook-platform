@@ -1114,3 +1114,10 @@ Added server-side portfolio PDF rendering, shareable portfolio links, and recomm
 Status: Foundation complete
 
 Added persisted portfolio shares, recommender requests, application workspaces, and workflow event activation.
+
+## 2026-07-04 15:37
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

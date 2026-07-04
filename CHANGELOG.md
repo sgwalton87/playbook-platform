@@ -1733,3 +1733,10 @@ Playbook now helps scholars turn their record, evidence, achievements, support n
 - Application workspace API
 - Persisted recommender request API
 - Event emission from application and recommendation workflows
+
+## 2026-07-04 15:37
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

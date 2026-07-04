@@ -1033,3 +1033,13 @@ Alpha 1.0 Complete — Intelligence OS foundation finished.
 
 ## 2026-07-04 15:21
 - **commit**: Fix portfolio PDF response body
+
+## 2026-07-04 15:34
+- **commit**: Build Beta 3.3 persistence and workflow activation
+
+## 2026-07-04 15:37
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
