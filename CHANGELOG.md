@@ -1577,3 +1577,16 @@ Playbook OS now has foundational intelligence engines that can coordinate events
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Tutorial, Gamification v2, Store v2
+
+## Added
+
+- First-login tutorial foundation
+- Platform coin reward engine
+- Coin ledger and balance foundation
+- Store v2 reward redemption model
+- Brand-partner store inventory foundation
+- NIL promotion connection foundation

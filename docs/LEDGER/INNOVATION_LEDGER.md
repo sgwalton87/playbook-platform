@@ -234,3 +234,9 @@ Playbook now has the foundation for one coherent visual language across all OS e
 **Type:** innovation
 
 Playbook now has a more consistent visual language across key platform surfaces.
+
+## 2026-07-04T11:39:40.028Z
+
+**Type:** innovation
+
+Playbook now connects platform actions, coin rewards, brand-partner products, and NIL campaign potential.

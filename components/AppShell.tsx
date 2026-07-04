@@ -6,6 +6,7 @@ import ProfileAvatar from "@/components/ProfileAvatar";
 
 const NAV = [
   {label:"Home",href:"/home",icon:"✨"},
+  {label:"Tutorial",href:"/tutorial",icon:"🧩"},
   {label:"Dashboard",href:"/dashboard",icon:"🏠"},
   {label:"Scholar Record",href:"/record",icon:"📘"},
   {label:"Athlete OS",href:"/scholar-athlete-os",icon:"🏀"},
@@ -13,9 +14,11 @@ const NAV = [
   {label:"Notifications",href:"/notifications",icon:"🔔"},
   {label:"Opportunities",href:"/opportunities",icon:"🌟"},
   {label:"Journey",href:"/journey",icon:"🧭"},
+  {label:"Coins",href:"/gamification",icon:"🪙"},
   {label:"Courses",href:"/courses",icon:"🎓"},
   {label:"Compass",href:"/compass",icon:"🧠"},
   {label:"Studio",href:"/studio",icon:"🛠️"},
+  {label:"Store",href:"/store-v2",icon:"🛍️"},
   {label:"Profile",href:"/profile",icon:"👤"},
 ];
 
