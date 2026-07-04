@@ -72,6 +72,28 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
+  await supabase.from("playbook_events").insert({
+    type: "action.assigned",
+    scholar_id: scholarId,
+    actor_id: user.id,
+    actor_role: body.assignedRole,
+    payload: {
+      title: body.title,
+      detail: body.detail || "A shared action was assigned.",
+    },
+  });
+
+  if (body.status === "complete") {
+    await supabase.from("playbook_events").insert({
+      type: "action.completed",
+      scholar_id: data.scholar_id,
+      payload: {
+        title: data.title,
+        detail: "A shared action was completed.",
+      },
+    });
+  }
+
   return NextResponse.json({ action: data });
 }
 
@@ -91,6 +113,28 @@ export async function PATCH(req: NextRequest) {
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 });
+  }
+
+  await supabase.from("playbook_events").insert({
+    type: "action.assigned",
+    scholar_id: scholarId,
+    actor_id: user.id,
+    actor_role: body.assignedRole,
+    payload: {
+      title: body.title,
+      detail: body.detail || "A shared action was assigned.",
+    },
+  });
+
+  if (body.status === "complete") {
+    await supabase.from("playbook_events").insert({
+      type: "action.completed",
+      scholar_id: data.scholar_id,
+      payload: {
+        title: data.title,
+        detail: "A shared action was completed.",
+      },
+    });
   }
 
   return NextResponse.json({ action: data });

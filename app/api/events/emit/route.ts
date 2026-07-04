@@ -3,7 +3,7 @@ import { supabase } from "@/lib/supabaseClient";
 import {
   buildPlaybookEvent,
   convertEventToNotification,
-  resolveDemoRecipients,
+  resolveRecipients,
 } from "@/lib/event-notifications";
 
 export async function POST(req: NextRequest) {
@@ -28,17 +28,24 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: eventError.message }, { status: 400 });
     }
 
-    const recipients = resolveDemoRecipients({
+    const { data: relationships } = await supabase
+      .from("support_relationships")
+      .select("*")
+      .eq("scholar_id", event.scholar_id);
+
+    const recipients = resolveRecipients({
       scholarId: event.scholar_id,
+      relationships: relationships || [],
       actorRole: event.actor_role,
     });
 
     const notifications = recipients
-      .map((recipientUserId) =>
+      .map((recipient) =>
         convertEventToNotification({
           eventId: savedEvent.id,
           event,
-          recipientUserId,
+          recipientUserId: recipient.userId,
+          recipientRole: recipient.role,
         })
       )
       .filter(

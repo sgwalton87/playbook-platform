@@ -709,3 +709,15 @@ Playbook can now convert ecosystem events into persisted notification records.
 
 ## 2026-07-04 03:25
 - Commit recorded: Fix notification pipeline type narrowing
+
+## 2026-07-04T10:31:25.750Z
+
+**Type:** product
+
+Built Beta 3.2 Sprint II real notification automation.
+
+## 2026-07-04T10:31:26.623Z
+
+**Type:** innovation
+
+Playbook notifications now resolve real support recipients, apply role-aware delivery rules, respect preferences, and support digest and escalation logic.

@@ -210,3 +210,9 @@ Playbook can now translate ecosystem events into role-aware attention signals an
 **Type:** innovation
 
 Playbook can now convert ecosystem events into persisted notification records.
+
+## 2026-07-04T10:31:26.623Z
+
+**Type:** innovation
+
+Playbook notifications now resolve real support recipients, apply role-aware delivery rules, respect preferences, and support digest and escalation logic.

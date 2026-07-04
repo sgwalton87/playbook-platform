@@ -83,6 +83,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       ok: true,
       destination: invitation.destination,
+      eventHint:
+        status === "accepted"
+          ? {
+              type: "invitation.accepted",
+              scholarId: invitation.scholar_id,
+              payload: {
+                title: "Support invitation accepted",
+                detail: `${invitation.invitee_name} joined the support network.`,
+              },
+            }
+          : null,
       invitation: {
         ...invitation,
         ...update,

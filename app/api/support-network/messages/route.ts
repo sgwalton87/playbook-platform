@@ -71,5 +71,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
+  await supabase.from("playbook_events").insert({
+    type: "message.received",
+    scholar_id: scholarId,
+    actor_id: user.id,
+    actor_role: body.senderRole || "supporter",
+    payload: {
+      title: "New support message",
+      detail: body.body,
+    },
+  });
+
   return NextResponse.json({ message: data });
 }

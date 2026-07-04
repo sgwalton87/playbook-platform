@@ -1491,3 +1491,17 @@ Playbook OS now has foundational intelligence engines that can coordinate events
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Beta 3.2 Sprint II — Real Notification Automation
+
+## Added
+
+- Real recipient resolver from support relationships
+- Role-aware notification delivery rules
+- Notification preferences foundation
+- Digest engine
+- Escalation engine
+- Event emission from messages and shared actions
+- Invitation acceptance event hint
