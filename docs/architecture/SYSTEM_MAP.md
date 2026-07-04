@@ -30,6 +30,7 @@ Playbook SDK
 - app/dashboard/page.tsx
 - app/demo/page.tsx
 - app/district-os/page.tsx
+- app/economy/page.tsx
 - app/educator-os/page.tsx
 - app/employer-os/page.tsx
 - app/events/page.tsx
@@ -103,6 +104,7 @@ Playbook SDK
 - supabase/migrations/20260704_notifications_events.sql
 - supabase/migrations/20260704_role_invitations.sql
 - supabase/migrations/20260704_scholar_athlete_os.sql
+- supabase/migrations/20260704_store_brand_guided_economy.sql
 - supabase/migrations/20260704_support_messages_actions.sql
 - supabase/migrations/20260704_support_relationships.sql
 
@@ -131,6 +133,7 @@ Playbook SDK
 - tests/unit/compass/compass-core.test.ts
 - tests/unit/demo/demo-mode.test.tsx
 - tests/unit/design-system/design-system.test.tsx
+- tests/unit/economy/economy-arc.test.tsx
 - tests/unit/email/email.test.ts
 - tests/unit/event-handlers.test.ts
 - tests/unit/event-notifications/event-notifications.test.ts

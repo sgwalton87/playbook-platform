@@ -306,3 +306,9 @@ Playbook is moving into guided onboarding, persistent rewards, store fulfillment
 **Type:** innovation
 
 Playbook can now persist reward events and coin ledger entries across platform actions.
+
+## 2026-07-04T23:37:25.042Z
+
+**Type:** innovation
+
+Playbook now has foundations for role tours, contextual help, reward integrity, Store v2, fulfillment, brand partners, and NIL commerce.

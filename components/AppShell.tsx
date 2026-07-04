@@ -18,6 +18,7 @@ const NAV = [
   {label:"Applications",href:"/opportunity-toolkit",icon:"📝"},
   {label:"Opportunities",href:"/opportunities",icon:"🌟"},
   {label:"Journey",href:"/journey",icon:"🧭"},
+  {label:"Economy",href:"/economy",icon:"💎"},
   {label:"Rewards",href:"/reward-economy",icon:"🏆"},
   {label:"Coins",href:"/gamification",icon:"🪙"},
   {label:"Courses",href:"/courses",icon:"🎓"},

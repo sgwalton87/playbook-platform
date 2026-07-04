@@ -1872,3 +1872,26 @@ Playbook now helps scholars turn their record, evidence, achievements, support n
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Beta 3.4 Sprints III-VII — Economy Arc
+
+## Added
+
+- Real workflow reward policy foundation
+- Reward idempotency keys
+- Message reward anti-farming logic
+- Ledger reversal model
+- Role-specific guided tours
+- Contextual help engine
+- Store v2 product model
+- Redemption transaction model
+- Fulfillment status model
+- Brand partner model
+- NIL/store campaign model
+- Campaign readiness evaluation
+- Guided tour progress table
+- Store product and redemption tables
+- Brand partner and NIL campaign tables
+- Economy Command Center
