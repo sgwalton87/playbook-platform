@@ -590,3 +590,13 @@ Alpha 1.0 Complete
 
 - Archivist v2 ship cycle completed.
 
+
+## 2026-07-04 00:53
+- Commit recorded: Build invitation delivery and acceptance flow
+
+## 2026-07-04 00:55
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

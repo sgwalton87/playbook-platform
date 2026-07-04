@@ -37,6 +37,7 @@ Playbook SDK
 - app/home/page.tsx
 - app/intelligence-platform/page.tsx
 - app/invitations/page.tsx
+- app/invite/[token]/page.tsx
 - app/journey/page.tsx
 - app/leaderboard/page.tsx
 - app/living-scholar/page.tsx
@@ -77,6 +78,7 @@ Playbook SDK
 ## Detected Migrations
 
 - supabase/migrations/20260701_playbook_graph.sql
+- supabase/migrations/20260704_role_invitations.sql
 
 ## Detected Tests
 
@@ -101,6 +103,7 @@ Playbook SDK
 - tests/unit/intelligence-network/intelligence-network.test.ts
 - tests/unit/intelligence-platform/intelligence-platform.test.ts
 - tests/unit/intelligence-platform-ui/intelligence-platform-ui.test.tsx
+- tests/unit/invitations/invitation-lifecycle.test.ts
 - tests/unit/invitations/invitations.test.tsx
 - tests/unit/journey/first-journey.test.tsx
 - tests/unit/living-scholar/living-scholar.test.tsx
