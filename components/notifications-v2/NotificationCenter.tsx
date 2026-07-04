@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { PlaybookHero, PlaybookMetric, PlaybookMetrics, PlaybookPage, PlaybookPill } from "@/components/ui";
 import { useEffect, useMemo, useState } from "react";
 import {
   getDemoNotifications,
@@ -96,27 +97,17 @@ export default function NotificationCenter() {
   }
 
   return (
-    <main style={page}>
-      <section style={hero}>
-        <p style={eyebrow}>Notifications Center</p>
-        <h1 style={title}>What needs your attention?</h1>
-        <p style={sub}>
-          Messages, invitations, shared actions, email replies, Compass alerts,
-          and network blockers in one place.
-        </p>
+    <PlaybookPage>
+      <PlaybookHero
+        eyebrow="Notifications Center"
+        title="What needs your attention?"
+        subtitle="Messages, invitations, shared actions, email replies, Compass alerts, and network blockers in one place."
+      />
 
-        <div style={heroStats}>
-          <div style={heroStat}>
-            <strong style={heroNumber}>{unreadCount}</strong>
-            <span>Unread</span>
-          </div>
-
-          <div style={heroStat}>
-            <strong style={heroNumber}>{notifications.length}</strong>
-            <span>Total signals</span>
-          </div>
-        </div>
-      </section>
+      <PlaybookMetrics>
+        <PlaybookMetric label="Unread" value={String(unreadCount)} />
+        <PlaybookMetric label="Total Signals" value={String(notifications.length)} />
+      </PlaybookMetrics>
 
       <section style={toolbar}>
         <div style={filters}>
@@ -152,9 +143,7 @@ export default function NotificationCenter() {
           >
             <div style={cardTop}>
               <div>
-                <span style={typePill}>
-                  {notification.type.replaceAll("_", " ")}
-                </span>
+                <PlaybookPill>{notification.type.replaceAll("_", " ")}</PlaybookPill>
 
                 <h2 style={cardTitle}>{notification.title}</h2>
               </div>
@@ -195,7 +184,7 @@ export default function NotificationCenter() {
           </article>
         )}
       </section>
-    </main>
+    </PlaybookPage>
   );
 }
 

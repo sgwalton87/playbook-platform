@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { PlaybookHero, PlaybookPage, PlaybookPill } from "@/components/ui";
 import {
   buildConversationMessage,
   getDemoConversationMessages,
@@ -40,14 +41,12 @@ export default function InboxV2() {
   }
 
   return (
-    <main style={page}>
-      <section style={hero}>
-        <p style={eyebrow}>Playbook Inbox v2</p>
-        <h1 style={title}>A real inbox for the scholar support system.</h1>
-        <p style={sub}>
-          Direct messages, support-network threads, shared-action conversations, unread states, and email replies can live here.
-        </p>
-      </section>
+    <PlaybookPage>
+      <PlaybookHero
+        eyebrow="Playbook Inbox v2"
+        title="A real inbox for the scholar support system."
+        subtitle="Direct messages, support-network threads, shared-action conversations, unread states, and email replies can live here."
+      />
 
       <section style={shell}>
         <aside style={sidebar}>
@@ -69,18 +68,16 @@ export default function InboxV2() {
                 )}
               </div>
               <p style={preview}>{conversation.lastMessage}</p>
-              <small style={kind}>{conversation.kind.replaceAll("_", " ")}</small>
+              <PlaybookPill>{conversation.kind.replaceAll("_", " ")}</PlaybookPill>
             </button>
           ))}
         </aside>
 
         <section style={thread}>
           <div style={threadHeader}>
-            <div>
-              <p style={eyebrow}>{activeConversation.kind.replaceAll("_", " ")}</p>
-              <h2 style={threadTitle}>{activeConversation.title}</h2>
-              <p style={participants}>{activeConversation.participants.join(" • ")}</p>
-            </div>
+            <p style={eyebrow}>{activeConversation.kind.replaceAll("_", " ")}</p>
+            <h2 style={threadTitle}>{activeConversation.title}</h2>
+            <p style={participants}>{activeConversation.participants.join(" • ")}</p>
           </div>
 
           <div style={composer}>
@@ -112,9 +109,8 @@ export default function InboxV2() {
           </div>
         </section>
       </section>
-    </main>
+    </PlaybookPage>
   );
-}
 
 const page: React.CSSProperties = {
   minHeight: "100vh",

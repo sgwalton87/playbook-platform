@@ -161,3 +161,69 @@ const secondaryButton: React.CSSProperties = {
   background: "#FFFFFF",
   color: playbookTheme.colors.ink,
 };
+
+export function PlaybookGrid({
+  children,
+  min = 280,
+}: {
+  children: React.ReactNode;
+  min?: number;
+}) {
+  return (
+    <section
+      style={{
+        maxWidth: playbookTheme.layout.max,
+        margin: "0 auto",
+        display: "grid",
+        gridTemplateColumns: `repeat(auto-fit,minmax(${min}px,1fr))`,
+        gap: 16,
+      }}
+    >
+      {children}
+    </section>
+  );
+}
+
+export function PlaybookMetrics({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <section
+      style={{
+        maxWidth: playbookTheme.layout.max,
+        margin: "0 auto 18px",
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))",
+        gap: 14,
+      }}
+    >
+      {children}
+    </section>
+  );
+}
+
+export function PlaybookPill({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <span
+      style={{
+        display: "inline-flex",
+        background: playbookTheme.colors.orangeSoft,
+        border: `1px solid ${playbookTheme.colors.orangeLine}`,
+        color: "#9A3412",
+        borderRadius: playbookTheme.radius.pill,
+        padding: "6px 9px",
+        fontSize: 11,
+        fontWeight: 900,
+        textTransform: "uppercase",
+      }}
+    >
+      {children}
+    </span>
+  );
+}
