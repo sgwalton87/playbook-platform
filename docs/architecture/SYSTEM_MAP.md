@@ -84,6 +84,7 @@ Playbook SDK
 ## Detected Migrations
 
 - supabase/migrations/20260701_playbook_graph.sql
+- supabase/migrations/20260704_notifications_events.sql
 - supabase/migrations/20260704_role_invitations.sql
 - supabase/migrations/20260704_support_messages_actions.sql
 - supabase/migrations/20260704_support_relationships.sql
@@ -109,6 +110,7 @@ Playbook SDK
 - tests/unit/demo/demo-mode.test.tsx
 - tests/unit/email/email.test.ts
 - tests/unit/event-handlers.test.ts
+- tests/unit/event-notifications/event-notifications.test.ts
 - tests/unit/events.test.ts
 - tests/unit/home/playbook-home.test.tsx
 - tests/unit/intelligence-automation/intelligence-automation.test.ts

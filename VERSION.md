@@ -955,3 +955,10 @@ Playbook begins converting platform events into role-aware notifications, attent
 # Playbook OS Beta 3.2 Sprint I
 
 Added persistent event-to-notification pipeline foundation.
+
+## 2026-07-04 03:22
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
