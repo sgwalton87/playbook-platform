@@ -1099,3 +1099,10 @@ Added portfolio PDF payloads, printable export foundation, recommender request w
 Status: Foundation complete
 
 Added server-side portfolio PDF rendering, shareable portfolio links, and recommender approval workflow foundations.
+
+## 2026-07-04 15:13
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
