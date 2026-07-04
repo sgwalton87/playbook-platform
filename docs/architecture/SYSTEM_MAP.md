@@ -111,6 +111,7 @@ Playbook SDK
 - tests/unit/event-handlers.test.ts
 - tests/unit/events.test.ts
 - tests/unit/home/playbook-home.test.tsx
+- tests/unit/intelligence-automation/intelligence-automation.test.ts
 - tests/unit/intelligence-network/intelligence-network.test.ts
 - tests/unit/intelligence-platform/intelligence-platform.test.ts
 - tests/unit/intelligence-platform-ui/intelligence-platform-ui.test.tsx

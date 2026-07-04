@@ -942,3 +942,10 @@ Playbook OS Beta 3.2 — Notifications + Intelligence Automation
 Status: Foundation started
 
 Playbook begins converting platform events into role-aware notifications, attention signals, and intelligent next-step routing.
+
+## 2026-07-04 03:12
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
