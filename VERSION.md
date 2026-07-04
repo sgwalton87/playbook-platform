@@ -678,3 +678,9 @@ Added coordinated action routing across scholar support roles.
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Playbook Intelligence Network
+
+Added foundational intelligence engines for orchestration, timelines, relationships, goals, and the Life Graph.

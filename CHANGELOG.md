@@ -1037,3 +1037,19 @@ Playbook now supports unique experiences for every role around the scholar.
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Playbook Intelligence Network
+
+## Added
+
+- Intelligence Orchestrator
+- Living Timeline Engine
+- Relationship Engine
+- Goal Engine
+- Life Graph Engine
+
+## Platform Shift
+
+Playbook OS now has foundational intelligence engines that can coordinate events, relationships, goals, timelines, and life graph connections across every role experience.

@@ -211,3 +211,19 @@ One scholar opportunity can now generate unique actions for:
 - District
 - University
 - Employer
+
+---
+
+# Playbook Intelligence Network
+
+Status: Foundation started
+
+Includes:
+- Intelligence Orchestrator
+- Living Timeline Engine
+- Relationship Engine
+- Goal Engine
+- Life Graph
+
+Purpose:
+Turn Playbook from role-based dashboards into a coordinated intelligence network.

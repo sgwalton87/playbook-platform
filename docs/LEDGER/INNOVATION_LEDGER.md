@@ -78,3 +78,9 @@ Playbook now tracks coordinated support progress across every scholar support ro
 **Type:** innovation
 
 Playbook now visualizes the full support ecosystem around one scholar-owned record.
+
+## 2026-07-04T06:21:14.935Z
+
+**Type:** innovation
+
+Playbook now has an intelligence core for orchestration, timeline, relationships, goals, and Life Graph.
