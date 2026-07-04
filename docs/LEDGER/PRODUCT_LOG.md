@@ -655,3 +655,6 @@ Built Inbox v2 conversation model.
 **Type:** innovation
 
 Playbook Inbox now supports conversation threads, unread state, action attachments, and inbound email conversation bridging.
+
+## 2026-07-04 02:47
+- Commit recorded: Build Inbox v2 conversation model

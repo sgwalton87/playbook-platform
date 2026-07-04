@@ -687,3 +687,13 @@ Alpha 1.0 Complete
 
 - Archivist v2 ship cycle completed.
 
+
+## 2026-07-04 02:47
+- Commit recorded: Build Inbox v2 conversation model
+
+## 2026-07-04 02:49
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

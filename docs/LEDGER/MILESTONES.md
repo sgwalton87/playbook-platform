@@ -834,3 +834,13 @@ Alpha 1.0 Complete — Intelligence OS foundation finished.
 
 - Archivist v2 ship cycle completed.
 
+
+## 2026-07-04 02:47
+- **commit**: Build Inbox v2 conversation model
+
+## 2026-07-04 02:49
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
