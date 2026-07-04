@@ -44,6 +44,7 @@ Playbook SDK
 - app/login/page.tsx
 - app/mentor-os/page.tsx
 - app/mentorship/page.tsx
+- app/messages/page.tsx
 - app/network-intelligence/page.tsx
 - app/notifications/page.tsx
 - app/onboarding/page.tsx
@@ -117,6 +118,7 @@ Playbook SDK
 - tests/unit/journey/first-journey.test.tsx
 - tests/unit/living-scholar/living-scholar.test.tsx
 - tests/unit/mail-gateway/mail-gateway.test.ts
+- tests/unit/messages/messages.test.tsx
 - tests/unit/network-intelligence/network-intelligence.test.tsx
 - tests/unit/opportunity-graph/opportunity-graph-card.test.tsx
 - tests/unit/opportunity-graph/opportunity-graph.test.ts
