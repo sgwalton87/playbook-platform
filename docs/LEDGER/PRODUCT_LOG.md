@@ -733,3 +733,6 @@ Playbook notifications now resolve real support recipients, apply role-aware del
 **Type:** product
 
 Added Scholar-Athlete OS, NCAA/NAIA eligibility, and NIL dashboard to future roadmap.
+
+## 2026-07-04 03:56
+- Commit recorded: Add Scholar-Athlete OS to sidebar

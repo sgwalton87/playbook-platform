@@ -58,6 +58,7 @@ Playbook SDK
 - app/reset-password/page.tsx
 - app/role-intelligence/page.tsx
 - app/role-select/page.tsx
+- app/scholar-athlete-os/page.tsx
 - app/scholar-network/page.tsx
 - app/store/page.tsx
 - app/studio/architecture/page.tsx
@@ -86,6 +87,7 @@ Playbook SDK
 - supabase/migrations/20260701_playbook_graph.sql
 - supabase/migrations/20260704_notifications_events.sql
 - supabase/migrations/20260704_role_invitations.sql
+- supabase/migrations/20260704_scholar_athlete_os.sql
 - supabase/migrations/20260704_support_messages_actions.sql
 - supabase/migrations/20260704_support_relationships.sql
 
@@ -139,6 +141,7 @@ Playbook SDK
 - tests/unit/role-os/role-dashboard-experience.test.tsx
 - tests/unit/role-os/role-os.test.ts
 - tests/unit/role-os/role-routes.test.ts
+- tests/unit/scholar-athlete/scholar-athlete-os.test.tsx
 - tests/unit/scholar-network/scholar-network.test.tsx
 - tests/unit/scholar-record.test.ts
 - tests/unit/smoke.test.ts
