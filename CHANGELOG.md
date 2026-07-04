@@ -1243,3 +1243,15 @@ Playbook OS now has foundational intelligence engines that can coordinate events
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Playbook Email Delivery Foundation
+
+## Added
+
+- Playbook email sender configuration
+- Hostinger SMTP email service
+- Invitation email template
+- Onboarding sender for support-network invitations
+- Support reply-to address

@@ -479,3 +479,22 @@ Support network invitations now generate secure tokens, persist invitation recor
 Updated:
 - docs/LEDGER/INNOVATION_LEDGER.md
 - docs/LEDGER/PRODUCT_LOG.md
+
+## 2026-07-04T08:06:28.983Z
+
+**PRODUCT**
+
+Built Playbook email delivery foundation using onboarding, support, notifications, hello, and noreply addresses.
+
+Updated:
+- docs/LEDGER/PRODUCT_LOG.md
+
+## 2026-07-04T08:06:29.903Z
+
+**INNOVATION**
+
+Invitation emails now send from Playbook Onboarding and route replies to Playbook Support.
+
+Updated:
+- docs/LEDGER/INNOVATION_LEDGER.md
+- docs/LEDGER/PRODUCT_LOG.md

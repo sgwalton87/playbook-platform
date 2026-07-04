@@ -8,6 +8,7 @@ import {
 } from "@/lib/invitations/server";
 
 import type { RelationshipKind } from "@/lib/permissions";
+import { buildSupportInvitationEmail, sendPlaybookEmail } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   try {
@@ -63,11 +64,26 @@ export async function POST(req: NextRequest) {
       origin: req.nextUrl.origin,
     });
 
+    const invitationEmail = buildSupportInvitationEmail({
+      inviteeName: record.inviteeName,
+      scholarName: record.scholarName,
+      relationship: record.relationship,
+      url: email.url,
+    });
+
+    await sendPlaybookEmail({
+      to: record.inviteeEmail,
+      subject: invitationEmail.subject,
+      text: invitationEmail.text,
+      html: invitationEmail.html,
+      fromType: "onboarding",
+    });
+
     return NextResponse.json({
       ok: true,
       invitation: record,
       email,
-      deliveryStatus: "prepared",
+      deliveryStatus: "sent",
     });
   } catch {
     return NextResponse.json(

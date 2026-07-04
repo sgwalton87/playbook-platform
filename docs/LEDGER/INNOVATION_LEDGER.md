@@ -138,3 +138,9 @@ Scholars can now invite family, mentors, educators, universities, and employers 
 **Type:** innovation
 
 Support network invitations now generate secure tokens, persist invitation records, support acceptance states, and route users toward the correct Playbook OS.
+
+## 2026-07-04T08:06:29.903Z
+
+**Type:** innovation
+
+Invitation emails now send from Playbook Onboarding and route replies to Playbook Support.

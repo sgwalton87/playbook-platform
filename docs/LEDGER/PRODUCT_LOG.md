@@ -523,3 +523,15 @@ Support network invitations now generate secure tokens, persist invitation recor
 
 ## 2026-07-04 00:53
 - Commit recorded: Build invitation delivery and acceptance flow
+
+## 2026-07-04T08:06:28.983Z
+
+**Type:** product
+
+Built Playbook email delivery foundation using onboarding, support, notifications, hello, and noreply addresses.
+
+## 2026-07-04T08:06:29.903Z
+
+**Type:** innovation
+
+Invitation emails now send from Playbook Onboarding and route replies to Playbook Support.
