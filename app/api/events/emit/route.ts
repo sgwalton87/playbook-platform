@@ -41,7 +41,12 @@ export async function POST(req: NextRequest) {
           recipientUserId,
         })
       )
-      .filter(Boolean);
+      .filter(
+        (
+          notification
+        ): notification is NonNullable<typeof notification> =>
+          notification !== null
+      );
 
     if (notifications.length) {
       const { error: notificationError } = await supabase
