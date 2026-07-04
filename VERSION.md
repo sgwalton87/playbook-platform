@@ -711,3 +711,9 @@ Added user-facing Recommendation Center and Scenario Lab.
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Intelligence Platform UI
+
+Added user-facing Recommendation Center and Scenario Lab.

@@ -240,3 +240,16 @@ Includes:
 - Impact Preview
 - Explanation Panel
 - Studio and Living Scholar links
+
+---
+
+# Recommendation + Scenario Experience
+
+Status: Foundation complete
+
+Includes:
+- Recommendation Center
+- Scenario Lab
+- Impact Preview
+- Explanation Panel
+- Studio and Living Scholar links
