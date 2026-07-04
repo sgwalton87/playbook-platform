@@ -1643,3 +1643,10 @@ Playbook OS now has foundational intelligence engines that can coordinate events
 ## Purpose
 
 Playbook now helps scholars turn their record, evidence, achievements, support network, and opportunities into application-ready materials.
+
+## 2026-07-04 14:09
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
