@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabaseClient";
+import { sendPlaybookEmail } from "@/lib/email";
 import {
   buildRecommenderEmail,
   buildRecommenderRequest,
@@ -57,11 +58,18 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    await sendPlaybookEmail({
+      to: request.recommenderEmail,
+      subject: email.subject,
+      text: email.text,
+      fromType: "onboarding",
+    });
+
     return NextResponse.json({
       ok: true,
       request: data,
       email,
-      deliveryStatus: "prepared",
+      deliveryStatus: "sent",
     });
   } catch {
     return NextResponse.json(

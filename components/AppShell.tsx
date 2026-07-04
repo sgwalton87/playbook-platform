@@ -14,6 +14,7 @@ const NAV = [
   {label:"Notifications",href:"/notifications",icon:"🔔"},
   {label:"Portfolio",href:"/portfolio/demo",icon:"📄"},
   {label:"Recommenders",href:"/recommenders",icon:"✍️"},
+  {label:"Workspaces",href:"/application-workspaces",icon:"📂"},
   {label:"Applications",href:"/opportunity-toolkit",icon:"📝"},
   {label:"Opportunities",href:"/opportunities",icon:"🌟"},
   {label:"Journey",href:"/journey",icon:"🧭"},

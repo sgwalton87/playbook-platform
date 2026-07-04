@@ -18,6 +18,7 @@ Playbook SDK
 
 - app/action-routing/page.tsx
 - app/admin/page.tsx
+- app/application-workspaces/page.tsx
 - app/auth/callback/page.tsx
 - app/badges/page.tsx
 - app/certificates/page.tsx
@@ -94,6 +95,7 @@ Playbook SDK
 
 - supabase/migrations/20260701_playbook_graph.sql
 - supabase/migrations/20260704_application_toolkit_persistence.sql
+- supabase/migrations/20260704_application_toolkit_rls.sql
 - supabase/migrations/20260704_notifications_events.sql
 - supabase/migrations/20260704_role_invitations.sql
 - supabase/migrations/20260704_scholar_athlete_os.sql
@@ -116,6 +118,7 @@ Playbook SDK
 - tests/unit/action-routing/action-routing.test.tsx
 - tests/unit/app-shell/app-shell.test.ts
 - tests/unit/application-workspace/application-workspace.test.ts
+- tests/unit/application-workspace-ui/application-workspace-ui.test.tsx
 - tests/unit/beta-completion/beta31-checklist.test.ts
 - tests/unit/beta-hardening/beta31-routes.test.ts
 - tests/unit/collaboration/collaboration.test.tsx
@@ -152,6 +155,7 @@ Playbook SDK
 - tests/unit/permissions/permissions.test.tsx
 - tests/unit/polish/polish.test.ts
 - tests/unit/portfolio-sharing/portfolio-sharing.test.ts
+- tests/unit/recommender-auth/recommender-auth.test.ts
 - tests/unit/recommenders/recommenders.test.tsx
 - tests/unit/responsive/responsive.test.ts
 - tests/unit/role-intelligence/role-intelligence.test.tsx
@@ -161,6 +165,7 @@ Playbook SDK
 - tests/unit/scholar-athlete/scholar-athlete-os.test.tsx
 - tests/unit/scholar-network/scholar-network.test.tsx
 - tests/unit/scholar-record.test.ts
+- tests/unit/secure-sharing/secure-sharing.test.ts
 - tests/unit/smoke.test.ts
 - tests/unit/store-v2/store-v2.test.tsx
 - tests/unit/studio/studio-operations.test.ts

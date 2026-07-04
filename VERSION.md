@@ -1121,3 +1121,19 @@ Added persisted portfolio shares, recommender requests, application workspaces, 
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Playbook OS Beta 3.3 Sprint IV — Persistence + Real Workflow Activation
+
+Status: Foundation complete
+
+Added persisted portfolio shares, recommender requests, application workspaces, and workflow event activation.
+
+---
+
+# Playbook OS Beta 3.3 Sprint V — Hardening + Real Data Wiring
+
+Status: Foundation complete
+
+Added RLS policies, secure sharing helpers, scholar data adapters, recommender auth handoff, recommender email delivery, and application workspace UI.

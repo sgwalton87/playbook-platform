@@ -1740,3 +1740,31 @@ Playbook now helps scholars turn their record, evidence, achievements, support n
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Beta 3.3 Sprint IV — Persistence + Real Workflow Activation
+
+## Added
+
+- Portfolio share persistence table
+- Recommender request persistence table
+- Application workspace persistence table
+- Portfolio share API
+- Application workspace API
+- Persisted recommender request API
+- Event emission from application and recommendation workflows
+
+---
+
+# Beta 3.3 Sprint V — Hardening + Real Data Wiring
+
+## Added
+
+- RLS policies for application toolkit tables
+- Secure share-link helpers
+- Scholar application data adapter
+- Recommender auth handoff helpers
+- Real recommender email delivery
+- Application Workspace UI
+- Application Workspaces navigation entry

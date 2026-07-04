@@ -276,3 +276,15 @@ Playbook can now render portfolio packets as PDFs and support shareable portfoli
 **Type:** innovation
 
 Playbook application tools now persist portfolio shares, recommender requests, and application workspaces while emitting workflow events.
+
+## 2026-07-04T22:49:51.237Z
+
+**Type:** innovation
+
+Playbook application tools now persist portfolio shares, recommender requests, and application workspaces while emitting workflow events.
+
+## 2026-07-04T22:51:02.106Z
+
+**Type:** innovation
+
+Playbook application workflows are now safer, more persistent, and closer to real authenticated scholar workflows.
