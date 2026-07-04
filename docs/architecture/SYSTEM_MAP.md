@@ -126,6 +126,7 @@ Playbook SDK
 - tests/unit/messages/inbox-v2.test.tsx
 - tests/unit/messages/messages.test.tsx
 - tests/unit/network-intelligence/network-intelligence.test.tsx
+- tests/unit/notification-automation/notification-automation.test.ts
 - tests/unit/notifications-v2/notifications-v2.test.tsx
 - tests/unit/opportunity-graph/opportunity-graph-card.test.tsx
 - tests/unit/opportunity-graph/opportunity-graph.test.ts

@@ -975,3 +975,10 @@ Added persistent event-to-notification pipeline foundation.
 # Playbook OS Beta 3.2 Sprint II
 
 Added recipient resolution, role-aware delivery rules, preferences, digests, escalation logic, and workflow event emission.
+
+## 2026-07-04 03:35
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
