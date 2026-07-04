@@ -12,7 +12,7 @@ describe("Role OS Permissions", () => {
   });
 
   it("checks permission access", () => {
-    expect(canRelationship("family" as any, "verify_evidence" as any)).toBe(false);
+    expect(canRelationship("parent_guardian", "verify_evidence")).toBe(false);
     expect(canRelationship("mentor", "support_tasks")).toBe(true);
   });
 
