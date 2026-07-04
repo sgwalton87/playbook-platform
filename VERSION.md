@@ -1199,3 +1199,10 @@ Playbook is moving into guided onboarding, role-specific tours, contextual help,
 Status: Foundation complete
 
 Added persistent coin ledger foundation, reward event processing, reward balance API, platform-wide reward values, and Reward Economy dashboard.
+
+## 2026-07-04 16:21
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

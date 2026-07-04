@@ -1865,3 +1865,10 @@ Playbook now helps scholars turn their record, evidence, achievements, support n
 - Reward balance API
 - Legacy gamification integration
 - Reward Economy dashboard
+
+## 2026-07-04 16:21
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
