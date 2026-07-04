@@ -24,14 +24,31 @@ export default function InvitationCenter() {
   const [relationship, setRelationship] = useState<RelationshipKind>("mentor");
   const [invitations, setInvitations] = useState<SupportInvitation[]>(getDemoInvitations());
 
-  function sendInvite() {
-    const invite = createSupportInvitation({
-      inviteeName,
-      inviteeEmail,
-      relationship,
+  async function sendInvite() {
+    const res = await fetch("/api/invitations/send", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        inviteeName,
+        inviteeEmail,
+        relationship,
+        scholarName: "Maya Johnson",
+      }),
     });
 
-    setInvitations([invite, ...invitations]);
+    const json = await res.json();
+
+    if (!res.ok) {
+      console.error(json.error);
+      return;
+    }
+
+    setInvitations((current) => [
+      json.invitation,
+      ...current,
+    ]);
   }
 
   function changeStatus(id: string, status: "accepted" | "declined") {

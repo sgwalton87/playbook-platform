@@ -1215,3 +1215,24 @@ Playbook OS now has foundational intelligence engines that can coordinate events
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Invitation Delivery + Acceptance Flow
+
+## Added
+
+- Secure invitation tokens
+- Support invitation database migration
+- Invitation send API
+- Invitation acceptance API
+- Dynamic invitation acceptance route
+- Relationship-aware destination routing
+- Invitation lifecycle tests
+
+## Next
+
+- Dedicated server-side Supabase client
+- Real email delivery
+- Authentication and registration continuation
+- Relationship persistence after acceptance

@@ -777,3 +777,9 @@ Added invitation workflow for connecting support roles to a scholar.
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Invitation Delivery + Acceptance Flow
+
+Added the operational foundation for delivering and accepting scholar support network invitations.

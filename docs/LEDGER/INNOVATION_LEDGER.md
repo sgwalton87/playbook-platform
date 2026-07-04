@@ -132,3 +132,9 @@ Role OS experiences now reveal or lock actions based on relationship permissions
 **Type:** innovation
 
 Scholars can now invite family, mentors, educators, universities, and employers into role-specific OS experiences.
+
+## 2026-07-04T07:49:14.843Z
+
+**Type:** innovation
+
+Support network invitations now generate secure tokens, persist invitation records, support acceptance states, and route users toward the correct Playbook OS.
