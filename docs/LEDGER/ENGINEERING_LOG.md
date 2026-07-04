@@ -1043,3 +1043,13 @@ Started Beta 2 — Archivist v3 Unified Ledger Engine and Demo Mode.
 
 - Archivist v2 ship cycle completed.
 
+
+## 2026-07-04 15:53
+- **commit**: Build Beta 3.3 hardening and real data wiring
+
+## 2026-07-04 15:56
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

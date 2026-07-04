@@ -1768,3 +1768,10 @@ Playbook now helps scholars turn their record, evidence, achievements, support n
 - Real recommender email delivery
 - Application Workspace UI
 - Application Workspaces navigation entry
+
+## 2026-07-04 15:56
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

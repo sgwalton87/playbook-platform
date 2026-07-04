@@ -1137,3 +1137,10 @@ Added persisted portfolio shares, recommender requests, application workspaces, 
 Status: Foundation complete
 
 Added RLS policies, secure sharing helpers, scholar data adapters, recommender auth handoff, recommender email delivery, and application workspace UI.
+
+## 2026-07-04 15:56
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
