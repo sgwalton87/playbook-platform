@@ -4,29 +4,19 @@ import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import ProfileAvatar from "@/components/ProfileAvatar";
 
-const NAV=[
-  {label:"Studio",href:"/studio",icon:"🛠"},
-  {label:"Demo",href:"/demo",icon:"🎤"},
-  {label:"Journey",href:"/journey",icon:"🚀"},
-  {label:"Living Scholar",href:"/living-scholar",icon:"🌱"},
+const NAV = [
   {label:"Home",href:"/home",icon:"✨"},
   {label:"Dashboard",href:"/dashboard",icon:"🏠"},
-  {label:"Profile",href:"/profile",icon:"👤"},
-  {label:"Feed",href:"/feed",icon:"💬"},
+  {label:"Scholar Record",href:"/record",icon:"📘"},
   {label:"Athlete OS",href:"/scholar-athlete-os",icon:"🏀"},
-  {label:"Opportunities",href:"/opportunities",icon:"🧭"},
-  {label:"Courses",href:"/courses",icon:"📚"},
-  {label:"Transcript",href:"/transcript",icon:"🎓"},
-  {label:"Certificates",href:"/certificates",icon:"🎖️"},
+  {label:"Messages",href:"/messages",icon:"💬"},
   {label:"Notifications",href:"/notifications",icon:"🔔"},
-  {label:"Connections",href:"/connections",icon:"🤝"},
-  {label:"Mentorship",href:"/mentorship",icon:"🧭"},
-  {label:"Events",href:"/events",icon:"📅"},
-  {label:"Leaderboard",href:"/leaderboard",icon:"🏆"},
-  {label:"Messages",href:"/messages",icon:"✉️"},
-  {label:"Analytics",href:"/analytics",icon:"📊"},
-  {label:"Store",href:"/store",icon:"🛒"},
-  {label:"Badges",href:"/badges",icon:"🏅"},
+  {label:"Opportunities",href:"/opportunities",icon:"🌟"},
+  {label:"Journey",href:"/journey",icon:"🧭"},
+  {label:"Courses",href:"/courses",icon:"🎓"},
+  {label:"Compass",href:"/compass",icon:"🧠"},
+  {label:"Studio",href:"/studio",icon:"🛠️"},
+  {label:"Profile",href:"/profile",icon:"👤"},
 ];
 
 export default function AppShell({children,title="Playbook"}:{children:React.ReactNode;title?:string}) {

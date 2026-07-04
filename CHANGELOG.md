@@ -1526,3 +1526,16 @@ Playbook OS now has foundational intelligence engines that can coordinate events
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Playbook Unified Experience Sprint
+
+## Added
+
+- Design tokens
+- Shared UI primitives
+- Unified homepage
+- Unified dashboard
+- Unified AppShell navigation order
+- Shared Playbook page, hero, card, metric, and button components
