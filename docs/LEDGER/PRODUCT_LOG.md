@@ -880,3 +880,18 @@ Playbook can now render portfolio packets as PDFs and support shareable portfoli
 
 ## 2026-07-04 15:11
 - Commit recorded: Build PDF rendering portfolio sharing and recommender approval
+
+## 2026-07-04 15:21
+- Commit recorded: Fix portfolio PDF response body
+
+## 2026-07-04T22:31:34.703Z
+
+**Type:** product
+
+Built Beta 3.3 Sprint IV persistence and real workflow activation.
+
+## 2026-07-04T22:31:36.094Z
+
+**Type:** innovation
+
+Playbook application tools now persist portfolio shares, recommender requests, and application workspaces while emitting workflow events.

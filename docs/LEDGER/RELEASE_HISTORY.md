@@ -883,3 +883,6 @@ Alpha 1.0 Complete
 
 - Archivist v2 ship cycle completed.
 
+
+## 2026-07-04 15:21
+- Commit recorded: Fix portfolio PDF response body

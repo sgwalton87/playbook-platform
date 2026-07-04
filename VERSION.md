@@ -1106,3 +1106,11 @@ Added server-side portfolio PDF rendering, shareable portfolio links, and recomm
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Playbook OS Beta 3.3 Sprint IV — Persistence + Real Workflow Activation
+
+Status: Foundation complete
+
+Added persisted portfolio shares, recommender requests, application workspaces, and workflow event activation.

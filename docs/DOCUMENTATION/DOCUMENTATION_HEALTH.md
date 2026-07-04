@@ -275,7 +275,7 @@ All files:
 
 ### release
 
-Count: 8
+Count: 9
 
 Canonical candidates:
 - docs/CHANGELOG.md
@@ -283,6 +283,7 @@ Canonical candidates:
 - docs/releases/BETA_3.3_OPPORTUNITY_APPLICATION_TOOLKIT.md
 - docs/releases/BETA_3.3_SPRINT_III_PORTFOLIO_SHARING.md
 - docs/releases/BETA_3.3_SPRINT_II_RECOMMENDER_WORKFLOW.md
+- docs/releases/BETA_3.3_SPRINT_IV_WORKFLOW_ACTIVATION.md
 - docs/releases/RELEASE_LOG.md
 
 All files:
@@ -293,6 +294,7 @@ All files:
 - docs/releases/BETA_3.3_OPPORTUNITY_APPLICATION_TOOLKIT.md
 - docs/releases/BETA_3.3_SPRINT_III_PORTFOLIO_SHARING.md
 - docs/releases/BETA_3.3_SPRINT_II_RECOMMENDER_WORKFLOW.md
+- docs/releases/BETA_3.3_SPRINT_IV_WORKFLOW_ACTIVATION.md
 - docs/releases/RELEASE_LOG.md
 
 ### design

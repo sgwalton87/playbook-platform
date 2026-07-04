@@ -270,3 +270,9 @@ Playbook can now prepare portfolio packets and recommendation request workflows 
 **Type:** innovation
 
 Playbook can now render portfolio packets as PDFs and support shareable portfolio/recommender approval workflows.
+
+## 2026-07-04T22:31:36.094Z
+
+**Type:** innovation
+
+Playbook application tools now persist portfolio shares, recommender requests, and application workspaces while emitting workflow events.

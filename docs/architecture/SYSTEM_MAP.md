@@ -93,6 +93,7 @@ Playbook SDK
 ## Detected Migrations
 
 - supabase/migrations/20260701_playbook_graph.sql
+- supabase/migrations/20260704_application_toolkit_persistence.sql
 - supabase/migrations/20260704_notifications_events.sql
 - supabase/migrations/20260704_role_invitations.sql
 - supabase/migrations/20260704_scholar_athlete_os.sql
@@ -114,6 +115,7 @@ Playbook SDK
 - tests/unit/academic-intelligence.test.ts
 - tests/unit/action-routing/action-routing.test.tsx
 - tests/unit/app-shell/app-shell.test.ts
+- tests/unit/application-workspace/application-workspace.test.ts
 - tests/unit/beta-completion/beta31-checklist.test.ts
 - tests/unit/beta-hardening/beta31-routes.test.ts
 - tests/unit/collaboration/collaboration.test.tsx
