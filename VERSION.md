@@ -724,3 +724,9 @@ Added user-facing Recommendation Center and Scenario Lab.
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Role-Aware Intelligence Platform
+
+Added role-aware recommendations and scenarios across the Playbook support ecosystem.

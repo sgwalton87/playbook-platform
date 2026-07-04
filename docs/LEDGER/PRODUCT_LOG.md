@@ -430,3 +430,15 @@ Playbook can now show recommendations, simulate scenarios, preview impact, and e
 
 ## 2026-07-03 23:48
 - Commit recorded: Build Intelligence Platform UI
+
+## 2026-07-04T06:51:04.288Z
+
+**Type:** product
+
+Built Role-Aware Intelligence Platform.
+
+## 2026-07-04T06:51:05.486Z
+
+**Type:** innovation
+
+Recommendations and scenarios now adapt by role across the full scholar support ecosystem.

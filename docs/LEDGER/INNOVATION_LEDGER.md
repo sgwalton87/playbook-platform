@@ -102,3 +102,9 @@ Playbook can now show recommendations, simulate scenarios, preview impact, and e
 **Type:** innovation
 
 Playbook can now show recommendations, simulate scenarios, preview impact, and explain why actions matter.
+
+## 2026-07-04T06:51:05.486Z
+
+**Type:** innovation
+
+Recommendations and scenarios now adapt by role across the full scholar support ecosystem.

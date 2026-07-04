@@ -1120,3 +1120,17 @@ Playbook OS now has foundational intelligence engines that can coordinate events
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Role-Aware Intelligence Platform
+
+## Added
+
+- Role Recommendation Engine
+- Role Scenario Engine
+- Role Intelligence Center
+- Role-specific recommendations
+- Role-specific scenario impact
+- Studio navigation link
+- Role OS dashboard link

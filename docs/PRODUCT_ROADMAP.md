@@ -253,3 +253,18 @@ Includes:
 - Impact Preview
 - Explanation Panel
 - Studio and Living Scholar links
+
+---
+
+# Role-Aware Intelligence Platform
+
+Status: Foundation complete
+
+Playbook Intelligence Platform now adapts recommendations and scenarios by role:
+- Learner
+- Family
+- Educator
+- Mentor
+- District
+- University
+- Employer
