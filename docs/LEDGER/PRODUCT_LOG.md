@@ -727,3 +727,9 @@ Playbook notifications now resolve real support recipients, apply role-aware del
 
 ## 2026-07-04 03:39
 - Commit recorded: Fix shared action event emission
+
+## 2026-07-04T10:43:55.833Z
+
+**Type:** product
+
+Added Scholar-Athlete OS, NCAA/NAIA eligibility, and NIL dashboard to future roadmap.

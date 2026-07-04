@@ -323,3 +323,21 @@ Completed capabilities:
 
 Next Phase:
 Playbook OS Beta 3.2 — Notifications + Intelligence Automation
+
+---
+
+# Future Lane — Scholar-Athlete OS
+
+Status: Proposed
+
+Purpose:
+Help scholar-athletes stay academically eligible, track NCAA/NAIA readiness, manage recruiting milestones, and navigate NIL opportunities with financial literacy support.
+
+Potential modules:
+- NCAA/NAIA eligibility tracker
+- Athletic profile
+- Recruiting dashboard
+- NIL deal tracker
+- Brand partner dashboard
+- Contract and compliance checklist
+- Financial literacy integration

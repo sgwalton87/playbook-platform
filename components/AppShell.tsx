@@ -13,6 +13,7 @@ const NAV=[
   {label:"Dashboard",href:"/dashboard",icon:"🏠"},
   {label:"Profile",href:"/profile",icon:"👤"},
   {label:"Feed",href:"/feed",icon:"💬"},
+  {label:"Athlete OS",href:"/scholar-athlete-os",icon:"🏀"},
   {label:"Opportunities",href:"/opportunities",icon:"🧭"},
   {label:"Courses",href:"/courses",icon:"📚"},
   {label:"Transcript",href:"/transcript",icon:"🎓"},
