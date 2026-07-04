@@ -1084,3 +1084,10 @@ Added resume building, recommendation letter drafting, brag sheets, portfolio pa
 Status: Foundation complete
 
 Added portfolio PDF payloads, printable export foundation, recommender request workflow, recommender email drafting, and recommender dashboard.
+
+## 2026-07-04 14:56
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
