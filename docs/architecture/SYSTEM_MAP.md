@@ -44,6 +44,7 @@ Playbook SDK
 - app/login/page.tsx
 - app/mentor-os/page.tsx
 - app/mentorship/page.tsx
+- app/network-intelligence/page.tsx
 - app/notifications/page.tsx
 - app/onboarding/page.tsx
 - app/opportunities/page.tsx
@@ -55,6 +56,7 @@ Playbook SDK
 - app/reset-password/page.tsx
 - app/role-intelligence/page.tsx
 - app/role-select/page.tsx
+- app/scholar-network/page.tsx
 - app/store/page.tsx
 - app/studio/architecture/page.tsx
 - app/studio/demo-director/page.tsx
@@ -62,6 +64,7 @@ Playbook SDK
 - app/studio/events/page.tsx
 - app/studio/inspector/page.tsx
 - app/studio/invitations/page.tsx
+- app/studio/network-inspector/page.tsx
 - app/studio/oracle/page.tsx
 - app/studio/page.tsx
 - app/studio/release/page.tsx
@@ -97,6 +100,7 @@ Playbook SDK
 - tests/unit/academic-engine.test.ts
 - tests/unit/academic-intelligence.test.ts
 - tests/unit/action-routing/action-routing.test.tsx
+- tests/unit/beta-completion/beta31-checklist.test.ts
 - tests/unit/collaboration/collaboration.test.tsx
 - tests/unit/compass/compass-core.test.ts
 - tests/unit/demo/demo-mode.test.tsx
@@ -113,6 +117,7 @@ Playbook SDK
 - tests/unit/journey/first-journey.test.tsx
 - tests/unit/living-scholar/living-scholar.test.tsx
 - tests/unit/mail-gateway/mail-gateway.test.ts
+- tests/unit/network-intelligence/network-intelligence.test.tsx
 - tests/unit/opportunity-graph/opportunity-graph-card.test.tsx
 - tests/unit/opportunity-graph/opportunity-graph.test.ts
 - tests/unit/opportunity-marketplace/opportunity-marketplace.test.tsx
@@ -124,6 +129,7 @@ Playbook SDK
 - tests/unit/role-os/role-dashboard-experience.test.tsx
 - tests/unit/role-os/role-os.test.ts
 - tests/unit/role-os/role-routes.test.ts
+- tests/unit/scholar-network/scholar-network.test.tsx
 - tests/unit/scholar-record.test.ts
 - tests/unit/smoke.test.ts
 - tests/unit/studio/studio-operations.test.ts
