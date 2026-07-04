@@ -140,6 +140,7 @@ Files:
 - docs/releases/BETA_3.3_SPRINT_II_RECOMMENDER_WORKFLOW.md
 - docs/releases/BETA_3.3_SPRINT_IV_WORKFLOW_ACTIVATION.md
 - docs/releases/BETA_3.3_SPRINT_V_HARDENING_REAL_DATA.md
+- docs/releases/BETA_3.4_GUIDED_EXPERIENCE_GAMIFICATION.md
 - docs/releases/RELEASE_LOG.md
 
 ## design

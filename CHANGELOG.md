@@ -1844,3 +1844,10 @@ Playbook now helps scholars turn their record, evidence, achievements, support n
 - Store v2 fulfillment phase
 - Brand partner catalog phase
 - NIL/store campaign workflow phase
+
+## 2026-07-04 16:15
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
