@@ -775,3 +775,6 @@ Refactored Role OS, intelligence pages, Inbox, and Notifications onto Playbook s
 **Type:** innovation
 
 Playbook now has a more consistent visual language across key platform surfaces.
+
+## 2026-07-04 04:16
+- Commit recorded: Refactor core surfaces onto unified Playbook primitives

@@ -787,3 +787,6 @@ Alpha 1.0 Complete
 
 - Archivist v2 ship cycle completed.
 
+
+## 2026-07-04 04:16
+- Commit recorded: Refactor core surfaces onto unified Playbook primitives

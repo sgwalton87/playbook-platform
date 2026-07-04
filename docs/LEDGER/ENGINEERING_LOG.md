@@ -934,3 +934,6 @@ Started Beta 2 — Archivist v3 Unified Ledger Engine and Demo Mode.
 
 - Archivist v2 ship cycle completed.
 
+
+## 2026-07-04 04:16
+- **commit**: Refactor core surfaces onto unified Playbook primitives

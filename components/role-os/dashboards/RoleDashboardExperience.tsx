@@ -32,7 +32,7 @@ export default function RoleDashboardExperience({
       <PlaybookHero
         eyebrow={`${role} OS`}
         title={dashboard.title}
-        subtitle={dashboard.description}
+        subtitle={(dashboard as any).description || (dashboard as any).greeting || (dashboard as any).question || "Role-specific intelligence, actions, and support network coordination."}
       >
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 18 }}>
           <PlaybookButton href="/role-intelligence">Open Role Intelligence</PlaybookButton>
@@ -41,9 +41,9 @@ export default function RoleDashboardExperience({
       </PlaybookHero>
 
       <PlaybookMetrics>
-        {(dashboard.metrics || []).map((metric: any) => (
-          <PlaybookMetric key={metric.label} label={metric.label} value={String(metric.value)} />
-        ))}
+        {(dashboard.metrics || []).map((metric: any) => { const label = Array.isArray(metric) ? metric[0] : metric.label; const value = Array.isArray(metric) ? metric[1] : metric.value; return (
+          <PlaybookMetric key={label} label={label} value={String(value)} />
+        ); })}
       </PlaybookMetrics>
 
       <PlaybookGrid min={300}>
@@ -85,7 +85,7 @@ export default function RoleDashboardExperience({
           </div>
         </PlaybookCard>
 
-        {(dashboard.cards || dashboard.sections || []).map((card: any) => (
+        {((dashboard as any).cards || (dashboard as any).sections || ((dashboard as any).actions || []).map((action: string) => ({ title: action, body: (dashboard as any).insight, label: "Action" }))).map((card: any) => (
           <PlaybookCard key={card.title} eyebrow={card.label || "Role OS"} title={card.title}>
             <p style={body}>{card.body || card.description || card.detail}</p>
             {card.status && <PlaybookPill>{card.status}</PlaybookPill>}

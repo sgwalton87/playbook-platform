@@ -934,3 +934,6 @@ Alpha 1.0 Complete — Intelligence OS foundation finished.
 
 - Archivist v2 ship cycle completed.
 
+
+## 2026-07-04 04:16
+- **commit**: Refactor core surfaces onto unified Playbook primitives
