@@ -612,3 +612,22 @@ Playbook now has a user-facing free-flowing inbox connected to support network m
 Updated:
 - docs/LEDGER/INNOVATION_LEDGER.md
 - docs/LEDGER/PRODUCT_LOG.md
+
+## 2026-07-04T09:30:29.572Z
+
+**PRODUCT**
+
+Added Playbook Inbox at /messages.
+
+Updated:
+- docs/LEDGER/PRODUCT_LOG.md
+
+## 2026-07-04T09:30:30.591Z
+
+**INNOVATION**
+
+Playbook now has a user-facing free-flowing inbox connected to support network messaging.
+
+Updated:
+- docs/LEDGER/INNOVATION_LEDGER.md
+- docs/LEDGER/PRODUCT_LOG.md

@@ -180,3 +180,9 @@ Playbook can now reason across support relationships, messages, shared actions, 
 **Type:** innovation
 
 Playbook now has a user-facing free-flowing inbox connected to support network messaging.
+
+## 2026-07-04T09:30:30.591Z
+
+**Type:** innovation
+
+Playbook now has a user-facing free-flowing inbox connected to support network messaging.
