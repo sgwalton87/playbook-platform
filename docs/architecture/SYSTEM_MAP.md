@@ -77,6 +77,7 @@ Playbook SDK
 - app/studio/simulator/page.tsx
 - app/studio/system-map/page.tsx
 - app/studio/themes/page.tsx
+- app/studio/visual-qa/page.tsx
 - app/support-messages/page.tsx
 - app/support-network/page.tsx
 - app/transcript/page.tsx
@@ -142,6 +143,7 @@ Playbook SDK
 - tests/unit/permissions/permission-gate.test.tsx
 - tests/unit/permissions/permissions.test.tsx
 - tests/unit/polish/polish.test.ts
+- tests/unit/responsive/responsive.test.ts
 - tests/unit/role-intelligence/role-intelligence.test.tsx
 - tests/unit/role-os/role-dashboard-experience.test.tsx
 - tests/unit/role-os/role-os.test.ts
@@ -161,4 +163,5 @@ Playbook SDK
 - tests/unit/support-relationships/support-relationships.test.ts
 - tests/unit/trust-engine.test.ts
 - tests/unit/tutorial/tutorial.test.tsx
+- tests/unit/visual-qa/visual-qa.test.ts
 - tests/unit/workflows/support-workflow.test.tsx
