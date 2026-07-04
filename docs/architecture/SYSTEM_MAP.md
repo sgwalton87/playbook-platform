@@ -69,6 +69,7 @@ Playbook SDK
 - app/studio/simulator/page.tsx
 - app/studio/system-map/page.tsx
 - app/studio/themes/page.tsx
+- app/support-messages/page.tsx
 - app/support-network/page.tsx
 - app/transcript/page.tsx
 - app/u/[username]/page.tsx
@@ -79,6 +80,8 @@ Playbook SDK
 
 - supabase/migrations/20260701_playbook_graph.sql
 - supabase/migrations/20260704_role_invitations.sql
+- supabase/migrations/20260704_support_messages_actions.sql
+- supabase/migrations/20260704_support_relationships.sql
 
 ## Detected Tests
 
@@ -125,5 +128,7 @@ Playbook SDK
 - tests/unit/studio/studio-tools.test.ts
 - tests/unit/studio/studio.test.tsx
 - tests/unit/support-network/support-network.test.tsx
+- tests/unit/support-network-live/support-network-live.test.tsx
+- tests/unit/support-relationships/support-relationships.test.ts
 - tests/unit/trust-engine.test.ts
 - tests/unit/workflows/support-workflow.test.tsx
