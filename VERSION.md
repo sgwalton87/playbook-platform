@@ -1004,3 +1004,10 @@ Added recipient resolution, role-aware delivery rules, preferences, digests, esc
 Status: Foundation started
 
 Established design tokens and shared primitives for a unified Playbook visual system across homepage, dashboard, navigation, Role OS experiences, intelligence pages, inbox, and notifications.
+
+## 2026-07-04 04:04
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

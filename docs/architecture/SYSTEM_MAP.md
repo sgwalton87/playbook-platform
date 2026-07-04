@@ -110,6 +110,7 @@ Playbook SDK
 - tests/unit/collaboration/collaboration.test.tsx
 - tests/unit/compass/compass-core.test.ts
 - tests/unit/demo/demo-mode.test.tsx
+- tests/unit/design-system/design-system.test.tsx
 - tests/unit/email/email.test.ts
 - tests/unit/event-handlers.test.ts
 - tests/unit/event-notifications/event-notifications.test.ts
