@@ -1464,3 +1464,16 @@ Playbook OS now has foundational intelligence engines that can coordinate events
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Beta 3.2 Sprint I — Persistent Event Notification Pipeline
+
+## Added
+
+- Playbook events table migration
+- Notifications table migration
+- Event emission API
+- Event-to-notification pipeline
+- Notification persistence foundation
+- Notifications Center persisted-load attempt

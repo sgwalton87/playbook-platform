@@ -204,3 +204,9 @@ Playbook now connects the scholar support ecosystem through relationships, permi
 **Type:** innovation
 
 Playbook can now translate ecosystem events into role-aware attention signals and notification routes.
+
+## 2026-07-04T10:18:13.151Z
+
+**Type:** innovation
+
+Playbook can now convert ecosystem events into persisted notification records.

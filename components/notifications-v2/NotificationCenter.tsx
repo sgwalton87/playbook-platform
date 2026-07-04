@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   getDemoNotifications,
   getUnreadCount,
@@ -17,6 +17,35 @@ export default function NotificationCenter() {
     useState<PlaybookNotification[]>(getDemoNotifications());
 
   const [filter, setFilter] = useState<Filter>("all");
+
+  useEffect(() => {
+    async function loadPersistedNotifications() {
+      try {
+        const res = await fetch("/api/notifications");
+        const json = await res.json();
+
+        if (res.ok && json.notifications?.length) {
+          setNotifications(json.notifications.map((item: any) => ({
+            id: item.id,
+            userId: item.user_id,
+            scholarId: item.scholar_id,
+            type: item.type,
+            title: item.title,
+            body: item.body,
+            href: item.href,
+            priority: item.priority,
+            read: item.read,
+            createdAt: item.created_at,
+            sourceId: item.source_event_id,
+          })));
+        }
+      } catch {
+        // Keep demo notifications.
+      }
+    }
+
+    loadPersistedNotifications();
+  }, []);
 
   const visible = useMemo(() => {
     const sorted = sortNotifications(notifications);
