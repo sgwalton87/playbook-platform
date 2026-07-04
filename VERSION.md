@@ -855,3 +855,9 @@ Added authenticated invitation handoff, relationship activation, and Hostinger M
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Playbook OS Beta 3.1 — Support Network Messaging v2
+
+Added persisted and email-aware support network messaging with shared action coordination.

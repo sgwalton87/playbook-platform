@@ -1,17 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
+import { supabase } from "@/lib/supabaseClient";
 import { routeMailToPlaybook, type MailGatewayChannel } from "@/lib/mail-gateway";
+import {
+  buildSupportMessageRecord,
+  suggestActionUpdateFromMessage,
+} from "@/lib/support-network-live/server";
 
 export async function POST(req: NextRequest) {
   const secret = req.headers.get("x-playbook-mail-secret");
 
-  if (
-    process.env.MAIL_GATEWAY_SECRET &&
-    secret !== process.env.MAIL_GATEWAY_SECRET
-  ) {
-    return NextResponse.json(
-      { error: "Unauthorized mail webhook." },
-      { status: 401 }
-    );
+  if (process.env.MAIL_GATEWAY_SECRET && secret !== process.env.MAIL_GATEWAY_SECRET) {
+    return NextResponse.json({ error: "Unauthorized mail webhook." }, { status: 401 });
   }
 
   const body = await req.json();
@@ -25,12 +24,47 @@ export async function POST(req: NextRequest) {
     messageId: body.messageId,
   });
 
-  // Foundation only:
-  // Next sprint persists this to support_messages/shared_actions
-  // after relationship validation.
+  const { data: relationship } = await supabase
+    .from("support_relationships")
+    .select("*")
+    .eq("supporter_email", routed.senderEmail)
+    .eq("status", "active")
+    .limit(1)
+    .maybeSingle();
+
+  if (!relationship) {
+    return NextResponse.json({
+      ok: true,
+      routed,
+      persisted: false,
+      reason: "No active support relationship found for sender.",
+    });
+  }
+
+  const messageRecord = buildSupportMessageRecord({
+    scholarId: relationship.scholar_id,
+    senderId: relationship.supporter_id,
+    senderRole: relationship.relationship,
+    body: routed.body,
+  });
+
+  const { data: message, error } = await supabase
+    .from("support_messages")
+    .insert(messageRecord)
+    .select()
+    .single();
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 400 });
+  }
+
+  const suggestedActionUpdate = suggestActionUpdateFromMessage(routed.body);
 
   return NextResponse.json({
     ok: true,
     routed,
+    persisted: true,
+    message,
+    suggestedActionUpdate,
   });
 }

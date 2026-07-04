@@ -583,3 +583,15 @@ Playbook can now resume invite tokens through auth, activate support relationshi
 
 ## 2026-07-04 01:51
 - Commit recorded: Build auth handoff relationships and mail gateway
+
+## 2026-07-04T09:01:30.113Z
+
+**Type:** product
+
+Built Support Network Messaging v2 with persisted APIs and email-aware routing.
+
+## 2026-07-04T09:01:31.038Z
+
+**Type:** innovation
+
+Playbook can now coordinate free-text DMs, shared actions, and inbound email replies around real support relationships.
