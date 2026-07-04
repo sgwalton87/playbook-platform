@@ -706,3 +706,6 @@ Playbook can now convert ecosystem events into persisted notification records.
 
 ## 2026-07-04 03:20
 - Commit recorded: Build persistent event notification pipeline
+
+## 2026-07-04 03:25
+- Commit recorded: Fix notification pipeline type narrowing
