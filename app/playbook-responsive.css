@@ -1,0 +1,47 @@
+@media (max-width: 760px) {
+  main {
+    padding: 18px !important;
+  }
+
+  h1 {
+    font-size: 38px !important;
+  }
+
+  h2 {
+    font-size: 25px !important;
+  }
+
+  section {
+    box-sizing: border-box;
+  }
+
+  aside {
+    width: 100% !important;
+  }
+
+  button,
+  a {
+    max-width: 100%;
+  }
+
+  textarea,
+  input,
+  select {
+    font-size: 16px !important;
+  }
+
+  [data-playbook-shell="two-column"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  [data-playbook-sidebar="true"] {
+    position: relative !important;
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 980px) {
+  [data-playbook-inbox-shell="true"] {
+    grid-template-columns: 1fr !important;
+  }
+}

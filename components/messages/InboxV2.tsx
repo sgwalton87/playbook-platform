@@ -48,7 +48,7 @@ export default function InboxV2() {
         subtitle="Direct messages, support-network threads, shared-action conversations, unread states, and email replies can live here."
       />
 
-      <section style={shell}>
+      <section style={shell} data-playbook-inbox-shell="true">
         <aside style={sidebar}>
           <p style={eyebrow}>Conversations</p>
 

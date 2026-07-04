@@ -227,3 +227,51 @@ export function PlaybookPill({
     </span>
   );
 }
+
+export function PlaybookSection({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <section
+      style={{
+        maxWidth: playbookTheme.layout.max,
+        margin: "0 auto 18px",
+        width: "100%",
+        boxSizing: "border-box",
+      }}
+    >
+      {children}
+    </section>
+  );
+}
+
+export function PlaybookStack({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      style={{
+        display: "grid",
+        gap: 14,
+        width: "100%",
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+export function PlaybookMobileNotice() {
+  return (
+    <div
+      style={{
+        display: "none",
+      }}
+      data-playbook-mobile-ready="true"
+    />
+  );
+}

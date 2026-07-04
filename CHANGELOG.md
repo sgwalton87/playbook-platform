@@ -1597,3 +1597,17 @@ Playbook OS now has foundational intelligence engines that can coordinate events
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Unified Experience Responsive QA
+
+## Added
+
+- Responsive utility layer
+- Mobile-safe shared primitives
+- Global responsive CSS
+- Inbox mobile stacking rule
+- Studio Visual QA page
+- Unified route checklist
+- Responsive QA checklist
