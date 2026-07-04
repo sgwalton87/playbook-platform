@@ -982,3 +982,10 @@ Added recipient resolution, role-aware delivery rules, preferences, digests, esc
 
 - Archivist v2 ship cycle completed.
 
+
+## 2026-07-04 03:41
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
