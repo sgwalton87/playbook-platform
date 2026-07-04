@@ -198,3 +198,9 @@ Playbook Inbox now supports conversation threads, unread state, action attachmen
 **Type:** innovation
 
 Playbook now connects the scholar support ecosystem through relationships, permissions, invitations, messaging, shared actions, network intelligence, and unified notifications.
+
+## 2026-07-04T10:08:07.009Z
+
+**Type:** innovation
+
+Playbook can now translate ecosystem events into role-aware attention signals and notification routes.

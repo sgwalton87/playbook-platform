@@ -934,3 +934,11 @@ Playbook OS Beta 3.2 — Notifications + Intelligence Automation
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Playbook OS Beta 3.2 — Notifications + Intelligence Automation
+
+Status: Foundation started
+
+Playbook begins converting platform events into role-aware notifications, attention signals, and intelligent next-step routing.
