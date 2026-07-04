@@ -8,7 +8,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body suppressHydrationWarning={true}>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider><UnifiedAppShell>{children}</UnifiedAppShell></ThemeProvider>
       </body>
     </html>
   );

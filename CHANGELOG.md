@@ -1650,3 +1650,17 @@ Playbook now helps scholars turn their record, evidence, achievements, support n
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Unified App Shell Recovery
+
+## Added
+
+- Global internal App Shell
+- Public route exclusions
+- Persistent sidebar navigation
+- Back button
+- Central menu link
+- Restored homepage content with unified design
+- Route shell tests

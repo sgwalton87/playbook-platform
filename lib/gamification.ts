@@ -4,9 +4,20 @@ import { awardCoins, type CoinAction } from "./gamification/index";
 
 export async function addReward(
   scholarId: string,
-  action: CoinAction | string,
+  actionOrReward: CoinAction | string | { coins?: number; xp?: number },
   sourceId?: string
 ) {
+  if (typeof actionOrReward === "object") {
+    return {
+      scholarId,
+      action: "legacy.reward",
+      coins: actionOrReward.coins || 0,
+      xp: actionOrReward.xp || 0,
+      sourceId: sourceId || null,
+      createdAt: new Date().toISOString(),
+    };
+  }
+
   const safeAction = ([
     "course.completed",
     "invitation.sent",
@@ -16,8 +27,8 @@ export async function addReward(
     "evidence.verified",
     "message.sent",
     "milestone.completed",
-  ].includes(action)
-    ? action
+  ].includes(actionOrReward)
+    ? actionOrReward
     : "course.completed") as CoinAction;
 
   return awardCoins({

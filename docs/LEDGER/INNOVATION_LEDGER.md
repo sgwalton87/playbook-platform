@@ -252,3 +252,9 @@ Playbook now has responsive rules, mobile-safe primitives, and a Studio QA surfa
 **Type:** innovation
 
 Playbook can now help scholars generate resumes, recommendation letters, brag sheets, portfolio packets, and application plans.
+
+## 2026-07-04T21:25:53.048Z
+
+**Type:** innovation
+
+Playbook now maintains persistent navigation and a consistent shell across the internal platform experience.

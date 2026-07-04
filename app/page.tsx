@@ -3,8 +3,10 @@
 import {
   PlaybookButton,
   PlaybookCard,
+  PlaybookGrid,
   PlaybookHero,
   PlaybookMetric,
+  PlaybookMetrics,
   PlaybookPage,
 } from "@/components/ui";
 
@@ -12,55 +14,39 @@ export default function HomePage() {
   return (
     <PlaybookPage>
       <PlaybookHero
-        eyebrow="Playbook OS"
-        title="The Education Intelligence Operating System."
-        subtitle="One platform for scholars, families, educators, mentors, districts, universities, employers, and scholar-athletes."
+        eyebrow="Playbook Series"
+        title="A college, career, and life-readiness operating system."
+        subtitle="Playbook helps scholars build their record, complete courses, earn coins, invite their support network, prepare applications, and move toward college, career, athletics, and financial freedom."
       >
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 18 }}>
-          <PlaybookButton href="/login">Enter Playbook</PlaybookButton>
+          <PlaybookButton href="/login">Start Now</PlaybookButton>
           <PlaybookButton href="/demo" variant="secondary">View Demo</PlaybookButton>
         </div>
       </PlaybookHero>
 
-      <section style={metrics}>
+      <PlaybookMetrics>
         <PlaybookMetric label="Role OS Experiences" value="8" />
-        <PlaybookMetric label="Connected Ecosystem" value="Live" />
-        <PlaybookMetric label="Intelligence Layer" value="Active" />
-        <PlaybookMetric label="Scholar Network" value="Built" />
-      </section>
+        <PlaybookMetric label="Scholar Network" value="Connected" />
+        <PlaybookMetric label="Coins + Store" value="Active" />
+        <PlaybookMetric label="Applications" value="Toolkit" />
+      </PlaybookMetrics>
 
-      <section style={grid}>
-        <PlaybookCard eyebrow="Learner Intelligence" title="Living Scholar Record">
-          <p style={body}>Academic DNA, Compass guidance, goals, opportunities, evidence, and support-network coordination.</p>
+      <PlaybookGrid>
+        <PlaybookCard eyebrow="For Scholars" title="Build your future record">
+          <p style={body}>Track academics, goals, courses, certificates, applications, evidence, opportunities, and milestones.</p>
         </PlaybookCard>
 
-        <PlaybookCard eyebrow="Connected Ecosystem" title="Support network in one place">
-          <p style={body}>Invites, permissions, messaging, shared actions, notifications, and role-aware intelligence.</p>
+        <PlaybookCard eyebrow="For Support Networks" title="Bring everyone into one ecosystem">
+          <p style={body}>Families, mentors, educators, districts, universities, employers, and coaches coordinate around the same scholar.</p>
         </PlaybookCard>
 
-        <PlaybookCard eyebrow="Scholar-Athlete OS" title="Eligibility, recruiting, NIL">
-          <p style={body}>A specialized command center for academic eligibility, athletic recruiting, NIL deals, and financial readiness.</p>
+        <PlaybookCard eyebrow="For Scholar-Athletes" title="Eligibility, recruiting, NIL, and finance">
+          <p style={body}>Support academic eligibility, recruiting pipelines, NIL readiness, financial literacy, and brand-partner opportunities.</p>
         </PlaybookCard>
-      </section>
+      </PlaybookGrid>
     </PlaybookPage>
   );
 }
-
-const metrics: React.CSSProperties = {
-  maxWidth: 1180,
-  margin: "0 auto 18px",
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))",
-  gap: 14,
-};
-
-const grid: React.CSSProperties = {
-  maxWidth: 1180,
-  margin: "0 auto",
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))",
-  gap: 16,
-};
 
 const body: React.CSSProperties = {
   color: "#64748B",

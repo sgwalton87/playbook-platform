@@ -45,3 +45,23 @@
     grid-template-columns: 1fr !important;
   }
 }
+
+@media (max-width: 860px) {
+  body {
+    overflow-x: hidden;
+  }
+
+  div[style*="grid-template-columns: 260px 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  [data-playbook-sidebar="true"] {
+    position: relative !important;
+    height: auto !important;
+    display: block !important;
+  }
+
+  [data-playbook-sidebar="true"] nav {
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)) !important;
+  }
+}
