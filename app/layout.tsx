@@ -1,4 +1,5 @@
 import { ThemeProvider } from "@/components/ThemeProvider";
+import UnifiedAppShell from "@/components/shell/UnifiedAppShell";
 
 export default function RootLayout({
   children,
