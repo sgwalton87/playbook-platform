@@ -93,7 +93,12 @@ export async function POST(req: NextRequest) {
     />
   );
 
-  return new Response(buffer, {
+  const arrayBuffer = buffer.buffer.slice(
+    buffer.byteOffset,
+    buffer.byteOffset + buffer.byteLength
+  ) as ArrayBuffer;
+
+  return new Response(arrayBuffer, {
     headers: {
       "Content-Type": "application/pdf",
       "Content-Disposition": `attachment; filename="${scholarName.replaceAll(" ", "_")}_Portfolio.pdf"`,
