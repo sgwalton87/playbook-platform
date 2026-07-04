@@ -445,3 +445,15 @@ Recommendations and scenarios now adapt by role across the full scholar support 
 
 ## 2026-07-03 23:52
 - Commit recorded: Build Role-Aware Intelligence Platform
+
+## 2026-07-04T07:04:23.764Z
+
+**Type:** product
+
+Embedded Role Intelligence into every Role OS dashboard.
+
+## 2026-07-04T07:04:24.501Z
+
+**Type:** innovation
+
+Each Role OS now displays intelligence tailored to that role's relationship to the scholar.

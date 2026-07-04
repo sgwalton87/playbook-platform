@@ -108,3 +108,9 @@ Playbook can now show recommendations, simulate scenarios, preview impact, and e
 **Type:** innovation
 
 Recommendations and scenarios now adapt by role across the full scholar support ecosystem.
+
+## 2026-07-04T07:04:24.501Z
+
+**Type:** innovation
+
+Each Role OS now displays intelligence tailored to that role's relationship to the scholar.

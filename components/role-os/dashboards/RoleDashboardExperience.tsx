@@ -1,10 +1,14 @@
 "use client";
 
 import { getRoleDashboard } from "@/lib/role-os/roleDashboards";
+import { buildRoleRecommendations, buildRoleScenarios, explainRoleIntelligence } from "@/lib/role-intelligence";
 import type { PlaybookRoleOS } from "@/lib/role-os";
 
 export default function RoleDashboardExperience({ role }: { role: PlaybookRoleOS }) {
   const dashboard = getRoleDashboard(role);
+  const roleRecommendations = buildRoleRecommendations(role);
+  const roleScenario = buildRoleScenarios(role);
+  const roleExplanation = explainRoleIntelligence(role);
 
   return (
     <main style={page}>

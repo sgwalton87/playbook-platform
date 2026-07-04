@@ -384,3 +384,22 @@ Recommendations and scenarios now adapt by role across the full scholar support 
 Updated:
 - docs/LEDGER/INNOVATION_LEDGER.md
 - docs/LEDGER/PRODUCT_LOG.md
+
+## 2026-07-04T07:04:23.764Z
+
+**PRODUCT**
+
+Embedded Role Intelligence into every Role OS dashboard.
+
+Updated:
+- docs/LEDGER/PRODUCT_LOG.md
+
+## 2026-07-04T07:04:24.501Z
+
+**INNOVATION**
+
+Each Role OS now displays intelligence tailored to that role's relationship to the scholar.
+
+Updated:
+- docs/LEDGER/INNOVATION_LEDGER.md
+- docs/LEDGER/PRODUCT_LOG.md
