@@ -1678,3 +1678,17 @@ Playbook now helps scholars turn their record, evidence, achievements, support n
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Beta 3.3 Sprint II — PDF Export + Recommender Workflow
+
+## Added
+
+- Portfolio PDF payload builder
+- Printable HTML export foundation
+- Recommender request workflow
+- Recommendation request email builder
+- Recommender dashboard
+- Recommender API route
+- Recommenders navigation entry

@@ -258,3 +258,9 @@ Playbook can now help scholars generate resumes, recommendation letters, brag sh
 **Type:** innovation
 
 Playbook now maintains persistent navigation and a consistent shell across the internal platform experience.
+
+## 2026-07-04T21:51:34.440Z
+
+**Type:** innovation
+
+Playbook can now prepare portfolio packets and recommendation request workflows from scholar evidence.

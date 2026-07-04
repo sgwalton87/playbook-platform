@@ -1076,3 +1076,11 @@ Added resume building, recommendation letter drafting, brag sheets, portfolio pa
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Playbook OS Beta 3.3 Sprint II — PDF Export + Recommender Workflow
+
+Status: Foundation complete
+
+Added portfolio PDF payloads, printable export foundation, recommender request workflow, recommender email drafting, and recommender dashboard.
