@@ -34,6 +34,7 @@ Playbook SDK
 - app/events/page.tsx
 - app/family-os/page.tsx
 - app/feed/page.tsx
+- app/gamification/page.tsx
 - app/home/page.tsx
 - app/intelligence-platform/page.tsx
 - app/invitations/page.tsx
@@ -61,6 +62,7 @@ Playbook SDK
 - app/scholar-athlete-os/page.tsx
 - app/scholar-network/page.tsx
 - app/store/page.tsx
+- app/store-v2/page.tsx
 - app/studio/architecture/page.tsx
 - app/studio/demo-director/page.tsx
 - app/studio/docs/page.tsx
@@ -78,6 +80,7 @@ Playbook SDK
 - app/support-messages/page.tsx
 - app/support-network/page.tsx
 - app/transcript/page.tsx
+- app/tutorial/page.tsx
 - app/u/[username]/page.tsx
 - app/university-os/page.tsx
 - app/workflows/page.tsx
@@ -115,6 +118,7 @@ Playbook SDK
 - tests/unit/event-handlers.test.ts
 - tests/unit/event-notifications/event-notifications.test.ts
 - tests/unit/events.test.ts
+- tests/unit/gamification/gamification-v2.test.tsx
 - tests/unit/home/playbook-home.test.tsx
 - tests/unit/intelligence-automation/intelligence-automation.test.ts
 - tests/unit/intelligence-network/intelligence-network.test.ts
@@ -146,6 +150,7 @@ Playbook SDK
 - tests/unit/scholar-network/scholar-network.test.tsx
 - tests/unit/scholar-record.test.ts
 - tests/unit/smoke.test.ts
+- tests/unit/store-v2/store-v2.test.tsx
 - tests/unit/studio/studio-operations.test.ts
 - tests/unit/studio/studio-tools.test.ts
 - tests/unit/studio/studio.test.tsx
@@ -155,4 +160,5 @@ Playbook SDK
 - tests/unit/support-relationships/relationship-activation.test.ts
 - tests/unit/support-relationships/support-relationships.test.ts
 - tests/unit/trust-engine.test.ts
+- tests/unit/tutorial/tutorial.test.tsx
 - tests/unit/workflows/support-workflow.test.tsx
