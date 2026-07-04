@@ -84,3 +84,9 @@ Playbook now visualizes the full support ecosystem around one scholar-owned reco
 **Type:** innovation
 
 Playbook now has an intelligence core for orchestration, timeline, relationships, goals, and Life Graph.
+
+## 2026-07-04T06:25:34.826Z
+
+**Type:** innovation
+
+Playbook can now recommend actions, run scenarios, calculate impact, and explain why it matters.
