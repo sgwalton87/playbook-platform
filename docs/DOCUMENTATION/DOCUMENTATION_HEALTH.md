@@ -109,12 +109,13 @@ All files:
 
 ### general
 
-Count: 69
+Count: 70
 
 Canonical candidates:
 - docs/ADVISORY/README.md
 - docs/ARCHIVIST/SHIP_2026-07-02.md
 - docs/ARCHIVIST/SHIP_2026-07-03.md
+- docs/ARCHIVIST/SHIP_2026-07-04.md
 - docs/BOARD/README.md
 - docs/COMPANY/OPERATING_SYSTEM.md
 - docs/COMPANY/README.md
@@ -179,6 +180,7 @@ All files:
 - docs/ADVISORY/README.md
 - docs/ARCHIVIST/SHIP_2026-07-02.md
 - docs/ARCHIVIST/SHIP_2026-07-03.md
+- docs/ARCHIVIST/SHIP_2026-07-04.md
 - docs/BOARD/README.md
 - docs/COMPANY/OPERATING_SYSTEM.md
 - docs/COMPANY/README.md
@@ -315,7 +317,7 @@ All files:
 
 ### ledger
 
-Count: 13
+Count: 14
 
 Canonical candidates:
 - docs/sprints/SPRINT_LOG.md
@@ -325,6 +327,7 @@ All files:
 - docs/DEPRECATED/OLD_REPOSITORY_CATALOG.md
 - docs/HISTORY/DAILY_LOGS/2026-07-02.md
 - docs/HISTORY/DAILY_LOGS/2026-07-03.md
+- docs/HISTORY/DAILY_LOGS/2026-07-04.md
 - docs/LEDGER/ENGINEERING_LOG.md
 - docs/LEDGER/FOUNDER_JOURNAL.md
 - docs/LEDGER/INNOVATION_LEDGER.md

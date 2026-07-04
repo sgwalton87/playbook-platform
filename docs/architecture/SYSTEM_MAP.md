@@ -93,6 +93,7 @@ Playbook SDK
 - tests/unit/event-handlers.test.ts
 - tests/unit/events.test.ts
 - tests/unit/home/playbook-home.test.tsx
+- tests/unit/intelligence-network/intelligence-network.test.ts
 - tests/unit/journey/first-journey.test.tsx
 - tests/unit/living-scholar/living-scholar.test.tsx
 - tests/unit/opportunity-graph/opportunity-graph-card.test.tsx

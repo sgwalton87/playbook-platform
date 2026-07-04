@@ -1053,3 +1053,10 @@ Playbook now supports unique experiences for every role around the scholar.
 ## Platform Shift
 
 Playbook OS now has foundational intelligence engines that can coordinate events, relationships, goals, timelines, and life graph connections across every role experience.
+
+## 2026-07-04 23:23
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
