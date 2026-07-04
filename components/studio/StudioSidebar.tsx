@@ -11,6 +11,7 @@ const nav = [
   ["Network Intelligence", "/network-intelligence"],
   ["Beta 3.1 Checklist", "/studio/beta-31"],
   ["Network Inspector", "/studio/network-inspector"],
+  ["Messages", "/messages"],
   ["Support Messages", "/support-messages"],
   ["Invitations", "/studio/invitations"],
   ["Permissions", "/permissions"],

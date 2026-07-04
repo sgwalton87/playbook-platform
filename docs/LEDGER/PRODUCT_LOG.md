@@ -613,3 +613,15 @@ Playbook can now reason across support relationships, messages, shared actions, 
 
 ## 2026-07-04 02:15
 - Commit recorded: Complete Beta 3.1 connected ecosystem intelligence
+
+## 2026-07-04T09:20:17.288Z
+
+**Type:** product
+
+Added Playbook Inbox at /messages.
+
+## 2026-07-04T09:20:18.166Z
+
+**Type:** innovation
+
+Playbook now has a user-facing free-flowing inbox connected to support network messaging.

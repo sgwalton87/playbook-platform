@@ -174,3 +174,9 @@ Playbook can now coordinate free-text DMs, shared actions, and inbound email rep
 **Type:** innovation
 
 Playbook can now reason across support relationships, messages, shared actions, invitations, blockers, and role-specific next steps.
+
+## 2026-07-04T09:20:18.166Z
+
+**Type:** innovation
+
+Playbook now has a user-facing free-flowing inbox connected to support network messaging.

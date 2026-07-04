@@ -1360,3 +1360,14 @@ Playbook OS now has foundational intelligence engines that can coordinate events
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Playbook Inbox
+
+## Added
+
+- `/messages` user-facing inbox route
+- Free-text support network inbox surface
+- Links to support thread and scholar network
+- Messages navigation entry

@@ -593,3 +593,22 @@ Playbook can now reason across support relationships, messages, shared actions, 
 Updated:
 - docs/LEDGER/INNOVATION_LEDGER.md
 - docs/LEDGER/PRODUCT_LOG.md
+
+## 2026-07-04T09:20:17.288Z
+
+**PRODUCT**
+
+Added Playbook Inbox at /messages.
+
+Updated:
+- docs/LEDGER/PRODUCT_LOG.md
+
+## 2026-07-04T09:20:18.166Z
+
+**INNOVATION**
+
+Playbook now has a user-facing free-flowing inbox connected to support network messaging.
+
+Updated:
+- docs/LEDGER/INNOVATION_LEDGER.md
+- docs/LEDGER/PRODUCT_LOG.md
