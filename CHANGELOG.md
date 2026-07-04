@@ -1152,3 +1152,10 @@ Playbook OS now has foundational intelligence engines that can coordinate events
 - Role-specific recommendation blocks
 - Role-specific scenario preview
 - Role-specific explanation text
+
+## 2026-07-04 00:08
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

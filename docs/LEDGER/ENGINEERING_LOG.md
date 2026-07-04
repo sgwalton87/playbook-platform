@@ -694,3 +694,13 @@ Started Beta 2 — Archivist v3 Unified Ledger Engine and Demo Mode.
 
 - Archivist v2 ship cycle completed.
 
+
+## 2026-07-04 00:06
+- **commit**: Embed Role Intelligence in Role OS dashboards
+
+## 2026-07-04 00:08
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
