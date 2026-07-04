@@ -103,6 +103,7 @@ Playbook SDK
 - tests/unit/academic-intelligence.test.ts
 - tests/unit/action-routing/action-routing.test.tsx
 - tests/unit/beta-completion/beta31-checklist.test.ts
+- tests/unit/beta-hardening/beta31-routes.test.ts
 - tests/unit/collaboration/collaboration.test.tsx
 - tests/unit/compass/compass-core.test.ts
 - tests/unit/demo/demo-mode.test.tsx
@@ -122,6 +123,7 @@ Playbook SDK
 - tests/unit/messages/inbox-v2.test.tsx
 - tests/unit/messages/messages.test.tsx
 - tests/unit/network-intelligence/network-intelligence.test.tsx
+- tests/unit/notifications-v2/notifications-v2.test.tsx
 - tests/unit/opportunity-graph/opportunity-graph-card.test.tsx
 - tests/unit/opportunity-graph/opportunity-graph.test.ts
 - tests/unit/opportunity-marketplace/opportunity-marketplace.test.tsx
