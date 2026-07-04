@@ -842,3 +842,9 @@ Status: In progress
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Playbook OS Beta 3.1 — Auth + Mail Gateway
+
+Added authenticated invitation handoff, relationship activation, and Hostinger Mail Gateway foundation.

@@ -156,3 +156,9 @@ Playbook now connects invitations, support relationships, free-text messaging, s
 **Type:** innovation
 
 Playbook Beta 3.1 defines the connected scholar support ecosystem across invitations, permissions, relationships, messaging, and shared actions.
+
+## 2026-07-04T08:49:55.184Z
+
+**Type:** innovation
+
+Playbook can now resume invite tokens through auth, activate support relationships, and begin routing inbound Hostinger mailbox events.

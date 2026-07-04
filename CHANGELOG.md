@@ -1296,3 +1296,19 @@ Playbook OS now has foundational intelligence engines that can coordinate events
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Auth Handoff + Relationship Persistence + Mail Gateway
+
+## Added
+
+- Invite auth handoff helpers
+- Invite token resume after login
+- Invitation acceptance auth check
+- Invitation email identity validation
+- Accepted invitation relationship activation
+- Hostinger Mail Gateway foundation
+- Incoming mail normalization
+- Mail intent classification
+- Mail webhook route foundation
