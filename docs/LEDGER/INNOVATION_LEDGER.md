@@ -150,3 +150,9 @@ Invitation emails now send from Playbook Onboarding and route replies to Playboo
 **Type:** innovation
 
 Playbook now connects invitations, support relationships, free-text messaging, shared actions, and OS routing into one scholar-centered ecosystem.
+
+## 2026-07-04T08:36:37.665Z
+
+**Type:** innovation
+
+Playbook Beta 3.1 defines the connected scholar support ecosystem across invitations, permissions, relationships, messaging, and shared actions.

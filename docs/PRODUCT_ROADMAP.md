@@ -268,3 +268,34 @@ Playbook Intelligence Platform now adapts recommendations and scenarios by role:
 - District
 - University
 - Employer
+
+---
+
+# Playbook OS Beta 3.1 — Connected Ecosystem
+
+Status: In progress
+
+Purpose:
+Turn Playbook's multi-role operating systems into one connected support ecosystem around the Scholar Record.
+
+Completion Gates:
+- Scholar sends invitation
+- Email arrives from Playbook Onboarding
+- Invitee accepts through secure token route
+- Existing users can sign in
+- New users can register
+- Invitation token survives authentication
+- Relationship is created
+- Permissions are attached
+- Invitee lands in the correct OS
+- Scholar sees active supporter
+- Support network can send free-text DMs
+- Shared actions can be assigned, updated, and completed
+- Mail Gateway can ingest approved inbound replies
+
+Next:
+- Auth handoff
+- Relationship persistence completion
+- Mail Gateway
+- Support Network Messaging
+- Shared Actions

@@ -817,3 +817,21 @@ Added relationship persistence, invitation handoff foundation, support network m
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Playbook OS Beta 3.1 — Connected Ecosystem
+
+Playbook is evolving from multi-role dashboards into a connected scholar-centered ecosystem.
+
+Beta 3.1 connects:
+- Role OS experiences
+- Relationship permissions
+- Scholar support invitations
+- Invitation delivery and acceptance
+- Correct OS routing
+- Support relationships
+- Free-text support messaging
+- Shared actions around goals, deadlines, evidence, opportunities, and milestones
+
+Status: In progress
