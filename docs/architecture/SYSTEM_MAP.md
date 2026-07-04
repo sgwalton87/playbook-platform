@@ -109,8 +109,10 @@ Playbook SDK
 - tests/unit/intelligence-platform-ui/intelligence-platform-ui.test.tsx
 - tests/unit/invitations/invitation-lifecycle.test.ts
 - tests/unit/invitations/invitations.test.tsx
+- tests/unit/invite-auth/invite-auth.test.ts
 - tests/unit/journey/first-journey.test.tsx
 - tests/unit/living-scholar/living-scholar.test.tsx
+- tests/unit/mail-gateway/mail-gateway.test.ts
 - tests/unit/opportunity-graph/opportunity-graph-card.test.tsx
 - tests/unit/opportunity-graph/opportunity-graph.test.ts
 - tests/unit/opportunity-marketplace/opportunity-marketplace.test.tsx
@@ -129,6 +131,7 @@ Playbook SDK
 - tests/unit/studio/studio.test.tsx
 - tests/unit/support-network/support-network.test.tsx
 - tests/unit/support-network-live/support-network-live.test.tsx
+- tests/unit/support-relationships/relationship-activation.test.ts
 - tests/unit/support-relationships/support-relationships.test.ts
 - tests/unit/trust-engine.test.ts
 - tests/unit/workflows/support-workflow.test.tsx

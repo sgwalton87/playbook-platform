@@ -784,3 +784,13 @@ Alpha 1.0 Complete — Intelligence OS foundation finished.
 
 - Archivist v2 ship cycle completed.
 
+
+## 2026-07-04 01:51
+- **commit**: Build auth handoff relationships and mail gateway
+
+## 2026-07-04 01:53
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
