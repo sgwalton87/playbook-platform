@@ -1208,3 +1208,10 @@ Playbook OS now has foundational intelligence engines that can coordinate events
 - Pending, accepted, and declined states
 - Destination routing by relationship
 - Studio Invitations page
+
+## 2026-07-04 00:30
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

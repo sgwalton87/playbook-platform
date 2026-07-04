@@ -770,3 +770,10 @@ Added relationship-aware permissions and access visualization.
 # Role Invitations
 
 Added invitation workflow for connecting support roles to a scholar.
+
+## 2026-07-04 00:30
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
