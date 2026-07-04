@@ -1144,3 +1144,27 @@ Added RLS policies, secure sharing helpers, scholar data adapters, recommender a
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Playbook OS Beta 3.3 — Opportunity Application Toolkit Complete
+
+Status: Complete
+
+Playbook now includes an Opportunity Application Toolkit that helps scholars create resumes, generate brag sheets, request recommendations, prepare recommendation letters, build portfolio packets, render PDFs, share portfolio links, and manage application workspaces.
+
+Next active development phase:
+
+Playbook OS Beta 3.4 — Guided Experience + Gamification Economy
+
+---
+
+# Playbook OS Beta 3.3 — Opportunity Application Toolkit Complete
+
+Status: Complete
+
+Playbook now includes an Opportunity Application Toolkit that helps scholars create resumes, generate brag sheets, request recommendations, prepare recommendation letters, build portfolio packets, render PDFs, share portfolio links, and manage application workspaces.
+
+Next active development phase:
+
+Playbook OS Beta 3.4 — Guided Experience + Gamification Economy

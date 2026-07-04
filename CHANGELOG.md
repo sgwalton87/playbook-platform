@@ -1775,3 +1775,49 @@ Playbook now helps scholars turn their record, evidence, achievements, support n
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Playbook OS Beta 3.3 — Opportunity Application Toolkit Complete
+
+## Completed
+
+- Resume Builder
+- Recommendation Letter Studio
+- Brag Sheet builder
+- Portfolio Packet export foundation
+- Actual PDF rendering route
+- Shareable portfolio links
+- Portfolio share persistence
+- Secure sharing helpers
+- Recommender request workflow
+- Recommender approval workflow
+- Recommender auth handoff foundation
+- Recommender email delivery foundation
+- Application Workspace UI
+- Application workspace persistence
+- Application journey model
+- Beta 3.3 completion checklist
+
+---
+
+# Playbook OS Beta 3.3 — Opportunity Application Toolkit Complete
+
+## Completed
+
+- Resume Builder
+- Recommendation Letter Studio
+- Brag Sheet builder
+- Portfolio Packet export foundation
+- Actual PDF rendering route
+- Shareable portfolio links
+- Portfolio share persistence
+- Secure sharing helpers
+- Recommender request workflow
+- Recommender approval workflow
+- Recommender auth handoff foundation
+- Recommender email delivery foundation
+- Application Workspace UI
+- Application workspace persistence
+- Application journey model
+- Beta 3.3 completion checklist

@@ -69,6 +69,7 @@ Playbook SDK
 - app/store/page.tsx
 - app/store-v2/page.tsx
 - app/studio/architecture/page.tsx
+- app/studio/beta-33/page.tsx
 - app/studio/demo-director/page.tsx
 - app/studio/docs/page.tsx
 - app/studio/events/page.tsx
@@ -121,6 +122,7 @@ Playbook SDK
 - tests/unit/application-workspace-ui/application-workspace-ui.test.tsx
 - tests/unit/beta-completion/beta31-checklist.test.ts
 - tests/unit/beta-hardening/beta31-routes.test.ts
+- tests/unit/beta33-journey/beta33-journey.test.ts
 - tests/unit/collaboration/collaboration.test.tsx
 - tests/unit/compass/compass-core.test.ts
 - tests/unit/demo/demo-mode.test.tsx

@@ -288,3 +288,9 @@ Playbook application tools now persist portfolio shares, recommender requests, a
 **Type:** innovation
 
 Playbook application workflows are now safer, more persistent, and closer to real authenticated scholar workflows.
+
+## 2026-07-04T23:02:13.016Z
+
+**Type:** innovation
+
+Playbook can now convert the Scholar Record into resumes, recommendations, brag sheets, portfolio packets, PDFs, share links, and application workspaces.
