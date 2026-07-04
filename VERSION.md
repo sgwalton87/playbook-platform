@@ -1175,3 +1175,12 @@ Playbook OS Beta 3.4 — Guided Experience + Gamification Economy
 
 - Archivist v2 ship cycle completed.
 
+
+
+---
+
+# Playbook OS Beta 3.4 — Guided Experience + Gamification Economy
+
+Status: Foundation started
+
+Playbook is moving into guided onboarding, role-specific tours, contextual help, persistent coin rewards, Store v2 fulfillment, brand partner inventory, and NIL-connected campaign workflows.

@@ -1828,3 +1828,19 @@ Playbook now helps scholars turn their record, evidence, achievements, support n
 
 - Archivist v2 ship cycle completed.
 
+
+
+---
+
+# Playbook OS Beta 3.4 — Guided Experience + Gamification Economy
+
+## Started
+
+- First-login tutorial phase
+- Role-specific guided tour phase
+- Contextual help phase
+- Persistent coin ledger phase
+- Platform-wide rewards phase
+- Store v2 fulfillment phase
+- Brand partner catalog phase
+- NIL/store campaign workflow phase

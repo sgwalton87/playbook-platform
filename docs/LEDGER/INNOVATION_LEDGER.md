@@ -294,3 +294,9 @@ Playbook application workflows are now safer, more persistent, and closer to rea
 **Type:** innovation
 
 Playbook can now convert the Scholar Record into resumes, recommendations, brag sheets, portfolio packets, PDFs, share links, and application workspaces.
+
+## 2026-07-04T23:09:38.133Z
+
+**Type:** innovation
+
+Playbook is moving into guided onboarding, persistent rewards, store fulfillment, brand partner inventory, and NIL-connected campaigns.
