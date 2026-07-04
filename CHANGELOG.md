@@ -1851,3 +1851,17 @@ Playbook now helps scholars turn their record, evidence, achievements, support n
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Beta 3.4 Sprint II — Persistent Coin Ledger + Reward Events
+
+## Added
+
+- Coin ledger table
+- Reward events table
+- Reward event values
+- Reward event API
+- Reward balance API
+- Legacy gamification integration
+- Reward Economy dashboard

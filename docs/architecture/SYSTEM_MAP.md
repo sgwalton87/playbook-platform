@@ -62,6 +62,7 @@ Playbook SDK
 - app/recommenders/page.tsx
 - app/record/page.tsx
 - app/reset-password/page.tsx
+- app/reward-economy/page.tsx
 - app/role-intelligence/page.tsx
 - app/role-select/page.tsx
 - app/scholar-athlete-os/page.tsx
@@ -98,6 +99,7 @@ Playbook SDK
 - supabase/migrations/20260701_playbook_graph.sql
 - supabase/migrations/20260704_application_toolkit_persistence.sql
 - supabase/migrations/20260704_application_toolkit_rls.sql
+- supabase/migrations/20260704_coin_ledger_reward_events.sql
 - supabase/migrations/20260704_notifications_events.sql
 - supabase/migrations/20260704_role_invitations.sql
 - supabase/migrations/20260704_scholar_athlete_os.sql
@@ -162,6 +164,8 @@ Playbook SDK
 - tests/unit/recommender-auth/recommender-auth.test.ts
 - tests/unit/recommenders/recommenders.test.tsx
 - tests/unit/responsive/responsive.test.ts
+- tests/unit/reward-economy/reward-economy.test.tsx
+- tests/unit/reward-events/reward-events.test.ts
 - tests/unit/role-intelligence/role-intelligence.test.tsx
 - tests/unit/role-os/role-dashboard-experience.test.tsx
 - tests/unit/role-os/role-os.test.ts

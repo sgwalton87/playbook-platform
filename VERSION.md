@@ -1191,3 +1191,11 @@ Playbook is moving into guided onboarding, role-specific tours, contextual help,
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Playbook OS Beta 3.4 Sprint II — Persistent Coin Ledger + Reward Events
+
+Status: Foundation complete
+
+Added persistent coin ledger foundation, reward event processing, reward balance API, platform-wide reward values, and Reward Economy dashboard.

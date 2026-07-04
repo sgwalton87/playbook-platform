@@ -275,7 +275,7 @@ All files:
 
 ### release
 
-Count: 12
+Count: 13
 
 Canonical candidates:
 - docs/CHANGELOG.md
@@ -287,6 +287,7 @@ Canonical candidates:
 - docs/releases/BETA_3.3_SPRINT_IV_WORKFLOW_ACTIVATION.md
 - docs/releases/BETA_3.3_SPRINT_V_HARDENING_REAL_DATA.md
 - docs/releases/BETA_3.4_GUIDED_EXPERIENCE_GAMIFICATION.md
+- docs/releases/BETA_3.4_SPRINT_II_REWARD_EVENTS.md
 - docs/releases/RELEASE_LOG.md
 
 All files:
@@ -301,6 +302,7 @@ All files:
 - docs/releases/BETA_3.3_SPRINT_IV_WORKFLOW_ACTIVATION.md
 - docs/releases/BETA_3.3_SPRINT_V_HARDENING_REAL_DATA.md
 - docs/releases/BETA_3.4_GUIDED_EXPERIENCE_GAMIFICATION.md
+- docs/releases/BETA_3.4_SPRINT_II_REWARD_EVENTS.md
 - docs/releases/RELEASE_LOG.md
 
 ### design

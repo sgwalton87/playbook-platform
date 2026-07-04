@@ -1,4 +1,12 @@
-export type CoinAction =
+import {
+  buildCoinLedgerEntry,
+  calculateRewardBalance,
+  getRewardValue,
+  type RewardEventType,
+} from "@/lib/reward-events";
+
+export type CoinAction = Extract<
+  RewardEventType,
   | "course.completed"
   | "invitation.sent"
   | "invitation.accepted"
@@ -6,21 +14,11 @@ export type CoinAction =
   | "goal.completed"
   | "evidence.verified"
   | "message.sent"
-  | "milestone.completed";
+  | "milestone.completed"
+>;
 
 export function getCoinValue(action: CoinAction) {
-  const values: Record<CoinAction, number> = {
-    "course.completed": 100,
-    "invitation.sent": 25,
-    "invitation.accepted": 50,
-    "shared_action.completed": 40,
-    "goal.completed": 150,
-    "evidence.verified": 75,
-    "message.sent": 5,
-    "milestone.completed": 125,
-  };
-
-  return values[action];
+  return getRewardValue(action).coins;
 }
 
 export function awardCoins(input: {
@@ -28,11 +26,19 @@ export function awardCoins(input: {
   action: CoinAction;
   sourceId?: string;
 }) {
-  return {
+  const entry = buildCoinLedgerEntry({
     scholarId: input.scholarId,
-    action: input.action,
-    coins: getCoinValue(input.action),
-    sourceId: input.sourceId || null,
+    eventType: input.action,
+    sourceId: input.sourceId,
+  });
+
+  return {
+    scholarId: entry.scholar_id,
+    action: entry.event_type,
+    coins: entry.coins,
+    xp: entry.xp,
+    reason: entry.reason,
+    sourceId: entry.source_id,
     createdAt: new Date().toISOString(),
   };
 }
@@ -46,5 +52,9 @@ export function getDemoCoinLedger() {
 }
 
 export function getCoinBalance(entries = getDemoCoinLedger()) {
-  return entries.reduce((sum, entry) => sum + entry.coins, 0);
+  return calculateRewardBalance(entries).coins;
+}
+
+export function getXPBalance(entries = getDemoCoinLedger()) {
+  return calculateRewardBalance(entries).xp;
 }
