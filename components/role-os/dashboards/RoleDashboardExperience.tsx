@@ -2,6 +2,8 @@
 
 import { getRoleDashboard } from "@/lib/role-os/roleDashboards";
 import { buildRoleRecommendations, buildRoleScenarios, explainRoleIntelligence } from "@/lib/role-intelligence";
+import PermissionGate from "@/components/permissions/PermissionGate";
+import { mapRoleToRelationship } from "@/lib/permissions";
 import type { PlaybookRoleOS } from "@/lib/role-os";
 
 export default function RoleDashboardExperience({ role }: { role: PlaybookRoleOS }) {
@@ -9,6 +11,7 @@ export default function RoleDashboardExperience({ role }: { role: PlaybookRoleOS
   const roleRecommendations = buildRoleRecommendations(role);
   const roleScenario = buildRoleScenarios(role);
   const roleExplanation = explainRoleIntelligence(role);
+  const relationship = mapRoleToRelationship(role);
 
   return (
     <main style={page}>

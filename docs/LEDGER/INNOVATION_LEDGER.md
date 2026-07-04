@@ -120,3 +120,9 @@ Each Role OS now displays intelligence tailored to that role's relationship to t
 **Type:** innovation
 
 Playbook now models support relationships with explicit permissions and access boundaries.
+
+## 2026-07-04T07:17:30.264Z
+
+**Type:** innovation
+
+Role OS experiences now reveal or lock actions based on relationship permissions.

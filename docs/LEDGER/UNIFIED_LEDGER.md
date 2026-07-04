@@ -422,3 +422,22 @@ Playbook now models support relationships with explicit permissions and access b
 Updated:
 - docs/LEDGER/INNOVATION_LEDGER.md
 - docs/LEDGER/PRODUCT_LOG.md
+
+## 2026-07-04T07:17:28.994Z
+
+**PRODUCT**
+
+Connected permissions to Role OS dashboards.
+
+Updated:
+- docs/LEDGER/PRODUCT_LOG.md
+
+## 2026-07-04T07:17:30.264Z
+
+**INNOVATION**
+
+Role OS experiences now reveal or lock actions based on relationship permissions.
+
+Updated:
+- docs/LEDGER/INNOVATION_LEDGER.md
+- docs/LEDGER/PRODUCT_LOG.md
