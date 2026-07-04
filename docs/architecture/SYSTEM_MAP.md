@@ -35,6 +35,7 @@ Playbook SDK
 - app/family-os/page.tsx
 - app/feed/page.tsx
 - app/home/page.tsx
+- app/intelligence-platform/page.tsx
 - app/journey/page.tsx
 - app/leaderboard/page.tsx
 - app/living-scholar/page.tsx
@@ -95,6 +96,7 @@ Playbook SDK
 - tests/unit/home/playbook-home.test.tsx
 - tests/unit/intelligence-network/intelligence-network.test.ts
 - tests/unit/intelligence-platform/intelligence-platform.test.ts
+- tests/unit/intelligence-platform-ui/intelligence-platform-ui.test.tsx
 - tests/unit/journey/first-journey.test.tsx
 - tests/unit/living-scholar/living-scholar.test.tsx
 - tests/unit/opportunity-graph/opportunity-graph-card.test.tsx

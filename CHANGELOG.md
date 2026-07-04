@@ -1092,3 +1092,10 @@ Playbook OS now has foundational intelligence engines that can coordinate events
 - Intelligence Platform page
 - Studio navigation link
 - Living Scholar link
+
+## 2026-07-04 23:38
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
