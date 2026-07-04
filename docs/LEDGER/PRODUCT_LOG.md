@@ -814,3 +814,6 @@ Playbook now has responsive rules, mobile-safe primitives, and a Studio QA surfa
 
 ## 2026-07-04 04:56
 - Commit recorded: Complete unified responsive QA foundation
+
+## 2026-07-04 05:14
+- Commit recorded: Restore gamification addReward compatibility
