@@ -47,6 +47,7 @@ Playbook SDK
 - app/opportunities/page.tsx
 - app/page.tsx
 - app/pending/page.tsx
+- app/permissions/page.tsx
 - app/profile/page.tsx
 - app/record/page.tsx
 - app/reset-password/page.tsx
@@ -104,6 +105,7 @@ Playbook SDK
 - tests/unit/opportunity-graph/opportunity-graph.test.ts
 - tests/unit/opportunity-marketplace/opportunity-marketplace.test.tsx
 - tests/unit/oracle/oracle.test.ts
+- tests/unit/permissions/permissions.test.tsx
 - tests/unit/polish/polish.test.ts
 - tests/unit/role-intelligence/role-intelligence.test.tsx
 - tests/unit/role-os/role-dashboard-experience.test.tsx

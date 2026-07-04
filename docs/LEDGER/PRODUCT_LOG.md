@@ -475,3 +475,6 @@ Playbook now models support relationships with explicit permissions and access b
 
 ## 2026-07-04 00:10
 - Commit recorded: Build Role OS Permissions
+
+## 2026-07-04 00:14
+- Commit recorded: Fix permission relationship test

@@ -750,3 +750,10 @@ Added role-aware recommendations and scenarios across the Playbook support ecosy
 # Role OS Permissions
 
 Added relationship-aware permissions and access visualization.
+
+## 2026-07-04 00:16
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
