@@ -847,3 +847,6 @@ Playbook now maintains persistent navigation and a consistent shell across the i
 
 ## 2026-07-04 14:28
 - Commit recorded: Recover unified app shell navigation
+
+## 2026-07-04 14:43
+- Commit recorded: Fix UnifiedAppShell layout import
