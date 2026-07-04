@@ -130,6 +130,7 @@ Playbook SDK
 - tests/unit/studio/studio-tools.test.ts
 - tests/unit/studio/studio.test.tsx
 - tests/unit/support-network/support-network.test.tsx
+- tests/unit/support-network-live/support-network-live-v2.test.ts
 - tests/unit/support-network-live/support-network-live.test.tsx
 - tests/unit/support-relationships/relationship-activation.test.ts
 - tests/unit/support-relationships/support-relationships.test.ts
