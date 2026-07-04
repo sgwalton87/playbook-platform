@@ -1047,3 +1047,11 @@ Established design tokens and shared primitives for a unified Playbook visual sy
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Playbook OS Beta 3.3 — Opportunity Application Toolkit
+
+Status: Foundation complete
+
+Added resume building, recommendation letter drafting, brag sheets, portfolio packet export foundation, and application planning for scholarships, internships, colleges, jobs, recruiting, and NIL opportunities.

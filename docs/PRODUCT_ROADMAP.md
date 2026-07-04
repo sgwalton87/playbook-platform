@@ -341,3 +341,23 @@ Potential modules:
 - Brand partner dashboard
 - Contract and compliance checklist
 - Financial literacy integration
+
+---
+
+# Playbook OS Beta 3.3 — Opportunity Application Toolkit
+
+Status: Foundation complete
+
+Capabilities:
+- Resume Builder
+- Recommendation Letter Studio
+- Brag Sheet
+- Portfolio Export Foundation
+- Application Assistant
+
+Next:
+- PDF export
+- Opportunity-specific tailoring
+- Recommender request workflow
+- Approval and sharing controls
+- Scholar-athlete recruiting packet export

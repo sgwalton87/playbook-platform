@@ -51,6 +51,7 @@ Playbook SDK
 - app/notifications/page.tsx
 - app/onboarding/page.tsx
 - app/opportunities/page.tsx
+- app/opportunity-toolkit/page.tsx
 - app/page.tsx
 - app/pending/page.tsx
 - app/permissions/page.tsx
@@ -139,6 +140,7 @@ Playbook SDK
 - tests/unit/opportunity-graph/opportunity-graph-card.test.tsx
 - tests/unit/opportunity-graph/opportunity-graph.test.ts
 - tests/unit/opportunity-marketplace/opportunity-marketplace.test.tsx
+- tests/unit/opportunity-toolkit/opportunity-toolkit.test.tsx
 - tests/unit/oracle/oracle.test.ts
 - tests/unit/permissions/permission-gate.test.tsx
 - tests/unit/permissions/permissions.test.tsx

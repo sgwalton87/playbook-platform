@@ -246,3 +246,9 @@ Playbook now connects platform actions, coin rewards, brand-partner products, an
 **Type:** innovation
 
 Playbook now has responsive rules, mobile-safe primitives, and a Studio QA surface for visual consistency.
+
+## 2026-07-04T21:02:42.735Z
+
+**Type:** innovation
+
+Playbook can now help scholars generate resumes, recommendation letters, brag sheets, portfolio packets, and application plans.

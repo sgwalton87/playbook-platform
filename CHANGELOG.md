@@ -1625,3 +1625,21 @@ Playbook OS now has foundational intelligence engines that can coordinate events
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Beta 3.3 — Opportunity Application Toolkit
+
+## Added
+
+- Resume Builder foundation
+- Recommendation Letter Studio
+- Brag Sheet builder
+- Portfolio Packet export foundation
+- Opportunity Application Assistant
+- Toolkit dashboard
+- Applications navigation entry
+
+## Purpose
+
+Playbook now helps scholars turn their record, evidence, achievements, support network, and opportunities into application-ready materials.
