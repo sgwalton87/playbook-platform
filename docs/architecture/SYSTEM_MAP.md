@@ -55,7 +55,9 @@ Playbook SDK
 - app/page.tsx
 - app/pending/page.tsx
 - app/permissions/page.tsx
+- app/portfolio/[shareId]/page.tsx
 - app/profile/page.tsx
+- app/recommenders/[requestId]/page.tsx
 - app/recommenders/page.tsx
 - app/record/page.tsx
 - app/reset-password/page.tsx
@@ -147,6 +149,7 @@ Playbook SDK
 - tests/unit/permissions/permission-gate.test.tsx
 - tests/unit/permissions/permissions.test.tsx
 - tests/unit/polish/polish.test.ts
+- tests/unit/portfolio-sharing/portfolio-sharing.test.ts
 - tests/unit/recommenders/recommenders.test.tsx
 - tests/unit/responsive/responsive.test.ts
 - tests/unit/role-intelligence/role-intelligence.test.tsx

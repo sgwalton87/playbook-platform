@@ -264,3 +264,9 @@ Playbook now maintains persistent navigation and a consistent shell across the i
 **Type:** innovation
 
 Playbook can now prepare portfolio packets and recommendation request workflows from scholar evidence.
+
+## 2026-07-04T22:09:09.279Z
+
+**Type:** innovation
+
+Playbook can now render portfolio packets as PDFs and support shareable portfolio/recommender approval workflows.

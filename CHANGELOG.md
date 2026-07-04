@@ -1699,3 +1699,16 @@ Playbook now helps scholars turn their record, evidence, achievements, support n
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Beta 3.3 Sprint III — PDF Rendering + Portfolio Sharing
+
+## Added
+
+- Actual PDF rendering route using React PDF
+- Shareable portfolio page
+- Portfolio access-status foundation
+- Recommender approval page
+- Recommendation approval model
+- Portfolio navigation entry

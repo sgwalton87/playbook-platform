@@ -865,3 +865,15 @@ Playbook can now prepare portfolio packets and recommendation request workflows 
 
 ## 2026-07-04 14:54
 - Commit recorded: Build Beta 3.3 PDF export and recommender workflow
+
+## 2026-07-04T22:09:08.411Z
+
+**Type:** product
+
+Built Beta 3.3 Sprint III PDF rendering and portfolio sharing.
+
+## 2026-07-04T22:09:09.279Z
+
+**Type:** innovation
+
+Playbook can now render portfolio packets as PDFs and support shareable portfolio/recommender approval workflows.

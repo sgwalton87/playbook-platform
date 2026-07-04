@@ -12,6 +12,7 @@ const NAV = [
   {label:"Athlete OS",href:"/scholar-athlete-os",icon:"🏀"},
   {label:"Messages",href:"/messages",icon:"💬"},
   {label:"Notifications",href:"/notifications",icon:"🔔"},
+  {label:"Portfolio",href:"/portfolio/demo",icon:"📄"},
   {label:"Recommenders",href:"/recommenders",icon:"✍️"},
   {label:"Applications",href:"/opportunity-toolkit",icon:"📝"},
   {label:"Opportunities",href:"/opportunities",icon:"🌟"},

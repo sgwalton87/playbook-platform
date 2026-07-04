@@ -275,12 +275,13 @@ All files:
 
 ### release
 
-Count: 7
+Count: 8
 
 Canonical candidates:
 - docs/CHANGELOG.md
 - docs/releases/ALPHA_0.1.md
 - docs/releases/BETA_3.3_OPPORTUNITY_APPLICATION_TOOLKIT.md
+- docs/releases/BETA_3.3_SPRINT_III_PORTFOLIO_SHARING.md
 - docs/releases/BETA_3.3_SPRINT_II_RECOMMENDER_WORKFLOW.md
 - docs/releases/RELEASE_LOG.md
 
@@ -290,6 +291,7 @@ All files:
 - docs/LEDGER/RELEASE_HISTORY.md
 - docs/releases/ALPHA_0.1.md
 - docs/releases/BETA_3.3_OPPORTUNITY_APPLICATION_TOOLKIT.md
+- docs/releases/BETA_3.3_SPRINT_III_PORTFOLIO_SHARING.md
 - docs/releases/BETA_3.3_SPRINT_II_RECOMMENDER_WORKFLOW.md
 - docs/releases/RELEASE_LOG.md
 
