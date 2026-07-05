@@ -1922,3 +1922,17 @@ Playbook now helps scholars turn their record, evidence, achievements, support n
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Unified Experience Cleanup + Activation Sprint
+
+## Added
+
+- Experience mode labeling
+- Foundation/Demo/Studio banners
+- Normalized Playbook page spacing
+- Legacy AppShell neutralized to prevent duplicate menus
+- Active Dashboard command center
+- Founder Command Center
+- Role-aware home route helpers

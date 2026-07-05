@@ -6,6 +6,7 @@ import { shouldUseAppShell } from "@/lib/app-shell";
 
 const NAV = [
   { label: "Home", href: "/home", icon: "✨" },
+  { label: "Founder", href: "/founder", icon: "👑" },
   { label: "Dashboard", href: "/dashboard", icon: "🏠" },
   { label: "Record", href: "/record", icon: "📘" },
   { label: "Applications", href: "/opportunity-toolkit", icon: "📝" },

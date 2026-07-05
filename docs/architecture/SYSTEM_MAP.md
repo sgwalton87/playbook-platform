@@ -37,6 +37,7 @@ Playbook SDK
 - app/events/page.tsx
 - app/family-os/page.tsx
 - app/feed/page.tsx
+- app/founder/page.tsx
 - app/gamification/page.tsx
 - app/home/page.tsx
 - app/intelligence-platform/page.tsx
@@ -142,6 +143,7 @@ Playbook SDK
 - tests/unit/event-handlers.test.ts
 - tests/unit/event-notifications/event-notifications.test.ts
 - tests/unit/events.test.ts
+- tests/unit/experience-cleanup/experience-cleanup.test.ts
 - tests/unit/full-site/full-site-routes.test.ts
 - tests/unit/gamification/gamification-v2.test.tsx
 - tests/unit/home/playbook-home.test.tsx

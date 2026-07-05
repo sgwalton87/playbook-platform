@@ -318,3 +318,9 @@ Playbook now has foundations for role tours, contextual help, reward integrity, 
 **Type:** innovation
 
 Playbook Demo Mode now includes a founder scholar-athlete case study that explains why the ecosystem exists.
+
+## 2026-07-05T00:22:56.939Z
+
+**Type:** innovation
+
+Playbook now separates demo, foundation, studio, founder, and active user experiences more clearly.

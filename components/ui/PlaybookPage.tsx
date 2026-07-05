@@ -1,14 +1,26 @@
 "use client";
 
 import { pageShellStyle, playbookTheme } from "@/lib/design-system/tokens";
+import ExperienceModeBanner from "@/components/experience/ExperienceModeBanner";
 
 export function PlaybookPage({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <main style={pageShellStyle}>{children}</main>;
+  return (
+    <main style={normalizedPageStyle}>
+      <ExperienceModeBanner />
+      {children}
+    </main>
+  );
 }
+
+const normalizedPageStyle: React.CSSProperties = {
+  ...pageShellStyle,
+  paddingTop: 24,
+  paddingBottom: 36,
+};
 
 export function PlaybookHero({
   eyebrow,

@@ -1236,3 +1236,11 @@ Added full route/pathway audit foundation, Studio audit page, and founder case s
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Unified Experience Cleanup + Activation Sprint
+
+Status: Foundation complete
+
+Cleaned up double-shell behavior, normalized page spacing, added experience-mode labels, separated Founder/Studio surfaces from user-facing pages, and converted Dashboard into a more active command center.
