@@ -1113,3 +1113,13 @@ Alpha 1.0 Complete
 
 - Archivist v2 ship cycle completed.
 
+
+## 2026-07-05 16:10
+- Commit recorded: Unify courses page with Playbook design schema
+
+## 2026-07-05 16:29
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

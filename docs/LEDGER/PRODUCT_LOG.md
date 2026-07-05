@@ -1057,3 +1057,6 @@ Playbook now separates demo, foundation, studio, founder, and active user experi
 
 ## 2026-07-05 14:53
 - Commit recorded: Unify activity feed page design schema
+
+## 2026-07-05 16:10
+- Commit recorded: Unify courses page with Playbook design schema
