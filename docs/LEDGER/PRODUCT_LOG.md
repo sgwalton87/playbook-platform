@@ -1018,3 +1018,6 @@ Playbook now separates demo, foundation, studio, founder, and active user experi
 
 ## 2026-07-04 17:59
 - Commit recorded: Restore Playbook core scholar journey
+
+## 2026-07-04 18:42
+- Commit recorded: Restore academic core dashboard transcript upload ag tracker
