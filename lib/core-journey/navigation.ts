@@ -1,5 +1,8 @@
 export const SCHOLAR_PRIMARY_NAV = [
   { label: "Start Here", href: "/start", icon: "✦" },
+  { label: "Events", href: "/community-events", icon: "◍" },
+  { label: "Mentors", href: "/mentor-connect", icon: "◌" },
+  { label: "Albums", href: "/albums", icon: "▧" },
   { label: "Community", href: "/feed", icon: "✺" },
   { label: "My Record", href: "/record", icon: "◈" },
   { label: "Academic Readiness", href: "/academic-readiness", icon: "◎" },

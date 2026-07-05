@@ -2033,3 +2033,17 @@ people who can help the scholar act.
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Social Core Recovery Sprint I
+
+## Restored
+
+- Community Feed prominence
+- Feed identity repair foundation
+- Photo Albums entry point
+- Mentor Connect entry point
+- Community Events entry point
+- Dashboard community card
+- Social reward/notification event foundation
