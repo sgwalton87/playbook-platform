@@ -274,22 +274,26 @@ export default function FeedPage() {
         </div>
       )}
 
-      <div style={{padding:"32px 36px",maxWidth:1080}}>
-        <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.2em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>The network</p>
-        <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:"clamp(32px,4vw,48px)",textTransform:"uppercase",color:T.ink,lineHeight:.95,marginBottom:20}}>Activity Feed</h1>
-
-        <div style={{display:"flex",gap:8,marginBottom:20}}>
+      <div style={{padding:"26px 40px 60px",maxWidth:1180,margin:"0 auto"}}>
+        <section style={{background:T.navy,borderRadius:32,padding:"38px 36px",marginBottom:18,boxShadow:"0 18px 42px rgba(15,23,42,.10)"}}>
+          <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.2em",textTransform:"uppercase",color:T.orange,marginBottom:14,fontWeight:900}}>Community</p>
+          <h1 style={{fontFamily:T.sans,fontWeight:950,fontSize:"clamp(36px,5vw,56px)",color:"#F8F7F4",lineHeight:1.02,letterSpacing:"-.04em",marginBottom:18}}>Share your journey.</h1>
+          <p style={{fontSize:18,lineHeight:1.55,color:"rgba(248,247,244,.78)",maxWidth:720,marginBottom:22}}>
+            Post updates, photos, accomplishments, questions, club moments, sports highlights, and milestones with the Playbook community.
+          </p>
+          <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
           {(["feed","gallery"]as const).map(t=>(
             <button key={t} onClick={()=>setTab(t)} style={{fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:tab===t?T.navy:"transparent",color:tab===t?"#F8F7F4":T.muted,border:`1.5px solid ${tab===t?T.navy:T.line}`,borderRadius:999,padding:"9px 20px",cursor:"pointer",transition:"all 0.15s"}}>
               {t==="feed"?"📣 Feed":`📸 Gallery (${gallery.length})`}
             </button>
           ))}
-        </div>
+          </div>
+        </section>
 
         {tab==="feed"&&(
-          <div style={{display:"grid",gridTemplateColumns:"1fr 280px",gap:20}}>
+          <div style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) 280px",gap:20}}>
             <div>
-              <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:18,padding:"18px 20px",marginBottom:16}}>
+              <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:24,padding:"22px 24px",marginBottom:16}}>
                 <div style={{display:"flex",gap:12,alignItems:"flex-start",marginBottom:12}}>
                   <div style={{width:40,height:40,borderRadius:"50%",background:T.orange,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:T.anton,fontSize:15,color:"#fff",flexShrink:0}}>{userInitials}</div>
                   <textarea value={newPost} onChange={e=>setNewPost(e.target.value)} placeholder="Share something with the network..." rows={3} style={{flex:1,background:T.surface2,border:`1.5px solid ${T.line}`,borderRadius:12,padding:"10px 14px",fontSize:14,color:T.ink,fontFamily:T.sans,transition:"border-color 0.15s",width:"100%"}}/>
@@ -318,7 +322,7 @@ export default function FeedPage() {
               </div>
 
               {filtered.length===0?(
-                <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:16,padding:"48px 24px",textAlign:"center"}}>
+                <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:24,padding:"48px 24px",textAlign:"center"}}>
                   <div style={{fontSize:36,marginBottom:14}}>📣</div>
                   <h3 style={{fontFamily:T.anton,fontSize:20,textTransform:"uppercase",color:T.ink,marginBottom:8}}>Nothing here yet</h3>
                   <p style={{fontFamily:T.mono,fontSize:11,color:T.faint}}>Be the first to post something to the network.</p>
@@ -326,7 +330,7 @@ export default function FeedPage() {
               ):(
                 <div style={{display:"flex",flexDirection:"column",gap:12}}>
                   {filtered.map(post=>(
-                    <div key={post.id} className="pb-post" style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:18,overflow:"hidden",transition:"border-color 0.15s"}}>
+                    <div key={post.id} className="pb-post" style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:24,overflow:"hidden",transition:"border-color 0.15s",boxShadow:"0 12px 30px rgba(15,23,42,.04)"}}>
                       {post.coverImg&&(
                         <div style={{position:"relative",maxHeight:280,overflow:"hidden",cursor:"pointer"}} onClick={()=>setLightbox(post.coverImg)}>
                           <img src={post.coverImg} alt="" style={{width:"100%",objectFit:"cover",display:"block",maxHeight:280}}/>
@@ -442,7 +446,7 @@ export default function FeedPage() {
               <button onClick={()=>setTab("feed")} style={{fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",background:"transparent",border:`1px solid ${T.line}`,color:T.muted,borderRadius:999,padding:"7px 14px",cursor:"pointer"}}>← Back to feed</button>
             </div>
             {gallery.length===0?(
-              <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:16,padding:"48px 24px",textAlign:"center"}}>
+              <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:24,padding:"48px 24px",textAlign:"center"}}>
                 <div style={{fontSize:36,marginBottom:14}}>📷</div>
                 <p style={{fontFamily:T.mono,fontSize:12,color:T.faint}}>No photos yet. Upload your first one above!</p>
               </div>

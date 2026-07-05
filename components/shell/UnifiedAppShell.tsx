@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { shouldUseAppShell } from "@/lib/app-shell";
 import { getNavigationForRole } from "@/lib/core-journey/navigation";
+import PlaybookLogo from "@/components/brand/PlaybookLogo";
 
 export default function UnifiedAppShell({
   children,
@@ -29,7 +30,7 @@ export default function UnifiedAppShell({
     <div style={shell}>
       <aside style={sidebar} data-playbook-sidebar="true">
         <Link href="/start" style={brand}>
-          <span style={logo}>P</span>
+          <PlaybookLogo size={46} priority />
           <span>
             <strong>Playbook OS</strong>
             <small style={brandSub}>Scholar Journey</small>
