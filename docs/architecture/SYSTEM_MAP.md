@@ -18,6 +18,7 @@ Playbook SDK
 
 - app/academic-readiness/page.tsx
 - app/action-routing/page.tsx
+- app/admin/moderation/page.tsx
 - app/admin/page.tsx
 - app/albums/page.tsx
 - app/application-workspaces/page.tsx
@@ -120,6 +121,7 @@ Playbook SDK
 - supabase/migrations/20260705_profile_albums.sql
 - supabase/migrations/20260705_social_comments_reactions.sql
 - supabase/migrations/20260705_social_comments_reactions_fix.sql
+- supabase/migrations/20260705_social_safety_trust.sql
 
 ## Detected Tests
 
@@ -200,6 +202,7 @@ Playbook SDK
 - tests/unit/smoke.test.ts
 - tests/unit/social-core/social-core.test.ts
 - tests/unit/social-interactions/social-interactions.test.ts
+- tests/unit/social-safety/social-safety.test.ts
 - tests/unit/store-v2/store-v2.test.tsx
 - tests/unit/studio/studio-operations.test.ts
 - tests/unit/studio/studio-tools.test.ts
