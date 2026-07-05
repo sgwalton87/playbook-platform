@@ -1936,3 +1936,10 @@ Playbook now helps scholars turn their record, evidence, achievements, support n
 - Active Dashboard command center
 - Founder Command Center
 - Role-aware home route helpers
+
+## 2026-07-05 17:27
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

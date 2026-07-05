@@ -1244,3 +1244,10 @@ Added full route/pathway audit foundation, Studio audit page, and founder case s
 Status: Foundation complete
 
 Cleaned up double-shell behavior, normalized page spacing, added experience-mode labels, separated Founder/Studio surfaces from user-facing pages, and converted Dashboard into a more active command center.
+
+## 2026-07-05 17:27
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
