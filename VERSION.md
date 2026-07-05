@@ -1264,3 +1264,10 @@ readiness, opportunity matching, applications, coordinated support, learning,
 and rewards.
 
 Stephisha's Founder Case Study is the canonical Demo Mode story.
+
+## 2026-07-05 18:02
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

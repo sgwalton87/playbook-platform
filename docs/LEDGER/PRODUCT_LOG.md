@@ -1015,3 +1015,6 @@ Playbook now separates demo, foundation, studio, founder, and active user experi
 
 ## 2026-07-04 17:25
 - Commit recorded: Clean up unified experience and activate dashboard
+
+## 2026-07-04 17:59
+- Commit recorded: Restore Playbook core scholar journey

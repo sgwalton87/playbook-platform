@@ -1979,3 +1979,10 @@ Start Here
 Playbook begins with the scholar, understands the scholar's evidence,
 identifies readiness and risk, connects opportunity, and coordinates the
 people who can help the scholar act.
+
+## 2026-07-05 18:02
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
