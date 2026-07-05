@@ -216,6 +216,40 @@ export default function FeedPage() {
     });
   };
 
+  const editComment=async(postId:string,comment:any)=>{
+    if(!userId||comment.user_id!==userId)return;
+    const body=window.prompt("Edit your comment",comment.body);
+    if(!body?.trim())return;
+
+    setCommentsByPost(current=>({
+      ...current,
+      [postId]:(current[postId]||[]).map((c:any)=>c.id===comment.id?{...c,body}:c)
+    }));
+
+    await fetch("/api/social/comments",{
+      method:"PATCH",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({commentId:comment.id,userId,body})
+    });
+  };
+
+  const deleteComment=async(postId:string,comment:any)=>{
+    if(!userId||comment.user_id!==userId)return;
+    if(!window.confirm("Delete this comment?"))return;
+
+    setCommentsByPost(current=>({
+      ...current,
+      [postId]:(current[postId]||[]).filter((c:any)=>c.id!==comment.id)
+    }));
+    setPosts(p=>p.map(x=>x.id===postId?{...x,comments:Math.max(0,x.comments-1)}:x));
+
+    await fetch("/api/social/comments",{
+      method:"DELETE",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({commentId:comment.id,userId})
+    });
+  };
+
   const filtered=filter==="All"?posts:posts.filter(p=>p.pillar===filter);
 
   if(loading)return<div style={{minHeight:"100vh",background:T.cream,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:T.mono,fontSize:12,color:T.faint}}>Loading feed...</div>;
@@ -329,6 +363,12 @@ export default function FeedPage() {
                                   </span>
                                 </div>
                                 <p style={{fontSize:13,lineHeight:1.5,color:T.muted}}>{comment.body}</p>
+                                {comment.user_id===userId&&(
+                                  <div style={{display:"flex",gap:10,marginTop:6}}>
+                                    <button onClick={()=>editComment(post.id,comment)} style={{fontFamily:T.mono,fontSize:9,fontWeight:700,color:T.orange,background:"transparent",border:"none",cursor:"pointer",padding:0}}>Edit</button>
+                                    <button onClick={()=>deleteComment(post.id,comment)} style={{fontFamily:T.mono,fontSize:9,fontWeight:700,color:T.faint,background:"transparent",border:"none",cursor:"pointer",padding:0}}>Delete</button>
+                                  </div>
+                                )}
                               </div>
                             ))}
                           </div>

@@ -39,3 +39,43 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ ok: true, comment: data });
 }
+
+export async function PATCH(req: NextRequest) {
+  const body = await req.json();
+  const supabase = admin();
+
+  if (!body.commentId || !body.userId || !body.body?.trim()) {
+    return NextResponse.json({ error: "Missing comment edit data." }, { status: 400 });
+  }
+
+  const { data, error } = await supabase
+    .from("feed_post_comments")
+    .update({ body: body.body.trim() })
+    .eq("id", body.commentId)
+    .eq("user_id", body.userId)
+    .select()
+    .single();
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+
+  return NextResponse.json({ ok: true, comment: data });
+}
+
+export async function DELETE(req: NextRequest) {
+  const body = await req.json();
+  const supabase = admin();
+
+  if (!body.commentId || !body.userId) {
+    return NextResponse.json({ error: "Missing comment delete data." }, { status: 400 });
+  }
+
+  const { error } = await supabase
+    .from("feed_post_comments")
+    .delete()
+    .eq("id", body.commentId)
+    .eq("user_id", body.userId);
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+
+  return NextResponse.json({ ok: true });
+}
