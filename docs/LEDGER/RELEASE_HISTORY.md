@@ -1043,3 +1043,13 @@ Alpha 1.0 Complete
 
 - Archivist v2 ship cycle completed.
 
+
+## 2026-07-04 21:56
+- Commit recorded: Display feed comments under posts
+
+## 2026-07-05 21:58
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

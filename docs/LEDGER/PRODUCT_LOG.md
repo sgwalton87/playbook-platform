@@ -1036,3 +1036,6 @@ Playbook now separates demo, foundation, studio, founder, and active user experi
 
 ## 2026-07-04 21:41
 - Commit recorded: Activate persistent social feed interactions
+
+## 2026-07-04 21:56
+- Commit recorded: Display feed comments under posts
