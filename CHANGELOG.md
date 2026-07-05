@@ -2005,3 +2005,10 @@ people who can help the scholar act.
 - Community Feed entry in scholar navigation
 - Community Feed entry from Dashboard
 - Profile wall/photo-post pathway preserved
+
+## 2026-07-05 18:59
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
