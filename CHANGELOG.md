@@ -1993,3 +1993,15 @@ people who can help the scholar act.
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Community Heartbeat Recovery Sprint
+
+## Restored
+
+- Community Feed visibility
+- Feed author identity and role display
+- Community Feed entry in scholar navigation
+- Community Feed entry from Dashboard
+- Profile wall/photo-post pathway preserved

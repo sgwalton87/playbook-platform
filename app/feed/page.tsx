@@ -49,12 +49,20 @@ export default function FeedPage() {
 
       if(dbPosts&&dbPosts.length>0){
         const authorIds=[...new Set(dbPosts.map((p:any)=>p.user_id))];
-        const{data:authorProfiles}=await supabase.from("profiles").select("id,first_name,full_name").in("id",authorIds);
+        const{data:authorProfiles}=await supabase.from("profiles").select("id,first_name,last_name,full_name,username,role,avatar_url").in("id",authorIds);
         const profileMap:Record<string,string>={};
-        authorProfiles?.forEach((ap:any)=>{profileMap[ap.id]=ap.full_name||ap.first_name||"Scholar";});
+        authorProfiles?.forEach((ap:any)=>{
+          profileMap[ap.id]={
+            name: ap.full_name || [ap.first_name, ap.last_name].filter(Boolean).join(" ") || ap.username || "Scholar",
+            role: ap.role || "Scholar",
+            avatar_url: ap.avatar_url || null,
+            username: ap.username || null,
+          };
+        });
 
         setPosts(dbPosts.map((post:any)=>{
-          const authorName=profileMap[post.user_id]||"Scholar";
+          const authorProfile=profileMap[post.user_id]||{name:"Scholar",role:"Scholar",avatar_url:null,username:null};
+          const authorName=authorProfile.name;
           const initials=authorName.split(" ").map((n:string)=>n[0]).join("").toUpperCase().slice(0,2);
           const d=new Date(post.created_at);
           const timeStr=d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})+" · "+d.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"});
@@ -62,7 +70,7 @@ export default function FeedPage() {
           return{
             id:post.id,author:authorName,initials,
             color:post.user_id===u.user.id?T.orange:T.blue,
-            role:"Scholar-Athlete",time:timeStr,
+            role:authorProfile.role,time:timeStr,
             title:post.title||null,
             content:post.body||"",
             pillar:"Leadership",pillarColor:T.orange,
@@ -127,7 +135,7 @@ export default function FeedPage() {
     setPosts(prev=>[{
       id:saved?.id||Date.now().toString(),
       author:userName,initials:userInitials,color:T.orange,
-      role:"Scholar-Athlete",time:"Just now",
+      role:userRole,time:"Just now",
       title:null,content:newPost,
       pillar:"Leadership",pillarColor:T.orange,
       coverImg:imageUrl,likes:0,comments:0,liked:false,isOwn:true,

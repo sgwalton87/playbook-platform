@@ -61,6 +61,15 @@ export default function DashboardPage() {
             </p>
             <PlaybookButton href="/support-network">Activate Support</PlaybookButton>
           </PlaybookCard>
+        
+        <PlaybookCard eyebrow="Community" title="Share your journey">
+          <p style={body}>
+            Post updates, photos, accomplishments, questions, club moments,
+            sports highlights, and milestones with the Playbook community.
+          </p>
+          <PlaybookButton href="/feed">Open Community Feed</PlaybookButton>
+        </PlaybookCard>
+
         </section>
       </div>
     </PlaybookPage>
