@@ -1251,3 +1251,16 @@ Cleaned up double-shell behavior, normalized page spacing, added experience-mode
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Playbook Core Journey Restoration Sprint
+
+Status: Restoration foundation complete
+
+Playbook has been recentered around the original scholar journey:
+Transcript Intelligence, A–G readiness, academic readiness, scholar-athlete
+readiness, opportunity matching, applications, coordinated support, learning,
+and rewards.
+
+Stephisha's Founder Case Study is the canonical Demo Mode story.

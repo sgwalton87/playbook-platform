@@ -1943,3 +1943,39 @@ Playbook now helps scholars turn their record, evidence, achievements, support n
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Playbook Core Journey Restoration Sprint
+
+## Restored
+
+- Scholar journey as the primary product flow
+- Transcript upload and transcript intelligence visibility
+- A–G readiness as a first-class scholar experience
+- Academic Readiness hub
+- Connection from academics to Scholar-Athlete OS
+- Connection from readiness to opportunities and applications
+- Support Network placement in the core scholar journey
+- Courses and rewards placement in the journey
+- Founder tools separated from scholar navigation
+- Stephisha Founder Case Study established as Demo Mode front door
+
+## Core Journey
+
+Start Here
+→ Scholar Record
+→ Transcript
+→ Academic Readiness
+→ Scholar-Athlete Readiness
+→ Opportunities
+→ Applications
+→ Support Network
+→ Courses
+→ Rewards
+
+## Product Principle
+
+Playbook begins with the scholar, understands the scholar's evidence,
+identifies readiness and risk, connects opportunity, and coordinates the
+people who can help the scholar act.

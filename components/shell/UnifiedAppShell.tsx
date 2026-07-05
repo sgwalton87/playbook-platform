@@ -3,23 +3,13 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { shouldUseAppShell } from "@/lib/app-shell";
+import { getNavigationForRole } from "@/lib/core-journey/navigation";
 
-const NAV = [
-  { label: "Home", href: "/home", icon: "✨" },
-  { label: "Founder", href: "/founder", icon: "👑" },
-  { label: "Dashboard", href: "/dashboard", icon: "🏠" },
-  { label: "Record", href: "/record", icon: "📘" },
-  { label: "Applications", href: "/opportunity-toolkit", icon: "📝" },
-  { label: "Athlete OS", href: "/scholar-athlete-os", icon: "🏀" },
-  { label: "Messages", href: "/messages", icon: "💬" },
-  { label: "Notifications", href: "/notifications", icon: "🔔" },
-  { label: "Courses", href: "/courses", icon: "🎓" },
-  { label: "Coins", href: "/gamification", icon: "🪙" },
-  { label: "Store", href: "/store-v2", icon: "🛍️" },
-  { label: "Studio", href: "/studio", icon: "🛠️" },
-];
-
-export default function UnifiedAppShell({ children }: { children: React.ReactNode }) {
+export default function UnifiedAppShell({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -27,17 +17,29 @@ export default function UnifiedAppShell({ children }: { children: React.ReactNod
     return <>{children}</>;
   }
 
+  // Later this should come from the authenticated user's profile.
+  // For now Founder gets both scholar journey + Founder Tools.
+  const profile = { role: "founder" };
+
+  const navigation = getNavigationForRole(profile?.role);
+  const primaryNav = navigation.primary;
+  const founderNav = navigation.founder;
+
   return (
     <div style={shell}>
       <aside style={sidebar} data-playbook-sidebar="true">
-        <Link href="/dashboard" style={brand}>
+        <Link href="/start" style={brand}>
           <span style={logo}>P</span>
-          <strong>Playbook OS</strong>
+          <span>
+            <strong>Playbook OS</strong>
+            <small style={brandSub}>Scholar Journey</small>
+          </span>
         </Link>
 
         <nav style={nav}>
-          {NAV.map((item) => {
-            const active = pathname === item.href || pathname?.startsWith(item.href + "/");
+          {primaryNav.map((item) => {
+            const active =
+              pathname === item.href || pathname?.startsWith(item.href + "/");
 
             return (
               <Link
@@ -54,6 +56,34 @@ export default function UnifiedAppShell({ children }: { children: React.ReactNod
             );
           })}
         </nav>
+
+        {founderNav.length > 0 && (
+          <div style={founderSection}>
+            <div style={sectionLabel}>Founder Tools</div>
+
+            <nav style={nav}>
+              {founderNav.map((item) => {
+                const active =
+                  pathname === item.href ||
+                  pathname?.startsWith(item.href + "/");
+
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    style={{
+                      ...navItem,
+                      ...(active ? activeNavItem : {}),
+                    }}
+                  >
+                    <span>{item.icon}</span>
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
+        )}
       </aside>
 
       <section style={main}>
@@ -62,8 +92,8 @@ export default function UnifiedAppShell({ children }: { children: React.ReactNod
             ← Back
           </button>
 
-          <Link href="/dashboard" style={menuButton}>
-            ☰ Menu
+          <Link href="/start" style={menuButton}>
+            Start Here
           </Link>
         </header>
 
@@ -76,7 +106,7 @@ export default function UnifiedAppShell({ children }: { children: React.ReactNod
 const shell: React.CSSProperties = {
   minHeight: "100vh",
   display: "grid",
-  gridTemplateColumns: "260px 1fr",
+  gridTemplateColumns: "280px 1fr",
   background: "#F8F7F4",
 };
 
@@ -101,13 +131,21 @@ const brand: React.CSSProperties = {
 };
 
 const logo: React.CSSProperties = {
-  width: 36,
-  height: 36,
-  borderRadius: 12,
-  background: "#F97316",
+  width: 38,
+  height: 38,
+  borderRadius: 14,
+  background: "#F4B942",
+  color: "#0F172A",
   display: "grid",
   placeItems: "center",
   fontWeight: 950,
+};
+
+const brandSub: React.CSSProperties = {
+  display: "block",
+  color: "rgba(255,255,255,.55)",
+  fontSize: 11,
+  marginTop: 2,
 };
 
 const nav: React.CSSProperties = {
@@ -127,9 +165,24 @@ const navItem: React.CSSProperties = {
 };
 
 const activeNavItem: React.CSSProperties = {
-  background: "rgba(249,115,22,.16)",
+  background: "rgba(244,185,66,.16)",
   color: "#FFFFFF",
-  border: "1px solid rgba(249,115,22,.35)",
+  border: "1px solid rgba(244,185,66,.35)",
+};
+
+const founderSection: React.CSSProperties = {
+  marginTop: 24,
+  paddingTop: 18,
+  borderTop: "1px solid rgba(255,255,255,.1)",
+};
+
+const sectionLabel: React.CSSProperties = {
+  fontSize: 10,
+  textTransform: "uppercase",
+  letterSpacing: ".16em",
+  color: "rgba(255,255,255,.42)",
+  fontWeight: 900,
+  marginBottom: 10,
 };
 
 const main: React.CSSProperties = {

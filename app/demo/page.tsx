@@ -1,7 +1,5 @@
-"use client";
-
-import DemoMode from "@/components/demo/DemoMode";
+import { redirect } from "next/navigation";
 
 export default function DemoPage() {
-  return <DemoMode />;
+  redirect("/demo/founder-case-study");
 }

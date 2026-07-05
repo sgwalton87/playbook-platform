@@ -16,6 +16,7 @@ Playbook SDK
 
 ## Detected Pages
 
+- app/academic-readiness/page.tsx
 - app/action-routing/page.tsx
 - app/admin/page.tsx
 - app/application-workspaces/page.tsx
@@ -70,6 +71,7 @@ Playbook SDK
 - app/role-select/page.tsx
 - app/scholar-athlete-os/page.tsx
 - app/scholar-network/page.tsx
+- app/start/page.tsx
 - app/store/page.tsx
 - app/store-v2/page.tsx
 - app/studio/architecture/page.tsx
@@ -135,6 +137,7 @@ Playbook SDK
 - tests/unit/beta34-audit/beta34-audit.test.ts
 - tests/unit/collaboration/collaboration.test.tsx
 - tests/unit/compass/compass-core.test.ts
+- tests/unit/core-journey/core-journey.test.ts
 - tests/unit/demo/demo-mode.test.tsx
 - tests/unit/demo-case-study/founder-case-study.test.tsx
 - tests/unit/design-system/design-system.test.tsx

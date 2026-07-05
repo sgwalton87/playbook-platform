@@ -277,7 +277,7 @@ All files:
 
 ### release
 
-Count: 15
+Count: 16
 
 Canonical candidates:
 - docs/CHANGELOG.md
@@ -292,6 +292,7 @@ Canonical candidates:
 - docs/releases/BETA_3.4_GUIDED_EXPERIENCE_GAMIFICATION.md
 - docs/releases/BETA_3.4_SPRINTS_III_VII_ECONOMY_ARC.md
 - docs/releases/BETA_3.4_SPRINT_II_REWARD_EVENTS.md
+- docs/releases/PLAYBOOK_CORE_JOURNEY_RESTORATION.md
 - docs/releases/RELEASE_LOG.md
 
 All files:
@@ -309,6 +310,7 @@ All files:
 - docs/releases/BETA_3.4_GUIDED_EXPERIENCE_GAMIFICATION.md
 - docs/releases/BETA_3.4_SPRINTS_III_VII_ECONOMY_ARC.md
 - docs/releases/BETA_3.4_SPRINT_II_REWARD_EVENTS.md
+- docs/releases/PLAYBOOK_CORE_JOURNEY_RESTORATION.md
 - docs/releases/RELEASE_LOG.md
 
 ### design
