@@ -44,7 +44,7 @@ export default function TranscriptUploadCard({ onParsed }: { onParsed?: () => vo
     if (!res.ok) {
       setStatus(json.error || "Could not parse transcript. Try another file.");
     } else {
-      setStatus(`Transcript parsed. ${json.agUpdates || 0} A-G areas updated.`);
+      setStatus(`Transcript parsed. ${json.agUpdates || 0} A-G areas updated. Refreshing tracker...`);
       onParsed?.();
     }
 

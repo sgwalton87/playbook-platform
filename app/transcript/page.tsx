@@ -21,12 +21,25 @@ export default function TranscriptPage() {
       if (!u.user) { router.replace("/login"); return; }
       const [{ data: p }, { data: ag }, { data: certs }, { data: acts }] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", u.user.id).single(),
-        supabase.from("ag_progress").select("*").eq("user_id", u.user.id).order("subject"),
+        supabase.from("ag_progress").select("*").eq("user_id", u.user.id).order("updated_at", { ascending: false }),
         supabase.from("certificates").select("*").eq("user_id", u.user.id),
         supabase.from("student_activities").select("*").eq("student_id", u.user.id),
       ]);
       setProfile(p);
-      setAgProgress((ag||[]).map((a:any)=>({...a,years_completed:Number(a.years_completed),years_required:Number(a.years_required)})));
+      const latestBySubject = new Map<string, any>();
+      for (const row of ag || []) {
+        if (!latestBySubject.has(row.subject)) {
+          latestBySubject.set(row.subject, row);
+        }
+      }
+
+      setAgProgress(
+        Array.from(latestBySubject.values()).map((a:any)=>({
+          ...a,
+          years_completed:Number(a.years_completed),
+          years_required:Number(a.years_required)
+        }))
+      );
       setCertificates(certs||[]);
       setActivities(acts||[]);
       setLoading(false);

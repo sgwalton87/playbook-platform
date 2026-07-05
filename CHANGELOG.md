@@ -2054,3 +2054,16 @@ people who can help the scholar act.
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Social Core Sprint II — Persistent Interaction
+
+## Added
+
+- Persistent feed reactions
+- Persistent feed comments
+- Feed reaction/comment API routes
+- Social coin ledger entries
+- Real profile role for new posts
+- Feed reaction/comment count loading

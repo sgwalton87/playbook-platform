@@ -17,6 +17,8 @@ export default function FeedPage() {
   const [newPost,setNewPost]=useState("");
   const [userName,setUserName]=useState("Scholar");
   const [userInitials,setUserInitials]=useState("SW");
+  const [userRole,setUserRole]=useState("member");
+  const [userUsername,setUserUsername]=useState<string|null>(null);
   const [userId,setUserId]=useState<string|null>(null);
   const [tab,setTab]=useState<"feed"|"gallery">("feed");
   const [pendingPhoto,setPendingPhoto]=useState<string|null>(null);
@@ -32,10 +34,12 @@ export default function FeedPage() {
       if(!u.user){router.replace("/login");return;}
       setUserId(u.user.id);
 
-      const{data:p}=await supabase.from("profiles").select("first_name,full_name").eq("id",u.user.id).single();
+      const{data:p}=await supabase.from("profiles").select("first_name,last_name,full_name,username,role,avatar_url").eq("id",u.user.id).single();
       const name=p?.full_name||p?.first_name||"Scholar";
       setUserName(p?.first_name||"Scholar");
       setUserInitials(name.split(" ").map((n:string)=>n[0]).join("").toUpperCase().slice(0,2));
+      setUserRole(p?.role||"member");
+      setUserUsername(p?.username||null);
 
       // Load from feed_posts — the real table
       const{data:dbPosts,error}=await supabase
@@ -48,6 +52,15 @@ export default function FeedPage() {
       if(error)console.error("Feed error:",error.message);
 
       if(dbPosts&&dbPosts.length>0){
+        const postIds=dbPosts.map((p:any)=>p.id);
+        const{data:reactionRows}=await supabase.from("feed_post_reactions").select("post_id,user_id").in("post_id",postIds);
+        const{data:commentRows}=await supabase.from("feed_post_comments").select("post_id").in("post_id",postIds);
+        const reactionCounts:Record<string,number>={};
+        const commentCounts:Record<string,number>={};
+        const likedByMe=new Set<string>();
+        (reactionRows||[]).forEach((r:any)=>{reactionCounts[r.post_id]=(reactionCounts[r.post_id]||0)+1;if(r.user_id===u.user.id)likedByMe.add(r.post_id);});
+        (commentRows||[]).forEach((c:any)=>{commentCounts[c.post_id]=(commentCounts[c.post_id]||0)+1;});
+
         const authorIds=[...new Set(dbPosts.map((p:any)=>p.user_id))];
         const{data:authorProfiles}=await supabase.from("profiles").select("id,first_name,last_name,full_name,username,role,avatar_url").in("id",authorIds);
         const profileMap:Record<string,{name:string;role:string;avatar_url:string|null;username:string|null}>={};
@@ -74,7 +87,7 @@ export default function FeedPage() {
             title:post.title||null,
             content:post.body||"",
             pillar:"Leadership",pillarColor:T.orange,
-            coverImg:imgUrl,likes:0,comments:0,liked:false,
+            coverImg:imgUrl,likes:reactionCounts[post.id]||0,comments:commentCounts[post.id]||0,liked:likedByMe.has(post.id),
             isOwn:post.user_id===u.user.id,
           };
         }));
@@ -135,7 +148,7 @@ export default function FeedPage() {
     setPosts(prev=>[{
       id:saved?.id||Date.now().toString(),
       author:userName,initials:userInitials,color:T.orange,
-      role:"Scholar",time:"Just now",
+      role:userRole,time:"Just now",
       title:null,content:newPost,
       pillar:"Leadership",pillarColor:T.orange,
       coverImg:imageUrl,likes:0,comments:0,liked:false,isOwn:true,
@@ -162,7 +175,27 @@ export default function FeedPage() {
     setUploading(false);
   };
 
-  const toggleLike=(id:string)=>setPosts(p=>p.map(x=>x.id===id?{...x,liked:!x.liked,likes:x.liked?x.likes-1:x.likes+1}:x));
+  const toggleLike=async(id:string)=>{
+    if(!userId)return;
+    setPosts(p=>p.map(x=>x.id===id?{...x,liked:!x.liked,likes:x.liked?Math.max(0,x.likes-1):x.likes+1}:x));
+    await fetch("/api/social/reactions",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({postId:id,userId,reaction:"like"})
+    });
+  };
+  const addComment=async(id:string)=>{
+    if(!userId)return;
+    const body=window.prompt("Write a comment");
+    if(!body?.trim())return;
+    setPosts(p=>p.map(x=>x.id===id?{...x,comments:x.comments+1}:x));
+    await fetch("/api/social/comments",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({postId:id,userId,body})
+    });
+  };
+
   const filtered=filter==="All"?posts:posts.filter(p=>p.pillar===filter);
 
   if(loading)return<div style={{minHeight:"100vh",background:T.cream,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:T.mono,fontSize:12,color:T.faint}}>Loading feed...</div>;
@@ -261,7 +294,7 @@ export default function FeedPage() {
                         {post.content&&<p style={{fontSize:15,lineHeight:1.65,color:T.ink,marginBottom:14}}>{post.content}</p>}
                         <div style={{display:"flex",gap:16,borderTop:`1px solid ${T.line}`,paddingTop:12}}>
                           <button onClick={()=>toggleLike(post.id)} className="pb-like" style={{display:"flex",alignItems:"center",gap:6,fontFamily:T.mono,fontSize:11,fontWeight:700,background:"transparent",border:"none",color:post.liked?T.orange:T.faint,cursor:"pointer",padding:0,transition:"color 0.15s"}}>{post.liked?"♥":"♡"} {post.likes}</button>
-                          <button style={{display:"flex",alignItems:"center",gap:6,fontFamily:T.mono,fontSize:11,fontWeight:700,background:"transparent",border:"none",color:T.faint,cursor:"pointer",padding:0}}>💬 {post.comments}</button>
+                          <button onClick={()=>addComment(post.id)} style={{display:"flex",alignItems:"center",gap:6,fontFamily:T.mono,fontSize:11,fontWeight:700,background:"transparent",border:"none",color:T.faint,cursor:"pointer",padding:0}}>💬 {post.comments}</button>
                           {post.coverImg&&<button onClick={()=>setLightbox(post.coverImg)} style={{display:"flex",alignItems:"center",gap:6,fontFamily:T.mono,fontSize:11,fontWeight:700,background:"transparent",border:"none",color:T.faint,cursor:"pointer",padding:0,marginLeft:"auto"}}>🔍 View</button>}
                         </div>
                       </div>
@@ -309,7 +342,7 @@ export default function FeedPage() {
 
               <div style={{background:T.navy,borderRadius:16,padding:"16px 18px"}}>
                 <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.12em",textTransform:"uppercase",color:T.orange,marginBottom:12}}>Quick links</p>
-                {[{l:"My dashboard",p:"/dashboard"},{l:"Course library",p:"/courses"},{l:"Mentorship",p:"/mentorship"},{l:"My profile",p:"/profile"}].map(({l,p})=>(
+                {[{l:"My dashboard",p:"/dashboard"},{l:"Course library",p:"/courses"},{l:"Mentorship",p:"/mentorship"},{l:"My profile",p:userUsername?`/u/${userUsername}`:"/profile"}].map(({l,p})=>(
                   <button key={l} onClick={()=>router.push(p)} style={{display:"block",width:"100%",textAlign:"left",fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.04em",textTransform:"uppercase",background:"transparent",border:"none",color:"rgba(248,247,244,.45)",cursor:"pointer",padding:"8px 0",borderBottom:"1px solid rgba(255,255,255,.07)"}}>{l} →</button>
                 ))}
               </div>

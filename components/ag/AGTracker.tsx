@@ -70,7 +70,7 @@ export default function AGTracker({
           "subject, years_completed, years_required, in_progress, courses_taken, current_course"
         )
         .eq("user_id", resolvedUserId)
-        .order("subject");
+        .order("updated_at", { ascending: false });
 
       if (!active) return;
 
@@ -78,7 +78,15 @@ export default function AGTracker({
         console.error("Unable to load A-G progress:", error);
         setRows([]);
       } else {
-        setRows((data || []) as AGRow[]);
+        const latestBySubject = new Map<string, AGRow>();
+
+        for (const row of (data || []) as AGRow[]) {
+          if (!latestBySubject.has(row.subject)) {
+            latestBySubject.set(row.subject, row);
+          }
+        }
+
+        setRows(Array.from(latestBySubject.values()));
       }
 
       setLoading(false);
