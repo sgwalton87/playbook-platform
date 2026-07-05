@@ -95,96 +95,9 @@ export default function CoursesPage() {
         img{display:block;}
       `}</style>
 
-      <div style={{
-        padding:"26px 40px 60px",
-        maxWidth:1180,
-        margin:"0 auto"
-      }}>
-
-        {/* Playbook page hero */}
-        <section style={{
-          background:"#0F172A",
-          borderRadius:32,
-          padding:"38px 36px",
-          marginBottom:18,
-          boxShadow:"0 18px 42px rgba(15,23,42,.10)"
-        }}>
-          <p style={{
-            fontFamily:"'Space Mono', monospace",
-            fontSize:10,
-            letterSpacing:"0.2em",
-            textTransform:"uppercase",
-            color:"#F97316",
-            marginBottom:14,
-            fontWeight:900
-          }}>
-            Courses
-          </p>
-
-          <h1 style={{
-            fontFamily:"'Hanken Grotesk', system-ui, sans-serif",
-            fontWeight:900,
-            fontSize:"clamp(36px,5vw,56px)",
-            color:"#F8F7F4",
-            lineHeight:1.02,
-            letterSpacing:"-.04em",
-            marginBottom:18
-          }}>
-            Build skills for school, life, leadership, and your future.
-          </h1>
-
-          <p style={{
-            fontSize:18,
-            lineHeight:1.55,
-            color:"rgba(248,247,244,.78)",
-            maxWidth:760,
-            marginBottom:22
-          }}>
-            Learn at your pace, earn XP and Playbook Coins, unlock certificates,
-            and add verified accomplishments to your Playbook story.
-          </p>
-
-          <div style={{
-            display:"flex",
-            gap:10,
-            flexWrap:"wrap"
-          }}>
-            <button
-              onClick={() => {
-                const next = inProgress[0];
-                if (next) router.push(`/courses/${next.id}`);
-              }}
-              disabled={inProgress.length === 0}
-              style={{
-                background:"#F97316",
-                color:"#fff",
-                border:"none",
-                borderRadius:999,
-                padding:"12px 18px",
-                fontWeight:800,
-                cursor:inProgress.length ? "pointer" : "default",
-                opacity:inProgress.length ? 1 : .55
-              }}
-            >
-              Continue Learning
-            </button>
-
-            <button
-              onClick={() => router.push("/certificates")}
-              style={{
-                background:"#F8F7F4",
-                color:"#0F172A",
-                border:"none",
-                borderRadius:999,
-                padding:"12px 18px",
-                fontWeight:800,
-                cursor:"pointer"
-              }}
-            >
-              View Certificates
-            </button>
-          </div>
-        </section>
+      <div style={{ padding:"32px 36px", maxWidth:1060 }}>
+        <p style={{ fontFamily:"'Space Mono', monospace", fontSize:10, letterSpacing:"0.2em", textTransform:"uppercase", color:"#F97316", marginBottom:6 }}>The library</p>
+        <h1 style={{ fontFamily:"Anton, sans-serif", fontWeight:400, fontSize:"clamp(32px,4vw,48px)", textTransform:"uppercase", color:"#0F172A", lineHeight:.95, marginBottom:20 }}>Course Library</h1>
 
         {/* Stats */}
         <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:10, marginBottom:20 }}>
@@ -194,7 +107,7 @@ export default function CoursesPage() {
             { icon:"✅", label:"Completed", value:FLAGSHIP.filter(c=>progress[c.id]===c.modules&&!c.comingSoon).length },
             { icon:"🎓", label:"Certificates", value:FLAGSHIP.filter(c=>progress[c.id]===c.modules&&!c.comingSoon).length },
           ].map(({ icon, label, value }) => (
-            <div key={label} style={{ background:"#fff", border:"1px solid #E2E8F0", borderRadius:20, padding:"18px 18px", display:"flex", alignItems:"center", gap:12 }}>
+            <div key={label} style={{ background:"#fff", border:"1px solid #E2E8F0", borderRadius:14, padding:"14px 16px", display:"flex", alignItems:"center", gap:12 }}>
               <div style={{ fontSize:22 }}>{icon}</div>
               <div>
                 <div style={{ fontFamily:"'Space Mono', monospace", fontSize:9, letterSpacing:"0.12em", textTransform:"uppercase", color:"#94A3B8", marginBottom:3 }}>{label}</div>
@@ -205,7 +118,7 @@ export default function CoursesPage() {
         </div>
 
         {/* Reward banner */}
-        <div style={{ background:"#0F172A", borderRadius:24, padding:"24px 26px", marginBottom:28, display:"flex", alignItems:"center", gap:20, flexWrap:"wrap" }}>
+        <div style={{ background:"#0F172A", borderRadius:18, padding:"22px 26px", marginBottom:24, display:"flex", alignItems:"center", gap:20, flexWrap:"wrap" }}>
           <div style={{ width:48, height:48, borderRadius:12, background:"#F97316"+"22", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, flexShrink:0 }}>⭐</div>
           <div style={{ flex:1 }}>
             <div style={{ fontFamily:"'Space Mono', monospace", fontSize:10, letterSpacing:"0.16em", textTransform:"uppercase", color:"#F97316", marginBottom:5 }}>How rewards work</div>
@@ -232,7 +145,7 @@ export default function CoursesPage() {
               const pct = Math.round((done / c.modules) * 100);
               return (
                 <div key={c.id} onClick={() => router.push(`/courses/${c.id}`)}
-                  style={{ display:"flex", alignItems:"center", gap:14, background:"#fff", border:"1.5px solid #E2E8F0", borderRadius:22, padding:"16px 18px", cursor:"pointer", marginBottom:8, transition:"border-color 0.15s" }}>
+                  style={{ display:"flex", alignItems:"center", gap:14, background:"#fff", border:"1.5px solid #E2E8F0", borderRadius:14, padding:"14px 18px", cursor:"pointer", marginBottom:8, transition:"border-color 0.15s" }}>
                   <div style={{ width:52, height:52, borderRadius:10, overflow:"hidden", flexShrink:0 }}>
                     <img src={c.img} alt={c.title} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
                   </div>
@@ -306,7 +219,7 @@ export default function CoursesPage() {
             return (
               <div key={c.id} className={c.comingSoon ? "" : "pb-card"}
                 onClick={() => !c.comingSoon && router.push(`/courses/${c.id}`)}
-                style={{ background:"#fff", border:`1.5px solid ${isComplete ? c.color+"44" : "#E2E8F0"}`, borderRadius:24, overflow:"hidden", transition:"all 0.2s", boxShadow:"0 12px 30px rgba(15,23,42,.04)", cursor:c.comingSoon?"default":"pointer", opacity:c.comingSoon?0.6:1 }}>
+                style={{ background:"#fff", border:`1.5px solid ${isComplete ? c.color+"44" : "#E2E8F0"}`, borderRadius:18, overflow:"hidden", transition:"all 0.2s", cursor:c.comingSoon?"default":"pointer", opacity:c.comingSoon?0.6:1 }}>
                 {/* Photo */}
                 <div style={{ position:"relative", height:160, overflow:"hidden" }}>
                   <img src={c.img} alt={c.title} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
@@ -359,7 +272,7 @@ export default function CoursesPage() {
 
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))", gap:18 }}>
             {COMING_SOON.map((c) => (
-              <div key={c.id} style={{ background:"#fff", border:"1px solid #E2E8F0", borderRadius:24, overflow:"hidden", opacity:.9, boxShadow:"0 12px 30px rgba(15,23,42,.04)" }}>
+              <div key={c.id} style={{ background:"#fff", border:"1px solid #E2E8F0", borderRadius:18, overflow:"hidden", opacity:.9 }}>
                 <img src={c.img} alt={c.title} style={{ width:"100%", height:160, objectFit:"cover" }} />
 
                 <div style={{ padding:"16px 18px 18px" }}>
@@ -390,7 +303,7 @@ export default function CoursesPage() {
         </div>
 
         {/* Bottom CTA */}
-        <div style={{ background:"#0F172A", borderRadius:28, padding:"30px 32px", display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:16 }}>
+        <div style={{ background:"#0F172A", borderRadius:18, padding:"24px 28px", display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:16 }}>
           <div>
             <div style={{ fontFamily:"'Space Mono', monospace", fontSize:10, letterSpacing:"0.16em", textTransform:"uppercase", color:"#F97316", marginBottom:8 }}>Complete the flagship library</div>
             <h3 style={{ fontFamily:"Anton, sans-serif", fontWeight:400, fontSize:"clamp(18px,3vw,28px)", textTransform:"uppercase", color:"#F8F7F4", lineHeight:1 }}>Earn all 5 certificate cards</h3>
