@@ -115,6 +115,8 @@ Playbook SDK
 - supabase/migrations/20260704_store_brand_guided_economy.sql
 - supabase/migrations/20260704_support_messages_actions.sql
 - supabase/migrations/20260704_support_relationships.sql
+- supabase/migrations/20260705_fix_ag_progress_upsert.sql
+- supabase/migrations/20260705_social_comments_reactions.sql
 
 ## Detected Tests
 
@@ -193,6 +195,7 @@ Playbook SDK
 - tests/unit/secure-sharing/secure-sharing.test.ts
 - tests/unit/smoke.test.ts
 - tests/unit/social-core/social-core.test.ts
+- tests/unit/social-interactions/social-interactions.test.ts
 - tests/unit/store-v2/store-v2.test.tsx
 - tests/unit/studio/studio-operations.test.ts
 - tests/unit/studio/studio-tools.test.ts

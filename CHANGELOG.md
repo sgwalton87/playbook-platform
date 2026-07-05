@@ -2067,3 +2067,10 @@ people who can help the scholar act.
 - Social coin ledger entries
 - Real profile role for new posts
 - Feed reaction/comment count loading
+
+## 2026-07-05 21:43
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
