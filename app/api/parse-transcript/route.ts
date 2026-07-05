@@ -13,26 +13,27 @@ const AG_SUBJECTS = [
 
 const PROMPT = [
   "Analyze this student transcript and extract California A-G course completion data.",
-  "Categorize each course: A=History/Social Science, B=English, C=Math(Algebra1+), D=Lab Science, E=World Language, F=Visual/Performing Arts, G=College-prep Elective.",
-  "Count 1-credit year-long courses as 1.0, 0.5-credit semester courses as 0.5.",
-  "Mark in_progress=true if the course appears to be current semester.",
-  "For courses_taken, list the actual course names from the transcript for each category.",
-  'Return ONLY valid JSON with no explanation: {"A":{"years_completed":2,"in_progress":false,"courses_taken":["U.S. History","World History"]},"B":{"years_completed":4,"in_progress":false,"courses_taken":["English 9","English 10","English 11","English 12"]},"C":{"years_completed":3,"in_progress":false,"courses_taken":["Algebra I","Geometry","Algebra II"]},"D":{"years_completed":2,"in_progress":false,"courses_taken":["Biology","Chemistry"]},"E":{"years_completed":2,"in_progress":false,"courses_taken":["Spanish I","Spanish II"]},"F":{"years_completed":1,"in_progress":false,"courses_taken":["Art I"]},"G":{"years_completed":1,"in_progress":false,"courses_taken":["Personal Finance"]}}',
+  "Categorize each course: A=History/Social Science, B=English, C=Math, D=Lab Science, E=World Language, F=Visual/Performing Arts, G=College-prep Elective.",
+  "Count year-long courses as 1.0 and semester courses as 0.5.",
+  "Return ONLY valid JSON.",
+  '{"A":{"years_completed":2,"in_progress":false,"courses_taken":["U.S. History"]},"B":{"years_completed":4,"in_progress":false,"courses_taken":["English 9"]},"C":{"years_completed":3,"in_progress":false,"courses_taken":["Algebra I"]},"D":{"years_completed":2,"in_progress":false,"courses_taken":["Biology"]},"E":{"years_completed":2,"in_progress":false,"courses_taken":["Spanish I"]},"F":{"years_completed":1,"in_progress":false,"courses_taken":["Art"]},"G":{"years_completed":1,"in_progress":false,"courses_taken":["Personal Finance"]}}',
 ].join(" ");
 
 export async function POST(req: NextRequest) {
   try {
     const { base64, mediaType, userId } = await req.json();
-    if (!base64 || !userId) {
-      return NextResponse.json({ error: "Missing data" }, { status: 400 });
+
+    if (!base64 || !mediaType || !userId) {
+      return NextResponse.json({ error: "Missing transcript data." }, { status: 400 });
     }
 
-    const isImage = mediaType.startsWith("image/");
-    const sourceBlock = isImage
-      ? { type: "base64", media_type: mediaType, data: base64 }
-      : { type: "base64", media_type: "application/pdf", data: base64 };
+    const sourceBlock = {
+      type: "base64",
+      media_type: mediaType,
+      data: base64,
+    };
 
-    const contentBlock = isImage
+    const contentBlock = mediaType.startsWith("image/")
       ? { type: "image", source: sourceBlock }
       : { type: "document", source: sourceBlock };
 
@@ -45,69 +46,75 @@ export async function POST(req: NextRequest) {
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-6",
-        max_tokens: 1000,
+        max_tokens: 1200,
         messages: [
           {
             role: "user",
-            content: [
-              contentBlock,
-              { type: "text", text: PROMPT },
-            ],
+            content: [contentBlock, { type: "text", text: PROMPT }],
           },
         ],
       }),
     });
 
     const data = await apiResponse.json();
-    console.log("Claude response:", JSON.stringify(data).slice(0, 500));
 
     if (data.error) {
-      console.error("Claude API error:", data.error);
-      return NextResponse.json({ message: "AI error. Please update manually." });
+      return NextResponse.json(
+        { error: "AI transcript reader failed. Please update A-G manually." },
+        { status: 400 }
+      );
     }
 
     const text = data.content?.[0]?.text || "";
-    console.log("Claude text:", text);
+    const rawJson = text.match(/```json([\s\S]*?)```/)?.[1]?.trim() || text.match(/\{[\s\S]*\}/)?.[0];
 
-    let parsed: Record<string, any> = {};
-    try {
-      const jsonBlock = text.match(/```json([\s\S]*?)```/);
-      const rawJson = jsonBlock ? jsonBlock[1].trim() : text.match(/\{[\s\S]*\}/)?.[0];
-      if (!rawJson) throw new Error("No JSON found");
-      parsed = JSON.parse(rawJson);
-      console.log("Parsed AG data:", JSON.stringify(parsed));
-    } catch {
-      return NextResponse.json({ message: "Could not read transcript. Click each subject to update manually." });
+    if (!rawJson) {
+      return NextResponse.json(
+        { error: "Could not extract A-G JSON from transcript." },
+        { status: 400 }
+      );
     }
+
+    const parsed = JSON.parse(rawJson);
 
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY||(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+      process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
     let agUpdates = 0;
-    for (const s of AG_SUBJECTS) {
-      const val = parsed[s.key];
-      if (val !== undefined) {
-        const { error, data: updateData } = await supabase
-          .from("ag_progress")
-          .update({
-            years_completed: Number(val.years_completed) || 0,
-            in_progress: Boolean(val.in_progress),
-            courses_taken: Array.isArray(val.courses_taken) ? val.courses_taken : [],
-            updated_at: new Date().toISOString(),
-          })
-          .eq("user_id", userId)
-          .eq("subject", s.key)
-          .select();
-        console.log(`Update ${s.key}:`, error||"ok", updateData);
-        if (!error) agUpdates++;
-      }
+
+    for (const subject of AG_SUBJECTS) {
+      const val = parsed[subject.key] || {};
+
+      const payload = {
+        user_id: userId,
+        subject: subject.key,
+        years_required: subject.required,
+        years_completed: Number(val.years_completed) || 0,
+        in_progress: Boolean(val.in_progress),
+        courses_taken: Array.isArray(val.courses_taken) ? val.courses_taken : [],
+        current_course: val.current_course || null,
+        updated_at: new Date().toISOString(),
+      };
+
+      const { data: existing } = await supabase
+        .from("ag_progress")
+        .select("id")
+        .eq("user_id", userId)
+        .eq("subject", subject.key)
+        .maybeSingle();
+
+      const result = existing?.id
+        ? await supabase.from("ag_progress").update(payload).eq("id", existing.id)
+        : await supabase.from("ag_progress").insert(payload);
+
+      if (!result.error) agUpdates++;
     }
 
-    return NextResponse.json({ agUpdates, parsed });
+    return NextResponse.json({ ok: true, agUpdates, parsed });
   } catch (err) {
-    console.error("Error:", err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    console.error("parse-transcript error:", err);
+    return NextResponse.json({ error: "Server error parsing transcript." }, { status: 500 });
   }
 }

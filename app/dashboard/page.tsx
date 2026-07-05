@@ -1,5 +1,6 @@
 "use client";
 
+import AGTracker from "@/components/ag/AGTracker";
 import {
   PlaybookButton,
   PlaybookCard,
@@ -8,79 +9,79 @@ import {
   PlaybookMetric,
   PlaybookMetrics,
   PlaybookPage,
-  PlaybookPill,
 } from "@/components/ui";
 
 export default function DashboardPage() {
-  const nextActions = [
-    { title: "Complete your Scholar Record", href: "/record", status: "active" },
-    { title: "Check unread support messages", href: "/messages", status: "active" },
-    { title: "Review application workspace", href: "/application-workspaces", status: "foundation" },
-    { title: "Open your reward economy", href: "/reward-economy", status: "foundation" },
-  ];
-
   return (
     <PlaybookPage>
       <PlaybookHero
-        eyebrow="Dashboard"
-        title="Your active Playbook command center."
-        subtitle="Start here for next actions, messages, support-network signals, applications, rewards, and Scholar Record progress."
+        eyebrow="Scholar Dashboard"
+        title="Your transcript is the starting point."
+        subtitle="Upload your transcript, see A–G readiness, close gaps with Compass, and activate your support network."
       >
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 18 }}>
-          <PlaybookButton href="/messages">Open Inbox</PlaybookButton>
-          <PlaybookButton href="/notifications" variant="secondary">Notifications</PlaybookButton>
+          <PlaybookButton href="/transcript">Upload Transcript</PlaybookButton>
+          <PlaybookButton href="/compass" variant="secondary">Open Compass Plan</PlaybookButton>
         </div>
       </PlaybookHero>
 
       <PlaybookMetrics>
-        <PlaybookMetric label="Network Health" value="86%" />
-        <PlaybookMetric label="Unread Signals" value="5" />
-        <PlaybookMetric label="Open Actions" value="4" />
-        <PlaybookMetric label="Coins" value="315" />
+        <PlaybookMetric label="Academic Core" value="Active" />
+        <PlaybookMetric label="A-G Tracker" value="Live" />
+        <PlaybookMetric label="Transcript Upload" value="Ready" />
+        <PlaybookMetric label="Next Step" value="Compass" />
       </PlaybookMetrics>
 
-      <PlaybookGrid>
-        <PlaybookCard eyebrow="Next Actions" title="What to do now">
-          {nextActions.map((action) => (
-            <div key={action.title} style={actionRow}>
-              <div>
-                <strong>{action.title}</strong>
-                <div style={{ marginTop: 6 }}>
-                  <PlaybookPill>{action.status}</PlaybookPill>
-                </div>
-              </div>
-              <PlaybookButton href={action.href}>Open</PlaybookButton>
-            </div>
-          ))}
-        </PlaybookCard>
+      <div style={mainGrid}>
+        <section>
+          <AGTracker />
+        </section>
 
-        <PlaybookCard eyebrow="Scholar Network" title="Your support system is connected">
-          <p style={body}>Messages, shared actions, invitations, recommendations, and application support now connect through one ecosystem.</p>
-          <PlaybookButton href="/scholar-network">View Network</PlaybookButton>
-        </PlaybookCard>
+        <section style={sideStack}>
+          <PlaybookCard eyebrow="Start Here" title="Upload your transcript">
+            <p style={body}>
+              This powers A–G readiness, graduation planning, scholar-athlete
+              eligibility, opportunity matching, applications, and support actions.
+            </p>
+            <PlaybookButton href="/transcript">Go to Transcript</PlaybookButton>
+          </PlaybookCard>
 
-        <PlaybookCard eyebrow="Applications" title="Turn your record into opportunity">
-          <p style={body}>Build resumes, brag sheets, recommendations, portfolio packets, PDFs, and workspace checklists.</p>
-          <PlaybookButton href="/opportunity-toolkit">Open Toolkit</PlaybookButton>
-        </PlaybookCard>
-      </PlaybookGrid>
+          <PlaybookCard eyebrow="Compass" title="Turn gaps into action">
+            <p style={body}>
+              After A–G results are visible, Compass will prioritize what needs
+              to happen next and who can help.
+            </p>
+            <PlaybookButton href="/compass">Open Compass</PlaybookButton>
+          </PlaybookCard>
+
+          <PlaybookCard eyebrow="Support Network" title="Do not do this alone">
+            <p style={body}>
+              Invite family, educators, mentors, coaches, and advocates to help
+              close academic and opportunity gaps.
+            </p>
+            <PlaybookButton href="/support-network">Activate Support</PlaybookButton>
+          </PlaybookCard>
+        </section>
+      </div>
     </PlaybookPage>
   );
 }
 
+const mainGrid: React.CSSProperties = {
+  maxWidth: 1180,
+  margin: "0 auto",
+  display: "grid",
+  gridTemplateColumns: "minmax(0, 1.4fr) minmax(280px, .6fr)",
+  gap: 18,
+  alignItems: "start",
+};
+
+const sideStack: React.CSSProperties = {
+  display: "grid",
+  gap: 14,
+};
+
 const body: React.CSSProperties = {
   color: "#64748B",
   lineHeight: 1.6,
-};
-
-const actionRow: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "space-between",
-  gap: 12,
-  alignItems: "center",
-  border: "1px solid #E2E8F0",
-  borderRadius: 16,
-  padding: 14,
-  marginBottom: 10,
-  color: "#0F172A",
 };
