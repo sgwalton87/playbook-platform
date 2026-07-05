@@ -135,7 +135,7 @@ export default function FeedPage() {
     setPosts(prev=>[{
       id:saved?.id||Date.now().toString(),
       author:userName,initials:userInitials,color:T.orange,
-      role:userRole,time:"Just now",
+      role:"Scholar",time:"Just now",
       title:null,content:newPost,
       pillar:"Leadership",pillarColor:T.orange,
       coverImg:imageUrl,likes:0,comments:0,liked:false,isOwn:true,

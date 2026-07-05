@@ -81,7 +81,7 @@ export default function CoreJourneyDashboard({
               >
                 <div style={cardTop}>
                   <div style={number}>{step.order}</div>
-                  <div style={statusPill}>{formatStatus(status)}</div>
+                  <div style={{ ...statusPill, ...getStatusColor(status) }}>{formatStatus(status)}</div>
                 </div>
 
                 <div style={stepIcon}>{step.icon}</div>
@@ -100,6 +100,22 @@ export default function CoreJourneyDashboard({
 
 function formatStatus(status: CoreJourneyStatus) {
   return status.replaceAll("_", " ");
+}
+
+function getStatusColor(status: CoreJourneyStatus) {
+  if (status === "complete" || status === "ready") {
+    return { background: "#ECFDF5", color: "#047857" };
+  }
+
+  if (status === "in_progress") {
+    return { background: "#FFFBEB", color: "#B45309" };
+  }
+
+  if (status === "needs_attention") {
+    return { background: "#FEF2F2", color: "#B91C1C" };
+  }
+
+  return { background: "#F1F5F9", color: "#64748B" };
 }
 
 const page: React.CSSProperties = {
