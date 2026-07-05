@@ -1030,3 +1030,6 @@ Playbook now separates demo, foundation, studio, founder, and active user experi
 
 ## 2026-07-04 19:25
 - Commit recorded: Connect Start Here progress to A-G readiness
+
+## 2026-07-04 20:21
+- Commit recorded: Restore social core community albums mentors events

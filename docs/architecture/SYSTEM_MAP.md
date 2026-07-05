@@ -19,11 +19,13 @@ Playbook SDK
 - app/academic-readiness/page.tsx
 - app/action-routing/page.tsx
 - app/admin/page.tsx
+- app/albums/page.tsx
 - app/application-workspaces/page.tsx
 - app/auth/callback/page.tsx
 - app/badges/page.tsx
 - app/certificates/page.tsx
 - app/collaboration/page.tsx
+- app/community-events/page.tsx
 - app/compass/page.tsx
 - app/connections/page.tsx
 - app/courses/[slug]/page.tsx
@@ -48,6 +50,7 @@ Playbook SDK
 - app/leaderboard/page.tsx
 - app/living-scholar/page.tsx
 - app/login/page.tsx
+- app/mentor-connect/page.tsx
 - app/mentor-os/page.tsx
 - app/mentorship/page.tsx
 - app/messages/[threadId]/page.tsx
@@ -189,6 +192,7 @@ Playbook SDK
 - tests/unit/scholar-record.test.ts
 - tests/unit/secure-sharing/secure-sharing.test.ts
 - tests/unit/smoke.test.ts
+- tests/unit/social-core/social-core.test.ts
 - tests/unit/store-v2/store-v2.test.tsx
 - tests/unit/studio/studio-operations.test.ts
 - tests/unit/studio/studio-tools.test.ts

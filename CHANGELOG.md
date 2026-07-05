@@ -2047,3 +2047,10 @@ people who can help the scholar act.
 - Community Events entry point
 - Dashboard community card
 - Social reward/notification event foundation
+
+## 2026-07-05 20:25
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
