@@ -1200,3 +1200,13 @@ Alpha 1.0 Complete — Intelligence OS foundation finished.
 
 - Archivist v2 ship cycle completed.
 
+
+## 2026-07-04 22:05
+- **commit**: Add feed comment edit delete controls
+
+## 2026-07-05 22:08
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

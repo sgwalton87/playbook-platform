@@ -1039,3 +1039,6 @@ Playbook now separates demo, foundation, studio, founder, and active user experi
 
 ## 2026-07-04 21:56
 - Commit recorded: Display feed comments under posts
+
+## 2026-07-04 22:05
+- Commit recorded: Add feed comment edit delete controls
