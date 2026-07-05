@@ -1024,3 +1024,6 @@ Playbook now separates demo, foundation, studio, founder, and active user experi
 
 ## 2026-07-04 18:56
 - Commit recorded: Restore community heartbeat feed navigation identity
+
+## 2026-07-04 19:05
+- Commit recorded: Fix feed author profile typing
