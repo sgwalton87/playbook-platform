@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import {
   PlaybookButton,
   PlaybookCard,
@@ -9,23 +10,29 @@ import {
   PlaybookPill,
 } from "@/components/ui";
 
-const mentorTypes = [
-  "Mentors",
-  "Teachers",
-  "Counselors",
-  "Coaches",
-  "Administrators",
-  "College reps",
-  "Employers",
-];
+const roles = ["", "mentor", "teacher", "counselor", "coach", "administrator"];
 
 export default function MentorConnectPage() {
+  const [q, setQ] = useState("");
+  const [role, setRole] = useState("");
+  const [mentors, setMentors] = useState<any[]>([]);
+
+  async function load() {
+    const res = await fetch(`/api/mentor-directory?q=${encodeURIComponent(q)}&role=${encodeURIComponent(role)}`);
+    const json = await res.json();
+    setMentors(json.mentors || []);
+  }
+
+  useEffect(() => {
+    load();
+  }, [role]);
+
   return (
     <PlaybookPage>
       <PlaybookHero
         eyebrow="Mentor Connect"
-        title="Find the people who can help."
-        subtitle="Invited mentors, teachers, counselors, coaches, and administrators should become searchable support resources once they join Playbook."
+        title="Find mentors, coaches, teachers, counselors, and administrators."
+        subtitle="Accepted supporters can become searchable directory resources while private scholar data stays permission-protected."
       >
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 18 }}>
           <PlaybookButton href="/invitations">Invite Supporter</PlaybookButton>
@@ -33,27 +40,34 @@ export default function MentorConnectPage() {
         </div>
       </PlaybookHero>
 
-      <PlaybookGrid>
-        <PlaybookCard eyebrow="Support Directory" title="Search by role">
-          {mentorTypes.map((type) => (
-            <p key={type} style={body}>✓ {type}</p>
-          ))}
-          <PlaybookPill>directory foundation</PlaybookPill>
-        </PlaybookCard>
+      <PlaybookCard eyebrow="Search Directory" title="Who can help?">
+        <div style={searchRow}>
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name, organization, expertise..." style={input} />
+          <select value={role} onChange={(e) => setRole(e.target.value)} style={input}>
+            {roles.map((r) => <option key={r} value={r}>{r || "all roles"}</option>)}
+          </select>
+          <button onClick={load} style={button}>Search</button>
+        </div>
+      </PlaybookCard>
 
-        <PlaybookCard eyebrow="How it works" title="Invites build the database">
-          <p style={body}>
-            When a mentor, teacher, admin, coach, or counselor accepts an invite,
-            they should be added to a searchable support directory with their role,
-            organization, and approved visibility.
-          </p>
-        </PlaybookCard>
+      <PlaybookGrid>
+        {mentors.map((person) => (
+          <PlaybookCard key={person.id} eyebrow={person.role} title={person.display_name}>
+            <p style={body}>{person.organization || "Independent supporter"}</p>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {(person.expertise || []).map((x: string) => <PlaybookPill key={x}>{x}</PlaybookPill>)}
+            </div>
+            <div style={{ marginTop: 14 }}>
+              <PlaybookButton href="/invitations">Request Connection</PlaybookButton>
+            </div>
+          </PlaybookCard>
+        ))}
       </PlaybookGrid>
     </PlaybookPage>
   );
 }
 
-const body: React.CSSProperties = {
-  color: "#64748B",
-  lineHeight: 1.6,
-};
+const searchRow: React.CSSProperties = { display: "grid", gridTemplateColumns: "1fr 180px auto", gap: 10 };
+const input: React.CSSProperties = { border: "1px solid #E2E8F0", borderRadius: 12, padding: 12 };
+const button: React.CSSProperties = { border: 0, borderRadius: 12, background: "#0F172A", color: "#F8F7F4", padding: "12px 16px", fontWeight: 900 };
+const body: React.CSSProperties = { color: "#64748B", lineHeight: 1.6 };

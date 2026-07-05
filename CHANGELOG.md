@@ -2095,3 +2095,19 @@ people who can help the scholar act.
 
 - Archivist v2 ship cycle completed.
 
+
+---
+
+# Social Core Sprint III-V — Live Screens
+
+## Added
+
+- Live Albums page
+- Album creation
+- User-scoped photo upload
+- Album photo persistence
+- Live Mentor Connect directory
+- Mentor directory API
+- Live Community Events page
+- Event creation
+- RSVP with coin ledger reward
