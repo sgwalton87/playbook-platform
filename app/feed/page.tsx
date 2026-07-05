@@ -27,6 +27,7 @@ export default function FeedPage() {
   const [lightbox,setLightbox]=useState<string|null>(null);
   const [loading,setLoading]=useState(true);
   const [uploading,setUploading]=useState(false);
+  const [commentsByPost,setCommentsByPost]=useState<Record<string,any[]>>({});
 
   useEffect(()=>{
     (async()=>{
@@ -54,7 +55,24 @@ export default function FeedPage() {
       if(dbPosts&&dbPosts.length>0){
         const postIds=dbPosts.map((p:any)=>p.id);
         const{data:reactionRows}=await supabase.from("feed_post_reactions").select("post_id,user_id").in("post_id",postIds);
-        const{data:commentRows}=await supabase.from("feed_post_comments").select("post_id").in("post_id",postIds);
+        const{data:commentRows}=await supabase.from("feed_post_comments").select("id,post_id,user_id,body,created_at").in("post_id",postIds).order("created_at",{ascending:true});
+        const commentAuthorIds=[...new Set((commentRows||[]).map((c:any)=>c.user_id))];
+        const{data:commentProfiles}=commentAuthorIds.length
+          ? await supabase.from("profiles").select("id,first_name,last_name,full_name,username,role,avatar_url").in("id",commentAuthorIds)
+          : {data:[] as any[]};
+        const commentProfileMap:Record<string,any>={};
+        (commentProfiles||[]).forEach((cp:any)=>{commentProfileMap[cp.id]=cp;});
+        const groupedComments:Record<string,any[]>={};
+        (commentRows||[]).forEach((c:any)=>{
+          const cp=commentProfileMap[c.user_id]||{};
+          const name=cp.full_name||[cp.first_name,cp.last_name].filter(Boolean).join(" ")||cp.username||"Playbook Member";
+          groupedComments[c.post_id]=[
+            ...(groupedComments[c.post_id]||[]),
+            {...c,author:name,role:cp.role||"member"}
+          ];
+        });
+        setCommentsByPost(groupedComments);
+
         const reactionCounts:Record<string,number>={};
         const commentCounts:Record<string,number>={};
         const likedByMe=new Set<string>();
@@ -189,6 +207,8 @@ export default function FeedPage() {
     const body=window.prompt("Write a comment");
     if(!body?.trim())return;
     setPosts(p=>p.map(x=>x.id===id?{...x,comments:x.comments+1}:x));
+    const optimisticComment={id:`local-${Date.now()}`,post_id:id,user_id:userId,body,created_at:new Date().toISOString(),author:userName,role:userRole};
+    setCommentsByPost(current=>({...current,[id]:[...(current[id]||[]),optimisticComment]}));
     await fetch("/api/social/comments",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
@@ -297,6 +317,22 @@ export default function FeedPage() {
                           <button onClick={()=>addComment(post.id)} style={{display:"flex",alignItems:"center",gap:6,fontFamily:T.mono,fontSize:11,fontWeight:700,background:"transparent",border:"none",color:T.faint,cursor:"pointer",padding:0}}>💬 {post.comments}</button>
                           {post.coverImg&&<button onClick={()=>setLightbox(post.coverImg)} style={{display:"flex",alignItems:"center",gap:6,fontFamily:T.mono,fontSize:11,fontWeight:700,background:"transparent",border:"none",color:T.faint,cursor:"pointer",padding:0,marginLeft:"auto"}}>🔍 View</button>}
                         </div>
+
+                        {(commentsByPost[post.id]||[]).length>0&&(
+                          <div style={{marginTop:12,borderTop:`1px solid ${T.line}`,paddingTop:12,display:"grid",gap:8}}>
+                            {(commentsByPost[post.id]||[]).map((comment:any)=>(
+                              <div key={comment.id} style={{background:T.surface2,borderRadius:12,padding:"10px 12px"}}>
+                                <div style={{display:"flex",justifyContent:"space-between",gap:10,marginBottom:4}}>
+                                  <strong style={{fontSize:12,color:T.ink}}>{comment.author}</strong>
+                                  <span style={{fontFamily:T.mono,fontSize:9,color:T.faint}}>
+                                    {new Date(comment.created_at).toLocaleDateString("en-US",{month:"short",day:"numeric"})}
+                                  </span>
+                                </div>
+                                <p style={{fontSize:13,lineHeight:1.5,color:T.muted}}>{comment.body}</p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
