@@ -50,7 +50,7 @@ export default function FeedPage() {
       if(dbPosts&&dbPosts.length>0){
         const authorIds=[...new Set(dbPosts.map((p:any)=>p.user_id))];
         const{data:authorProfiles}=await supabase.from("profiles").select("id,first_name,last_name,full_name,username,role,avatar_url").in("id",authorIds);
-        const profileMap:Record<string,string>={};
+        const profileMap:Record<string,{name:string;role:string;avatar_url:string|null;username:string|null}>={};
         authorProfiles?.forEach((ap:any)=>{
           profileMap[ap.id]={
             name: ap.full_name || [ap.first_name, ap.last_name].filter(Boolean).join(" ") || ap.username || "Scholar",
