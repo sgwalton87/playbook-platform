@@ -82,6 +82,7 @@ Playbook SDK
 - app/studio/beta-33/page.tsx
 - app/studio/beta-34/page.tsx
 - app/studio/beta-34-audit/page.tsx
+- app/studio/connected-journey-qa/page.tsx
 - app/studio/demo-director/page.tsx
 - app/studio/docs/page.tsx
 - app/studio/events/page.tsx
@@ -148,6 +149,7 @@ Playbook SDK
 - tests/unit/collaboration/collaboration.test.tsx
 - tests/unit/community-recovery/community-recovery.test.ts
 - tests/unit/compass/compass-core.test.ts
+- tests/unit/connected-journey/connected-journey.test.ts
 - tests/unit/core-journey/core-journey.test.ts
 - tests/unit/demo/demo-mode.test.tsx
 - tests/unit/demo-case-study/founder-case-study.test.tsx
