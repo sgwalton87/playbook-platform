@@ -167,6 +167,7 @@ Playbook SDK
 - tests/unit/invitations/invitations.test.tsx
 - tests/unit/invite-auth/invite-auth.test.ts
 - tests/unit/journey/first-journey.test.tsx
+- tests/unit/live-social-screens/live-social-screens.test.ts
 - tests/unit/living-scholar/living-scholar.test.tsx
 - tests/unit/mail-gateway/mail-gateway.test.ts
 - tests/unit/messages/inbox-v2.test.tsx

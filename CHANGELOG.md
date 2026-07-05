@@ -2111,3 +2111,10 @@ people who can help the scholar act.
 - Live Community Events page
 - Event creation
 - RSVP with coin ledger reward
+
+## 2026-07-05 22:50
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
