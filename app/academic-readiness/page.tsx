@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
 
 const readinessAreas = [
   {

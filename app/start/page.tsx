@@ -6,6 +6,7 @@ import { PLAYBOOK_QUOTES } from "@/lib/brand-story";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import CoreJourneyDashboard from "@/components/core-journey/CoreJourneyDashboard";
+import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
 
 export default function StartPage() {
   const [statuses, setStatuses] = useState<any>({

@@ -1,6 +1,7 @@
 "use client";
 
 import CompassCoreCard from "@/components/compass/CompassCoreCard";
+import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
 
 const demoCourses = [
   { name: "Biology", subject: "science", credits: 10, grade: "A", completed: true },

@@ -1,6 +1,7 @@
 "use client";
 
 import OpportunityMarketplace from "@/components/opportunity-marketplace/OpportunityMarketplace";
+import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
 
 const demoCourses = [
   { name: "Biology", subject: "science", credits: 10, completed: true },

@@ -6,6 +6,7 @@ import { AG_SUBJECT_NAMES, AG_REQUIREMENTS } from "@/lib/agCourses";
 import { PlaybookStoryBanner, PlaybookQuote } from "@/components/brand-story";
 import { PLAYBOOK_QUOTES, PLAYBOOK_STORY_IMAGES } from "@/lib/brand-story";
 import TranscriptUploadCard from "@/components/transcript/TranscriptUploadCard";
+import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
 
 const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",green:"#10B981",greenL:"#ECFDF5",amber:"#F59E0B",red:"#E24B4A",blue:"#3B82F6",purple:"#8B5CF6",mono:"'Space Mono',monospace",sans:"'Hanken Grotesk',system-ui,sans-serif",anton:"'Anton',sans-serif"};
 
