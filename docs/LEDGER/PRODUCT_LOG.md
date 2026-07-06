@@ -1075,3 +1075,6 @@ Playbook now separates demo, foundation, studio, founder, and active user experi
 
 ## 2026-07-06 11:17
 - Commit recorded: Complete course detail design schema migration
+
+## 2026-07-06 12:04
+- Commit recorded: Add Playbook storytelling banner to transcript

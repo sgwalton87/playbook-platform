@@ -147,6 +147,7 @@ Playbook SDK
 - tests/unit/beta33-journey/beta33-journey.test.ts
 - tests/unit/beta34/beta34.test.tsx
 - tests/unit/beta34-audit/beta34-audit.test.ts
+- tests/unit/brand-story/brand-story.test.ts
 - tests/unit/collaboration/collaboration.test.tsx
 - tests/unit/community-recovery/community-recovery.test.ts
 - tests/unit/compass/compass-core.test.ts

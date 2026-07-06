@@ -1166,3 +1166,13 @@ Alpha 1.0 Complete
 
 ## 2026-07-06 11:17
 - Commit recorded: Complete course detail design schema migration
+
+## 2026-07-06 12:04
+- Commit recorded: Add Playbook storytelling banner to transcript
+
+## 2026-07-06 12:08
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

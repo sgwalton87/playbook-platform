@@ -1313,3 +1313,13 @@ Started Beta 2 — Archivist v3 Unified Ledger Engine and Demo Mode.
 
 ## 2026-07-06 11:17
 - **commit**: Complete course detail design schema migration
+
+## 2026-07-06 12:04
+- **commit**: Add Playbook storytelling banner to transcript
+
+## 2026-07-06 12:08
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
