@@ -1078,3 +1078,6 @@ Playbook now separates demo, foundation, studio, founder, and active user experi
 
 ## 2026-07-06 12:04
 - Commit recorded: Add Playbook storytelling banner to transcript
+
+## 2026-07-06 15:47
+- Commit recorded: Fix AppShell client directive

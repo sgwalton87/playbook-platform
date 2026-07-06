@@ -1323,3 +1323,13 @@ Started Beta 2 — Archivist v3 Unified Ledger Engine and Demo Mode.
 
 - Archivist v2 ship cycle completed.
 
+
+## 2026-07-06 15:47
+- **commit**: Fix AppShell client directive
+
+## 2026-07-06 15:50
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

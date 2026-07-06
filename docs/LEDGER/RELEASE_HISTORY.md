@@ -1176,3 +1176,13 @@ Alpha 1.0 Complete
 
 - Archivist v2 ship cycle completed.
 
+
+## 2026-07-06 15:47
+- Commit recorded: Fix AppShell client directive
+
+## 2026-07-06 15:50
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+
