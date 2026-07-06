@@ -1081,3 +1081,6 @@ Playbook now separates demo, foundation, studio, founder, and active user experi
 
 ## 2026-07-06 15:47
 - Commit recorded: Fix AppShell client directive
+
+## 2026-07-06 16:23
+- Commit recorded: Fix login suspense and complete scholar hero visuals
