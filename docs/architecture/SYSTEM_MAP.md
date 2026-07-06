@@ -84,6 +84,7 @@ Playbook SDK
 - app/studio/beta-34-audit/page.tsx
 - app/studio/connected-journey-qa/page.tsx
 - app/studio/demo-director/page.tsx
+- app/studio/design-schema-audit/page.tsx
 - app/studio/docs/page.tsx
 - app/studio/events/page.tsx
 - app/studio/inspector/page.tsx
@@ -153,6 +154,7 @@ Playbook SDK
 - tests/unit/core-journey/core-journey.test.ts
 - tests/unit/demo/demo-mode.test.tsx
 - tests/unit/demo-case-study/founder-case-study.test.tsx
+- tests/unit/design-schema/design-schema.test.ts
 - tests/unit/design-system/design-system.test.tsx
 - tests/unit/economy/economy-arc.test.tsx
 - tests/unit/email/email.test.ts
