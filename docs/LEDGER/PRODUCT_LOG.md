@@ -1066,3 +1066,6 @@ Playbook now separates demo, foundation, studio, founder, and active user experi
 
 ## 2026-07-05 18:32
 - Commit recorded: Add server-side Z.ai gateway
+
+## 2026-07-05 19:18
+- Commit recorded: Make browser Supabase client build safe
