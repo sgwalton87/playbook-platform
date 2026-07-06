@@ -1163,3 +1163,6 @@ Alpha 1.0 Complete
 
 ## 2026-07-06 10:34
 - Commit recorded: Restore Scholar Record totals and service contract
+
+## 2026-07-06 11:17
+- Commit recorded: Complete course detail design schema migration

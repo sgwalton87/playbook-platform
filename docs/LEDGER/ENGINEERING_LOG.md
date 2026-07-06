@@ -1310,3 +1310,6 @@ Started Beta 2 — Archivist v3 Unified Ledger Engine and Demo Mode.
 
 ## 2026-07-06 10:34
 - **commit**: Restore Scholar Record totals and service contract
+
+## 2026-07-06 11:17
+- **commit**: Complete course detail design schema migration

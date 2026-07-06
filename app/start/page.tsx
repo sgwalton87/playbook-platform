@@ -1,5 +1,8 @@
 "use client";
 
+import { PlaybookQuote } from "@/components/brand-story";
+import { PLAYBOOK_QUOTES } from "@/lib/brand-story";
+
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import CoreJourneyDashboard from "@/components/core-journey/CoreJourneyDashboard";
