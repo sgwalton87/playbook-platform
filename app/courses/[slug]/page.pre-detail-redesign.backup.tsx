@@ -225,26 +225,42 @@ export default function CourseModulePage() {
 
       {toast&&<div style={{position:"fixed",top:20,right:20,zIndex:9999,background:T.navy,color:"#F8F7F4",padding:"13px 18px",borderRadius:14,fontFamily:T.mono,fontSize:12,fontWeight:700,letterSpacing:"0.04em",boxShadow:"0 8px 32px rgba(15,23,42,.35)",maxWidth:380,lineHeight:1.5}}>{toast}</div>}
 
-      <div
-        style={{
-          width: "100%",
-          maxWidth: 1180,
-          margin: "0 auto",
-          padding: "24px 32px 56px",
-        }}
-      >
-        <CourseDetailHeader
-          title={course.title}
-          pillar={course.pillar}
-          pillarColor={course.pillarColor}
-          image={course.img}
-          description={course.desc}
-          completedCount={completedCount}
-          totalModules={totalModules}
-          percent={pct}
-          xpEarned={course.xpPerModule * completedCount}
-          coinsEarned={course.coinsPerModule * completedCount}
-        />
+      {/* Hero */}
+      <div style={{position:"relative",height:260,overflow:"hidden"}}>
+        <img src={course.img} alt={course.title} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+        <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,rgba(15,23,42,.3) 0%,rgba(15,23,42,.88) 100%)"}}/>
+        <div style={{position:"absolute",inset:0,padding:"24px 36px",display:"flex",flexDirection:"column",justifyContent:"space-between"}}>
+          <button onClick={()=>router.push("/courses")} style={{fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:"rgba(255,255,255,.12)",backdropFilter:"blur(8px)",border:"1px solid rgba(255,255,255,.2)",color:"#F8F7F4",borderRadius:999,padding:"8px 16px",cursor:"pointer",alignSelf:"flex-start"}}>← Back to courses</button>
+          <div>
+            <span style={{fontFamily:T.mono,fontSize:9,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",background:course.pillarColor,color:"#fff",padding:"4px 10px",borderRadius:999,display:"inline-block",marginBottom:10}}>{course.pillar}</span>
+            <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:"clamp(28px,5vw,52px)",textTransform:"uppercase",color:"#F8F7F4",lineHeight:.95,marginBottom:8}}>{course.title}</h1>
+            <p style={{fontSize:13,color:"rgba(248,247,244,.7)",maxWidth:"52ch",lineHeight:1.6}}>{course.desc}</p>
+          </div>
+        </div>
+      </div>
+
+      <div style={{maxWidth:960,margin:"0 auto",padding:"24px 36px"}}>
+
+        {/* Progress bar */}
+        <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:16,padding:"18px 22px",marginBottom:18}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10,flexWrap:"wrap",gap:10}}>
+            <div>
+              <span style={{fontSize:14,fontWeight:700,color:T.ink}}>Your progress</span>
+              <span style={{fontFamily:T.mono,fontSize:11,color:T.muted,marginLeft:12}}>{completedCount}/{totalModules} modules complete</span>
+            </div>
+            <div style={{display:"flex",gap:14}}>
+              <span style={{fontFamily:T.mono,fontSize:11,color:T.orange}}>+{course.xpPerModule*completedCount} XP earned</span>
+              <span style={{fontFamily:T.mono,fontSize:11,color:T.amber}}>+{course.coinsPerModule*completedCount} coins</span>
+            </div>
+          </div>
+          <div style={{background:T.line,borderRadius:999,height:8,overflow:"hidden",marginBottom:6}}>
+            <div style={{background:`linear-gradient(90deg,${T.orange},${T.amber})`,height:"100%",width:`${pct}%`,borderRadius:999,transition:"width 0.6s ease"}}/>
+          </div>
+          <div style={{display:"flex",justifyContent:"space-between"}}>
+            <span style={{fontFamily:T.mono,fontSize:10,color:T.faint}}>{pct}% complete</span>
+            {!isComplete&&<span style={{fontFamily:T.mono,fontSize:10,color:T.orange}}>+{course.xpPerModule*(totalModules-completedCount)} XP remaining</span>}
+          </div>
+        </div>
 
         {/* Certificate claim */}
         {isComplete&&(
