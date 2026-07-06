@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
+import { PlaybookHeroVisual } from "@/components/brand-story";
 
 const readinessAreas = [
   {
@@ -50,6 +51,12 @@ const readinessAreas = [
 
 export default function AcademicReadinessPage() {
   return (
+    <>
+      <PlaybookHeroVisual
+        image={PLAYBOOK_HERO_VISUALS.academicReadiness.image}
+        alt={PLAYBOOK_HERO_VISUALS.academicReadiness.alt}
+      />
+
     <main style={page}>
       <section style={hero}>
         <div style={eyebrow}>ACADEMIC READINESS</div>
@@ -105,6 +112,7 @@ export default function AcademicReadinessPage() {
         </div>
       </section>
     </main>
+    </>
   );
 }
 

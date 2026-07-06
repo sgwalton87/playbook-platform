@@ -5,6 +5,12 @@ import { usePathname, useRouter } from "next/navigation";
 import { shouldUseAppShell } from "@/lib/app-shell";
 import { getNavigationForRole } from "@/lib/core-journey/navigation";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
+import { supabase } from "@/lib/supabaseClient";
+
+async function handleSignOut() {
+  await supabase.auth.signOut();
+  window.location.href = "/login";
+}
 
 export default function UnifiedAppShell({
   children,
@@ -56,6 +62,23 @@ export default function UnifiedAppShell({
               </Link>
             );
           })}
+        
+          <button
+            onClick={handleSignOut}
+            style={{
+              background:"#FFFFFF",
+              color:"#0F172A",
+              border:"1px solid rgba(15,23,42,.15)",
+              borderRadius:999,
+              padding:"10px 14px",
+              fontWeight:900,
+              cursor:"pointer",
+              marginTop:8
+            }}
+          >
+            Sign Out
+          </button>
+
         </nav>
 
         {founderNav.length > 0 && (
