@@ -12,7 +12,15 @@ describe("Design Schema Audit", () => {
   });
 
   it("tracks legacy pages", () => {
-    expect(getLegacyDesignRoutes().some((route) => route.route === "/courses/[slug]")).toBe(true);
+    expect(getLegacyDesignRoutes()).toEqual([]);
+  });
+
+  it("classifies redesigned course detail as current schema", () => {
+    const courseDetail = getDesignSchemaRoutes().find(
+      (route) => route.route === "/courses/[slug]"
+    );
+
+    expect(courseDetail?.status).toBe("Current Schema");
   });
 
   it("summarizes schema statuses", () => {

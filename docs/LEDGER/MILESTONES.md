@@ -1307,3 +1307,6 @@ Alpha 1.0 Complete — Intelligence OS foundation finished.
 
 - Archivist v2 ship cycle completed.
 
+
+## 2026-07-06 10:34
+- **commit**: Restore Scholar Record totals and service contract

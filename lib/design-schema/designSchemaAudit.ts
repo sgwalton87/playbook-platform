@@ -18,7 +18,7 @@ export function getDesignSchemaRoutes(): DesignSchemaRoute[] {
     { route: "/mentor-connect", label: "Mentor Connect", status: "Current Schema", notes: "Matches current Playbook hero/card schema." },
     { route: "/community-events", label: "Community Events", status: "Current Schema", notes: "Live event foundation." },
     { route: "/courses", label: "Courses", status: "Current Schema", notes: "Library page updated; detail page next." },
-    { route: "/courses/[slug]", label: "Course Detail", status: "Legacy Schema", notes: "Next visual refactor target." },
+    { route: "/courses/[slug]", label: "Course Detail", status: "Current Schema", notes: "Uses CourseDetailHeader and preserves course progress, rewards, certificates, and modules." },
     { route: "/u/[username]", label: "Public Profile", status: "Special Experience", notes: "Profile/story surface; should be branded but can have richer custom layout." },
     { route: "/demo", label: "Founder Demo", status: "Special Experience", notes: "Investor/district storytelling mode." },
     { route: "/admin/moderation", label: "Moderation", status: "Current Schema", notes: "Trust queue." },

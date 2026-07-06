@@ -1069,3 +1069,6 @@ Playbook now separates demo, foundation, studio, founder, and active user experi
 
 ## 2026-07-05 19:18
 - Commit recorded: Make browser Supabase client build safe
+
+## 2026-07-06 10:34
+- Commit recorded: Restore Scholar Record totals and service contract

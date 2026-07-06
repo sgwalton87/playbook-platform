@@ -1160,3 +1160,6 @@ Alpha 1.0 Complete
 
 - Archivist v2 ship cycle completed.
 
+
+## 2026-07-06 10:34
+- Commit recorded: Restore Scholar Record totals and service contract
