@@ -1133,3 +1133,13 @@ Alpha 1.0 Complete
 
 - Archivist v2 ship cycle completed.
 
+
+## 2026-07-05 18:32
+- Commit recorded: Add server-side Z.ai gateway
+
+## 2026-07-06 18:34
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

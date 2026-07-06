@@ -1280,3 +1280,13 @@ Started Beta 2 — Archivist v3 Unified Ledger Engine and Demo Mode.
 
 - Archivist v2 ship cycle completed.
 
+
+## 2026-07-05 18:32
+- **commit**: Add server-side Z.ai gateway
+
+## 2026-07-06 18:34
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

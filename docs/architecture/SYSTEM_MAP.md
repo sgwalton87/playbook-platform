@@ -220,3 +220,4 @@ Playbook SDK
 - tests/unit/tutorial/tutorial.test.tsx
 - tests/unit/visual-qa/visual-qa.test.ts
 - tests/unit/workflows/support-workflow.test.tsx
+- tests/unit/zai/zai.test.ts

@@ -1063,3 +1063,6 @@ Playbook now separates demo, foundation, studio, founder, and active user experi
 
 ## 2026-07-05 17:20
 - Commit recorded: Add design schema audit foundation
+
+## 2026-07-05 18:32
+- Commit recorded: Add server-side Z.ai gateway
