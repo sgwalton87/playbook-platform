@@ -1,34 +1,55 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabaseClient";
-import { evaluateCampaignReadiness } from "@/lib/brand-partners";
+import { createClient } from "@supabase/supabase-js";
+
+function getSupabaseAdmin() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
 export async function POST(req: NextRequest) {
-  const body = await req.json();
+  try {
+    const supabase = getSupabaseAdmin();
+    const body = await req.json();
 
-  const readiness = evaluateCampaignReadiness({
-    status: body.status || "review",
-    deliverables: body.deliverables || [],
-    disclosureApproved: body.disclosureApproved || false,
-    athleteApproved: body.athleteApproved || false,
-  });
+    const { data, error } = await supabase
+      .from("nil_store_campaigns")
+      .insert({
+        partner_id: body.partnerId,
+        athlete_profile_id: body.athleteProfileId,
+        product_id: body.productId,
+        title: body.title,
+        description: body.description || null,
+        status: body.status || "draft",
+      })
+      .select()
+      .single();
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
+    return NextResponse.json({ ok: true, campaign: data });
+  } catch {
+    return NextResponse.json(
+      { error: "Unable to create campaign." },
+      { status: 500 }
+    );
+  }
+}
+
+export async function GET() {
+  const supabase = getSupabaseAdmin();
 
   const { data, error } = await supabase
     .from("nil_store_campaigns")
-    .insert({
-      partner_id: body.partnerId,
-      store_product_id: body.storeProductId,
-      scholar_id: body.scholarId,
-      athlete_profile_id: body.athleteProfileId,
-      nil_deal_id: body.nilDealId,
-      status: body.status || "review",
-      deliverables: body.deliverables || [],
-      disclosure_approved: body.disclosureApproved || false,
-      athlete_approved: body.athleteApproved || false,
-    })
-    .select()
-    .single();
+    .select("*")
+    .order("created_at", { ascending: false });
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 400 });
+  }
 
-  return NextResponse.json({ ok: true, campaign: data, readiness });
+  return NextResponse.json({ campaigns: data || [] });
 }

@@ -1,13 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabaseClient";
 import { routeMailToPlaybook, type MailGatewayChannel } from "@/lib/mail-gateway";
 import {
   buildSupportMessageRecord,
   suggestActionUpdateFromMessage,
 } from "@/lib/support-network-live/server";
 import { bridgeMailToConversation } from "@/lib/messages";
+import { createClient } from "@supabase/supabase-js";
+
+function getSupabaseAdmin() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
 export async function POST(req: NextRequest) {
+  const supabase = getSupabaseAdmin();
+
   const secret = req.headers.get("x-playbook-mail-secret");
 
   if (process.env.MAIL_GATEWAY_SECRET && secret !== process.env.MAIL_GATEWAY_SECRET) {
