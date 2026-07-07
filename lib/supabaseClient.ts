@@ -14,8 +14,8 @@ export const supabase = createBrowserClient(
   supabaseAnonKey || "placeholder-anon-key",
   {
     auth: {
-      persistSession: false,
-      autoRefreshToken: false,
+      persistSession: true,
+      autoRefreshToken: true,
       detectSessionInUrl: true,
     },
   }

@@ -1,24 +1,81 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { getPathway, normalizeRole } from "@/lib/onboarding/pathwayMap";
 
 export default function AuthCallbackPage() {
-  const router = useRouter();
+  return (
+    <Suspense fallback={<main style={{ padding: 40 }}>Confirming...</main>}>
+      <AuthCallbackContent />
+    </Suspense>
+  );
+}
+
+function AuthCallbackContent() {
+  const params = useSearchParams();
 
   useEffect(() => {
-    async function handleCallback() {
-      await supabase.auth.getSession();
-      router.replace("/onboarding");
+    async function finishAuth() {
+      const code = params.get("code");
+
+      if (code) {
+        const { error } = await supabase.auth.exchangeCodeForSession(code);
+        if (error) {
+          console.error("Auth callback exchange failed:", error.message);
+          window.location.href = `/login?error=${encodeURIComponent(error.message)}`;
+          return;
+        }
+      }
+
+      const { data, error } = await supabase.auth.getUser();
+
+      if (error || !data.user) {
+        console.error("No user after confirmation:", error?.message);
+        window.location.href = "/login";
+        return;
+      }
+
+      const role = normalizeRole(
+        data.user.user_metadata?.profile_mode ||
+        data.user.user_metadata?.role ||
+        data.user.user_metadata?.requested_role ||
+        "scholar"
+      );
+
+      const { data: existing } = await supabase
+        .from("profiles")
+        .select("id,onboarding_completed")
+        .eq("id", data.user.id)
+        .maybeSingle();
+
+      await supabase.from("profiles").upsert(
+        {
+          id: data.user.id,
+          email: data.user.email,
+          role,
+          profile_mode: role,
+          requested_role: role,
+          verification_status: "email_confirmed",
+          onboarding_completed: existing?.onboarding_completed || false,
+        },
+        { onConflict: "id" }
+      );
+
+      if (existing?.onboarding_completed) {
+        window.location.href = getPathway(role).osRoute;
+      } else {
+        window.location.href = `/start?first=1&role=${encodeURIComponent(role)}`;
+      }
     }
 
-    handleCallback();
-  }, [router]);
+    finishAuth();
+  }, [params]);
 
   return (
     <main style={{ padding: 40 }}>
-      <p>Signing you in...</p>
+      Confirming your email and opening your Playbook...
     </main>
   );
 }

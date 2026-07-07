@@ -12,6 +12,17 @@ async function handleSignOut() {
   window.location.href = "/login";
 }
 
+const AUTH_FULLSCREEN_ROUTES = [
+  "/",
+  "/login",
+  "/check-email",
+  "/start",
+  "/auth/callback",
+  "/pending",
+  "/role-select",
+  "/reset-password"
+];
+
 export default function UnifiedAppShell({
   children,
 }: {
@@ -31,6 +42,10 @@ export default function UnifiedAppShell({
   const navigation = getNavigationForRole(profile?.role);
   const primaryNav = navigation.primary;
   const founderNav = navigation.founder;
+
+  if (AUTH_FULLSCREEN_ROUTES.some((route) => pathname === route || pathname.startsWith(route + "/"))) {
+    return <>{children}</>;
+  }
 
   return (
     <div style={shell}>
