@@ -24,12 +24,15 @@ Playbook SDK
 - app/application-workspaces/page.tsx
 - app/auth/callback/page.tsx
 - app/badges/page.tsx
+- app/brand-partner-os/page.tsx
 - app/certificates/page.tsx
+- app/check-email/page.tsx
 - app/collaboration/page.tsx
 - app/community-events/page.tsx
 - app/compass/page.tsx
 - app/connections/page.tsx
 - app/courses/[slug]/page.tsx
+- app/courses/community-safety-no-bullying/page.tsx
 - app/courses/page.tsx
 - app/dashboard/page.tsx
 - app/demo/founder-case-study/page.tsx
@@ -124,6 +127,8 @@ Playbook SDK
 - supabase/migrations/20260705_social_comments_reactions.sql
 - supabase/migrations/20260705_social_comments_reactions_fix.sql
 - supabase/migrations/20260705_social_safety_trust.sql
+- supabase/migrations/202607070001_profile_onboarding_flow.sql
+- supabase/migrations/202607070002_onboarding_options.sql
 
 ## Detected Tests
 

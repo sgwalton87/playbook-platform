@@ -1346,3 +1346,13 @@ Started Beta 2 — Archivist v3 Unified Ledger Engine and Demo Mode.
 
 ## 2026-07-07 01:00
 - **commit**: Stabilize onboarding role routing foundation
+
+## 2026-07-07 02:16
+- **commit**: Activate brand partner OS and update release ledgers
+
+## 2026-07-07 02:18
+
+- Documentation changed: 5
+
+- Archivist v2 ship cycle completed.
+

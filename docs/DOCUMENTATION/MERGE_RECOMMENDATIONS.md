@@ -36,6 +36,7 @@ Files:
 - docs/ARCHIVIST/SHIP_2026-07-04.md
 - docs/ARCHIVIST/SHIP_2026-07-05.md
 - docs/ARCHIVIST/SHIP_2026-07-06.md
+- docs/ARCHIVIST/SHIP_2026-07-07.md
 - docs/BOARD/README.md
 - docs/COMPANY/OPERATING_SYSTEM.md
 - docs/COMPANY/README.md
@@ -101,6 +102,7 @@ Files:
 - docs/USER_JOURNEYS.md
 - docs/WHY_NOT.md
 - docs/WHY_NOTS/README.md
+- docs/archives/2026-07-07-implementation-archive.md
 - docs/sprints/ALPHA_0.6_PLAYBOOK_GRAPH_AND_EVENT_BUS.md
 
 ## architecture
@@ -135,6 +137,7 @@ Files:
 - docs/CHANGELOG.md
 - docs/DEPRECATED/RELEASES_README.md
 - docs/LEDGER/RELEASE_HISTORY.md
+- docs/releases/2026-07-07-onboarding-profile-os-release.md
 - docs/releases/ALPHA_0.1.md
 - docs/releases/BETA_3.3_COMPLETE.md
 - docs/releases/BETA_3.3_OPPORTUNITY_APPLICATION_TOOLKIT.md
@@ -180,6 +183,8 @@ Files:
 - docs/HISTORY/DAILY_LOGS/2026-07-04.md
 - docs/HISTORY/DAILY_LOGS/2026-07-05.md
 - docs/HISTORY/DAILY_LOGS/2026-07-06.md
+- docs/HISTORY/DAILY_LOGS/2026-07-07.md
+- docs/LEDGER/2026-07-07-build-ledger.md
 - docs/LEDGER/ENGINEERING_LOG.md
 - docs/LEDGER/FOUNDER_JOURNAL.md
 - docs/LEDGER/INNOVATION_LEDGER.md
@@ -234,4 +239,5 @@ Files:
 - docs/HISTORY/FOUNDERS_JOURNAL/Volume_3_Building_the_OS.md
 - docs/HISTORY/PLAYBOOK_HISTORY.md
 - docs/PLAYBOOK_HISTORY.md
+- docs/journal/2026-07-07-builder-journal.md
 
