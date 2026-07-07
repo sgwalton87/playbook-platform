@@ -18,21 +18,36 @@ function AuthCallbackContent() {
 
   useEffect(() => {
     async function finishAuth() {
-      const code = params.get("code");
+      const tokenHash = params.get("token_hash");
+      const type = params.get("type") || "email";
 
-      if (code) {
-        const { error } = await supabase.auth.exchangeCodeForSession(code);
+      if (tokenHash) {
+        const { error } = await supabase.auth.verifyOtp({
+          token_hash: tokenHash,
+          type: type as any,
+        });
+
         if (error) {
-          console.error("Auth callback exchange failed:", error.message);
+          console.error("Auth token verification failed:", error.message);
           window.location.href = `/login?error=${encodeURIComponent(error.message)}`;
           return;
+        }
+      } else {
+        const code = params.get("code");
+
+        if (code) {
+          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          if (error) {
+            console.error("Auth callback exchange failed:", error.message);
+            window.location.href = `/login?error=${encodeURIComponent(error.message)}`;
+            return;
+          }
         }
       }
 
       const { data, error } = await supabase.auth.getUser();
 
       if (error || !data.user) {
-        console.error("No user after confirmation:", error?.message);
         window.location.href = "/login";
         return;
       }
@@ -46,7 +61,7 @@ function AuthCallbackContent() {
 
       const { data: existing } = await supabase
         .from("profiles")
-        .select("id,onboarding_completed")
+        .select("id,onboarding_completed,profile_mode,role")
         .eq("id", data.user.id)
         .maybeSingle();
 
@@ -54,7 +69,7 @@ function AuthCallbackContent() {
         {
           id: data.user.id,
           email: data.user.email,
-          role,
+          role: role,
           profile_mode: role,
           requested_role: role,
           verification_status: "email_confirmed",
@@ -64,7 +79,7 @@ function AuthCallbackContent() {
       );
 
       if (existing?.onboarding_completed) {
-        window.location.href = getPathway(role).osRoute;
+        window.location.href = getPathway(existing.profile_mode || existing.role || role).osRoute;
       } else {
         window.location.href = `/start?first=1&role=${encodeURIComponent(role)}`;
       }

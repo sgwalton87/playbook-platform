@@ -1084,3 +1084,6 @@ Playbook now separates demo, foundation, studio, founder, and active user experi
 
 ## 2026-07-06 16:23
 - Commit recorded: Fix login suspense and complete scholar hero visuals
+
+## 2026-07-07 01:00
+- Commit recorded: Stabilize onboarding role routing foundation

@@ -1196,3 +1196,6 @@ Alpha 1.0 Complete
 
 - Archivist v2 ship cycle completed.
 
+
+## 2026-07-07 01:00
+- Commit recorded: Stabilize onboarding role routing foundation
