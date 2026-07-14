@@ -7,6 +7,49 @@ import { supabase } from "@/lib/supabaseClient";
 import { getOnboardingSteps, ALL_COLLEGE_OPTIONS, CAREER_OPTIONS, ACTIVITY_OPTIONS, CALIFORNIA_DISTRICTS } from "@/lib/onboarding";
 import { getPathway, normalizeRole } from "@/lib/onboarding/pathwayMap";
 import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
+import {
+  page,
+  hero,
+  heroText,
+  heroImageWrap,
+  heroImage,
+  eyebrow,
+  heroTitle,
+  heroBody,
+  progressWrap,
+  stepPill,
+  card,
+  formEyebrow,
+  formTitle,
+  formBody,
+  fields,
+  label,
+  input,
+  actions,
+  primary,
+  secondary,
+  group,
+  sectionLabel,
+  miniGrid,
+  chipGrid,
+  chip,
+  avatarRow,
+  avatar,
+  avatarImg,
+  uploadButton,
+  overlay,
+  overlayTitle,
+  overlayText,
+  confetti,
+  activityCategoryGrid,
+  activityCategory,
+  addRow,
+  summaryList,
+  summaryItem,
+  removeButton,
+  safetyBox,
+  agreeRow
+} from "@/components/onboarding/onboardingStyles";
 
 export default function StartPage() {
   return (
@@ -652,108 +695,3 @@ function FieldRenderer({ field, value, onChange, onBlur }: any) {
     </label>
   );
 }
-
-const page: React.CSSProperties = { minHeight: "100vh", background: "#F8F7F4", color: "#0F172A", padding: 24 };
-const hero: React.CSSProperties = { maxWidth: 1280, margin: "0 auto 22px", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(340px,1fr))", background: "#0F172A", borderRadius: 34, overflow: "hidden" };
-const heroText: React.CSSProperties = { padding: "clamp(26px,4vw,52px)", display: "flex", flexDirection: "column", justifyContent: "center" };
-const heroImageWrap: React.CSSProperties = { minHeight: 330 };
-const heroImage: React.CSSProperties = { width: "100%", height: "100%", objectFit: "cover", display: "block" };
-const eyebrow: React.CSSProperties = { marginTop: 18, fontFamily: "'Space Mono', monospace", fontSize: 11, fontWeight: 900, letterSpacing: ".18em", textTransform: "uppercase", color: "#F97316" };
-const heroTitle: React.CSSProperties = { fontFamily: "'Anton', sans-serif", fontSize: "clamp(38px,5.5vw,68px)", lineHeight: .92, color: "#F8F7F4", textTransform: "uppercase", margin: "10px 0 18px" };
-const heroBody: React.CSSProperties = { fontSize: 19, lineHeight: 1.45, color: "rgba(248,247,244,.76)", fontWeight: 700 };
-const progressWrap: React.CSSProperties = { maxWidth: 1280, margin: "0 auto 22px", display: "flex", gap: 10, overflowX: "auto" };
-const stepPill = (active: boolean): React.CSSProperties => ({ border: active ? "1px solid #F97316" : "1px solid #E2E8F0", background: active ? "#FFF7ED" : "#FFFFFF", borderRadius: 999, padding: "10px 14px", display: "flex", gap: 8, alignItems: "center", flexShrink: 0 });
-const card: React.CSSProperties = { maxWidth: 920, margin: "0 auto", background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 30, padding: "clamp(28px,5vw,58px)", boxShadow: "0 18px 42px rgba(15,23,42,.08)" };
-const formEyebrow: React.CSSProperties = { fontFamily: "'Space Mono', monospace", fontSize: 10, fontWeight: 900, letterSpacing: ".16em", textTransform: "uppercase", color: "#F97316", margin: 0 };
-const formTitle: React.CSSProperties = { fontSize: "clamp(34px,5vw,58px)", lineHeight: 1, margin: "8px 0" };
-const formBody: React.CSSProperties = { fontSize: 19, color: "#64748B", lineHeight: 1.5 };
-const fields: React.CSSProperties = { display: "grid", gap: 16, marginTop: 18 };
-const label: React.CSSProperties = { display: "grid", gap: 8, fontWeight: 900 };
-const input: React.CSSProperties = { border: "1px solid #CBD5E1", borderRadius: 16, padding: "15px 18px", fontSize: 18, width: "100%" };
-const actions: React.CSSProperties = { display: "flex", gap: 12, flexWrap: "wrap", marginTop: 24 };
-const primary: React.CSSProperties = { border: "none", borderRadius: 999, background: "#F97316", color: "#FFFFFF", padding: "15px 24px", fontWeight: 950, cursor: "pointer" };
-const secondary: React.CSSProperties = { border: "1px solid #CBD5E1", borderRadius: 999, background: "#FFFFFF", color: "#0F172A", padding: "15px 22px", fontWeight: 950, cursor: "pointer" };
-const group: React.CSSProperties = { display: "grid", gap: 10 };
-const sectionLabel: React.CSSProperties = { fontFamily: "'Space Mono', monospace", fontSize: 10, fontWeight: 900, letterSpacing: ".14em", color: "#64748B", textTransform: "uppercase" };
-const miniGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(230px,1fr))", gap: 10 };
-const chipGrid: React.CSSProperties = { display: "flex", flexWrap: "wrap", gap: 8 };
-const chip = (active: boolean): React.CSSProperties => ({ border: active ? "1px solid #F97316" : "1px solid #CBD5E1", background: active ? "#FFF7ED" : "#FFFFFF", color: active ? "#F97316" : "#0F172A", borderRadius: 999, padding: "10px 14px", fontWeight: 900, cursor: "pointer" });
-const avatarRow: React.CSSProperties = { display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" };
-const avatar: React.CSSProperties = { width: 86, height: 86, borderRadius: 999, background: "#E2E8F0", display: "grid", placeItems: "center", overflow: "hidden", fontSize: 28 };
-const avatarImg: React.CSSProperties = { width: "100%", height: "100%", objectFit: "cover" };
-const uploadButton: React.CSSProperties = { border: "1px solid #CBD5E1", borderRadius: 999, padding: "12px 18px", fontWeight: 950, cursor: "pointer" };
-const overlay: React.CSSProperties = { position: "fixed", inset: 0, zIndex: 9999, background: "rgba(15,23,42,.94)", color: "#F8F7F4", display: "grid", placeItems: "center", textAlign: "center", padding: 24 };
-const overlayTitle: React.CSSProperties = { fontFamily: "'Anton', sans-serif", fontSize: "clamp(44px,7vw,86px)", textTransform: "uppercase", margin: 0 };
-const overlayText: React.CSSProperties = { fontSize: 22, color: "rgba(248,247,244,.75)" };
-const confetti: React.CSSProperties = { fontSize: 38, marginBottom: 16 };
-
-const activityCategoryGrid: React.CSSProperties = {
-  display: "flex",
-  gap: 8,
-  flexWrap: "wrap",
-  marginBottom: 8,
-};
-
-const activityCategory: React.CSSProperties = {
-  border: "1px solid #CBD5E1",
-  background: "#FFFFFF",
-  borderRadius: 999,
-  padding: "10px 14px",
-  fontWeight: 900,
-  cursor: "pointer",
-};
-
-const addRow: React.CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "1fr auto",
-  gap: 10,
-};
-
-const summaryList: React.CSSProperties = {
-  display: "grid",
-  gap: 10,
-  marginTop: 10,
-};
-
-const summaryItem: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  gap: 12,
-  border: "1px solid #E2E8F0",
-  borderRadius: 14,
-  padding: "12px 14px",
-  background: "#F8FAFC",
-  fontWeight: 900,
-};
-
-const removeButton: React.CSSProperties = {
-  border: "none",
-  background: "transparent",
-  color: "#F97316",
-  fontWeight: 950,
-  cursor: "pointer",
-};
-
-const safetyBox: React.CSSProperties = {
-  maxHeight: 360,
-  overflowY: "auto",
-  border: "1px solid #CBD5E1",
-  borderRadius: 20,
-  padding: 20,
-  background: "#F8FAFC",
-  color: "#334155",
-  lineHeight: 1.55,
-};
-
-const agreeRow: React.CSSProperties = {
-  display: "flex",
-  gap: 12,
-  alignItems: "center",
-  fontSize: 18,
-  fontWeight: 950,
-  background: "#FFF7ED",
-  border: "1px solid #FED7AA",
-  borderRadius: 18,
-  padding: 16,
-};
