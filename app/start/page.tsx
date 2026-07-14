@@ -5,8 +5,8 @@ import { useSearchParams } from "next/navigation";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import { supabase } from "@/lib/supabaseClient";
 import { getOnboardingSteps, ALL_COLLEGE_OPTIONS, CAREER_OPTIONS, ACTIVITY_OPTIONS, CALIFORNIA_DISTRICTS } from "@/lib/onboarding";
-import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
 import { getPathway, normalizeRole } from "@/lib/onboarding/pathwayMap";
+import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
 
 export default function StartPage() {
   return (

@@ -1,16 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { shouldUseAppShell } from "@/lib/app-shell";
 import { getNavigationForRole } from "@/lib/core-journey/navigation";
+import { getRoleNavigation } from "@/lib/navigation";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
+import ProfileAvatar from "@/components/ProfileAvatar";
 import { supabase } from "@/lib/supabaseClient";
-
-async function handleSignOut() {
-  await supabase.auth.signOut();
-  window.location.href = "/login";
-}
 
 const AUTH_FULLSCREEN_ROUTES = [
   "/",
@@ -20,48 +18,101 @@ const AUTH_FULLSCREEN_ROUTES = [
   "/auth/callback",
   "/pending",
   "/role-select",
-  "/reset-password"
+  "/reset-password",
 ];
 
-export default function UnifiedAppShell({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function UnifiedAppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [profile, setProfile] = useState<any>(null);
+  const [open, setOpen] = useState(true);
 
-  if (!shouldUseAppShell(pathname || "/")) {
-    return <>{children}</>;
-  }
+  useEffect(() => {
+    async function loadProfile() {
+      const { data: u } = await supabase.auth.getUser();
 
-  // Later this should come from the authenticated user's profile.
-  // For now Founder gets both scholar journey + Founder Tools.
-  const profile = { role: "founder" };
+      if (!u.user) return;
 
-  const navigation = getNavigationForRole(profile?.role);
-  const primaryNav = navigation.primary;
-  const founderNav = navigation.founder;
+      const { data } = await supabase
+        .from("profiles")
+        .select("id,full_name,first_name,last_name,username,avatar_url,role,profile_mode")
+        .eq("id", u.user.id)
+        .maybeSingle();
+
+      setProfile(data);
+    }
+
+    loadProfile();
+  }, []);
+
+  const roleNav = useMemo(
+    () => getRoleNavigation(profile?.profile_mode, profile?.role),
+    [profile?.profile_mode, profile?.role]
+  );
+
+  const founderNav = useMemo(() => {
+    const base = getNavigationForRole(profile?.role || profile?.profile_mode || "");
+    return profile?.role === "founder" || profile?.profile_mode === "founder"
+      ? base.founder
+      : [];
+  }, [profile?.role, profile?.profile_mode]);
+
+  if (!shouldUseAppShell(pathname || "/")) return <>{children}</>;
 
   if (AUTH_FULLSCREEN_ROUTES.some((route) => pathname === route || pathname.startsWith(route + "/"))) {
     return <>{children}</>;
   }
 
+  async function handleSignOut() {
+    await supabase.auth.signOut();
+    window.location.href = "/login";
+  }
+
+  const displayName =
+    profile?.full_name ||
+    `${profile?.first_name || ""} ${profile?.last_name || ""}`.trim() ||
+    profile?.username ||
+    "Playbook User";
+
   return (
-    <div style={shell}>
+    <div
+      style={{
+        ...shell,
+        gridTemplateColumns: open ? "280px 1fr" : "86px 1fr",
+      }}
+    >
       <aside style={sidebar} data-playbook-sidebar="true">
-        <Link href="/start" style={brand}>
-          <PlaybookLogo size={46} priority />
-          <span>
-            <strong>Playbook OS</strong>
-            <small style={brandSub}>Scholar Journey</small>
-          </span>
+        <button
+          onClick={() => setOpen((v) => !v)}
+          style={collapseButton}
+          aria-label="Toggle sidebar"
+        >
+          {open ? "←" : "→"}
+        </button>
+
+        <Link href={roleNav.home} style={brand}>
+          <PlaybookLogo size={open ? 46 : 42} priority />
+          {open && (
+            <span>
+              <strong>Playbook OS</strong>
+              <small style={brandSub}>{roleNav.label}</small>
+            </span>
+          )}
+        </Link>
+
+        <Link href="/profile" style={profileCard}>
+          <ProfileAvatar src={profile?.avatar_url} name={displayName} size={open ? 46 : 42} />
+          {open && (
+            <span style={{ minWidth: 0 }}>
+              <strong style={profileName}>{displayName}</strong>
+              <small style={roleBadge}>{roleNav.label}</small>
+            </span>
+          )}
         </Link>
 
         <nav style={nav}>
-          {primaryNav.map((item) => {
-            const active =
-              pathname === item.href || pathname?.startsWith(item.href + "/");
+          {roleNav.items.map((item) => {
+            const active = pathname === item.href || pathname?.startsWith(item.href + "/");
 
             return (
               <Link
@@ -69,42 +120,35 @@ export default function UnifiedAppShell({
                 href={item.href}
                 style={{
                   ...navItem,
+                  justifyContent: open ? "flex-start" : "center",
                   ...(active ? activeNavItem : {}),
                 }}
               >
                 <span>{item.icon}</span>
-                <span>{item.label}</span>
+                {open && <span>{item.label}</span>}
               </Link>
             );
           })}
-        
+
           <button
             onClick={handleSignOut}
             style={{
-              background:"#FFFFFF",
-              color:"#0F172A",
-              border:"1px solid rgba(15,23,42,.15)",
-              borderRadius:999,
-              padding:"10px 14px",
-              fontWeight:900,
-              cursor:"pointer",
-              marginTop:8
+              ...signOutButton,
+              justifyContent: open ? "flex-start" : "center",
             }}
           >
-            Sign Out
+            <span>↪</span>
+            {open && <span>Sign Out</span>}
           </button>
-
         </nav>
 
-        {founderNav.length > 0 && (
+        {open && founderNav.length > 0 && (
           <div style={founderSection}>
             <div style={sectionLabel}>Founder Tools</div>
 
             <nav style={nav}>
               {founderNav.map((item) => {
-                const active =
-                  pathname === item.href ||
-                  pathname?.startsWith(item.href + "/");
+                const active = pathname === item.href || pathname?.startsWith(item.href + "/");
 
                 return (
                   <Link
@@ -131,8 +175,8 @@ export default function UnifiedAppShell({
             ← Back
           </button>
 
-          <Link href="/start" style={menuButton}>
-            Start Here
+          <Link href={roleNav.home} style={menuButton}>
+            {roleNav.label}
           </Link>
         </header>
 
@@ -145,8 +189,8 @@ export default function UnifiedAppShell({
 const shell: React.CSSProperties = {
   minHeight: "100vh",
   display: "grid",
-  gridTemplateColumns: "280px 1fr",
   background: "#F8F7F4",
+  transition: "grid-template-columns .2s ease",
 };
 
 const sidebar: React.CSSProperties = {
@@ -160,29 +204,59 @@ const sidebar: React.CSSProperties = {
   overflowY: "auto",
 };
 
+const collapseButton: React.CSSProperties = {
+  width: "100%",
+  border: "1px solid rgba(255,255,255,.12)",
+  background: "rgba(255,255,255,.06)",
+  color: "#F8F7F4",
+  borderRadius: 14,
+  padding: "9px 10px",
+  cursor: "pointer",
+  fontWeight: 950,
+  marginBottom: 14,
+};
+
 const brand: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
   gap: 10,
   color: "#FFFFFF",
   textDecoration: "none",
-  marginBottom: 20,
-};
-
-const logo: React.CSSProperties = {
-  width: 38,
-  height: 38,
-  borderRadius: 14,
-  background: "#F4B942",
-  color: "#0F172A",
-  display: "grid",
-  placeItems: "center",
-  fontWeight: 950,
+  marginBottom: 18,
 };
 
 const brandSub: React.CSSProperties = {
   display: "block",
-  color: "rgba(255,255,255,.55)",
+  color: "#F97316",
+  fontSize: 10,
+  fontWeight: 900,
+  textTransform: "uppercase",
+  letterSpacing: ".08em",
+};
+
+const profileCard: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+  color: "#FFFFFF",
+  textDecoration: "none",
+  background: "rgba(255,255,255,.06)",
+  border: "1px solid rgba(255,255,255,.10)",
+  borderRadius: 18,
+  padding: 10,
+  marginBottom: 18,
+};
+
+const profileName: React.CSSProperties = {
+  display: "block",
+  overflow: "hidden",
+  whiteSpace: "nowrap",
+  textOverflow: "ellipsis",
+};
+
+const roleBadge: React.CSSProperties = {
+  display: "block",
+  color: "rgba(248,247,244,.62)",
   fontSize: 11,
   marginTop: 2,
 };
@@ -196,31 +270,45 @@ const navItem: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
   gap: 10,
-  color: "#CBD5E1",
+  color: "rgba(248,247,244,.78)",
   textDecoration: "none",
-  padding: "10px 12px",
   borderRadius: 14,
-  fontWeight: 850,
+  padding: "11px 12px",
+  fontWeight: 900,
 };
 
 const activeNavItem: React.CSSProperties = {
-  background: "rgba(244,185,66,.16)",
+  background: "#F97316",
   color: "#FFFFFF",
-  border: "1px solid rgba(244,185,66,.35)",
+};
+
+const signOutButton: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+  width: "100%",
+  background: "#FFFFFF",
+  color: "#0F172A",
+  border: "1px solid rgba(15,23,42,.15)",
+  borderRadius: 999,
+  padding: "10px 14px",
+  fontWeight: 900,
+  cursor: "pointer",
+  marginTop: 8,
 };
 
 const founderSection: React.CSSProperties = {
   marginTop: 24,
-  paddingTop: 18,
-  borderTop: "1px solid rgba(255,255,255,.1)",
+  paddingTop: 16,
+  borderTop: "1px solid rgba(255,255,255,.12)",
 };
 
 const sectionLabel: React.CSSProperties = {
   fontSize: 10,
+  fontWeight: 950,
+  color: "rgba(248,247,244,.5)",
   textTransform: "uppercase",
-  letterSpacing: ".16em",
-  color: "rgba(255,255,255,.42)",
-  fontWeight: 900,
+  letterSpacing: ".14em",
   marginBottom: 10,
 };
 
@@ -229,34 +317,35 @@ const main: React.CSSProperties = {
 };
 
 const topbar: React.CSSProperties = {
+  minHeight: 68,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  padding: "14px 22px",
+  borderBottom: "1px solid #E2E8F0",
+  background: "rgba(248,247,244,.86)",
+  backdropFilter: "blur(10px)",
   position: "sticky",
   top: 0,
-  zIndex: 20,
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  padding: "12px 18px",
-  background: "rgba(248,247,244,.92)",
-  backdropFilter: "blur(10px)",
-  borderBottom: "1px solid #E2E8F0",
+  zIndex: 10,
 };
 
 const backButton: React.CSSProperties = {
-  border: "1px solid #E2E8F0",
+  border: "1px solid #CBD5E1",
   background: "#FFFFFF",
   color: "#0F172A",
   borderRadius: 999,
-  padding: "8px 11px",
+  padding: "10px 14px",
   fontWeight: 900,
   cursor: "pointer",
 };
 
 const menuButton: React.CSSProperties = {
-  border: "1px solid #E2E8F0",
-  background: "#FFFFFF",
-  color: "#0F172A",
+  border: "none",
+  background: "#0F172A",
+  color: "#FFFFFF",
   borderRadius: 999,
-  padding: "8px 11px",
-  fontWeight: 900,
+  padding: "10px 16px",
+  fontWeight: 950,
   textDecoration: "none",
 };

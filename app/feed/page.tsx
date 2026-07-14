@@ -42,7 +42,7 @@ export default function FeedPage() {
       setUserRole(p?.role||"member");
       setUserUsername(p?.username||null);
 
-      // Load from feed_posts — the real table
+      // Load all public feed posts
       const{data:dbPosts,error}=await supabase
         .from("feed_posts")
         .select("id,user_id,post_type,title,body,image_url,media_url,created_at,visibility")
