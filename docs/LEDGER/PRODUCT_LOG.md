@@ -1090,3 +1090,6 @@ Playbook now separates demo, foundation, studio, founder, and active user experi
 
 ## 2026-07-07 02:16
 - Commit recorded: Activate brand partner OS and update release ledgers
+
+## 2026-07-14 10:13
+- Commit recorded: Checkpoint before Founder Knowledge Base
