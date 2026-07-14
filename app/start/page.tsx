@@ -185,7 +185,10 @@ function StartContent() {
     },
   });
 
-  async function saveCustomOption(type: "college" | "career" | "activity" | "district", value?: string) {
+  async function saveCustomOption(
+  type: "school" | "college" | "career" | "activity" | "district",
+  value?: string
+) {
     const clean = String(value || "").trim();
     if (!clean || !user?.id) return;
 
@@ -449,8 +452,21 @@ function StartContent() {
               value={form[field.key]}
               onChange={(value: any) => update(field.key, value)}
               onBlur={(value: string) => {
-                if (field.type === "college") saveCustomOption("college", value);
-                if (field.type === "career") saveCustomOption("career", value);
+                if (field.type === "school") {
+                  saveCustomOption("school", value);
+                }
+
+                if (field.type === "college") {
+                  saveCustomOption("college", value);
+                }
+
+                if (field.type === "career") {
+                  saveCustomOption("career", value);
+                }
+
+                if (field.type === "district") {
+                  saveCustomOption("district", value);
+                }
               }}
             />
           ))}

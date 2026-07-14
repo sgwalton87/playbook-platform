@@ -1,20 +1,36 @@
+import {
+  GPA_OPTIONS,
+  GRADE_OPTIONS,
+  GRADUATION_YEARS,
+} from "@/lib/education";
+
 export type OnboardingField = {
   key: string;
   label: string;
   placeholder?: string;
   type?:
-    | "text"
+    "text"
     | "textarea"
     | "select"
     | "multi-select"
+    | "school"
+    | "district"
     | "college"
     | "college-list"
-    | "district"
     | "career"
+    | "major"
+    | "gpa"
+    | "graduation-year"
+    | "assessment-score"
     | "activity-list"
     | "invite-list"
     | "safety-agreement";
   options?: string[];
+
+  required?: boolean;
+  optional?: boolean;
+  helpText?: string;
+  validation?: "email" | "year" | "gpa" | "assessment-score";
 };
 
 export type OnboardingStep = {
@@ -57,15 +73,78 @@ const SCHOLAR_ACADEMIC: OnboardingStep = {
   id: "scholar-academic",
   phase: "Phase 3 · Academic Baseline",
   title: "Map your academic path.",
-  body: "This powers A-G readiness, college matching, internships, and your Scholar Record.",
+  body: "This powers A-G readiness, college matching, internships, scholarships, and your Scholar Record.",
   fields: [
-    { key: "school", label: "Current high school / institution", placeholder: "School name" },
-    { key: "school_district", label: "California school district", type: "district", placeholder: "Start typing your district..." },
-    { key: "grade", label: "Grade", type: "select", options: ["8", "9", "10", "11", "12", "College", "Transition-age youth", "Other"] },
-    { key: "gpa", label: "Current GPA", placeholder: "ex: 3.4" },
-    { key: "graduation_year", label: "Graduation year", placeholder: "ex: 2027" },
-    { key: "dream_school", label: "Dream school", type: "college", placeholder: "Start typing any college..." },
-    { key: "top_schools", label: "Top 10 schools", type: "college-list", placeholder: "Start typing any college..." },
+    {
+      key: "school",
+      label: "Current high school / institution",
+      type: "school",
+      placeholder: "Start typing your school...",
+      required: true,
+      helpText: "Choose your school or type it if it is not listed.",
+    },
+    {
+      key: "school_district",
+      label: "California school district",
+      type: "district",
+      placeholder: "Start typing your district...",
+      required: true,
+    },
+    {
+      key: "grade",
+      label: "Current grade or education stage",
+      type: "select",
+      options: [...GRADE_OPTIONS],
+      required: true,
+    },
+    {
+      key: "gpa",
+      label: "Current cumulative GPA",
+      type: "gpa",
+      options: [...GPA_OPTIONS],
+      required: true,
+      validation: "gpa",
+      helpText: "Choose your weighted or unweighted cumulative GPA.",
+    },
+    {
+      key: "graduation_year",
+      label: "Expected graduation year",
+      type: "graduation-year",
+      options: [...GRADUATION_YEARS],
+      required: true,
+      validation: "year",
+    },
+    {
+      key: "ela_score",
+      label: "Latest ELA assessment score",
+      type: "assessment-score",
+      placeholder: "Optional",
+      optional: true,
+      validation: "assessment-score",
+    },
+    {
+      key: "math_score",
+      label: "Latest Math assessment score",
+      type: "assessment-score",
+      placeholder: "Optional",
+      optional: true,
+      validation: "assessment-score",
+    },
+    {
+      key: "dream_school",
+      label: "Dream school",
+      type: "college",
+      placeholder: "Start typing any college...",
+      required: true,
+    },
+    {
+      key: "top_schools",
+      label: "Top college choices",
+      type: "college-list",
+      placeholder: "Start typing any college...",
+      required: true,
+      helpText: "Add up to 10 schools. You must add at least one.",
+    },
   ],
 };
 
