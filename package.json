@@ -30,7 +30,11 @@
     "docs:consolidate": "tsx scripts/docs-consolidate.ts",
     "log:milestone": "tsx scripts/ledger.ts milestone",
     "log:architecture": "tsx scripts/ledger.ts architecture",
-    "log:demo": "tsx scripts/ledger.ts demo"
+    "log:demo": "tsx scripts/ledger.ts demo",
+    "founder:bootstrap": "node scripts/founder/bootstrap.mjs",
+    "founder:docs": "node scripts/founder/generate-docs.mjs",
+    "founder:update": "node scripts/founder/update.mjs",
+    "founder:list": "node scripts/founder/list.mjs"
   },
   "dependencies": {
     "@hcaptcha/react-hcaptcha": "^2.0.2",

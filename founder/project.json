@@ -1,0 +1,4273 @@
+{
+  "version": 1,
+  "projectName": "Playbook OS",
+  "founder": "Stephisha Walton",
+  "updatedAt": "2026-07-14T17:35:56.991Z",
+  "overallCompletionPercent": 0,
+  "currentPhaseId": "phase-1",
+  "currentTaskId": "identity-and-authentication--login",
+  "phases": [
+    {
+      "id": "phase-1",
+      "number": 1,
+      "title": "Identity & Authentication",
+      "status": "not_started",
+      "completionPercent": 0
+    },
+    {
+      "id": "phase-2",
+      "number": 2,
+      "title": "Onboarding",
+      "status": "not_started",
+      "completionPercent": 0
+    },
+    {
+      "id": "phase-3",
+      "number": 3,
+      "title": "Public Profile",
+      "status": "not_started",
+      "completionPercent": 0
+    },
+    {
+      "id": "phase-4",
+      "number": 4,
+      "title": "Operating Systems",
+      "status": "not_started",
+      "completionPercent": 0
+    },
+    {
+      "id": "phase-5",
+      "number": 5,
+      "title": "Network",
+      "status": "testing",
+      "completionPercent": 0
+    },
+    {
+      "id": "phase-6",
+      "number": 6,
+      "title": "Feed",
+      "status": "not_started",
+      "completionPercent": 0
+    },
+    {
+      "id": "phase-7",
+      "number": 7,
+      "title": "Messaging",
+      "status": "not_started",
+      "completionPercent": 0
+    },
+    {
+      "id": "phase-8",
+      "number": 8,
+      "title": "Courses",
+      "status": "not_started",
+      "completionPercent": 0
+    },
+    {
+      "id": "phase-9",
+      "number": 9,
+      "title": "Academic",
+      "status": "not_started",
+      "completionPercent": 0
+    },
+    {
+      "id": "phase-10",
+      "number": 10,
+      "title": "Recruiting",
+      "status": "not_started",
+      "completionPercent": 0
+    },
+    {
+      "id": "phase-11",
+      "number": 11,
+      "title": "Events",
+      "status": "not_started",
+      "completionPercent": 0
+    },
+    {
+      "id": "phase-12",
+      "number": 12,
+      "title": "Brand Partner Marketplace",
+      "status": "not_started",
+      "completionPercent": 0
+    },
+    {
+      "id": "phase-13",
+      "number": 13,
+      "title": "Athletes Abroad Hub",
+      "status": "not_started",
+      "completionPercent": 0
+    },
+    {
+      "id": "phase-14",
+      "number": 14,
+      "title": "Founder Dashboard",
+      "status": "not_started",
+      "completionPercent": 0
+    },
+    {
+      "id": "phase-15",
+      "number": 15,
+      "title": "Platform QA",
+      "status": "not_started",
+      "completionPercent": 0
+    }
+  ],
+  "tasks": [
+    {
+      "id": "identity-and-authentication--login",
+      "phaseId": "phase-1",
+      "title": "Login",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "identity-and-authentication--signup",
+      "phaseId": "phase-1",
+      "title": "Signup",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "identity-and-authentication--google-login",
+      "phaseId": "phase-1",
+      "title": "Google Login",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "identity-and-authentication--password-reset",
+      "phaseId": "phase-1",
+      "title": "Password Reset",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "identity-and-authentication--remember-me",
+      "phaseId": "phase-1",
+      "title": "Remember Me",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "identity-and-authentication--logout",
+      "phaseId": "phase-1",
+      "title": "Logout",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "identity-and-authentication--session-timeout",
+      "phaseId": "phase-1",
+      "title": "Session Timeout",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "identity-and-authentication--close-browser-logout",
+      "phaseId": "phase-1",
+      "title": "Close Browser Logout",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "identity-and-authentication--captcha",
+      "phaseId": "phase-1",
+      "title": "CAPTCHA",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "identity-and-authentication--pkce",
+      "phaseId": "phase-1",
+      "title": "PKCE",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "identity-and-authentication--email-verification",
+      "phaseId": "phase-1",
+      "title": "Email Verification",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "identity-and-authentication--hostinger-email",
+      "phaseId": "phase-1",
+      "title": "Hostinger Email",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "identity-and-authentication--email-templates",
+      "phaseId": "phase-1",
+      "title": "Email Templates",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "identity-and-authentication--role-selection",
+      "phaseId": "phase-1",
+      "title": "Role Selection",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "identity-and-authentication--authentication-security-testing",
+      "phaseId": "phase-1",
+      "title": "Authentication Security Testing",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "identity-and-authentication--authentication-mobile-testing",
+      "phaseId": "phase-1",
+      "title": "Authentication Mobile Testing",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "onboarding--scholar-onboarding",
+      "phaseId": "phase-2",
+      "title": "Scholar Onboarding",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "onboarding--scholar-athlete-onboarding",
+      "phaseId": "phase-2",
+      "title": "Scholar-Athlete Onboarding",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "onboarding--parent-guardian-onboarding",
+      "phaseId": "phase-2",
+      "title": "Parent Guardian Onboarding",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "onboarding--teacher-educator-onboarding",
+      "phaseId": "phase-2",
+      "title": "Teacher Educator Onboarding",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "onboarding--high-school-counselor-onboarding",
+      "phaseId": "phase-2",
+      "title": "High School Counselor Onboarding",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "onboarding--mentor-onboarding",
+      "phaseId": "phase-2",
+      "title": "Mentor Onboarding",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "onboarding--high-school-coach-onboarding",
+      "phaseId": "phase-2",
+      "title": "High School Coach Onboarding",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "onboarding--college-coach-recruiter-onboarding",
+      "phaseId": "phase-2",
+      "title": "College Coach Recruiter Onboarding",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "onboarding--college-admissions-onboarding",
+      "phaseId": "phase-2",
+      "title": "College Admissions Onboarding",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "onboarding--brand-partner-onboarding",
+      "phaseId": "phase-2",
+      "title": "Brand Partner Onboarding",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "onboarding--transition-aged-youth-onboarding",
+      "phaseId": "phase-2",
+      "title": "Transition-Aged Youth Onboarding",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "onboarding--athlete-abroad-enrollment",
+      "phaseId": "phase-2",
+      "title": "Athlete Abroad Enrollment",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "onboarding--dynamic-user-agreement",
+      "phaseId": "phase-2",
+      "title": "Dynamic User Agreement",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "onboarding--onboarding-autosave",
+      "phaseId": "phase-2",
+      "title": "Onboarding Autosave",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "onboarding--profile-creation-animation",
+      "phaseId": "phase-2",
+      "title": "Profile Creation Animation",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "onboarding--public-profile-generation",
+      "phaseId": "phase-2",
+      "title": "Public Profile Generation",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "onboarding--onboarding-os-redirects",
+      "phaseId": "phase-2",
+      "title": "Onboarding OS Redirects",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "public-profile--avatar",
+      "phaseId": "phase-3",
+      "title": "Avatar",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "public-profile--cover-photo",
+      "phaseId": "phase-3",
+      "title": "Cover Photo",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "public-profile--username",
+      "phaseId": "phase-3",
+      "title": "Username",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "public-profile--biography",
+      "phaseId": "phase-3",
+      "title": "Biography",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "public-profile--activities",
+      "phaseId": "phase-3",
+      "title": "Activities",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "public-profile--athletics",
+      "phaseId": "phase-3",
+      "title": "Athletics",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "public-profile--transcript",
+      "phaseId": "phase-3",
+      "title": "Transcript",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "public-profile--dream-schools",
+      "phaseId": "phase-3",
+      "title": "Dream Schools",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "public-profile--top-colleges",
+      "phaseId": "phase-3",
+      "title": "Top Colleges",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "public-profile--certificates",
+      "phaseId": "phase-3",
+      "title": "Certificates",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "public-profile--badges",
+      "phaseId": "phase-3",
+      "title": "Badges",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "public-profile--xp",
+      "phaseId": "phase-3",
+      "title": "XP",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "public-profile--coins",
+      "phaseId": "phase-3",
+      "title": "Coins",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "public-profile--connections",
+      "phaseId": "phase-3",
+      "title": "Connections",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "public-profile--public-timeline",
+      "phaseId": "phase-3",
+      "title": "Public Timeline",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "public-profile--privacy-settings",
+      "phaseId": "phase-3",
+      "title": "Privacy Settings",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "public-profile--private-profile-editing",
+      "phaseId": "phase-3",
+      "title": "Private Profile Editing",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "operating-systems--scholar-os",
+      "phaseId": "phase-4",
+      "title": "Scholar OS",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "operating-systems--scholar-athlete-os",
+      "phaseId": "phase-4",
+      "title": "Scholar-Athlete OS",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "operating-systems--parent-guardian-os",
+      "phaseId": "phase-4",
+      "title": "Parent Guardian OS",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "operating-systems--teacher-educator-os",
+      "phaseId": "phase-4",
+      "title": "Teacher Educator OS",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "operating-systems--high-school-counselor-os",
+      "phaseId": "phase-4",
+      "title": "High School Counselor OS",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "operating-systems--mentor-os",
+      "phaseId": "phase-4",
+      "title": "Mentor OS",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "operating-systems--high-school-coach-os",
+      "phaseId": "phase-4",
+      "title": "High School Coach OS",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "operating-systems--college-coach-recruiter-os",
+      "phaseId": "phase-4",
+      "title": "College Coach Recruiter OS",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "operating-systems--college-admissions-os",
+      "phaseId": "phase-4",
+      "title": "College Admissions OS",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "operating-systems--brand-partner-os",
+      "phaseId": "phase-4",
+      "title": "Brand Partner OS",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "operating-systems--employer-os",
+      "phaseId": "phase-4",
+      "title": "Employer OS",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "operating-systems--founder-os",
+      "phaseId": "phase-4",
+      "title": "Founder OS",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "operating-systems--athletes-abroad-hub",
+      "phaseId": "phase-4",
+      "title": "Athletes Abroad Hub",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "operating-systems--role-aware-sidebar-navigation",
+      "phaseId": "phase-4",
+      "title": "Role-Aware Sidebar Navigation",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "operating-systems--role-permissions",
+      "phaseId": "phase-4",
+      "title": "Role Permissions",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "network--user-search",
+      "phaseId": "phase-5",
+      "title": "User Search",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "network--suggested-users",
+      "phaseId": "phase-5",
+      "title": "Suggested Users",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "network--connection-requests",
+      "phaseId": "phase-5",
+      "title": "Connection Requests",
+      "status": "testing",
+      "owner": "",
+      "notes": "Connection request tables, request actions, and the existing Connections page have been connected. End-to-end testing remains.",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "network--accept-requests",
+      "phaseId": "phase-5",
+      "title": "Accept Requests",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "network--decline-requests",
+      "phaseId": "phase-5",
+      "title": "Decline Requests",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "network--cancel-requests",
+      "phaseId": "phase-5",
+      "title": "Cancel Requests",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "network--remove-connections",
+      "phaseId": "phase-5",
+      "title": "Remove Connections",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "network--mutual-connections",
+      "phaseId": "phase-5",
+      "title": "Mutual Connections",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "network--public-profile-links",
+      "phaseId": "phase-5",
+      "title": "Public Profile Links",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "network--network-notifications",
+      "phaseId": "phase-5",
+      "title": "Network Notifications",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "network--network-messaging-integration",
+      "phaseId": "phase-5",
+      "title": "Network Messaging Integration",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "feed--real-author-identity",
+      "phaseId": "phase-6",
+      "title": "Real Author Identity",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "feed--create-post",
+      "phaseId": "phase-6",
+      "title": "Create Post",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "feed--image-posts",
+      "phaseId": "phase-6",
+      "title": "Image Posts",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "feed--video-posts",
+      "phaseId": "phase-6",
+      "title": "Video Posts",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "feed--comments",
+      "phaseId": "phase-6",
+      "title": "Comments",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "feed--likes",
+      "phaseId": "phase-6",
+      "title": "Likes",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "feed--shares",
+      "phaseId": "phase-6",
+      "title": "Shares",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "feed--edit-post",
+      "phaseId": "phase-6",
+      "title": "Edit Post",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "feed--delete-post",
+      "phaseId": "phase-6",
+      "title": "Delete Post",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "feed--profile-links",
+      "phaseId": "phase-6",
+      "title": "Profile Links",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "feed--timeline-visibility",
+      "phaseId": "phase-6",
+      "title": "Timeline Visibility",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "feed--infinite-scroll",
+      "phaseId": "phase-6",
+      "title": "Infinite Scroll",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "feed--feed-moderation",
+      "phaseId": "phase-6",
+      "title": "Feed Moderation",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "messaging--direct-messages",
+      "phaseId": "phase-7",
+      "title": "Direct Messages",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "messaging--group-messages",
+      "phaseId": "phase-7",
+      "title": "Group Messages",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "messaging--conversation-search",
+      "phaseId": "phase-7",
+      "title": "Conversation Search",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "messaging--attachments",
+      "phaseId": "phase-7",
+      "title": "Attachments",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "messaging--read-receipts",
+      "phaseId": "phase-7",
+      "title": "Read Receipts",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "messaging--message-notifications",
+      "phaseId": "phase-7",
+      "title": "Message Notifications",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "messaging--block-user",
+      "phaseId": "phase-7",
+      "title": "Block User",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "messaging--report-user",
+      "phaseId": "phase-7",
+      "title": "Report User",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "messaging--meeting-links",
+      "phaseId": "phase-7",
+      "title": "Meeting Links",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "courses--course-library",
+      "phaseId": "phase-8",
+      "title": "Course Library",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "courses--course-search",
+      "phaseId": "phase-8",
+      "title": "Course Search",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "courses--course-detail",
+      "phaseId": "phase-8",
+      "title": "Course Detail",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "courses--module-completion",
+      "phaseId": "phase-8",
+      "title": "Module Completion",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "courses--progress-tracking",
+      "phaseId": "phase-8",
+      "title": "Progress Tracking",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "courses--reflections",
+      "phaseId": "phase-8",
+      "title": "Reflections",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "courses--quizzes",
+      "phaseId": "phase-8",
+      "title": "Quizzes",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "courses--xp-rewards",
+      "phaseId": "phase-8",
+      "title": "XP Rewards",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "courses--coin-rewards",
+      "phaseId": "phase-8",
+      "title": "Coin Rewards",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "courses--certificates",
+      "phaseId": "phase-8",
+      "title": "Certificates",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "courses--community-safety-course",
+      "phaseId": "phase-8",
+      "title": "Community Safety Course",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "courses--athletes-abroad-course",
+      "phaseId": "phase-8",
+      "title": "Athletes Abroad Course",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "academic--transcript-upload",
+      "phaseId": "phase-9",
+      "title": "Transcript Upload",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "academic--transcript-parsing",
+      "phaseId": "phase-9",
+      "title": "Transcript Parsing",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "academic--a-g-tracker",
+      "phaseId": "phase-9",
+      "title": "A-G Tracker",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "academic--fafsa-tracker",
+      "phaseId": "phase-9",
+      "title": "FAFSA Tracker",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "academic--scholarships",
+      "phaseId": "phase-9",
+      "title": "Scholarships",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "academic--college-search",
+      "phaseId": "phase-9",
+      "title": "College Search",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "academic--dream-schools",
+      "phaseId": "phase-9",
+      "title": "Dream Schools",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "academic--top-schools",
+      "phaseId": "phase-9",
+      "title": "Top Schools",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "academic--application-deadlines",
+      "phaseId": "phase-9",
+      "title": "Application Deadlines",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "academic--application-tracker",
+      "phaseId": "phase-9",
+      "title": "Application Tracker",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "academic--academic-readiness",
+      "phaseId": "phase-9",
+      "title": "Academic Readiness",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "academic--compass-recommendations",
+      "phaseId": "phase-9",
+      "title": "Compass Recommendations",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "recruiting--athlete-profile",
+      "phaseId": "phase-10",
+      "title": "Athlete Profile",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "recruiting--film",
+      "phaseId": "phase-10",
+      "title": "Film",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "recruiting--measurements",
+      "phaseId": "phase-10",
+      "title": "Measurements",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "recruiting--statistics",
+      "phaseId": "phase-10",
+      "title": "Statistics",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "recruiting--eligibility",
+      "phaseId": "phase-10",
+      "title": "Eligibility",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "recruiting--coach-connections",
+      "phaseId": "phase-10",
+      "title": "Coach Connections",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "recruiting--recruiter-search",
+      "phaseId": "phase-10",
+      "title": "Recruiter Search",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "recruiting--college-targets",
+      "phaseId": "phase-10",
+      "title": "College Targets",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "recruiting--visits",
+      "phaseId": "phase-10",
+      "title": "Visits",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "recruiting--offers",
+      "phaseId": "phase-10",
+      "title": "Offers",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "recruiting--recruiting-timeline",
+      "phaseId": "phase-10",
+      "title": "Recruiting Timeline",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "recruiting--nil-readiness",
+      "phaseId": "phase-10",
+      "title": "NIL Readiness",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "events--browse-events",
+      "phaseId": "phase-11",
+      "title": "Browse Events",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "events--event-detail",
+      "phaseId": "phase-11",
+      "title": "Event Detail",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "events--rsvp",
+      "phaseId": "phase-11",
+      "title": "RSVP",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "events--calendar-integration",
+      "phaseId": "phase-11",
+      "title": "Calendar Integration",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "events--reminders",
+      "phaseId": "phase-11",
+      "title": "Reminders",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "events--qr-check-in",
+      "phaseId": "phase-11",
+      "title": "QR Check-In",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "events--event-networking",
+      "phaseId": "phase-11",
+      "title": "Event Networking",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "events--replay-library",
+      "phaseId": "phase-11",
+      "title": "Replay Library",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "events--summit-events",
+      "phaseId": "phase-11",
+      "title": "Summit Events",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "brand-partner-marketplace--organization-profiles",
+      "phaseId": "phase-12",
+      "title": "Organization Profiles",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "brand-partner-marketplace--campaign-builder",
+      "phaseId": "phase-12",
+      "title": "Campaign Builder",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "brand-partner-marketplace--rewards",
+      "phaseId": "phase-12",
+      "title": "Rewards",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "brand-partner-marketplace--internships",
+      "phaseId": "phase-12",
+      "title": "Internships",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "brand-partner-marketplace--jobs",
+      "phaseId": "phase-12",
+      "title": "Jobs",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "brand-partner-marketplace--sponsorships",
+      "phaseId": "phase-12",
+      "title": "Sponsorships",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "brand-partner-marketplace--nil-opportunities",
+      "phaseId": "phase-12",
+      "title": "NIL Opportunities",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "brand-partner-marketplace--scholarships",
+      "phaseId": "phase-12",
+      "title": "Scholarships",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "brand-partner-marketplace--mentorship",
+      "phaseId": "phase-12",
+      "title": "Mentorship",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "brand-partner-marketplace--opportunity-applicants",
+      "phaseId": "phase-12",
+      "title": "Opportunity Applicants",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "brand-partner-marketplace--opportunity-tracking",
+      "phaseId": "phase-12",
+      "title": "Opportunity Tracking",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "brand-partner-marketplace--compliance-review",
+      "phaseId": "phase-12",
+      "title": "Compliance Review",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "athletes-abroad-hub--go-abroad",
+      "phaseId": "phase-13",
+      "title": "Go Abroad",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "athletes-abroad-hub--living-abroad",
+      "phaseId": "phase-13",
+      "title": "Living Abroad",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "athletes-abroad-hub--life-after-sport",
+      "phaseId": "phase-13",
+      "title": "Life After Sport",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "athletes-abroad-hub--global-athlete-profile",
+      "phaseId": "phase-13",
+      "title": "Global Athlete Profile",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "athletes-abroad-hub--career-history",
+      "phaseId": "phase-13",
+      "title": "Career History",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "athletes-abroad-hub--country-channels",
+      "phaseId": "phase-13",
+      "title": "Country Channels",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "athletes-abroad-hub--sport-channels",
+      "phaseId": "phase-13",
+      "title": "Sport Channels",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "athletes-abroad-hub--global-locker-room",
+      "phaseId": "phase-13",
+      "title": "Global Locker Room",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "athletes-abroad-hub--summit-integration",
+      "phaseId": "phase-13",
+      "title": "Summit Integration",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "athletes-abroad-hub--summit-meetings",
+      "phaseId": "phase-13",
+      "title": "Summit Meetings",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "athletes-abroad-hub--meetups",
+      "phaseId": "phase-13",
+      "title": "Meetups",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "athletes-abroad-hub--housing-resources",
+      "phaseId": "phase-13",
+      "title": "Housing Resources",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "athletes-abroad-hub--healthcare-resources",
+      "phaseId": "phase-13",
+      "title": "Healthcare Resources",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "athletes-abroad-hub--tax-resources",
+      "phaseId": "phase-13",
+      "title": "Tax Resources",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "athletes-abroad-hub--contract-resources",
+      "phaseId": "phase-13",
+      "title": "Contract Resources",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "athletes-abroad-hub--alumni-network",
+      "phaseId": "phase-13",
+      "title": "Alumni Network",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "founder-dashboard--project-intelligence",
+      "phaseId": "phase-14",
+      "title": "Project Intelligence",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "founder-dashboard--analytics",
+      "phaseId": "phase-14",
+      "title": "Analytics",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "founder-dashboard--user-management",
+      "phaseId": "phase-14",
+      "title": "User Management",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "founder-dashboard--verification",
+      "phaseId": "phase-14",
+      "title": "Verification",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "founder-dashboard--moderation",
+      "phaseId": "phase-14",
+      "title": "Moderation",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "founder-dashboard--feature-flags",
+      "phaseId": "phase-14",
+      "title": "Feature Flags",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "founder-dashboard--bug-tracking",
+      "phaseId": "phase-14",
+      "title": "Bug Tracking",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "founder-dashboard--release-management",
+      "phaseId": "phase-14",
+      "title": "Release Management",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "founder-dashboard--architecture-viewer",
+      "phaseId": "phase-14",
+      "title": "Architecture Viewer",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "founder-dashboard--documentation-center",
+      "phaseId": "phase-14",
+      "title": "Documentation Center",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "founder-dashboard--content-review",
+      "phaseId": "phase-14",
+      "title": "Content Review",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "founder-dashboard--system-health",
+      "phaseId": "phase-14",
+      "title": "System Health",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "platform-qa--scholar-end-to-end-qa",
+      "phaseId": "phase-15",
+      "title": "Scholar End-to-End QA",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "platform-qa--scholar-athlete-end-to-end-qa",
+      "phaseId": "phase-15",
+      "title": "Scholar-Athlete End-to-End QA",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "platform-qa--parent-guardian-end-to-end-qa",
+      "phaseId": "phase-15",
+      "title": "Parent Guardian End-to-End QA",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "platform-qa--teacher-educator-end-to-end-qa",
+      "phaseId": "phase-15",
+      "title": "Teacher Educator End-to-End QA",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "platform-qa--counselor-end-to-end-qa",
+      "phaseId": "phase-15",
+      "title": "Counselor End-to-End QA",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "platform-qa--mentor-end-to-end-qa",
+      "phaseId": "phase-15",
+      "title": "Mentor End-to-End QA",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "platform-qa--high-school-coach-end-to-end-qa",
+      "phaseId": "phase-15",
+      "title": "High School Coach End-to-End QA",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "platform-qa--college-coach-end-to-end-qa",
+      "phaseId": "phase-15",
+      "title": "College Coach End-to-End QA",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "platform-qa--admissions-end-to-end-qa",
+      "phaseId": "phase-15",
+      "title": "Admissions End-to-End QA",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "platform-qa--brand-partner-end-to-end-qa",
+      "phaseId": "phase-15",
+      "title": "Brand Partner End-to-End QA",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "platform-qa--employer-end-to-end-qa",
+      "phaseId": "phase-15",
+      "title": "Employer End-to-End QA",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "platform-qa--founder-end-to-end-qa",
+      "phaseId": "phase-15",
+      "title": "Founder End-to-End QA",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "platform-qa--athlete-abroad-end-to-end-qa",
+      "phaseId": "phase-15",
+      "title": "Athlete Abroad End-to-End QA",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "platform-qa--desktop-qa",
+      "phaseId": "phase-15",
+      "title": "Desktop QA",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "platform-qa--tablet-qa",
+      "phaseId": "phase-15",
+      "title": "Tablet QA",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "platform-qa--mobile-qa",
+      "phaseId": "phase-15",
+      "title": "Mobile QA",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "platform-qa--accessibility-qa",
+      "phaseId": "phase-15",
+      "title": "Accessibility QA",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "platform-qa--performance-qa",
+      "phaseId": "phase-15",
+      "title": "Performance QA",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "platform-qa--security-qa",
+      "phaseId": "phase-15",
+      "title": "Security QA",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "platform-qa--rls-audit",
+      "phaseId": "phase-15",
+      "title": "RLS Audit",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "platform-qa--production-build",
+      "phaseId": "phase-15",
+      "title": "Production Build",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "platform-qa--soft-launch",
+      "phaseId": "phase-15",
+      "title": "Soft Launch",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "platform-qa--beta-feedback",
+      "phaseId": "phase-15",
+      "title": "Beta Feedback",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    },
+    {
+      "id": "platform-qa--final-launch-qa",
+      "phaseId": "phase-15",
+      "title": "Final Launch QA",
+      "status": "not_started",
+      "owner": "",
+      "notes": "",
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "UI matches Playbook design language",
+        "Data persists and reads correctly",
+        "Role permissions are verified",
+        "TypeScript passes",
+        "Tests pass",
+        "Production build passes",
+        "End-to-end workflow is verified"
+      ],
+      "filesTouched": [],
+      "completedAt": null
+    }
+  ],
+  "events": [
+    {
+      "id": "1784050556906-2ba8ya",
+      "actor": "Stephisha Walton",
+      "createdAt": "2026-07-14T17:35:56.907Z",
+      "filesTouched": [],
+      "type": "task_updated",
+      "taskId": "network--connection-requests",
+      "phaseId": "phase-5",
+      "title": "Connection Requests: testing",
+      "description": "Connection request tables, request actions, and the existing Connections page have been connected. End-to-end testing remains."
+    }
+  ],
+  "bugs": [],
+  "decisions": []
+}
