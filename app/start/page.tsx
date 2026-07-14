@@ -4,7 +4,14 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import { supabase } from "@/lib/supabaseClient";
-import { getOnboardingSteps, ALL_COLLEGE_OPTIONS, CAREER_OPTIONS, ACTIVITY_OPTIONS, CALIFORNIA_DISTRICTS } from "@/lib/onboarding";
+import {
+  getOnboardingSteps,
+  ALL_COLLEGE_OPTIONS,
+  CAREER_OPTIONS,
+  ACTIVITY_OPTIONS,
+  CALIFORNIA_DISTRICTS,
+  persistOnboardingProfile,
+} from "@/lib/onboarding";
 import { getPathway, normalizeRole } from "@/lib/onboarding/pathwayMap";
 import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
 import {
@@ -50,6 +57,8 @@ import {
   safetyBox,
   agreeRow
 } from "@/components/onboarding/onboardingStyles";
+import FieldRenderer from "@/components/onboarding/FieldRenderer";
+import { useOnboardingAutosave } from "@/components/onboarding/useOnboardingAutosave";
 
 export default function StartPage() {
   return (
@@ -72,6 +81,7 @@ function StartContent() {
   const [saving, setSaving] = useState(false);
   const [creating, setCreating] = useState(false);
   const [created, setCreated] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
 
   const role = normalizeRole(
     params.get("first") === "1"
@@ -144,7 +154,13 @@ function StartContent() {
       setCustomColleges((options || []).filter((o) => o.type === "college").map((o) => o.value));
       setCustomCareers((options || []).filter((o) => o.type === "career").map((o) => o.value));
       setCustomActivities((options || []).filter((o) => o.type === "activity").map((o) => o.value));
-      setCustomDistricts((options || []).filter((o) => o.type === "district").map((o) => o.value));
+      setCustomDistricts(
+        (options || [])
+          .filter((o) => o.type === "district")
+          .map((o) => o.value)
+      );
+
+      setHydrated(true);
     }
 
     load();
@@ -153,6 +169,21 @@ function StartContent() {
   function update(key: string, value: any) {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
+
+  useOnboardingAutosave({
+    enabled:
+      hydrated &&
+      Boolean(user?.id) &&
+      Boolean(profile?.id),
+    userId: user?.id,
+    stepIndex,
+    form,
+    isBusy: saving || creating || created,
+    delayMs: 2500,
+    onSave: async () => {
+      await persist(false);
+    },
+  });
 
   async function saveCustomOption(type: "college" | "career" | "activity" | "district", value?: string) {
     const clean = String(value || "").trim();
@@ -219,38 +250,56 @@ function StartContent() {
       saveCustomOption("college", nextForm.dream_school),
       saveCustomOption("career", nextForm.ideal_profession),
       saveCustomOption("district", nextForm.school_district),
-      ...(Array.isArray(nextForm.activities) ? nextForm.activities.map((a: string) => saveCustomOption("activity", a)) : []),
+      ...(Array.isArray(nextForm.activities)
+        ? nextForm.activities
+            .map((activity: any) =>
+              typeof activity === "string"
+                ? activity
+                : activity?.activity
+            )
+            .filter(Boolean)
+            .map((activityName: string) =>
+              saveCustomOption("activity", activityName)
+            )
+        : []),
     ]);
 
-    const payload = {
-      id: user.id,
+    const result = await persistOnboardingProfile({
+      userId: user.id,
       email: user.email,
       role,
-      full_name: nextForm.full_name || null,
-      username: nextForm.username || null,
-      avatar_url: nextForm.avatar_url || null,
-      bio: nextForm.bio || null,
-      school: nextForm.school || null,
-      grade: nextForm.grade || null,
-      dream_school: nextForm.dream_school || null,
-      ideal_profession: nextForm.ideal_profession || null,
-      onboarding_data: {
+      form: {
         ...nextForm,
         top_schools: topSchools,
         activities,
         invite_supporters: inviteSupporters,
-        onboarding_step_index: stepIndex,
       },
-      onboarding_completed: complete,
-      onboarding_completed_at: complete ? new Date().toISOString() : null,
-      public_profile_complete: Boolean(nextForm.full_name && nextForm.username && nextForm.bio),
-      community_safety_agreed: Boolean(nextForm.community_safety_agreed),
-      community_safety_agreed_at: nextForm.community_safety_agreed ? new Date().toISOString() : null,
-      community_safety_policy_version: nextForm.community_safety_agreed ? "playbook-safety-v1" : null,
-    };
+      existingOnboardingData:
+        profile?.onboarding_data || {},
+      stepIndex,
+      complete,
+    });
 
-    await supabase.from("profiles").upsert(payload, { onConflict: "id" });
-    setProfile((prev: any) => ({ ...prev, ...payload }));
+    if (result.error || !result.profile) {
+      console.error(
+        "Onboarding persistence failed:",
+        result.error?.message
+      );
+
+      alert(
+        result.error?.message ||
+          "We could not save your profile. Please try again."
+      );
+
+      throw result.error || new Error("Profile save failed.");
+    }
+
+    setForm((prev) => ({
+      ...prev,
+      ...result.normalizedForm,
+    }));
+
+    setProfile(result.profile);
   }
 
   async function sendInvites() {
@@ -424,274 +473,5 @@ function StartContent() {
         </div>
       </section>
     </main>
-  );
-}
-
-function FieldRenderer({ field, value, onChange, onBlur }: any) {
-  if (field.type === "textarea") {
-    return (
-      <label style={label}>
-        {field.label}
-        <textarea
-          value={value || ""}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={field.placeholder}
-          style={{ ...input, minHeight: 120 }}
-        />
-      </label>
-    );
-  }
-
-
-  if (field.type === "safety-agreement") {
-    return (
-      <div style={group}>
-        <div style={safetyBox}>
-          <h3 style={{ marginTop: 0 }}>The Playbook Community Safety Agreement</h3>
-          <p>The Playbook is a community built for learning, opportunity, growth, mentorship, and connection. Every member deserves to participate without being bullied, harassed, threatened, humiliated, excluded, or targeted.</p>
-          <p>By joining The Playbook, I agree that I will not participate in bullying, harassment, intimidation, discrimination, threats, unwanted sexual conduct, cyberbullying, coordinated targeting, or retaliation in any form.</p>
-          <p>This applies to posts, comments, messages, groups, events, courses, mentoring relationships, athletic spaces, and other interactions connected to The Playbook.</p>
-          <p>Harmful conduct may include repeated unwanted contact, spreading harmful rumors, sharing private or embarrassing information without permission, encouraging others to target someone, discriminatory harassment, threatening language, or using Playbook features to isolate, shame, or intimidate another person.</p>
-          <p>I agree to treat other community members with dignity, report serious safety concerns through the appropriate reporting tools, and cooperate with reasonable safety reviews when necessary.</p>
-          <p>I understand that violating this agreement may result in content removal, feature restrictions, temporary suspension, removal from a program or event, or account termination, depending on the circumstances and severity of the conduct.</p>
-        </div>
-
-        <label style={agreeRow}>
-          <input
-            type="checkbox"
-            checked={Boolean(value)}
-            onChange={(e) => onChange(e.target.checked)}
-          />
-          <span>{field.label}</span>
-        </label>
-      </div>
-    );
-  }
-
-  if (field.type === "select") {
-    return (
-      <label style={label}>
-        {field.label}
-        <select
-          value={value || ""}
-          onChange={(e) => onChange(e.target.value)}
-          style={input}
-        >
-          <option value="">Choose one...</option>
-          {(field.options || []).map((option: string) => (
-            <option key={option} value={option}>{option}</option>
-          ))}
-        </select>
-      </label>
-    );
-  }
-
-  if (field.type === "multi-select") {
-    const arr = Array.isArray(value) ? value : [];
-
-    return (
-      <div style={group}>
-        <div style={sectionLabel}>{field.label}</div>
-        <div style={chipGrid}>
-          {(field.options || []).map((option: string) => {
-            const active = arr.includes(option);
-
-            return (
-              <button
-                key={option}
-                type="button"
-                onClick={() =>
-                  onChange(
-                    active
-                      ? arr.filter((x: string) => x !== option)
-                      : [...arr, option]
-                  )
-                }
-                style={chip(active)}
-              >
-                {option}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    );
-  }
-
-  if (field.type === "college" || field.type === "career" || field.type === "district") {
-    const list =
-      field.type === "college"
-        ? "college-options"
-        : field.type === "career"
-          ? "career-options"
-          : "district-options";
-
-    return (
-      <label style={label}>
-        {field.label}
-        <input
-          list={list}
-          value={value || ""}
-          onChange={(e) => onChange(e.target.value)}
-          onBlur={(e) => onBlur?.(e.target.value)}
-          placeholder={field.placeholder}
-          style={input}
-        />
-      </label>
-    );
-  }
-
-  if (field.type === "activity-list") {
-    const arr = Array.isArray(value) ? value : [];
-    const [draft, setDraft] = useState({
-      activity: "",
-      category: "",
-      description: "",
-      hours: "",
-      supervisor: "",
-    });
-
-    function addActivity() {
-      if (!draft.activity.trim()) return;
-      onChange([...arr, draft]);
-      onBlur?.(draft.activity);
-      setDraft({ activity: "", category: "", description: "", hours: "", supervisor: "" });
-    }
-
-    return (
-      <div style={group}>
-        <div style={sectionLabel}>{field.label}</div>
-
-        <div style={miniGrid}>
-          <label style={label}>
-            Activity
-            <input
-              list="activity-options"
-              value={draft.activity}
-              onChange={(e) => setDraft({ ...draft, activity: e.target.value })}
-              placeholder="Basketball, robotics, job, volunteering..."
-              style={input}
-            />
-          </label>
-
-          <label style={label}>
-            Category
-            <select
-              value={draft.category}
-              onChange={(e) => setDraft({ ...draft, category: e.target.value })}
-              style={input}
-            >
-              <option value="">Choose category...</option>
-              {["Sports","Leadership","Arts","Service","Work","STEM","Faith/Community","Family responsibilities","Other"].map((x) => (
-                <option key={x} value={x}>{x}</option>
-              ))}
-            </select>
-          </label>
-
-          <label style={label}>
-            Hours
-            <input
-              value={draft.hours}
-              onChange={(e) => setDraft({ ...draft, hours: e.target.value })}
-              placeholder="ex: 25"
-              style={input}
-            />
-          </label>
-
-          <label style={label}>
-            Mentor / Supervisor
-            <input
-              value={draft.supervisor}
-              onChange={(e) => setDraft({ ...draft, supervisor: e.target.value })}
-              placeholder="Coach, teacher, manager..."
-              style={input}
-            />
-          </label>
-        </div>
-
-        <label style={label}>
-          Description
-          <textarea
-            value={draft.description}
-            onChange={(e) => setDraft({ ...draft, description: e.target.value })}
-            placeholder="What did you do? What did you learn?"
-            style={{ ...input, minHeight: 90 }}
-          />
-        </label>
-
-        <button type="button" style={primary} onClick={addActivity}>
-          Add Entry
-        </button>
-
-        <div style={summaryList}>
-          {arr.length === 0 ? (
-            <p style={{ color: "#64748B", margin: 0 }}>No activity entries added yet.</p>
-          ) : (
-            arr.map((item: any, i: number) => (
-              <div key={`${item.activity}-${i}`} style={summaryItem}>
-                <div>
-                  <strong>{item.activity}</strong>
-                  <div style={{ color: "#64748B", fontSize: 13 }}>
-                    {item.category || "Uncategorized"} · {item.hours || "0"} hours · {item.supervisor || "No supervisor listed"}
-                  </div>
-                  {item.description && <p style={{ margin: "6px 0 0", color: "#475569" }}>{item.description}</p>}
-                </div>
-                <button
-                  type="button"
-                  style={removeButton}
-                  onClick={() => onChange(arr.filter((_: any, index: number) => index !== i))}
-                >
-                  Remove
-                </button>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  if (field.type === "college-list" || field.type === "invite-list") {
-    const length = field.type === "college-list" ? 10 : 5;
-    const list = field.type === "college-list" ? "college-options" : undefined;
-    const arr = Array.isArray(value) ? value : Array(length).fill("");
-
-    return (
-      <div style={group}>
-        <div style={sectionLabel}>{field.label}</div>
-        <div style={miniGrid}>
-          {Array.from({ length }).map((_, i) => (
-            <input
-              key={i}
-              list={list}
-              type={field.type === "invite-list" ? "email" : "text"}
-              value={arr[i] || ""}
-              onChange={(e) => {
-                const next = [...arr];
-                next[i] = e.target.value;
-                onChange(next);
-              }}
-              onBlur={(e) => {
-                if (field.type === "college-list") onBlur?.(e.target.value);
-              }}
-              placeholder={`${i + 1}. ${field.placeholder}`}
-              style={input}
-            />
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <label style={label}>
-      {field.label}
-      <input
-        value={value || ""}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={field.placeholder}
-        style={input}
-      />
-    </label>
   );
 }
