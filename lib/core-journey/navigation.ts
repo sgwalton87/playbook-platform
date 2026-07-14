@@ -17,6 +17,11 @@ export const SCHOLAR_PRIMARY_NAV = [
 
 export const FOUNDER_NAV = [
   { label: "Founder Home", href: "/founder", icon: "◉" },
+  {
+    label: "Control Tower",
+    href: "/founder/project-intelligence",
+    icon: "🛰️",
+  },
   { label: "Studio", href: "/studio", icon: "⌘" },
   { label: "Beta Audit", href: "/studio/beta-34-audit", icon: "✓" },
   { label: "Demo Mode", href: "/demo", icon: "▶" },

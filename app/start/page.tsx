@@ -66,7 +66,8 @@ function StartContent() {
         .eq("id", u.user.id)
         .maybeSingle();
 
-      const safeProfile = p || {
+      const safeProfile = {
+        ...(p || {}),
         id: u.user.id,
         email: u.user.email,
         role,

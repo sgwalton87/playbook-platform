@@ -76,18 +76,12 @@ function LoginContent() {
       if (isSignup) {
         const origin = window.location.origin;
 
-        if (!captchaToken) {
-          setStatus("Please complete the CAPTCHA before creating your account.");
-          setLoading(false);
-          return;
-        }
-
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: `${origin}/auth/callback`,
-            captchaToken,
+            emailRedirectTo: `${origin}/auth/callback?next=/pending`,
+            captchaToken: captchaToken || undefined,
             data: {
               role: normalizeRole(role),
               profile_mode: normalizeRole(role),
@@ -111,18 +105,9 @@ function LoginContent() {
         return;
       }
 
-      if (!captchaToken) {
-        setStatus("Please complete the CAPTCHA before signing in.");
-        setLoading(false);
-        return;
-      }
-
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
-        options: {
-          captchaToken,
-        },
       });
 
       if (error) {

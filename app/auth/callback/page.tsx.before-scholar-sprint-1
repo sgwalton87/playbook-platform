@@ -79,11 +79,7 @@ function AuthCallbackContent() {
       );
 
       if (existing?.onboarding_completed) {
-        const destinationRole = normalizeRole(
-          existing.profile_mode || existing.role || role
-        );
-
-        window.location.href = getPathway(destinationRole).osRoute;
+        window.location.href = getPathway(existing.profile_mode || existing.role || role).osRoute;
       } else {
         window.location.href = `/start?first=1&role=${encodeURIComponent(role)}`;
       }
