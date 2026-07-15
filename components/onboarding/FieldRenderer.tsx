@@ -17,10 +17,29 @@ import {
   summaryList,
 } from "@/components/onboarding/onboardingStyles";
 
-export default function FieldRenderer({ field, value, onChange, onBlur }: any) {
+export default function FieldRenderer({
+  field,
+  value,
+  error,
+  onChange,
+  onBlur,
+}: any) {
+  const errorMessage = error ? (
+    <span
+      role="alert"
+      style={{
+        color: "#B91C1C",
+        fontSize: 13,
+        fontWeight: 800,
+      }}
+    >
+      {error}
+    </span>
+  ) : null;
+
   if (field.type === "textarea") {
     return (
-      <label style={label}>
+      <label style={label} data-field-key={field.key}>
         {field.label}
         <textarea
           value={value || ""}
@@ -28,6 +47,7 @@ export default function FieldRenderer({ field, value, onChange, onBlur }: any) {
           placeholder={field.placeholder}
           style={{ ...input, minHeight: 120 }}
         />
+        {errorMessage}
       </label>
     );
   }
@@ -35,7 +55,7 @@ export default function FieldRenderer({ field, value, onChange, onBlur }: any) {
 
   if (field.type === "safety-agreement") {
     return (
-      <div style={group}>
+      <div style={group} data-field-key={field.key}>
         <div style={safetyBox}>
           <h3 style={{ marginTop: 0 }}>The Playbook Community Safety Agreement</h3>
           <p>The Playbook is a community built for learning, opportunity, growth, mentorship, and connection. Every member deserves to participate without being bullied, harassed, threatened, humiliated, excluded, or targeted.</p>
@@ -60,7 +80,7 @@ export default function FieldRenderer({ field, value, onChange, onBlur }: any) {
 
   if (field.type === "select") {
     return (
-      <label style={label}>
+      <label style={label} data-field-key={field.key}>
         <span>
           {field.label}
           {field.required ? " *" : ""}
@@ -82,6 +102,7 @@ export default function FieldRenderer({ field, value, onChange, onBlur }: any) {
             <option key={option} value={option}>{option}</option>
           ))}
         </select>
+        {errorMessage}
       </label>
     );
   }
@@ -92,7 +113,7 @@ export default function FieldRenderer({ field, value, onChange, onBlur }: any) {
     field.type === "major"
   ) {
     return (
-      <label style={label}>
+      <label style={label} data-field-key={field.key}>
         <span>
           {field.label}
           {field.required ? " *" : ""}
@@ -118,13 +139,14 @@ export default function FieldRenderer({ field, value, onChange, onBlur }: any) {
             </option>
           ))}
         </select>
+        {errorMessage}
       </label>
     );
   }
 
   if (field.type === "assessment-score") {
     return (
-      <label style={label}>
+      <label style={label} data-field-key={field.key}>
         <span>
           {field.label}
           {field.optional ? " (optional)" : ""}
@@ -137,6 +159,7 @@ export default function FieldRenderer({ field, value, onChange, onBlur }: any) {
           inputMode="decimal"
           style={input}
         />
+        {errorMessage}
       </label>
     );
   }
@@ -145,8 +168,9 @@ export default function FieldRenderer({ field, value, onChange, onBlur }: any) {
     const arr = Array.isArray(value) ? value : [];
 
     return (
-      <div style={group}>
+      <div style={group} data-field-key={field.key}>
         <div style={sectionLabel}>{field.label}</div>
+        {errorMessage}
         <div style={chipGrid}>
           {(field.options || []).map((option: string) => {
             const active = arr.includes(option);
@@ -189,7 +213,7 @@ export default function FieldRenderer({ field, value, onChange, onBlur }: any) {
             : "district-options";
 
     return (
-      <label style={label}>
+      <label style={label} data-field-key={field.key}>
         {field.label}
         <input
           list={list}
@@ -199,6 +223,7 @@ export default function FieldRenderer({ field, value, onChange, onBlur }: any) {
           placeholder={field.placeholder}
           style={input}
         />
+        {errorMessage}
       </label>
     );
   }
@@ -221,11 +246,12 @@ export default function FieldRenderer({ field, value, onChange, onBlur }: any) {
     }
 
     return (
-      <div style={group}>
+      <div style={group} data-field-key={field.key}>
         <div style={sectionLabel}>{field.label}</div>
+        {errorMessage}
 
         <div style={miniGrid}>
-          <label style={label}>
+          <label style={label} data-field-key={field.key}>
             Activity
             <input
               list="activity-options"
@@ -236,7 +262,7 @@ export default function FieldRenderer({ field, value, onChange, onBlur }: any) {
             />
           </label>
 
-          <label style={label}>
+          <label style={label} data-field-key={field.key}>
             Category
             <select
               value={draft.category}
@@ -250,7 +276,7 @@ export default function FieldRenderer({ field, value, onChange, onBlur }: any) {
             </select>
           </label>
 
-          <label style={label}>
+          <label style={label} data-field-key={field.key}>
             Hours
             <input
               value={draft.hours}
@@ -260,7 +286,7 @@ export default function FieldRenderer({ field, value, onChange, onBlur }: any) {
             />
           </label>
 
-          <label style={label}>
+          <label style={label} data-field-key={field.key}>
             Mentor / Supervisor
             <input
               value={draft.supervisor}
@@ -271,7 +297,7 @@ export default function FieldRenderer({ field, value, onChange, onBlur }: any) {
           </label>
         </div>
 
-        <label style={label}>
+        <label style={label} data-field-key={field.key}>
           Description
           <textarea
             value={draft.description}
@@ -319,8 +345,9 @@ export default function FieldRenderer({ field, value, onChange, onBlur }: any) {
     const arr = Array.isArray(value) ? value : Array(length).fill("");
 
     return (
-      <div style={group}>
+      <div style={group} data-field-key={field.key}>
         <div style={sectionLabel}>{field.label}</div>
+        {errorMessage}
         <div style={miniGrid}>
           {Array.from({ length }).map((_, i) => (
             <input
@@ -346,7 +373,7 @@ export default function FieldRenderer({ field, value, onChange, onBlur }: any) {
   }
 
   return (
-    <label style={label}>
+    <label style={label} data-field-key={field.key}>
       {field.label}
       <input
         value={value || ""}

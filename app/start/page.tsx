@@ -59,6 +59,7 @@ import {
 } from "@/components/onboarding/onboardingStyles";
 import FieldRenderer from "@/components/onboarding/FieldRenderer";
 import { useOnboardingAutosave } from "@/components/onboarding/useOnboardingAutosave";
+import { validateAcademicPath } from "@/lib/education";
 
 export default function StartPage() {
   return (
@@ -81,6 +82,7 @@ function StartContent() {
   const [saving, setSaving] = useState(false);
   const [creating, setCreating] = useState(false);
   const [created, setCreated] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [hydrated, setHydrated] = useState(false);
 
   const role = normalizeRole(
@@ -168,6 +170,14 @@ function StartContent() {
 
   function update(key: string, value: any) {
     setForm((prev) => ({ ...prev, [key]: value }));
+
+    setFieldErrors((prev) => {
+      if (!prev[key]) return prev;
+
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
   }
 
   useOnboardingAutosave({
@@ -327,8 +337,32 @@ function StartContent() {
   }
 
   async function next(skip = false) {
+    if (step.id === "scholar-academic") {
+      const validation = validateAcademicPath(form);
+
+      if (!validation.valid) {
+        setFieldErrors(validation.errors);
+
+        const firstErrorKey = Object.keys(validation.errors)[0];
+
+        window.requestAnimationFrame(() => {
+          document
+            .querySelector(`[data-field-key="${firstErrorKey}"]`)
+            ?.scrollIntoView({
+              behavior: "smooth",
+              block: "center",
+            });
+        });
+
+        return;
+      }
+    }
+
+    setFieldErrors({});
     setSaving(true);
-    await persist(false);
+
+    try {
+      await persist(false);
 
     if (step.id === "network") {
       await sendInvites();
@@ -351,8 +385,12 @@ function StartContent() {
       return;
     }
 
-    setStepIndex((i) => i + 1);
-    setSaving(false);
+      setStepIndex((i) => i + 1);
+    } catch (error) {
+      console.error("Onboarding progression failed:", error);
+    } finally {
+      setSaving(false);
+    }
   }
 
   if (!profile) return <main style={{ padding: 40 }}>Loading...</main>;
@@ -450,6 +488,7 @@ function StartContent() {
               key={field.key}
               field={field}
               value={form[field.key]}
+              error={fieldErrors[field.key]}
               onChange={(value: any) => update(field.key, value)}
               onBlur={(value: string) => {
                 if (field.type === "school") {
@@ -479,9 +518,15 @@ function StartContent() {
             </button>
           )}
 
-          <button style={secondary} onClick={() => next(true)} disabled={saving}>
-            Skip for now
-          </button>
+          {step.id !== "scholar-academic" && (
+            <button
+              style={secondary}
+              onClick={() => next(true)}
+              disabled={saving}
+            >
+              Skip for now
+            </button>
+          )}
 
           <button style={primary} onClick={() => next(false)} disabled={saving}>
             {saving ? "Saving..." : isLast ? "Finish + Create Profile" : "Next Play →"}
