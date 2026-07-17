@@ -3,7 +3,7 @@ import type {
   ScholarRecordSource,
 } from "./types";
 
-import { buildAthleticsProfile } from "@/lib/athletics/builder";
+import { createDefaultAthletics } from "@/lib/athletics";
 
 import { normalizeScholarActivities } from "./normalizeActivities";
 
@@ -380,10 +380,7 @@ export function buildScholarRecord({
       ),
     },
 
-    athletics: buildAthleticsProfile({
-      row,
-      onboarding,
-    }),
+    athletics: createDefaultAthletics(),
 
     onboarding,
 
