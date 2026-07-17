@@ -1138,3 +1138,6 @@ Playbook now separates demo, foundation, studio, founder, and active user experi
 
 ## 2026-07-17 00:36
 - Commit recorded: Fix athletics and scholar TypeScript lint issues
+
+## 2026-07-17 00:55
+- Commit recorded: chore: update engineering ledger after athletics cleanup
