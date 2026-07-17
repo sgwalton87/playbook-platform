@@ -1,3 +1,6 @@
+import type { StandardizedTestPlan } from "@/lib/education";
+import type { AthleticsProfile } from "@/lib/athletics";
+
 export type ScholarRecordValue =
   | string
   | number
@@ -23,6 +26,10 @@ export type ScholarIdentity = {
   coverUrl: string | null;
   bio: string | null;
 
+  gender: string | null;
+  dateOfBirth: string | null;
+  favoriteQuote: string | null;
+
   city: string | null;
   zipCode: string | null;
 };
@@ -42,6 +49,9 @@ export type ScholarAcademicProfile = {
   mathScore: string | number | null;
   satScore: string | number | null;
   actScore: string | number | null;
+
+  satTesting: StandardizedTestPlan;
+  actTesting: StandardizedTestPlan;
 
   intendedMajor: string | null;
   idealProfession: string | null;
@@ -64,6 +74,19 @@ export type ScholarTranscriptProfile = {
   agProgress: Array<Record<string, unknown>>;
 };
 
+export type ScholarDemographics = {
+  raceEthnicity: string[];
+  lgbtqiaAffinity: string | null;
+  householdIncome: string | null;
+  firstGeneration: string | boolean | null;
+  ellStatus: string | boolean | null;
+  freeReducedLunch: string | boolean | null;
+  migrantStudent: string | boolean | null;
+  fosterYouth: string | boolean | null;
+  housingInsecurity: string | boolean | null;
+  hasIep: string | boolean | null;
+};
+
 export type ScholarCommunityProfile = {
   pillars: string[];
   activities: Array<Record<string, unknown>>;
@@ -75,10 +98,12 @@ export type ScholarRecord = {
   id: string;
 
   identity: ScholarIdentity;
+  demographics: ScholarDemographics;
   academic: ScholarAcademicProfile;
   college: ScholarCollegeProfile;
   transcript: ScholarTranscriptProfile;
   community: ScholarCommunityProfile;
+  athletics: AthleticsProfile;
 
   onboarding: Record<string, unknown>;
 

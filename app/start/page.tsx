@@ -151,7 +151,13 @@ function StartContent() {
       const { data: options } = await supabase
         .from("onboarding_options")
         .select("type,value")
-        .in("type", ["college", "career", "activity", "district"]);
+        .in("type", [
+          "college",
+          "career",
+          "major",
+          "activity",
+          "district",
+        ]);
 
       setCustomColleges((options || []).filter((o) => o.type === "college").map((o) => o.value));
       setCustomCareers((options || []).filter((o) => o.type === "career").map((o) => o.value));
@@ -196,7 +202,7 @@ function StartContent() {
   });
 
   async function saveCustomOption(
-  type: "school" | "college" | "career" | "activity" | "district",
+  type: "school" | "college" | "career" | "major" | "activity" | "district",
   value?: string
 ) {
     const clean = String(value || "").trim();
@@ -209,11 +215,43 @@ function StartContent() {
 
     if (known) return;
 
-    await supabase.from("onboarding_options").insert({
-      type,
-      value: clean,
-      created_by: user.id,
-    });
+    // Prevent duplicate custom options already stored in Supabase.
+    const { data: existingOptions, error: lookupError } =
+      await supabase
+        .from("onboarding_options")
+        .select("id")
+        .eq("type", type)
+        .ilike("value", clean)
+        .limit(1);
+
+    if (lookupError) {
+      console.error(
+        "Could not check onboarding option:",
+        lookupError.message
+      );
+      return;
+    }
+
+    if (existingOptions?.length) {
+      return;
+    }
+
+    const { error: insertError } = await supabase
+      .from("onboarding_options")
+      .insert({
+        type,
+        value: clean,
+        created_by: user.id,
+      });
+
+    // A duplicate may still occur if two saves happen simultaneously.
+    // Ignore only the PostgreSQL duplicate-key error.
+    if (insertError && insertError.code !== "23505") {
+      console.error(
+        "Could not save onboarding option:",
+        insertError.message
+      );
+    }
 
     if (type === "college") setCustomColleges((prev) => [...prev, clean]);
     if (type === "career") setCustomCareers((prev) => [...prev, clean]);
@@ -262,6 +300,11 @@ function StartContent() {
       ...topSchools.map((school: string) => saveCustomOption("college", school)),
       saveCustomOption("college", nextForm.dream_school),
       saveCustomOption("career", nextForm.ideal_profession),
+      saveCustomOption(
+        "major",
+        nextForm.intended_major ||
+          nextForm.target_major
+      ),
       saveCustomOption("district", nextForm.school_district),
       ...(Array.isArray(nextForm.activities)
         ? nextForm.activities
@@ -450,10 +493,6 @@ function StartContent() {
           {collegeOptions.map((name) => <option key={name} value={name} />)}
         </datalist>
 
-        <datalist id="career-options">
-          {careerOptions.map((name) => <option key={name} value={name} />)}
-        </datalist>
-
         <datalist id="district-options">
           {CALIFORNIA_DISTRICTS.map((name) => <option key={name} value={name} />)}
         </datalist>
@@ -501,6 +540,10 @@ function StartContent() {
 
                 if (field.type === "career") {
                   saveCustomOption("career", value);
+                }
+
+                if (field.type === "major") {
+                  saveCustomOption("major", value);
                 }
 
                 if (field.type === "district") {

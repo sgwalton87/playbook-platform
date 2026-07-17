@@ -4,3 +4,5 @@ export * from "./buildScholarRecord";
 export * from "./loadScholarRecord";
 export * from "./useScholarRecord";
 export * from "./assembleScholarRecord";
+export * from "./scholarRecordToProfileForm";
+export * from "./normalizeActivities";

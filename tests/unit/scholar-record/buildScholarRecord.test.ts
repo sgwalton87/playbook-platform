@@ -74,8 +74,8 @@ describe("buildScholarRecord", () => {
     ]);
 
     expect(record.community.pillars).toEqual([
-      "academic",
-      "financial",
+      "Academic Success",
+      "Financial Literacy",
     ]);
 
     expect(record.transcript.uploaded).toBe(true);

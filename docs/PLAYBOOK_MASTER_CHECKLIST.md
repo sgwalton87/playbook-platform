@@ -1,7 +1,7 @@
 # PLAYBOOK OS — MASTER BUILD CHECKLIST
 
 **Overall completion:** 0%
-**Last updated:** 2026-07-14T17:35:56.991Z
+**Last updated:** 2026-07-15T20:10:44.411Z
 
 ## Status legend
 
@@ -39,10 +39,10 @@ A task may be marked complete only after its interface, persistence, permissions
 
 # Phase 2 — Onboarding
 
-**Status:** ⬜ not started
+**Status:** 🟦 testing
 **Completion:** 0%
 
-- ⬜ Scholar Onboarding
+- 🟨 Scholar Onboarding
 - ⬜ Scholar-Athlete Onboarding
 - ⬜ Parent Guardian Onboarding
 - ⬜ Teacher Educator Onboarding
@@ -55,7 +55,7 @@ A task may be marked complete only after its interface, persistence, permissions
 - ⬜ Transition-Aged Youth Onboarding
 - ⬜ Athlete Abroad Enrollment
 - ⬜ Dynamic User Agreement
-- ⬜ Onboarding Autosave
+- 🟦 Onboarding Autosave
 - ⬜ Profile Creation Animation
 - ⬜ Public Profile Generation
 - ⬜ Onboarding OS Redirects
@@ -175,7 +175,7 @@ A task may be marked complete only after its interface, persistence, permissions
 
 # Phase 9 — Academic
 
-**Status:** ⬜ not started
+**Status:** 🟨 in progress
 **Completion:** 0%
 
 - ⬜ Transcript Upload
@@ -188,7 +188,7 @@ A task may be marked complete only after its interface, persistence, permissions
 - ⬜ Top Schools
 - ⬜ Application Deadlines
 - ⬜ Application Tracker
-- ⬜ Academic Readiness
+- 🟨 Academic Readiness
 - ⬜ Compass Recommendations
 
 # Phase 10 — Recruiting

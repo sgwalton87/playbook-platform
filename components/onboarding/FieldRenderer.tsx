@@ -1,6 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import CollegeSearch from "@/components/CollegeSearch";
+import SearchableSchoolField from "@/components/onboarding/SearchableSchoolField";
+import SearchableDistrictField from "@/components/onboarding/SearchableDistrictField";
+import SearchableMajorField from "@/components/onboarding/SearchableMajorField";
+import SearchableCareerField from "@/components/onboarding/SearchableCareerField";
+import ActivityListField from "@/components/onboarding/ActivityListField";
+import PriorityListField from "@/components/onboarding/PriorityListField";
+import StandardizedTestField from "@/components/onboarding/StandardizedTestField";
 import {
   agreeRow,
   chip,
@@ -36,6 +44,114 @@ export default function FieldRenderer({
       {error}
     </span>
   ) : null;
+
+  if (field.type === "school") {
+    return (
+      <SearchableSchoolField
+        fieldKey={field.key}
+        label={field.label}
+        value={String(value || "")}
+        placeholder={field.placeholder}
+        required={field.required}
+        helpText={field.helpText}
+        error={error}
+        onChange={onChange}
+        onBlur={onBlur}
+      />
+    );
+  }
+
+  if (field.type === "district") {
+    return (
+      <SearchableDistrictField
+        fieldKey={field.key}
+        label={field.label}
+        value={String(value || "")}
+        placeholder={field.placeholder}
+        required={field.required}
+        helpText={field.helpText}
+        error={error}
+        onChange={onChange}
+        onBlur={onBlur}
+      />
+    );
+  }
+
+  if (field.type === "major") {
+    return (
+      <SearchableMajorField
+        fieldKey={field.key}
+        label={field.label}
+        value={String(value || "")}
+        placeholder={field.placeholder}
+        required={field.required}
+        helpText={field.helpText}
+        error={error}
+        onChange={onChange}
+        onBlur={onBlur}
+      />
+    );
+  }
+
+  if (field.type === "standardized-test") {
+    return (
+      <StandardizedTestField
+        fieldKey={field.key}
+        label={field.label}
+        testName={
+          field.key === "act_testing"
+            ? "ACT"
+            : "SAT"
+        }
+        value={value}
+        helpText={field.helpText}
+        error={error}
+        onChange={onChange}
+      />
+    );
+  }
+
+  if (field.type === "priority-list") {
+    return (
+      <PriorityListField
+        fieldKey={field.key}
+        label={field.label}
+        value={value}
+        options={field.options || []}
+        helpText={field.helpText}
+        error={error}
+        maxSelections={field.maxSelections}
+        onChange={onChange}
+      />
+    );
+  }
+
+  if (field.type === "date") {
+    return (
+      <label
+        style={label}
+        data-field-key={field.key}
+      >
+        {field.label}
+        {field.required ? (
+          <span style={{ color: "#F97316", marginLeft: 4 }}>
+            *
+          </span>
+        ) : null}
+
+        <input
+          type="date"
+          value={value || ""}
+          onChange={(event) =>
+            onChange(event.target.value)
+          }
+          style={input}
+        />
+
+        {errorMessage}
+      </label>
+    );
+  }
 
   if (field.type === "textarea") {
     return (
@@ -109,8 +225,7 @@ export default function FieldRenderer({
 
   if (
     field.type === "gpa" ||
-    field.type === "graduation-year" ||
-    field.type === "major"
+    field.type === "graduation-year"
   ) {
     return (
       <label style={label} data-field-key={field.key}>
@@ -197,145 +312,107 @@ export default function FieldRenderer({
     );
   }
 
-  if (
-    field.type === "school" ||
-    field.type === "college" ||
-    field.type === "career" ||
-    field.type === "district"
-  ) {
-    const list =
-      field.type === "school"
-        ? "school-options"
-        : field.type === "college"
-          ? "college-options"
-          : field.type === "career"
-            ? "career-options"
-            : "district-options";
-
+  if (field.type === "college") {
     return (
-      <label style={label} data-field-key={field.key}>
-        {field.label}
-        <input
-          list={list}
-          value={value || ""}
-          onChange={(e) => onChange(e.target.value)}
-          onBlur={(e) => onBlur?.(e.target.value)}
-          placeholder={field.placeholder}
-          style={input}
+      <div
+        data-field-key={field.key}
+        style={{
+          position: "relative",
+          width: "100%",
+          minWidth: 0,
+          marginBottom: 18,
+        }}
+      >
+        <label
+          htmlFor={field.key}
+          style={{
+            display: "block",
+            marginBottom: 6,
+            color: "#0F172A",
+            fontSize: 13,
+            fontWeight: 800,
+          }}
+        >
+          {field.label}
+          {field.required ? (
+            <span
+              style={{
+                marginLeft: 4,
+                color: "#F97316",
+              }}
+            >
+              *
+            </span>
+          ) : null}
+        </label>
+
+        {field.helpText ? (
+          <div
+            style={{
+              marginBottom: 7,
+              color: "#64748B",
+              fontSize: 12,
+            }}
+          >
+            {field.helpText}
+          </div>
+        ) : null}
+
+        <CollegeSearch
+          fieldId={field.key}
+          value={String(value || "")}
+          placeholder={
+            field.placeholder ||
+            "Start typing a college or university..."
+          }
+          required={field.required}
+          error={error}
+          onChange={(
+            schoolName: string,
+            schoolId?: string
+          ) => {
+            /*
+             * The current onboarding form stores the selected name.
+             * CollegeSearch still returns the official ID for screens
+             * that maintain a separate ID field.
+             */
+            onChange(schoolName);
+          }}
+          onBlur={(schoolName: string) => {
+            onBlur?.(schoolName);
+          }}
         />
-        {errorMessage}
-      </label>
+      </div>
+    );
+  }
+
+  if (field.type === "career") {
+    return (
+      <SearchableCareerField
+        fieldKey={field.key}
+        label={field.label}
+        value={String(value || "")}
+        placeholder={field.placeholder}
+        required={field.required}
+        helpText={field.helpText}
+        error={error}
+        onChange={onChange}
+        onBlur={onBlur}
+      />
     );
   }
 
   if (field.type === "activity-list") {
-    const arr = Array.isArray(value) ? value : [];
-    const [draft, setDraft] = useState({
-      activity: "",
-      category: "",
-      description: "",
-      hours: "",
-      supervisor: "",
-    });
-
-    function addActivity() {
-      if (!draft.activity.trim()) return;
-      onChange([...arr, draft]);
-      onBlur?.(draft.activity);
-      setDraft({ activity: "", category: "", description: "", hours: "", supervisor: "" });
-    }
-
     return (
-      <div style={group} data-field-key={field.key}>
-        <div style={sectionLabel}>{field.label}</div>
-        {errorMessage}
-
-        <div style={miniGrid}>
-          <label style={label} data-field-key={field.key}>
-            Activity
-            <input
-              list="activity-options"
-              value={draft.activity}
-              onChange={(e) => setDraft({ ...draft, activity: e.target.value })}
-              placeholder="Basketball, robotics, job, volunteering..."
-              style={input}
-            />
-          </label>
-
-          <label style={label} data-field-key={field.key}>
-            Category
-            <select
-              value={draft.category}
-              onChange={(e) => setDraft({ ...draft, category: e.target.value })}
-              style={input}
-            >
-              <option value="">Choose category...</option>
-              {["Sports","Leadership","Arts","Service","Work","STEM","Faith/Community","Family responsibilities","Other"].map((x) => (
-                <option key={x} value={x}>{x}</option>
-              ))}
-            </select>
-          </label>
-
-          <label style={label} data-field-key={field.key}>
-            Hours
-            <input
-              value={draft.hours}
-              onChange={(e) => setDraft({ ...draft, hours: e.target.value })}
-              placeholder="ex: 25"
-              style={input}
-            />
-          </label>
-
-          <label style={label} data-field-key={field.key}>
-            Mentor / Supervisor
-            <input
-              value={draft.supervisor}
-              onChange={(e) => setDraft({ ...draft, supervisor: e.target.value })}
-              placeholder="Coach, teacher, manager..."
-              style={input}
-            />
-          </label>
-        </div>
-
-        <label style={label} data-field-key={field.key}>
-          Description
-          <textarea
-            value={draft.description}
-            onChange={(e) => setDraft({ ...draft, description: e.target.value })}
-            placeholder="What did you do? What did you learn?"
-            style={{ ...input, minHeight: 90 }}
-          />
-        </label>
-
-        <button type="button" style={primary} onClick={addActivity}>
-          Add Entry
-        </button>
-
-        <div style={summaryList}>
-          {arr.length === 0 ? (
-            <p style={{ color: "#64748B", margin: 0 }}>No activity entries added yet.</p>
-          ) : (
-            arr.map((item: any, i: number) => (
-              <div key={`${item.activity}-${i}`} style={summaryItem}>
-                <div>
-                  <strong>{item.activity}</strong>
-                  <div style={{ color: "#64748B", fontSize: 13 }}>
-                    {item.category || "Uncategorized"} · {item.hours || "0"} hours · {item.supervisor || "No supervisor listed"}
-                  </div>
-                  {item.description && <p style={{ margin: "6px 0 0", color: "#475569" }}>{item.description}</p>}
-                </div>
-                <button
-                  type="button"
-                  style={removeButton}
-                  onClick={() => onChange(arr.filter((_: any, index: number) => index !== i))}
-                >
-                  Remove
-                </button>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
+      <ActivityListField
+        fieldKey={field.key}
+        label={field.label}
+        value={value}
+        helpText={field.helpText}
+        error={error}
+        onChange={onChange}
+        onBlur={onBlur}
+      />
     );
   }
 
@@ -350,22 +427,51 @@ export default function FieldRenderer({
         {errorMessage}
         <div style={miniGrid}>
           {Array.from({ length }).map((_, i) => (
+
+            field.type==="college-list"
+
+            ?
+
+            <div
+              key={i}
+              style={{
+                position:"relative",
+                width:"100%",
+                minWidth:0
+              }}
+            >
+
+              <CollegeSearch
+                fieldId={`${field.key}-college-${i + 1}`}
+                value={arr[i] || ""}
+                placeholder={`${i + 1}. ${field.placeholder}`}
+                onChange={(schoolName: string) => {
+                  const next = [...arr];
+                  next[i] = schoolName;
+                  onChange(next);
+                }}
+                onBlur={(schoolName: string) => {
+                  onBlur?.(schoolName);
+                }}
+              />
+
+            </div>
+
+            :
+
             <input
               key={i}
-              list={list}
-              type={field.type === "invite-list" ? "email" : "text"}
-              value={arr[i] || ""}
-              onChange={(e) => {
-                const next = [...arr];
-                next[i] = e.target.value;
+              type="email"
+              value={arr[i]||""}
+              placeholder={`${i+1}. ${field.placeholder}`}
+              style={input}
+              onChange={(e)=>{
+                const next=[...arr];
+                next[i]=e.target.value;
                 onChange(next);
               }}
-              onBlur={(e) => {
-                if (field.type === "college-list") onBlur?.(e.target.value);
-              }}
-              placeholder={`${i + 1}. ${field.placeholder}`}
-              style={input}
             />
+
           ))}
         </div>
       </div>

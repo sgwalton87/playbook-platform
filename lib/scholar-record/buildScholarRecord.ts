@@ -3,6 +3,10 @@ import type {
   ScholarRecordSource,
 } from "./types";
 
+import { createDefaultAthletics } from "@/lib/athletics";
+
+import { normalizeScholarActivities } from "./normalizeActivities";
+
 import {
   firstDefined,
   normalizedArray,
@@ -10,6 +14,12 @@ import {
   normalizedObject,
   normalizedString,
 } from "./normalize";
+
+import {
+  getHighestTestScore,
+  normalizePillars,
+  normalizeTestPlan,
+} from "@/lib/education";
 
 export function buildScholarRecord({
   profile,
@@ -122,6 +132,19 @@ export function buildScholarRecord({
         onboarding.bio
       ),
 
+      gender: normalizedString(
+        row.gender,
+        onboarding.gender
+      ),
+      dateOfBirth: normalizedString(
+        row.date_of_birth,
+        onboarding.date_of_birth
+      ),
+      favoriteQuote: normalizedString(
+        row.favorite_quote,
+        onboarding.favorite_quote
+      ),
+
       city: normalizedString(
         row.city,
         onboarding.city
@@ -130,6 +153,58 @@ export function buildScholarRecord({
         row.zip_code,
         onboarding.zip_code,
         onboarding.zipCode
+      ),
+    },
+
+    demographics: {
+      raceEthnicity: normalizedArray<string>(
+        row.race_ethnicity,
+        onboarding.race_ethnicity
+      ),
+
+      lgbtqiaAffinity: normalizedString(
+        row.lgbtqia_affinity,
+        onboarding.lgbtqia_affinity
+      ),
+
+      householdIncome: normalizedString(
+        row.household_income,
+        onboarding.household_income
+      ),
+
+      firstGeneration: firstDefined(
+        row.first_generation,
+        onboarding.first_generation
+      ),
+
+      ellStatus: firstDefined(
+        row.ell_status,
+        onboarding.ell_status
+      ),
+
+      freeReducedLunch: firstDefined(
+        row.free_reduced_lunch,
+        onboarding.free_reduced_lunch
+      ),
+
+      migrantStudent: firstDefined(
+        row.migrant_student,
+        onboarding.migrant_student
+      ),
+
+      fosterYouth: firstDefined(
+        row.foster_youth,
+        onboarding.foster_youth
+      ),
+
+      housingInsecurity: firstDefined(
+        row.housing_insecurity,
+        onboarding.housing_insecurity
+      ),
+
+      hasIep: firstDefined(
+        row.has_iep,
+        onboarding.has_iep
       ),
     },
 
@@ -188,12 +263,34 @@ export function buildScholarRecord({
 
       satScore: firstDefined(
         row.sat_score,
-        onboarding.sat_score
+        onboarding.sat_score,
+        getHighestTestScore(
+          normalizeTestPlan(
+            onboarding.sat_testing ||
+              row.sat_testing
+          )
+        )
       ),
 
       actScore: firstDefined(
         row.act_score,
-        onboarding.act_score
+        onboarding.act_score,
+        getHighestTestScore(
+          normalizeTestPlan(
+            onboarding.act_testing ||
+              row.act_testing
+          )
+        )
+      ),
+
+      satTesting: normalizeTestPlan(
+        onboarding.sat_testing ||
+          row.sat_testing
+      ),
+
+      actTesting: normalizeTestPlan(
+        onboarding.act_testing ||
+          row.act_testing
       ),
 
       intendedMajor: normalizedString(
@@ -253,18 +350,22 @@ export function buildScholarRecord({
     },
 
     community: {
-      pillars: normalizedArray<string>(
-        row.pillars,
-        onboarding.pillars,
-        onboarding.selected_pillars
+      pillars: normalizePillars(
+        normalizedArray<string>(
+          row.pillars,
+          onboarding.pillars,
+          onboarding.selected_pillars
+        )
       ),
 
       activities:
-        normalizedArray<Record<string, unknown>>(
-          row.activities,
-          onboarding.activities,
-          onboarding.activity_list,
-          onboarding.extracurriculars
+        normalizeScholarActivities(
+          normalizedArray<Record<string, unknown>>(
+            row.activities,
+            onboarding.activities,
+            onboarding.activity_list,
+            onboarding.extracurriculars
+          )
         ),
 
       engagementPreferences: normalizedArray<string>(
@@ -278,6 +379,8 @@ export function buildScholarRecord({
         onboarding.invite_supporters
       ),
     },
+
+    athletics: createDefaultAthletics(),
 
     onboarding,
 

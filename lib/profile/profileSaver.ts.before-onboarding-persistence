@@ -1,0 +1,109 @@
+import { supabase } from "@/lib/supabaseClient";
+import type {
+  CanonicalProfile,
+  ProfilePatch,
+} from "./types";
+
+const DATABASE_COLUMNS = [
+  "id",
+  "email",
+  "role",
+  "profile_mode",
+  "first_name",
+  "last_name",
+  "full_name",
+  "username",
+  "avatar_url",
+  "cover_url",
+  "bio",
+  "school",
+  "gpa",
+  "graduation_year",
+  "intended_major",
+  "dream_school_name",
+  "dream_school_id",
+  "onboarding_data",
+  "onboarding_complete",
+  "onboarding_completed",
+  "updated_at",
+] as const;
+
+function databasePayload(
+  patch: ProfilePatch
+): Record<string, unknown> {
+  const payload: Record<string, unknown> = {};
+
+  for (const key of DATABASE_COLUMNS) {
+    if (key in patch) {
+      payload[key] = patch[key as keyof ProfilePatch];
+    }
+  }
+
+  payload.id = patch.id;
+  payload.updated_at = new Date().toISOString();
+
+  return payload;
+}
+
+export async function saveProfile(
+  patch: ProfilePatch
+): Promise<{
+  profile: CanonicalProfile | null;
+  error: Error | null;
+}> {
+  const payload = databasePayload(patch);
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .upsert(payload, {
+      onConflict: "id",
+    })
+    .select("*")
+    .single();
+
+  if (error) {
+    console.error(
+      "Canonical profile save failed:",
+      error.message
+    );
+
+    return {
+      profile: null,
+      error: new Error(error.message),
+    };
+  }
+
+  return {
+    profile: {
+      ...data,
+      onboarding_data:
+        data?.onboarding_data &&
+        typeof data.onboarding_data === "object"
+          ? data.onboarding_data
+          : {},
+    } as CanonicalProfile,
+    error: null,
+  };
+}
+
+export async function saveProfileDraft({
+  userId,
+  onboardingData,
+  role,
+}: {
+  userId: string;
+  onboardingData: Record<string, unknown>;
+  role: string;
+}) {
+  return saveProfile({
+    id: userId,
+    role,
+    profile_mode: role,
+    onboarding_data: {
+      ...onboardingData,
+      last_saved_at: new Date().toISOString(),
+    },
+    onboarding_complete: false,
+    onboarding_completed: false,
+  });
+}

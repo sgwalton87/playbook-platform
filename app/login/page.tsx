@@ -225,7 +225,7 @@ function LoginContent() {
             />
           </label>
 
-          {isSignup && process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY && (
+          {process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY && (
             <HCaptcha
               sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY}
               onVerify={(token) => setCaptchaToken(token)}

@@ -1,127 +1,415 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
-type CollegeResult = {
-  id?: number | string;
-  relevance_score?: number;
-  "school.name"?: string;
-  "school.alias"?: string;
+import {
+  searchColleges,
+  type CollegeSearchOption,
+} from "@/lib/education/providers/collegeSearch";
+
+type CollegeSearchProps = {
+  value: string;
+  onChange: (
+    schoolName: string,
+    schoolId?: string
+  ) => void;
+  placeholder?: string;
+  required?: boolean;
+  error?: string;
+  helpText?: string;
+  fieldId?: string;
+  onBlur?: (value: string) => void;
+};
+
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  minWidth: 0,
+  boxSizing: "border-box",
+  padding: "13px 14px",
+  borderRadius: 12,
+  border: "1.5px solid #E2E8F0",
+  background: "#FFFFFF",
+  color: "#0F172A",
+  fontSize: 14,
+  outline: "none",
 };
 
 export default function CollegeSearch({
   value,
   onChange,
-}: {
-  value: string;
-  onChange: (schoolName: string, schoolId?: string) => void;
-}) {
-  const [results, setResults] = useState<CollegeResult[]>([]);
-  const [loading, setLoading] = useState(false);
+  placeholder = "Start typing a college or university...",
+  required = false,
+  error,
+  helpText,
+  fieldId = "college-search",
+  onBlur,
+}: CollegeSearchProps) {
+  const [results, setResults] = useState<
+    CollegeSearchOption[]
+  >([]);
+
+  const [loading, setLoading] =
+    useState(false);
+
+  const [open, setOpen] = useState(false);
+
+  const [activeIndex, setActiveIndex] =
+    useState(-1);
+
+  const [requestError, setRequestError] =
+    useState<string | null>(null);
+
+  const requestIdRef = useRef(0);
+
+  const closeTimerRef =
+    useRef<ReturnType<typeof setTimeout> | null>(
+      null
+    );
+
+  const query = useMemo(
+    () => value.trim(),
+    [value]
+  );
 
   useEffect(() => {
-    if (!value || value.length < 3) {
+    if (query.length < 2) {
       setResults([]);
+      setLoading(false);
+      setRequestError(null);
       return;
     }
+
+    const requestId = requestIdRef.current + 1;
+    requestIdRef.current = requestId;
 
     const timer = setTimeout(async () => {
       try {
         setLoading(true);
+        setRequestError(null);
 
-        const url =
-          `https://api.data.gov/ed/collegescorecard/v1/name-autocomplete` +
-          `?school_search=${encodeURIComponent(value)}` +
-          `&api_key=${process.env.NEXT_PUBLIC_COLLEGE_SCORECARD_API_KEY}`;
+        const matches =
+          await searchColleges(query);
 
-        const res = await fetch(url);
-        const data = await res.json();
+        if (
+          requestId !== requestIdRef.current
+        ) {
+          return;
+        }
 
-        console.log("College autocomplete response:", data);
+        setResults(matches.slice(0, 30));
+        setOpen(true);
+        setActiveIndex(-1);
+      } catch (searchError) {
+        if (
+          requestId !== requestIdRef.current
+        ) {
+          return;
+        }
 
-        setResults(Array.isArray(data.results) ? data.results : []);
-      } catch (err) {
-        console.error("College search failed:", err);
+        console.error(
+          "College search failed:",
+          searchError
+        );
+
         setResults([]);
+        setRequestError(
+          "College search is temporarily unavailable. You may still type the school name."
+        );
+        setOpen(true);
       } finally {
-        setLoading(false);
+        if (
+          requestId === requestIdRef.current
+        ) {
+          setLoading(false);
+        }
       }
-    }, 400);
+    }, 350);
 
     return () => clearTimeout(timer);
-  }, [value]);
+  }, [query]);
+
+  function selectCollege(
+    college: CollegeSearchOption
+  ) {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+    }
+
+    onChange(college.name, college.id);
+
+    setOpen(false);
+    setResults([]);
+    setActiveIndex(-1);
+    setRequestError(null);
+  }
+
+  function closeResults() {
+    closeTimerRef.current = setTimeout(() => {
+      setOpen(false);
+      setActiveIndex(-1);
+      onBlur?.(value.trim());
+    }, 150);
+  }
 
   return (
-    <div style={{ position: "relative" }}>
-      <input
-        style={{
-          width: "100%",
-          padding: "13px 14px",
-          borderRadius: 12,
-          border: "1.5px solid #e5e7eb",
-          fontSize: 14,
-        }}
-        placeholder="Type your dream school"
-        value={value}
-        onChange={(e) => onChange(e.target.value, "")}
-      />
-
-      {loading && (
-        <div style={{ fontSize: 12, marginTop: 6, color: "#666" }}>
-          Searching colleges...
-        </div>
-      )}
-
-      {results.length > 0 && (
+    <div
+      style={{
+        position: "relative",
+        display: "block",
+        width: "100%",
+        minWidth: 0,
+        boxSizing: "border-box",
+        marginBottom: open ? 12 : 0,
+        zIndex: open ? 500 : 1,
+        isolation: "isolate",
+      }}
+    >
+      {helpText ? (
         <div
           style={{
-            position: "absolute",
-            zIndex: 999,
-            background: "#fff",
-            width: "100%",
-            border: "1px solid #e5e7eb",
-            borderRadius: 12,
-            marginTop: 6,
-            maxHeight: 300,
-            overflowY: "auto",
-            boxShadow: "0 12px 30px rgba(0,0,0,0.12)",
+            marginBottom: 7,
+            color: "#64748B",
+            fontSize: 12,
           }}
         >
-          {results.map((school, index) => {
-            const schoolName = school["school.name"] || school["school.alias"] || "Unknown school";
-            const schoolId = school.id ? String(school.id) : "";
+          {helpText}
+        </div>
+      ) : null}
 
-            return (
+      <input
+        id={fieldId}
+        type="text"
+        role="combobox"
+        autoComplete="off"
+        aria-expanded={open}
+        aria-autocomplete="list"
+        aria-controls={`${fieldId}-results`}
+        aria-required={required}
+        value={value}
+        placeholder={placeholder}
+        style={{
+          ...inputStyle,
+          borderColor: error
+            ? "#DC2626"
+            : open
+              ? "#F97316"
+              : "#E2E8F0",
+          boxShadow: open
+            ? "0 0 0 3px rgba(249,115,22,.12)"
+            : "none",
+        }}
+        onFocus={() => {
+          if (
+            query.length >= 2 ||
+            loading ||
+            requestError
+          ) {
+            setOpen(true);
+          }
+        }}
+        onBlur={closeResults}
+        onChange={(event) => {
+          onChange(event.target.value, "");
+
+          if (
+            event.target.value.trim().length >= 2
+          ) {
+            setOpen(true);
+          } else {
+            setOpen(false);
+            setResults([]);
+          }
+        }}
+        onKeyDown={(event) => {
+          if (
+            event.key === "ArrowDown" &&
+            results.length
+          ) {
+            event.preventDefault();
+            setOpen(true);
+
+            setActiveIndex((current) =>
+              Math.min(
+                current + 1,
+                results.length - 1
+              )
+            );
+          }
+
+          if (
+            event.key === "ArrowUp" &&
+            results.length
+          ) {
+            event.preventDefault();
+
+            setActiveIndex((current) =>
+              Math.max(current - 1, 0)
+            );
+          }
+
+          if (
+            event.key === "Enter" &&
+            activeIndex >= 0 &&
+            results[activeIndex]
+          ) {
+            event.preventDefault();
+
+            selectCollege(
+              results[activeIndex]
+            );
+          }
+
+          if (event.key === "Escape") {
+            setOpen(false);
+            setActiveIndex(-1);
+          }
+        }}
+      />
+
+      {open ? (
+        <div
+          id={`${fieldId}-results`}
+          role="listbox"
+          style={{
+            position: "absolute",
+            top: "calc(100% + 6px)",
+            left: 0,
+            width: "100%",
+            minWidth: "100%",
+            maxWidth: "100%",
+            boxSizing: "border-box",
+            zIndex: 10000,
+            maxHeight: 320,
+            overflowY: "auto",
+            overflowX: "hidden",
+            border: "1px solid #CBD5E1",
+            borderRadius: 12,
+            background: "#FFFFFF",
+            boxShadow:
+              "0 18px 45px rgba(15,23,42,.18)",
+          }}
+        >
+          {loading ? (
+            <div
+              style={{
+                padding: "13px 14px",
+                color: "#64748B",
+                fontSize: 13,
+              }}
+            >
+              Searching colleges...
+            </div>
+          ) : null}
+
+          {!loading &&
+          results.length > 0 ? (
+            results.map((college, index) => (
               <button
-                key={`${schoolId}-${schoolName}-${index}`}
+                key={[
+                  college.id,
+                  college.name,
+                  index,
+                ].join("::")}
                 type="button"
-                onClick={() => {
-                  onChange(schoolName, schoolId);
-                  setResults([]);
+                role="option"
+                aria-selected={
+                  index === activeIndex
+                }
+                onMouseDown={(event) => {
+                  event.preventDefault();
+                  selectCollege(college);
                 }}
                 style={{
                   display: "block",
                   width: "100%",
-                  textAlign: "left",
                   padding: "12px 14px",
-                  border: "none",
-                  background: "#fff",
-                  cursor: "pointer",
+                  border: 0,
+                  borderBottom:
+                    index ===
+                    results.length - 1
+                      ? 0
+                      : "1px solid #E2E8F0",
+                  background:
+                    index === activeIndex
+                      ? "#FFF7ED"
+                      : "#FFFFFF",
+                  color: "#0F172A",
                   fontSize: 14,
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "#f5f5f5";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "#fff";
+                  fontWeight: 700,
+                  textAlign: "left",
+                  cursor: "pointer",
                 }}
               >
-                <strong>{schoolName}</strong>
+                <div>{college.name}</div>
+
+                {college.country ? (
+                  <div
+                    style={{
+                      marginTop: 3,
+                      color: "#64748B",
+                      fontSize: 11,
+                      fontWeight: 500,
+                    }}
+                  >
+                    {college.country}
+                  </div>
+                ) : null}
               </button>
-            );
-          })}
+            ))
+          ) : null}
+
+          {!loading &&
+          results.length === 0 &&
+          !requestError &&
+          query.length >= 2 ? (
+            <div
+              style={{
+                padding: "13px 14px",
+                color: "#64748B",
+                fontSize: 13,
+                lineHeight: 1.5,
+              }}
+            >
+              No official match found. You may
+              continue using the college name you
+              typed.
+            </div>
+          ) : null}
+
+          {requestError ? (
+            <div
+              style={{
+                padding: "13px 14px",
+                color: "#92400E",
+                background: "#FFFBEB",
+                fontSize: 13,
+                lineHeight: 1.5,
+              }}
+            >
+              {requestError}
+            </div>
+          ) : null}
         </div>
-      )}
+      ) : null}
+
+      {error ? (
+        <div
+          role="alert"
+          style={{
+            marginTop: 6,
+            color: "#B91C1C",
+            fontSize: 13,
+            fontWeight: 700,
+          }}
+        >
+          {error}
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -697,6 +697,7 @@ const canProceed = requiredByStep[currentStepName]
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
               <div><label style={lbl}>GPA</label><input style={inp} placeholder="3.5" value={gpa} onChange={e=>setGpa(e.target.value)}/></div>
               <div><label style={lbl}>Dream school</label><CollegeSearch
+  fieldId="onboarding-school-location-dream-school"
   value={dreamSchoolName}
   onChange={(schoolName, schoolId) => {
     setDreamSchoolName(schoolName);
@@ -850,6 +851,7 @@ const canProceed = requiredByStep[currentStepName]
   <label style={lbl}>Dream school / college goal *</label>
 
   <CollegeSearch
+    fieldId="onboarding-college-goals-dream-school"
     value={dreamSchoolName}
     onChange={(schoolName, schoolId) => {
       setDreamSchoolName(schoolName);

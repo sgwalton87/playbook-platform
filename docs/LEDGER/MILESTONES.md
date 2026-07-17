@@ -1371,3 +1371,27 @@ Alpha 1.0 Complete — Intelligence OS foundation finished.
 
 ## 2026-07-14 10:42
 - **build-pass**: Pre-push tests and build passed.
+
+## 2026-07-14 11:52
+- **commit**: Checkpoint before canonical profile persistence
+
+## 2026-07-14 12:17
+- **commit**: Extract shared onboarding styles
+
+## 2026-07-14 13:33
+- **commit**: Add sustainable onboarding autosave
+
+## 2026-07-14 14:43
+- **commit**: Connect Scholar Academic Path to Education Engine
+
+## 2026-07-14 17:46
+- **commit**: Ingest official California school directory
+
+## 2026-07-14 19:31
+- **commit**: Add required Scholar Academic Path validation
+
+## 2026-07-15 12:54
+- **commit**: Add canonical Scholar Record foundation
+
+## 2026-07-15 13:10
+- **commit**: Add canonical Scholar Record loader

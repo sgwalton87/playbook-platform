@@ -21,14 +21,14 @@ Founder Project Intelligence
 ## System status
 
 - ⬜ **Phase 1: Identity & Authentication** — 0%
-- ⬜ **Phase 2: Onboarding** — 0%
+- 🟦 **Phase 2: Onboarding** — 0%
 - ⬜ **Phase 3: Public Profile** — 0%
 - ⬜ **Phase 4: Operating Systems** — 0%
 - 🟦 **Phase 5: Network** — 0%
 - ⬜ **Phase 6: Feed** — 0%
 - ⬜ **Phase 7: Messaging** — 0%
 - ⬜ **Phase 8: Courses** — 0%
-- ⬜ **Phase 9: Academic** — 0%
+- 🟨 **Phase 9: Academic** — 0%
 - ⬜ **Phase 10: Recruiting** — 0%
 - ⬜ **Phase 11: Events** — 0%
 - ⬜ **Phase 12: Brand Partner Marketplace** — 0%

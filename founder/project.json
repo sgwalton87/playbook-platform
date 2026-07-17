@@ -2,7 +2,7 @@
   "version": 1,
   "projectName": "Playbook OS",
   "founder": "Stephisha Walton",
-  "updatedAt": "2026-07-14T17:35:56.991Z",
+  "updatedAt": "2026-07-15T20:10:44.411Z",
   "overallCompletionPercent": 0,
   "currentPhaseId": "phase-1",
   "currentTaskId": "identity-and-authentication--login",
@@ -18,7 +18,7 @@
       "id": "phase-2",
       "number": 2,
       "title": "Onboarding",
-      "status": "not_started",
+      "status": "testing",
       "completionPercent": 0
     },
     {
@@ -67,7 +67,7 @@
       "id": "phase-9",
       "number": 9,
       "title": "Academic",
-      "status": "not_started",
+      "status": "in_progress",
       "completionPercent": 0
     },
     {
@@ -438,9 +438,9 @@
       "id": "onboarding--scholar-onboarding",
       "phaseId": "phase-2",
       "title": "Scholar Onboarding",
-      "status": "not_started",
+      "status": "in_progress",
       "owner": "",
-      "notes": "",
+      "notes": "Scholar Academic Path now blocks progression until required fields are complete, shows inline field errors, keeps ELA and Math optional, and removes Skip from the required academic step.",
       "dependencies": [],
       "acceptanceCriteria": [
         "UI matches Playbook design language",
@@ -698,9 +698,9 @@
       "id": "onboarding--onboarding-autosave",
       "phaseId": "phase-2",
       "title": "Onboarding Autosave",
-      "status": "not_started",
+      "status": "testing",
       "owner": "",
-      "notes": "",
+      "notes": "Added reusable debounced onboarding autosave with hydration protection, duplicate snapshot prevention, overlapping-write protection, and retry handling. Manual resume testing remains.",
       "dependencies": [],
       "acceptanceCriteria": [
         "UI matches Playbook design language",
@@ -2518,9 +2518,9 @@
       "id": "academic--academic-readiness",
       "phaseId": "phase-9",
       "title": "Academic Readiness",
-      "status": "not_started",
+      "status": "in_progress",
       "owner": "",
-      "notes": "",
+      "notes": "Imported 10,551 California schools from the official CDE directory into the reusable Education Engine, including CDS, NCES, district, city, county, type, and status metadata.",
       "dependencies": [],
       "acceptanceCriteria": [
         "UI matches Playbook design language",
@@ -4266,6 +4266,122 @@
       "phaseId": "phase-5",
       "title": "Connection Requests: testing",
       "description": "Connection request tables, request actions, and the existing Connections page have been connected. End-to-end testing remains."
+    },
+    {
+      "id": "1784056664878-mi9xsn",
+      "actor": "Stephisha Walton",
+      "createdAt": "2026-07-14T19:17:44.878Z",
+      "filesTouched": [
+        "app/start/page.tsx",
+        "components/onboarding/onboardingStyles.ts"
+      ],
+      "type": "task_updated",
+      "taskId": "onboarding--scholar-onboarding",
+      "phaseId": "phase-2",
+      "title": "Scholar Onboarding: in progress",
+      "description": "Moved onboarding presentation styles into a dedicated shared module without changing behavior. Field rendering and persistence extraction remain."
+    },
+    {
+      "id": "1784061189285-oucjq7",
+      "actor": "Stephisha Walton",
+      "createdAt": "2026-07-14T20:33:09.285Z",
+      "filesTouched": [
+        "app/start/page.tsx",
+        "components/onboarding/useOnboardingAutosave.ts"
+      ],
+      "type": "task_updated",
+      "taskId": "onboarding--onboarding-autosave",
+      "phaseId": "phase-2",
+      "title": "Onboarding Autosave: testing",
+      "description": "Added reusable debounced onboarding autosave with hydration protection, duplicate snapshot prevention, overlapping-write protection, and retry handling. Manual resume testing remains."
+    },
+    {
+      "id": "1784061189707-wzu2fd",
+      "actor": "Stephisha Walton",
+      "createdAt": "2026-07-14T20:33:09.707Z",
+      "filesTouched": [
+        "app/start/page.tsx",
+        "lib/onboarding/persistence.ts",
+        "components/onboarding/useOnboardingAutosave.ts"
+      ],
+      "type": "task_updated",
+      "taskId": "onboarding--scholar-onboarding",
+      "phaseId": "phase-2",
+      "title": "Scholar Onboarding: in progress",
+      "description": "Scholar onboarding now uses canonical persistence and reusable guarded autosave. Private profile mirroring and complete browser persistence validation remain."
+    },
+    {
+      "id": "1784062810646-ivn8wl",
+      "actor": "Stephisha Walton",
+      "createdAt": "2026-07-14T21:00:10.647Z",
+      "filesTouched": [
+        "lib/education",
+        "tests/unit/education/education-engine.test.ts"
+      ],
+      "type": "task_updated",
+      "taskId": "academic--academic-readiness",
+      "phaseId": "phase-9",
+      "title": "Academic Readiness: in progress",
+      "description": "Built the reusable Education Engine foundation with GPA, graduation-year, California district, school, major, assessment, and academic-validation providers. Scholar Academic Path UI integration and authoritative school-data ingestion remain."
+    },
+    {
+      "id": "1784062810908-p8abuq",
+      "actor": "Stephisha Walton",
+      "createdAt": "2026-07-14T21:00:10.908Z",
+      "filesTouched": [
+        "lib/education"
+      ],
+      "type": "task_updated",
+      "taskId": "onboarding--scholar-onboarding",
+      "phaseId": "phase-2",
+      "title": "Scholar Onboarding: in progress",
+      "description": "Scholar onboarding now has a reusable Education Engine ready to power the Academic Path step. UI field integration and mandatory-step validation remain."
+    },
+    {
+      "id": "1784065387594-01a85f",
+      "actor": "Stephisha Walton",
+      "createdAt": "2026-07-14T21:43:07.594Z",
+      "filesTouched": [
+        "lib/onboarding/roleOnboarding.ts",
+        "components/onboarding/FieldRenderer.tsx",
+        "app/start/page.tsx"
+      ],
+      "type": "task_updated",
+      "taskId": "onboarding--scholar-onboarding",
+      "phaseId": "phase-2",
+      "title": "Scholar Onboarding: in progress",
+      "description": "Scholar Academic Path now uses semantic Education Engine fields for schools, districts, grade, GPA, graduation year, and optional assessment scores. Required-step validation and authoritative California school ingestion remain."
+    },
+    {
+      "id": "1784076376267-84pz1k",
+      "actor": "Stephisha Walton",
+      "createdAt": "2026-07-15T00:46:16.269Z",
+      "filesTouched": [
+        "scripts/education/import-california-schools.mjs",
+        "lib/education/providers/californiaSchools.generated.ts",
+        "lib/education/providers/schools.ts",
+        "lib/education/types.ts",
+        "data/education/generated/california-schools.json"
+      ],
+      "type": "task_updated",
+      "taskId": "academic--academic-readiness",
+      "phaseId": "phase-9",
+      "title": "Academic Readiness: in progress",
+      "description": "Imported 10,551 California schools from the official CDE directory into the reusable Education Engine, including CDS, NCES, district, city, county, type, and status metadata."
+    },
+    {
+      "id": "1784082683834-mqy84m",
+      "actor": "Stephisha Walton",
+      "createdAt": "2026-07-15T02:31:23.834Z",
+      "filesTouched": [
+        "app/start/page.tsx",
+        "components/onboarding/FieldRenderer.tsx"
+      ],
+      "type": "task_updated",
+      "taskId": "onboarding--scholar-onboarding",
+      "phaseId": "phase-2",
+      "title": "Scholar Onboarding: in progress",
+      "description": "Scholar Academic Path now blocks progression until required fields are complete, shows inline field errors, keeps ELA and Math optional, and removes Skip from the required academic step."
     }
   ],
   "bugs": [],

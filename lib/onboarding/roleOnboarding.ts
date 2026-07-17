@@ -2,6 +2,8 @@ import {
   GPA_OPTIONS,
   GRADE_OPTIONS,
   GRADUATION_YEARS,
+  MAX_SCHOLAR_PILLARS,
+  PLAYBOOK_PILLARS,
 } from "@/lib/education";
 
 export type OnboardingField = {
@@ -10,9 +12,11 @@ export type OnboardingField = {
   placeholder?: string;
   type?:
     "text"
+    | "date"
     | "textarea"
     | "select"
     | "multi-select"
+    | "priority-list"
     | "school"
     | "district"
     | "college"
@@ -22,6 +26,7 @@ export type OnboardingField = {
     | "gpa"
     | "graduation-year"
     | "assessment-score"
+    | "standardized-test"
     | "activity-list"
     | "invite-list"
     | "safety-agreement";
@@ -30,6 +35,7 @@ export type OnboardingField = {
   required?: boolean;
   optional?: boolean;
   helpText?: string;
+  maxSelections?: number;
   validation?: "email" | "year" | "gpa" | "assessment-score";
 };
 
@@ -47,9 +53,55 @@ const IDENTITY = (label: string): OnboardingStep => ({
   title: `Create your ${label} profile.`,
   body: "Your name, handle, photo, and story personalize your Playbook experience.",
   fields: [
-    { key: "full_name", label: "Full name", placeholder: "Your name" },
-    { key: "username", label: "Username / handle", placeholder: "ex: futureleader" },
-    { key: "bio", label: "Short bio", type: "textarea", placeholder: "Tell the community who you are becoming." },
+    {
+      key: "full_name",
+      label: "Full name",
+      placeholder: "Your name",
+      required: true,
+    },
+    {
+      key: "username",
+      label: "Username / handle",
+      placeholder: "ex: futureleader",
+      required: true,
+    },
+    {
+      key: "bio",
+      label: "Short bio",
+      type: "textarea",
+      placeholder:
+        "Tell the community who you are becoming.",
+    },
+    {
+      key: "gender",
+      label: "Gender",
+      type: "select",
+      options: [
+        "Male",
+        "Female",
+        "Non-binary",
+        "Prefer not to say",
+        "Self-describe",
+      ],
+    },
+    {
+      key: "date_of_birth",
+      label: "Date of birth",
+      type: "date",
+      required: true,
+    },
+    {
+      key: "city",
+      label: "City",
+      placeholder: "Oakland",
+      required: true,
+    },
+    {
+      key: "zip_code",
+      label: "ZIP code",
+      placeholder: "94601",
+      required: true,
+    },
   ],
 });
 
@@ -61,11 +113,36 @@ const SCHOLAR_SUPPORT: OnboardingStep = {
   fields: [
     { key: "race_ethnicity", label: "Race/ethnicity", type: "multi-select", options: ["Black/African American", "Latino/a/e", "Indigenous/Native American", "AAPI", "Pacific Islander", "White", "Multiracial", "Prefer not to say", "Self-describe"] },
     { key: "lgbtqia_affinity", label: "LGBTQIA+ identity or allyship", type: "select", options: ["LGBTQIA+", "Questioning", "Ally", "Prefer not to say"] },
+    {
+      key: "household_income",
+      label: "Household income",
+      type: "select",
+      options: [
+        "Under $25,000",
+        "$25,000–$49,999",
+        "$50,000–$74,999",
+        "$75,000–$99,999",
+        "$100,000+",
+        "Prefer not to say",
+      ],
+    },
     { key: "first_generation", label: "First-generation college student?", type: "select", options: ["Yes", "No", "Not sure", "Prefer not to say"] },
     { key: "ell_status", label: "English learner / multilingual learner?", type: "select", options: ["Yes", "No", "Former ELL", "Not sure", "Prefer not to say"] },
     { key: "free_reduced_lunch", label: "Free/reduced lunch eligible?", type: "select", options: ["Yes", "No", "Not sure", "Prefer not to say"] },
+    {
+      key: "migrant_student",
+      label: "Migrant student?",
+      type: "select",
+      options: ["Yes", "No", "Not sure", "Prefer not to say"],
+    },
     { key: "foster_youth", label: "Foster youth / former foster youth?", type: "select", options: ["Yes", "No", "Prefer not to say"] },
     { key: "housing_insecurity", label: "Housing insecurity experience?", type: "select", options: ["Yes", "No", "Prefer not to say"] },
+    {
+      key: "has_iep",
+      label: "IEP or 504 plan?",
+      type: "select",
+      options: ["Yes", "No", "Not sure", "Prefer not to say"],
+    },
   ],
 };
 
@@ -154,10 +231,51 @@ const SCHOLAR_GOALS: OnboardingStep = {
   title: "Name your future.",
   body: "Tell us what future you are building so Compass can guide your next moves.",
   fields: [
-    { key: "intended_major", label: "Intended college major(s)", placeholder: "Business, biology, computer science..." },
-    { key: "ideal_profession", label: "Career interest", type: "career", placeholder: "Start typing a career..." },
-    { key: "sat_act_status", label: "SAT/ACT status", type: "select", options: ["Taken", "Planning", "Skipping", "Not sure"] },
-    { key: "engagement_preferences", label: "What help do you want first?", type: "multi-select", options: ["Essay Help", "College Matching", "Scholarship Tracking", "Internships", "Mentorship", "Transcript Review"] },
+    {
+      key: "intended_major",
+      label: "Intended college major(s)",
+      type: "major",
+      placeholder: "Start typing a college major...",
+      required: true,
+    },
+    {
+      key: "ideal_profession",
+      label: "Career interest",
+      type: "career",
+      placeholder: "Start typing a career...",
+    },
+    {
+      key: "sat_testing",
+      label: "SAT testing plan",
+      type: "standardized-test",
+      optional: true,
+      helpText:
+        "Record completed SAT attempts, future test dates, or why you are skipping it for now.",
+    },
+    {
+      key: "act_testing",
+      label: "ACT testing plan",
+      type: "standardized-test",
+      optional: true,
+      helpText:
+        "Record completed ACT attempts, future test dates, or why you are skipping it for now.",
+    },
+    {
+      key: "engagement_preferences",
+      label: "What help do you want first?",
+      type: "priority-list",
+      required: true,
+      helpText:
+        "Rank the support you want. Your first choice becomes your highest priority for Compass and mentor matching.",
+      options: [
+        "Essay Help",
+        "College Matching",
+        "Scholarship Tracking",
+        "Internships",
+        "Mentorship",
+        "Transcript Review",
+      ],
+    },
   ],
 };
 
@@ -167,7 +285,35 @@ const SCHOLAR_ACTIVITIES: OnboardingStep = {
   title: "Show the full story.",
   body: "Activities, jobs, leadership, service, family responsibilities, and creativity belong in your Scholar Record.",
   fields: [
-    { key: "activities", label: "Activity entries", type: "activity-list", placeholder: "Add activity details..." },
+    {
+      key: "activities",
+      label: "Activity entries",
+      type: "activity-list",
+      optional: true,
+      helpText:
+        "Choose a category first, then add the specific activity, your role, organization, weekly hours, total hours, supervisor, and what you learned.",
+    },
+  ],
+};
+
+
+const SCHOLAR_PILLARS: OnboardingStep = {
+  id: "scholar-pillars",
+  phase: "Phase 6 · Pillars",
+  title: "Choose what drives you.",
+  body:
+    "Select and rank the five areas that matter most to your goals, identity, and future opportunities.",
+  fields: [
+    {
+      key: "pillars",
+      label: "Your Top 5 Playbook Pillars",
+      type: "priority-list",
+      required: true,
+      maxSelections: MAX_SCHOLAR_PILLARS,
+      helpText:
+        "Choose up to five Pillars and rank them. Number 1 should be the area that matters most to you right now.",
+      options: [...PLAYBOOK_PILLARS],
+    },
   ],
 };
 
@@ -193,8 +339,18 @@ const ATHLETE_RECRUITING: OnboardingStep = {
   body: "This powers the Scholar-Athlete OS for eligibility, recruiting, NIL, and life after sports.",
   fields: [
     { key: "target_division", label: "Target level", type: "select", options: ["NCAA D1", "NCAA D2", "NCAA D3", "NAIA", "JUCO", "Club", "Undecided"] },
-    { key: "target_major", label: "Target major", placeholder: "Kinesiology, business, biology..." },
-    { key: "highlight_video_status", label: "Highlight video?", type: "select", options: ["Yes", "No", "Working on it"] },
+    {
+      key: "target_major",
+      label: "Target major",
+      type: "major",
+      placeholder: "Start typing a college major...",
+    },
+    {
+      key: "highlight_video_status",
+      label: "Highlight video?",
+      type: "select",
+      options: ["Yes", "No", "Working on it"],
+    },
     { key: "highlight_link", label: "Highlight/video link", placeholder: "Hudl, YouTube, Instagram, MaxPreps..." },
     { key: "eligibility_support_needed", label: "Eligibility support needed?", type: "multi-select", options: ["GPA", "A-G requirements", "NCAA/NAIA eligibility", "SAT/ACT", "Financial aid", "Transfer pathway", "Not sure"] },
     { key: "nil_interest", label: "NIL / brand interest", type: "multi-select", options: ["Personal brand", "Social media", "Local business partnerships", "Merch", "Financial literacy", "Not sure yet"] },
@@ -680,6 +836,7 @@ export const ROLE_ONBOARDING: Record<string, OnboardingStep[]> = {
     SCHOLAR_ACADEMIC,
     SCHOLAR_GOALS,
     SCHOLAR_ACTIVITIES,
+    SCHOLAR_PILLARS,
     NETWORK,
     USER_AGREEMENT,
   ],
@@ -691,6 +848,7 @@ export const ROLE_ONBOARDING: Record<string, OnboardingStep[]> = {
     ATHLETE_PROFILE,
     ATHLETE_RECRUITING,
     SCHOLAR_ACTIVITIES,
+    SCHOLAR_PILLARS,
     NETWORK,
     USER_AGREEMENT,
   ],
@@ -756,6 +914,7 @@ export const ROLE_ONBOARDING: Record<string, OnboardingStep[]> = {
     SCHOLAR_GOALS,
     ATHLETE_PROFILE,
     SCHOLAR_ACTIVITIES,
+    SCHOLAR_PILLARS,
     NETWORK,
     USER_AGREEMENT,
   ],

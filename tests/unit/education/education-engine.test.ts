@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
+
 import {
-  CALIFORNIA_DISTRICT_NAMES,
+  CALIFORNIA_DISTRICTS,
   GPA_OPTIONS,
   GRADUATION_YEARS,
   MAJOR_OPTIONS,
@@ -32,20 +33,16 @@ describe("Playbook Education Engine", () => {
   });
 
   it("sorts and deduplicates districts", () => {
-    const sorted = [...CALIFORNIA_DISTRICT_NAMES].sort(
-      (a, b) => a.localeCompare(b)
-    );
+  const sorted = [...CALIFORNIA_DISTRICTS].sort((a, b) =>
+    a.localeCompare(b)
+  );
 
-    expect(CALIFORNIA_DISTRICT_NAMES).toEqual(sorted);
+  expect(CALIFORNIA_DISTRICTS).toEqual(sorted);
 
-    expect(
-      new Set(
-        CALIFORNIA_DISTRICT_NAMES.map((name) =>
-          name.toLowerCase()
-        )
-      ).size
-    ).toBe(CALIFORNIA_DISTRICT_NAMES.length);
-  });
+  expect(
+    new Set(CALIFORNIA_DISTRICTS).size
+  ).toBe(CALIFORNIA_DISTRICTS.length);
+});
 
   it("searches districts and majors", () => {
     expect(searchDistricts("Oakland").length).toBeGreaterThan(0);
@@ -124,5 +121,116 @@ describe("California school dataset", () => {
             "California Department of Education"
       )
     ).toBe(true);
+  });
+});
+
+describe("California district provider", () => {
+  it("derives unique alphabetized districts from CDE schools", async () => {
+    const {
+      CALIFORNIA_DISTRICTS,
+    } = await import(
+      "@/lib/education/providers/districts"
+    );
+
+    expect(
+      CALIFORNIA_DISTRICTS.length
+    ).toBeGreaterThan(500);
+
+    expect(
+      new Set(
+        CALIFORNIA_DISTRICTS.map(
+          (district) =>
+            district.toLowerCase()
+        )
+      ).size
+    ).toBe(
+      CALIFORNIA_DISTRICTS.length
+    );
+
+    expect(CALIFORNIA_DISTRICTS).toEqual(
+      [...CALIFORNIA_DISTRICTS].sort(
+        (a, b) =>
+          a.localeCompare(b, "en", {
+            sensitivity: "base",
+            numeric: true,
+          })
+      )
+    );
+  });
+
+  it("searches official and custom districts", async () => {
+    const {
+      searchDistricts,
+    } = await import(
+      "@/lib/education/providers/districts"
+    );
+
+    expect(
+      searchDistricts("Oakland")
+    ).toContain("Oakland Unified");
+
+    expect(
+      searchDistricts(
+        "Future Scholars",
+        ["Future Scholars Unified"]
+      )
+    ).toContain(
+      "Future Scholars Unified"
+    );
+  });
+});
+
+describe("Major Intelligence provider", () => {
+  it("provides unique alphabetized majors", async () => {
+    const {
+      MAJOR_OPTIONS,
+    } = await import(
+      "@/lib/education/providers/majors"
+    );
+
+    expect(MAJOR_OPTIONS.length).toBeGreaterThan(60);
+
+    expect(
+      new Set(
+        MAJOR_OPTIONS.map((major) =>
+          major.toLowerCase()
+        )
+      ).size
+    ).toBe(MAJOR_OPTIONS.length);
+
+    expect(MAJOR_OPTIONS).toEqual(
+      [...MAJOR_OPTIONS].sort((a, b) =>
+        a.localeCompare(b, "en", {
+          sensitivity: "base",
+          numeric: true,
+        })
+      )
+    );
+  });
+
+  it("prioritizes relevant major matches", async () => {
+    const {
+      searchMajors,
+    } = await import(
+      "@/lib/education/providers/majors"
+    );
+
+    const computerResults =
+      searchMajors("computer");
+
+    expect(computerResults).toContain(
+      "Computer Science"
+    );
+
+    expect(computerResults).toContain(
+      "Computer Engineering"
+    );
+
+    expect(
+      searchMajors(
+        "sports analytics",
+        ["Sports Analytics"]
+      )
+    ).toContain("Sports Analytics");
   });
 });
