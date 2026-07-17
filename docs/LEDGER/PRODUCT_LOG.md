@@ -1135,3 +1135,6 @@ Playbook now separates demo, foundation, studio, founder, and active user experi
 
 ## 2026-07-16 21:50
 - Commit recorded: feat: canonical athletics domain foundation
+
+## 2026-07-17 00:36
+- Commit recorded: Fix athletics and scholar TypeScript lint issues
