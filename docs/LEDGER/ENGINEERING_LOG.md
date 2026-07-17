@@ -1395,3 +1395,6 @@ Started Beta 2 — Archivist v3 Unified Ledger Engine and Demo Mode.
 
 ## 2026-07-15 13:10
 - **commit**: Add canonical Scholar Record loader
+
+## 2026-07-16 21:37
+- **commit**: Chunk 9A - Introduce canonical AthleticsProfile into ScholarRecord
