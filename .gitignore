@@ -4,3 +4,5 @@ node_modules
 .DS_Store
 *.zippublic/assets/playbook-promo.mp4
 public/assets/playbook-promo.mp4
+
+next-env.d.ts
