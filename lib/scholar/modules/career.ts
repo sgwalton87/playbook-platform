@@ -1,4 +1,6 @@
-export function buildCareer(profile:any){
+import type { ScholarProfile } from "../types";
+
+export function buildCareer(profile: ScholarProfile){
 
   return{
 

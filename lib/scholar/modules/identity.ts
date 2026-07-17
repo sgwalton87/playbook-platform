@@ -1,4 +1,6 @@
-export function buildIdentity(profile:any){
+import type { ScholarProfile } from "../types";
+
+export function buildIdentity(profile: ScholarProfile){
   return {
     id: profile?.id,
     username: profile?.username,

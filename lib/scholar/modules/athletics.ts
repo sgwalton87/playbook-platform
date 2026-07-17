@@ -1,4 +1,6 @@
-export function buildAthletics(profile:any){
+import type { ScholarProfile } from "../types";
+
+export function buildAthletics(profile: ScholarProfile){
 
   return{
 

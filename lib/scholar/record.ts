@@ -1,4 +1,4 @@
-import type { ScholarRecord } from "./types";
+import type { ScholarProfile, ScholarRecord, ScholarRecordArtifact } from "./types";
 
 export function buildScholarRecord({
   profile = {},
@@ -7,11 +7,11 @@ export function buildScholarRecord({
   activities = [],
   posts = [],
 }: {
-  profile?: any;
-  certificates?: any[];
-  badges?: any[];
-  activities?: any[];
-  posts?: any[];
+  profile?: ScholarProfile;
+  certificates?: ScholarRecordArtifact[];
+  badges?: ScholarRecordArtifact[];
+  activities?: ScholarRecordArtifact[];
+  posts?: ScholarRecordArtifact[];
 }): ScholarRecord {
   const fullName =
     profile.full_name ||
@@ -61,7 +61,7 @@ export function buildScholarRecord({
   );
 
   return {
-    id: profile.id,
+    id: profile.id ?? "",
     identity: {
       username: profile.username,
       role: profile.role,

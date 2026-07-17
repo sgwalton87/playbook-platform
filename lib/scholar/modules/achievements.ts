@@ -1,9 +1,16 @@
+import type { ScholarRecordArtifact } from "../types";
+
 export function buildAchievements({
   certificates=[],
   badges=[],
   posts=[],
   activities=[],
-}:any){
+}: {
+  certificates?: ScholarRecordArtifact[];
+  badges?: ScholarRecordArtifact[];
+  posts?: ScholarRecordArtifact[];
+  activities?: ScholarRecordArtifact[];
+}){
 
   return{
 

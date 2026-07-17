@@ -1,18 +1,14 @@
+import type { ScholarRecordArtifact } from "../types";
+
 export function buildLeadership(
-  badges:any[]=[],
-  activities:any[]=[]
-){
-
-  return{
-
+  badges: ScholarRecordArtifact[] = [],
+  activities: ScholarRecordArtifact[] = []
+) {
+  return {
     badges,
-
     activities,
-
     leadershipScore:
-      badges.length*10+
-      activities.length*5,
-
+      badges.length * 10 +
+      activities.length * 5,
   };
-
 }

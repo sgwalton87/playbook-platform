@@ -2,11 +2,11 @@ import { createDefaultAthletics } from "./defaults";
 import type { AthleticsProfile } from "./types";
 
 type BuilderInput = {
-  row?: Record<string, any>;
-  onboarding?: Record<string, any>;
+  row?: Record<string, unknown>;
+  onboarding?: Record<string, unknown>;
 };
 
-function first(...values: any[]) {
+function first(...values: unknown[]): unknown {
   for (const v of values) {
     if (
       v !== undefined &&
@@ -20,7 +20,7 @@ function first(...values: any[]) {
   return null;
 }
 
-function arr(value: any): string[] {
+function arr(value: unknown): string[] {
   if (!value) return [];
 
   if (Array.isArray(value)) {
@@ -124,11 +124,12 @@ export function buildAthleticsProfile({
       )
     );
 
-  athletics.recruiting.recruitingEmail =
-    first(
+  const recruitingEmail = first(
       row.athlete_email,
       onboarding.athlete_email
     );
+  athletics.recruiting.recruitingEmail =
+    typeof recruitingEmail === "string" ? recruitingEmail : undefined;
 
   return athletics;
 
