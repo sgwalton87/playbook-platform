@@ -1,0 +1,10 @@
+{
+  "createdAt": null,
+  "typescript": null,
+  "build": null,
+  "lint": {
+    "passed": false,
+    "errors": 0,
+    "warnings": 0
+  }
+}
