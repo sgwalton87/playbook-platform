@@ -1219,3 +1219,6 @@ Playbook now separates demo, foundation, studio, founder, and active user experi
 
 ## 2026-07-20 22:52
 - Commit recorded: chore: archive legacy backup files
+
+## 2026-07-20 23:31
+- Commit recorded: Create ParticipantToProfile adapter scaffold

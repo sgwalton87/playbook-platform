@@ -1506,3 +1506,6 @@ Started Beta 2 — Archivist v3 Unified Ledger Engine and Demo Mode.
 
 ## 2026-07-20 22:52
 - **commit**: chore: archive legacy backup files
+
+## 2026-07-20 23:31
+- **commit**: Create ParticipantToProfile adapter scaffold
