@@ -1521,3 +1521,9 @@ Started Beta 2 — Archivist v3 Unified Ledger Engine and Demo Mode.
 
 ## 2026-07-21 10:28
 - **commit**: docs: architecture and governance foundation
+
+## 2026-07-21 10:29
+- **commit**: docs: architecture and governance foundation
+
+## 2026-07-21 10:49
+- **commit**: Merge remote-tracking branch 'origin/main' into docs/data-model-foundation

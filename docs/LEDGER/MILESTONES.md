@@ -1521,3 +1521,9 @@ Alpha 1.0 Complete — Intelligence OS foundation finished.
 
 ## 2026-07-21 10:28
 - **commit**: docs: architecture and governance foundation
+
+## 2026-07-21 10:29
+- **commit**: docs: architecture and governance foundation
+
+## 2026-07-21 10:49
+- **commit**: Merge remote-tracking branch 'origin/main' into docs/data-model-foundation
