@@ -1518,3 +1518,6 @@ Started Beta 2 — Archivist v3 Unified Ledger Engine and Demo Mode.
 
 ## 2026-07-21 00:09
 - **commit**: docs(cartographer): initial repository inspection ledger updates
+
+## 2026-07-21 10:28
+- **commit**: docs: architecture and governance foundation

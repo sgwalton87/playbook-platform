@@ -1231,3 +1231,6 @@ Playbook now separates demo, foundation, studio, founder, and active user experi
 
 ## 2026-07-21 00:09
 - Commit recorded: docs(cartographer): initial repository inspection ledger updates
+
+## 2026-07-21 10:28
+- Commit recorded: docs: architecture and governance foundation

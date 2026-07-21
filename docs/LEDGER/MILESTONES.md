@@ -1518,3 +1518,6 @@ Alpha 1.0 Complete — Intelligence OS foundation finished.
 
 ## 2026-07-21 00:09
 - **commit**: docs(cartographer): initial repository inspection ledger updates
+
+## 2026-07-21 10:28
+- **commit**: docs: architecture and governance foundation
