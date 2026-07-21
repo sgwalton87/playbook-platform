@@ -2326,3 +2326,403 @@ Policies produce authorization decisions.
 Permissions represent those evaluated decisions.
 
 ---
+
+# Permissions
+
+## Definition
+
+A Permission is the evaluated authorization decision that determines whether a Participant may perform a specific action against a specific resource within a specific Context at a specific point in time.
+
+Permissions are not assigned directly.
+
+Permissions are computed through Policy evaluation.
+
+A Permission represents the outcome of evaluating the applicable Policies against the current Participant, Identity, Relationships, Organizations, Roles, Context, Resource, Consent, and system state.
+
+---
+
+## Purpose
+
+Permissions provide a consistent, deterministic, and secure authorization layer for every capability within the Playbook platform.
+
+Rather than storing static permissions on participants or roles, Playbook computes permissions dynamically from canonical entities.
+
+This ensures that authorization automatically adapts as relationships, organizations, roles, contexts, and policies evolve.
+
+---
+
+## Permission Formula
+
+Conceptually, every Permission is computed from:
+
+```text
+Permission =
+    Identity
+    +
+    Participant Record
+    +
+    Relationships
+    +
+    Organizations
+    +
+    Roles
+    +
+    Context
+    +
+    Policies
+    +
+    Consent
+    +
+    Resource
+    +
+    Current State
+```
+
+No individual component is sufficient by itself.
+
+Authorization emerges from the combination.
+
+---
+
+## Permission Principles
+
+### Permissions Are Computed
+
+Permissions should never be manually attached to Participants.
+
+Instead, they are evaluated when needed.
+
+This minimizes stale authorization and reduces administrative complexity.
+
+---
+
+### Permissions Are Temporary
+
+A Permission exists only for the duration of an evaluation.
+
+Changing any input may produce a different authorization decision.
+
+Examples include:
+
+- relationship termination
+- organization membership changes
+- consent revocation
+- policy updates
+- context switching
+- role expiration
+- participant suspension
+
+---
+
+### Permissions Are Resource-Specific
+
+Authorization applies to a specific resource.
+
+Examples include:
+
+- a single Participant Record
+- one organization
+- one course
+- one event
+- one application
+- one certificate
+- one conversation
+- one scholarship
+
+Authorization to one resource does not imply authorization to another.
+
+---
+
+### Permissions Are Action-Specific
+
+Every Permission evaluates one requested action.
+
+Examples:
+
+- view
+- edit
+- create
+- approve
+- verify
+- archive
+- publish
+- invite
+- export
+- manage
+- administer
+
+Broad permissions should be avoided whenever more specific actions can be evaluated.
+
+---
+
+### Permissions Are Explainable
+
+Every authorization decision should be capable of explaining why it was granted or denied.
+
+Examples:
+
+Allowed because:
+
+- verified coaching relationship
+- organization membership
+- active mentor assignment
+- participant consent
+
+Denied because:
+
+- relationship expired
+- policy restriction
+- missing consent
+- organization mismatch
+- insufficient role capability
+
+Explainability supports security, trust, auditing, and AI transparency.
+
+---
+
+## Permission Scope
+
+Permissions may be evaluated at several scopes.
+
+### Participant
+
+Example:
+
+May view Participant Record.
+
+---
+
+### Organization
+
+Example:
+
+May manage members.
+
+---
+
+### Program
+
+Example:
+
+May review applications.
+
+---
+
+### Resource
+
+Example:
+
+May edit this certificate.
+
+---
+
+### Administrative
+
+Example:
+
+May configure organization settings.
+
+---
+
+## Permission Evaluation
+
+Permission evaluation should generally occur in the following sequence.
+
+```text
+Authenticate Identity
+
+↓
+
+Resolve Participant
+
+↓
+
+Determine Context
+
+↓
+
+Resolve Relationships
+
+↓
+
+Resolve Organizations
+
+↓
+
+Resolve Roles
+
+↓
+
+Load Applicable Policies
+
+↓
+
+Evaluate Consent
+
+↓
+
+Evaluate Resource
+
+↓
+
+Compute Decision
+
+↓
+
+Return Permission
+```
+
+Each stage may further restrict authorization.
+
+---
+
+## Permission Outcomes
+
+Permission evaluation returns one canonical decision.
+
+```text
+Allowed
+
+Denied
+
+Allowed With Conditions
+```
+
+Conditional authorization may include:
+
+- read only
+- limited fields
+- expiration
+- masked data
+- organization scope
+- relationship scope
+- audit requirement
+- approval workflow
+
+---
+
+## Permission Categories
+
+Examples include:
+
+### Participant Permissions
+
+- manage profile
+- update goals
+- manage portfolio
+
+---
+
+### Relationship Permissions
+
+- invite mentor
+- approve guardian
+- end relationship
+
+---
+
+### Organization Permissions
+
+- manage membership
+- publish events
+- administer programs
+
+---
+
+### Evidence Permissions
+
+- upload evidence
+- verify evidence
+- archive evidence
+
+---
+
+### Opportunity Permissions
+
+- publish opportunity
+- apply
+- review application
+- award opportunity
+
+---
+
+### AI Permissions
+
+- generate recommendation
+- summarize participant
+- recommend opportunities
+- review evidence
+- draft communications
+
+AI permissions remain subject to Policy evaluation.
+
+---
+
+## Permission Invariants
+
+The following statements must always remain true.
+
+- Every Permission is computed.
+- Permissions are never permanently stored as participant attributes.
+- Every Permission references a resource.
+- Every Permission evaluates an action.
+- Every Permission is traceable to one or more Policies.
+- Equivalent inputs produce equivalent decisions.
+- Authorization is deterministic.
+- Authorization defaults to denial.
+
+---
+
+## Relationship to Operating Systems
+
+Operating Systems never define authorization.
+
+Operating Systems present experiences.
+
+Permissions determine which capabilities become available within those experiences.
+
+For example:
+
+Founder OS may display Organization Management.
+
+Whether management controls are enabled depends upon evaluated Permissions rather than the operating system itself.
+
+---
+
+## Artificial Intelligence
+
+Compass AI and future intelligent agents must request Permissions using the same evaluation process as human participants.
+
+AI systems must never bypass authorization simply because they operate internally.
+
+Every AI action should execute on behalf of an authenticated identity or trusted platform service operating under explicit Policies.
+
+---
+
+## Architectural Implications
+
+Permissions are the executable manifestation of the canonical architecture.
+
+Participant defines who.
+
+Identity authenticates.
+
+Participant Record provides history.
+
+Relationships establish trust.
+
+Organizations establish environment.
+
+Roles define capability.
+
+Context defines experience.
+
+Policies define rules.
+
+Permissions determine whether an action may occur.
+
+Every secure interaction within Playbook ultimately depends upon Permission evaluation.
+
+Permissions therefore form the operational boundary between canonical architecture and platform implementation.
+
+---
