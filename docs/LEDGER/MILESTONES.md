@@ -1428,3 +1428,15 @@ Alpha 1.0 Complete — Intelligence OS foundation finished.
 
 ## 2026-07-17 01:02
 - **build-pass**: Pre-push tests and build passed.
+
+## 2026-07-17 01:08
+- **commit**: chore: update engineering ledger after athletics cleanup
+
+## 2026-07-17 01:11
+- **build-pass**: Pre-push tests and build passed.
+
+## 2026-07-17 02:13
+- **commit**: chore: exclude generated and archived files from lint
+
+## 2026-07-17 12:49
+- **commit**: refactor(onboarding): extract profile persistence module

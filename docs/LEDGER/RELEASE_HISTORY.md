@@ -1281,3 +1281,15 @@ Alpha 1.0 Complete
 
 ## 2026-07-17 01:02
 - Build validation passed: Pre-push tests and build passed.
+
+## 2026-07-17 01:08
+- Commit recorded: chore: update engineering ledger after athletics cleanup
+
+## 2026-07-17 01:11
+- Build validation passed: Pre-push tests and build passed.
+
+## 2026-07-17 02:13
+- Commit recorded: chore: exclude generated and archived files from lint
+
+## 2026-07-17 12:49
+- Commit recorded: refactor(onboarding): extract profile persistence module
