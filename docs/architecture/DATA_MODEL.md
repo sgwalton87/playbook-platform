@@ -162,7 +162,7 @@ Permissions are established through verified relationships rather than through a
 
 ## Evidence Before Opinion
 
-Whenever possible, recommendations should be supported by verified evidence contained within the Scholar Record rather than subjective opinion.
+Whenever possible, recommendations should be supported by verified evidence contained within the Participant Record rather than subjective opinion.
 
 ---
 
@@ -191,13 +191,13 @@ Participant
 │
 ├── Identity
 │
-├── Scholar Record
-│
-├── Roles
+├── Participant Record
 │
 ├── Relationships
 │
 ├── Organizations
+│
+├── Roles
 │
 ├── Context
 │
@@ -405,7 +405,7 @@ Organizations may contribute information to a participant's record only within t
 The following statements must always remain true.
 
 - Every Playbook Identity belongs to exactly one Participant.
-- Every Scholar Record belongs to exactly one Participant.
+- Every Participant Record belongs to exactly one Participant.
 - Every Role assignment references a Participant.
 - Every Relationship references one or more Participants.
 - Every Opportunity engagement references one or more Participants.
@@ -426,5 +426,428 @@ Because the Participant is the root entity:
 - Future modules should extend participant capabilities instead of introducing competing identity models.
 
 This principle ensures that Playbook remains a lifelong platform rather than a collection of disconnected applications.
+
+---
+
+# Playbook Identity
+
+## Definition
+
+A Playbook Identity is the permanent digital identity assigned to exactly one Participant.
+
+It provides the stable reference through which authentication, authorization, system services, and platform interactions are managed.
+
+Identity is not the participant.
+
+Identity represents the participant within the Playbook ecosystem.
+
+---
+
+## Purpose
+
+The purpose of the Playbook Identity is to provide a single, lifelong digital identity that survives changes in:
+
+- schools
+- employers
+- organizations
+- email addresses
+- phone numbers
+- usernames
+- authentication providers
+- geographic location
+- role assignments
+
+A participant's identity should never require recreation simply because their life changes.
+
+---
+
+## Identity Principles
+
+### One Identity Per Participant
+
+Every participant possesses exactly one Playbook Identity.
+
+Duplicate identities are prohibited.
+
+When duplicate accounts are discovered, they should be merged according to the Identity Merge Specification rather than maintained independently.
+
+---
+
+### Identity Is Permanent
+
+Identity never expires.
+
+Identity is retained throughout the participant's lifetime unless legal deletion requirements require permanent removal.
+
+---
+
+### Authentication Is Replaceable
+
+Authentication methods are attached to an identity.
+
+Authentication is not the identity itself.
+
+Examples include:
+
+- Email/password
+- Google
+- Apple
+- Microsoft
+- School SSO
+- Passkeys
+- Future authentication providers
+
+Participants may replace authentication methods without affecting their identity.
+
+---
+
+### Usernames Are Mutable
+
+Usernames are public presentation attributes.
+
+They are not primary identifiers.
+
+Participants may change usernames without affecting relationships, permissions, evidence, or historical records.
+
+---
+
+### Contact Information Is Mutable
+
+Email addresses, phone numbers, mailing addresses, and communication preferences may change throughout a participant's life.
+
+Identity remains constant despite these changes.
+
+---
+
+## Identity Responsibilities
+
+The Playbook Identity is responsible for:
+
+- authentication
+- account security
+- account recovery
+- notification routing
+- session management
+- public profile references
+- API ownership
+- audit attribution
+
+Identity is not responsible for storing educational history, achievements, or relationships.
+
+Those belong to downstream canonical entities.
+
+---
+
+## Identity Invariants
+
+The following statements must always remain true.
+
+- Every Identity belongs to exactly one Participant.
+- Every Participant has exactly one Identity.
+- Authentication providers attach to an Identity.
+- Sessions authenticate an Identity.
+- Audit logs reference an Identity.
+- Public URLs reference an Identity.
+
+These invariants establish Identity as the technical anchor of the platform.
+
+---
+
+## Architectural Implications
+
+Identity should be referenced internally using immutable identifiers rather than mutable user-facing attributes.
+
+Production systems should never rely on email addresses or usernames as primary foreign keys.
+
+All services should resolve platform activity through the Playbook Identity before applying permissions, contexts, or operating systems.
+
+This separation between Participant and Identity allows the platform to evolve authentication technologies without disrupting the participant's lifelong record.
+
+---
+
+# Participant Record
+
+## Definition
+
+The Participant Record is the canonical, lifelong record of a participant's growth, learning, achievements, experiences, relationships, and verified evidence within the Playbook ecosystem.
+
+Every participant possesses exactly one Participant Record.
+
+The Participant Record persists throughout the participant's lifetime regardless of changes in schools, employers, organizations, roles, or geographic location.
+
+Unlike institutional records, the Participant Record is participant-centered rather than organization-centered.
+
+---
+
+## Purpose
+
+The Participant Record exists to preserve the participant's complete developmental journey.
+
+Rather than replacing previous records as a participant progresses through life, the Participant Record continuously expands to reflect new experiences, accomplishments, credentials, and relationships.
+
+It serves as the authoritative source of truth for the participant's history within Playbook.
+
+---
+
+## Core Principles
+
+### Lifelong Continuity
+
+The Participant Record begins when a participant first joins Playbook and continues indefinitely.
+
+Educational milestones, professional experiences, leadership roles, certifications, entrepreneurial ventures, and community service become chapters within a single continuous record.
+
+---
+
+### Institution Independence
+
+Schools, colleges, employers, nonprofits, athletic organizations, and businesses contribute information to the Participant Record.
+
+None of these organizations owns the record.
+
+Participants retain the continuity of their record throughout life.
+
+---
+
+### Evidence-Centered
+
+Every meaningful achievement within the Participant Record should, whenever possible, be supported by evidence.
+
+Examples include:
+
+- transcripts
+- certificates
+- badges
+- portfolios
+- applications
+- recommendation letters
+- evaluations
+- videos
+- publications
+- athletic statistics
+- recruiting profiles
+- financial literacy milestones
+- volunteer hours
+- employment history
+
+Evidence increases trustworthiness and enables intelligent recommendations throughout the platform.
+
+---
+
+### Progressive Growth
+
+The Participant Record is additive.
+
+Historical information should not be discarded simply because a participant enters a new stage of life.
+
+Instead, the record grows over time, preserving a complete developmental history.
+
+---
+
+## Domains
+
+The Participant Record may contain information spanning multiple domains.
+
+### Education
+
+Academic history
+
+Courses
+
+Transcripts
+
+Degrees
+
+Academic plans
+
+Assessments
+
+FAFSA progress
+
+A-G completion
+
+College applications
+
+Scholarships
+
+---
+
+### Athletics
+
+Sports history
+
+Teams
+
+Performance metrics
+
+Recruiting information
+
+Highlight videos
+
+Athletic achievements
+
+Physical measurements
+
+Training history
+
+---
+
+### Career
+
+Internships
+
+Employment
+
+Professional certifications
+
+Licenses
+
+References
+
+Career interests
+
+Career milestones
+
+---
+
+### Leadership
+
+Organizations
+
+Board service
+
+Student government
+
+Volunteer leadership
+
+Community organizing
+
+Public speaking
+
+Projects
+
+---
+
+### Entrepreneurship
+
+Businesses
+
+Startups
+
+Products
+
+Patents
+
+Pitch competitions
+
+Business plans
+
+Revenue milestones
+
+Investor relationships
+
+---
+
+### Financial Capability
+
+Financial education
+
+Certificates
+
+Budgeting achievements
+
+Investment education
+
+Credit education
+
+Tax education
+
+Financial wellness milestones
+
+---
+
+### Personal Development
+
+Goals
+
+Strengths
+
+Interests
+
+Values
+
+Growth reflections
+
+Coaching milestones
+
+Mentorship history
+
+---
+
+## Record Views
+
+The Participant Record is canonical.
+
+Different operating systems present specialized views of the same record.
+
+Examples include:
+
+- Scholar Profile
+- Scholar-Athlete Profile
+- Parent Dashboard
+- Mentor Workspace
+- Founder Workspace
+- Recruiter View
+- Organization Administration
+
+These experiences present different perspectives of the same underlying record.
+
+No duplicate records should exist.
+
+---
+
+## Ownership
+
+Participants own the continuity of their Participant Record.
+
+Organizations may contribute information only within authorized permissions.
+
+Participants may grant or revoke access according to platform policies, legal requirements, and consent agreements.
+
+---
+
+## Participant Record Invariants
+
+The following statements must always remain true.
+
+- Every Participant has exactly one Participant Record.
+- Every Participant Record belongs to exactly one Participant.
+- Every Evidence artifact references a Participant Record.
+- Every Opportunity engagement references a Participant Record.
+- Every Achievement references a Participant Record.
+- Historical information is additive rather than destructive.
+- Participant Record identifiers are immutable.
+
+---
+
+## Architectural Implications
+
+The Participant Record serves as the primary knowledge source for:
+
+- Compass AI
+- Opportunity Matching
+- Scholarship Discovery
+- Recruiting Intelligence
+- Career Planning
+- Course Recommendations
+- Certificate Generation
+- Transcript Generation
+- Portfolio Assembly
+- Analytics
+- Longitudinal Reporting
+
+Future platform capabilities should extend the Participant Record rather than introduce competing records for specific life stages.
+
+The Participant Record is the heart of the Playbook ecosystem.
 
 ---
