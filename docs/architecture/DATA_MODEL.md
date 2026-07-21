@@ -1096,3 +1096,259 @@ No feature should grant participant access solely because of a role assignment.
 Relationship-aware authorization is a foundational architectural requirement of Playbook.
 
 ---
+
+# Organizations
+
+## Definition
+
+An Organization is a structured entity that participates in the development, support, governance, employment, education, mentorship, or advancement of Participants within the Playbook ecosystem.
+
+Organizations do not own Participants.
+
+Organizations provide environments in which Participants learn, work, compete, collaborate, lead, and grow.
+
+Organizations may contribute information to Participant Records only within authorized permissions.
+
+---
+
+## Purpose
+
+Organizations provide the institutional context in which participant activity occurs.
+
+Examples include educational institutions, employers, athletic organizations, nonprofits, businesses, government agencies, scholarship providers, community organizations, and other structured groups.
+
+Organizations are contributors to participant development.
+
+They are never the center of the platform.
+
+Participants remain the canonical entity.
+
+---
+
+## Core Principles
+
+### Organizations Are Independent Entities
+
+Every organization possesses its own identity independent of its members.
+
+Organizations may continue to exist even as participants join, leave, or change roles.
+
+Likewise, participants may continue throughout life while changing organizations many times.
+
+---
+
+### Organizations Do Not Own Participants
+
+Participant identity, Participant Records, evidence, achievements, and historical experiences remain participant-centered.
+
+Organizations contribute verified information.
+
+Ownership remains with the participant and the platform's governance model.
+
+---
+
+### Organizations Enable Context
+
+Organizations provide one source of operational context.
+
+Examples include:
+
+- Oakland Unified School District
+- University of California, Berkeley
+- Oakland Roots SC
+- Education Justice Academy
+- Playbook Series
+- Bulletproof Financial Group
+
+When a participant enters an organization, they may gain access to one or more organization-specific operating systems.
+
+---
+
+### Organizations Host Roles
+
+Roles are assigned within organizational context.
+
+Examples:
+
+A participant may simultaneously be:
+
+• Scholar at Skyline High School
+
+• Coach at Oakland Dynamites AAU
+
+• Founder of Playbook Series
+
+• Mentor for Education Justice Academy
+
+The participant remains one individual while operating across multiple organizations.
+
+---
+
+### Organizations May Collaborate
+
+Organizations may establish partnerships that enable shared opportunities, referrals, data exchange, and collaborative programs.
+
+Partnerships should never bypass participant consent requirements.
+
+---
+
+## Organization Categories
+
+Organizations may belong to one or more categories.
+
+Examples include:
+
+### Education
+
+- Elementary School
+- Middle School
+- High School
+- Community College
+- University
+- Trade School
+
+---
+
+### Athletics
+
+- High School Team
+- College Team
+- AAU Program
+- Club
+- Professional Team
+- League
+
+---
+
+### Government
+
+- School District
+- City
+- County
+- State Agency
+- Federal Agency
+
+---
+
+### Business
+
+- Startup
+- Corporation
+- Small Business
+- Consulting Firm
+
+---
+
+### Nonprofit
+
+- Foundation
+- Community Organization
+- Scholarship Provider
+- Advocacy Organization
+
+---
+
+### Professional
+
+- Licensing Board
+- Professional Association
+- Certification Body
+
+---
+
+Additional organization categories may be introduced through future specifications.
+
+---
+
+## Organization Attributes
+
+Organizations may maintain canonical information including:
+
+- legal name
+- public name
+- organization type
+- industry
+- website
+- branding
+- contact information
+- locations
+- accreditation
+- verification status
+- memberships
+- partnerships
+- active programs
+- operating systems
+- available opportunities
+
+---
+
+## Membership
+
+Participants interact with organizations through Membership.
+
+Membership is distinct from employment, enrollment, or role assignment.
+
+Membership establishes the participant's association with the organization.
+
+Roles determine capability.
+
+Relationships determine trust.
+
+Context determines experience.
+
+---
+
+## Organization Invariants
+
+The following statements must always remain true.
+
+- Every Organization possesses exactly one Organization Identity.
+- Organizations never own Participants.
+- Organizations may contain many Participants.
+- Participants may belong to many Organizations.
+- Organizations may expose multiple Operating Systems.
+- Organizations may publish Opportunities.
+- Organizations may contribute verified Evidence.
+- Organizations may define Programs.
+- Organizations may define Workspaces.
+
+---
+
+## Organizational Graph
+
+Collectively, organizations form an ecosystem connected through participants, partnerships, and opportunities.
+
+This graph enables:
+
+- opportunity discovery
+- cross-organization collaboration
+- referral pathways
+- mentorship ecosystems
+- recruiting pipelines
+- scholarship ecosystems
+- workforce development
+- community engagement
+
+The Organizational Graph serves as one of the platform's primary intelligence networks.
+
+---
+
+## Architectural Implications
+
+Organizations provide structure.
+
+Participants provide continuity.
+
+Relationships provide trust.
+
+Roles provide capability.
+
+Context provides experience.
+
+Permissions emerge from the interaction of all five.
+
+Organizations therefore function as environments within which participant growth occurs rather than containers that own participant identity.
+
+This distinction preserves lifelong continuity while enabling unlimited organizational participation throughout a participant's life.
+
+---
