@@ -6,6 +6,7 @@ import {
   renderDataModel,
   renderEngineCatalog,
   renderEventCatalog,
+  renderOwnershipMap,
   renderRepositoryCatalog,
   renderSystemMap,
 } from "./ArchitectureRenderer";
@@ -23,6 +24,11 @@ export function runCartographer() {
   write("docs/ARCHITECTURE/COMPONENT_CATALOG.md", renderComponentCatalog());
   write("docs/ARCHITECTURE/SYSTEM_MAP.md", renderSystemMap());
   write("docs/ARCHITECTURE/DATA_MODEL.md", renderDataModel());
+
+  write(
+    "docs/ARCHITECTURE/OWNERSHIP_MAP.md",
+    renderOwnershipMap()
+  );
 
   return "Cartographer generated architecture documents.";
 }

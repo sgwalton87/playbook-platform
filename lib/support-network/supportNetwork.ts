@@ -1,4 +1,4 @@
-export function getSupportNetwork() {
+export function getDemoSupportNetwork() {
   return {
     scholar: "Maya Johnson",
     center: "Scholar Record",

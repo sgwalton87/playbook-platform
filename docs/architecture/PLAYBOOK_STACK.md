@@ -1,296 +1,480 @@
 # Playbook Stack
 
-Version: 1.0
+Version: 2.0
 
 Status: Canonical
 
 Owner: Platform Architecture
 
+Related Documents
+
+- FOUNDATION.md
+- DATA_MODEL.md
+- DATABASE_BLUEPRINT.md
+- ENGINE_CONTRACT.md
+- EVENT_CONTRACT.md
+- COMPUTATION_MODEL.md
+- STATE_MODEL.md
+- SECURITY_MODEL.md
+- AI_MODEL.md
+
 ---
 
 # Purpose
 
-The Playbook Stack defines the architectural layers of the Playbook platform.
+The Playbook Stack defines the complete architectural hierarchy of the Playbook platform.
 
-It explains how every component of the system fits together—from a Participant's lifelong identity to the AI experiences that guide them.
+It describes how participant experiences flow through deterministic engines to produce trusted outcomes, opportunities, plans, and AI guidance.
 
-This document is the primary architectural blueprint for the Playbook platform.
+Every component within the platform exists within this stack.
 
-All domain specifications, engines, policies, operating systems, and AI capabilities derive from this stack.
+Nothing exists outside of it.
 
 ---
 
 # Vision
 
+Playbook is not a Learning Management System.
+
+Playbook is not a CRM.
+
+Playbook is not a Social Network.
+
+Playbook is not an Applicant Tracking System.
+
 Playbook is a Human Development and Opportunity Operating System.
 
-The platform exists to continuously transform verified evidence into meaningful opportunities throughout a Participant's lifetime.
-
-Playbook does not organize around products.
-
-Playbook organizes around human development.
+The platform continuously transforms verified human experiences into lifelong opportunity.
 
 ---
 
-# Core Philosophy
+# Platform Philosophy
 
-Everything begins with the Participant.
+Participants are lifelong.
 
-Participants accumulate verified evidence through education, athletics, entrepreneurship, leadership, employment, financial capability, and community engagement.
+Organizations are temporary.
 
-Verified evidence becomes part of the Participant Record.
+Experiences generate evidence.
 
-The platform continuously evaluates that record to identify new opportunities.
+Evidence builds records.
 
-Operating Systems present the appropriate experience.
+Records unlock opportunities.
 
-Compass guides Participants toward meaningful action.
+Opportunities become plans.
+
+Plans drive action.
+
+Actions generate new evidence.
+
+This creates a continuous cycle of growth.
 
 ---
 
-# Architectural Layers
+# Architectural Principles
+
+Participant First
+
+Evidence Before Computation
+
+Deterministic Business Logic
+
+Append-Only History
+
+Relationships Define Trust
+
+Organizations Define Environment
+
+Policies Define Rules
+
+Permissions Are Computed
+
+AI Assists
+
+Humans Decide
+
+---
+
+# Complete Platform Stack
 
 ```
 ┌────────────────────────────────────────────┐
-│ Layer 8 │ Compass                          │
-├────────────────────────────────────────────┤
-│ Layer 7 │ Operating Systems                │
-├────────────────────────────────────────────┤
-│ Layer 6 │ Planning Engine                  │
-├────────────────────────────────────────────┤
-│ Layer 5 │ Opportunity Engine               │
-├────────────────────────────────────────────┤
-│ Layer 4 │ Participant Record               │
-├────────────────────────────────────────────┤
-│ Layer 3 │ Domain Engines                   │
-├────────────────────────────────────────────┤
-│ Layer 2 │ Canonical Entities               │
-├────────────────────────────────────────────┤
-│ Layer 1 │ Human Development Domains        │
+│            Participant Experience          │
+└────────────────────────────────────────────┘
+                    │
+                    ▼
+┌────────────────────────────────────────────┐
+│           Operating Systems                │
+│ Scholar │ Founder │ Athlete │ Parent       │
+│ Mentor │ Coach │ Advisor │ Admin           │
+└────────────────────────────────────────────┘
+                    │
+                    ▼
+┌────────────────────────────────────────────┐
+│                 Compass                    │
+│ Conversational Intelligence                │
+└────────────────────────────────────────────┘
+                    │
+                    ▼
+┌────────────────────────────────────────────┐
+│            Planning Engine                 │
+└────────────────────────────────────────────┘
+                    │
+                    ▼
+┌────────────────────────────────────────────┐
+│           Opportunity Engine               │
+└────────────────────────────────────────────┘
+                    │
+                    ▼
+┌────────────────────────────────────────────┐
+│        Participant Record Engine           │
+└────────────────────────────────────────────┘
+                    │
+                    ▼
+┌────────────────────────────────────────────┐
+│             Evidence Engine                │
+└────────────────────────────────────────────┘
+                    │
+                    ▼
+┌────────────────────────────────────────────┐
+│             Domain Engines                 │
+│ Learning │ Athletics │ Entrepreneurship    │
+│ Community │ Financial │ Wellness │ Career  │
+└────────────────────────────────────────────┘
+                    │
+                    ▼
+┌────────────────────────────────────────────┐
+│           Canonical Entities               │
+└────────────────────────────────────────────┘
+                    │
+                    ▼
+┌────────────────────────────────────────────┐
+│            Human Development               │
 └────────────────────────────────────────────┘
 ```
 
-Each layer has a single responsibility.
-
-Higher layers never replace lower layers.
-
 ---
 
-# Layer 1 — Human Development Domains
+# Layer 1 — Human Development
 
-Human Development Domains represent the major areas of a Participant's life.
+The foundation of the platform.
 
-These domains define *why* the platform exists.
+Playbook exists to support lifelong human development.
 
-Examples include:
+Examples:
 
-- Education
-- Athletics
-- Career
-- Entrepreneurship
-- Financial Capability
-- Leadership
-- Civic Engagement
-- Community
-- Wellness
-- Creativity
-- Lifelong Learning
+Education
 
-Domains are conceptual.
+Athletics
 
-They are not implementation.
+Career
+
+Entrepreneurship
+
+Leadership
+
+Financial Capability
+
+Community
+
+Service
+
+Health & Wellness
+
+Creative Achievement
+
+Every future domain begins here.
 
 ---
 
 # Layer 2 — Canonical Entities
 
-Canonical Entities represent the platform's shared language.
+The platform's universal language.
 
-Every engine uses the same entities.
+Core entities include:
 
-Examples include:
+Participant
 
-- Participant
-- Identity
-- Participant Record
-- Organization
-- Relationship
-- Policy
-- Permission
-- Context
-- Evidence
-- Opportunity
+Identity
 
-Canonical entities never belong to individual features.
+Participant Record
 
-They belong to the platform.
+Organization
+
+Relationship
+
+Evidence
+
+Opportunity
+
+Plan
+
+Context
+
+Policy
+
+Permission
+
+Consent
+
+Every Domain Engine uses these entities.
 
 ---
 
 # Layer 3 — Domain Engines
 
-Domain Engines contain deterministic business logic.
+Domain Engines own business logic.
 
-Each engine owns a bounded context.
+Examples:
 
-Examples include:
+Learning Engine
 
-- Learning Engine
-- Athletics Engine
-- Entrepreneurship Engine
-- Financial Capability Engine
-- Community Engine
-- Relationship Engine
-- Organization Engine
-- Evidence Engine
-- Opportunity Engine
-- Planning Engine
+Athletics Engine
 
-Engines compute.
+Community Engine
 
-They do not render user experiences.
+Entrepreneurship Engine
 
----
+Financial Capability Engine
 
-# Layer 4 — Participant Record
+Career Engine
 
-The Participant Record is the permanent, append-only record of a Participant's verified development.
+Wellness Engine
 
-It aggregates evidence across every domain.
+Identity Engine
 
-Examples include:
+Relationship Engine
 
-- Academic achievements
-- Athletic performance
-- Business milestones
-- Certifications
-- Community service
-- Leadership experiences
-- Financial literacy achievements
+Organization Engine
 
-The Participant Record is lifelong.
+Domain Engines:
 
-It is not tied to any single organization.
+Validate
+
+Compute
+
+Publish Events
+
+Maintain bounded contexts
+
+No Domain Engine owns another Domain Engine.
 
 ---
 
-# Layer 5 — Opportunity Engine
+# Layer 4 — Evidence Engine
 
-The Opportunity Engine transforms verified evidence into meaningful opportunities.
+The compiler of Playbook.
 
-It continuously evaluates:
+Responsibilities:
 
-- Eligibility
-- Goals
-- Policies
-- Permissions
-- Relationships
-- Organizations
-- Deadlines
-- Participant preferences
+Capture submissions
 
-Opportunity types include:
+Normalize information
 
-- Scholarships
-- Internships
-- Employment
-- College Admissions
-- Recruiting
-- Fellowships
-- Grants
-- Accelerators
-- Venture Funding
-- Certifications
-- Leadership Programs
-- Research
-- Conferences
-- Mentorship
+Verify authenticity
 
-The Opportunity Engine is deterministic.
+Publish evidence
+
+Maintain history
+
+Everything meaningful becomes Evidence before entering the platform intelligence pipeline.
 
 ---
 
-# Layer 6 — Planning Engine
+# Layer 5 — Participant Record Engine
 
-The Planning Engine determines what should happen next.
+The lifelong verified record.
 
-It prioritizes opportunities according to:
+Responsibilities:
 
-- Impact
-- Deadlines
-- Dependencies
-- Participant goals
-- Time availability
-- Organizational requirements
-- Historical progress
+Aggregate verified evidence
 
-Planning converts possibilities into action.
+Build participant history
+
+Track achievements
+
+Maintain longitudinal records
+
+Produce trusted participant state
+
+The Participant Record is append-only.
 
 ---
 
-# Layer 7 — Operating Systems
+# Layer 6 — Opportunity Engine
 
-Operating Systems assemble platform capabilities into role- and context-specific experiences.
+The matching engine.
 
-Examples include:
+Responsibilities:
 
-- Scholar OS
-- Athlete OS
-- Founder OS
-- Parent OS
-- Coach OS
-- Mentor OS
-- Advisor OS
-- Recruiter OS
-- Administrator OS
+Determine eligibility
 
-Operating Systems reuse canonical engines.
+Rank opportunities
 
-They never duplicate business logic.
+Evaluate qualifications
 
-Context determines which Operating System is active.
+Compute recommendations
+
+Publish matches
+
+Examples:
+
+Scholarships
+
+Jobs
+
+Internships
+
+Mentorships
+
+Accelerators
+
+Recruiting
+
+Volunteer opportunities
+
+Grants
+
+Competitions
+
+Funding
+
+---
+
+# Layer 7 — Planning Engine
+
+The orchestration engine.
+
+Responsibilities:
+
+Prioritize opportunities
+
+Generate action plans
+
+Track goals
+
+Manage deadlines
+
+Adapt plans
+
+Coordinate next actions
+
+Planning converts opportunities into execution.
 
 ---
 
 # Layer 8 — Compass
 
-Compass is Playbook's AI orchestration layer.
+Compass is Playbook's conversational intelligence.
 
-Compass consumes canonical engines.
+Responsibilities:
 
-Compass does not replace them.
+Explain
 
-Compass provides:
+Coach
 
-- Coaching
-- Recommendations
-- Explanations
-- Planning assistance
-- Reflection
-- Goal tracking
-- Draft generation
-- Conversational workflows
+Teach
 
-If Compass is unavailable, the platform continues to function.
+Summarize
+
+Draft
+
+Recommend
+
+Encourage
+
+Reflect
+
+Compass never owns business logic.
+
+Compass consumes deterministic computation.
 
 ---
 
-# Platform Flow
+# Layer 9 — Operating Systems
 
-```
-Human Development
+Operating Systems customize participant experiences.
+
+Examples:
+
+Scholar OS
+
+Founder OS
+
+Athlete OS
+
+Parent OS
+
+Mentor OS
+
+Coach OS
+
+Advisor OS
+
+Administrator OS
+
+Operating Systems determine:
+
+Navigation
+
+Modules
+
+Dashboards
+
+Notifications
+
+Widgets
+
+AI Context
+
+Operating Systems never change business logic.
+
+---
+
+# Layer 10 — Participant Experience
+
+The participant experiences the platform through:
+
+Dashboard
+
+Mobile App
+
+Community
+
+Courses
+
+Transcript
+
+Store
+
+Events
+
+Certificates
+
+Mentorship
+
+Planning
+
+Compass
+
+Every experience is powered by lower layers.
+
+---
+
+# Data Flow
+
+Participant Activity
 
 ↓
 
-Participant Actions
+Domain Engine
 
 ↓
 
-Evidence
+Evidence Engine
 
 ↓
 
-Participant Record
+Participant Record Engine
 
 ↓
 
@@ -302,65 +486,107 @@ Planning Engine
 
 ↓
 
-Operating System
-
-↓
-
 Compass
 
 ↓
 
-Participant Action
+Operating System
 
 ↓
 
-New Evidence
-```
-
-This creates a continuous lifelong development loop.
-
----
-
-# Guiding Principles
-
-1. The Participant is the center of the platform.
-
-2. Evidence is more valuable than self-reported data.
-
-3. Opportunity is the mission.
-
-4. AI accelerates decisions but never owns business logic.
-
-5. Every engine has one clear responsibility.
-
-6. Operating Systems compose capabilities rather than duplicate them.
-
-7. The Participant Record is lifelong.
-
-8. Organizations provide environments but never own Participants.
-
-9. Relationships establish trust.
-
-10. Policies determine authority.
-
-11. Permissions are computed.
-
-12. Every meaningful action should generate evidence.
-
-13. Every verified piece of evidence should create new opportunities.
-
-14. Human development is continuous.
-
----
-
-# The Playbook Equation
-
-```
-Human Development
+Participant Experience
 
 ↓
 
-Verified Evidence
+New Participant Activity
+
+This creates a continuous feedback loop.
+
+---
+
+# Event Flow
+
+Commands
+
+↓
+
+Domain Engines
+
+↓
+
+Events
+
+↓
+
+Event Bus
+
+↓
+
+Subscribers
+
+↓
+
+Computed State
+
+↓
+
+Participant Experience
+
+Events connect every engine.
+
+---
+
+# Security Flow
+
+Authentication
+
+↓
+
+Identity
+
+↓
+
+Relationships
+
+↓
+
+Organizations
+
+↓
+
+Policies
+
+↓
+
+Permissions
+
+↓
+
+Authorization
+
+↓
+
+Platform Experience
+
+Security applies at every layer.
+
+---
+
+# AI Flow
+
+Participant
+
+↓
+
+Operating System
+
+↓
+
+Planning Engine
+
+↓
+
+Opportunity Engine
 
 ↓
 
@@ -368,49 +594,129 @@ Participant Record
 
 ↓
 
-Opportunity
+Evidence
 
 ↓
 
-Planning
+Compass
 
 ↓
 
-Action
+Conversation
 
-↓
-
-Growth
-```
-
-Everything in Playbook exists to strengthen this cycle.
+Compass consumes deterministic platform intelligence.
 
 ---
 
-# North Star
+# Domain Expansion
 
-Playbook exists to help every Participant realize their fullest potential by continuously transforming verified evidence into meaningful opportunities throughout a lifetime.
+Future domains include:
 
-# What Playbook Is Not
+Healthcare
 
-Playbook is not an LMS.
+Military
 
-Playbook is not a CRM.
+Public Service
 
-Playbook is not a student information system.
+Research
 
-Playbook is not a social network.
+Arts
 
-Playbook is not an applicant tracking system.
+Entertainment
 
-Playbook is not a recruiting platform.
+Faith
 
-Playbook is not a portfolio builder.
+Civic Leadership
 
-Playbook is not an AI chatbot.
+Housing
 
-Playbook incorporates capabilities commonly found in these systems, but its architecture is fundamentally different.
+Transportation
 
-Playbook is a Human Development and Opportunity Operating System.
+International Education
 
-Its purpose is to help Participants continuously transform verified evidence into meaningful opportunities throughout their lifetime.
+Every new domain integrates through Domain Engines and Evidence.
+
+---
+
+# Platform Invariants
+
+Participant identity is permanent.
+
+Evidence is immutable.
+
+Participant Records are append-only.
+
+Opportunities are computed.
+
+Plans are adaptive.
+
+Policies are deterministic.
+
+Permissions are computed.
+
+Compass is advisory.
+
+Organizations are temporary.
+
+Relationships establish trust.
+
+Every meaningful action generates evidence.
+
+Every verified evidence creates opportunity.
+
+---
+
+# Implementation Mapping
+
+| Layer | Primary Owner |
+|--------|---------------|
+| Human Development | Domain Experts |
+| Canonical Entities | Architecture |
+| Domain Engines | Backend Services |
+| Evidence Engine | Backend Services |
+| Participant Record Engine | Backend Services |
+| Opportunity Engine | Backend Services |
+| Planning Engine | Backend Services |
+| Compass | AI Platform |
+| Operating Systems | Frontend |
+| Participant Experience | Web / Mobile |
+
+---
+
+# Definition of Done
+
+The Playbook Stack is complete when:
+
+✓ Every architectural layer is defined.
+
+✓ Layer responsibilities are explicit.
+
+✓ Data flow is documented.
+
+✓ Event flow is documented.
+
+✓ Security flow is documented.
+
+✓ AI flow is documented.
+
+✓ Platform invariants are enforced.
+
+✓ Future expansion is supported.
+
+✓ Layer ownership is assigned.
+
+✓ Every component maps into the stack.
+
+Only then may implementation begin.
+
+---
+
+# Closing Principle
+
+Playbook exists to help every participant become the fullest version of themselves.
+
+Every line of code, every engine, every policy, every interface, and every AI interaction should ultimately answer one question:
+
+**"Does this help a participant grow?"**
+
+If the answer is no, it does not belong in the platform.

@@ -18,20 +18,27 @@ Playbook SDK
 
 - app/academic-readiness/page.tsx
 - app/action-routing/page.tsx
+- app/admin/founder-academy/applications/page.tsx
+- app/admin/founder-academy/page.tsx
 - app/admin/moderation/page.tsx
 - app/admin/page.tsx
 - app/albums/page.tsx
 - app/application-workspaces/page.tsx
+- app/athlete-abroad-os/page.tsx
 - app/auth/callback/page.tsx
 - app/badges/page.tsx
 - app/brand-partner-os/page.tsx
 - app/certificates/page.tsx
 - app/check-email/page.tsx
+- app/claim/[token]/page.tsx
 - app/collaboration/page.tsx
 - app/community-events/page.tsx
 - app/compass/page.tsx
 - app/connections/page.tsx
+- app/courses/100-startup/apply/page.tsx
+- app/courses/100-startup/page.tsx
 - app/courses/[slug]/page.tsx
+- app/courses/athletes-abroad-global-hub/page.tsx
 - app/courses/community-safety-no-bullying/page.tsx
 - app/courses/page.tsx
 - app/dashboard/page.tsx
@@ -45,6 +52,7 @@ Playbook SDK
 - app/family-os/page.tsx
 - app/feed/page.tsx
 - app/founder/page.tsx
+- app/founder/project-intelligence/page.tsx
 - app/gamification/page.tsx
 - app/home/page.tsx
 - app/intelligence-platform/page.tsx
@@ -129,6 +137,9 @@ Playbook SDK
 - supabase/migrations/20260705_social_safety_trust.sql
 - supabase/migrations/202607070001_profile_onboarding_flow.sql
 - supabase/migrations/202607070002_onboarding_options.sql
+- supabase/migrations/20260717_founder_applications.sql
+- supabase/migrations/20260717_starting_five_invitation_claims.sql
+- supabase/migrations/20260719_scholar_activity_feed.sql
 
 ## Detected Tests
 
@@ -163,6 +174,10 @@ Playbook SDK
 - tests/unit/design-schema/design-schema.test.ts
 - tests/unit/design-system/design-system.test.tsx
 - tests/unit/economy/economy-arc.test.tsx
+- tests/unit/education/activity-intelligence.test.ts
+- tests/unit/education/education-engine.test.ts
+- tests/unit/education/pillars-intelligence.test.ts
+- tests/unit/education/standardized-tests.test.ts
 - tests/unit/email/email.test.ts
 - tests/unit/event-handlers.test.ts
 - tests/unit/event-notifications/event-notifications.test.ts
@@ -196,6 +211,7 @@ Playbook SDK
 - tests/unit/permissions/permissions.test.tsx
 - tests/unit/polish/polish.test.ts
 - tests/unit/portfolio-sharing/portfolio-sharing.test.ts
+- tests/unit/profile/profile-persistence.test.ts
 - tests/unit/recommender-auth/recommender-auth.test.ts
 - tests/unit/recommenders/recommenders.test.tsx
 - tests/unit/responsive/responsive.test.ts
@@ -207,6 +223,9 @@ Playbook SDK
 - tests/unit/role-os/role-routes.test.ts
 - tests/unit/scholar-athlete/scholar-athlete-os.test.tsx
 - tests/unit/scholar-network/scholar-network.test.tsx
+- tests/unit/scholar-record/assembleScholarRecord.test.ts
+- tests/unit/scholar-record/buildScholarRecord.test.ts
+- tests/unit/scholar-record/scholarRecordToProfileForm.test.ts
 - tests/unit/scholar-record.test.ts
 - tests/unit/secure-sharing/secure-sharing.test.ts
 - tests/unit/smoke.test.ts
@@ -218,6 +237,8 @@ Playbook SDK
 - tests/unit/studio/studio-tools.test.ts
 - tests/unit/studio/studio.test.tsx
 - tests/unit/support-network/support-network.test.tsx
+- tests/unit/support-network/support-network.test.tsx.bak
+- tests/unit/support-network/support-network.test.tsx.bak2
 - tests/unit/support-network-live/support-network-live-v2.test.ts
 - tests/unit/support-network-live/support-network-live.test.tsx
 - tests/unit/support-relationships/relationship-activation.test.ts

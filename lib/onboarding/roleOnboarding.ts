@@ -29,6 +29,7 @@ export type OnboardingField = {
     | "standardized-test"
     | "activity-list"
     | "invite-list"
+    | "starting-five"
     | "safety-agreement";
   options?: string[];
 
@@ -810,12 +811,19 @@ const ADMISSIONS_ENGAGEMENT: OnboardingStep = {
 };
 
 const NETWORK: OnboardingStep = {
-  id: "network",
-  phase: "Support Network",
-  title: "Invite your support team.",
-  body: "Invite family, mentors, coaches, counselors, partners, or trusted adults.",
+  id: "starting-5",
+  phase: "Starting 5",
+  title: "Build Your Starting 5",
+  body: "Every scholar deserves a strong support team. Add at least one parent, guardian, or trusted adult now. You'll finish building your Starting 5 after onboarding.",
   fields: [
-    { key: "invite_supporters", label: "Supporter emails", type: "invite-list", placeholder: "supporter@example.com" },
+    {
+      key: "starting5_parent",
+      label: "Parent / Guardian Email",
+      type: "starting-five",
+      placeholder: "parent@example.com",
+      required: true,
+      helpText: "Only the first email is required during onboarding.",
+    },
   ],
 };
 

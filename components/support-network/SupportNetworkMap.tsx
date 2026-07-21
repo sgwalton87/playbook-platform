@@ -1,9 +1,9 @@
 "use client";
 
-import { getSupportNetwork } from "@/lib/support-network";
+import { getDemoSupportNetwork } from "@/lib/support-network";
 
 export default function SupportNetworkMap() {
-  const network = getSupportNetwork();
+  const network = getDemoSupportNetwork();
 
   return (
     <main style={page}>

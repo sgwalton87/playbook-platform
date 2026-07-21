@@ -66,6 +66,8 @@ export default function CollegeSearch({
 
   const requestIdRef = useRef(0);
 
+  const suppressNextSearchRef = useRef(false);
+
   const closeTimerRef =
     useRef<ReturnType<typeof setTimeout> | null>(
       null
@@ -77,6 +79,10 @@ export default function CollegeSearch({
   );
 
   useEffect(() => {
+    if (suppressNextSearchRef.current) {
+      suppressNextSearchRef.current = false;
+      return;
+    }
     if (query.length < 2) {
       setResults([]);
       setLoading(false);
@@ -139,6 +145,8 @@ export default function CollegeSearch({
     if (closeTimerRef.current) {
       clearTimeout(closeTimerRef.current);
     }
+
+    suppressNextSearchRef.current = true;
 
     onChange(college.name, college.id);
 

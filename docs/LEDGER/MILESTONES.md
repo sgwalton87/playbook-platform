@@ -1440,3 +1440,66 @@ Alpha 1.0 Complete — Intelligence OS foundation finished.
 
 ## 2026-07-17 12:49
 - **commit**: refactor(onboarding): extract profile persistence module
+
+## 2026-07-20 19:54
+- **commit**: docs: scaffold onboarding and role operating system specifications
+
+## 2026-07-20 19:58
+- **commit**: docs(spec-000): establish Playbook Constitution as platform governing specification
+
+## 2026-07-20 19:59
+- **commit**: docs: create foundational specifications for Universal Onboarding, Scholar OS, and Scholar-Athlete OS
+
+## 2026-07-20 20:25
+- **commit**: docs(data-model): define canonical participant entity
+
+## 2026-07-20 20:34
+- **commit**: docs(data-model): define participant identity architecture
+
+## 2026-07-20 20:36
+- **commit**: docs(data-model): define canonical relationship model
+
+## 2026-07-20 20:36
+- **commit**: docs(data-model): define canonical organization model
+
+## 2026-07-20 20:37
+- **commit**: docs(data-model): define canonical role model
+
+## 2026-07-20 20:38
+- **commit**: docs(data-model): define canonical context model
+
+## 2026-07-20 20:42
+- **commit**: docs(data-model): define canonical policy model
+
+## 2026-07-20 20:44
+- **commit**: docs(data-model): define canonical permission model
+
+## 2026-07-20 20:53
+- **commit**: docs(entities): add canonical foundation entity specifications
+
+## 2026-07-20 20:57
+- **commit**: docs(entities): define canonical relationship model
+
+## 2026-07-20 21:00
+- **commit**: docs(entities): define canonical organization model
+
+## 2026-07-20 21:02
+- **commit**: docs(entities): define canonical learning model
+
+## 2026-07-20 21:05
+- **commit**: docs(entities): define canonical community model
+
+## 2026-07-20 21:06
+- **commit**: docs(entities): define canonical athletics model
+
+## 2026-07-20 21:09
+- **commit**: docs(entities): define canonical entrepreneurship model
+
+## 2026-07-20 21:13
+- **commit**: adr: establish universal opportunity engine
+
+## 2026-07-20 21:15
+- **commit**: adr: define compass as orchestration layer
+
+## 2026-07-20 21:38
+- **commit**: Create Playbook canonical architecture and engine documentation scaffold

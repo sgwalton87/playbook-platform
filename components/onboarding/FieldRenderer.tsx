@@ -9,6 +9,7 @@ import SearchableCareerField from "@/components/onboarding/SearchableCareerField
 import ActivityListField from "@/components/onboarding/ActivityListField";
 import PriorityListField from "@/components/onboarding/PriorityListField";
 import StandardizedTestField from "@/components/onboarding/StandardizedTestField";
+import StartingFiveOnboardingStep from "@/components/onboarding/StartingFiveOnboardingStep";
 import {
   agreeRow,
   chip,
@@ -416,7 +417,11 @@ export default function FieldRenderer({
     );
   }
 
-  if (field.type === "college-list" || field.type === "invite-list") {
+  if (field.type === "starting-five") {
+    return <StartingFiveOnboardingStep />;
+  }
+
+  if (field.type === "college-list") {
     const length = field.type === "college-list" ? 10 : 5;
     const list = field.type === "college-list" ? "college-options" : undefined;
     const arr = Array.isArray(value) ? value : Array(length).fill("");

@@ -284,6 +284,8 @@ function SuccessScreen({ onDone }: { onDone: () => void }) {
   );
 }
 
+import OnboardingHero from "@/components/OnboardingHero";
+import StartingFiveOnboardingStep from "@/components/onboarding/StartingFiveOnboardingStep";
 export default function OnboardingPage() {
   const router=useRouter();
   const [phase,setPhase]=useState<"video"|"data"|"creating"|"success">("video");  const [step,setStep]=useState(0);
@@ -337,26 +339,34 @@ const [careerOptions,setCareerOptions] = useState<any[]>([]);
 const [dreamSchoolName, setDreamSchoolName] = useState("");
 const [dreamSchoolId, setDreamSchoolId] = useState("");
 
-const isScholarAthlete = role === "scholar-athlete";
+const [supportMembers, setSupportMembers] = useState<any[]>([]);
+const [supportName, setSupportName] = useState("");
+const [supportEmail, setSupportEmail] = useState("");
+const [supportRelationship, setSupportRelationship] = useState("");
+const [supportRole, setSupportRole] = useState("");
+const [supportPhone, setSupportPhone] = useState("");
+
+const isScholarAthlete = role === "scholar_athlete";
+
+const scholarSteps = [
+  "School & Location",
+  "Academic Profile",
+  "Background",
+  "College & Career Goals",
+  "Activities & Service",
+  "Your Pillars",
+];
 
 const steps = isScholarAthlete
   ? [
-      "School & Location",
+      ...scholarSteps,
       "Athletic Profile",
-      "Academic Profile",
-      "Background",
-      "College & Career Goals",
       "Recruiting Profile",
-      "Activities & Service",
-      "Your Pillars",
+      "Meet Your Starting 5",
     ]
   : [
-      "School & Location",
-      "Academic Profile",
-      "Background",
-      "College & Career Goals",
-      "Activities & Service",
-      "Your Pillars",
+      ...scholarSteps,
+      "Meet Your Starting 5",
     ];
 
  useEffect(() => {
@@ -467,6 +477,46 @@ if (p?.role) {
     await awardXP(xpMap[step],labels[step]);setStep(s=>s+1);
   };
 
+
+
+  const createSupportMember = () => ({
+    id: crypto.randomUUID(),
+    name: supportName.trim(),
+    email: supportEmail.trim().toLowerCase(),
+    phone: supportPhone.trim(),
+    relationship: supportRelationship,
+    playbookRole: supportRole,
+    inviteStatus: "not_sent",
+    verificationStatus: "pending",
+    acceptedAt: null,
+    permissions: [],
+    createdAt: new Date().toISOString(),
+  });
+
+
+  const addSupportMember = () => {
+    if (
+      !supportName.trim() ||
+      !supportEmail.trim() ||
+      !supportRelationship
+    ) {
+      setToast("Please complete the name, email, and relationship.");
+      return;
+    }
+
+    setSupportMembers(prev => [
+      ...prev,
+      createSupportMember()
+    ]);
+
+    setSupportName("");
+    setSupportEmail("");
+    setSupportPhone("");
+    setSupportRelationship("");
+    setSupportRole("");
+
+    setToast("Support member added.");
+  };
 
   const addActivity=()=>{
     if(!activityType || !activityName.trim()){
@@ -681,8 +731,13 @@ const canProceed = requiredByStep[currentStepName]
           </div>
 
           {currentStepName==="School & Location"&&(<div>
-            <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>Step {step + 1} of {steps.length}</p>
-            <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink,marginBottom:18,lineHeight:1}}>School & Location</h1>
+            <OnboardingHero
+              eyebrow="STEP 1 • BUILD YOUR FOUNDATION"
+              icon="📍"
+              title="School & Location"
+              quote="Your journey begins where you are."
+              description="Your school, hometown, and community help us personalize scholarships, mentors, internships, events, and opportunities available specifically to you. This information becomes the foundation of your Playbook."
+            />
             <div style={{marginBottom:14}}><label style={lbl}>School name *</label><input style={inp} placeholder="Lincoln High School" value={school} onChange={e=>setSchool(e.target.value)}/></div>
             <div style={{marginBottom:14}}><label style={lbl}>School district</label><SearchDropdown options={districtOptions} value={district} onChange={setDistrict} placeholder="Search CA districts or type yours..." onAddNew={v=>{setDistrictOptions(p=>[...new Set([...p,v])]);addCustomOption("district",v);}}/></div>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
@@ -711,7 +766,13 @@ const canProceed = requiredByStep[currentStepName]
 
           {currentStepName==="Athletic Profile"&&isScholarAthlete&&(<div>
             <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>Step {step + 1} of {steps.length}</p>
-            <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink,marginBottom:18,lineHeight:1}}>Athletic Profile</h1>
+            <OnboardingHero
+  eyebrow="STEP • COMPETE"
+  icon="🏀"
+  title="Athletic Profile"
+  quote="Talent opens doors. Character keeps them open."
+  description="Help coaches, mentors, and recruiters understand who you are beyond statistics. Your athletic journey is about leadership, discipline, resilience, and teamwork."
+/>
             <div style={{marginBottom:14}}>
               <label style={lbl}>Primary sport *</label>
               <div style={{display:"flex",flexWrap:"wrap",gap:7}}>
@@ -809,7 +870,13 @@ const canProceed = requiredByStep[currentStepName]
           
 {currentStepName==="Academic Profile"&&(<div>
   <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>Academic Profile</p>
-  <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink,marginBottom:18,lineHeight:1}}>Academic Profile</h1>
+  <OnboardingHero
+  eyebrow="STEP • YOUR STORY"
+  icon="🎓"
+  title="Academic Profile"
+  quote="Grades tell part of the story. Growth tells the rest."
+  description="Your academic profile helps us recommend scholarships, A-G planning, FAFSA guidance, colleges, and academic opportunities. We're building your story—not comparing you to anyone else."
+/>
 
   <div style={{marginBottom:14}}>
     <label style={lbl}>Weighted GPA *</label>
@@ -966,6 +1033,11 @@ const canProceed = requiredByStep[currentStepName]
             </div>
             <div><label style={lbl}>Choose a username *</label><UsernameField value={username} onChange={setUsername} onStatusChange={setUsernameStatus}/></div>
           </div>)}
+
+
+          {currentStepName === "Meet Your Starting 5" && (
+            <StartingFiveOnboardingStep />
+          )}
 
           <div style={{display:"flex",gap:10,marginTop:24}}>
             {step>0&&<button onClick={()=>setStep(s=>s-1)} style={{fontFamily:T.mono,fontSize:12,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:"transparent",color:T.muted,border:`1.5px solid ${T.line}`,borderRadius:12,padding:"13px 20px",cursor:"pointer"}}>← Back</button>}

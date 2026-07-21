@@ -1,0 +1,506 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import SupporterForm, { Supporter } from "./SupporterForm";
+import SupporterStatus from "./SupporterStatus";
+import SupporterActions from "./SupporterActions";
+import { addSupportMember, updateSupportMember, deleteSupportMember, getSupportNetwork } from "@/lib/support-network/service";
+import { createStartingFiveInvitation } from "@/lib/invitations/createStartingFiveInvitation";
+import { cancelStartingFiveInvitation } from "@/lib/invitations/cancelStartingFiveInvitation";
+import { supabase } from "@/lib/supabaseClient";
+import Card from "@/components/ui/Card";
+
+type Props = {
+  scholarId: string;
+};
+
+const DEFAULT_MEMBERS = [
+  {
+    key: "parent",
+    emoji: "👩",
+    title: "Parent / Guardian",
+    description: "Someone who supports you at home.",
+  },
+  {
+    key: "coach",
+    emoji: "🏀",
+    title: "Coach",
+    description: "A coach who believes in your growth.",
+  },
+  {
+    key: "counselor",
+    emoji: "🎓",
+    title: "Counselor",
+    description: "School counselor or advisor.",
+  },
+  {
+    key: "mentor",
+    emoji: "❤️",
+    title: "Mentor",
+    description: "A trusted adult you look up to.",
+  },
+  {
+    key: "community",
+    emoji: "🌍",
+    title: "Community Leader",
+    description: "A trusted community member who believes in your future.",
+  },
+];
+
+export default function StartingFiveCard({
+  scholarId,
+}: Props) {
+  const [expanded, setExpanded] = useState<string | null>(null);
+const [members, setMembers] = useState<Record<string, Supporter>>({});
+
+const completedCount = Object.values(members).filter((member) => Boolean(member.id)).length;
+const completion = Math.round((completedCount / 5) * 100);
+
+
+useEffect(() => {
+  if (!scholarId) return;
+
+  async function loadMembers() {
+    try {
+      const supporters = await getSupportNetwork(scholarId);
+
+      const mapped: Record<string, Supporter> = {};
+
+      supporters.forEach((m:any) => {
+        const roleKey =
+          m.role === "Parent / Guardian" ? "parent" :
+          m.role === "Community Leader" ? "community" :
+          m.role.toLowerCase().replace(/[^a-z]/g,"");
+
+        mapped[roleKey] = {
+          role:m.role,
+          relationship:m.relationship ?? "",
+          fullName:m.fullName ?? "",
+          email:m.email ?? "",
+          phone:m.phone ?? "",
+          occupation:"",
+          organization:"",
+          message:"",
+          id:m.id,
+          status:(m.status ?? "draft") as Supporter["status"],
+        };
+      });
+
+      setMembers(mapped);
+
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  loadMembers();
+
+}, [scholarId]);
+
+
+
+  async function sendAllInvitations() {
+    alert("SEND CLICKED");
+    console.log("MEMBERS:", members);
+
+    const supporters = Object.entries(members).filter(
+      ([_, member]) =>
+        member.id &&
+        (member.status === "draft" || member.status === undefined)
+    );
+
+    if (!supporters.length) {
+      alert("Add and save at least one trusted adult first.");
+      return;
+    }
+
+    for (const [key, member] of supporters) {
+      try {
+        await createStartingFiveInvitation(member.id!);
+
+        setMembers((prev) => ({
+          ...prev,
+          [key]: {
+            ...prev[key],
+            status: "pending",
+          },
+        }));
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    alert("Invitations sent!");
+  }
+
+
+  return (
+    <div
+      style={{
+        display: "grid",
+        maxWidth: 1100,
+        margin: "0 auto",
+        width: "100%",
+        gap: 22,
+      }}
+    >
+      <div
+        style={{
+          background:"#FFFDF8",
+          border:"1px solid #F3E8C8",
+          borderRadius:28,
+          padding:"48px",
+          textAlign:"center",
+          boxShadow:"0 12px 35px rgba(15,23,42,.06)",
+          marginBottom:28,
+        }}
+      >
+
+        <div
+          style={{
+            maxWidth:520,
+            margin:"0 auto 28px",
+          }}
+        >
+
+          <div
+            style={{
+              display:"flex",
+              justifyContent:"space-between",
+              fontWeight:800,
+              marginBottom:8,
+            }}
+          >
+            <span>{completedCount} / 5 Trusted Adults Ready</span>
+            <span>{completion}% Complete</span>
+          </div>
+
+          <div
+            style={{
+              height:12,
+              background:"#E2E8F0",
+              borderRadius:999,
+              overflow:"hidden",
+            }}
+          >
+            <div
+              style={{
+                width: `${completion}%`,
+                height:"100%",
+                background:"#F97316",
+                transition:"width .35s ease",
+              }}
+            />
+          </div>
+
+        </div>
+
+        <div
+          style={{
+            fontSize: 14,
+            letterSpacing: 2,
+            fontWeight: 900,
+            color:"#C48A00",
+            textTransform: "uppercase",
+          }}
+        >
+          STARTING FIVE
+        </div>
+
+        <h1
+          style={{
+            marginTop: 10,
+            marginBottom: 12,
+            fontSize:56,
+            lineHeight: 1,
+          }}
+        >
+          Your Starting Five
+        </h1>
+
+        <p
+          style={{
+            color: "#64748B",
+            maxWidth:760,
+            margin: "0 auto",
+            fontSize: 18,
+            lineHeight: 1.6,
+          }}
+        >
+          The five trusted adults who will encourage you, challenge you, celebrate your wins, and help you stay on course throughout your Playbook journey.
+        </p>
+      </div>
+
+      {DEFAULT_MEMBERS.map((person) => (
+        <Card
+          key={person.key}
+          style={{
+            border:"1px solid #ECE7DA",
+            borderRadius:24,
+            overflow:"hidden",
+            background:"#FFFEFC",
+            boxShadow:"0 10px 30px rgba(15,23,42,.05)",
+            transition:"all .25s ease",
+          }}
+        >
+          <div
+            onClick={() =>
+              setExpanded(
+                expanded === person.key
+                  ? null
+                  : person.key
+              )
+            }
+            style={{
+              width: "100%",
+              background: "white",
+              border: "none",
+              padding: 24,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              cursor: "pointer",
+            }}
+          >
+            <div
+              style={{
+                display:"flex",
+                gap:18,
+                alignItems:"center",
+              }}
+            >
+              <div
+                style={{
+                  width:74,
+                  height:74,
+                  borderRadius:"50%",
+                  background:"#FFF7ED",
+                  display:"grid",
+                  placeItems:"center",
+                  fontSize:38,
+                }}
+              >
+                {person.emoji}
+              </div>
+
+              <div style={{textAlign:"left"}}>
+
+                <div
+                  style={{
+                    fontWeight:900,
+                    fontSize:22,
+                  }}
+                >
+                  {members[person.key]?.fullName || person.title}
+                </div>
+
+                {members[person.key] ? (
+
+                  <>
+
+                    <div
+                      style={{
+                        marginTop:4,
+                        color:"#64748B",
+                      }}
+                    >
+                      {members[person.key].email}
+                    </div>
+
+                    <div style={{marginTop:12}}>
+                      <SupporterStatus
+                        status={members[person.key].status ?? "draft"}
+                      />
+
+                      <SupporterActions
+                        status={members[person.key].status ?? "draft"}
+                        onEdit={()=>{
+                          setExpanded(person.key);
+                        }}
+                        onDelete={async ()=>{
+                          const member = members[person.key];
+
+                          if (!member?.id) {
+                            alert("This supporter does not have a database ID.");
+                            return;
+                          }
+
+                          try {
+                            await deleteSupportMember(member.id);
+
+                            setMembers(prev=>{
+                              const copy={...prev};
+                              delete copy[person.key];
+                              return copy;
+                            });
+
+                            if (expanded === person.key) {
+                              setExpanded(null);
+                            }
+                          } catch (err) {
+                            console.error(err);
+                            alert("Unable to remove supporter.");
+                          }
+                        }}
+
+                        onCancel={async ()=>{
+                          const member = members[person.key];
+
+                          if (!member?.id) return;
+
+                          try {
+                            await cancelStartingFiveInvitation(member.id);
+
+                            setMembers(prev=>({
+                              ...prev,
+                              [person.key]:{
+                                ...prev[person.key],
+                                status:"draft",
+                              },
+                            }));
+
+                          } catch(err){
+                            console.error(err);
+                            alert("Unable to cancel invitation.");
+                          }
+                        }}
+                      />
+                    </div>
+
+                  </>
+
+                ) : (
+
+                  <div
+                    style={{
+                      color:"#64748B",
+                      marginTop:6,
+                    }}
+                  >
+                    {person.description}
+                  </div>
+
+                )}
+
+              </div>
+
+            </div>
+
+            <div
+              style={{
+                fontSize: 34,
+                color:"#C48A00",
+                fontWeight: 300,
+              }}
+            >
+              {expanded === person.key ? "−" : "+"}
+            </div>
+          </div>
+
+          {expanded === person.key && (
+            <div
+              style={{
+                padding:28,
+                borderTop:"1px solid #E2E8F0",
+                background:"#FFF7ED",
+              }}
+            >
+              <SupporterForm
+                role={person.title}
+                initial={members[person.key]}
+                onCancel={()=>setExpanded(null)}
+                onSave={async (supporter:Supporter)=>{
+                  try{
+                    console.log("SUPPORTER ID:", supporter.id);
+                    console.log("SUPPORTER:", supporter);
+
+                    console.log("SUPPORTER ID:", supporter.id);
+                    console.log("SUPPORTER:", supporter);
+
+                      console.log("Saving supporter for scholarId:", scholarId);                      const saved = supporter.id
+                      ? await updateSupportMember(supporter.id,{
+fullName:supporter.fullName,
+                          email:supporter.email,
+                          phone:supporter.phone,
+                          relationship:supporter.relationship,
+})
+                      : await addSupportMember({
+                          scholarId,
+                          role:person.title,
+                          fullName:supporter.fullName,
+                          email:supporter.email,
+                          phone:supporter.phone,
+                          relationship:supporter.relationship,
+                          isStartingFive:true,
+                        });
+
+                    setMembers(prev=>({
+                      ...prev,
+                      [person.key]:{
+                        ...supporter,
+                        id:saved.id,
+                        status:(saved.status ?? "draft") as Supporter["status"],
+                      },
+                    }));
+
+                    setExpanded(null);
+                  }catch(err){
+                    console.error("Support save failed:", err);
+                    alert(err instanceof Error ? err.message : JSON.stringify(err, null, 2));
+                  }
+                }}
+              />
+            </div>
+          )}
+        </Card>
+      ))}
+
+      <div
+        style={{
+          position: "sticky",
+          bottom: 0,
+          background: "#FFFDF8",
+          padding: "28px 0 12px",
+          marginTop: 20,
+        }}
+      >
+        <button
+          onClick={sendAllInvitations}
+          disabled={completedCount === 0}
+          style={{
+            width: "100%",
+            padding: "22px",
+            border: "none",
+            borderRadius: 20,
+            background:
+              completedCount === 0
+                ? "#CBD5E1"
+                : "linear-gradient(135deg,#18382D,#24513F)",
+            color: "#F4E7C5",
+            fontWeight: 900,
+            fontSize: 22,
+            cursor:
+              completedCount === 0
+                ? "not-allowed"
+                : "pointer",
+            boxShadow: "0 12px 35px rgba(0,0,0,.18)",
+          }}
+        >
+          🏀 SEND MY STARTING FIVE
+        </button>
+
+        <div
+          style={{
+            textAlign: "center",
+            marginTop: 12,
+            color: "#64748B",
+            fontWeight: 600,
+          }}
+        >
+          {completedCount} of 5 supporters ready
+        </div>
+      </div>
+
+    </div>
+  );
+}

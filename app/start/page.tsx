@@ -58,6 +58,7 @@ import {
   agreeRow
 } from "@/components/onboarding/onboardingStyles";
 import FieldRenderer from "@/components/onboarding/FieldRenderer";
+import ProgressTracker from "@/components/onboarding/ProgressTracker";
 import { useOnboardingAutosave } from "@/components/onboarding/useOnboardingAutosave";
 import { validateAcademicPath } from "@/lib/education";
 
@@ -475,14 +476,15 @@ function StartContent() {
         </div>
       </section>
 
-      <section style={progressWrap}>
-        {steps.map((item, index) => (
-          <div key={item.id} style={stepPill(index <= stepIndex)}>
-            <span>{index + 1}</span>
-            <strong>{item.title.split(".")[0]}</strong>
-          </div>
-        ))}
-      </section>
+      
+<ProgressTracker
+  steps={steps.map(step=>({
+    id:step.id,
+    title:step.title.split(".")[0],
+  }))}
+  currentStep={stepIndex}
+/>
+
 
       <section style={card}>
         <p style={formEyebrow}>{step.id}</p>

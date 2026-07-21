@@ -1,6 +1,20 @@
 "use client";
 
-import { pageShellStyle, playbookTheme } from "@/lib/design-system/tokens";
+import {
+  pageShellStyle,
+  playbookTheme,
+  eyebrowStyle,
+  titleStyle,
+  subtitleStyle,
+  heroStyle,
+  cardStyle,
+  cardTitleStyle,
+  metricStyle,
+  metricLabelStyle,
+  metricValueStyle,
+  buttonStyle,
+  secondaryButtonStyle,
+} from "@/lib/design-system";
 import ExperienceModeBanner from "@/components/experience/ExperienceModeBanner";
 
 export function PlaybookPage({
@@ -34,7 +48,7 @@ export function PlaybookHero({
   children?: React.ReactNode;
 }) {
   return (
-    <section style={hero}>
+    <section style={heroStyle}>
       <p style={eyebrowStyle}>{eyebrow}</p>
       <h1 style={titleStyle}>{title}</h1>
       {subtitle && <p style={subtitleStyle}>{subtitle}</p>}
@@ -53,9 +67,9 @@ export function PlaybookCard({
   children: React.ReactNode;
 }) {
   return (
-    <article style={card}>
+    <article style={cardStyle}>
       {eyebrow && <p style={eyebrowStyle}>{eyebrow}</p>}
-      {title && <h2 style={cardTitle}>{title}</h2>}
+      {title && <h2 style={cardTitleStyle}>{title}</h2>}
       {children}
     </article>
   );
@@ -69,9 +83,9 @@ export function PlaybookMetric({
   value: string;
 }) {
   return (
-    <article style={metric}>
-      <span style={metricLabel}>{label}</span>
-      <strong style={metricValue}>{value}</strong>
+    <article style={metricStyle}>
+      <span style={metricLabelStyle}>{label}</span>
+      <strong style={metricValueStyle}>{value}</strong>
     </article>
   );
 }
@@ -92,14 +106,6 @@ export function PlaybookButton({
   );
 }
 
-const eyebrowStyle: React.CSSProperties = {
-  margin: 0,
-  color: playbookTheme.colors.orange,
-  fontWeight: 950,
-  fontSize: 11,
-  letterSpacing: ".14em",
-  textTransform: "uppercase",
-};
 
 const hero: React.CSSProperties = {
   maxWidth: playbookTheme.layout.max,
@@ -111,18 +117,7 @@ const hero: React.CSSProperties = {
   boxShadow: playbookTheme.shadow.hero,
 };
 
-const titleStyle: React.CSSProperties = {
-  margin: "12px 0",
-  fontSize: 54,
-  lineHeight: 1,
-};
 
-const subtitleStyle: React.CSSProperties = {
-  color: "#CBD5E1",
-  fontSize: 17,
-  lineHeight: 1.6,
-  maxWidth: 780,
-};
 
 const card: React.CSSProperties = {
   background: playbookTheme.colors.card,
