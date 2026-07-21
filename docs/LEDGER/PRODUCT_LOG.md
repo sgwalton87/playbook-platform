@@ -1216,3 +1216,6 @@ Playbook now separates demo, foundation, studio, founder, and active user experi
 
 ## 2026-07-20 21:38
 - Commit recorded: Create Playbook canonical architecture and engine documentation scaffold
+
+## 2026-07-20 22:52
+- Commit recorded: chore: archive legacy backup files

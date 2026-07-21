@@ -1503,3 +1503,6 @@ Started Beta 2 — Archivist v3 Unified Ledger Engine and Demo Mode.
 
 ## 2026-07-20 21:38
 - **commit**: Create Playbook canonical architecture and engine documentation scaffold
+
+## 2026-07-20 22:52
+- **commit**: chore: archive legacy backup files
