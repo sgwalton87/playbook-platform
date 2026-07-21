@@ -851,3 +851,248 @@ Future platform capabilities should extend the Participant Record rather than in
 The Participant Record is the heart of the Playbook ecosystem.
 
 ---
+
+# Relationships
+
+## Definition
+
+A Relationship is a verified connection between two or more Participants, or between a Participant and an Organization, that establishes trust, responsibility, collaboration, or oversight within the Playbook ecosystem.
+
+Relationships define *who* a participant is connected to.
+
+Relationships do not define *what* a participant can do.
+
+Capabilities are assigned through Roles.
+
+Scope is established through Relationships.
+
+Permissions are computed from the combination of Relationships, Roles, Context, and Organizational Membership.
+
+---
+
+## Purpose
+
+Relationships exist to model the real-world network surrounding every participant.
+
+No participant develops in isolation.
+
+Playbook recognizes that growth is supported through families, educators, mentors, coaches, peers, employers, organizations, and communities.
+
+The Relationship model provides the canonical representation of these trusted connections.
+
+---
+
+## Core Principles
+
+### Relationship First
+
+Relationships establish trust before permissions are granted.
+
+A role alone is insufficient to authorize access to participant information.
+
+For example:
+
+A participant may hold the role of Coach.
+
+That role does not automatically grant access to every Scholar.
+
+Access is granted only when a verified coaching relationship exists.
+
+---
+
+### Relationships Are Explicit
+
+Relationships should never be inferred solely from shared organizations or matching attributes.
+
+Every meaningful relationship should be explicitly created, verified, or accepted through platform workflows.
+
+---
+
+### Relationships Are Directional
+
+Some relationships are reciprocal.
+
+Others are directional.
+
+Examples:
+
+Scholar ↔ Mentor
+
+Parent → Child
+
+Coach → Athlete
+
+Teacher → Student
+
+Recruiter → Prospect
+
+Organization → Member
+
+Direction determines responsibility, visibility, and workflow behavior.
+
+---
+
+### Relationships Have Lifecycle
+
+Relationships evolve over time.
+
+Typical lifecycle:
+
+```text
+Invited
+    │
+Requested
+    │
+Pending Verification
+    │
+Active
+    │
+Paused
+    │
+Expired
+    │
+Archived
+```
+
+Historical relationships remain part of the Participant Record unless legal or privacy requirements dictate otherwise.
+
+---
+
+## Relationship Categories
+
+Examples include, but are not limited to:
+
+### Family
+
+- Parent
+- Guardian
+- Sibling
+- Relative
+
+### Education
+
+- Teacher
+- Counselor
+- Academic Advisor
+- Tutor
+
+### Athletics
+
+- Coach
+- Assistant Coach
+- Trainer
+- Recruiter
+- Teammate
+
+### Mentorship
+
+- Mentor
+- Mentee
+- Career Coach
+- Executive Coach
+
+### Professional
+
+- Employer
+- Manager
+- Internship Supervisor
+- Colleague
+
+### Entrepreneurship
+
+- Founder
+- Co-Founder
+- Investor
+- Advisor
+- Board Member
+
+### Community
+
+- Volunteer Coordinator
+- Organization Leader
+- Faith Leader
+- Community Partner
+
+These categories may expand as the platform evolves.
+
+---
+
+## Relationship Attributes
+
+A relationship may contain metadata including:
+
+- relationship type
+- status
+- start date
+- end date
+- verification status
+- verification source
+- organization
+- notes
+- visibility level
+- communication preferences
+- permissions granted
+
+Additional attributes may be introduced through downstream specifications.
+
+---
+
+## Ownership
+
+Relationships belong to the participants involved.
+
+Organizations may facilitate relationship creation but do not own participant relationships.
+
+Participants retain continuity of their relationship history throughout their lifetime.
+
+---
+
+## Relationship Invariants
+
+The following statements must always remain true.
+
+- Every Relationship references one or more Participants.
+- Every Relationship has a defined type.
+- Every Relationship has a lifecycle state.
+- Every Relationship may be verified.
+- Historical Relationships are retained unless legally removed.
+- Relationships do not directly grant permissions.
+
+---
+
+## Relationship Graph
+
+Collectively, Relationships form the participant's trusted network.
+
+The Relationship Graph enables:
+
+- mentorship discovery
+- support network visualization
+- collaboration
+- referrals
+- introductions
+- opportunity routing
+- communication pathways
+- organizational insights
+
+The Relationship Graph is one of the foundational intelligence layers of the Playbook platform.
+
+---
+
+## Architectural Implications
+
+Relationships define scope.
+
+Roles define capability.
+
+Context defines experience.
+
+Permissions are computed from all three.
+
+This separation prevents over-permissioning while allowing participants to safely participate in multiple organizations and communities throughout their lifetime.
+
+No feature should grant participant access solely because of a role assignment.
+
+Relationship-aware authorization is a foundational architectural requirement of Playbook.
+
+---
