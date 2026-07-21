@@ -1352,3 +1352,249 @@ Organizations therefore function as environments within which participant growth
 This distinction preserves lifelong continuity while enabling unlimited organizational participation throughout a participant's life.
 
 ---
+
+# Roles
+
+## Definition
+
+A Role is a reusable capability bundle assigned to a Participant within one or more organizational contexts.
+
+Roles define what a Participant is authorized to do.
+
+Roles do not define who a Participant may act upon.
+
+Roles never establish trust.
+
+Roles never establish ownership.
+
+Roles grant capabilities.
+
+Relationships establish scope.
+
+Organizations establish environment.
+
+Context determines experience.
+
+Permissions are computed from all four.
+
+---
+
+## Purpose
+
+Roles allow Participants to contribute to the Playbook ecosystem in different capacities throughout their lifetime.
+
+Participants frequently hold multiple simultaneous roles.
+
+Examples include:
+
+- Scholar
+- Scholar-Athlete
+- Parent
+- Guardian
+- Teacher
+- Coach
+- Mentor
+- Recruiter
+- Founder
+- Employer
+- Financial Advisor
+- Counselor
+- Organization Administrator
+
+Rather than creating separate user accounts for each responsibility, Playbook allows one Participant to accumulate multiple Roles over time.
+
+---
+
+## Core Principles
+
+### Roles Are Capabilities
+
+Roles represent capability bundles.
+
+A Coach Role grants coaching capabilities.
+
+A Mentor Role grants mentoring capabilities.
+
+A Founder Role grants organizational capabilities.
+
+The role itself does not establish authority over specific Participants.
+
+---
+
+### Roles Are Additive
+
+Participants may possess multiple simultaneous Roles.
+
+Examples include:
+
+Scholar + Entrepreneur
+
+Parent + Mentor
+
+Coach + Teacher
+
+Founder + Financial Advisor
+
+Organization Administrator + Recruiter
+
+Capabilities are accumulated rather than replaced.
+
+---
+
+### Roles Are Contextual
+
+Roles may exist within different Organizations.
+
+Example:
+
+Coach — Oakland Roots
+
+Coach — Skyline High School
+
+Coach — AAU Team
+
+Each represents the same capability bundle operating within different environments.
+
+---
+
+### Roles Are Reusable
+
+Capability definitions should be reusable across organizations.
+
+Organizations should configure capabilities through policy rather than redefining Role behavior.
+
+---
+
+### Roles Are Independent of Identity
+
+Changing Roles never changes Identity.
+
+Identity is permanent.
+
+Roles evolve throughout the participant's life.
+
+---
+
+## Capability Model
+
+Every Role grants one or more capability groups.
+
+Examples include:
+
+### View
+
+- View Profiles
+- View Participant Records
+- View Opportunities
+
+### Create
+
+- Create Courses
+- Create Programs
+- Create Events
+- Create Organizations
+
+### Review
+
+- Review Applications
+- Review Portfolios
+- Review Evidence
+
+### Manage
+
+- Manage Organizations
+- Manage Programs
+- Manage Membership
+
+### Coach
+
+- Provide Feedback
+- Approve Goals
+- Track Progress
+
+### Recruit
+
+- Discover Talent
+- Contact Prospects
+- Build Recruiting Lists
+
+Additional capability groups may be introduced through future specifications.
+
+---
+
+## Role Assignment
+
+Role assignment should occur through controlled workflows.
+
+Examples include:
+
+Invitation
+
+Organization Approval
+
+Verification
+
+Certification
+
+Administrative Assignment
+
+Election
+
+Employment
+
+Self-registration where appropriate
+
+Assignments should be auditable.
+
+---
+
+## Role Lifecycle
+
+Roles typically progress through:
+
+```text
+Available
+    │
+Assigned
+    │
+Active
+    │
+Suspended
+    │
+Expired
+    │
+Archived
+```
+
+Historical assignments remain part of the Participant Record.
+
+---
+
+## Role Invariants
+
+The following statements must always remain true.
+
+- Every Role references a Participant.
+- Every Role references a Role Definition.
+- Roles never directly grant permissions.
+- Roles never establish Relationships.
+- Roles may exist in multiple Organizations.
+- Participants may hold multiple Roles simultaneously.
+
+---
+
+## Architectural Implications
+
+Roles define capability.
+
+Relationships define scope.
+
+Organizations define environment.
+
+Context defines experience.
+
+Permissions are computed dynamically from these canonical entities.
+
+This separation prevents role explosion, reduces authorization complexity, and enables lifelong participation across multiple organizations without creating duplicate identities or conflicting permission models.
+
+---
