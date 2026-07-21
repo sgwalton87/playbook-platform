@@ -201,11 +201,13 @@ Participant
 │
 ├── Context
 │
+├── Policies
+│
+├── Permissions
+│
 ├── Operating Systems
 │
 ├── Modules
-│
-├── Permissions
 │
 ├── Evidence
 │
@@ -1853,5 +1855,474 @@ This inversion ensures that user interfaces remain adaptive while the underlying
 As new industries, organizations, and participant types are introduced, new Contexts may be created without requiring changes to the Participant, Identity, Participant Record, Relationship, Organization, or Role models.
 
 Context therefore provides the extensibility mechanism for the Playbook platform.
+
+---
+
+# Policies
+
+## Definition
+
+A Policy is a versioned rule that defines the conditions under which a Participant may perform an action, access information, activate a capability, or interact with a resource within the Playbook ecosystem.
+
+Policies express the platform's business, privacy, safety, governance, compliance, and organizational rules.
+
+Policies do not represent the final authorization decision.
+
+Permissions are the result of evaluating applicable Policies against the current Participant, Relationship, Organization, Role, Context, Resource, Consent, and system state.
+
+---
+
+## Purpose
+
+Policies provide a consistent and auditable method for governing platform behavior.
+
+Without a canonical Policy model, authorization rules become scattered across:
+
+- database policies
+- API routes
+- user interfaces
+- server actions
+- background jobs
+- artificial intelligence workflows
+- organization settings
+- individual features
+
+Scattered rules create inconsistent behavior and security risk.
+
+The Policy model ensures that the same governing rule can be evaluated consistently across every platform surface.
+
+---
+
+## Policy Principles
+
+### Policies Express Rules
+
+Policies define what must be true before an action is allowed, denied, limited, escalated, or reviewed.
+
+Examples include:
+
+- A guardian may approve consent for a minor with whom they have a verified guardian relationship.
+- A mentor may comment on an assigned participant's goals but may not edit the participant's academic transcript.
+- A recruiter may view evidence explicitly shared for recruiting purposes.
+- An organization administrator may manage membership only within organizations they administer.
+- A coach may view athletic information for athletes with whom they have an active coaching relationship.
+- A participant may revoke optional data-sharing consent at any time.
+
+---
+
+### Policies Are Separate From Roles
+
+Roles provide capability definitions.
+
+Policies determine whether those capabilities may be exercised under current conditions.
+
+A Participant may possess a capability through a Role while still being denied a specific action because the required Relationship, Organization, Context, Consent, or Resource condition is absent.
+
+---
+
+### Policies Are Context-Aware
+
+The same Participant may receive different authorization decisions in different Contexts.
+
+For example:
+
+A Participant acting in Parent Context may review information for their verified child.
+
+The same Participant acting in Mentor Context may only access information explicitly shared through a mentoring relationship.
+
+Identity remains constant.
+
+The applicable Policies change with Context.
+
+---
+
+### Policies Are Resource-Aware
+
+Policies evaluate the specific resource involved in an action.
+
+Resources may include:
+
+- Participant Records
+- profiles
+- evidence
+- goals
+- courses
+- programs
+- opportunities
+- applications
+- messages
+- organizations
+- memberships
+- reports
+- financial information
+- academic information
+- athletic information
+- consent records
+
+Access to one resource does not imply access to another.
+
+---
+
+### Policies Are Action-Specific
+
+Policies evaluate explicit actions.
+
+Examples include:
+
+- view
+- create
+- update
+- delete
+- publish
+- approve
+- reject
+- invite
+- assign
+- export
+- share
+- comment
+- verify
+- archive
+- administer
+
+Broad permissions such as `manage_everything` should be avoided except for tightly controlled platform-level administration.
+
+---
+
+### Policies Are Versioned
+
+Every Policy must possess a version.
+
+When a Policy changes, the previous version should remain available for audit and historical interpretation.
+
+Versioning allows the platform to determine which rule governed an action at a specific point in time.
+
+---
+
+### Policies Are Auditable
+
+Policy evaluations that affect sensitive information or high-impact actions should be recorded.
+
+An audit record should be capable of identifying:
+
+- the Participant
+- the authenticated Identity
+- the active Context
+- the requested action
+- the target resource
+- the applicable Policies
+- the evaluation result
+- the evaluation time
+- the reason for the decision
+
+---
+
+### Policies Default to Least Privilege
+
+When no Policy explicitly authorizes an action, the action should be denied.
+
+Access must be granted intentionally.
+
+Ambiguity must never result in broader access.
+
+---
+
+## Policy Sources
+
+Policies may originate from several governance layers.
+
+### Platform Policies
+
+Rules that apply throughout Playbook.
+
+Examples include:
+
+- identity security
+- minor protection
+- prohibited conduct
+- audit requirements
+- platform administration
+- data retention
+
+---
+
+### Legal and Regulatory Policies
+
+Rules required by applicable law or regulation.
+
+Examples may include:
+
+- privacy rights
+- educational record protections
+- children's data protections
+- consent requirements
+- financial information restrictions
+- accessibility obligations
+- record retention
+
+Legal interpretation belongs in dedicated compliance specifications.
+
+---
+
+### Organization Policies
+
+Rules configured by an Organization within boundaries permitted by Playbook.
+
+Examples include:
+
+- program eligibility
+- staff approval requirements
+- workspace access
+- application review procedures
+- organizational communication rules
+
+Organization Policies may restrict platform capabilities.
+
+They may not override mandatory platform safety, privacy, or legal Policies.
+
+---
+
+### Program Policies
+
+Rules applying to a specific Program, Course, Team, Cohort, Event, or Initiative.
+
+Examples include:
+
+- enrollment eligibility
+- completion requirements
+- attendance standards
+- evidence submission rules
+- certification requirements
+
+---
+
+### Participant Policies
+
+Participant-controlled preferences and permissions where choice is legally and operationally available.
+
+Examples include:
+
+- profile visibility
+- contact preferences
+- evidence sharing
+- opportunity preferences
+- optional AI personalization
+- notification settings
+
+---
+
+## Policy Evaluation Inputs
+
+A Policy evaluation may consider:
+
+- authenticated Identity
+- acting Participant
+- target Participant
+- active Context
+- active Role assignments
+- active Relationships
+- Organization Memberships
+- resource ownership
+- resource classification
+- requested action
+- Consent
+- age or minor status
+- verification status
+- program enrollment
+- geographic or jurisdictional requirements
+- current lifecycle states
+- time-based restrictions
+- risk signals
+- platform safety status
+
+Only inputs necessary for the specific decision should be evaluated.
+
+---
+
+## Policy Outcomes
+
+A Policy evaluation may produce one of several outcomes.
+
+```text
+Allow
+Deny
+Allow With Conditions
+Require Consent
+Require Verification
+Require Approval
+Require Escalation
+Not Applicable
+```
+
+`Allow With Conditions` may require controls such as:
+
+- redaction
+- limited fields
+- expiration
+- read-only access
+- organization scope
+- relationship scope
+- purpose limitation
+- additional logging
+
+---
+
+## Policy Precedence
+
+When multiple Policies apply, precedence must be deterministic.
+
+The general order is:
+
+```text
+Legal and Safety Restrictions
+        ↓
+Platform Policies
+        ↓
+Participant Consent and Privacy Controls
+        ↓
+Organization Policies
+        ↓
+Program Policies
+        ↓
+Role Capabilities
+        ↓
+Default Deny
+```
+
+A lower-level Policy may further restrict access.
+
+It may not weaken a higher-level mandatory restriction.
+
+---
+
+## Policy Conflicts
+
+When Policies conflict, the more restrictive valid Policy should generally prevail.
+
+Exceptions must be explicitly defined within a governing specification.
+
+Policy conflicts must never be silently resolved through user-interface assumptions.
+
+They must be resolved by the Policy evaluation layer.
+
+---
+
+## Sensitive Data Policies
+
+Sensitive data requires purpose-specific access.
+
+Examples may include:
+
+- academic records
+- financial information
+- legal information
+- health-related accommodations
+- identity verification materials
+- minor data
+- private communications
+- disciplinary information
+- recruiting communications
+- consent records
+
+A general relationship or organization membership is insufficient to authorize access to every category of sensitive data.
+
+Policies must evaluate data classification and intended purpose.
+
+---
+
+## Minor Protection Policies
+
+Participants who are minors require additional safeguards.
+
+Policies involving minors may require:
+
+- verified guardian relationships
+- age-appropriate experiences
+- limited discoverability
+- restricted direct messaging
+- guardian approval
+- organization verification
+- enhanced audit logging
+- controlled data sharing
+- mandatory reporting workflows where legally required
+
+The detailed rules belong in the Minor Protection and Consent Specifications.
+
+---
+
+## Artificial Intelligence Policies
+
+AI systems must operate under the same Policy framework as human participants and platform services.
+
+Compass AI and future agents may only access information authorized for the current purpose and Context.
+
+AI Policies must govern:
+
+- permitted data inputs
+- purpose limitations
+- recommendation boundaries
+- sensitive-data handling
+- human review requirements
+- action authority
+- explanation requirements
+- audit attribution
+
+An AI agent must never receive broader access than the Participant or service on whose behalf it operates.
+
+---
+
+## Policy Lifecycle
+
+A Policy typically progresses through:
+
+```text
+Draft
+    │
+Under Review
+    │
+Approved
+    │
+Active
+    │
+Superseded
+    │
+Retired
+```
+
+Emergency suspension may occur when a Policy creates an identified security, legal, or safety risk.
+
+---
+
+## Policy Invariants
+
+The following statements must always remain true.
+
+- Every Policy has a defined scope.
+- Every Policy has a version.
+- Every Policy identifies applicable actions and resources.
+- Every active Policy has an effective date.
+- Policy evaluation is deterministic for equivalent inputs.
+- Mandatory platform Policies cannot be weakened by Organization Policies.
+- Absence of authorization results in denial.
+- Sensitive actions are attributable through audit records.
+- AI systems are governed by the same authorization framework as other actors.
+
+---
+
+## Architectural Implications
+
+Policies are the canonical source of authorization rules.
+
+User interfaces may hide unavailable actions for usability, but interface visibility is not authorization.
+
+APIs, server actions, database access, background jobs, integrations, and AI agents must enforce the same applicable Policies.
+
+No feature may treat a client-side role check as sufficient security.
+
+Policy evaluation must occur within trusted execution boundaries.
+
+Policies produce authorization decisions.
+
+Permissions represent those evaluated decisions.
 
 ---
