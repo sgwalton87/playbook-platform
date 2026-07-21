@@ -1598,3 +1598,260 @@ Permissions are computed dynamically from these canonical entities.
 This separation prevents role explosion, reduces authorization complexity, and enables lifelong participation across multiple organizations without creating duplicate identities or conflicting permission models.
 
 ---
+
+# Context
+
+## Definition
+
+A Context represents the active operational perspective through which a Participant interacts with the Playbook platform at a given moment.
+
+Context determines the participant's active experience by combining their Identity, Relationships, Organization Memberships, Roles, and current objectives into a single operational environment.
+
+A Participant possesses one Identity but may operate within many Contexts throughout their lifetime.
+
+Only one Context is active during a platform session unless explicitly designed otherwise.
+
+---
+
+## Purpose
+
+The purpose of Context is to allow Participants to safely and efficiently perform different responsibilities without creating separate accounts or fragmenting their lifelong identity.
+
+Rather than asking:
+
+"Who are you?"
+
+Playbook asks:
+
+"How are you participating right now?"
+
+This distinction allows a single Participant to seamlessly transition between different responsibilities while preserving continuity of identity and record.
+
+---
+
+## Core Principles
+
+### Identity Remains Constant
+
+Changing Context never changes Identity.
+
+The authenticated Participant remains the same individual regardless of the experience currently being presented.
+
+---
+
+### Context Is Dynamic
+
+Participants may switch Contexts during a session without logging out.
+
+Changing Context updates:
+
+- navigation
+- operating system
+- available modules
+- permissions
+- dashboards
+- notifications
+- recommendations
+- Compass AI behavior
+
+without creating a new account or session.
+
+---
+
+### Context Is Computed
+
+Context is computed from canonical entities.
+
+Inputs include:
+
+- Identity
+- Participant Record
+- Active Roles
+- Active Relationships
+- Organization Membership
+- Session State
+- Feature Availability
+
+No Context should be manually hard-coded into the user interface.
+
+---
+
+### Context Is Scoped
+
+Every Context exists within a defined scope.
+
+Examples include:
+
+- Personal
+- Organization
+- Program
+- Course
+- Event
+- Team
+- Community
+
+Scope determines the operational boundary of the active experience.
+
+---
+
+## Context Examples
+
+Examples include:
+
+### Scholar Context
+
+Primary objectives:
+
+- complete coursework
+- discover opportunities
+- build Participant Record
+- connect with mentors
+
+---
+
+### Scholar-Athlete Context
+
+Primary objectives:
+
+- academic progress
+- athletic development
+- recruiting
+- eligibility
+- highlight management
+
+---
+
+### Parent Context
+
+Primary objectives:
+
+- monitor participant progress
+- provide support
+- communicate with organizations
+- approve permissions
+
+---
+
+### Mentor Context
+
+Primary objectives:
+
+- guide participants
+- review goals
+- provide feedback
+- monitor progress
+
+---
+
+### Founder Context
+
+Primary objectives:
+
+- manage organizations
+- create programs
+- analyze metrics
+- publish opportunities
+
+---
+
+### Recruiter Context
+
+Primary objectives:
+
+- discover talent
+- review participant records
+- evaluate evidence
+- communicate with prospects
+
+---
+
+## Context Lifecycle
+
+Contexts typically progress through:
+
+```text
+Available
+    │
+Activated
+    │
+Active
+    │
+Inactive
+    │
+Archived
+```
+
+Participants may activate or deactivate contexts as their responsibilities evolve.
+
+---
+
+## Context Invariants
+
+The following statements must always remain true.
+
+- Every active Context belongs to exactly one Participant.
+- A Participant may possess multiple available Contexts.
+- Only one primary Context is active at a time unless otherwise specified.
+- Context never changes Identity.
+- Context never changes historical records.
+- Context determines presentation, not ownership.
+
+---
+
+## Context Composition
+
+A Context is computed from:
+
+Participant
+
++
+
+Identity
+
++
+
+Participant Record
+
++
+
+Relationships
+
++
+
+Organizations
+
++
+
+Roles
+
++
+
+Current Scope
+
++
+
+Platform Policies
+
++
+
+Session State
+
+The resulting Context determines the participant's operational experience.
+
+---
+
+## Architectural Implications
+
+Context serves as the orchestration layer between canonical data and user experience.
+
+Operating Systems do not determine Context.
+
+Rather, Operating Systems are activated because a particular Context has been established.
+
+This inversion ensures that user interfaces remain adaptive while the underlying architecture remains stable.
+
+As new industries, organizations, and participant types are introduced, new Contexts may be created without requiring changes to the Participant, Identity, Participant Record, Relationship, Organization, or Role models.
+
+Context therefore provides the extensibility mechanism for the Playbook platform.
+
+---
