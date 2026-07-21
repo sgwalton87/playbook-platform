@@ -1509,3 +1509,6 @@ Alpha 1.0 Complete — Intelligence OS foundation finished.
 
 ## 2026-07-20 23:31
 - **commit**: Create ParticipantToProfile adapter scaffold
+
+## 2026-07-20 23:48
+- **commit**: Sprint 001 - Playbook Record foundation
