@@ -132,3 +132,83 @@ These trade-offs are accepted because they produce a more reliable, explainable,
 # Status
 
 Accepted.
+
+# Human Development Model
+Human Development
+
+├── Education
+├── Athletics
+├── Career
+├── Entrepreneurship
+├── Financial Capability
+├── Leadership
+├── Civic Engagement
+├── Wellness
+├── Creativity
+├── Relationships
+└── Lifelong Learning
+
+# Architecture
+Life Domains
+        │
+        ▼
+Domain Engines
+        │
+        ▼
+Evidence
+        │
+        ▼
+Participant Record
+        │
+        ▼
+Opportunity Engine
+        │
+        ▼
+Planning Engine
+        │
+        ▼
+Operating Systems
+        │
+        ▼
+Compass
+
+--- 
+# PLAYBOOK STACK
+
+Layer 1
+Human Development Domains
+
+↓
+
+Layer 2
+Canonical Entities
+
+↓
+
+Layer 3
+Domain Engines
+
+↓
+
+Layer 4
+Participant Record
+
+↓
+
+Layer 5
+Opportunity Engine
+
+↓
+
+Layer 6
+Planning Engine
+
+↓
+
+Layer 7
+Operating Systems
+
+↓
+
+Layer 8
+Compass
