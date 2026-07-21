@@ -95,7 +95,7 @@ export default function OnboardingHero({
           fontSize:17
         }}
       >
-        "{quote}"
+        &quot;{quote}&quot;
       </p>
 
       <p

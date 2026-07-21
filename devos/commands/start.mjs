@@ -1,7 +1,7 @@
 import { hasMission, loadMission, saveMission } from "../core/StateEngine.mjs";
+import { markImplementing } from "../core/ChecklistEngine.mjs";
 
 export async function start() {
-
   if (!(await hasMission())) {
     console.log("");
     console.log("No active mission.");
@@ -11,13 +11,18 @@ export async function start() {
 
   const mission = await loadMission();
 
+  // Don't overwrite the original start time if we're resuming.
   if (!mission.startedAt) {
     mission.startedAt = new Date().toISOString();
   }
 
   mission.status = "IMPLEMENTING";
 
+  // Persist mission state
   await saveMission(mission);
+
+  // Update roadmap state
+  await markImplementing(mission.title);
 
   console.log("");
   console.log("==================================");
@@ -27,6 +32,8 @@ export async function start() {
   console.log(`Phase   : ${mission.phase}`);
   console.log(`Status  : ${mission.status}`);
   console.log(`Started : ${mission.startedAt}`);
+  console.log("");
+  console.log("Roadmap updated: 🟨 IMPLEMENTING");
   console.log("");
   console.log("Begin implementation.");
 }

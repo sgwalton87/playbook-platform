@@ -36,7 +36,8 @@
     "founder:update": "node scripts/founder/update.mjs",
     "founder:list": "node scripts/founder/list.mjs",
     "education:schools": "node scripts/education/import-california-schools.mjs",
-    "education:refresh": "rm -f data/education/raw/california-public-schools.txt && npm run education:schools"
+    "education:refresh": "rm -f data/education/raw/california-public-schools.txt && npm run education:schools",
+    "playbook": "./scripts/playbook"
   },
   "dependencies": {
     "@hcaptcha/react-hcaptcha": "^2.0.2",

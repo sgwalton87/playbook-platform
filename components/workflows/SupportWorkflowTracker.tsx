@@ -9,7 +9,7 @@ export default function SupportWorkflowTracker() {
     <main style={page}>
       <section style={hero}>
         <p style={eyebrow}>Support Workflow Tracker</p>
-        <h1 style={title}>{workflow.scholar}'s opportunity support plan</h1>
+        <h1 style={title}>{workflow.scholar}&apos;s opportunity support plan</h1>
         <p style={sub}>{workflow.opportunity}</p>
         <div style={track}><div style={{...fill,width:`${workflow.progress}%`}} /></div>
         <strong>{workflow.progress}% coordinated</strong>

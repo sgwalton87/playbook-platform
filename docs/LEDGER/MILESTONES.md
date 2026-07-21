@@ -1536,3 +1536,6 @@ Alpha 1.0 Complete — Intelligence OS foundation finished.
 
 ## 2026-07-21 12:25
 - **precommit**: docs: update engineering ledgers after merge
+
+## 2026-07-21 15:33
+- **precommit**: feat(devos): add baseline engine foundation

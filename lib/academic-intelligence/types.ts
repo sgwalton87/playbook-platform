@@ -38,7 +38,7 @@ export interface AcademicReport extends IntelligenceReport {
  * Backward-compatible types for Academic Intelligence v1.
  * Older engines/tests still import these names.
  */
-export interface ParsedCourse extends AcademicCourse {}
+export type ParsedCourse = AcademicCourse;
 
 export interface AcademicIntelligenceReport {
   courses: ParsedCourse[];

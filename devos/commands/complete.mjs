@@ -1,8 +1,8 @@
-import readline from "readline";
 import { loadMission, clearMission } from "../core/StateEngine.mjs";
+import { loadVerification } from "../core/VerificationState.mjs";
+import { evaluateRepository } from "../core/RepositoryGovernor.mjs";
 
 export async function complete() {
-
   const mission = await loadMission();
 
   if (!mission.id) {
@@ -10,22 +10,32 @@ export async function complete() {
     return;
   }
 
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  });
+  console.log("complete() started");
 
-  const answer = await new Promise(resolve =>
-    rl.question(
-      "Did you verify Architecture, Sprint and Master Checklist? (y/n): ",
-      resolve
-    )
-  );
+  const report = await loadVerification();
 
-  rl.close();
+  if (!report) {
+    console.log("");
+    console.log("==================================");
+    console.log("NO VERIFICATION FOUND");
+    console.log("==================================");
+    console.log("");
+    console.log("Run:");
+    console.log("node devos/playbook.mjs verify");
+    console.log("");
+    return;
+  }
 
-  if (answer.toLowerCase() !== "y") {
-    console.log("Mission not completed.");
+  const result = await evaluateRepository(report);
+
+  if (!result.passed) {
+    console.log("");
+    console.log("==================================");
+    console.log("MISSION BLOCKED");
+    console.log("==================================");
+    console.log("");
+    console.log("Repository health has regressed.");
+    console.log("");
     return;
   }
 

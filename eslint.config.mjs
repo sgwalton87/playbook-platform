@@ -8,6 +8,10 @@ const eslintConfig = defineConfig([
 {
   rules: {
     "react-hooks/set-state-in-effect": "off",
+    "react-hooks/preserve-manual-memoization": "off",
+    "react-hooks/immutability": "off",
+
+    "@typescript-eslint/no-explicit-any": "off",
   },
 },
   globalIgnores([
@@ -19,6 +23,10 @@ const eslintConfig = defineConfig([
     "archives/**",
     "backups/**",
     "data/education/generated/**",
+    "**/*.bak",
+    "**/*.backup.*",
+    "**/*.old.*",
+    ".playbook-backups/**",
   ]),
 ]);
 

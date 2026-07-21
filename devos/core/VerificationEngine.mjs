@@ -3,20 +3,30 @@ import { promisify } from "util";
 
 const run = promisify(exec);
 
-async function execute(command) {
+async function execute(name, command) {
+  console.log(`▶ Starting ${name}...`);
+
+  const start = Date.now();
+
   try {
     await run(command);
 
+    console.log(
+      `✅ ${name} completed in ${((Date.now() - start) / 1000).toFixed(1)}s`
+    );
+
     return {
-      command,
       passed: true,
       exitCode: 0
     };
 
   } catch (err) {
 
+    console.log(
+      `❌ ${name} failed in ${((Date.now() - start) / 1000).toFixed(1)}s`
+    );
+
     return {
-      command,
       passed: false,
       exitCode: err.code ?? 1,
       output: err.stdout ?? "",
@@ -27,25 +37,28 @@ async function execute(command) {
 
 export async function verifyRepository() {
 
-  const lint = await execute("npm run lint");
+  const lint = await execute(
+    "Lint",
+    "npm run lint"
+  );
 
-  const typescript = await execute("npx tsc --noEmit");
+  const typescript = await execute(
+    "TypeScript",
+    "npx tsc --noEmit"
+  );
 
-  const build = await execute("npm run build");
+  const build = await execute(
+    "Build",
+    "npm run build"
+  );
 
   return {
-
     lint,
-
     typescript,
-
     build,
-
     overall:
       lint.passed &&
       typescript.passed &&
       build.passed
-
   };
-
 }

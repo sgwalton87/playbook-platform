@@ -133,7 +133,7 @@ function SearchDropdown({options,value,onChange,placeholder,onAddNew}:{options:s
           {filtered.map(o=>(
             <div key={o} onMouseDown={()=>{setQuery(o);onChange(o, "");setOpen(false);}} style={{padding:"11px 14px",fontSize:14,color:T.ink,cursor:"pointer",borderBottom:`1px solid ${T.line}`}} onMouseEnter={e=>(e.currentTarget.style.background=T.orangeL)} onMouseLeave={e=>(e.currentTarget.style.background="transparent")}>{o}</div>
           ))}
-          {showAdd&&<div onMouseDown={()=>{onChange(query, "");onAddNew!(query);setOpen(false);}} style={{padding:"11px 14px",fontSize:14,color:T.orange,cursor:"pointer",fontWeight:700,background:T.orangeL,borderTop:`1px solid ${T.line}`}}>+ Add "{query}"</div>}
+          {showAdd&&<div onMouseDown={()=>{onChange(query, "");onAddNew!(query);setOpen(false);}} style={{padding:"11px 14px",fontSize:14,color:T.orange,cursor:"pointer",fontWeight:700,background:T.orangeL,borderTop:`1px solid ${T.line}`}}>+ Add &quot;{query}&quot;</div>}
         </div>
       )}
     </div>

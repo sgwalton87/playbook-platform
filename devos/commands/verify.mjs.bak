@@ -1,14 +1,13 @@
 import { loadMission } from "../core/StateEngine.mjs";
 import { verifyRepository } from "../core/VerificationEngine.mjs";
 import { evaluateRepository } from "../core/RepositoryGovernor.mjs";
-import { saveVerification } from "../core/VerificationState.mjs";
-import { markTesting } from "../core/ChecklistEngine.mjs";
 
 function icon(pass) {
   return pass ? "✅" : "❌";
 }
 
 export async function verify() {
+
   const mission = await loadMission();
 
   if (!mission.id) {
@@ -21,50 +20,35 @@ export async function verify() {
   console.log("MISSION VERIFICATION");
   console.log("==================================");
   console.log("");
+
   console.log(`Mission : ${mission.title}`);
   console.log("");
+
   console.log("Running repository verification...");
   console.log("");
 
   const report = await verifyRepository();
-
-  await saveVerification(report);
-
-  const result = await evaluateRepository(report);
-
-  console.log("\nDEBUG report =", JSON.stringify(report, null, 2));
-  console.log("DEBUG result =", JSON.stringify(result, null, 2));
-
+  const result =
+  await evaluateRepository(report);
 
   console.log(`${icon(report.lint.passed)} Lint`);
   console.log(`${icon(report.typescript.passed)} TypeScript`);
   console.log(`${icon(report.build.passed)} Build`);
+
   console.log("");
 
-  if (result.passed) {
-    await markTesting(mission.title);
+  if(result.passed) {
 
     console.log("==================================");
     console.log("STATUS: READY FOR COMPLETION");
     console.log("==================================");
-    return;
+
+  } else {
+
+    console.log("==================================");
+    console.log("STATUS: NOT READY");
+    console.log("==================================");
+
   }
 
-  console.log("==================================");
-  console.log("STATUS: NOT READY");
-  console.log("==================================");
-
-  if (result.regression) {
-    if (result.regression.lintErrors > 0) {
-      console.log(
-        `New lint errors: +${result.regression.lintErrors}`
-      );
-    }
-
-    if (result.regression.lintWarnings > 0) {
-      console.log(
-        `New lint warnings: +${result.regression.lintWarnings}`
-      );
-    }
-  }
 }

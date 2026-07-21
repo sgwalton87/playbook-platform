@@ -254,8 +254,7 @@ export default function CourseModulePage() {
               <div style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.18em",textTransform:"uppercase",color:T.orange,marginBottom:10}}>🏆 Course complete!</div>
               <h3 style={{fontFamily:T.anton,fontWeight:400,fontSize:"clamp(20px,3vw,30px)",textTransform:"uppercase",color:"#F8F7F4",lineHeight:1,marginBottom:12}}>Claim your certificate</h3>
               <p style={{fontSize:13,color:"rgba(248,247,244,.55)",lineHeight:1.6,maxWidth:"44ch",marginBottom:18}}>
-                You've completed all {totalModules} modules. Your certificate card is ready — it will appear on your profile and transcript.
-              </p>
+You&apos;ve completed all {totalModules} modules. Your certificate card is ready — it will appear on your profile and transcript.              </p>
               {!claimed?(
                 <button onClick={claimCert} style={{fontFamily:T.mono,fontSize:12,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:T.orange,color:"#fff",border:"none",borderRadius:999,padding:"13px 24px",cursor:"pointer"}}>
                   Claim certificate → Profile

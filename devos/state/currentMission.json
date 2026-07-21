@@ -1,8 +1,8 @@
 {
-  "id": "password-reset",
+  "id": "email-verification",
   "phase": 1,
   "phaseTitle": "# Phase 1 — Identity & Authentication",
-  "title": "Password Reset",
+  "title": "Email Verification",
   "status": "IMPLEMENTING",
-  "startedAt": "2026-07-21T19:17:50.483Z"
+  "startedAt": "2026-07-21T20:16:10.821Z"
 }

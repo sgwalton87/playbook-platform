@@ -1,0 +1,40 @@
+import { loadBaseline } from "./BaselineEngine.mjs";
+
+export async function evaluateRepository(report) {
+  const baseline = await loadBaseline();
+
+  if (!baseline) {
+    return {
+      passed: true,
+      reason: "No baseline exists."
+    };
+  }
+
+  const lintErrors =
+    report.lint.errors ?? 0;
+
+  const baselineErrors =
+    baseline.lint.errors ?? 0;
+
+  const lintWarnings =
+    report.lint.warnings ?? 0;
+
+  const baselineWarnings =
+    baseline.lint.warnings ?? 0;
+
+  return {
+    passed:
+      report.typescript.passed &&
+      report.build.passed &&
+      lintErrors <= baselineErrors &&
+      lintWarnings <= baselineWarnings,
+
+    regression: {
+      lintErrors:
+        lintErrors - baselineErrors,
+
+      lintWarnings:
+        lintWarnings - baselineWarnings
+    }
+  };
+}

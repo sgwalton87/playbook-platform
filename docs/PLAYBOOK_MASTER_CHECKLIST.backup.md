@@ -23,14 +23,14 @@ A task may be marked complete only after its interface, persistence, permissions
 - 🟦 Login
 - 🟦 Signup
 - 🟦 Google Login
-- 🟩 Password Reset
+- 🟨 Password Reset
 - 🟦 Remember Me
 - 🟦 Logout
 - 🟦 Session Timeout
 - 🟦 Close Browser Logout
 - 🟦 CAPTCHA
 - 🟦 PKCE
-- 🟦 Email Verification
+- 🟨 Email Verification
 - 🟨 Hostinger Email
 - 🟨 Email Templates
 - 🟦 Role Selection
@@ -41,6 +41,12 @@ Notes: Auth interfaces and Supabase flows are present, including login/signup, O
 
 # Phase 2 — Onboarding
 
+**Status:** 🟦 testing
+**Completion:** 0%
+
+- 🟨 Scholar Onboarding
+- ⬜ Scholar-Athlete Onboarding
+=======
 **Status:** 🟥 needs fix
 **Completion:** 19%
 
@@ -57,6 +63,12 @@ Notes: Auth interfaces and Supabase flows are present, including login/signup, O
 - 🟨 Transition-Aged Youth Onboarding
 - ⬜ Athlete Abroad Enrollment
 - ⬜ Dynamic User Agreement
+<<<<<<< HEAD
+- 🟦 Onboarding Autosave
+- ⬜ Profile Creation Animation
+- ⬜ Public Profile Generation
+- ⬜ Onboarding OS Redirects
+=======
 - 🟨 Onboarding Autosave
 - 🟨 Profile Creation Animation
 - 🟨 Public Profile Generation
@@ -192,6 +204,22 @@ Notes: Course surfaces and flagship content exist, but completion/progress/rewar
 # Phase 9 — Academic
 
 **Status:** 🟨 in progress
+<<<<<<< HEAD
+**Completion:** 0%
+
+- ⬜ Transcript Upload
+- ⬜ Transcript Parsing
+- ⬜ A-G Tracker
+- ⬜ FAFSA Tracker
+- ⬜ Scholarships
+- ⬜ College Search
+- ⬜ Dream Schools
+- ⬜ Top Schools
+- ⬜ Application Deadlines
+- ⬜ Application Tracker
+- 🟨 Academic Readiness
+- ⬜ Compass Recommendations
+=======
 **Completion:** 35%
 
 - 🟦 Transcript Upload
@@ -208,7 +236,7 @@ Notes: Course surfaces and flagship content exist, but completion/progress/rewar
 - 🟦 Compass Recommendations
 
 Notes: Academic pages, college search, A-G tracking, readiness, and recommendation surfaces are present and some have unit-test coverage. Remaining items stay Partial/Testing until the full academic workflow is validated against the Definition of Done.
-
+>>>>>>> origin/main
 
 # Phase 10 — Recruiting
 

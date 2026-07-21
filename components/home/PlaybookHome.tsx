@@ -91,7 +91,7 @@ export default function PlaybookHome({ courses = demoCourses, name = "Scholar" }
                 </div>
               ))}
             </div>
-            <p style={encouragement}>Keep going. You're building something powerful.</p>
+            <p style={encouragement}>Keep going. You&apos;re building something powerful..</p>
           </Card>
         </section>
 

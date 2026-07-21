@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import { supabase } from "@/lib/supabaseClient";
 import { getUserPathway, USER_PATHWAYS } from "@/lib/auth";
+import Link from "next/link";
 
 export default function CheckEmailPage() {
   return (
@@ -55,8 +56,7 @@ function CheckEmailContent() {
 
         <div style={actions}>
           <button onClick={resendConfirmation} style={primary}>Resend Confirmation Email</button>
-          <a href="/login" style={secondary}>Back to Login</a>
-          <a href="/" style={secondary}>Return Home</a>
+          <Link href="/" style={secondary}>Return Home</Link>
         </div>
       </section>
 

@@ -1,0 +1,314 @@
+#!/usr/bin/env bash
+
+set -u
+
+ROOT_DIR="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+CHECKLIST="$ROOT_DIR/docs/PLAYBOOK_MASTER_CHECKLIST.md"
+BACKLOG="$ROOT_DIR/docs/SPRINT_BACKLOG.md"
+PROTOCOL="$ROOT_DIR/docs/GOVERNANCE/SPRINT_EXECUTION_PROTOCOL.md"
+
+BOLD="$(printf '\033[1m')"
+DIM="$(printf '\033[2m')"
+GREEN="$(printf '\033[32m')"
+YELLOW="$(printf '\033[33m')"
+RED="$(printf '\033[31m')"
+CYAN="$(printf '\033[36m')"
+RESET="$(printf '\033[0m')"
+
+line() {
+  printf '%s\n' "============================================================"
+}
+
+require_file() {
+  if [ ! -f "$1" ]; then
+    printf '%sERROR:%s Required file not found:\n%s\n' "$RED" "$RESET" "$1"
+    exit 1
+  fi
+}
+
+require_governance() {
+  require_file "$CHECKLIST"
+  require_file "$BACKLOG"
+  require_file "$PROTOCOL"
+}
+
+has_conflicts() {
+  grep -Eq '^(<<<<<<<|=======|>>>>>>>)' "$CHECKLIST" "$BACKLOG" "$PROTOCOL"
+}
+
+conflict_report() {
+  printf '%sGovernance conflict markers detected.%s\n\n' "$RED" "$RESET"
+  grep -nHE '^(<<<<<<<|=======|>>>>>>>)' \
+    "$CHECKLIST" "$BACKLOG" "$PROTOCOL" 2>/dev/null || true
+
+  printf '\n%sImplementation is blocked until canonical documents are reconciled.%s\n' \
+    "$YELLOW" "$RESET"
+}
+
+branch_name() {
+  git -C "$ROOT_DIR" branch --show-current 2>/dev/null || printf 'unknown'
+}
+
+working_tree_status() {
+  if [ -z "$(git -C "$ROOT_DIR" status --porcelain)" ]; then
+    printf '%sClean%s\n' "$GREEN" "$RESET"
+  else
+    printf '%sChanges present%s\n' "$YELLOW" "$RESET"
+  fi
+}
+
+checklist_summary() {
+  awk '
+    /^# Phase [0-9]+/ {
+      phase=$0
+      getline
+      status=$0
+      getline
+      completion=$0
+      print phase
+      print "  " status
+      print "  " completion
+    }
+  ' "$CHECKLIST"
+}
+
+first_open_checklist_item() {
+  awk '
+    /^# Phase [0-9]+/ {
+      phase=$0
+    }
+
+    /^- (⬜|🟨|🟥)/ {
+      print phase
+      print $0
+      exit
+    }
+  ' "$CHECKLIST"
+}
+
+first_open_architecture_sprint() {
+  awk '
+    /^# Sprint [0-9]+/ {
+      sprint=$0
+      getline
+      while ($0 == "") getline
+      title=$0
+    }
+
+    /^Status: (🔴|🟡|⏸)/ {
+      print sprint
+      print title
+      print $0
+      exit
+    }
+  ' "$BACKLOG"
+}
+
+show_status() {
+  require_governance
+
+  line
+  printf '%sPLAYBOOK COMMAND CENTER%s\n' "$BOLD" "$RESET"
+  line
+  printf '%sRepository:%s %s\n' "$CYAN" "$RESET" "$ROOT_DIR"
+  printf '%sBranch:%s     %s\n' "$CYAN" "$RESET" "$(branch_name)"
+  printf '%sGit tree:%s   ' "$CYAN" "$RESET"
+  working_tree_status
+  printf '\n'
+
+  if has_conflicts; then
+    conflict_report
+    return 2
+  fi
+
+  printf '%sGovernance:%s Valid\n\n' "$CYAN" "$RESET"
+  checklist_summary
+}
+
+show_next() {
+  require_governance
+
+  line
+  printf '%sPLAYBOOK — NEXT APPROVED WORK%s\n' "$BOLD" "$RESET"
+  line
+
+  if has_conflicts; then
+    conflict_report
+    return 2
+  fi
+
+  printf '%sPRODUCT TRACK%s\n' "$BOLD" "$RESET"
+  first_open_checklist_item
+
+  printf '\n%sARCHITECTURE TRACK%s\n' "$BOLD" "$RESET"
+  first_open_architecture_sprint
+
+  printf '\n%sGOVERNING REFERENCES%s\n' "$BOLD" "$RESET"
+  printf '%s\n' \
+    "docs/PLAYBOOK_MASTER_CHECKLIST.md" \
+    "docs/SPRINT_BACKLOG.md" \
+    "docs/GOVERNANCE/SPRINT_EXECUTION_PROTOCOL.md"
+
+  printf '\n%sRequired execution order%s\n' "$BOLD" "$RESET"
+  printf '%s\n' \
+    "1. Discovery — inspect only; do not modify files." \
+    "2. Define objective, affected files, acceptance criteria, and non-goals." \
+    "3. Obtain human approval." \
+    "4. Implement the smallest safe change." \
+    "5. Verify." \
+    "6. Review diff and commit." \
+    "7. Update canonical documentation and ledgers."
+}
+
+show_sprint() {
+  require_governance
+
+  line
+  printf '%sPLAYBOOK SPRINT VIEW%s\n' "$BOLD" "$RESET"
+  line
+
+  if has_conflicts; then
+    conflict_report
+    return 2
+  fi
+
+  printf '%sArchitecture sprint queue%s\n\n' "$BOLD" "$RESET"
+
+  awk '
+    /^# Sprint [0-9]+/ {
+      sprint=$0
+      getline
+      while ($0 == "") getline
+      title=$0
+    }
+
+    /^Status:/ {
+      printf "%-14s %-42s %s\n", sprint, title, $0
+    }
+  ' "$BACKLOG"
+}
+
+run_check() {
+  label="$1"
+  shift
+
+  printf '\n%s▶ %s%s\n' "$CYAN" "$label" "$RESET"
+
+  if "$@"; then
+    printf '%sPASS%s — %s\n' "$GREEN" "$RESET" "$label"
+    return 0
+  fi
+
+  printf '%sFAIL%s — %s\n' "$RED" "$RESET" "$label"
+  return 1
+}
+
+verify_project() {
+  require_governance
+
+  line
+  printf '%sPLAYBOOK VERIFICATION%s\n' "$BOLD" "$RESET"
+  line
+
+  failures=0
+
+  if has_conflicts; then
+    conflict_report
+    failures=$((failures + 1))
+  else
+    printf '%sPASS%s — governance documents contain no conflict markers\n' \
+      "$GREEN" "$RESET"
+  fi
+
+  cd "$ROOT_DIR" || exit 1
+
+  if npm run | grep -qE '^[[:space:]]+lint$'; then
+    run_check "Lint" npm run lint || failures=$((failures + 1))
+  else
+    printf '\n%sWARNING%s — no npm lint script found; skipped\n' "$YELLOW" "$RESET"
+  fi
+
+  run_check "TypeScript" npx tsc --noEmit || failures=$((failures + 1))
+  run_check "Production build" npm run build || failures=$((failures + 1))
+
+  printf '\n%sGit status%s\n' "$BOLD" "$RESET"
+  git status --short
+
+  printf '\n%sDiff summary%s\n' "$BOLD" "$RESET"
+  git diff --stat
+
+  printf '\n'
+  line
+
+  if [ "$failures" -eq 0 ]; then
+    printf '%sVERIFICATION PASSED%s\n' "$GREEN" "$RESET"
+    return 0
+  fi
+
+  printf '%sVERIFICATION FAILED%s — %s check(s) require attention.\n' \
+    "$RED" "$RESET" "$failures"
+  return 1
+}
+
+show_governance() {
+  require_governance
+
+  printf '%s\n' \
+    "$CHECKLIST" \
+    "$BACKLOG" \
+    "$PROTOCOL"
+}
+
+show_help() {
+  cat <<'HELP'
+Playbook Command Center
+
+Usage:
+  ./scripts/playbook status
+  ./scripts/playbook next
+  ./scripts/playbook sprint
+  ./scripts/playbook verify
+  ./scripts/playbook governance
+  ./scripts/playbook help
+
+Commands:
+  status       Show branch, repository health, and phase progress.
+  next         Show the next open product item and architecture sprint.
+  sprint       Show the architecture sprint queue.
+  verify       Run governance, lint, TypeScript, build, and git checks.
+  governance   Print the canonical governing-document paths.
+  help         Show this help screen.
+
+Safety:
+  This first version is intentionally read-only except for verification
+  commands. It does not edit checklists, commit, push, merge, or ship.
+HELP
+}
+
+COMMAND="${1:-status}"
+
+case "$COMMAND" in
+  status)
+    show_status
+    ;;
+  next)
+    show_next
+    ;;
+  sprint)
+    show_sprint
+    ;;
+  verify)
+    verify_project
+    ;;
+  governance)
+    show_governance
+    ;;
+  help|-h|--help)
+    show_help
+    ;;
+  *)
+    printf '%sUnknown command:%s %s\n\n' "$RED" "$RESET" "$COMMAND"
+    show_help
+    exit 1
+    ;;
+esac

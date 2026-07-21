@@ -147,7 +147,7 @@ export default function EventsPage() {
         {/* LEFT */}
         <div>
           <div style={{ marginBottom: 24 }}>
-            <p style={{ fontFamily: mono, fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase", color: accent, marginBottom: 8 }}>What's happening</p>
+            <p style={{ fontFamily: mono, fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase", color: accent, marginBottom: 8 }}>What&apos;s happening</p>
             <h1 style={{ fontFamily: anton, fontWeight: 400, fontSize: "clamp(32px,4vw,52px)", lineHeight: 0.95, textTransform: "uppercase", color: ink, marginBottom: 16 }}>
               Upcoming <span style={{ color: accent }}>events</span>
             </h1>
@@ -233,7 +233,7 @@ export default function EventsPage() {
           <div style={{ background: surface, border: `1px solid ${line}`, borderRadius: 16, padding: "18px 20px" }}>
             <p style={{ fontFamily: mono, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: muted, marginBottom: 14 }}>My upcoming</p>
             {myEvents.length === 0 ? (
-              <p style={{ fontSize: 13, color: faint }}>You haven't RSVP'd to any events yet.</p>
+              <p style={{ fontSize: 13, color: faint }}>You haven&apos;t RSVP&apos;d to any events yet.</p>
             ) : myEvents.map((ev) => (
               <div key={ev.id} style={{ padding: "10px 0", borderBottom: `1px solid ${line}` }}>
                 <div style={{ fontSize: 13, fontWeight: 600, color: ink, marginBottom: 3 }}>{ev.title}</div>
