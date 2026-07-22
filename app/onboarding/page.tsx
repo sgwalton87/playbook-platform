@@ -380,7 +380,22 @@ const steps = isScholarAthlete
 
     const { data: p } = await supabase
   .from("profiles")
-  .select("onboarded,username,role,registration_type")
+  .select(`
+  onboarded,
+  username,
+  role,
+  registration_type,
+  school,
+  district,
+  city,
+  grad_year,
+  gpa,
+  weighted_gpa,
+  unweighted_gpa,
+  current_math,
+  current_english,
+  current_science
+`)
   .eq("id", data.user.id)
   .single();
 
@@ -400,11 +415,19 @@ if (p?.onboarded) {
   return;
 }
 
-if (p?.username) setUsername(p.username);
+if (p?.school) setSchool(p.school);
+if (p?.district) setDistrict(p.district);
+if (p?.city) setCity(p.city);
 
-if (p?.role) {
-  setRole(p.role);
-}
+if (p?.grad_year) setGradYear(String(p.grad_year));
+
+if (p?.gpa) setGpa(String(p.gpa));
+if (p?.weighted_gpa) setWeightedGpa(String(p.weighted_gpa));
+if (p?.unweighted_gpa) setUnweightedGpa(String(p.unweighted_gpa));
+
+if (p?.current_math) setCurrentMath(p.current_math);
+if (p?.current_english) setCurrentEnglish(p.current_english);
+if (p?.current_science) setCurrentScience(p.current_science);
 
     const { data: custom } = await supabase
       .from("custom_options")

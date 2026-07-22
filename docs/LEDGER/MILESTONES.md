@@ -1551,3 +1551,6 @@ Alpha 1.0 Complete — Intelligence OS foundation finished.
 
 ## 2026-07-21 16:32
 - **precommit**: Update Playbook build ledger
+
+## 2026-07-21 17:14
+- **precommit**: Sprint 1.1 - Persist academic and recruiting onboarding fields

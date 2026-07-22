@@ -44,6 +44,9 @@ export type ScholarAcademicProfile = {
   gpa: string | number | null;
   weightedGpa: string | number | null;
   unweightedGpa: string | number | null;
+  currentMath: string | null;
+currentEnglish: string | null;
+currentScience: string | null;
 
   elaScore: string | number | null;
   mathScore: string | number | null;

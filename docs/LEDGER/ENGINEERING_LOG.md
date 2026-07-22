@@ -1551,3 +1551,6 @@ Started Beta 2 — Archivist v3 Unified Ledger Engine and Demo Mode.
 
 ## 2026-07-21 16:32
 - **precommit**: Update Playbook build ledger
+
+## 2026-07-21 17:14
+- **precommit**: Sprint 1.1 - Persist academic and recruiting onboarding fields

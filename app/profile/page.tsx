@@ -61,6 +61,9 @@ export default function ProfilePage() {
   const [gradYear, setGradYear] = useState("");
   const [weightedGpa, setWeightedGpa] = useState("");
   const [unweightedGpa, setUnweightedGpa] = useState("");
+  const [currentMath, setCurrentMath] = useState("");
+  const [currentEnglish, setCurrentEnglish] = useState("");
+  const [currentScience, setCurrentScience] = useState("");
   const [city, setCity] = useState("");
   const [zipCode, setZipCode] = useState("");
   const [ell, setEll] = useState(false);
@@ -127,6 +130,9 @@ export default function ProfilePage() {
   setFirstName(form.firstName);
   setLastName(form.lastName);
   setBio(form.bio);
+  setGender(form.gender);
+  setDob(form.dateOfBirth);
+  setFavoriteQuote(form.favoriteQuote);
 
   setAvatarUrl(form.avatarUrl);
 
@@ -138,6 +144,10 @@ export default function ProfilePage() {
 
   setWeightedGpa(form.weightedGpa);
   setUnweightedGpa(form.unweightedGpa);
+
+  setCurrentMath(form.currentMath);
+  setCurrentEnglish(form.currentEnglish);
+  setCurrentScience(form.currentScience);
 
   setCity(form.city);
   setZipCode(form.zipCode);
@@ -171,7 +181,9 @@ export default function ProfilePage() {
     setSaving(true);
     await supabase.from("profiles").update({
       first_name:firstName,last_name:lastName,full_name:`${firstName} ${lastName}`.trim(),bio,gender,date_of_birth:dob||null,favorite_quote:favoriteQuote||null,
-      school,grade,school_district:district,grad_year:gradYear,weighted_gpa:weightedGpa||null,unweighted_gpa:unweightedGpa||null,city,zip_code:zipCode,english_language_learner:ell,dream_school:dreamSchool||null,sat_score:satScore||null,act_score:actScore||null,intended_major:intendedMajor||null,
+      school,grade,school_district:district,grad_year:gradYear,weighted_gpa:weightedGpa||null,unweighted_gpa:unweightedGpa||null,current_math: currentMath || null,
+current_english: currentEnglish || null,
+current_science: currentScience || null,city,zip_code:zipCode,english_language_learner:ell,dream_school:dreamSchool||null,sat_score:satScore||null,act_score:actScore||null,intended_major:intendedMajor||null,
       college_list_2:collegeList[0]||null,college_list_3:collegeList[1]||null,college_list_4:collegeList[2]||null,college_list_5:collegeList[3]||null,college_list_6:collegeList[4]||null,college_list_7:collegeList[5]||null,college_list_8:collegeList[6]||null,college_list_9:collegeList[7]||null,college_list_10:collegeList[8]||null,
       sport:sport||null,position:position||null,height:height||null,weight:weight||null,jersey_number:jerseyNumber||null,team_level:teamLevel||null,travel_team:travelTeam||null,coach_name:coachName||null,coach_email:coachEmail||null,
       highlight_reel_url:highlightReelUrl||null,recruiting_status:recruitingStatus||null,desired_college_level:desiredCollegeLevel||null,athlete_email:athleteEmail||null,camps_attended:campsAttended||null,
@@ -180,7 +192,9 @@ export default function ProfilePage() {
       pillars,race:race||null,household_income:householdIncome||null,first_generation:firstGen,free_reduced_lunch:freeLunch,migrant_student:migrant,foster_youth:fosterYouth,unhoused,has_iep:iep,
     }).eq("id",profile.id);
     setSaving(false);setSaved(true);setTimeout(()=>setSaved(false),3000);
-  },[profile?.id,firstName,lastName,bio,gender,dob,favoriteQuote,school,grade,district,gradYear,weightedGpa,unweightedGpa,city,zipCode,ell,dreamSchool,satScore,actScore,intendedMajor,collegeList,sport,position,height,weight,jerseyNumber,teamLevel,travelTeam,coachName,coachEmail,highlightReelUrl,recruitingStatus,desiredCollegeLevel,athleteEmail,campsAttended,nilInstagram,nilTiktok,nilTwitter,nilFollowerRange,nilBrandInterests,nilWorkedWithBrands,nilDealTypes,instagram,tiktok,twitter,hudl,youtube,pillars,race,householdIncome,firstGen,freeLunch,migrant,fosterYouth,unhoused,iep]);
+  },[profile?.id,firstName,lastName,bio,gender,dob,favoriteQuote,school,grade,district,gradYear,weightedGpa,unweightedGpa,currentMath,
+currentEnglish,
+currentScience,city,zipCode,ell,dreamSchool,satScore,actScore,intendedMajor,collegeList,sport,position,height,weight,jerseyNumber,teamLevel,travelTeam,coachName,coachEmail,highlightReelUrl,recruitingStatus,desiredCollegeLevel,athleteEmail,campsAttended,nilInstagram,nilTiktok,nilTwitter,nilFollowerRange,nilBrandInterests,nilWorkedWithBrands,nilDealTypes,instagram,tiktok,twitter,hudl,youtube,pillars,race,householdIncome,firstGen,freeLunch,migrant,fosterYouth,unhoused,iep]);
 
 if (loading || recordLoading) {
     return (
@@ -323,10 +337,57 @@ if (loading || recordLoading) {
               <div><label style={lbl}>City</label><input style={inp} value={city} onChange={e=>setCity(e.target.value)} placeholder="Oakland"/></div>
               <div><label style={lbl}>ZIP code</label><input style={inp} value={zipCode} onChange={e=>setZipCode(e.target.value)} placeholder="94601"/></div>
             </div>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginTop:14}}>
-              <div><label style={lbl}>Weighted GPA</label><input style={inp} value={weightedGpa} onChange={e=>setWeightedGpa(e.target.value)} placeholder="3.8"/></div>
-              <div><label style={lbl}>Unweighted GPA</label><input style={inp} value={unweightedGpa} onChange={e=>setUnweightedGpa(e.target.value)} placeholder="3.5"/></div>
-            </div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(2,minmax(0,1fr))",gap:14,marginTop:14}}>
+  <div>
+    <label style={lbl}>Weighted GPA</label>
+    <input
+      style={inp}
+      value={weightedGpa}
+      onChange={e=>setWeightedGpa(e.target.value)}
+      placeholder="3.8"
+    />
+  </div>
+
+  <div>
+    <label style={lbl}>Unweighted GPA</label>
+    <input
+      style={inp}
+      value={unweightedGpa}
+      onChange={e=>setUnweightedGpa(e.target.value)}
+      placeholder="3.5"
+    />
+  </div>
+
+  <div>
+    <label style={lbl}>Current Math</label>
+    <input
+      style={inp}
+      value={currentMath}
+      onChange={e=>setCurrentMath(e.target.value)}
+      placeholder="Algebra II"
+    />
+  </div>
+
+  <div>
+    <label style={lbl}>Current English</label>
+    <input
+      style={inp}
+      value={currentEnglish}
+      onChange={e=>setCurrentEnglish(e.target.value)}
+      placeholder="English 11"
+    />
+  </div>
+
+  <div>
+    <label style={lbl}>Current Science</label>
+    <input
+      style={inp}
+      value={currentScience}
+      onChange={e=>setCurrentScience(e.target.value)}
+      placeholder="Chemistry"
+    />
+  </div>
+</div>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginTop:14}}>
               <div><label style={lbl}>SAT score</label><input style={inp} value={satScore} onChange={e=>setSatScore(e.target.value)} placeholder="1200"/></div>
               <div><label style={lbl}>ACT score</label><input style={inp} value={actScore} onChange={e=>setActScore(e.target.value)} placeholder="26"/></div>

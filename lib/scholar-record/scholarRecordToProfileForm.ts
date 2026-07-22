@@ -8,6 +8,9 @@ export type ScholarProfileForm = {
   avatarUrl: string;
   coverUrl: string;
   bio: string;
+  gender: string;
+  dateOfBirth: string;
+  favoriteQuote: string;
 
   school: string;
   grade: string;
@@ -16,6 +19,10 @@ export type ScholarProfileForm = {
 
   weightedGpa: string;
   unweightedGpa: string;
+
+  currentMath: string;
+currentEnglish: string;
+currentScience: string;
 
   city: string;
   zipCode: string;
@@ -78,6 +85,9 @@ export function scholarRecordToProfileForm(
     avatarUrl: formString(record.identity.avatarUrl),
     coverUrl: formString(record.identity.coverUrl),
     bio: formString(record.identity.bio),
+    gender: formString(record.identity.gender),
+    dateOfBirth: formString(record.identity.dateOfBirth),
+    favoriteQuote: formString(record.identity.favoriteQuote),
 
     school: formString(record.academic.school),
     grade: formString(record.academic.grade),
@@ -94,6 +104,18 @@ export function scholarRecordToProfileForm(
     unweightedGpa: formString(
       record.academic.unweightedGpa
     ),
+
+    currentMath: formString(
+  record.academic.currentMath
+),
+
+currentEnglish: formString(
+  record.academic.currentEnglish
+),
+
+currentScience: formString(
+  record.academic.currentScience
+),
 
     city: formString(record.identity.city),
     zipCode: formString(record.identity.zipCode),

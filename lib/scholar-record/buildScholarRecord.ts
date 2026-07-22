@@ -251,6 +251,20 @@ export function buildScholarRecord({
         onboarding.unweighted_gpa
       ),
 
+      currentMath: normalizedString(
+  row.current_math,
+  onboarding.current_math
+),
+
+currentEnglish: normalizedString(
+  row.current_english,
+  onboarding.current_english
+),
+
+currentScience: normalizedString(
+  row.current_science,
+  onboarding.current_science
+),
       elaScore: firstDefined(
         row.ela_score,
         onboarding.ela_score
