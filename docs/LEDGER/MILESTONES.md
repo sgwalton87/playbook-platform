@@ -1365,3 +1365,9 @@ Alpha 1.0 Complete — Intelligence OS foundation finished.
 
 ## 2026-07-14 10:23
 - **commit**: Checkpoint before Founder Knowledge Base
+
+## 2026-07-22 11:00
+- **precommit**: Canonicalize scholar community activities (#2)
+
+## 2026-07-22 11:03
+- **precommit**: Canonicalize academic scholar record

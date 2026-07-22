@@ -2,17 +2,23 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
-import { buildScholarRecord, type CommunityExperience, type RawCommunityActivity } from "@/lib/scholar";
 import { AG_SUBJECT_NAMES, AG_REQUIREMENTS } from "@/lib/agCourses";
 import { PlaybookStoryBanner, PlaybookQuote } from "@/components/brand-story";
 import { PLAYBOOK_QUOTES, PLAYBOOK_STORY_IMAGES } from "@/lib/brand-story";
 import TranscriptUploadCard from "@/components/transcript/TranscriptUploadCard";
+import {
+  buildScholarRecord,
+  type CommunityExperience,
+  type RawCommunityActivity,
+  type ScholarRecord,
+} from "@/lib/scholar";
 
 const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",green:"#10B981",greenL:"#ECFDF5",amber:"#F59E0B",red:"#E24B4A",blue:"#3B82F6",purple:"#8B5CF6",mono:"'Space Mono',monospace",sans:"'Hanken Grotesk',system-ui,sans-serif",anton:"'Anton',sans-serif"};
 
 export default function TranscriptPage() {
   const router = useRouter();
   const [profile, setProfile] = useState<any>(null);
+  const [scholarRecord, setScholarRecord] = useState<ScholarRecord | null>(null);
   const [agProgress, setAgProgress] = useState<any[]>([]);
   const [certificates, setCertificates] = useState<any[]>([]);
   const [activities, setActivities] = useState<RawCommunityActivity[]>([]);
@@ -29,20 +35,16 @@ export default function TranscriptPage() {
         supabase.from("student_activities").select("*").eq("student_id", u.user.id),
       ]);
       setProfile(p);
-      const latestBySubject = new Map<string, any>();
-      for (const row of ag || []) {
-        if (!latestBySubject.has(row.subject)) {
-          latestBySubject.set(row.subject, row);
-        }
-      }
-
-      setAgProgress(
-        Array.from(latestBySubject.values()).map((a:any)=>({
-          ...a,
-          years_completed:Number(a.years_completed),
-          years_required:Number(a.years_required)
-        }))
-      );
+      const record = buildScholarRecord({ profile: p, agProgress: ag || [], certificates: certs || [], activities: acts || [] });
+      setScholarRecord(record);
+      setAgProgress(record.academics.agProgress.map((a)=>({
+        subject: a.subject,
+        years_completed: a.yearsCompleted,
+        years_required: a.yearsRequired,
+        in_progress: a.inProgress,
+        courses_taken: a.coursesTaken,
+        current_course: a.currentCourse,
+      })));
       setCertificates(certs||[]);
       setActivities((acts || []) as RawCommunityActivity[]);
       setLoading(false);
@@ -51,9 +53,9 @@ export default function TranscriptPage() {
 
   if (loading) return <><div style={{padding:"28px 32px",fontFamily:T.mono,fontSize:12,color:T.faint}}>Loading transcript...</div></>;
 
-  const agDone = agProgress.filter(a => a.years_completed >= a.years_required).length;
-  const scholarRecord = buildScholarRecord({ profile: profile || {}, certificates, activities });
-  const communityActivities = scholarRecord.community.activities;
+  const academic = scholarRecord?.academics;
+  const agDone = academic?.agSummary.subjectsMet ?? agProgress.filter(a => a.years_completed >= a.years_required).length;
+  const communityActivities = scholarRecord?.community.activities ?? [];
 
   return (
     <>
@@ -72,11 +74,11 @@ export default function TranscriptPage() {
       <div style={{display:"flex",gap:24,alignItems:"flex-start",width:"100%"}}>
 
         <div className="no-print" style={{width:260,flexShrink:0,display:"flex",flexDirection:"column",gap:14,position:"sticky",top:28}}>
-          {profile?.dream_school&&(
+          {academic?.dreamSchool&&(
             <div style={{background:T.navy,borderRadius:14,padding:"16px"}}>
               <div style={{fontFamily:T.mono,fontSize:9,letterSpacing:"0.14em",textTransform:"uppercase",color:"rgba(248,247,244,.4)",marginBottom:8}}>Dream school</div>
-              <div style={{fontSize:14,fontWeight:700,color:"#F8F7F4",marginBottom:4}}>🎓 {profile.dream_school}</div>
-              {profile?.intended_major&&<div style={{fontSize:12,color:"rgba(248,247,244,.5)"}}>Intended major: {profile.intended_major}</div>}
+              <div style={{fontSize:14,fontWeight:700,color:"#F8F7F4",marginBottom:4}}>🎓 {academic?.dreamSchool}</div>
+              {academic?.intendedMajor&&<div style={{fontSize:12,color:"rgba(248,247,244,.5)"}}>Intended major: {academic?.intendedMajor}</div>}
             </div>
           )}
           <div style={{background:T.navy,borderRadius:16,padding:"18px 16px",color:"#F8F7F4"}}>
@@ -89,7 +91,7 @@ export default function TranscriptPage() {
           </div>
           <div style={{background:T.surface,border:`0.5px solid ${T.line}`,borderRadius:14,padding:"16px"}}>
             <div style={{fontFamily:T.mono,fontSize:9,letterSpacing:"0.14em",textTransform:"uppercase",color:T.muted,marginBottom:12}}>Academic stats</div>
-            {[{label:"Weighted GPA",val:profile?.weighted_gpa||profile?.gpa||"—",color:T.green},{label:"Unweighted GPA",val:profile?.unweighted_gpa||"—",color:T.blue},{label:"SAT Score",val:profile?.sat_score||"—",color:T.purple},{label:"ACT Score",val:profile?.act_score||"—",color:T.amber},{label:"Grad year",val:profile?.grad_year||"—",color:T.orange}].map(({label,val,color})=>(
+            {[{label:"Weighted GPA",val:academic?.weightedGpa||academic?.gpa||"—",color:T.green},{label:"Unweighted GPA",val:academic?.unweightedGpa||"—",color:T.blue},{label:"SAT Score",val:academic?.sat.total||"—",color:T.purple},{label:"ACT Score",val:academic?.act.composite||"—",color:T.amber},{label:"Grad year",val:academic?.graduationYear||"—",color:T.orange}].map(({label,val,color})=>(
               <div key={label} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px 0",borderBottom:`0.5px solid ${T.line}`}}>
                 <span style={{fontSize:12,color:T.muted}}>{label}</span>
                 <span style={{fontFamily:T.mono,fontSize:13,fontWeight:700,color}}>{val}</span>
@@ -117,7 +119,7 @@ export default function TranscriptPage() {
           </div>
           <div style={{background:T.orangeL,border:`0.5px solid #FED7AA`,borderRadius:14,padding:"16px"}}>
             <div style={{fontFamily:T.mono,fontSize:9,letterSpacing:"0.14em",textTransform:"uppercase",color:T.orange,marginBottom:10}}>💡 Tips for success</div>
-            {[agDone<7?"Complete all A-G requirements to qualify for UC and CSU.":null,!profile?.weighted_gpa&&!profile?.gpa?"Add your GPA to strengthen your application.":null,"Request transcripts early — colleges need official copies.","A-G courses must be completed with a C or better to count."].filter(Boolean).slice(0,4).map((tip,i)=>(
+            {[agDone<7?"Complete all A-G requirements to qualify for UC and CSU.":null,!academic?.weightedGpa&&!academic?.gpa?"Add your GPA to strengthen your application.":null,"Request transcripts early — colleges need official copies.","A-G courses must be completed with a C or better to count."].filter(Boolean).slice(0,4).map((tip,i)=>(
               <div key={i} style={{display:"flex",gap:8,fontSize:11,color:"#7C2D12",lineHeight:1.5,marginBottom:6}}>
                 <span style={{flexShrink:0}}>→</span><span>{tip}</span>
               </div>
@@ -136,11 +138,11 @@ export default function TranscriptPage() {
               <div>
                 <div style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.18em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>Official Academic Record</div>
                 <h2 style={{fontFamily:T.anton,fontWeight:400,fontSize:32,textTransform:"uppercase",lineHeight:.95,marginBottom:4}}>{profile?.full_name||`${profile?.first_name||""} ${profile?.last_name||""}`.trim()||"Student"}</h2>
-                <div style={{fontSize:13,color:"rgba(248,247,244,.6)"}}>{profile?.school||"School not set"} · Class of {profile?.grad_year||"—"}</div>
+                <div style={{fontSize:13,color:"rgba(248,247,244,.6)"}}>{academic?.school||"School not set"} · Class of {academic?.graduationYear||"—"}</div>
               </div>
               <div style={{textAlign:"right"}}>
                 <div style={{fontSize:12,color:"rgba(248,247,244,.5)",marginBottom:4}}>Cumulative GPA</div>
-                <div style={{fontFamily:T.anton,fontSize:36,color:T.orange,lineHeight:1}}>{profile?.weighted_gpa||profile?.gpa||"—"}</div>
+                <div style={{fontFamily:T.anton,fontSize:36,color:T.orange,lineHeight:1}}>{academic?.weightedGpa||academic?.gpa||"—"}</div>
                 <div style={{fontSize:11,color:"rgba(248,247,244,.4)"}}>Weighted</div>
               </div>
             </div>

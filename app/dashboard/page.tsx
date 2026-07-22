@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import AGTracker from "@/components/ag/AGTracker";
 import {
   PlaybookButton,
@@ -10,8 +11,30 @@ import {
   PlaybookMetrics,
   PlaybookPage,
 } from "@/components/ui";
+import { buildScholarRecord } from "@/lib/scholar";
+import type { ScholarRecord } from "@/lib/scholar";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function DashboardPage() {
+  const [record, setRecord] = useState<ScholarRecord | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    async function loadScholarRecord() {
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) return;
+      const [{ data: profile }, { data: agProgress }] = await Promise.all([
+        supabase.from("profiles").select("*").eq("id", u.user.id).single(),
+        supabase.from("ag_progress").select("*").eq("user_id", u.user.id).order("updated_at", { ascending: false }),
+      ]);
+      if (active) setRecord(buildScholarRecord({ profile, agProgress: agProgress || [] }));
+    }
+    loadScholarRecord();
+    return () => { active = false; };
+  }, []);
+
+  const academics = record?.academics;
+
   return (
     <PlaybookPage>
       <PlaybookHero
@@ -26,10 +49,10 @@ export default function DashboardPage() {
       </PlaybookHero>
 
       <PlaybookMetrics>
-        <PlaybookMetric label="Academic Core" value="Active" />
-        <PlaybookMetric label="A-G Tracker" value="Live" />
-        <PlaybookMetric label="Transcript Upload" value="Ready" />
-        <PlaybookMetric label="Next Step" value="Compass" />
+        <PlaybookMetric label="Academic Core" value={academics?.weightedGpa || academics?.gpa || "Active"} />
+        <PlaybookMetric label="A-G Tracker" value={academics ? `${academics.agSummary.percent}%` : "Live"} />
+        <PlaybookMetric label="Credits Earned" value={academics ? String(academics.creditsEarned) : "—"} />
+        <PlaybookMetric label="Grad Year" value={academics?.graduationYear || "—"} />
       </PlaybookMetrics>
 
       <div style={mainGrid}>
@@ -44,6 +67,15 @@ export default function DashboardPage() {
               eligibility, opportunity matching, applications, and support actions.
             </p>
             <PlaybookButton href="/transcript">Go to Transcript</PlaybookButton>
+          </PlaybookCard>
+
+          <PlaybookCard eyebrow="Academic Summary" title="Canonical Scholar Record">
+            <p style={body}>
+              {academics
+                ? `Class of ${academics.graduationYear || "—"} · ${academics.agSummary.subjectsMet}/7 A–G areas met · ${academics.currentCourses.length} current courses.`
+                : "Loading ScholarRecord academic summary..."}
+            </p>
+            <PlaybookButton href="/profile">Update Academics</PlaybookButton>
           </PlaybookCard>
 
           <PlaybookCard eyebrow="Compass" title="Turn gaps into action">
@@ -61,15 +93,14 @@ export default function DashboardPage() {
             </p>
             <PlaybookButton href="/support-network">Activate Support</PlaybookButton>
           </PlaybookCard>
-        
-        <PlaybookCard eyebrow="Community" title="Share your journey">
-          <p style={body}>
-            Post updates, photos, accomplishments, questions, club moments,
-            sports highlights, and milestones with the Playbook community.
-          </p>
-          <PlaybookButton href="/feed">Open Community Feed</PlaybookButton>
-        </PlaybookCard>
 
+          <PlaybookCard eyebrow="Community" title="Share your journey">
+            <p style={body}>
+              Post updates, photos, accomplishments, questions, club moments,
+              sports highlights, and milestones with the Playbook community.
+            </p>
+            <PlaybookButton href="/feed">Open Community Feed</PlaybookButton>
+          </PlaybookCard>
         </section>
       </div>
     </PlaybookPage>
@@ -85,12 +116,5 @@ const mainGrid: React.CSSProperties = {
   alignItems: "start",
 };
 
-const sideStack: React.CSSProperties = {
-  display: "grid",
-  gap: 14,
-};
-
-const body: React.CSSProperties = {
-  color: "#64748B",
-  lineHeight: 1.6,
-};
+const sideStack: React.CSSProperties = { display: "grid", gap: 14 };
+const body: React.CSSProperties = { color: "#64748B", lineHeight: 1.6 };
