@@ -12,7 +12,7 @@ import {
 
 import {
   normalizeScholarActivities,
-} from "@/lib/scholar-record";
+} from "@/lib/playbook";
 
 describe("Activities Intelligence", () => {
   it("provides category-specific activity options", () => {

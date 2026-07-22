@@ -6,22 +6,22 @@ import {
   useState,
 } from "react";
 
-import { loadScholarRecord } from "./loadScholarRecord";
-import type { ScholarRecord } from "./types";
+import { loadPlaybookRecord } from "./loadPlaybookRecord";
+import type { PlaybookRecord } from "./types";
 
-type UseScholarRecordOptions = {
+type UsePlaybookRecordOptions = {
   userId?: string | null;
   includeAcademicData?: boolean;
   enabled?: boolean;
 };
 
-export function useScholarRecord({
+export function usePlaybookRecord({
   userId,
   includeAcademicData = true,
   enabled = true,
-}: UseScholarRecordOptions = {}) {
+}: UsePlaybookRecordOptions = {}) {
   const [record, setRecord] =
-    useState<ScholarRecord | null>(null);
+    useState<PlaybookRecord | null>(null);
 
   const [loading, setLoading] =
     useState(enabled);
@@ -38,7 +38,7 @@ export function useScholarRecord({
     setLoading(true);
     setError(null);
 
-    const result = await loadScholarRecord({
+    const result = await loadPlaybookRecord({
       userId,
       includeAcademicData,
     });

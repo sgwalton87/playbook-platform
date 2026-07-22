@@ -18,7 +18,7 @@ function Bar({label,value}:{label:string;value:number}) {
   );
 }
 
-export default function ScholarRecordSummary({record}:Props) {
+export default function PlaybookRecordSummary({record}:Props) {
   const readiness = record?.readiness || {};
 
   return (

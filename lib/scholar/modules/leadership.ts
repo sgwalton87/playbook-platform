@@ -1,8 +1,8 @@
-import type { ScholarRecordArtifact } from "../types";
+import type { PlaybookRecordArtifact } from "../types";
 
 export function buildLeadership(
-  badges: ScholarRecordArtifact[] = [],
-  activities: ScholarRecordArtifact[] = []
+  badges: PlaybookRecordArtifact[] = [],
+  activities: PlaybookRecordArtifact[] = []
 ) {
   return {
     badges,

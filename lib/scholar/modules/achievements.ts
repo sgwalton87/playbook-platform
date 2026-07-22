@@ -1,4 +1,4 @@
-import type { ScholarRecordArtifact } from "../types";
+import type { PlaybookRecordArtifact } from "../types";
 
 export function buildAchievements({
   certificates=[],
@@ -6,10 +6,10 @@ export function buildAchievements({
   posts=[],
   activities=[],
 }: {
-  certificates?: ScholarRecordArtifact[];
-  badges?: ScholarRecordArtifact[];
-  posts?: ScholarRecordArtifact[];
-  activities?: ScholarRecordArtifact[];
+  certificates?: PlaybookRecordArtifact[];
+  badges?: PlaybookRecordArtifact[];
+  posts?: PlaybookRecordArtifact[];
+  activities?: PlaybookRecordArtifact[];
 }){
 
   return{

@@ -1,15 +1,15 @@
 import { supabase } from "@/lib/supabaseClient";
 
-import { assembleScholarRecord } from "./assembleScholarRecord";
-import type { ScholarRecord } from "./types";
+import { assemblePlaybookRecord } from "./assemblePlaybookRecord";
+import type { PlaybookRecord } from "./types";
 
-type LoadScholarRecordOptions = {
+type LoadPlaybookRecordOptions = {
   userId?: string | null;
   includeAcademicData?: boolean;
 };
 
-type LoadScholarRecordResult = {
-  record: ScholarRecord | null;
+type LoadPlaybookRecordResult = {
+  record: PlaybookRecord | null;
   error: Error | null;
 };
 
@@ -123,10 +123,10 @@ async function loadTranscriptCourses(userId: string) {
   return [];
 }
 
-export async function loadScholarRecord({
+export async function loadPlaybookRecord({
   userId,
   includeAcademicData = true,
-}: LoadScholarRecordOptions = {}): Promise<LoadScholarRecordResult> {
+}: LoadPlaybookRecordOptions = {}): Promise<LoadPlaybookRecordResult> {
   const authResult = await loadAuthenticatedUser();
 
   if (authResult.error) {
@@ -149,7 +149,7 @@ export async function loadScholarRecord({
   }
 
   try {
-    const record = await assembleScholarRecord({
+    const record = await assemblePlaybookRecord({
       userId: resolvedUserId,
       authEmail: authResult.user?.email || null,
       includeAcademicData,

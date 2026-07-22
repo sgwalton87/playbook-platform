@@ -2,9 +2,9 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
-  useScholarRecord,
+  usePlaybookRecord,
   scholarRecordToProfileForm,
-} from "@/lib/scholar-record";
+} from "@/lib/playbook";
 import { supabase } from "@/lib/supabaseClient";
 import CollegeSearch from "@/components/CollegeSearch";
 
@@ -39,7 +39,7 @@ export default function ProfilePage() {
   record,
   loading: recordLoading,
   refresh,
-} = useScholarRecord();
+} = usePlaybookRecord();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

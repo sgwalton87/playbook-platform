@@ -3,7 +3,7 @@ import { generateResumeDraft } from "./services/resume";
 import { createRecommendationContext } from "./services/recommendation";
 import { getOpportunitySignals } from "./services/opportunity";
 
-export function buildScholarRecord(assembled: any) {
+export function buildPlaybookRecord(assembled: any) {
   const portfolio = assembled.portfolio;
 
   return {

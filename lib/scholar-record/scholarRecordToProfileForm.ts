@@ -1,4 +1,4 @@
-import type { ScholarRecord } from "./types";
+import type { PlaybookRecord } from "./types";
 
 export type ScholarProfileForm = {
   firstName: string;
@@ -59,7 +59,7 @@ function formString(value: unknown): string {
 }
 
 export function scholarRecordToProfileForm(
-  record: ScholarRecord
+  record: PlaybookRecord
 ): ScholarProfileForm {
   const dreamSchool =
     record.college.dreamSchoolName ||

@@ -1,7 +1,7 @@
-import { buildScholarRecord } from "./buildScholarRecord";
-import type { ScholarRecord } from "./types";
+import { buildPlaybookRecord } from "./buildPlaybookRecord";
+import type { PlaybookRecord } from "./types";
 
-export type ScholarRecordDependencies = {
+export type PlaybookRecordDependencies = {
   loadProfile: (
     userId: string
   ) => Promise<Record<string, any> | null>;
@@ -15,7 +15,7 @@ export type ScholarRecordDependencies = {
   ) => Promise<Array<Record<string, unknown>>>;
 };
 
-export async function assembleScholarRecord({
+export async function assemblePlaybookRecord({
   userId,
   authEmail,
   includeAcademicData = true,
@@ -24,8 +24,8 @@ export async function assembleScholarRecord({
   userId: string;
   authEmail?: string | null;
   includeAcademicData?: boolean;
-  dependencies: ScholarRecordDependencies;
-}): Promise<ScholarRecord | null> {
+  dependencies: PlaybookRecordDependencies;
+}): Promise<PlaybookRecord | null> {
   const profile =
     await dependencies.loadProfile(userId);
 
@@ -43,7 +43,7 @@ export async function assembleScholarRecord({
         ])
       : [[], []];
 
-  return buildScholarRecord({
+  return buildPlaybookRecord({
     profile,
     authEmail,
     agProgress,

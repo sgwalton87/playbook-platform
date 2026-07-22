@@ -1,6 +1,6 @@
 "use client";
 
-import ScholarRecordSummary from "@/components/scholar/ScholarRecordSummary";
+import PlaybookRecordSummary from "@/components/scholar/PlaybookRecordSummary";
 
 type Props = {
   record: any;
@@ -60,7 +60,7 @@ function Row({ label, value }: { label: string; value: any }) {
   );
 }
 
-export default function ScholarRecordDashboard({ record }: Props) {
+export default function PlaybookRecordDashboard({ record }: Props) {
   const academics = record?.academics || {};
   const career = record?.career || {};
   const athletics = record?.athletics || {};
@@ -70,7 +70,7 @@ export default function ScholarRecordDashboard({ record }: Props) {
 
   return (
     <div style={{ marginBottom: 14 }}>
-      <ScholarRecordSummary record={record} />
+      <PlaybookRecordSummary record={record} />
 
       <div
         style={{

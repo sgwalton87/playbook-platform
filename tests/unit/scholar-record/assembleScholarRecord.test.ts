@@ -6,10 +6,10 @@ import {
 } from "vitest";
 
 import {
-  assembleScholarRecord,
-} from "@/lib/scholar-record";
+  assemblePlaybookRecord,
+} from "@/lib/playbook";
 
-describe("assembleScholarRecord", () => {
+describe("assemblePlaybookRecord", () => {
   it("loads all scholar data into one record", async () => {
     const loadProfile = vi.fn().mockResolvedValue({
       id: "scholar-1",
@@ -41,7 +41,7 @@ describe("assembleScholarRecord", () => {
       ]);
 
     const record =
-      await assembleScholarRecord({
+      await assemblePlaybookRecord({
         userId: "scholar-1",
         authEmail: "scholar@example.com",
         dependencies: {
@@ -92,7 +92,7 @@ describe("assembleScholarRecord", () => {
     const loadTranscriptCourses = vi.fn();
 
     const record =
-      await assembleScholarRecord({
+      await assemblePlaybookRecord({
         userId: "scholar-2",
         includeAcademicData: false,
         dependencies: {
@@ -120,7 +120,7 @@ describe("assembleScholarRecord", () => {
 
   it("returns null when no profile exists", async () => {
     const record =
-      await assembleScholarRecord({
+      await assemblePlaybookRecord({
         userId: "missing-user",
         dependencies: {
           loadProfile: async () => null,

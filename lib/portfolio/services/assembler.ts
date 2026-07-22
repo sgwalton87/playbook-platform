@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabaseClient";
 import { mapProfileToPortfolio } from "./profile";
 import { buildPortfolioIntelligence } from "./intelligence";
-import { buildScholarRecord } from "../scholar-record";
+import { buildPlaybookRecord } from "../scholar-record";
 
 export async function getPortfolioByUsername(username: string) {
   const { data: profileData, error } = await supabase
@@ -45,6 +45,6 @@ export async function getPortfolioByUsername(username: string) {
 
   return {
     ...assembled,
-    scholarRecord: buildScholarRecord(assembled),
+    scholarRecord: buildPlaybookRecord(assembled),
   };
 }

@@ -34,10 +34,15 @@ export function buildAthleticsProfile({
   row = {},
   onboarding = {},
 }: BuilderInput): AthleticsProfile {
-
   const athletics = createDefaultAthletics();
 
+  // ------------------------------------------------------------------
+  // SPORTS
+  // ------------------------------------------------------------------
+
   const primarySport = first(
+    row.sport,
+    onboarding.sport,
     row.primary_sport,
     onboarding.primary_sport
   );
@@ -48,8 +53,8 @@ export function buildAthleticsProfile({
   );
 
   if (primarySport) {
-
     athletics.status.isAthlete = true;
+    athletics.status.careerStage = "high-school";
 
     athletics.sports.push({
       id: crypto.randomUUID(),
@@ -68,7 +73,6 @@ export function buildAthleticsProfile({
   }
 
   if (secondarySport) {
-
     athletics.sports.push({
       id: crypto.randomUUID(),
       sport: String(secondarySport),
@@ -80,26 +84,112 @@ export function buildAthleticsProfile({
     });
   }
 
-  const team = first(
+  // ------------------------------------------------------------------
+  // TEAMS
+  // ------------------------------------------------------------------
+
+  const highSchoolTeam = first(
+    row.high_school_team,
+    onboarding.high_school_team
+  );
+
+  const travelTeam = first(
+    row.travel_team,
+    onboarding.travel_team,
     row.current_team,
     onboarding.current_team
   );
 
-  if (team) {
+  const teamLevel = first(
+    row.team_level,
+    onboarding.team_level
+  );
 
+  const jersey = first(
+    row.jersey_number,
+    onboarding.jersey_number
+  );
+
+  if (highSchoolTeam) {
     athletics.affiliations.push({
-
       id: crypto.randomUUID(),
-
-      organization: String(team),
-
-      team: String(team),
-
+      organization: String(highSchoolTeam),
+      team: String(highSchoolTeam),
       current: true,
-
+      level: teamLevel ? String(teamLevel) : undefined,
+      jerseyNumber: jersey ? String(jersey) : undefined,
     });
-
   }
+
+  if (travelTeam) {
+    athletics.affiliations.push({
+      id: crypto.randomUUID(),
+      organization: String(travelTeam),
+      team: String(travelTeam),
+      current: true,
+    });
+  }
+
+  // ------------------------------------------------------------------
+  // MEASUREMENTS
+  // ------------------------------------------------------------------
+
+  const height = first(
+    row.height,
+    onboarding.height
+  );
+
+  const weight = first(
+    row.weight,
+    onboarding.weight
+  );
+
+  if (height) {
+    athletics.measurements.push({
+      id: crypto.randomUUID(),
+      type: "Height",
+      value: String(height),
+    });
+  }
+
+  if (weight) {
+    athletics.measurements.push({
+      id: crypto.randomUUID(),
+      type: "Weight",
+      value: String(weight),
+      unit: "lbs",
+    });
+  }
+
+  // ------------------------------------------------------------------
+  // COACH
+  // ------------------------------------------------------------------
+
+  const coachName = first(
+    row.coach_name,
+    onboarding.coach_name
+  );
+
+  const coachEmail = first(
+    row.coach_email,
+    onboarding.coach_email
+  );
+
+  if (coachName || coachEmail) {
+    athletics.contacts.push({
+      id: crypto.randomUUID(),
+      name: coachName ? String(coachName) : "Coach",
+      role: "Coach",
+      email:
+        typeof coachEmail === "string"
+          ? coachEmail
+          : undefined,
+    });
+  }
+
+  // ------------------------------------------------------------------
+  // MEDIA
+  // ------------------------------------------------------------------
 
   const highlight = first(
     row.highlight_reel_url,
@@ -108,29 +198,39 @@ export function buildAthleticsProfile({
   );
 
   if (highlight) {
-
-    athletics.media.highlightVideo =
-      String(highlight);
-
+    athletics.media.highlightVideo = String(highlight);
   }
 
-  athletics.recruiting.desiredLevels =
-    arr(
+  // ------------------------------------------------------------------
+  // RECRUITING
+  // ------------------------------------------------------------------
+
+  athletics.recruiting.openToRecruiting =
+    Boolean(
       first(
-        row.desired_college_level,
-        onboarding.desired_college_level,
-        row.target_division,
-        onboarding.target_division
+        row.recruiting_interest,
+        onboarding.recruiting_interest
       )
     );
 
+  athletics.recruiting.desiredLevels = arr(
+    first(
+      row.desired_college_level,
+      onboarding.desired_college_level,
+      row.target_division,
+      onboarding.target_division
+    )
+  );
+
   const recruitingEmail = first(
-      row.athlete_email,
-      onboarding.athlete_email
-    );
-  athletics.recruiting.recruitingEmail =
-    typeof recruitingEmail === "string" ? recruitingEmail : undefined;
+    row.athlete_email,
+    onboarding.athlete_email
+  );
+
+  if (typeof recruitingEmail === "string") {
+    athletics.recruiting.recruitingEmail =
+      recruitingEmail;
+  }
 
   return athletics;
-
 }

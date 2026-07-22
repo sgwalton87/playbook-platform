@@ -1,6 +1,6 @@
 import type {
-  PlaybookRecord,
-  PlaybookRecordSource,
+  ScholarRecord,
+  ScholarRecordSource,
 } from "./types";
 
 import { buildAthleticsProfile } from "@/lib/athletics/builder";
@@ -21,12 +21,12 @@ import {
   normalizeTestPlan,
 } from "@/lib/education";
 
-export function buildPlaybookRecord({
+export function buildScholarRecord({
   profile,
   authEmail,
   agProgress,
   transcriptCourses,
-}: PlaybookRecordSource): PlaybookRecord {
+}: ScholarRecordSource): ScholarRecord {
   const row = profile || {};
   const onboarding = normalizedObject(row.onboarding_data);
 
@@ -157,62 +157,56 @@ export function buildPlaybookRecord({
     },
 
     demographics: {
-  raceEthnicity: normalizedArray<string>(
-    row.race_ethnicity,
-    row.race,
-    onboarding.race_ethnicity,
-    onboarding.race
-  ),
+      raceEthnicity: normalizedArray<string>(
+        row.race_ethnicity,
+        onboarding.race_ethnicity
+      ),
 
-  lgbtqiaAffinity: normalizedString(
-    row.lgbtqia_affinity,
-    onboarding.lgbtqia_affinity
-  ),
+      lgbtqiaAffinity: normalizedString(
+        row.lgbtqia_affinity,
+        onboarding.lgbtqia_affinity
+      ),
 
-  householdIncome: normalizedString(
-    row.household_income,
-    onboarding.household_income
-  ),
+      householdIncome: normalizedString(
+        row.household_income,
+        onboarding.household_income
+      ),
 
-  firstGeneration: firstDefined(
-    row.first_generation,
-    onboarding.first_generation
-  ),
+      firstGeneration: firstDefined(
+        row.first_generation,
+        onboarding.first_generation
+      ),
 
-  ellStatus: firstDefined(
-    row.ell_status,
-    row.english_language_learner,
-    onboarding.ell_status,
-    onboarding.english_language_learner
-  ),
+      ellStatus: firstDefined(
+        row.ell_status,
+        onboarding.ell_status
+      ),
 
-  freeReducedLunch: firstDefined(
-    row.free_reduced_lunch,
-    onboarding.free_reduced_lunch
-  ),
+      freeReducedLunch: firstDefined(
+        row.free_reduced_lunch,
+        onboarding.free_reduced_lunch
+      ),
 
-  migrantStudent: firstDefined(
-    row.migrant_student,
-    onboarding.migrant_student
-  ),
+      migrantStudent: firstDefined(
+        row.migrant_student,
+        onboarding.migrant_student
+      ),
 
-  fosterYouth: firstDefined(
-    row.foster_youth,
-    onboarding.foster_youth
-  ),
+      fosterYouth: firstDefined(
+        row.foster_youth,
+        onboarding.foster_youth
+      ),
 
-  housingInsecurity: firstDefined(
-    row.housing_insecurity,
-    row.unhoused,
-    onboarding.housing_insecurity,
-    onboarding.unhoused
-  ),
+      housingInsecurity: firstDefined(
+        row.housing_insecurity,
+        onboarding.housing_insecurity
+      ),
 
-  hasIep: firstDefined(
-    row.has_iep,
-    onboarding.has_iep
-  ),
-},
+      hasIep: firstDefined(
+        row.has_iep,
+        onboarding.has_iep
+      ),
+    },
 
     academic: {
       school: normalizedString(

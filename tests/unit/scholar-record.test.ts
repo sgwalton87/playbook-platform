@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { buildScholarRecord } from "@/lib/scholar";
+import { buildPlaybookRecord } from "@/lib/scholar";
 
-describe("buildScholarRecord", () => {
+describe("buildPlaybookRecord", () => {
   it("builds a Scholar Record from profile and achievements", () => {
-    const record = buildScholarRecord({
+    const record = buildPlaybookRecord({
       profile: {
         id: "scholar-1",
         username: "testscholar",
@@ -34,7 +34,7 @@ describe("buildScholarRecord", () => {
   });
 
   it("handles missing optional data without crashing", () => {
-    const record = buildScholarRecord({
+    const record = buildPlaybookRecord({
       profile: {
         id: "scholar-2",
         username: "incomplete",

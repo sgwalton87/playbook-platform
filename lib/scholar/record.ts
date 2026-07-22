@@ -1,6 +1,6 @@
-import type { ScholarProfile, ScholarRecord, ScholarRecordArtifact } from "./types";
+import type { ScholarProfile, PlaybookRecord, PlaybookRecordArtifact } from "./types";
 
-export function buildScholarRecord({
+export function buildPlaybookRecord({
   profile = {},
   certificates = [],
   badges = [],
@@ -8,11 +8,11 @@ export function buildScholarRecord({
   posts = [],
 }: {
   profile?: ScholarProfile;
-  certificates?: ScholarRecordArtifact[];
-  badges?: ScholarRecordArtifact[];
-  activities?: ScholarRecordArtifact[];
-  posts?: ScholarRecordArtifact[];
-}): ScholarRecord {
+  certificates?: PlaybookRecordArtifact[];
+  badges?: PlaybookRecordArtifact[];
+  activities?: PlaybookRecordArtifact[];
+  posts?: PlaybookRecordArtifact[];
+}): PlaybookRecord {
   const fullName =
     profile.full_name ||
     [profile.first_name, profile.last_name].filter(Boolean).join(" ") ||

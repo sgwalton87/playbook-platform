@@ -5,13 +5,13 @@ import {
 } from "vitest";
 
 import {
-  buildScholarRecord,
+  buildPlaybookRecord,
   scholarRecordToProfileForm,
-} from "@/lib/scholar-record";
+} from "@/lib/playbook";
 
 describe("scholarRecordToProfileForm", () => {
   it("maps the canonical record into Profile editor fields", () => {
-    const record = buildScholarRecord({
+    const record = buildPlaybookRecord({
       profile: {
         id: "scholar-1",
         full_name: "Jordan Scholar",
@@ -96,7 +96,7 @@ describe("scholarRecordToProfileForm", () => {
   });
 
   it("returns safe controlled-input defaults", () => {
-    const record = buildScholarRecord({
+    const record = buildPlaybookRecord({
       profile: {
         id: "scholar-2",
       },
@@ -114,7 +114,7 @@ describe("scholarRecordToProfileForm", () => {
   });
 
   it("does not duplicate the dream school in the additional list", () => {
-    const record = buildScholarRecord({
+    const record = buildPlaybookRecord({
       profile: {
         id: "scholar-3",
 

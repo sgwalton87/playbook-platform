@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { buildScholarRecord } from "@/lib/scholar-record";
+import { buildPlaybookRecord } from "@/lib/playbook";
 
-describe("buildScholarRecord", () => {
+describe("buildPlaybookRecord", () => {
   it("merges database columns and onboarding data", () => {
-    const record = buildScholarRecord({
+    const record = buildPlaybookRecord({
       authEmail: "scholar@example.com",
 
       profile: {
@@ -83,7 +83,7 @@ describe("buildScholarRecord", () => {
   });
 
   it("supports legacy profile column names", () => {
-    const record = buildScholarRecord({
+    const record = buildPlaybookRecord({
       profile: {
         id: "scholar-2",
         grad_year: 2028,
@@ -106,7 +106,7 @@ describe("buildScholarRecord", () => {
   });
 
   it("prefers direct profile columns over onboarding fallbacks", () => {
-    const record = buildScholarRecord({
+    const record = buildPlaybookRecord({
       profile: {
         id: "scholar-3",
         school: "Current School",
@@ -123,7 +123,7 @@ describe("buildScholarRecord", () => {
   });
 
   it("returns safe defaults for missing data", () => {
-    const record = buildScholarRecord({
+    const record = buildPlaybookRecord({
       profile: {
         id: "scholar-4",
       },

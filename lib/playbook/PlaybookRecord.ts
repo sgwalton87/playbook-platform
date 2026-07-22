@@ -1,7 +1,7 @@
 import type { StandardizedTestPlan } from "@/lib/education";
 import type { AthleticsProfile } from "@/lib/athletics";
 
-export type ScholarRecordValue =
+export type PlaybookRecordValue =
   | string
   | number
   | boolean
@@ -97,7 +97,7 @@ export type ScholarCommunityProfile = {
   supporters: string[];
 };
 
-export type ScholarRecord = {
+export type PlaybookRecord = {
   id: string;
 
   identity: ScholarIdentity;
@@ -117,7 +117,7 @@ export type ScholarRecord = {
   updatedAt: string | null;
 };
 
-export type ScholarRecordSource = {
+export type PlaybookRecordSource = {
   profile?: Record<string, any> | null;
   authEmail?: string | null;
   agProgress?: Array<Record<string, unknown>> | null;

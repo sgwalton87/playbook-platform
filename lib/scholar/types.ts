@@ -1,4 +1,4 @@
-export type ScholarRecordArtifact = Record<string, unknown>;
+export type PlaybookRecordArtifact = Record<string, unknown>;
 
 export interface ScholarProfile extends Record<string, unknown> {
   id?: string;
@@ -36,7 +36,7 @@ export interface ScholarProfile extends Record<string, unknown> {
   onboarding_data?: Record<string, unknown> | null;
 }
 
-export interface ScholarRecord {
+export interface PlaybookRecord {
   id: string;
   identity: {
     username?: string;
@@ -57,10 +57,10 @@ export interface ScholarRecord {
   };
   achievements: {
     total: number;
-    certificates: ScholarRecordArtifact[];
-    badges: ScholarRecordArtifact[];
-    activities: ScholarRecordArtifact[];
-    posts: ScholarRecordArtifact[];
+    certificates: PlaybookRecordArtifact[];
+    badges: PlaybookRecordArtifact[];
+    activities: PlaybookRecordArtifact[];
+    posts: PlaybookRecordArtifact[];
   };
   service: {
     volunteerHours: number;
