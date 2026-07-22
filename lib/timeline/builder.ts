@@ -3,7 +3,7 @@ import type { TimelineEvent } from "./types";
 export function buildScholarTimeline(record: any): TimelineEvent[] {
   const certificates = record?.achievements?.certificates || [];
   const badges = record?.achievements?.badges || [];
-  const activities = record?.achievements?.activities || [];
+  const activities = record?.community?.activities || record?.achievements?.activities || [];
   const posts = record?.achievements?.posts || [];
 
   return [

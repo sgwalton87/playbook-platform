@@ -1,4 +1,23 @@
 import type { ScholarRecord } from "./types";
+import { buildCommunityRecord, type RawCommunityActivity } from "./community";
+
+interface ScholarProfileInput {
+  id?: string;
+  username?: string;
+  role?: string;
+  full_name?: string | null;
+  first_name?: string | null;
+  last_name?: string | null;
+  avatar_url?: string | null;
+  bio?: string | null;
+  school?: string | null;
+  grade?: string | null;
+  gpa?: string | null;
+  dream_school?: string | null;
+  ideal_profession?: string | null;
+  desired_salary_range?: string | null;
+}
+
 
 export function buildScholarRecord({
   profile = {},
@@ -7,11 +26,11 @@ export function buildScholarRecord({
   activities = [],
   posts = [],
 }: {
-  profile?: any;
-  certificates?: any[];
-  badges?: any[];
-  activities?: any[];
-  posts?: any[];
+  profile?: ScholarProfileInput;
+  certificates?: unknown[];
+  badges?: unknown[];
+  activities?: RawCommunityActivity[];
+  posts?: unknown[];
 }): ScholarRecord {
   const fullName =
     profile.full_name ||
@@ -19,9 +38,8 @@ export function buildScholarRecord({
     profile.username ||
     "Scholar";
 
-  const volunteerHours = activities.reduce((sum, activity) => {
-    return sum + Number(activity.hours || activity.volunteer_hours || 0);
-  }, 0);
+  const community = buildCommunityRecord(activities);
+  const volunteerHours = community.volunteerHours;
 
   const achievementsTotal =
     certificates.length + badges.length + activities.length + posts.length;
@@ -61,7 +79,7 @@ export function buildScholarRecord({
   );
 
   return {
-    id: profile.id,
+    id: profile.id || "",
     identity: {
       username: profile.username,
       role: profile.role,
@@ -83,11 +101,19 @@ export function buildScholarRecord({
       total: achievementsTotal,
       certificates,
       badges,
-      activities,
+      activities: community.activities,
       posts,
     },
+    community,
     service: {
       volunteerHours,
+      activities: community.activities,
+    },
+    leadership: {
+      badges,
+      activities: community.activities,
+      leadershipPositions: community.leadershipPositions,
+      leadershipScore: badges.length * 10 + community.leadershipPositions.length * 12 + community.activities.length * 3,
     },
     readiness: {
       portfolioCompletion,

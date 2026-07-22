@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { buildScholarRecord, type CommunityExperience, type RawCommunityActivity } from "@/lib/scholar";
 import { AG_SUBJECT_NAMES, AG_REQUIREMENTS } from "@/lib/agCourses";
 import { PlaybookStoryBanner, PlaybookQuote } from "@/components/brand-story";
 import { PLAYBOOK_QUOTES, PLAYBOOK_STORY_IMAGES } from "@/lib/brand-story";
@@ -14,7 +15,7 @@ export default function TranscriptPage() {
   const [profile, setProfile] = useState<any>(null);
   const [agProgress, setAgProgress] = useState<any[]>([]);
   const [certificates, setCertificates] = useState<any[]>([]);
-  const [activities, setActivities] = useState<any[]>([]);
+  const [activities, setActivities] = useState<RawCommunityActivity[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -43,7 +44,7 @@ export default function TranscriptPage() {
         }))
       );
       setCertificates(certs||[]);
-      setActivities(acts||[]);
+      setActivities((acts || []) as RawCommunityActivity[]);
       setLoading(false);
     })();
   }, []);
@@ -51,6 +52,8 @@ export default function TranscriptPage() {
   if (loading) return <><div style={{padding:"28px 32px",fontFamily:T.mono,fontSize:12,color:T.faint}}>Loading transcript...</div></>;
 
   const agDone = agProgress.filter(a => a.years_completed >= a.years_required).length;
+  const scholarRecord = buildScholarRecord({ profile: profile || {}, certificates, activities });
+  const communityActivities = scholarRecord.community.activities;
 
   return (
     <>
@@ -226,7 +229,7 @@ export default function TranscriptPage() {
               </div>
             </div>
           )}
-          {activities.length>0&&(
+          {communityActivities.length>0&&(
             <div style={{marginBottom:24}}>
               <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
                 <div style={{flex:1,height:1,background:T.line}}/>
@@ -236,7 +239,7 @@ export default function TranscriptPage() {
               <div style={{border:`0.5px solid ${T.line}`,borderRadius:12,overflow:"hidden"}}>
                 <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
                   <thead><tr style={{background:T.navy,color:"#F8F7F4"}}><th style={{padding:"10px 14px",textAlign:"left",fontFamily:T.mono,fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:700}}>Activity</th><th style={{padding:"10px 14px",textAlign:"left",fontFamily:T.mono,fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:700}}>Type</th><th style={{padding:"10px 14px",textAlign:"left",fontFamily:T.mono,fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:700}}>Organization</th><th style={{padding:"10px 14px",textAlign:"center",fontFamily:T.mono,fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:700}}>Hours</th></tr></thead>
-                  <tbody>{activities.map((a:any,i:number)=><tr key={a.id} style={{borderBottom:`0.5px solid ${T.line}`,background:i%2===0?T.surface:T.surface2}}><td style={{padding:"12px 14px",fontWeight:600,color:T.ink}}>{a.activity_name}</td><td style={{padding:"12px 14px",color:T.muted,textTransform:"capitalize"}}>{a.activity_type}</td><td style={{padding:"12px 14px",color:T.muted}}>{a.organization||"—"}</td><td style={{padding:"12px 14px",textAlign:"center",fontFamily:T.mono,fontWeight:700,color:T.ink}}>{a.total_hours||"—"}</td></tr>)}</tbody>
+                  <tbody>{communityActivities.map((a:CommunityExperience,i:number)=><tr key={a.id} style={{borderBottom:`0.5px solid ${T.line}`,background:i%2===0?T.surface:T.surface2}}><td style={{padding:"12px 14px",fontWeight:600,color:T.ink}}>{a.name}</td><td style={{padding:"12px 14px",color:T.muted,textTransform:"capitalize"}}>{a.type}</td><td style={{padding:"12px 14px",color:T.muted}}>{a.organization||"—"}</td><td style={{padding:"12px 14px",textAlign:"center",fontFamily:T.mono,fontWeight:700,color:T.ink}}>{a.hours||"—"}</td></tr>)}</tbody>
                 </table>
               </div>
             </div>

@@ -1,18 +1,12 @@
-export function buildLeadership(
-  badges:any[]=[],
-  activities:any[]=[]
-){
+import { buildCommunityRecord, type RawCommunityActivity } from "../community";
 
-  return{
+export function buildLeadership(badges: unknown[] = [], activities: RawCommunityActivity[] = []) {
+  const community = buildCommunityRecord(activities);
 
+  return {
     badges,
-
-    activities,
-
-    leadershipScore:
-      badges.length*10+
-      activities.length*5,
-
+    activities: community.activities,
+    leadershipPositions: community.leadershipPositions,
+    leadershipScore: badges.length * 10 + community.leadershipPositions.length * 12 + community.activities.length * 3,
   };
-
 }

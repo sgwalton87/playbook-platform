@@ -13,7 +13,7 @@ import AboutCard from "@/components/profile/AboutCard";
 import ScholarRecordDashboard from "@/components/scholar/ScholarRecordDashboard";
 import PortfolioEngine from "@/components/portfolio/PortfolioEngine";
 import TrustScoreCard from "@/components/trust/TrustScoreCard";
-import { buildScholarRecord } from "@/lib/scholar";
+import { buildScholarRecord, type RawCommunityActivity } from "@/lib/scholar";
 
 const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",blue:"#3B82F6",green:"#10B981",amber:"#F59E0B",purple:"#8B5CF6",mono:"'Space Mono', monospace",sans:"'Hanken Grotesk', system-ui, sans-serif",anton:"'Anton', sans-serif"};
 const SURL="https://oexgxnybeixwadgtdtzp.supabase.co";
@@ -54,7 +54,7 @@ export default function PublicProfilePage() {
   const [certificates,setCertificates]=useState<any[]>([]);
   const [posts,setPosts]=useState<any[]>([]);
   const [gallery,setGallery]=useState<string[]>([]);
-  const [activities,setActivities]=useState<any[]>([]);
+  const [activities,setActivities]=useState<RawCommunityActivity[]>([]);
   const [newPost,setNewPost]=useState("");
   const [posting,setPosting]=useState(false);
   const [loading,setLoading]=useState(true);
@@ -85,7 +85,7 @@ export default function PublicProfilePage() {
       setCertificates(certData||[]);
       setBadges(combinedBadges);
       setPosts(feedData||[]);
-      setActivities(activityData||[]);
+      setActivities((activityData||[]) as RawCommunityActivity[]);
       const photoPostUrls=(feedData||[]).filter((p:any)=>p.image_url).map((p:any)=>p.image_url);
       const{data:files}=await supabase.storage.from("photos").list("gallery",{limit:100,sortBy:{column:"created_at",order:"desc"}});
       const storageUrls=(files||[]).filter((f:any)=>f.name!==".emptyFolderPlaceholder").map((f:any)=>`${SURL}/storage/v1/object/public/photos/gallery/${f.name}`);

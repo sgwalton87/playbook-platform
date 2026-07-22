@@ -30,7 +30,23 @@ describe("buildScholarRecord", () => {
     expect(record.academics.dreamSchool).toBe("UC Berkeley");
     expect(record.achievements.total).toBe(4);
     expect(record.service.volunteerHours).toBe(5);
+    expect(record.community.activities[0].name).toBe("Activity");
     expect(record.readiness.opportunityReadiness).toBeGreaterThan(0);
+  });
+
+  it("canonicalizes community experiences for AI-ready querying", () => {
+    const record = buildScholarRecord({
+      activities: [
+        { id: "lead-1", activity_type: "Leadership", activity_name: "Student Council", role_title: "President" },
+        { id: "vol-1", activity_type: "Volunteer Work", activity_name: "Food Bank", total_hours: 12 },
+        { id: "intern-1", activity_type: "Internship", activity_name: "Clinic Intern", organization: "Health Center" },
+      ],
+    });
+
+    expect(record.community.leadershipPositions[0].roleTitle).toBe("President");
+    expect(record.community.volunteerWork[0].volunteerHours).toBe(12);
+    expect(record.community.internships[0].organization).toBe("Health Center");
+    expect(record.achievements.activities).toBe(record.community.activities);
   });
 
   it("handles missing optional data without crashing", () => {
