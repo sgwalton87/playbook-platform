@@ -1,12 +1,44 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import Image from "next/image";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import { supabase } from "@/lib/supabaseClient";
-import { getOnboardingSteps, ALL_COLLEGE_OPTIONS, CAREER_OPTIONS, ACTIVITY_OPTIONS, CALIFORNIA_DISTRICTS } from "@/lib/onboarding";
+import { getOnboardingSteps, ALL_COLLEGE_OPTIONS, CAREER_OPTIONS, ACTIVITY_OPTIONS, CALIFORNIA_DISTRICTS, getNextOnboardingStep, getOnboardingValidationError } from "@/lib/onboarding";
 import { getPathway, normalizeRole } from "@/lib/onboarding/pathwayMap";
 import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
+import type { User } from "@supabase/supabase-js";
+import type { OnboardingField } from "@/lib/onboarding";
+
+type OnboardingProfile = {
+  id: string;
+  email?: string | null;
+  role?: string | null;
+  profile_mode?: string | null;
+  full_name?: string | null;
+  username?: string | null;
+  avatar_url?: string | null;
+  bio?: string | null;
+  school?: string | null;
+  grade?: string | null;
+  dream_school?: string | null;
+  ideal_profession?: string | null;
+  onboarding_data?: OnboardingForm;
+  [key: string]: unknown;
+};
+
+type ActivityEntry = {
+  activity: string;
+  category: string;
+  description: string;
+  hours: string;
+  supervisor: string;
+};
+
+type OnboardingForm = Record<string, unknown>;
+
+const asText = (value: unknown) => typeof value === "string" || typeof value === "number" ? String(value) : "";
 
 export default function StartPage() {
   return (
@@ -18,10 +50,10 @@ export default function StartPage() {
 
 function StartContent() {
   const params = useSearchParams();
-  const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<OnboardingProfile | null>(null);
   const [stepIndex, setStepIndex] = useState(0);
-  const [form, setForm] = useState<Record<string, any>>({});
+  const [form, setForm] = useState<OnboardingForm>({});
   const [customColleges, setCustomColleges] = useState<string[]>([]);
   const [customCareers, setCustomCareers] = useState<string[]>([]);
   const [customActivities, setCustomActivities] = useState<string[]>([]);
@@ -29,6 +61,9 @@ function StartContent() {
   const [saving, setSaving] = useState(false);
   const [creating, setCreating] = useState(false);
   const [created, setCreated] = useState(false);
+  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [formError, setFormError] = useState("");
+  const autosaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const role = normalizeRole(
     params.get("first") === "1"
@@ -48,6 +83,20 @@ function StartContent() {
     () => Array.from(new Set([...CAREER_OPTIONS, ...customCareers])).sort(),
     [customCareers]
   );
+
+  const activityOptions = useMemo(
+    () => Array.from(new Set([...ACTIVITY_OPTIONS, ...customActivities])).sort(),
+    [customActivities]
+  );
+
+  const districtOptions = useMemo(
+    () => Array.from(new Set([...CALIFORNIA_DISTRICTS, ...customDistricts])).sort(),
+    [customDistricts]
+  );
+
+  useEffect(() => () => {
+    if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
+  }, []);
 
   useEffect(() => {
     async function load() {
@@ -104,10 +153,18 @@ function StartContent() {
     }
 
     load();
-  }, []);
+  }, [role]);
 
-  function update(key: string, value: any) {
+  function update(key: string, value: unknown) {
     setForm((prev) => ({ ...prev, [key]: value }));
+    setFormError("");
+
+    if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
+    autosaveTimer.current = setTimeout(async () => {
+      setSaveState("saving");
+      const saved = await persist(false, { [key]: value });
+      setSaveState(saved ? "saved" : "error");
+    }, 900);
   }
 
   async function saveCustomOption(type: "college" | "career" | "activity" | "district", value?: string) {
@@ -153,13 +210,13 @@ function StartContent() {
     await persist(false, { avatar_url: data.publicUrl });
   }
 
-  async function persist(complete = false, override: Record<string, any> = {}) {
-    if (!user?.id) return;
+  async function persist(complete = false, override: OnboardingForm = {}) {
+    if (!user?.id) return false;
 
     const nextForm = { ...form, ...override };
 
     const topSchools = Array.isArray(nextForm.top_schools)
-      ? nextForm.top_schools.filter(Boolean)
+      ? nextForm.top_schools.map(asText).filter(Boolean)
       : [];
 
     const activities = Array.isArray(nextForm.activities)
@@ -167,15 +224,15 @@ function StartContent() {
       : [];
 
     const inviteSupporters = Array.isArray(nextForm.invite_supporters)
-      ? nextForm.invite_supporters.filter(Boolean)
+      ? nextForm.invite_supporters.map(asText).filter(Boolean)
       : [];
 
     await Promise.all([
       ...topSchools.map((school: string) => saveCustomOption("college", school)),
-      saveCustomOption("college", nextForm.dream_school),
-      saveCustomOption("career", nextForm.ideal_profession),
-      saveCustomOption("district", nextForm.school_district),
-      ...(Array.isArray(nextForm.activities) ? nextForm.activities.map((a: string) => saveCustomOption("activity", a)) : []),
+      saveCustomOption("college", asText(nextForm.dream_school)),
+      saveCustomOption("career", asText(nextForm.ideal_profession)),
+      saveCustomOption("district", asText(nextForm.school_district)),
+      ...(Array.isArray(nextForm.activities) ? nextForm.activities.map((activity) => saveCustomOption("activity", typeof activity === "object" && activity && "activity" in activity ? asText(activity.activity) : asText(activity))) : []),
     ]);
 
     const payload = {
@@ -207,8 +264,15 @@ function StartContent() {
       community_safety_policy_version: nextForm.community_safety_agreed ? "playbook-safety-v1" : null,
     };
 
-    await supabase.from("profiles").upsert(payload, { onConflict: "id" });
-    setProfile((prev: any) => ({ ...prev, ...payload }));
+    const { error } = await supabase.from("profiles").upsert(payload, { onConflict: "id" });
+
+    if (error) {
+      setFormError("We couldn’t save your progress. Check your connection and try again.");
+      return false;
+    }
+
+    setProfile((prev) => prev ? ({ ...prev, ...payload } as OnboardingProfile) : prev);
+    return true;
   }
 
   async function sendInvites() {
@@ -233,29 +297,46 @@ function StartContent() {
   }
 
   async function next(skip = false) {
+    if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
+    const validationError = getOnboardingValidationError({ stepId: step.id, form, skip, isLast });
+    if (validationError) {
+      setFormError(validationError);
+      return;
+    }
+
     setSaving(true);
-    await persist(false, {
-      onboarding_step_index: Math.min(stepIndex + 1, steps.length - 1),
+    setSaveState("saving");
+    const saved = await persist(false, {
+      onboarding_step_index: getNextOnboardingStep(stepIndex, steps.length),
     });
+
+    if (!saved) {
+      setSaving(false);
+      setSaveState("error");
+      return;
+    }
+
+    setSaveState("saved");
 
     if (step.id === "network") {
       await sendInvites();
     }
 
-    if (isLast && !form.community_safety_agreed) {
-      alert("Please read and agree to The Playbook Community Safety Agreement before creating your profile.");
-      setSaving(false);
-      return;
-    }
-
     if (isLast) {
       setCreating(true);
-      await persist(true);
+      const completed = await persist(true);
       setCreating(false);
+
+      if (!completed) {
+        setSaving(false);
+        setSaveState("error");
+        return;
+      }
+
       setCreated(true);
       setTimeout(() => {
         window.location.href = getPathway(role).osRoute;
-      }, 15000);
+      }, 1800);
       return;
     }
 
@@ -270,7 +351,7 @@ function StartContent() {
       {creating && (
         <div style={overlay}>
           <div style={confetti}>✨ 🧭 📚</div>
-          <h1 style={overlayTitle}>Hold tight, {form.full_name || "Scholar"}.</h1>
+          <h1 style={overlayTitle}>Hold tight, {asText(form.full_name) || "Scholar"}.</h1>
           <p style={overlayText}>We are creating your profile...</p>
         </div>
       )}
@@ -278,7 +359,7 @@ function StartContent() {
       {created && (
         <div style={overlay}>
           <div style={confetti}>🎉 ✨ 🏆 🎓 🧭 🎉<br />🎉 ✨ 🏆 🎓 🧭 🎉<br />🎉 ✨ 🏆 🎓 🧭 🎉</div>
-          <h1 style={overlayTitle}>Congratulations, {form.full_name || "Scholar"}!</h1>
+          <h1 style={overlayTitle}>Congratulations, {asText(form.full_name) || "Scholar"}!</h1>
           <p style={overlayText}>Your Playbook profile is ready. Taking you to your dashboard...</p>
         </div>
       )}
@@ -294,9 +375,11 @@ function StartContent() {
         </div>
 
         <div style={heroImageWrap}>
-          <img
+          <Image
             src={role === "scholar-athlete" ? PLAYBOOK_HERO_VISUALS.athlete.image : PLAYBOOK_HERO_VISUALS.signup.image}
             alt="Scholars building their next play"
+            fill
+            sizes="(max-width: 760px) 100vw, 50vw"
             style={heroImage}
           />
         </div>
@@ -304,7 +387,7 @@ function StartContent() {
 
       <section style={progressWrap}>
         {steps.map((item, index) => (
-          <div key={item.id} style={stepPill(index <= stepIndex)}>
+          <div key={item.id} style={stepPill(index <= stepIndex)} aria-current={index === stepIndex ? "step" : undefined}>
             <span>{index + 1}</span>
             <strong>{item.title.split(".")[0]}</strong>
           </div>
@@ -312,6 +395,11 @@ function StartContent() {
       </section>
 
       <section style={card}>
+        <div style={statusRow} aria-live="polite">
+          <span style={statusDot(saveState)} />
+          <span>{saveState === "saving" ? "Saving your progress…" : saveState === "saved" ? "Progress saved" : saveState === "error" ? "Save needs attention" : "Your progress autosaves"}</span>
+          <span style={stepCount}>Step {stepIndex + 1} of {steps.length}</span>
+        </div>
         <p style={formEyebrow}>{step.id}</p>
         <h2 style={formTitle}>{step.title}</h2>
         <p style={formBody}>{step.body}</p>
@@ -325,18 +413,20 @@ function StartContent() {
         </datalist>
 
         <datalist id="district-options">
-          {CALIFORNIA_DISTRICTS.map((name) => <option key={name} value={name} />)}
+          {districtOptions.map((name) => <option key={name} value={name} />)}
         </datalist>
 
         <datalist id="activity-options">
-          {ACTIVITY_OPTIONS.map((name) => <option key={name} value={name} />)}
+          {activityOptions.map((name) => <option key={name} value={name} />)}
         </datalist>
 
         <div style={fields}>
           {step.id === "identity" && (
             <div style={avatarRow}>
               <div style={avatar}>
-                {form.avatar_url ? <img src={form.avatar_url} style={avatarImg} alt="" /> : "📸"}
+                {typeof form.avatar_url === "string" && form.avatar_url ? (
+                  <Image src={form.avatar_url} alt="Profile preview" fill sizes="86px" unoptimized style={avatarImg} />
+                ) : "📸"}
               </div>
               <label style={uploadButton}>
                 Upload profile photo
@@ -358,7 +448,7 @@ function StartContent() {
               key={field.key}
               field={field}
               value={form[field.key]}
-              onChange={(value: any) => update(field.key, value)}
+              onChange={(value) => update(field.key, value)}
               onBlur={(value: string) => {
                 if (field.type === "college") saveCustomOption("college", value);
                 if (field.type === "career") saveCustomOption("career", value);
@@ -367,18 +457,20 @@ function StartContent() {
           ))}
         </div>
 
+        {formError && <div role="alert" style={errorBanner}>{formError}</div>}
+
         <div style={actions}>
           {stepIndex > 0 && (
-            <button style={secondary} onClick={() => setStepIndex((i) => i - 1)}>
+            <button type="button" style={secondary} onClick={() => setStepIndex((i) => i - 1)}>
               Back
             </button>
           )}
 
-          <button style={secondary} onClick={() => next(true)} disabled={saving}>
+          <button type="button" style={secondary} onClick={() => next(true)} disabled={saving}>
             Skip for now
           </button>
 
-          <button style={primary} onClick={() => next(false)} disabled={saving}>
+          <button type="button" style={primary} onClick={() => next(false)} disabled={saving}>
             {saving ? "Saving..." : isLast ? "Finish + Create Profile" : "Next Play →"}
           </button>
         </div>
@@ -387,13 +479,31 @@ function StartContent() {
   );
 }
 
-function FieldRenderer({ field, value, onChange, onBlur }: any) {
+function FieldRenderer({
+  field,
+  value,
+  onChange,
+  onBlur,
+}: {
+  field: OnboardingField;
+  value: unknown;
+  onChange: (value: unknown) => void;
+  onBlur?: (value: string) => void;
+}) {
+  const [activityDraft, setActivityDraft] = useState({
+    activity: "",
+    category: "",
+    description: "",
+    hours: "",
+    supervisor: "",
+  });
+
   if (field.type === "textarea") {
     return (
       <label style={label}>
         {field.label}
         <textarea
-          value={value || ""}
+          value={asText(value)}
           onChange={(e) => onChange(e.target.value)}
           placeholder={field.placeholder}
           style={{ ...input, minHeight: 120 }}
@@ -433,7 +543,7 @@ function FieldRenderer({ field, value, onChange, onBlur }: any) {
       <label style={label}>
         {field.label}
         <select
-          value={value || ""}
+          value={asText(value)}
           onChange={(e) => onChange(e.target.value)}
           style={input}
         >
@@ -447,7 +557,7 @@ function FieldRenderer({ field, value, onChange, onBlur }: any) {
   }
 
   if (field.type === "multi-select") {
-    const arr = Array.isArray(value) ? value : [];
+    const arr = Array.isArray(value) ? value.map(String) : [];
 
     return (
       <div style={group}>
@@ -491,7 +601,7 @@ function FieldRenderer({ field, value, onChange, onBlur }: any) {
         {field.label}
         <input
           list={list}
-          value={value || ""}
+          value={asText(value)}
           onChange={(e) => onChange(e.target.value)}
           onBlur={(e) => onBlur?.(e.target.value)}
           placeholder={field.placeholder}
@@ -502,20 +612,13 @@ function FieldRenderer({ field, value, onChange, onBlur }: any) {
   }
 
   if (field.type === "activity-list") {
-    const arr = Array.isArray(value) ? value : [];
-    const [draft, setDraft] = useState({
-      activity: "",
-      category: "",
-      description: "",
-      hours: "",
-      supervisor: "",
-    });
+    const arr = Array.isArray(value) ? value as ActivityEntry[] : [];
 
     function addActivity() {
-      if (!draft.activity.trim()) return;
-      onChange([...arr, draft]);
-      onBlur?.(draft.activity);
-      setDraft({ activity: "", category: "", description: "", hours: "", supervisor: "" });
+      if (!activityDraft.activity.trim()) return;
+      onChange([...arr, activityDraft]);
+      onBlur?.(activityDraft.activity);
+      setActivityDraft({ activity: "", category: "", description: "", hours: "", supervisor: "" });
     }
 
     return (
@@ -527,8 +630,8 @@ function FieldRenderer({ field, value, onChange, onBlur }: any) {
             Activity
             <input
               list="activity-options"
-              value={draft.activity}
-              onChange={(e) => setDraft({ ...draft, activity: e.target.value })}
+              value={activityDraft.activity}
+              onChange={(e) => setActivityDraft({ ...activityDraft, activity: e.target.value })}
               placeholder="Basketball, robotics, job, volunteering..."
               style={input}
             />
@@ -537,8 +640,8 @@ function FieldRenderer({ field, value, onChange, onBlur }: any) {
           <label style={label}>
             Category
             <select
-              value={draft.category}
-              onChange={(e) => setDraft({ ...draft, category: e.target.value })}
+              value={activityDraft.category}
+              onChange={(e) => setActivityDraft({ ...activityDraft, category: e.target.value })}
               style={input}
             >
               <option value="">Choose category...</option>
@@ -551,8 +654,8 @@ function FieldRenderer({ field, value, onChange, onBlur }: any) {
           <label style={label}>
             Hours
             <input
-              value={draft.hours}
-              onChange={(e) => setDraft({ ...draft, hours: e.target.value })}
+              value={activityDraft.hours}
+              onChange={(e) => setActivityDraft({ ...activityDraft, hours: e.target.value })}
               placeholder="ex: 25"
               style={input}
             />
@@ -561,8 +664,8 @@ function FieldRenderer({ field, value, onChange, onBlur }: any) {
           <label style={label}>
             Mentor / Supervisor
             <input
-              value={draft.supervisor}
-              onChange={(e) => setDraft({ ...draft, supervisor: e.target.value })}
+              value={activityDraft.supervisor}
+              onChange={(e) => setActivityDraft({ ...activityDraft, supervisor: e.target.value })}
               placeholder="Coach, teacher, manager..."
               style={input}
             />
@@ -572,8 +675,8 @@ function FieldRenderer({ field, value, onChange, onBlur }: any) {
         <label style={label}>
           Description
           <textarea
-            value={draft.description}
-            onChange={(e) => setDraft({ ...draft, description: e.target.value })}
+            value={activityDraft.description}
+            onChange={(e) => setActivityDraft({ ...activityDraft, description: e.target.value })}
             placeholder="What did you do? What did you learn?"
             style={{ ...input, minHeight: 90 }}
           />
@@ -587,7 +690,7 @@ function FieldRenderer({ field, value, onChange, onBlur }: any) {
           {arr.length === 0 ? (
             <p style={{ color: "#64748B", margin: 0 }}>No activity entries added yet.</p>
           ) : (
-            arr.map((item: any, i: number) => (
+            arr.map((item, i) => (
               <div key={`${item.activity}-${i}`} style={summaryItem}>
                 <div>
                   <strong>{item.activity}</strong>
@@ -599,7 +702,7 @@ function FieldRenderer({ field, value, onChange, onBlur }: any) {
                 <button
                   type="button"
                   style={removeButton}
-                  onClick={() => onChange(arr.filter((_: any, index: number) => index !== i))}
+                  onClick={() => onChange(arr.filter((_, index) => index !== i))}
                 >
                   Remove
                 </button>
@@ -614,7 +717,7 @@ function FieldRenderer({ field, value, onChange, onBlur }: any) {
   if (field.type === "college-list" || field.type === "invite-list") {
     const length = field.type === "college-list" ? 10 : 5;
     const list = field.type === "college-list" ? "college-options" : undefined;
-    const arr = Array.isArray(value) ? value : Array(length).fill("");
+    const arr = Array.isArray(value) ? value.map(String) : Array(length).fill("");
 
     return (
       <div style={group}>
@@ -647,7 +750,7 @@ function FieldRenderer({ field, value, onChange, onBlur }: any) {
     <label style={label}>
       {field.label}
       <input
-        value={value || ""}
+        value={asText(value)}
         onChange={(e) => onChange(e.target.value)}
         placeholder={field.placeholder}
         style={input}
@@ -659,7 +762,7 @@ function FieldRenderer({ field, value, onChange, onBlur }: any) {
 const page: React.CSSProperties = { minHeight: "100vh", background: "#F8F7F4", color: "#0F172A", padding: 24 };
 const hero: React.CSSProperties = { maxWidth: 1280, margin: "0 auto 22px", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(340px,1fr))", background: "#0F172A", borderRadius: 34, overflow: "hidden" };
 const heroText: React.CSSProperties = { padding: "clamp(26px,4vw,52px)", display: "flex", flexDirection: "column", justifyContent: "center" };
-const heroImageWrap: React.CSSProperties = { minHeight: 330 };
+const heroImageWrap: React.CSSProperties = { minHeight: 330, position: "relative" };
 const heroImage: React.CSSProperties = { width: "100%", height: "100%", objectFit: "cover", display: "block" };
 const eyebrow: React.CSSProperties = { marginTop: 18, fontFamily: "'Space Mono', monospace", fontSize: 11, fontWeight: 900, letterSpacing: ".18em", textTransform: "uppercase", color: "#F97316" };
 const heroTitle: React.CSSProperties = { fontFamily: "'Anton', sans-serif", fontSize: "clamp(38px,5.5vw,68px)", lineHeight: .92, color: "#F8F7F4", textTransform: "uppercase", margin: "10px 0 18px" };
@@ -670,6 +773,10 @@ const card: React.CSSProperties = { maxWidth: 920, margin: "0 auto", background:
 const formEyebrow: React.CSSProperties = { fontFamily: "'Space Mono', monospace", fontSize: 10, fontWeight: 900, letterSpacing: ".16em", textTransform: "uppercase", color: "#F97316", margin: 0 };
 const formTitle: React.CSSProperties = { fontSize: "clamp(34px,5vw,58px)", lineHeight: 1, margin: "8px 0" };
 const formBody: React.CSSProperties = { fontSize: 19, color: "#64748B", lineHeight: 1.5 };
+const statusRow: React.CSSProperties = { display: "flex", alignItems: "center", gap: 8, marginBottom: 22, color: "#64748B", fontFamily: "'Space Mono', monospace", fontSize: 10, fontWeight: 800, letterSpacing: ".05em", textTransform: "uppercase" };
+const statusDot = (state: "idle" | "saving" | "saved" | "error"): React.CSSProperties => ({ width: 8, height: 8, borderRadius: 999, background: state === "error" ? "#DC2626" : state === "saved" ? "#10B981" : state === "saving" ? "#F59E0B" : "#94A3B8", boxShadow: `0 0 0 4px ${state === "error" ? "#FEE2E2" : state === "saved" ? "#D1FAE5" : state === "saving" ? "#FEF3C7" : "#F1F5F9"}` });
+const stepCount: React.CSSProperties = { marginLeft: "auto", color: "#0F172A" };
+const errorBanner: React.CSSProperties = { marginTop: 18, border: "1px solid #FCA5A5", background: "#FEF2F2", color: "#991B1B", borderRadius: 16, padding: "13px 16px", fontWeight: 800, lineHeight: 1.45 };
 const fields: React.CSSProperties = { display: "grid", gap: 16, marginTop: 18 };
 const label: React.CSSProperties = { display: "grid", gap: 8, fontWeight: 900 };
 const input: React.CSSProperties = { border: "1px solid #CBD5E1", borderRadius: 16, padding: "15px 18px", fontSize: 18, width: "100%" };
@@ -682,35 +789,13 @@ const miniGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "r
 const chipGrid: React.CSSProperties = { display: "flex", flexWrap: "wrap", gap: 8 };
 const chip = (active: boolean): React.CSSProperties => ({ border: active ? "1px solid #F97316" : "1px solid #CBD5E1", background: active ? "#FFF7ED" : "#FFFFFF", color: active ? "#F97316" : "#0F172A", borderRadius: 999, padding: "10px 14px", fontWeight: 900, cursor: "pointer" });
 const avatarRow: React.CSSProperties = { display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" };
-const avatar: React.CSSProperties = { width: 86, height: 86, borderRadius: 999, background: "#E2E8F0", display: "grid", placeItems: "center", overflow: "hidden", fontSize: 28 };
+const avatar: React.CSSProperties = { width: 86, height: 86, position: "relative", borderRadius: 999, background: "#E2E8F0", display: "grid", placeItems: "center", overflow: "hidden", fontSize: 28 };
 const avatarImg: React.CSSProperties = { width: "100%", height: "100%", objectFit: "cover" };
 const uploadButton: React.CSSProperties = { border: "1px solid #CBD5E1", borderRadius: 999, padding: "12px 18px", fontWeight: 950, cursor: "pointer" };
 const overlay: React.CSSProperties = { position: "fixed", inset: 0, zIndex: 9999, background: "rgba(15,23,42,.94)", color: "#F8F7F4", display: "grid", placeItems: "center", textAlign: "center", padding: 24 };
 const overlayTitle: React.CSSProperties = { fontFamily: "'Anton', sans-serif", fontSize: "clamp(44px,7vw,86px)", textTransform: "uppercase", margin: 0 };
 const overlayText: React.CSSProperties = { fontSize: 22, color: "rgba(248,247,244,.75)" };
 const confetti: React.CSSProperties = { fontSize: 38, marginBottom: 16 };
-
-const activityCategoryGrid: React.CSSProperties = {
-  display: "flex",
-  gap: 8,
-  flexWrap: "wrap",
-  marginBottom: 8,
-};
-
-const activityCategory: React.CSSProperties = {
-  border: "1px solid #CBD5E1",
-  background: "#FFFFFF",
-  borderRadius: 999,
-  padding: "10px 14px",
-  fontWeight: 900,
-  cursor: "pointer",
-};
-
-const addRow: React.CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "1fr auto",
-  gap: 10,
-};
 
 const summaryList: React.CSSProperties = {
   display: "grid",

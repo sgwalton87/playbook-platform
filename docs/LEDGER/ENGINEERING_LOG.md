@@ -1382,3 +1382,8 @@ Integrate Sprint 001.004 academic Scholar Record
 
 ## 2026-07-22 11:59
 - **precommit**: Unify onboarding role and OS routing
+
+## 2026-07-22 13:04
+- **precommit**: Merge pull request #6 from sgwalton87/agent/onboarding-role-os-foundation
+
+Unify onboarding role and OS routing
