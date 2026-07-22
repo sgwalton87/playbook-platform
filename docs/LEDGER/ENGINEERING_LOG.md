@@ -1368,3 +1368,6 @@ Started Beta 2 — Archivist v3 Unified Ledger Engine and Demo Mode.
 
 ## 2026-07-22 11:00
 - **precommit**: Canonicalize scholar community activities (#2)
+
+## 2026-07-22 11:03
+- **precommit**: Canonicalize academic scholar record
