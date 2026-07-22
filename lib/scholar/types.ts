@@ -13,6 +13,12 @@ export interface ScholarRecord {
     gpa?: string | null;
     dreamSchool?: string | null;
   };
+  college: {
+    dreamSchool?: string | null;
+    dreamSchoolName?: string | null;
+    dreamSchoolId?: string | null;
+    topSchools: string[];
+  };
   career: {
     idealProfession?: string | null;
     desiredSalaryRange?: string | null;

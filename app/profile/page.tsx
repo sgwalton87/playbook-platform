@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import CollegeSearch from "@/components/CollegeSearch";
+import { buildScholarRecord, scholarRecordToProfileForm } from "@/lib/scholar";
 
 const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",blue:"#3B82F6",green:"#10B981",purple:"#8B5CF6",amber:"#F59E0B",mono:"'Space Mono',monospace",sans:"'Hanken Grotesk',system-ui,sans-serif",anton:"'Anton',sans-serif"};
 
@@ -60,6 +61,7 @@ export default function ProfilePage() {
   const [intendedMajor, setIntendedMajor] = useState("");
 
   const [dreamSchool, setDreamSchool] = useState("");
+  const [dreamSchoolId, setDreamSchoolId] = useState("");
   const [collegeList, setCollegeList] = useState<string[]>(Array(9).fill(""));
 
   const [sport, setSport] = useState("");
@@ -111,8 +113,10 @@ export default function ProfilePage() {
       setProfile(p);
       setFirstName(p.first_name||""); setLastName(p.last_name||""); setBio(p.bio||""); setAvatarUrl(p.avatar_url||""); setGender(p.gender||""); setDob(p.date_of_birth||""); setFavoriteQuote(p.favorite_quote||"");
       setSchool(p.school||""); setGrade(p.grade||""); setDistrict(p.school_district||""); setGradYear(p.grad_year||""); setWeightedGpa(p.weighted_gpa||p.gpa||""); setUnweightedGpa(p.unweighted_gpa||""); setCity(p.city||""); setZipCode(p.zip_code||""); setEll(p.english_language_learner||false); setSatScore(p.sat_score||""); setActScore(p.act_score||""); setIntendedMajor(p.intended_major||"");
-      setDreamSchool(p.dream_school||"");
-      setCollegeList([p.college_list_2||"",p.college_list_3||"",p.college_list_4||"",p.college_list_5||"",p.college_list_6||"",p.college_list_7||"",p.college_list_8||"",p.college_list_9||"",p.college_list_10||""]);
+      const collegeGoalsForm = scholarRecordToProfileForm(buildScholarRecord({ profile: p }));
+      setDreamSchool(collegeGoalsForm.dreamSchool);
+      setDreamSchoolId(collegeGoalsForm.dreamSchoolId);
+      setCollegeList(collegeGoalsForm.collegeList);
       setSport(p.sport||""); setPosition(p.position||""); setHeight(p.height||""); setWeight(p.weight||""); setJerseyNumber(p.jersey_number||""); setTeamLevel(p.team_level||""); setTravelTeam(p.travel_team||""); setCoachName(p.coach_name||""); setCoachEmail(p.coach_email||"");
       setHighlightReelUrl(p.highlight_reel_url||""); setRecruitingStatus(p.recruiting_status||""); setDesiredCollegeLevel(p.desired_college_level||""); setAthleteEmail(p.athlete_email||""); setCampsAttended(p.camps_attended||"");
       setNilInstagram(p.nil_instagram||""); setNilTiktok(p.nil_tiktok||""); setNilTwitter(p.nil_twitter||""); setNilFollowerRange(p.nil_follower_range||""); setNilBrandInterests(p.nil_brand_interests||[]); setNilWorkedWithBrands(p.nil_worked_with_brands||false); setNilDealTypes(p.nil_deal_types||[]);
@@ -138,7 +142,7 @@ export default function ProfilePage() {
     setSaving(true);
     await supabase.from("profiles").update({
       first_name:firstName,last_name:lastName,full_name:`${firstName} ${lastName}`.trim(),bio,gender,date_of_birth:dob||null,favorite_quote:favoriteQuote||null,
-      school,grade,school_district:district,grad_year:gradYear,weighted_gpa:weightedGpa||null,unweighted_gpa:unweightedGpa||null,city,zip_code:zipCode,english_language_learner:ell,dream_school:dreamSchool||null,sat_score:satScore||null,act_score:actScore||null,intended_major:intendedMajor||null,
+      school,grade,school_district:district,grad_year:gradYear,weighted_gpa:weightedGpa||null,unweighted_gpa:unweightedGpa||null,city,zip_code:zipCode,english_language_learner:ell,dream_school:dreamSchool||null,dream_school_name:dreamSchool||null,dream_school_id:dreamSchoolId||null,sat_score:satScore||null,act_score:actScore||null,intended_major:intendedMajor||null,
       college_list_2:collegeList[0]||null,college_list_3:collegeList[1]||null,college_list_4:collegeList[2]||null,college_list_5:collegeList[3]||null,college_list_6:collegeList[4]||null,college_list_7:collegeList[5]||null,college_list_8:collegeList[6]||null,college_list_9:collegeList[7]||null,college_list_10:collegeList[8]||null,
       sport:sport||null,position:position||null,height:height||null,weight:weight||null,jersey_number:jerseyNumber||null,team_level:teamLevel||null,travel_team:travelTeam||null,coach_name:coachName||null,coach_email:coachEmail||null,
       highlight_reel_url:highlightReelUrl||null,recruiting_status:recruitingStatus||null,desired_college_level:desiredCollegeLevel||null,athlete_email:athleteEmail||null,camps_attended:campsAttended||null,
@@ -147,7 +151,7 @@ export default function ProfilePage() {
       pillars,race:race||null,household_income:householdIncome||null,first_generation:firstGen,free_reduced_lunch:freeLunch,migrant_student:migrant,foster_youth:fosterYouth,unhoused,has_iep:iep,
     }).eq("id",profile.id);
     setSaving(false);setSaved(true);setTimeout(()=>setSaved(false),3000);
-  },[profile?.id,firstName,lastName,bio,gender,dob,favoriteQuote,school,grade,district,gradYear,weightedGpa,unweightedGpa,city,zipCode,ell,dreamSchool,satScore,actScore,intendedMajor,collegeList,sport,position,height,weight,jerseyNumber,teamLevel,travelTeam,coachName,coachEmail,highlightReelUrl,recruitingStatus,desiredCollegeLevel,athleteEmail,campsAttended,nilInstagram,nilTiktok,nilTwitter,nilFollowerRange,nilBrandInterests,nilWorkedWithBrands,nilDealTypes,instagram,tiktok,twitter,hudl,youtube,pillars,race,householdIncome,firstGen,freeLunch,migrant,fosterYouth,unhoused,iep]);
+  },[profile?.id,firstName,lastName,bio,gender,dob,favoriteQuote,school,grade,district,gradYear,weightedGpa,unweightedGpa,city,zipCode,ell,dreamSchool,dreamSchoolId,satScore,actScore,intendedMajor,collegeList,sport,position,height,weight,jerseyNumber,teamLevel,travelTeam,coachName,coachEmail,highlightReelUrl,recruitingStatus,desiredCollegeLevel,athleteEmail,campsAttended,nilInstagram,nilTiktok,nilTwitter,nilFollowerRange,nilBrandInterests,nilWorkedWithBrands,nilDealTypes,instagram,tiktok,twitter,hudl,youtube,pillars,race,householdIncome,firstGen,freeLunch,migrant,fosterYouth,unhoused,iep]);
 
   if(loading)return<><div style={{padding:40,fontFamily:"'Space Mono',monospace",fontSize:12,color:T.faint}}>Loading profile...</div></>;
 
@@ -165,6 +169,26 @@ export default function ProfilePage() {
 
   const toggleMulti=(arr:string[],val:string,setter:(v:string[])=>void)=>{
     setter(arr.includes(val)?arr.filter(x=>x!==val):[...arr,val]);
+  };
+
+  const collegeNameKey=(value:string)=>value.trim().toLowerCase();
+  const selectedCollegeNames=(excludeIndex?:number)=>[
+    dreamSchool,
+    ...collegeList.filter((_,index)=>index!==excludeIndex),
+  ].map(collegeNameKey).filter(Boolean);
+  const setDreamCollege=(value:string, schoolId?:string)=>{
+    const nextValue=value.trim();
+    if(nextValue&&collegeList.some(school=>collegeNameKey(school)===collegeNameKey(nextValue)))return;
+    setDreamSchool(value);
+    setDreamSchoolId(schoolId || "");
+  };
+  const setOptionalCollege=(index:number,value:string)=>{
+    const nextValue=value.trim();
+    if(nextValue&&collegeNameKey(nextValue)===collegeNameKey(dreamSchool))return;
+    if(nextValue&&collegeList.some((school,schoolIndex)=>schoolIndex!==index&&collegeNameKey(school)===collegeNameKey(nextValue)))return;
+    const updated=Array.from({length:9},(_,slot)=>collegeList[slot]||"");
+    updated[index]=value;
+    setCollegeList(updated);
   };
 
   return(
@@ -307,7 +331,7 @@ export default function ProfilePage() {
 
             <div>
               <label style={lbl}>🌟 Dream school (#1)</label>
-              <CollegeSearch value={dreamSchool} onChange={setDreamSchool}/>
+              <CollegeSearch value={dreamSchool} excludedValues={collegeList} onChange={setDreamCollege}/>
             </div>
 
             <div style={{marginTop:20,padding:"16px",background:T.surface2,borderRadius:12}}>
@@ -320,7 +344,8 @@ export default function ProfilePage() {
                     <div style={{flex:1}}>
                       <CollegeSearch
                         value={val}
-                        onChange={v=>{const updated=[...collegeList];updated[i]=v;setCollegeList(updated);}}
+                        excludedValues={selectedCollegeNames(i)}
+                        onChange={v=>setOptionalCollege(i,v)}
                       />
                     </div>
                     {val&&<button onClick={()=>{const updated=[...collegeList];updated[i]="";setCollegeList(updated);}} style={{background:"none",border:"none",color:T.faint,cursor:"pointer",fontSize:16,padding:"0 4px"}}>✕</button>}

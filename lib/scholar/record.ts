@@ -34,11 +34,23 @@ export function buildScholarRecord({
     profile.avatar_url,
   ].filter(Boolean).length;
 
+  const dreamSchool =
+    profile.dream_school || profile.dream_school_name || null;
+  const dreamSchoolName =
+    profile.dream_school_name || profile.dream_school || null;
+  const dreamSchoolId = profile.dream_school_id
+    ? String(profile.dream_school_id)
+    : null;
+  const topSchools = Array.from({ length: 9 }, (_, index) => {
+    const key = `college_list_${index + 2}`;
+    return typeof profile[key] === "string" ? profile[key].trim() : "";
+  });
+
   const academicFields = [
     profile.school,
     profile.grade,
     profile.gpa,
-    profile.dream_school,
+    dreamSchool,
   ].filter(Boolean).length;
 
   const careerFields = [
@@ -73,7 +85,13 @@ export function buildScholarRecord({
       school: profile.school || null,
       grade: profile.grade || null,
       gpa: profile.gpa || null,
-      dreamSchool: profile.dream_school || null,
+      dreamSchool,
+    },
+    college: {
+      dreamSchool,
+      dreamSchoolName,
+      dreamSchoolId,
+      topSchools,
     },
     career: {
       idealProfession: profile.ideal_profession || null,

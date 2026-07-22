@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type CollegeResult = {
   id?: number | string;
@@ -12,15 +12,27 @@ type CollegeResult = {
 export default function CollegeSearch({
   value,
   onChange,
+  excludedValues = [],
 }: {
   value: string;
   onChange: (schoolName: string, schoolId?: string) => void;
+  excludedValues?: string[];
 }) {
   const [results, setResults] = useState<CollegeResult[]>([]);
   const [loading, setLoading] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [selectedValue, setSelectedValue] = useState(value);
+  const excludedNames = useMemo(
+    () => excludedValues.map((school) => school.trim().toLowerCase()).filter(Boolean),
+    [excludedValues]
+  );
 
   useEffect(() => {
-    if (!value || value.length < 3) {
+    if (value !== selectedValue) {
+      setDropdownOpen(true);
+    }
+
+    if (!value || value.length < 3 || !dropdownOpen) {
       setResults([]);
       return;
     }
@@ -39,7 +51,13 @@ export default function CollegeSearch({
 
         console.log("College autocomplete response:", data);
 
-        setResults(Array.isArray(data.results) ? data.results : []);
+        const nextResults = Array.isArray(data.results) ? data.results : [];
+        setResults(
+          nextResults.filter((school: CollegeResult) => {
+            const schoolName = school["school.name"] || school["school.alias"] || "";
+            return !excludedNames.includes(schoolName.trim().toLowerCase());
+          })
+        );
       } catch (err) {
         console.error("College search failed:", err);
         setResults([]);
@@ -49,7 +67,7 @@ export default function CollegeSearch({
     }, 400);
 
     return () => clearTimeout(timer);
-  }, [value]);
+  }, [dropdownOpen, excludedNames, selectedValue, value]);
 
   return (
     <div style={{ position: "relative" }}>
@@ -63,7 +81,12 @@ export default function CollegeSearch({
         }}
         placeholder="Type your dream school"
         value={value}
-        onChange={(e) => onChange(e.target.value, "")}
+        onChange={(e) => {
+          setSelectedValue("");
+          setDropdownOpen(true);
+          onChange(e.target.value, "");
+        }}
+        onFocus={() => setDropdownOpen(true)}
       />
 
       {loading && (
@@ -72,7 +95,7 @@ export default function CollegeSearch({
         </div>
       )}
 
-      {results.length > 0 && (
+      {dropdownOpen && results.length > 0 && (
         <div
           style={{
             position: "absolute",
@@ -96,8 +119,10 @@ export default function CollegeSearch({
                 key={`${schoolId}-${schoolName}-${index}`}
                 type="button"
                 onClick={() => {
+                  setSelectedValue(schoolName);
                   onChange(schoolName, schoolId);
                   setResults([]);
+                  setDropdownOpen(false);
                 }}
                 style={{
                   display: "block",
