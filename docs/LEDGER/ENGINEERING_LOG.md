@@ -1371,3 +1371,14 @@ Started Beta 2 — Archivist v3 Unified Ledger Engine and Demo Mode.
 
 ## 2026-07-22 11:03
 - **precommit**: Canonicalize academic scholar record
+
+## 2026-07-22 11:53
+- **precommit**: Merge pull request #5 from sgwalton87/agent/integrate-sprint-001-004
+
+Integrate Sprint 001.004 academic Scholar Record
+
+## 2026-07-22 11:57
+- **build-pass**: Pre-push tests and build passed.
+
+## 2026-07-22 11:59
+- **precommit**: Unify onboarding role and OS routing

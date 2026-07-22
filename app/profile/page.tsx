@@ -108,7 +108,7 @@ export default function ProfilePage() {
       const{data:u}=await supabase.auth.getUser();
       if(!u.user){router.replace("/login");return;}
       const{data:p}=await supabase.from("profiles").select("*").eq("id",u.user.id).single();
-      if(!p){router.replace("/onboarding");return;}
+      if(!p){router.replace("/start");return;}
       setProfile(p);
       setFirstName(p.first_name||""); setLastName(p.last_name||""); setBio(p.bio||""); setAvatarUrl(p.avatar_url||""); setGender(p.gender||""); setDob(p.date_of_birth||""); setFavoriteQuote(p.favorite_quote||"");
       const academicForm = scholarRecordToProfileForm(buildScholarRecord({ profile: p }));

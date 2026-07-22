@@ -1,3 +1,5 @@
+import { normalizePlaybookRole } from "@/lib/roles/registry";
+
 export type NavItem = {
   label: string;
   href: string;
@@ -245,22 +247,7 @@ export function normalizeNavigationRole(
   profileMode?: string | null,
   role?: string | null
 ) {
-  const raw = profileMode || role || "scholar";
-
-  const aliases: Record<string, string> = {
-    athlete: "scholar-athlete",
-    scholar_athlete: "scholar-athlete",
-    brand_partner: "brand-partner",
-    parent: "family",
-    guardian: "family",
-    teacher: "educator",
-    "high-school-coach": "coach",
-    recruiter: "college-coach",
-    "admissions-officer": "college-admissions",
-    tay: "transition-youth",
-  };
-
-  return aliases[raw] || raw;
+  return normalizePlaybookRole(profileMode || role);
 }
 
 export function getRoleNavigation(

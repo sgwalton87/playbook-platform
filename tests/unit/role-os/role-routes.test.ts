@@ -6,7 +6,9 @@ describe("Role OS routing", () => {
     expect(getRoleDestination("family")).toBe("/family-os");
   });
 
-  it("has seven signup role options", () => {
-    expect(roleOptions.length).toBe(7);
+  it("exposes every completed public onboarding pathway", () => {
+    expect(roleOptions.length).toBe(10);
+    expect(roleOptions.map((option) => option.role)).toContain("scholar-athlete");
+    expect(roleOptions.map((option) => option.role)).toContain("college-admissions");
   });
 });
