@@ -1554,3 +1554,9 @@ Started Beta 2 — Archivist v3 Unified Ledger Engine and Demo Mode.
 
 ## 2026-07-21 17:14
 - **precommit**: Sprint 1.1 - Persist academic and recruiting onboarding fields
+
+## 2026-07-21 18:14
+- **build-pass**: Pre-push tests and build passed.
+
+## 2026-07-21 19:09
+- **precommit**: Sprint 2.1 - Canonical ScholarRecord profile persistence
