@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import CollegeSearch from "@/components/CollegeSearch";
 import Confetti from "react-confetti";
+import type { RawCommunityActivity } from "@/lib/scholar";
 
 const ONBOARDING_steps_BY_ROLE = {
   scholar: [
@@ -331,7 +332,7 @@ const [currentScience,setCurrentScience]=useState("");
 const [collegeGoal,setCollegeGoal]=useState("");
 const [idealProfession,setIdealProfession]=useState("");
 const [desiredSalaryRange,setDesiredSalaryRange]=useState("");
-const [activities,setActivities]=useState<any[]>([]);
+const [activities,setActivities]=useState<RawCommunityActivity[]>([]);
 const [careerOptions,setCareerOptions] = useState<any[]>([]);
 
 const [dreamSchoolName, setDreamSchoolName] = useState("");
@@ -519,9 +520,9 @@ if (p?.role) {
     );
   }
 
+  const pendingActivities: RawCommunityActivity[] = [...activities];
   if (activityType && activityName.trim()) {
-    await supabase.from("student_activities").insert({
-      student_id: userId,
+    pendingActivities.push({
       activity_type: activityType,
       activity_name: activityName.trim(),
       role_title: activityRole || null,
@@ -529,6 +530,20 @@ if (p?.role) {
       total_hours: activityHours ? Number(activityHours) : null,
       description: activityDescription || null,
     });
+  }
+
+  if (pendingActivities.length > 0) {
+    await supabase.from("student_activities").insert(
+      pendingActivities.map((activity) => ({
+        student_id: userId,
+        activity_type: activity.activity_type,
+        activity_name: activity.activity_name,
+        role_title: activity.role_title,
+        organization: activity.organization,
+        total_hours: activity.total_hours,
+        description: activity.description,
+      }))
+    );
   }
   console.log({
   dreamSchoolName,

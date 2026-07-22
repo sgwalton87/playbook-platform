@@ -1,3 +1,5 @@
+import type { CommunityExperience, ScholarCommunityRecord } from "./community";
+
 export interface ScholarRecord {
   id: string;
   identity: {
@@ -17,15 +19,23 @@ export interface ScholarRecord {
     idealProfession?: string | null;
     desiredSalaryRange?: string | null;
   };
+  community: ScholarCommunityRecord;
   achievements: {
     total: number;
-    certificates: any[];
-    badges: any[];
-    activities: any[];
-    posts: any[];
+    certificates: unknown[];
+    badges: unknown[];
+    activities: CommunityExperience[];
+    posts: unknown[];
   };
   service: {
     volunteerHours: number;
+    activities: CommunityExperience[];
+  };
+  leadership: {
+    badges: unknown[];
+    activities: CommunityExperience[];
+    leadershipPositions: CommunityExperience[];
+    leadershipScore: number;
   };
   readiness: {
     portfolioCompletion: number;
