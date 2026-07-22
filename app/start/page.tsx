@@ -182,6 +182,8 @@ function StartContent() {
       id: user.id,
       email: user.email,
       role,
+      profile_mode: role,
+      requested_role: role,
       full_name: nextForm.full_name || null,
       username: nextForm.username || null,
       avatar_url: nextForm.avatar_url || null,
@@ -195,7 +197,7 @@ function StartContent() {
         top_schools: topSchools,
         activities,
         invite_supporters: inviteSupporters,
-        onboarding_step_index: stepIndex,
+        onboarding_step_index: nextForm.onboarding_step_index ?? stepIndex,
       },
       onboarding_completed: complete,
       onboarding_completed_at: complete ? new Date().toISOString() : null,
@@ -232,7 +234,9 @@ function StartContent() {
 
   async function next(skip = false) {
     setSaving(true);
-    await persist(false);
+    await persist(false, {
+      onboarding_step_index: Math.min(stepIndex + 1, steps.length - 1),
+    });
 
     if (step.id === "network") {
       await sendInvites();

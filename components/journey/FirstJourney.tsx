@@ -83,7 +83,7 @@ export default function FirstJourney() {
             label="Step 1"
             title="Scholar onboarding complete"
             body="The learner creates an account, completes role-based onboarding, and enters Playbook Home."
-            action={<Link href="/onboarding" style={primaryBtn}>View onboarding →</Link>}
+            action={<Link href="/start" style={primaryBtn}>View onboarding →</Link>}
           />
         )}
 
