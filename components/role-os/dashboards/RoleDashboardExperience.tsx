@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback, useEffect, useState } from "react";
 import {
   PlaybookButton,
   PlaybookCard,
@@ -8,87 +9,134 @@ import {
   PlaybookMetric,
   PlaybookMetrics,
   PlaybookPage,
-  PlaybookPill,
 } from "@/components/ui";
-import PermissionGate from "@/components/permissions/PermissionGate";
 import { getRoleDashboard } from "@/lib/role-os/roleDashboards";
-import { buildRoleRecommendations, buildRoleScenarios, explainRoleIntelligence } from "@/lib/role-intelligence";
-import { mapRoleToRelationship } from "@/lib/permissions";
-import type { PlaybookRoleOS } from "@/lib/role-os";
+import { normalizePlaybookRole, type PlaybookRole } from "@/lib/roles/registry";
+import { supabase } from "@/lib/supabaseClient";
+import { withTimeout } from "@/lib/async/withTimeout";
+
+type Profile = {
+  full_name?: string | null;
+  username?: string | null;
+  role?: string | null;
+  profile_mode?: string | null;
+  onboarding_completed?: boolean | null;
+  organization_name?: string | null;
+  onboarding_data?: Record<string, unknown> | null;
+};
 
 export default function RoleDashboardExperience({
-  role,
+  role: defaultRole,
+  allowedRoles,
 }: {
-  role: PlaybookRoleOS;
+  role: PlaybookRole;
+  allowedRoles?: PlaybookRole[];
 }) {
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [role, setRole] = useState<PlaybookRole>(defaultRole);
+  const [networkCount, setNetworkCount] = useState(0);
+  const [messageCount, setMessageCount] = useState(0);
+  const [state, setState] = useState<"loading" | "ready" | "signed-out" | "error">("loading");
+
+  const load = useCallback(async () => {
+    setState("loading");
+    const session = await withTimeout(
+      supabase.auth.getSession().then(({ data }) => data.session),
+      1_800,
+    ).catch(() => null);
+
+    if (!session?.user) {
+      setState("signed-out");
+      return;
+    }
+
+    const result = await withTimeout(
+      supabase
+        .from("profiles")
+        .select("full_name,username,role,profile_mode,onboarding_completed,organization_name,onboarding_data")
+        .eq("id", session.user.id)
+        .maybeSingle(),
+      8_000,
+    ).catch(() => null);
+
+    if (!result || result.error) {
+      setState("error");
+      return;
+    }
+
+    const loadedProfile: Profile = result.data || {};
+    const profileRole = normalizePlaybookRole(
+      loadedProfile.profile_mode || loadedProfile.role,
+    );
+    const resolvedRole = allowedRoles?.includes(profileRole)
+      ? profileRole
+      : defaultRole;
+    setProfile(loadedProfile);
+    setRole(resolvedRole);
+
+    const inboxResponse = await fetch("/api/messages", {
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    }).catch(() => null);
+    if (inboxResponse?.ok) {
+      const inbox = await inboxResponse.json();
+      setNetworkCount(inbox.networks?.length || 0);
+      setMessageCount(
+        (inbox.networks || []).reduce(
+          (total: number, network: { messages?: unknown[] }) =>
+            total + (network.messages?.length || 0),
+          0,
+        ),
+      );
+    }
+    setState("ready");
+  }, [allowedRoles, defaultRole]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => { void load(); }, 0);
+    return () => window.clearTimeout(timer);
+  }, [load]);
+
+  if (state === "loading") return <OSState title="Opening your Playbook…" body="Connecting your profile, role, relationships, and live operating system." />;
+  if (state === "signed-out") return <OSState title="Sign in to open your OS." body="This dashboard uses your authenticated profile and live relationships." href="/login" />;
+  if (state === "error") return <OSState title="Your OS needs another moment." body="We could not load your profile. No demo record was substituted." onRetry={load} />;
+
   const dashboard = getRoleDashboard(role);
-  const roleRecommendations = buildRoleRecommendations(role);
-  const roleScenario = buildRoleScenarios(role);
-  const roleExplanation = explainRoleIntelligence(role);
-  const relationship = mapRoleToRelationship(role);
+  const displayName = profile?.full_name || profile?.username || "Playbook member";
+  const organization =
+    profile?.organization_name ||
+    (typeof profile?.onboarding_data?.organization_name === "string"
+      ? profile.onboarding_data.organization_name
+      : null);
 
   return (
     <PlaybookPage>
-      <PlaybookHero
-        eyebrow={`${role} OS`}
-        title={dashboard.title}
-        subtitle={(dashboard as any).description || (dashboard as any).greeting || (dashboard as any).question || "Role-specific intelligence, actions, and support network coordination."}
-      >
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 18 }}>
-          <PlaybookButton href="/role-intelligence">Open Role Intelligence</PlaybookButton>
-          <PlaybookButton href="/messages" variant="secondary">Messages</PlaybookButton>
+      <PlaybookHero eyebrow={`${dashboard.title} · ${dashboard.accent}`} title={dashboard.headline} subtitle={dashboard.subtitle}>
+        <div style={actions}>
+          <PlaybookButton href="/messages">Open Messages</PlaybookButton>
+          <PlaybookButton href="/support-network" variant="secondary">View Network</PlaybookButton>
         </div>
       </PlaybookHero>
 
+      <section style={welcome}>
+        <div>
+          <p style={kicker}>Authenticated workspace</p>
+          <h2 style={welcomeTitle}>{displayName}</h2>
+          <p style={muted}>{organization || dashboard.title}</p>
+        </div>
+      </section>
+
       <PlaybookMetrics>
-        {(dashboard.metrics || []).map((metric: any) => { const label = Array.isArray(metric) ? metric[0] : metric.label; const value = Array.isArray(metric) ? metric[1] : metric.value; return (
-          <PlaybookMetric key={label} label={label} value={String(value)} />
-        ); })}
+        <PlaybookMetric label="Role Onboarding" value={profile?.onboarding_completed ? "Complete" : "In progress"} />
+        <PlaybookMetric label="Connected Networks" value={String(networkCount)} />
+        <PlaybookMetric label="Persisted Messages" value={String(messageCount)} />
+        <PlaybookMetric label="Data Source" value="Live" />
       </PlaybookMetrics>
 
-      <PlaybookGrid min={300}>
-        <PlaybookCard eyebrow="Role Intelligence Active" title="Recommendations for this role">
-          <div style={{ display: "grid", gap: 10 }}>
-            {roleRecommendations.recommendations.map((item) => (
-              <div key={item} style={row}>
-                <span style={check}>✓</span>
-                <span>{item}</span>
-              </div>
-            ))}
-          </div>
-
-          <div style={callout}>
-            <strong>Scenario</strong>
-            <span>{roleScenario.scenario}</span>
-          </div>
-
-          <p style={body}>{roleExplanation}</p>
-        </PlaybookCard>
-
-        <PlaybookCard eyebrow="Permission-Aware Access" title="What this relationship can do">
-          <div style={{ display: "grid", gap: 10 }}>
-            <PermissionGate relationship={relationship} permission="view_progress">
-              <div style={row}><span style={check}>✓</span><span>View learner progress</span></div>
-            </PermissionGate>
-
-            <PermissionGate relationship={relationship} permission="verify_evidence">
-              <div style={row}><span style={check}>✓</span><span>Verify scholar evidence</span></div>
-            </PermissionGate>
-
-            <PermissionGate relationship={relationship} permission="create_opportunities">
-              <div style={row}><span style={check}>✓</span><span>Create opportunity pathways</span></div>
-            </PermissionGate>
-
-            <PermissionGate relationship={relationship} permission="view_equity_metrics">
-              <div style={row}><span style={check}>✓</span><span>View system equity metrics</span></div>
-            </PermissionGate>
-          </div>
-        </PlaybookCard>
-
-        {((dashboard as any).cards || (dashboard as any).sections || ((dashboard as any).actions || []).map((action: string) => ({ title: action, body: (dashboard as any).insight, label: "Action" }))).map((card: any) => (
-          <PlaybookCard key={card.title} eyebrow={card.label || "Role OS"} title={card.title}>
-            <p style={body}>{card.body || card.description || card.detail}</p>
-            {card.status && <PlaybookPill>{card.status}</PlaybookPill>}
+      <PlaybookGrid min={280}>
+        {dashboard.modules.map((module) => (
+          <PlaybookCard key={`${role}-${module.title}`} eyebrow={module.eyebrow} title={module.title}>
+            <p style={body}>{module.body}</p>
+            <PlaybookButton href={module.href}>{module.action}</PlaybookButton>
           </PlaybookCard>
         ))}
       </PlaybookGrid>
@@ -96,39 +144,21 @@ export default function RoleDashboardExperience({
   );
 }
 
-const body: React.CSSProperties = {
-  color: "#64748B",
-  lineHeight: 1.6,
-};
+function OSState({ title, body, href, onRetry }: { title: string; body: string; href?: string; onRetry?: () => void }) {
+  return (
+    <PlaybookPage>
+      <PlaybookHero eyebrow="Playbook OS" title={title} subtitle={body}>
+        {href && <PlaybookButton href={href}>Sign in</PlaybookButton>}
+        {onRetry && <button type="button" style={retry} onClick={onRetry}>Try again</button>}
+      </PlaybookHero>
+    </PlaybookPage>
+  );
+}
 
-const row: React.CSSProperties = {
-  display: "flex",
-  gap: 10,
-  alignItems: "center",
-  color: "#0F172A",
-  fontWeight: 800,
-};
-
-const check: React.CSSProperties = {
-  width: 22,
-  height: 22,
-  borderRadius: 999,
-  background: "#10B981",
-  color: "#fff",
-  display: "grid",
-  placeItems: "center",
-  fontSize: 12,
-  fontWeight: 900,
-  flexShrink: 0,
-};
-
-const callout: React.CSSProperties = {
-  marginTop: 16,
-  display: "grid",
-  gap: 4,
-  background: "#FFF7ED",
-  border: "1px solid #FED7AA",
-  borderRadius: 16,
-  padding: 14,
-  color: "#0F172A",
-};
+const actions: React.CSSProperties = { display: "flex", gap: 10, flexWrap: "wrap", marginTop: 18 };
+const welcome: React.CSSProperties = { maxWidth: 1180, margin: "0 auto 18px", padding: 24, border: "1px solid #E2E8F0", borderRadius: 24, background: "#FFFFFF" };
+const kicker: React.CSSProperties = { margin: 0, color: "#F97316", fontSize: 11, fontWeight: 950, letterSpacing: ".14em", textTransform: "uppercase" };
+const welcomeTitle: React.CSSProperties = { margin: "6px 0", color: "#0F172A", fontSize: "clamp(28px,4vw,42px)" };
+const muted: React.CSSProperties = { margin: 0, color: "#64748B", fontWeight: 700 };
+const body: React.CSSProperties = { color: "#64748B", lineHeight: 1.65 };
+const retry: React.CSSProperties = { marginTop: 18, border: 0, borderRadius: 999, background: "#F97316", color: "#FFFFFF", padding: "12px 18px", fontWeight: 900, cursor: "pointer" };

@@ -1,7 +1,7 @@
 "use client";
 
-import ScholarNetworkDashboard from "@/components/scholar-network/ScholarNetworkDashboard";
+import LiveSupportNetwork from "@/components/support-network/LiveSupportNetwork";
 
 export default function ScholarNetworkPage() {
-  return <ScholarNetworkDashboard />;
+  return <LiveSupportNetwork />;
 }

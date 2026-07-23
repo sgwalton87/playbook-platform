@@ -1,3 +1,11 @@
+import { getLearnerOSDefinition, type LearnerOSRole } from "@/lib/learner-os";
+import { getRoleDashboard } from "./roleDashboards";
+import {
+  PLAYBOOK_ROLES,
+  PUBLIC_ONBOARDING_ROLES,
+  type PlaybookRole,
+} from "@/lib/roles/registry";
+
 export type PlaybookRoleOS =
   | "learner"
   | "family"
@@ -7,77 +15,40 @@ export type PlaybookRoleOS =
   | "employer"
   | "mentor";
 
-export function getRoleOS(role: PlaybookRoleOS) {
-  const systems = {
-    learner: {
-      title: "Learner OS",
-      audience: "Scholar",
-      headline: "Own your story. Grow your future.",
-      focus: ["Academic DNA", "Opportunities", "Compass Guidance", "Scholar Record"],
-      primaryAction: "Open Living Scholar",
-      href: "/living-scholar",
-    },
-    family: {
-      title: "Family OS",
-      audience: "Parent / Guardian",
-      headline: "Know how to support your scholar today.",
-      focus: ["Progress Briefing", "Deadlines", "Family Actions", "Opportunity Support"],
-      primaryAction: "View Family Briefing",
-      href: "/family-os",
-    },
-    educator: {
-      title: "Educator OS",
-      audience: "Teacher / Counselor / Coach",
-      headline: "See who needs support before they fall behind.",
-      focus: ["Cohort Signals", "A-G Risk", "Verification Requests", "Interventions"],
-      primaryAction: "Review Students",
-      href: "/educator-os",
-    },
-    district: {
-      title: "District OS",
-      audience: "District Leader",
-      headline: "Turn readiness data into equity action.",
-      focus: ["Readiness Trends", "Opportunity Gaps", "School Health", "Impact Metrics"],
-      primaryAction: "Open District View",
-      href: "/district-os",
-    },
-    university: {
-      title: "University OS",
-      audience: "Admissions / Outreach",
-      headline: "Find verified talent earlier.",
-      focus: ["Readiness Signals", "Verified Records", "Pathway Fit", "Recruitment"],
-      primaryAction: "Explore Scholars",
-      href: "/university-os",
-    },
-    employer: {
-      title: "Employer OS",
-      audience: "Employer / Workforce Partner",
-      headline: "Match opportunity to verified growth.",
-      focus: ["Skills Evidence", "Career Pathways", "Trust Signals", "Workforce Readiness"],
-      primaryAction: "View Talent Pipeline",
-      href: "/employer-os",
-    },
-    mentor: {
-      title: "Mentor OS",
-      audience: "Mentor / Trusted Adult",
-      headline: "Know who you are helping and what they need next.",
-      focus: ["Weekly Check-ins", "Scholar Goals", "Opportunity Coaching", "Encouragement"],
-      primaryAction: "Open Mentor View",
-      href: "/mentor-os",
-    },
-  };
+type CanonicalRoleOS = Exclude<PlaybookRole, "other">;
 
-  return systems[role];
+const LEARNER_ROLES = new Set<CanonicalRoleOS>([
+  "scholar",
+  "scholar-athlete",
+  "transition-youth",
+  "athlete-abroad",
+]);
+
+export function getRoleOS(inputRole: PlaybookRoleOS | CanonicalRoleOS) {
+  const role: CanonicalRoleOS =
+    inputRole === "learner"
+      ? "scholar"
+      : inputRole === "university"
+        ? "college-coach"
+        : inputRole;
+  const registry = PLAYBOOK_ROLES[role];
+  const experience = LEARNER_ROLES.has(role)
+    ? getLearnerOSDefinition(role as LearnerOSRole)
+    : getRoleDashboard(role);
+
+  return {
+    role,
+    title: registry.osLabel,
+    audience: registry.label,
+    headline: experience.headline,
+    focus: experience.modules.map((module) => module.title),
+    primaryAction: `Open ${registry.osLabel}`,
+    href: registry.osRoute,
+  };
 }
 
 export function getAllRoleOS() {
-  return [
-    getRoleOS("learner"),
-    getRoleOS("family"),
-    getRoleOS("educator"),
-    getRoleOS("district"),
-    getRoleOS("university"),
-    getRoleOS("employer"),
-    getRoleOS("mentor"),
-  ];
+  return PUBLIC_ONBOARDING_ROLES
+    .filter((role): role is CanonicalRoleOS => role !== "other")
+    .map((role) => getRoleOS(role));
 }

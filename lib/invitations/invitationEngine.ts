@@ -68,7 +68,7 @@ export function createSupportInvitation(input: {
   return {
     id: `invite-${input.relationship}-${input.inviteeEmail.toLowerCase().replace(/[^a-z0-9]/g, "-")}`,
     scholarId: input.scholarId || "scholar-maya",
-    scholarName: input.scholarName || "Maya Johnson",
+    scholarName: input.scholarName || "A Playbook learner",
     inviteeName: input.inviteeName,
     inviteeEmail: input.inviteeEmail,
     relationship: input.relationship,

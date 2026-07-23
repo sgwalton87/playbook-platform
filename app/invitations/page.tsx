@@ -1,7 +1,7 @@
 "use client";
 
-import InvitationCenter from "@/components/invitations/InvitationCenter";
+import LiveInvitationCenter from "@/components/invitations/LiveInvitationCenter";
 
 export default function InvitationsPage() {
-  return <InvitationCenter />;
+  return <LiveInvitationCenter />;
 }

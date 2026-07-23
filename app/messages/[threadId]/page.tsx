@@ -1,7 +1,7 @@
 "use client";
 
-import InboxV2 from "@/components/messages/InboxV2";
+import LiveInbox from "@/components/messages/LiveInbox";
 
 export default function MessageThreadPage() {
-  return <InboxV2 />;
+  return <LiveInbox />;
 }

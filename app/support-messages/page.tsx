@@ -1,7 +1,7 @@
 "use client";
 
-import SupportNetworkLiveCenter from "@/components/support-network-live/SupportNetworkLiveCenter";
+import LiveInbox from "@/components/messages/LiveInbox";
 
 export default function SupportMessagesPage() {
-  return <SupportNetworkLiveCenter />;
+  return <LiveInbox />;
 }

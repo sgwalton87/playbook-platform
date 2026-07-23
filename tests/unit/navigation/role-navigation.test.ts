@@ -37,7 +37,25 @@ describe("role-aware navigation", () => {
         "/compass",
         "/opportunities",
         "/courses",
+        "/support-network",
         "/messages",
+        "/notifications",
+        "/profile",
+      ]) {
+        expect(destinations).toContain(destination);
+      }
+    },
+  );
+
+  it.each(Object.keys(PLAYBOOK_ROLES).filter((role) => role !== "other"))(
+    "gives %s the live platform navigation foundation",
+    (role) => {
+      const destinations = getRoleNavigation(role).items.map((item) => item.href);
+
+      for (const destination of [
+        "/support-network",
+        "/messages",
+        "/notifications",
         "/profile",
       ]) {
         expect(destinations).toContain(destination);

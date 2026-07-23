@@ -3,5 +3,10 @@
 import RoleDashboardExperience from "@/components/role-os/dashboards/RoleDashboardExperience";
 
 export default function EducatorOSPage() {
-  return <RoleDashboardExperience role="educator" />;
+  return (
+    <RoleDashboardExperience
+      role="educator"
+      allowedRoles={["educator", "counselor", "coach"]}
+    />
+  );
 }

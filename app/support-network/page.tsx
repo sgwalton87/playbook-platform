@@ -1,7 +1,7 @@
 "use client";
 
-import SupportNetworkMap from "@/components/support-network/SupportNetworkMap";
+import LiveSupportNetwork from "@/components/support-network/LiveSupportNetwork";
 
 export default function SupportNetworkPage() {
-  return <SupportNetworkMap />;
+  return <LiveSupportNetwork />;
 }

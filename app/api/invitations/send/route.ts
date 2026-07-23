@@ -17,6 +17,23 @@ function getSupabaseAdmin() {
   );
 }
 
+export async function GET(req: NextRequest) {
+  const supabase = getSupabaseAdmin();
+  const accessToken = req.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
+  const { data: { user } } = await supabase.auth.getUser(accessToken);
+
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { data, error } = await supabase
+    .from("support_invitations")
+    .select("id,invitee_name,invitee_email,relationship,invited_role,status,destination,created_at")
+    .eq("scholar_id", user.id)
+    .order("created_at", { ascending: false });
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  return NextResponse.json({ invitations: data || [] });
+}
+
 export async function POST(req: NextRequest) {
   const supabase = getSupabaseAdmin();
 
