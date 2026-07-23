@@ -10,6 +10,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
+    "sprint:queue": "tsx scripts/sprint-queue.ts",
     "log:event": "bash scripts/log-dev-event.sh",
     "log:build-pass": "bash scripts/log-build-pass.sh",
     "log:sprint": "bash scripts/log-sprint.sh",

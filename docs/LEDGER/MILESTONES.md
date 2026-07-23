@@ -1390,3 +1390,6 @@ Unify onboarding role and OS routing
 
 ## 2026-07-22 13:50
 - **precommit**: Build premium onboarding shell
+
+## 2026-07-22 17:04
+- **precommit**: Checkpoint before remote development setup

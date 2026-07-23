@@ -1,7 +1,9 @@
 # PLAYBOOK OS — MASTER BUILD CHECKLIST
 
 **Overall completion:** 36%
-**Last updated:** 2026-07-21T00:00:00.000Z
+**Last updated:** 2026-07-22T00:00:00.000Z
+
+**Auto-build control:** `docs/sprints/AUTO_BUILD_CONTROL_BOARD.md` and `docs/sprints/AUTO_BUILD_QUEUE.json`
 
 ## Status legend
 
@@ -41,7 +43,7 @@ Notes: Auth interfaces and Supabase flows are present, including login/signup, O
 
 # Phase 2 — Onboarding
 
-**Status:** 🟥 needs fix
+**Status:** 🟨 in progress
 **Completion:** 19%
 
 - 🟨 Scholar Onboarding
@@ -60,9 +62,9 @@ Notes: Auth interfaces and Supabase flows are present, including login/signup, O
 - 🟨 Onboarding Autosave
 - 🟨 Profile Creation Animation
 - 🟨 Public Profile Generation
-- 🟥 Onboarding OS Redirects
+- 🟦 Onboarding OS Redirects
 
-Notes: Onboarding is role-aware for the currently coded role set, but the checklist roles are broader than the implemented pathway map. Needs Fix: Onboarding OS Redirects should be reconciled against the onboarding audit scope before launch because not every registry role has a completed onboarding path.
+Notes: Canonical role resolution and OS redirects were reconciled in OR-001 and are in Testing. OR-002's premium shared shell is locally validated but remains unmerged, so its autosave and recovery improvements are not yet promoted to Complete. OR-003 through OR-008 are queued to close every role pathway, permission boundary, and release gate.
 
 # Phase 3 — Public Profile
 

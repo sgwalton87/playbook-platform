@@ -1,5 +1,9 @@
 # Onboarding and Role OS Sprint Map
 
+**Execution queue:** `docs/sprints/AUTO_BUILD_QUEUE.json`
+
+**Current state:** OR-001 merged; OR-002 locally complete and awaiting publish/merge; OR-003 is next after OR-002 merges.
+
 **Source of truth:** `docs/PLAYBOOK_MASTER_CHECKLIST.md`, `TECH_DEBT.md`, current architecture documents, and verified application routes on `main`.
 
 ## Quality gates for every sprint
@@ -10,6 +14,8 @@
 - Do not mark a role complete until role selection, onboarding, redirect, navigation, OS landing, and permission boundaries all agree.
 
 ## Sprint OR-001 — Canonical role registry and routing
+
+**Status:** Merged — PR #6.
 
 **Goal:** Make one registry authoritative for role aliases, onboarding availability, OS destinations, and role-selection labels.
 
@@ -23,6 +29,8 @@
 
 ## Sprint OR-002 — Unified premium onboarding shell
 
+**Status:** Local implementation and validation complete; not yet merged.
+
 **Goal:** Promote `/start` as the sole onboarding experience and bring every step to the strongest Playbook design standard.
 
 **Acceptance gates:**
@@ -33,6 +41,8 @@
 - Legacy scholar-only onboarding is retired without broken links.
 
 ## Sprint OR-003 — Learner pathways
+
+**Status:** Queued; blocked until OR-002 is merged.
 
 **Roles:** Scholar, Scholar-Athlete, Transition-Aged Youth.
 

@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 1,
+  "sourceOfTruth": [
+    "docs/PLAYBOOK_MASTER_CHECKLIST.md",
+    "docs/ONBOARDING_ROLE_OS_SPRINT_MAP.md",
+    "docs/architecture/CURRENT_ARCHITECTURE.md",
+    "docs/architecture/DATA_MODEL.md",
+    "docs/ENGINEERING/TECH_DEBT.md"
+  ],
+  "definitionOfDone": [
+    "interface",
+    "persistence",
+    "permissions",
+    "integrations",
+    "accessibility",
+    "responsive-design",
+    "tests",
+    "production-build",
+    "end-to-end-evidence",
+    "documentation"
+  ],
+  "sprints": [
+    {
+      "id": "OR-001",
+      "title": "Canonical role registry and routing",
+      "branch": "agent/onboarding-role-os-foundation",
+      "status": "merged",
+      "dependsOn": [],
+      "checklistPhases": [1, 2, 4],
+      "mergeEvidence": "PR #6"
+    },
+    {
+      "id": "OR-002",
+      "title": "Unified premium onboarding shell",
+      "branch": "agent/onboarding-premium-shell",
+      "status": "local-complete",
+      "dependsOn": ["OR-001"],
+      "checklistPhases": [2],
+      "mergeEvidence": null
+    },
+    {
+      "id": "OR-003",
+      "title": "Learner pathways",
+      "branch": "agent/or-003-learner-pathways",
+      "status": "queued",
+      "dependsOn": ["OR-002"],
+      "checklistPhases": [2, 3, 4, 9, 10],
+      "mergeEvidence": null
+    },
+    {
+      "id": "OR-004",
+      "title": "Family and trusted-support pathways",
+      "branch": "agent/or-004-family-support",
+      "status": "queued",
+      "dependsOn": ["OR-003"],
+      "checklistPhases": [2, 4, 5, 7],
+      "mergeEvidence": null
+    },
+    {
+      "id": "OR-005",
+      "title": "K-12 institutional pathways",
+      "branch": "agent/or-005-k12-pathways",
+      "status": "queued",
+      "dependsOn": ["OR-004"],
+      "checklistPhases": [2, 4, 5, 7, 9],
+      "mergeEvidence": null
+    },
+    {
+      "id": "OR-006",
+      "title": "College pathways",
+      "branch": "agent/or-006-college-pathways",
+      "status": "queued",
+      "dependsOn": ["OR-005"],
+      "checklistPhases": [2, 4, 9, 10],
+      "mergeEvidence": null
+    },
+    {
+      "id": "OR-007",
+      "title": "Opportunity partner pathways",
+      "branch": "agent/or-007-opportunity-partners",
+      "status": "queued",
+      "dependsOn": ["OR-006"],
+      "checklistPhases": [2, 4, 10],
+      "mergeEvidence": null
+    },
+    {
+      "id": "OR-008",
+      "title": "Onboarding governance and release validation",
+      "branch": "agent/or-008-governance-release",
+      "status": "queued",
+      "dependsOn": ["OR-003", "OR-004", "OR-005", "OR-006", "OR-007"],
+      "checklistPhases": [1, 2, 3, 4],
+      "mergeEvidence": null
+    },
+    {
+      "id": "CORE-001",
+      "title": "Identity and authentication release gate",
+      "branch": "agent/core-001-auth-release-gate",
+      "status": "queued",
+      "dependsOn": ["OR-008"],
+      "checklistPhases": [1],
+      "mergeEvidence": null
+    },
+    {
+      "id": "CORE-002",
+      "title": "Public Playbook Record and privacy",
+      "branch": "agent/core-002-public-record",
+      "status": "queued",
+      "dependsOn": ["CORE-001"],
+      "checklistPhases": [3],
+      "mergeEvidence": null
+    },
+    {
+      "id": "CORE-003",
+      "title": "Network, messaging, and safety",
+      "branch": "agent/core-003-network-messaging",
+      "status": "queued",
+      "dependsOn": ["CORE-002"],
+      "checklistPhases": [5, 7],
+      "mergeEvidence": null
+    },
+    {
+      "id": "CORE-004",
+      "title": "Feed, events, and moderation",
+      "branch": "agent/core-004-community",
+      "status": "queued",
+      "dependsOn": ["CORE-003"],
+      "checklistPhases": [6, 11],
+      "mergeEvidence": null
+    },
+    {
+      "id": "CORE-005",
+      "title": "Courses, rewards, and credentials",
+      "branch": "agent/core-005-learning-rewards",
+      "status": "queued",
+      "dependsOn": ["CORE-004"],
+      "checklistPhases": [8],
+      "mergeEvidence": null
+    },
+    {
+      "id": "CORE-006",
+      "title": "Academic and recruiting workflows",
+      "branch": "agent/core-006-academic-recruiting",
+      "status": "queued",
+      "dependsOn": ["CORE-005"],
+      "checklistPhases": [9, 10],
+      "mergeEvidence": null
+    }
+  ]
+}
