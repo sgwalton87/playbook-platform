@@ -1399,3 +1399,6 @@ Unify onboarding role and OS routing
 
 ## 2026-07-22 17:20
 - **precommit**: Clarify signup and role selection flow
+
+## 2026-07-22 17:22
+- **precommit**: Refine homepage hero and representation

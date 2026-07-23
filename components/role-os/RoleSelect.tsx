@@ -58,7 +58,7 @@ export default function RoleSelect() {
 
       <section style={hero}>
         <div style={heroCopy}>
-          <PlaybookLogo size={118} priority />
+          <PlaybookLogo size={88} priority />
           <p style={eyebrow}>Choose your Playbook</p>
           <h1 style={title}>One platform. A purpose-built OS for every role.</h1>
           <p style={lead}>
@@ -72,8 +72,8 @@ export default function RoleSelect() {
         </div>
         <div style={imageWrap}>
           <Image
-            src={PLAYBOOK_HERO_VISUALS.signup.image}
-            alt={PLAYBOOK_HERO_VISUALS.signup.alt}
+            src={PLAYBOOK_HERO_VISUALS.home.image}
+            alt={PLAYBOOK_HERO_VISUALS.home.alt}
             fill
             sizes="(max-width: 720px) 100vw, 46vw"
             style={image}
@@ -118,16 +118,16 @@ const accountLinks: React.CSSProperties = { display: "flex", alignItems: "center
 const memberPrompt: React.CSSProperties = { color: "#64748B", fontSize: 13, fontWeight: 700 };
 const signInLink: React.CSSProperties = { color: "#0F172A", fontWeight: 900, textDecoration: "none" };
 const navSignup: React.CSSProperties = { background: "#F97316", color: "#FFFFFF", borderRadius: 999, padding: "10px 16px", fontWeight: 950, textDecoration: "none", boxShadow: "0 8px 20px rgba(249,115,22,.22)" };
-const hero: React.CSSProperties = { maxWidth: 1180, margin: "0 auto 32px", minHeight: 410, display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,320px),1fr))", overflow: "hidden", borderRadius: 32, background: "#0F172A", boxShadow: "0 30px 80px rgba(15,23,42,.18)" };
-const heroCopy: React.CSSProperties = { padding: "clamp(30px,5vw,64px)", display: "flex", flexDirection: "column", justifyContent: "center" };
+const hero: React.CSSProperties = { maxWidth: 1180, margin: "0 auto 32px", minHeight: 440, display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,320px),1fr))", overflow: "hidden", borderRadius: 32, background: "#0F172A", boxShadow: "0 30px 80px rgba(15,23,42,.18)" };
+const heroCopy: React.CSSProperties = { padding: "clamp(24px,3.5vw,44px)", display: "flex", flexDirection: "column", justifyContent: "center" };
 const eyebrow: React.CSSProperties = { margin: "18px 0 8px", fontFamily: "'Space Mono', monospace", fontSize: 10, letterSpacing: ".18em", textTransform: "uppercase", fontWeight: 800, color: "#F97316" };
-const title: React.CSSProperties = { margin: 0, maxWidth: 680, color: "#F8F7F4", fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: "clamp(38px,5.5vw,72px)", lineHeight: .98, textTransform: "uppercase" };
-const lead: React.CSSProperties = { maxWidth: 650, color: "rgba(248,247,244,.7)", fontSize: 16, lineHeight: 1.7, margin: "20px 0 0" };
-const heroActions: React.CSSProperties = { display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", marginTop: 26 };
-const primaryAction: React.CSSProperties = { display: "inline-flex", alignItems: "center", justifyContent: "center", background: "#F97316", color: "#FFFFFF", borderRadius: 999, padding: "15px 22px", fontWeight: 950, textDecoration: "none", boxShadow: "0 12px 28px rgba(249,115,22,.28)" };
-const secondaryAction: React.CSSProperties = { display: "inline-flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(248,247,244,.28)", color: "#F8F7F4", borderRadius: 999, padding: "14px 20px", fontWeight: 900, textDecoration: "none" };
+const title: React.CSSProperties = { margin: 0, maxWidth: 610, color: "#F8F7F4", fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: "clamp(36px,4.2vw,56px)", lineHeight: .94, textTransform: "uppercase" };
+const lead: React.CSSProperties = { maxWidth: 610, color: "rgba(248,247,244,.72)", fontSize: 14, lineHeight: 1.55, margin: "15px 0 0" };
+const heroActions: React.CSSProperties = { display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginTop: 20 };
+const primaryAction: React.CSSProperties = { display: "inline-flex", alignItems: "center", justifyContent: "center", background: "#F97316", color: "#FFFFFF", borderRadius: 999, padding: "12px 18px", fontSize: 14, fontWeight: 950, textDecoration: "none", boxShadow: "0 12px 28px rgba(249,115,22,.28)" };
+const secondaryAction: React.CSSProperties = { display: "inline-flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(248,247,244,.28)", color: "#F8F7F4", borderRadius: 999, padding: "11px 17px", fontSize: 14, fontWeight: 900, textDecoration: "none" };
 const reassurance: React.CSSProperties = { color: "rgba(248,247,244,.52)", fontSize: 12, lineHeight: 1.5, margin: "14px 0 0" };
-const imageWrap: React.CSSProperties = { minHeight: 360, position: "relative", background: "#1E293B" };
+const imageWrap: React.CSSProperties = { minHeight: 440, position: "relative", background: "#1E293B" };
 const image: React.CSSProperties = { width: "100%", height: "100%", objectFit: "cover", display: "block" };
 const intro: React.CSSProperties = { maxWidth: 1180, margin: "0 auto 18px", display: "flex", alignItems: "end", justifyContent: "space-between", gap: 24 };
 const sectionTitle: React.CSSProperties = { maxWidth: 760, margin: 0, fontSize: "clamp(24px,3vw,38px)", lineHeight: 1.08 };
