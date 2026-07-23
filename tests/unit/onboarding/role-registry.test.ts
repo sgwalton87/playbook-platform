@@ -52,6 +52,32 @@ describe("canonical Playbook role registry", () => {
     expect(getOnboardingSteps(role).map((step) => step.id)).toContain(requiredStep);
   });
 
+  it.each([
+    "scholar",
+    "scholar-athlete",
+    "transition-youth",
+    "athlete-abroad",
+  ])("integrates Starting Five for learner-owned pathway %s", (role) => {
+    const stepIds = getOnboardingSteps(role).map((step) => step.id);
+    expect(stepIds).toContain("starting-five");
+    expect(stepIds).not.toContain("network");
+  });
+
+  it.each([
+    "family",
+    "mentor",
+    "educator",
+    "counselor",
+    "coach",
+    "college-coach",
+    "college-admissions",
+    "brand-partner",
+    "employer",
+    "district",
+  ])("keeps invitation-based support network onboarding for %s", (role) => {
+    expect(getOnboardingSteps(role).map((step) => step.id)).toContain("network");
+  });
+
   it("routes coaches to the institutional support OS instead of Mentor OS", () => {
     expect(getRoleDestination("coach")).toBe("/educator-os");
   });

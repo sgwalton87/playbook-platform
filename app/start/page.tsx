@@ -40,6 +40,21 @@ type ActivityEntry = {
 
 type OnboardingForm = Record<string, unknown>;
 
+type StartingFiveEntry = {
+  role: "parent_guardian" | "educator" | "mentor";
+  label: string;
+  name: string;
+  email: string;
+};
+
+const STARTING_FIVE_DEFAULTS: StartingFiveEntry[] = [
+  { role: "parent_guardian", label: "Parent / Guardian", name: "", email: "" },
+  { role: "educator", label: "Coach", name: "", email: "" },
+  { role: "educator", label: "Counselor / Educator", name: "", email: "" },
+  { role: "mentor", label: "Mentor", name: "", email: "" },
+  { role: "mentor", label: "Trusted Community Adult", name: "", email: "" },
+];
+
 const asText = (value: unknown) => typeof value === "string" || typeof value === "number" ? String(value) : "";
 
 export default function StartPage() {
@@ -147,6 +162,7 @@ function StartContent() {
         top_schools: onboarding.top_schools || Array(10).fill(""),
         activities: onboarding.activities || Array(8).fill(""),
         invite_supporters: onboarding.invite_supporters || Array(5).fill(""),
+        starting_five: onboarding.starting_five || STARTING_FIVE_DEFAULTS,
         ...onboarding,
       });
 
@@ -286,20 +302,49 @@ function StartContent() {
   }
 
   async function sendInvites() {
-    const emails = Array.isArray(form.invite_supporters)
-      ? form.invite_supporters.filter(Boolean)
+    const legacyInvites = Array.isArray(form.invite_supporters)
+      ? form.invite_supporters
+          .map((email) => ({
+            email: asText(email),
+            name: "Trusted supporter",
+            relationship: "mentor",
+          }))
+          .filter((invite) => invite.email)
       : [];
 
+    const startingFive = Array.isArray(form.starting_five)
+      ? form.starting_five
+          .filter((entry): entry is StartingFiveEntry => Boolean(entry && typeof entry === "object"))
+          .map((entry) => ({
+            email: asText(entry.email),
+            name: asText(entry.name) || entry.label,
+            relationship: entry.role,
+          }))
+          .filter((invite) => invite.email)
+      : [];
+
+    const invitations = step.id === "starting-five" ? startingFive : legacyInvites;
+
+    const session = await withTimeout(
+      supabase.auth.getSession().then(({ data }) => data.session),
+      1_800,
+    ).catch(() => null);
+
+    if (!session?.access_token) return;
+
     await Promise.all(
-      emails.map((email: string) =>
+      invitations.map((invite) =>
         fetch("/api/invitations/send", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
           body: JSON.stringify({
-            email,
-            role: "supporter",
-            scholarId: user?.id,
-            message: "I’m building my Playbook and would like you to support my journey.",
+            inviteeEmail: invite.email,
+            inviteeName: invite.name,
+            relationship: invite.relationship,
+            scholarName: asText(form.full_name) || "A Playbook learner",
           }),
         }).catch(() => null)
       )
@@ -328,7 +373,7 @@ function StartContent() {
 
     setSaveState("saved");
 
-    if (step.id === "network") {
+    if (step.id === "network" || step.id === "starting-five") {
       await sendInvites();
     }
 
@@ -572,6 +617,57 @@ function FieldRenderer({
     );
   }
 
+  if (field.type === "starting-five") {
+    const entries: StartingFiveEntry[] = STARTING_FIVE_DEFAULTS.map((slot, index) => {
+      const saved = Array.isArray(value) && value[index] && typeof value[index] === "object"
+        ? value[index] as Partial<StartingFiveEntry>
+        : {};
+      return { ...slot, ...saved, role: slot.role, label: slot.label };
+    });
+
+    return (
+      <div style={group}>
+        <div style={startingFiveIntro}>
+          <strong>STARTING FIVE</strong>
+          <span>{entries.filter((entry) => entry.email).length} of 5 supporters ready</span>
+        </div>
+        <div style={startingFiveGrid}>
+          {entries.map((entry, index) => (
+            <section key={`${entry.label}-${index}`} style={startingFiveCard}>
+              <div style={startingFiveNumber}>{index + 1}</div>
+              <div>
+                <div style={startingFiveLabel}>{entry.label}</div>
+                <div style={startingFiveHelp}>Invite a trusted adult using their personal email.</div>
+              </div>
+              <input
+                value={entry.name}
+                onChange={(event) => {
+                  const next = [...entries];
+                  next[index] = { ...entry, name: event.target.value };
+                  onChange(next);
+                }}
+                placeholder="Full name"
+                style={{ ...input, gridColumn: "1 / -1" }}
+              />
+              <input
+                type="email"
+                value={entry.email}
+                onChange={(event) => {
+                  const next = [...entries];
+                  next[index] = { ...entry, email: event.target.value };
+                  onChange(next);
+                }}
+                placeholder="Email address"
+                style={{ ...input, gridColumn: "1 / -1" }}
+              />
+            </section>
+          ))}
+        </div>
+        <p style={startingFivePrivacy}>Invitations are private and optional. You can update your Starting Five later.</p>
+      </div>
+    );
+  }
+
   if (field.type === "multi-select") {
     const arr = Array.isArray(value) ? value.map(String) : [];
 
@@ -802,6 +898,13 @@ const secondary: React.CSSProperties = { border: "1px solid #CBD5E1", borderRadi
 const group: React.CSSProperties = { display: "grid", gap: 10 };
 const sectionLabel: React.CSSProperties = { fontFamily: "'Space Mono', monospace", fontSize: 10, fontWeight: 900, letterSpacing: ".14em", color: "#64748B", textTransform: "uppercase" };
 const miniGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(230px,1fr))", gap: 10 };
+const startingFiveIntro: React.CSSProperties = { display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", color: "#F97316", fontFamily: "'Space Mono', monospace", fontSize: 11, fontWeight: 900, letterSpacing: ".12em" };
+const startingFiveGrid: React.CSSProperties = { display: "grid", gap: 12 };
+const startingFiveCard: React.CSSProperties = { display: "grid", gridTemplateColumns: "auto minmax(0,1fr)", alignItems: "center", gap: 14, border: "1px solid #E2E8F0", borderRadius: 20, padding: 16, background: "#FFFDF8" };
+const startingFiveNumber: React.CSSProperties = { width: 42, height: 42, display: "grid", placeItems: "center", borderRadius: 999, background: "#0F172A", color: "#FFFFFF", fontWeight: 950 };
+const startingFiveLabel: React.CSSProperties = { fontSize: 16, fontWeight: 950 };
+const startingFiveHelp: React.CSSProperties = { marginTop: 4, color: "#64748B", fontSize: 12, lineHeight: 1.4 };
+const startingFivePrivacy: React.CSSProperties = { margin: "4px 0 0", color: "#64748B", fontSize: 12, lineHeight: 1.5 };
 const chipGrid: React.CSSProperties = { display: "flex", flexWrap: "wrap", gap: 8 };
 const chip = (active: boolean): React.CSSProperties => ({ border: active ? "1px solid #F97316" : "1px solid #CBD5E1", background: active ? "#FFF7ED" : "#FFFFFF", color: active ? "#F97316" : "#0F172A", borderRadius: 999, padding: "10px 14px", fontWeight: 900, cursor: "pointer" });
 const avatarRow: React.CSSProperties = { display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" };

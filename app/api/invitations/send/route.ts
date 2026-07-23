@@ -23,10 +23,11 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
+    const accessToken = req.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
     const {
       data: { user },
       error: authError,
-    } = await supabase.auth.getUser();
+    } = await supabase.auth.getUser(accessToken);
 
     if (authError || !user) {
       return NextResponse.json(

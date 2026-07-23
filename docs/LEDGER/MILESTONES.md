@@ -1435,3 +1435,6 @@ Unify onboarding role and OS routing
 
 ## 2026-07-22 18:48
 - **precommit**: Build onboarding plans for every public role
+
+## 2026-07-22 18:56
+- **precommit**: Update onboarding sprint status

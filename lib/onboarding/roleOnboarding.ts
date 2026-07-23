@@ -13,6 +13,7 @@ export type OnboardingField = {
     | "career"
     | "activity-list"
     | "invite-list"
+    | "starting-five"
     | "safety-agreement";
   options?: string[];
 };
@@ -724,6 +725,20 @@ const NETWORK: OnboardingStep = {
   ],
 };
 
+const STARTING_FIVE: OnboardingStep = {
+  id: "starting-five",
+  phase: "Support Network · Starting Five",
+  title: "Build the team behind your dreams.",
+  body: "Add up to five trusted adults who can encourage you, celebrate milestones, and help you stay on course. Start with one person or return later.",
+  fields: [
+    {
+      key: "starting_five",
+      label: "Your Starting Five",
+      type: "starting-five",
+    },
+  ],
+};
+
 const USER_AGREEMENT: OnboardingStep = {
   id: "community-safety",
   phase: "Final Step · User Agreement",
@@ -741,7 +756,7 @@ export const ROLE_ONBOARDING = {
     SCHOLAR_ACADEMIC,
     SCHOLAR_GOALS,
     SCHOLAR_ACTIVITIES,
-    NETWORK,
+    STARTING_FIVE,
     USER_AGREEMENT,
   ],
 
@@ -752,7 +767,7 @@ export const ROLE_ONBOARDING = {
     ATHLETE_PROFILE,
     ATHLETE_RECRUITING,
     SCHOLAR_ACTIVITIES,
-    NETWORK,
+    STARTING_FIVE,
     USER_AGREEMENT,
   ],
 
@@ -825,7 +840,7 @@ export const ROLE_ONBOARDING = {
     SCHOLAR_GOALS,
     ATHLETE_PROFILE,
     SCHOLAR_ACTIVITIES,
-    NETWORK,
+    STARTING_FIVE,
     USER_AGREEMENT,
   ],
   employer: [
@@ -852,7 +867,7 @@ export const ROLE_ONBOARDING = {
     ATHLETE_RECRUITING,
     ATHLETE_ABROAD_ENROLLMENT,
     ATHLETE_ABROAD_READINESS,
-    NETWORK,
+    STARTING_FIVE,
     USER_AGREEMENT,
   ],
   other: [IDENTITY("Community Partner"), NETWORK, USER_AGREEMENT],

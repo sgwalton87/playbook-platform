@@ -10,7 +10,7 @@
 2. A role card opens `/start?first=1&role=<role>` directly.
 3. The user creates an account inside the onboarding shell or resumes an existing session.
 4. The selected role's steps render in the same premium, mobile-safe shell.
-5. Every pathway begins with Identity, offers a Support Network step, and ends with the User Agreement.
+5. Every pathway begins with Identity and ends with the User Agreement. Learner-owned pathways build a Starting Five; support and institutional roles receive the invitation-based Support Network step.
 6. Completion saves the canonical record and opens the role's OS destination.
 
 Returning users can sign in from the home page or role-selection header without restarting onboarding.
@@ -19,9 +19,9 @@ Returning users can sign in from the home page or role-selection header without 
 
 | # | Public role | Ordered onboarding steps | Role-specific information | Destination |
 | --- | --- | --- | --- | --- |
-| 01 | Scholar | Identity → Support Data → Academic Baseline → Future Vision → Activities → Support Network → User Agreement | optional support demographics, school/district, grade/GPA, college and career goals, activities | Scholar OS `/dashboard` |
-| 02 | Scholar-Athlete | Identity → Support Data → Academic Baseline → Athletic Profile → Recruiting Goals → Activities → Support Network → User Agreement | Scholar foundation plus sport, team, position, stats/honors, division, film, eligibility and NIL interests | Scholar-Athlete OS `/scholar-athlete-os` |
-| 03 | Transition-Aged Youth | Identity → Support Data → Academic Baseline → Future Vision → Athletic Profile → Activities → Support Network → User Agreement | education/work stage, support context, future plans, optional athletics and trusted network | TAY experience `/dashboard` |
+| 01 | Scholar | Identity → Support Data → Academic Baseline → Future Vision → Activities → Starting Five → User Agreement | optional support demographics, school/district, grade/GPA, college and career goals, activities, five trusted-adult slots | Scholar OS `/dashboard` |
+| 02 | Scholar-Athlete | Identity → Support Data → Academic Baseline → Athletic Profile → Recruiting Goals → Activities → Starting Five → User Agreement | Scholar foundation plus sport, team, position, stats/honors, division, film, eligibility, NIL interests and five trusted adults | Scholar-Athlete OS `/scholar-athlete-os` |
+| 03 | Transition-Aged Youth | Identity → Support Data → Academic Baseline → Future Vision → Athletic Profile → Activities → Starting Five → User Agreement | education/work stage, support context, future plans, optional athletics and five trusted adults | TAY experience `/dashboard` |
 | 04 | Parent / Guardian | Identity → Scholar Support → Support Network → User Agreement | relationship, scholar invite, household, communication method and support focus | Family OS `/family-os` |
 | 05 | Mentor | Identity → Guidance Profile → Support Network → User Agreement | organization, expertise, age groups, availability, format and recommendation preference | Mentor OS `/mentor-os` |
 | 06 | Teacher / Educator | Identity → Educator Verification → Support Network → User Agreement | school/district, subjects, official email, student connections and support focus | Educator OS `/educator-os` |
@@ -32,7 +32,7 @@ Returning users can sign in from the home page or role-selection header without 
 | 11 | Brand Partner | Identity → Partnership Profile → Compliance → Support Network → User Agreement | organization/category, goals, audience, budget, campaign types, NIL acknowledgement and approval contact | Brand Partner OS `/brand-partner-os` |
 | 12 | Employer / Workforce Partner | Identity → Organization Verification → Opportunity Design → Youth Safety & Contact → Support Network → User Agreement | organization, official contact, opportunity types, sectors, ages, geography, compensation and safeguards | Employer OS `/employer-os` |
 | 13 | District / School Administrator | Identity → Authority Verification → Implementation Scope → Data & Permissions → Support Network → User Agreement | institution/authority, rollout scope, schools, volume, goals, roster method, agreements and permission owners | District OS `/district-os` |
-| 14 | Athlete Abroad | Identity → Support Data → Academic Baseline → Athletic Profile → Recruiting Goals → International Goals → Travel & Eligibility Readiness → Support Network → User Agreement | canonical scholar-athlete record plus countries, abroad goal/timing, languages, passport, travel, guardian and readiness needs | Athlete Abroad OS `/athlete-abroad-os` |
+| 14 | Athlete Abroad | Identity → Support Data → Academic Baseline → Athletic Profile → Recruiting Goals → International Goals → Travel & Eligibility Readiness → Starting Five → User Agreement | canonical scholar-athlete record plus countries, abroad goal/timing, languages, passport, travel, guardian, readiness needs and five trusted adults | Athlete Abroad OS `/athlete-abroad-os` |
 
 ## Completion status and release gates
 
