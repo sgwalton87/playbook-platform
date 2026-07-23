@@ -6,10 +6,13 @@ import Image from "next/image";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import { supabase } from "@/lib/supabaseClient";
 import { getOnboardingSteps, ALL_COLLEGE_OPTIONS, CAREER_OPTIONS, ACTIVITY_OPTIONS, CALIFORNIA_DISTRICTS, getNextOnboardingStep, getOnboardingValidationError } from "@/lib/onboarding";
+import { getSupportRoleOption, getSupportRoleOptions } from "@/lib/onboarding";
 import { getPathway, normalizeRole } from "@/lib/onboarding/pathwayMap";
 import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
 import type { User } from "@supabase/supabase-js";
 import type { OnboardingField } from "@/lib/onboarding";
+import type { RelationshipKind } from "@/lib/permissions";
+import type { PlaybookRole } from "@/lib/roles/registry";
 import OnboardingAccountGate from "@/components/onboarding/OnboardingAccountGate";
 import { withTimeout } from "@/lib/async/withTimeout";
 import { fireConfetti } from "@/lib/confetti";
@@ -43,18 +46,20 @@ type ActivityEntry = {
 type OnboardingForm = Record<string, unknown>;
 
 type SupportNetworkEntry = {
-  role: "parent_guardian" | "educator" | "mentor";
+  role: RelationshipKind;
+  invitedRole: PlaybookRole | "";
   label: string;
+  customRole?: string;
   name: string;
   email: string;
 };
 
 const SUPPORT_NETWORK_DEFAULTS: SupportNetworkEntry[] = [
-  { role: "parent_guardian", label: "Parent / Guardian", name: "", email: "" },
-  { role: "educator", label: "Coach", name: "", email: "" },
-  { role: "educator", label: "Counselor / Educator", name: "", email: "" },
-  { role: "mentor", label: "Mentor", name: "", email: "" },
-  { role: "mentor", label: "Trusted Community Adult", name: "", email: "" },
+  { role: "parent_guardian", invitedRole: "family", label: "Parent / Guardian", name: "", email: "" },
+  { role: "mentor", invitedRole: "", label: "Choose a role", name: "", email: "" },
+  { role: "mentor", invitedRole: "", label: "Choose a role", name: "", email: "" },
+  { role: "mentor", invitedRole: "", label: "Choose a role", name: "", email: "" },
+  { role: "mentor", invitedRole: "", label: "Choose a role", name: "", email: "" },
 ];
 
 const asText = (value: unknown) => typeof value === "string" || typeof value === "number" ? String(value) : "";
@@ -319,20 +324,13 @@ function StartContent() {
     const invitations = Array.isArray(form.support_network)
       ? form.support_network
           .filter((entry): entry is SupportNetworkEntry => Boolean(entry && typeof entry === "object"))
+          .filter((entry) => Boolean(entry.email && entry.invitedRole))
           .map((entry) => ({
             email: asText(entry.email),
-            name: asText(entry.name) || entry.label,
+            name: asText(entry.name) || entry.customRole || entry.label,
             relationship: entry.role,
-            invitedRole:
-              entry.label === "Parent / Guardian"
-                ? "family"
-                : entry.label === "Coach"
-                  ? "coach"
-                  : entry.label === "Counselor / Educator"
-                    ? "counselor"
-                    : "mentor",
+            invitedRole: entry.invitedRole,
           }))
-          .filter((invite) => invite.email)
       : [];
 
     const session = await withTimeout(
@@ -558,6 +556,7 @@ function StartContent() {
             <FieldRenderer
               key={field.key}
               field={field}
+              ownerRole={role}
               value={form[field.key]}
               onChange={(value) => update(field.key, value)}
               onBlur={(value: string) => {
@@ -592,11 +591,13 @@ function StartContent() {
 
 function FieldRenderer({
   field,
+  ownerRole,
   value,
   onChange,
   onBlur,
 }: {
   field: OnboardingField;
+  ownerRole: PlaybookRole;
   value: unknown;
   onChange: (value: unknown) => void;
   onBlur?: (value: string) => void;
@@ -668,11 +669,12 @@ function FieldRenderer({
   }
 
   if (field.type === "support-network") {
+    const roleOptions = getSupportRoleOptions(ownerRole);
     const entries: SupportNetworkEntry[] = SUPPORT_NETWORK_DEFAULTS.map((slot, index) => {
       const saved = Array.isArray(value) && value[index] && typeof value[index] === "object"
         ? value[index] as Partial<SupportNetworkEntry>
         : {};
-      return { ...slot, ...saved, role: slot.role, label: slot.label };
+      return { ...slot, ...saved };
     });
 
     return (
@@ -686,9 +688,43 @@ function FieldRenderer({
             <section key={`${entry.label}-${index}`} style={startingFiveCard}>
               <div style={startingFiveNumber}>{index + 1}</div>
               <div>
-                <div style={startingFiveLabel}>{entry.label}</div>
+                <div style={startingFiveLabel}>{entry.label || "Choose a role"}</div>
                 <div style={startingFiveHelp}>Invite a trusted adult using their personal email.</div>
               </div>
+              <select
+                value={entry.invitedRole}
+                onChange={(event) => {
+                  const selected = getSupportRoleOption(event.target.value);
+                  const next = [...entries];
+                  next[index] = {
+                    ...entry,
+                    invitedRole: (selected?.role || "") as PlaybookRole | "",
+                    role: selected?.relationship || "mentor",
+                    label: selected?.label || "Choose a role",
+                    customRole: selected?.role === "other" ? entry.customRole || "" : "",
+                  };
+                  onChange(next);
+                }}
+                style={{ ...input, gridColumn: "1 / -1" }}
+                aria-label={`Role for Starting Five member ${index + 1}`}
+              >
+                <option value="">Select their role…</option>
+                {roleOptions.map((option) => (
+                  <option key={option.role} value={option.role}>{option.label}</option>
+                ))}
+              </select>
+              {entry.invitedRole === "other" && (
+                <input
+                  value={entry.customRole || ""}
+                  onChange={(event) => {
+                    const next = [...entries];
+                    next[index] = { ...entry, customRole: event.target.value };
+                    onChange(next);
+                  }}
+                  placeholder="Describe their role"
+                  style={{ ...input, gridColumn: "1 / -1" }}
+                />
+              )}
               <input
                 value={entry.name}
                 onChange={(event) => {

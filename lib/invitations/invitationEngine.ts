@@ -18,13 +18,13 @@ export interface SupportInvitation {
 }
 
 const SUPPORT_ROLES_BY_RELATIONSHIP: Record<RelationshipKind, readonly PlaybookRole[]> = {
-  scholar: ["scholar"],
+  scholar: ["scholar", "scholar-athlete", "transition-youth", "athlete-abroad"],
   parent_guardian: ["family"],
   educator: ["educator", "counselor", "coach"],
-  mentor: ["mentor"],
+  mentor: ["mentor", "other"],
   district_admin: ["district"],
   university_partner: ["college-coach", "college-admissions"],
-  employer_partner: ["employer"],
+  employer_partner: ["employer", "brand-partner"],
 };
 
 export function roleForSupportInvitation(
@@ -32,6 +32,7 @@ export function roleForSupportInvitation(
   requestedRole?: string | null,
 ): PlaybookRole {
   const allowed = SUPPORT_ROLES_BY_RELATIONSHIP[relationship];
+  if (!requestedRole) return allowed[0];
   const normalized = normalizePlaybookRole(requestedRole);
   return allowed.includes(normalized) ? normalized : allowed[0];
 }
