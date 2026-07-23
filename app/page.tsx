@@ -2,6 +2,7 @@
 
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
+import { ROLE_SELECTION_ROUTE } from "@/lib/roles/registry";
 import Image from "next/image";
 
 export default function HomePage() {
@@ -18,7 +19,7 @@ export default function HomePage() {
 
           <div style={buttons}>
             <a href="/login" style={primary}>Log In</a>
-            <a href="/login?mode=signup" style={secondary}>Sign Up</a>
+            <a href={ROLE_SELECTION_ROUTE} style={secondary}>Sign Up</a>
           </div>
         </div>
 

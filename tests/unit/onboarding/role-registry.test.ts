@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   PUBLIC_ONBOARDING_ROLES,
+  ROLE_SELECTION_ROUTE,
   getOnboardingDestination,
   getRoleDestination,
   getSignupDestination,
@@ -33,5 +34,9 @@ describe("canonical Playbook role registry", () => {
   it("carries a selected role into account creation", () => {
     expect(getSignupDestination("college-coach"))
       .toBe("/login?mode=signup&role=college-coach");
+  });
+
+  it("uses role selection as the public signup entry point", () => {
+    expect(ROLE_SELECTION_ROUTE).toBe("/role-select");
   });
 });

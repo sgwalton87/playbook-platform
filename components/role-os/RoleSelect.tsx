@@ -52,7 +52,7 @@ export default function RoleSelect() {
         <div style={accountLinks}>
           <span style={memberPrompt}>Already have an account?</span>
           <Link href="/login" style={signInLink}>Sign in</Link>
-          <Link href="/login?mode=signup" style={navSignup}>Create account</Link>
+          <a href="#pathways" style={navSignup}>Choose a role</a>
         </div>
       </nav>
 
@@ -65,10 +65,10 @@ export default function RoleSelect() {
             Choose the role that best describes you. We’ll build the right profile first, then open the operating system designed for your work.
           </p>
           <div style={heroActions}>
-            <Link href="/login?mode=signup" style={primaryAction}>Create your free account</Link>
+            <a href="#pathways" style={primaryAction}>Choose your onboarding role</a>
             <a href="#pathways" style={secondaryAction}>Explore the pathways ↓</a>
           </div>
-          <p style={reassurance}>Choose now or during signup. You can update your pathway as your role evolves.</p>
+          <p style={reassurance}>Select your role first. We’ll carry it into account creation and build the right onboarding pathway.</p>
         </div>
         <div style={imageWrap}>
           <Image

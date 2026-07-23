@@ -1408,3 +1408,6 @@ Unify onboarding role and OS routing
 
 ## 2026-07-22 17:29
 - **precommit**: Rebalance authentication layout
+
+## 2026-07-22 17:30
+- **precommit**: Replace soft homepage hero photo

@@ -64,5 +64,7 @@ export function getSignupDestination(role?: string | null) {
   return `/login?mode=signup&role=${encodeURIComponent(normalized)}`;
 }
 
+export const ROLE_SELECTION_ROUTE = "/role-select";
+
 export const PUBLIC_ONBOARDING_ROLES = (Object.keys(PLAYBOOK_ROLES) as PlaybookRole[])
   .filter((role) => PLAYBOOK_ROLES[role].onboarding && role !== "other");
