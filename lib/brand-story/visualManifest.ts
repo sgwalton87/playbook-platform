@@ -1,8 +1,7 @@
 export const PLAYBOOK_HERO_VISUALS = {
   home: {
-    image:
-      "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1600&q=90",
-    alt: "Graduates celebrating together",
+    image: "/brand/playbook-home-hero-v2.png",
+    alt: "A diverse group of students collaborating around a laptop and notebooks",
   },
   login: {
     image:
