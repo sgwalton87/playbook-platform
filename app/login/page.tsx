@@ -2,6 +2,7 @@
 
 import { Suspense, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import Image from "next/image";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import { supabase } from "@/lib/supabaseClient";
 import { getUserPathway, USER_PATHWAYS } from "@/lib/auth";
@@ -125,14 +126,16 @@ function LoginContent() {
     <main style={page}>
       <section style={card}>
         <div style={brand}>
-          <img
+          <Image
             src={isSignup ? PLAYBOOK_HERO_VISUALS.signup.image : PLAYBOOK_HERO_VISUALS.login.image}
             alt={isSignup ? PLAYBOOK_HERO_VISUALS.signup.alt : PLAYBOOK_HERO_VISUALS.login.alt}
+            fill
+            sizes="(max-width: 840px) 100vw, 50vw"
             style={brandImage}
           />
           <div style={brandOverlay} />
           <div style={brandContent}>
-            <PlaybookLogo size={138} priority />
+            <PlaybookLogo size={106} priority />
             <p style={eyebrow}>The Playbook</p>
             <h1 style={title}>{copy.title}</h1>
             <p style={body}>{copy.body}</p>
@@ -254,14 +257,14 @@ const page: React.CSSProperties = {
     "radial-gradient(circle at 10% 10%, rgba(249,115,22,.16), transparent 28%), #F8F7F4",
   display: "grid",
   placeItems: "center",
-  padding: 24,
+  padding: "clamp(14px,2vw,28px)",
   color: "#0F172A",
 };
 
 const card: React.CSSProperties = {
-  width: "min(1240px, 100%)",
+  width: "min(1180px, 100%)",
   display: "grid",
-  gridTemplateColumns: "minmax(300px,.85fr) minmax(380px,1.15fr)",
+  gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,420px),1fr))",
   background: "#FFFFFF",
   border: "1px solid #E2E8F0",
   borderRadius: 34,
@@ -271,7 +274,7 @@ const card: React.CSSProperties = {
 
 const brand: React.CSSProperties = {
   position: "relative",
-  minHeight: 640,
+  minHeight: 590,
   background: "#0F172A",
   color: "#F8F7F4",
   overflow: "hidden",
@@ -294,15 +297,15 @@ const brandOverlay: React.CSSProperties = {
 const brandContent: React.CSSProperties = {
   position: "relative",
   zIndex: 1,
-  minHeight: 640,
-  padding: "clamp(34px,5vw,68px)",
+  minHeight: 590,
+  padding: "clamp(30px,4vw,52px)",
   display: "flex",
   flexDirection: "column",
   justifyContent: "center",
 };
 
 const eyebrow: React.CSSProperties = {
-  marginTop: 24,
+  margin: "20px 0 0",
   fontFamily: "'Space Mono', monospace",
   fontSize: 11,
   fontWeight: 900,
@@ -313,25 +316,31 @@ const eyebrow: React.CSSProperties = {
 
 const title: React.CSSProperties = {
   fontFamily: "'Anton', sans-serif",
-  fontSize: "clamp(48px,7vw,82px)",
-  lineHeight: .9,
+  fontSize: "clamp(44px,5vw,66px)",
+  lineHeight: .92,
   textTransform: "uppercase",
-  margin: "12px 0 18px",
+  margin: "10px 0 16px",
+  maxWidth: 440,
 };
 
 const body: React.CSSProperties = {
   color: "rgba(248,247,244,.76)",
-  fontSize: 20,
-  lineHeight: 1.5,
-  maxWidth: 580,
+  fontSize: 17,
+  lineHeight: 1.48,
+  maxWidth: 440,
+  margin: 0,
 };
 
 const form: React.CSSProperties = {
-  padding: "clamp(28px,4vw,52px)",
+  width: "100%",
+  maxWidth: 620,
+  margin: "0 auto",
+  padding: "clamp(30px,4vw,50px)",
+  boxSizing: "border-box",
   display: "flex",
   flexDirection: "column",
   justifyContent: "center",
-  gap: 18,
+  gap: 14,
 };
 
 const formEyebrow: React.CSSProperties = {
@@ -345,8 +354,9 @@ const formEyebrow: React.CSSProperties = {
 };
 
 const formTitle: React.CSSProperties = {
-  fontSize: 38,
-  margin: "6px 0 0",
+  fontSize: 34,
+  lineHeight: 1.05,
+  margin: "5px 0 0",
 };
 
 const sectionLabel: React.CSSProperties = {
@@ -383,15 +393,15 @@ const roleCard: React.CSSProperties = {
 
 const label: React.CSSProperties = {
   display: "grid",
-  gap: 8,
+  gap: 7,
   fontWeight: 900,
 };
 
 const input: React.CSSProperties = {
   border: "1px solid #CBD5E1",
-  borderRadius: 16,
-  padding: "15px 18px",
-  fontSize: 18,
+  borderRadius: 14,
+  padding: "13px 16px",
+  fontSize: 16,
   outline: "none",
 };
 
@@ -409,8 +419,8 @@ const primaryButton: React.CSSProperties = {
   borderRadius: 999,
   background: "#F97316",
   color: "#FFFFFF",
-  padding: "17px 24px",
-  fontSize: 20,
+  padding: "14px 22px",
+  fontSize: 17,
   fontWeight: 950,
   cursor: "pointer",
 };
@@ -447,8 +457,8 @@ const googleButton: React.CSSProperties = {
   borderRadius: 999,
   background: "#FFFFFF",
   color: "#0F172A",
-  padding: "16px 22px",
-  fontSize: 18,
+  padding: "13px 20px",
+  fontSize: 16,
   fontWeight: 950,
   cursor: "pointer",
 };
