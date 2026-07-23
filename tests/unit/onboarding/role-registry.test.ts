@@ -3,6 +3,7 @@ import {
   PUBLIC_ONBOARDING_ROLES,
   getOnboardingDestination,
   getRoleDestination,
+  getSignupDestination,
   normalizePlaybookRole,
 } from "@/lib/roles/registry";
 
@@ -27,5 +28,10 @@ describe("canonical Playbook role registry", () => {
 
   it("routes coaches to the institutional support OS instead of Mentor OS", () => {
     expect(getRoleDestination("coach")).toBe("/educator-os");
+  });
+
+  it("carries a selected role into account creation", () => {
+    expect(getSignupDestination("college-coach"))
+      .toBe("/login?mode=signup&role=college-coach");
   });
 });

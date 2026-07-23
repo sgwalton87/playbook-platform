@@ -2,11 +2,12 @@
 
 import { supabase } from "@/lib/supabaseClient";
 import { roleOptions } from "@/lib/role-os/roleRoutes";
-import { getOnboardingDestination } from "@/lib/roles/registry";
+import { getOnboardingDestination, getSignupDestination } from "@/lib/roles/registry";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 
 export default function RoleSelect() {
@@ -22,20 +23,23 @@ export default function RoleSelect() {
     const { data } = await supabase.auth.getUser();
     const user = data?.user;
 
-    if (user) {
-      const { error: saveError } = await supabase.from("profiles").upsert({
-        id: user.id,
-        role,
-        profile_mode: role,
-        requested_role: role,
-        updated_at: new Date().toISOString(),
-      });
+    if (!user) {
+      router.push(getSignupDestination(role));
+      return;
+    }
 
-      if (saveError) {
-        setError("We could not save your pathway. Please try again.");
-        setSaving("");
-        return;
-      }
+    const { error: saveError } = await supabase.from("profiles").upsert({
+      id: user.id,
+      role,
+      profile_mode: role,
+      requested_role: role,
+      updated_at: new Date().toISOString(),
+    });
+
+    if (saveError) {
+      setError("We could not save your pathway. Please try again.");
+      setSaving("");
+      return;
     }
 
     router.push(getOnboardingDestination(role));
@@ -43,6 +47,15 @@ export default function RoleSelect() {
 
   return (
     <main style={page}>
+      <nav style={topBar} aria-label="Welcome navigation">
+        <Link href="/" style={homeLink}>← Playbook home</Link>
+        <div style={accountLinks}>
+          <span style={memberPrompt}>Already have an account?</span>
+          <Link href="/login" style={signInLink}>Sign in</Link>
+          <Link href="/login?mode=signup" style={navSignup}>Create account</Link>
+        </div>
+      </nav>
+
       <section style={hero}>
         <div style={heroCopy}>
           <PlaybookLogo size={118} priority />
@@ -51,6 +64,11 @@ export default function RoleSelect() {
           <p style={lead}>
             Choose the role that best describes you. We’ll build the right profile first, then open the operating system designed for your work.
           </p>
+          <div style={heroActions}>
+            <Link href="/login?mode=signup" style={primaryAction}>Create your free account</Link>
+            <a href="#pathways" style={secondaryAction}>Explore the pathways ↓</a>
+          </div>
+          <p style={reassurance}>Choose now or during signup. You can update your pathway as your role evolves.</p>
         </div>
         <div style={imageWrap}>
           <Image
@@ -63,7 +81,7 @@ export default function RoleSelect() {
         </div>
       </section>
 
-      <section style={intro}>
+      <section id="pathways" style={intro}>
         <div>
           <p style={eyebrow}>Start with your role</p>
           <h2 style={sectionTitle}>Your onboarding shapes what you see, what you can do, and who you can support.</h2>
@@ -94,11 +112,21 @@ export default function RoleSelect() {
 }
 
 const page: React.CSSProperties = { minHeight: "100vh", background: "#F8F7F4", padding: "clamp(18px,4vw,44px)", fontFamily: "'Hanken Grotesk', system-ui, sans-serif", color: "#0F172A" };
+const topBar: React.CSSProperties = { maxWidth: 1180, margin: "0 auto 18px", minHeight: 48, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 18, flexWrap: "wrap" };
+const homeLink: React.CSSProperties = { color: "#0F172A", textDecoration: "none", fontWeight: 900, fontSize: 14 };
+const accountLinks: React.CSSProperties = { display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 12, flexWrap: "wrap" };
+const memberPrompt: React.CSSProperties = { color: "#64748B", fontSize: 13, fontWeight: 700 };
+const signInLink: React.CSSProperties = { color: "#0F172A", fontWeight: 900, textDecoration: "none" };
+const navSignup: React.CSSProperties = { background: "#F97316", color: "#FFFFFF", borderRadius: 999, padding: "10px 16px", fontWeight: 950, textDecoration: "none", boxShadow: "0 8px 20px rgba(249,115,22,.22)" };
 const hero: React.CSSProperties = { maxWidth: 1180, margin: "0 auto 32px", minHeight: 410, display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,320px),1fr))", overflow: "hidden", borderRadius: 32, background: "#0F172A", boxShadow: "0 30px 80px rgba(15,23,42,.18)" };
 const heroCopy: React.CSSProperties = { padding: "clamp(30px,5vw,64px)", display: "flex", flexDirection: "column", justifyContent: "center" };
 const eyebrow: React.CSSProperties = { margin: "18px 0 8px", fontFamily: "'Space Mono', monospace", fontSize: 10, letterSpacing: ".18em", textTransform: "uppercase", fontWeight: 800, color: "#F97316" };
 const title: React.CSSProperties = { margin: 0, maxWidth: 680, color: "#F8F7F4", fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: "clamp(38px,5.5vw,72px)", lineHeight: .98, textTransform: "uppercase" };
 const lead: React.CSSProperties = { maxWidth: 650, color: "rgba(248,247,244,.7)", fontSize: 16, lineHeight: 1.7, margin: "20px 0 0" };
+const heroActions: React.CSSProperties = { display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", marginTop: 26 };
+const primaryAction: React.CSSProperties = { display: "inline-flex", alignItems: "center", justifyContent: "center", background: "#F97316", color: "#FFFFFF", borderRadius: 999, padding: "15px 22px", fontWeight: 950, textDecoration: "none", boxShadow: "0 12px 28px rgba(249,115,22,.28)" };
+const secondaryAction: React.CSSProperties = { display: "inline-flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(248,247,244,.28)", color: "#F8F7F4", borderRadius: 999, padding: "14px 20px", fontWeight: 900, textDecoration: "none" };
+const reassurance: React.CSSProperties = { color: "rgba(248,247,244,.52)", fontSize: 12, lineHeight: 1.5, margin: "14px 0 0" };
 const imageWrap: React.CSSProperties = { minHeight: 360, position: "relative", background: "#1E293B" };
 const image: React.CSSProperties = { width: "100%", height: "100%", objectFit: "cover", display: "block" };
 const intro: React.CSSProperties = { maxWidth: 1180, margin: "0 auto 18px", display: "flex", alignItems: "end", justifyContent: "space-between", gap: 24 };

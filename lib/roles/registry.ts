@@ -59,5 +59,10 @@ export function getOnboardingDestination(role?: string | null) {
   return `/start?first=1&role=${encodeURIComponent(normalized)}`;
 }
 
+export function getSignupDestination(role?: string | null) {
+  const normalized = normalizePlaybookRole(role);
+  return `/login?mode=signup&role=${encodeURIComponent(normalized)}`;
+}
+
 export const PUBLIC_ONBOARDING_ROLES = (Object.keys(PLAYBOOK_ROLES) as PlaybookRole[])
   .filter((role) => PLAYBOOK_ROLES[role].onboarding && role !== "other");

@@ -4,7 +4,7 @@ import { Suspense, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import { supabase } from "@/lib/supabaseClient";
-import { USER_PATHWAYS } from "@/lib/auth";
+import { getUserPathway, USER_PATHWAYS } from "@/lib/auth";
 import { normalizeRole } from "@/lib/onboarding/pathwayMap";
 import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
@@ -25,7 +25,7 @@ function LoginContent() {
   const [email, setEmail] = useState(typeof window !== "undefined" ? localStorage.getItem("playbook_saved_email") || "" : "");
   const [rememberEmail, setRememberEmail] = useState(typeof window !== "undefined" ? Boolean(localStorage.getItem("playbook_saved_email")) : false);
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("scholar");
+  const [role, setRole] = useState(() => getUserPathway(params.get("role")).role);
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
