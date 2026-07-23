@@ -1,5 +1,30 @@
 # PLAYBOOK OS — MASTER BUILD CHECKLIST
 
+# 🏀 PLAYBOOK OS v1.0
+## Codename: RUN IT
+
+North Star
+
+Every Scholar should feel more confident after leaving Playbook than when they arrived.
+
+Every feature must:
+
+✔ Improve the Scholar Record
+
+✔ Increase Opportunity
+
+✔ Strengthen the Starting Five
+
+✔ Build Momentum
+
+✔ Feel like Playbook OS
+
+If it doesn't…
+
+We redesign.
+
+Run It.
+
 **Overall completion:** 41%
 **Last updated:** 2026-07-22T20:25:00.000Z
 
@@ -22,6 +47,73 @@ A task may be marked complete only after its interface, persistence, permissions
 All 14 public role pathways are locally built on `agent/onboarding-premium-shell`, use canonical role resolution, and pass local contract tests, TypeScript, and production compilation. Four learner OS dashboards and ten non-learner role dashboards now share enforced platform foundations while retaining role-specific modules. Starting Five invitations carry precise invited roles, require matching onboarding before activation, and connect to persisted network messaging.
 
 This is **local build evidence, not production completion**. The highest-value remaining gate is OR-008: apply and verify migrations in a review environment, audit RLS and permission-denied behavior, and run role-by-role browser E2E across desktop and mobile. No item requiring those gates is marked Complete.
+
+# 🏀 PLAYBOOK OS v1.0 — RUN IT
+
+**Design Status:** 🟨 In Progress
+
+This section governs the visual identity, component architecture, and user experience of the Playbook platform. Every feature in the phases below must inherit Playbook OS standards.
+
+## Sprint 1.1 — Brand Foundation
+Status: 🟨 In Progress
+
+### Deliverables
+- [ ] Design Tokens
+- [ ] Color System
+- [ ] Typography
+- [ ] Spacing Scale
+- [ ] Radius Scale
+- [ ] Shadow Scale
+- [ ] Motion Tokens
+- [ ] Breakpoints
+- [ ] Theme Provider
+- [ ] Component Primitives
+
+### Definition of Done
+- [ ] All new UI imports from `lib/design-system`
+- [ ] No hard-coded colors
+- [ ] No hard-coded spacing
+- [ ] No duplicated styling
+- [ ] TypeScript passes
+
+---
+
+## Sprint 1.2 — Playbook Shell
+
+- [ ] AppShell
+- [ ] Responsive Navigation
+- [ ] Coach's Corner
+- [ ] Hero Banner
+- [ ] Progress Header
+- [ ] Footer
+- [ ] Mobile Navigation
+
+---
+
+## Sprint 1.3 — Component Library
+
+- [ ] Buttons
+- [ ] Cards
+- [ ] Inputs
+- [ ] Badges
+- [ ] Avatars
+- [ ] Empty States
+- [ ] Loading States
+- [ ] Dialogs
+- [ ] Toasts
+
+---
+
+## Sprint 1.4 — Motion & Accessibility
+
+- [ ] Motion System
+- [ ] Page Transitions
+- [ ] Keyboard Navigation
+- [ ] Screen Reader Support
+- [ ] Responsive QA
+- [ ] WCAG AA Review
+
+---
 
 # Phase 1 — Identity & Authentication
 
