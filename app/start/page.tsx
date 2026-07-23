@@ -102,25 +102,29 @@ function StartContent() {
 
   useEffect(() => {
     async function load() {
-      const { data: u } = await supabase.auth.getUser();
+      const sessionData = await Promise.race([
+        supabase.auth.getSession().then(({ data }) => data),
+        new Promise<{ session: null }>((resolve) => setTimeout(() => resolve({ session: null }), 1800)),
+      ]);
+      const currentUser = sessionData.session?.user;
 
-      if (!u.user) {
+      if (!currentUser) {
         setAuthResolved(true);
         return;
       }
 
-      setUser(u.user);
+      setUser(currentUser);
       setAuthResolved(true);
 
       const { data: p } = await supabase
         .from("profiles")
         .select("*")
-        .eq("id", u.user.id)
+        .eq("id", currentUser.id)
         .maybeSingle();
 
       const safeProfile = p || {
-        id: u.user.id,
-        email: u.user.email,
+        id: currentUser.id,
+        email: currentUser.email,
         role,
         profile_mode: role,
       };

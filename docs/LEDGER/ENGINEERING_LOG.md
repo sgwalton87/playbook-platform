@@ -1423,3 +1423,6 @@ Unify onboarding role and OS routing
 
 ## 2026-07-22 17:57
 - **precommit**: Retire legacy signup role picker
+
+## 2026-07-22 17:59
+- **precommit**: Make onboarding role cards direct links
