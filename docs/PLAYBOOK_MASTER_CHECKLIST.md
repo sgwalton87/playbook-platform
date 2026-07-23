@@ -104,6 +104,12 @@ Notes: Profile surfaces and fields are present, but all items remain Partial bec
 **Status:** 🟦 testing
 **Completion:** 68%
 
+- 🟨 Complete Playbook Operating Systems Master Checklist
+  - Detailed checklist: [`docs/MASTER_CHECKLIST_PLAYBOOK_OS.md`](MASTER_CHECKLIST_PLAYBOOK_OS.md)
+  - 🟨 remains In Progress while any OS feature or component is incomplete.
+  - 🟦 may be marked Testing only after every listed OS and component is implemented and has required unit and integration coverage.
+  - 🟩 may be marked Complete only after every OS passes role-specific desktop and mobile browser E2E, permissions/RLS validation, persistence validation, production build validation, and the platform Definition of Done.
+
 - 🟦 Scholar OS
 - 🟦 Scholar-Athlete OS
 - 🟦 Transition-Aged Youth OS

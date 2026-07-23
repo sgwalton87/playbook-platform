@@ -1480,3 +1480,6 @@ Unify onboarding role and OS routing
 
 ## 2026-07-22 22:24
 - **precommit**: Complete OR-008 governance framework and onboarding enhancements
+
+## 2026-07-22 22:31
+- **precommit**: Add Playbook OS master checklist roadmap
