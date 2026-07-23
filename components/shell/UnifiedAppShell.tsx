@@ -51,12 +51,18 @@ export default function UnifiedAppShell({ children }: { children: React.ReactNod
   const router = useRouter();
   const [profile, setProfile] = useState<ShellProfile | null>(null);
   const [open, setOpen] = useState(true);
+  const [authResolved, setAuthResolved] = useState(false);
+  const [hasAuthenticatedUser, setHasAuthenticatedUser] = useState(false);
 
   useEffect(() => {
     async function loadProfile() {
       const { data: u } = await supabase.auth.getUser();
 
-      if (!u.user) return;
+      if (!u.user) {
+        setAuthResolved(true);
+        return;
+      }
+      setHasAuthenticatedUser(true);
 
       const { data } = await supabase
         .from("profiles")
@@ -65,6 +71,7 @@ export default function UnifiedAppShell({ children }: { children: React.ReactNod
         .maybeSingle();
 
       setProfile(data);
+      setAuthResolved(true);
     }
 
     loadProfile();
@@ -96,6 +103,8 @@ export default function UnifiedAppShell({ children }: { children: React.ReactNod
   if (AUTH_FULLSCREEN_ROUTES.some((route) => pathname === route || pathname.startsWith(route + "/"))) {
     return <>{children}</>;
   }
+
+  if (authResolved && !hasAuthenticatedUser) return <>{children}</>;
 
   async function handleSignOut() {
     await supabase.auth.signOut();

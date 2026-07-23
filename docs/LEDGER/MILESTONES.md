@@ -1468,3 +1468,6 @@ Unify onboarding role and OS routing
 
 ## 2026-07-22 20:24
 - **precommit**: Make Starting Five roles selectable and role-aware
+
+## 2026-07-22 22:13
+- **precommit**: Audit master checklist and prioritize OR-008
