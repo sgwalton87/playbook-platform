@@ -1405,3 +1405,6 @@ Unify onboarding role and OS routing
 
 ## 2026-07-22 17:26
 - **precommit**: Compact role selection hero
+
+## 2026-07-22 17:29
+- **precommit**: Rebalance authentication layout

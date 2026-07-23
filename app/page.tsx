@@ -47,4 +47,4 @@ const buttons: React.CSSProperties = { display: "flex", gap: 12, flexWrap: "wrap
 const primary: React.CSSProperties = { background: "#F97316", color: "#fff", padding: "14px 28px", borderRadius: 999, textDecoration: "none", fontWeight: 950, fontSize: 18, boxShadow: "0 12px 26px rgba(249,115,22,.22)" };
 const secondary: React.CSSProperties = { background: "#0F172A", color: "#fff", padding: "14px 28px", borderRadius: 999, textDecoration: "none", fontWeight: 950, fontSize: 18 };
 const imageWrap: React.CSSProperties = { minHeight: "clamp(340px,52vh,640px)", position: "relative", background: "#0F172A" };
-const image: React.CSSProperties = { width: "100%", height: "100%", objectFit: "cover", display: "block" };
+const image: React.CSSProperties = { width: "100%", height: "100%", objectFit: "cover", objectPosition: "38% center", display: "block" };

@@ -1,7 +1,7 @@
 export const PLAYBOOK_HERO_VISUALS = {
   home: {
-    image: "/brand/playbook-home-hero-v2.png",
-    alt: "A diverse group of students collaborating around a laptop and notebooks",
+    image: "/brand/playbook-home-hero-v3.jpg",
+    alt: "A Black college student working on a laptop with a diverse study group",
   },
   login: {
     image:
