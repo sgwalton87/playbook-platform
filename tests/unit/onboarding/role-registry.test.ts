@@ -7,6 +7,7 @@ import {
   getSignupDestination,
   normalizePlaybookRole,
 } from "@/lib/roles/registry";
+import { getOnboardingSteps } from "@/lib/onboarding/roleOnboarding";
 
 describe("canonical Playbook role registry", () => {
   it.each([
@@ -16,6 +17,8 @@ describe("canonical Playbook role registry", () => {
     ["recruiter", "college-coach"],
     ["admissions-officer", "college-admissions"],
     ["tay", "transition-youth"],
+    ["high-school-counselor", "counselor"],
+    ["athletes-abroad", "athlete-abroad"],
   ])("normalizes %s to %s", (input, expected) => {
     expect(normalizePlaybookRole(input)).toBe(expected);
   });
@@ -25,6 +28,28 @@ describe("canonical Playbook role registry", () => {
       expect(getOnboardingDestination(role)).toBe(`/start?first=1&role=${role}`);
       expect(getRoleDestination(role)).toMatch(/^\//);
     }
+  });
+
+  it("gives every public role a complete, bounded onboarding sequence", () => {
+    expect(PUBLIC_ONBOARDING_ROLES).toHaveLength(14);
+
+    for (const role of PUBLIC_ONBOARDING_ROLES) {
+      const steps = getOnboardingSteps(role);
+      const stepIds = steps.map((step) => step.id);
+
+      expect(steps[0].id, `${role} must begin with identity`).toBe("identity");
+      expect(steps.at(-1)?.id, `${role} must end with the agreement`).toBe("community-safety");
+      expect(new Set(stepIds).size, `${role} step IDs must be unique`).toBe(stepIds.length);
+    }
+  });
+
+  it.each([
+    ["counselor", "counselor-verification"],
+    ["employer", "employer-verification"],
+    ["district", "district-verification"],
+    ["athlete-abroad", "athlete-abroad-enrollment"],
+  ])("uses role-specific onboarding for %s", (role, requiredStep) => {
+    expect(getOnboardingSteps(role).map((step) => step.id)).toContain(requiredStep);
   });
 
   it("routes coaches to the institutional support OS instead of Mentor OS", () => {

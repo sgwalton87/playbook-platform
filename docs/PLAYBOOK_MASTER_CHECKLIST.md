@@ -44,27 +44,29 @@ Notes: Auth interfaces and Supabase flows are present, including login/signup, O
 # Phase 2 — Onboarding
 
 **Status:** 🟨 in progress
-**Completion:** 19%
+**Completion:** 48%
 
 - 🟨 Scholar Onboarding
 - 🟨 Scholar-Athlete Onboarding
-- ⬜ Parent Guardian Onboarding
-- ⬜ Teacher Educator Onboarding
-- ⬜ High School Counselor Onboarding
+- 🟨 Parent Guardian Onboarding
+- 🟨 Teacher Educator Onboarding
+- 🟨 High School Counselor Onboarding
 - 🟨 Mentor Onboarding
-- ⬜ High School Coach Onboarding
-- ⬜ College Coach Recruiter Onboarding
-- ⬜ College Admissions Onboarding
-- ⬜ Brand Partner Onboarding
+- 🟨 High School Coach Onboarding
+- 🟨 College Coach Recruiter Onboarding
+- 🟨 College Admissions Onboarding
+- 🟨 Brand Partner Onboarding
+- 🟨 Employer Workforce Partner Onboarding
+- 🟨 District School Administrator Onboarding
 - 🟨 Transition-Aged Youth Onboarding
-- ⬜ Athlete Abroad Enrollment
-- ⬜ Dynamic User Agreement
+- 🟨 Athlete Abroad Enrollment
+- 🟨 Dynamic User Agreement
 - 🟨 Onboarding Autosave
 - 🟨 Profile Creation Animation
 - 🟨 Public Profile Generation
 - 🟦 Onboarding OS Redirects
 
-Notes: Canonical role resolution and OS redirects were reconciled in OR-001 and are in Testing. OR-002's premium shared shell is locally validated but remains unmerged, so its autosave and recovery improvements are not yet promoted to Complete. OR-003 through OR-008 are queued to close every role pathway, permission boundary, and release gate.
+Notes: All 14 public role schemas, their canonical routes, and OS destinations are now built and contract-tested locally. They remain Partial until persistence/resume, relationship permissions and RLS, institutional verification, agreement audit records, and role-by-role mobile/desktop E2E validation pass. The exact implementation map is `docs/ROLE_ONBOARDING_STEP_CATALOG.md`. Nothing is promoted to Complete or merged before desktop review.
 
 # Phase 3 — Public Profile
 

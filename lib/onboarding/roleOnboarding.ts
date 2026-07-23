@@ -574,6 +574,146 @@ const ADMISSIONS_ENGAGEMENT: OnboardingStep = {
   ],
 };
 
+const COUNSELOR_VERIFICATION: OnboardingStep = {
+  id: "counselor-verification",
+  phase: "Counselor Phase 1 · Institution Verification",
+  title: "Verify your counselor profile.",
+  body: "Connect your official school identity before accessing student planning and support workflows.",
+  fields: [
+    { key: "school", label: "High school / institution", placeholder: "School name" },
+    { key: "school_district", label: "District", type: "district", placeholder: "Start typing your district..." },
+    { key: "official_school_email", label: "Official school email", placeholder: "counselor@school.edu" },
+    { key: "counselor_title", label: "Title / role", type: "select", options: ["School Counselor", "College Counselor", "College & Career Advisor", "Academic Counselor", "Student Support Counselor", "Department Lead", "Other"] },
+  ],
+};
+
+const COUNSELOR_CASELOAD: OnboardingStep = {
+  id: "counselor-caseload",
+  phase: "Counselor Phase 2 · Caseload & Programs",
+  title: "Define the students and programs you support.",
+  body: "Caseload context shapes permissions, readiness views, interventions, and outreach.",
+  fields: [
+    { key: "grade_levels_served", label: "Grade levels served", type: "multi-select", options: ["8", "9", "10", "11", "12", "Transition-age youth", "Graduates / alumni"] },
+    { key: "approximate_caseload", label: "Approximate caseload", type: "select", options: ["1–50", "51–150", "151–300", "301–500", "500+"] },
+    { key: "programs_supported", label: "Programs supported", type: "multi-select", options: ["A-G planning", "College applications", "FAFSA / CADAA", "Scholarships", "Dual enrollment", "Career technical education", "Transfer pathways", "Foster youth", "McKinney-Vento", "Special education", "Athletic eligibility"] },
+  ],
+};
+
+const COUNSELOR_SUPPORT: OnboardingStep = {
+  id: "counselor-support",
+  phase: "Counselor Phase 3 · Workflow Preferences",
+  title: "Choose your counselor workflows.",
+  body: "Tell Playbook which student milestones and requests should reach you first.",
+  fields: [
+    { key: "counselor_workflows", label: "Priority workflows", type: "multi-select", options: ["Transcript review", "Graduation readiness", "College list review", "Application deadlines", "Financial aid completion", "Recommendation coordination", "Crisis / support referral", "Family outreach", "Athletic eligibility"] },
+    { key: "student_connection_method", label: "How should students connect?", type: "select", options: ["Invitation / roster only", "School email match", "Student request with approval", "Administrator-assigned caseload"] },
+  ],
+};
+
+const EMPLOYER_VERIFICATION: OnboardingStep = {
+  id: "employer-verification",
+  phase: "Employer Phase 1 · Organization Verification",
+  title: "Verify your workforce organization.",
+  body: "Verified organizations can publish responsible, age-appropriate career opportunities.",
+  fields: [
+    { key: "organization_name", label: "Organization name", placeholder: "Company, agency, nonprofit..." },
+    { key: "organization_website", label: "Organization website", placeholder: "https://..." },
+    { key: "employer_title", label: "Your title", placeholder: "Hiring manager, program director..." },
+    { key: "official_work_email", label: "Official work email", placeholder: "name@organization.org" },
+    { key: "organization_size", label: "Organization size", type: "select", options: ["1–10", "11–50", "51–250", "251–1,000", "1,000+"] },
+  ],
+};
+
+const EMPLOYER_OPPORTUNITIES: OnboardingStep = {
+  id: "employer-opportunities",
+  phase: "Employer Phase 2 · Opportunity Design",
+  title: "Define the opportunities you plan to offer.",
+  body: "Opportunity details power responsible matching, eligibility, and student preparation.",
+  fields: [
+    { key: "opportunity_types", label: "Opportunity types", type: "multi-select", options: ["Career exploration", "Job shadow", "Internship", "Paid internship", "Apprenticeship", "Part-time job", "Full-time entry role", "Mentorship", "Workshop", "Site visit"] },
+    { key: "career_sectors", label: "Career sectors", type: "multi-select", options: ["Technology", "Healthcare", "Business", "Education", "Public service", "Skilled trades", "Sports", "Media / creative", "Hospitality", "Green economy", "Other"] },
+    { key: "participant_age_groups", label: "Eligible age groups", type: "multi-select", options: ["14–15", "16–17", "18+", "College students", "Transition-age youth"] },
+    { key: "opportunity_geography", label: "Opportunity geography", type: "select", options: ["Remote", "Local / in person", "Regional", "Statewide", "National"] },
+    { key: "compensation_commitment", label: "Compensation approach", type: "select", options: ["All opportunities paid", "Mix of paid and unpaid learning", "Stipends", "Academic credit", "Still determining"] },
+  ],
+};
+
+const EMPLOYER_SAFEGUARDS: OnboardingStep = {
+  id: "employer-safeguards",
+  phase: "Employer Phase 3 · Youth Safety & Contact",
+  title: "Set opportunity safeguards.",
+  body: "Clear supervision and contact boundaries protect young people and partner organizations.",
+  fields: [
+    { key: "background_check_readiness", label: "Youth-serving staff readiness", type: "select", options: ["Required checks complete", "Checks in progress", "Only serving adults 18+", "Need guidance"] },
+    { key: "student_contact_boundary", label: "Student contact preference", type: "select", options: ["Platform messages only", "Through school staff", "Through parent / guardian", "Official work email after approval"] },
+    { key: "opportunity_approval_contact", label: "Opportunity approval contact", placeholder: "Name and official email" },
+  ],
+};
+
+const DISTRICT_VERIFICATION: OnboardingStep = {
+  id: "district-verification",
+  phase: "District Phase 1 · Authority Verification",
+  title: "Verify your institution and authority.",
+  body: "Administrative access is provisioned only after organization and authority verification.",
+  fields: [
+    { key: "organization_name", label: "District / school organization", placeholder: "Organization name" },
+    { key: "school_district", label: "District", type: "district", placeholder: "Start typing district..." },
+    { key: "administrator_title", label: "Administrative role", type: "select", options: ["District Administrator", "Superintendent", "Principal", "Assistant Principal", "Program Director", "IT / Data Administrator", "College & Career Lead", "Athletic Director", "Other"] },
+    { key: "official_school_email", label: "Official organization email", placeholder: "name@district.org" },
+  ],
+};
+
+const DISTRICT_IMPLEMENTATION: OnboardingStep = {
+  id: "district-implementation",
+  phase: "District Phase 2 · Implementation Scope",
+  title: "Plan your Playbook implementation.",
+  body: "Define the schools, users, programs, and outcomes included in your rollout.",
+  fields: [
+    { key: "implementation_scope", label: "Implementation scope", type: "select", options: ["Single school", "Multiple schools", "Districtwide", "Program / cohort", "Pilot"] },
+    { key: "schools_in_scope", label: "Schools / programs in scope", type: "textarea", placeholder: "List schools or programs" },
+    { key: "estimated_student_count", label: "Estimated students", type: "select", options: ["1–100", "101–500", "501–2,000", "2,001–10,000", "10,000+"] },
+    { key: "implementation_goals", label: "Implementation goals", type: "multi-select", options: ["Graduation readiness", "College access", "Financial aid", "Career pathways", "Athletic eligibility", "Mentorship", "Family engagement", "Opportunity access", "Transition-age youth support"] },
+  ],
+};
+
+const DISTRICT_GOVERNANCE: OnboardingStep = {
+  id: "district-governance",
+  phase: "District Phase 3 · Data & Permissions",
+  title: "Set governance and permission boundaries.",
+  body: "Playbook access follows least-privilege rules, student consent, and institutional agreements.",
+  fields: [
+    { key: "roster_method", label: "Preferred roster method", type: "select", options: ["Secure CSV", "SIS integration", "Invitation codes", "Manual pilot roster", "Not decided"] },
+    { key: "data_agreement_status", label: "Data agreement status", type: "select", options: ["Ready for review", "Legal / privacy review required", "Existing agreement", "Pilot without roster integration"] },
+    { key: "permission_owners", label: "Permission / data owners", type: "textarea", placeholder: "Names, titles, and official emails" },
+  ],
+};
+
+const ATHLETE_ABROAD_ENROLLMENT: OnboardingStep = {
+  id: "athlete-abroad-enrollment",
+  phase: "Abroad Phase 1 · International Goals",
+  title: "Map your athlete-abroad pathway.",
+  body: "Connect education, sport, travel, eligibility, and support into one international plan.",
+  fields: [
+    { key: "target_countries", label: "Countries / regions of interest", type: "multi-select", options: ["United Kingdom", "Spain", "France", "Germany", "Italy", "Portugal", "Australia", "Canada", "Latin America", "Asia", "Africa", "Open to options"] },
+    { key: "abroad_pathway_goal", label: "Primary goal", type: "select", options: ["University + sport", "Academy / club", "Gap-year development", "Professional pathway", "Exchange program", "Training / competition", "Still exploring"] },
+    { key: "desired_start_window", label: "Desired start window", placeholder: "Season and year" },
+    { key: "languages_spoken", label: "Languages spoken", placeholder: "Languages and proficiency" },
+  ],
+};
+
+const ATHLETE_ABROAD_READINESS: OnboardingStep = {
+  id: "athlete-abroad-readiness",
+  phase: "Abroad Phase 2 · Travel & Eligibility Readiness",
+  title: "Check international readiness.",
+  body: "Private readiness details help the support team surface the right next steps and risks.",
+  fields: [
+    { key: "passport_status", label: "Passport status", type: "select", options: ["Valid passport", "Application in progress", "Need to apply", "Need help"] },
+    { key: "travel_experience", label: "International travel experience", type: "select", options: ["Frequent", "Some", "None yet"] },
+    { key: "guardian_travel_support", label: "Family / guardian support", type: "select", options: ["Confirmed", "Discussing", "Need a trusted-adult plan", "Not applicable (18+)"] },
+    { key: "international_readiness_needs", label: "Support needed", type: "multi-select", options: ["Academic eligibility", "Credential evaluation", "Visa guidance", "Housing", "Travel budget", "Insurance / healthcare", "Club / school vetting", "Language preparation", "Safety planning"] },
+  ],
+};
+
 const NETWORK: OnboardingStep = {
   id: "network",
   phase: "Support Network",
@@ -594,7 +734,7 @@ const USER_AGREEMENT: OnboardingStep = {
   ],
 };
 
-export const ROLE_ONBOARDING: Record<string, OnboardingStep[]> = {
+export const ROLE_ONBOARDING = {
   scholar: [
     IDENTITY("Scholar"),
     SCHOLAR_SUPPORT,
@@ -644,6 +784,14 @@ export const ROLE_ONBOARDING: Record<string, OnboardingStep[]> = {
     NETWORK,
     USER_AGREEMENT,
   ],
+  counselor: [
+    IDENTITY("High School Counselor"),
+    COUNSELOR_VERIFICATION,
+    COUNSELOR_CASELOAD,
+    COUNSELOR_SUPPORT,
+    NETWORK,
+    USER_AGREEMENT,
+  ],
   coach: [
     IDENTITY("High School Coach"),
     HIGH_SCHOOL_COACH_CONTEXT,
@@ -680,9 +828,40 @@ export const ROLE_ONBOARDING: Record<string, OnboardingStep[]> = {
     NETWORK,
     USER_AGREEMENT,
   ],
+  employer: [
+    IDENTITY("Employer / Workforce Partner"),
+    EMPLOYER_VERIFICATION,
+    EMPLOYER_OPPORTUNITIES,
+    EMPLOYER_SAFEGUARDS,
+    NETWORK,
+    USER_AGREEMENT,
+  ],
+  district: [
+    IDENTITY("District / School Administrator"),
+    DISTRICT_VERIFICATION,
+    DISTRICT_IMPLEMENTATION,
+    DISTRICT_GOVERNANCE,
+    NETWORK,
+    USER_AGREEMENT,
+  ],
+  "athlete-abroad": [
+    IDENTITY("Athlete Abroad"),
+    SCHOLAR_SUPPORT,
+    SCHOLAR_ACADEMIC,
+    ATHLETE_PROFILE,
+    ATHLETE_RECRUITING,
+    ATHLETE_ABROAD_ENROLLMENT,
+    ATHLETE_ABROAD_READINESS,
+    NETWORK,
+    USER_AGREEMENT,
+  ],
   other: [IDENTITY("Community Partner"), NETWORK, USER_AGREEMENT],
-};
+} satisfies Record<PlaybookRole, OnboardingStep[]>;
 
 export function getOnboardingSteps(role?: string | null) {
-  return ROLE_ONBOARDING[role || "scholar"] || ROLE_ONBOARDING.scholar;
+  return ROLE_ONBOARDING[normalizePlaybookRole(role)];
 }
+import {
+  normalizePlaybookRole,
+  type PlaybookRole,
+} from "@/lib/roles/registry";

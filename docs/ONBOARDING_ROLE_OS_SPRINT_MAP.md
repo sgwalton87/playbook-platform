@@ -4,6 +4,8 @@
 
 **Role blueprint:** `docs/ROLE_ONBOARDING_BLUEPRINT.md`
 
+**Exact step catalog:** `docs/ROLE_ONBOARDING_STEP_CATALOG.md`
+
 **Current state:** OR-001 merged; OR-002 locally complete and awaiting publish/merge; OR-003 is next after OR-002 merges.
 
 **Source of truth:** `docs/PLAYBOOK_MASTER_CHECKLIST.md`, `TECH_DEBT.md`, current architecture documents, and verified application routes on `main`.
@@ -46,7 +48,7 @@
 
 **Status:** Queued; blocked until OR-002 is merged.
 
-**Roles:** Scholar, Scholar-Athlete, Transition-Aged Youth.
+**Roles:** Scholar, Scholar-Athlete, Transition-Aged Youth, Athlete Abroad.
 
 **Acceptance gates:** complete identity, demographics/support data, academics, goals, activities, athletics/recruiting where applicable, support network, agreement capture, Playbook Record projection, and correct OS landing.
 

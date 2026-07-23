@@ -1,4 +1,7 @@
-import { normalizePlaybookRole } from "@/lib/roles/registry";
+import {
+  normalizePlaybookRole,
+  type PlaybookRole,
+} from "@/lib/roles/registry";
 
 export type NavItem = {
   label: string;
@@ -36,7 +39,7 @@ const SHARED_OPPORTUNITIES: NavItem = {
   icon: "🚀",
 };
 
-export const ROLE_NAVIGATION: Record<string, RoleNavigation> = {
+export const ROLE_NAVIGATION = {
   scholar: {
     home: "/dashboard",
     label: "Scholar OS",
@@ -150,13 +153,26 @@ export const ROLE_NAVIGATION: Record<string, RoleNavigation> = {
     ],
   },
 
+  counselor: {
+    home: "/educator-os",
+    label: "Counselor OS",
+    items: [
+      { label: "Counselor Dashboard", href: "/educator-os", icon: "🧭" },
+      { label: "Academic Readiness", href: "/academic-readiness", icon: "📚" },
+      SHARED_OPPORTUNITIES,
+      SHARED_COURSES,
+      SHARED_MESSAGES,
+      SHARED_PROFILE,
+    ],
+  },
+
   coach: {
-    home: "/mentor-os",
+    home: "/educator-os",
     label: "Coach OS",
     items: [
       {
         label: "Coach Dashboard",
-        href: "/mentor-os",
+        href: "/educator-os",
         icon: "📋",
       },
       {
@@ -230,18 +246,43 @@ export const ROLE_NAVIGATION: Record<string, RoleNavigation> = {
     ],
   },
 
-  other: {
-    home: "/dashboard",
-    label: "Playbook",
+  district: {
+    home: "/district-os",
+    label: "District OS",
     items: [
-      { label: "Dashboard", href: "/dashboard", icon: "🏠" },
+      { label: "District Dashboard", href: "/district-os", icon: "🏫" },
+      { label: "Academic Readiness", href: "/academic-readiness", icon: "📚" },
+      SHARED_OPPORTUNITIES,
+      SHARED_MESSAGES,
+      SHARED_PROFILE,
+    ],
+  },
+
+  "athlete-abroad": {
+    home: "/athlete-abroad-os",
+    label: "Athlete Abroad OS",
+    items: [
+      { label: "Athlete Abroad", href: "/athlete-abroad-os", icon: "🌍" },
+      { label: "Academic Readiness", href: "/academic-readiness", icon: "📚" },
       SHARED_OPPORTUNITIES,
       SHARED_COURSES,
       SHARED_MESSAGES,
       SHARED_PROFILE,
     ],
   },
-};
+
+  other: {
+    home: "/pending",
+    label: "Playbook",
+    items: [
+      { label: "Access Status", href: "/pending", icon: "🏠" },
+      SHARED_OPPORTUNITIES,
+      SHARED_COURSES,
+      SHARED_MESSAGES,
+      SHARED_PROFILE,
+    ],
+  },
+} satisfies Record<PlaybookRole, RoleNavigation>;
 
 export function normalizeNavigationRole(
   profileMode?: string | null,
