@@ -4,6 +4,8 @@
 
 **Record model:** Every pathway updates one canonical Playbook Record. A role changes the questions, verification, relationships, permissions, OS projection, and navigation—not who owns the record.
 
+**Network model:** Starting Five is the learner-facing presentation of the canonical Support Network. Both learner and supporter onboarding save one `support_network` collection and use the same invitations, relationships, and permission system. Legacy `starting_five` and `invite_supporters` values are migrated into that collection when a profile loads.
+
 ## Shared journey
 
 1. Home page **Sign up** opens `/role-select`.
@@ -11,7 +13,8 @@
 3. The user creates an account inside the onboarding shell or resumes an existing session.
 4. The selected role's steps render in the same premium, mobile-safe shell.
 5. Every pathway begins with Identity and ends with the User Agreement. Learner-owned pathways build a Starting Five; support and institutional roles receive the invitation-based Support Network step.
-6. Completion saves the canonical record and opens the role's OS destination.
+6. Successful completion saves the canonical record, fires the profile celebration, and opens the mandatory role-aware tutorial.
+7. Finishing the tutorial opens the role's OS destination.
 
 Returning users can sign in from the home page or role-selection header without restarting onboarding.
 

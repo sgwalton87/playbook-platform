@@ -13,7 +13,7 @@ export type OnboardingField = {
     | "career"
     | "activity-list"
     | "invite-list"
-    | "starting-five"
+    | "support-network"
     | "safety-agreement";
   options?: string[];
 };
@@ -721,7 +721,7 @@ const NETWORK: OnboardingStep = {
   title: "Invite your support team.",
   body: "Invite family, mentors, coaches, counselors, partners, or trusted adults.",
   fields: [
-    { key: "invite_supporters", label: "Supporter emails", type: "invite-list", placeholder: "supporter@example.com" },
+    { key: "support_network", label: "Your Support Network", type: "support-network" },
   ],
 };
 
@@ -732,9 +732,9 @@ const STARTING_FIVE: OnboardingStep = {
   body: "Add up to five trusted adults who can encourage you, celebrate milestones, and help you stay on course. Start with one person or return later.",
   fields: [
     {
-      key: "starting_five",
+      key: "support_network",
       label: "Your Starting Five",
-      type: "starting-five",
+      type: "support-network",
     },
   ],
 };

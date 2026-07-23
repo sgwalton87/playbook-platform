@@ -12,6 +12,7 @@ import type { User } from "@supabase/supabase-js";
 import type { OnboardingField } from "@/lib/onboarding";
 import OnboardingAccountGate from "@/components/onboarding/OnboardingAccountGate";
 import { withTimeout } from "@/lib/async/withTimeout";
+import { fireConfetti } from "@/lib/confetti";
 
 type OnboardingProfile = {
   id: string;
@@ -40,14 +41,14 @@ type ActivityEntry = {
 
 type OnboardingForm = Record<string, unknown>;
 
-type StartingFiveEntry = {
+type SupportNetworkEntry = {
   role: "parent_guardian" | "educator" | "mentor";
   label: string;
   name: string;
   email: string;
 };
 
-const STARTING_FIVE_DEFAULTS: StartingFiveEntry[] = [
+const SUPPORT_NETWORK_DEFAULTS: SupportNetworkEntry[] = [
   { role: "parent_guardian", label: "Parent / Guardian", name: "", email: "" },
   { role: "educator", label: "Coach", name: "", email: "" },
   { role: "educator", label: "Counselor / Educator", name: "", email: "" },
@@ -161,8 +162,15 @@ function StartContent() {
         ideal_profession: safeProfile.ideal_profession || "",
         top_schools: onboarding.top_schools || Array(10).fill(""),
         activities: onboarding.activities || Array(8).fill(""),
-        invite_supporters: onboarding.invite_supporters || Array(5).fill(""),
-        starting_five: onboarding.starting_five || STARTING_FIVE_DEFAULTS,
+        support_network:
+          onboarding.support_network ||
+          onboarding.starting_five ||
+          (Array.isArray(onboarding.invite_supporters)
+            ? SUPPORT_NETWORK_DEFAULTS.map((slot, index) => ({
+                ...slot,
+                email: asText(onboarding.invite_supporters?.[index]),
+              }))
+            : SUPPORT_NETWORK_DEFAULTS),
         ...onboarding,
       });
 
@@ -249,9 +257,13 @@ function StartContent() {
       ? nextForm.activities.filter(Boolean)
       : [];
 
-    const inviteSupporters = Array.isArray(nextForm.invite_supporters)
-      ? nextForm.invite_supporters.map(asText).filter(Boolean)
-      : [];
+    const supportNetwork = Array.isArray(nextForm.support_network)
+      ? nextForm.support_network
+      : SUPPORT_NETWORK_DEFAULTS;
+
+    const canonicalOnboarding = { ...nextForm };
+    delete canonicalOnboarding.starting_five;
+    delete canonicalOnboarding.invite_supporters;
 
     await Promise.all([
       ...topSchools.map((school: string) => saveCustomOption("college", school)),
@@ -276,10 +288,10 @@ function StartContent() {
       dream_school: nextForm.dream_school || null,
       ideal_profession: nextForm.ideal_profession || null,
       onboarding_data: {
-        ...nextForm,
+        ...canonicalOnboarding,
         top_schools: topSchools,
         activities,
-        invite_supporters: inviteSupporters,
+        support_network: supportNetwork,
         onboarding_step_index: nextForm.onboarding_step_index ?? stepIndex,
       },
       onboarding_completed: complete,
@@ -302,19 +314,9 @@ function StartContent() {
   }
 
   async function sendInvites() {
-    const legacyInvites = Array.isArray(form.invite_supporters)
-      ? form.invite_supporters
-          .map((email) => ({
-            email: asText(email),
-            name: "Trusted supporter",
-            relationship: "mentor",
-          }))
-          .filter((invite) => invite.email)
-      : [];
-
-    const startingFive = Array.isArray(form.starting_five)
-      ? form.starting_five
-          .filter((entry): entry is StartingFiveEntry => Boolean(entry && typeof entry === "object"))
+    const invitations = Array.isArray(form.support_network)
+      ? form.support_network
+          .filter((entry): entry is SupportNetworkEntry => Boolean(entry && typeof entry === "object"))
           .map((entry) => ({
             email: asText(entry.email),
             name: asText(entry.name) || entry.label,
@@ -322,8 +324,6 @@ function StartContent() {
           }))
           .filter((invite) => invite.email)
       : [];
-
-    const invitations = step.id === "starting-five" ? startingFive : legacyInvites;
 
     const session = await withTimeout(
       supabase.auth.getSession().then(({ data }) => data.session),
@@ -389,9 +389,11 @@ function StartContent() {
       }
 
       setCreated(true);
+      fireConfetti();
       setTimeout(() => {
-        window.location.href = getPathway(role).osRoute;
-      }, 1800);
+        const destination = getPathway(role).osRoute;
+        window.location.href = `/tutorial?role=${encodeURIComponent(role)}&destination=${encodeURIComponent(destination)}`;
+      }, 2600);
       return;
     }
 
@@ -617,10 +619,10 @@ function FieldRenderer({
     );
   }
 
-  if (field.type === "starting-five") {
-    const entries: StartingFiveEntry[] = STARTING_FIVE_DEFAULTS.map((slot, index) => {
+  if (field.type === "support-network") {
+    const entries: SupportNetworkEntry[] = SUPPORT_NETWORK_DEFAULTS.map((slot, index) => {
       const saved = Array.isArray(value) && value[index] && typeof value[index] === "object"
-        ? value[index] as Partial<StartingFiveEntry>
+        ? value[index] as Partial<SupportNetworkEntry>
         : {};
       return { ...slot, ...saved, role: slot.role, label: slot.label };
     });
@@ -628,7 +630,7 @@ function FieldRenderer({
     return (
       <div style={group}>
         <div style={startingFiveIntro}>
-          <strong>STARTING FIVE</strong>
+          <strong>{field.label.toUpperCase()}</strong>
           <span>{entries.filter((entry) => entry.email).length} of 5 supporters ready</span>
         </div>
         <div style={startingFiveGrid}>

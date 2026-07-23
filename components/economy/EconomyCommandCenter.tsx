@@ -15,8 +15,8 @@ import {
 } from "@/components/ui";
 
 export default function EconomyCommandCenter() {
-  const tour = getRoleTour("scholar_athlete");
-  const tourProgress = getTourProgress({ role: "scholar_athlete", completedStepIds: ["dashboard", "messages"] });
+  const tour = getRoleTour("scholar-athlete");
+  const tourProgress = getTourProgress({ role: "scholar-athlete", completedStepIds: ["home", "messages"] });
 
   const policy = buildRewardPolicyDecision({
     scholarId: "scholar-maya",

@@ -78,6 +78,19 @@ describe("canonical Playbook role registry", () => {
     expect(getOnboardingSteps(role).map((step) => step.id)).toContain("network");
   });
 
+  it("uses one canonical support-network field for every role", () => {
+    for (const role of PUBLIC_ONBOARDING_ROLES) {
+      const networkSteps = getOnboardingSteps(role).filter((step) =>
+        ["network", "starting-five"].includes(step.id),
+      );
+
+      expect(networkSteps).toHaveLength(1);
+      expect(networkSteps[0].fields).toEqual([
+        expect.objectContaining({ key: "support_network", type: "support-network" }),
+      ]);
+    }
+  });
+
   it("routes coaches to the institutional support OS instead of Mentor OS", () => {
     expect(getRoleDestination("coach")).toBe("/educator-os");
   });
