@@ -96,10 +96,11 @@ Notes: Profile surfaces and fields are present, but all items remain Partial bec
 # Phase 4 — Operating Systems
 
 **Status:** 🟥 needs fix
-**Completion:** 42%
+**Completion:** 50%
 
 - 🟦 Scholar OS
 - 🟦 Scholar-Athlete OS
+- 🟦 Transition-Aged Youth OS
 - 🟨 Parent Guardian OS
 - 🟨 Teacher Educator OS
 - 🟨 High School Counselor OS
@@ -110,11 +111,11 @@ Notes: Profile surfaces and fields are present, but all items remain Partial bec
 - 🟦 Brand Partner OS
 - 🟦 Employer OS
 - 🟨 Founder OS
-- 🟦 Athletes Abroad Hub
+- 🟦 Athlete Abroad OS + Global Hub
 - 🟦 Role-Aware Sidebar Navigation
 - 🟥 Role Permissions
 
-Notes: Role OS pages, a role selection surface, and role-aware navigation exist for many audiences. Needs Fix: Role Permissions must be reconciled with the role registry and Role OS audit before any OS item can move to Complete under the Definition of Done.
+Notes: The four learner operating systems now use a shared canonical projection layer with distinct role-specific readiness, modules, actions, destinations, and recovery states. Evidence is recorded in `docs/LEARNER_OS_BUILD_MAP.md`. Needs Fix: live persistence, Role Permissions/RLS, and phone/desktop E2E must be reconciled before any OS item moves to Complete under the Definition of Done.
 
 # Phase 5 — Network
 

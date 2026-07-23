@@ -218,10 +218,10 @@ export const ROLE_NAVIGATION = {
   },
 
   "transition-youth": {
-    home: "/dashboard",
+    home: "/tay-os",
     label: "TAY OS",
     items: [
-      { label: "Dashboard", href: "/dashboard", icon: "🏠" },
+      { label: "TAY Dashboard", href: "/tay-os", icon: "🏠" },
       { label: "Start Here", href: "/start", icon: "▶️" },
       { label: "Compass", href: "/compass", icon: "🧭" },
       SHARED_OPPORTUNITIES,

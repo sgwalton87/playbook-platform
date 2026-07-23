@@ -6,6 +6,13 @@ describe("Role OS routing", () => {
     expect(getRoleDestination("family")).toBe("/family-os");
   });
 
+  it("gives every learner pathway its intended OS destination", () => {
+    expect(getRoleDestination("scholar")).toBe("/dashboard");
+    expect(getRoleDestination("scholar-athlete")).toBe("/scholar-athlete-os");
+    expect(getRoleDestination("transition-youth")).toBe("/tay-os");
+    expect(getRoleDestination("athlete-abroad")).toBe("/athlete-abroad-os");
+  });
+
   it("exposes every completed public onboarding pathway", () => {
     expect(roleOptions.length).toBe(14);
     expect(roleOptions.map((option) => option.role)).toContain("scholar-athlete");

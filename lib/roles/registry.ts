@@ -1,7 +1,7 @@
 export const PLAYBOOK_ROLES = {
   scholar: { label: "Scholar", osLabel: "Scholar OS", osRoute: "/dashboard", onboarding: true },
   "scholar-athlete": { label: "Scholar-Athlete", osLabel: "Scholar-Athlete OS", osRoute: "/scholar-athlete-os", onboarding: true },
-  "transition-youth": { label: "Transition-Aged Youth", osLabel: "TAY OS", osRoute: "/dashboard", onboarding: true },
+  "transition-youth": { label: "Transition-Aged Youth", osLabel: "TAY OS", osRoute: "/tay-os", onboarding: true },
   family: { label: "Parent / Guardian", osLabel: "Family OS", osRoute: "/family-os", onboarding: true },
   mentor: { label: "Mentor", osLabel: "Mentor OS", osRoute: "/mentor-os", onboarding: true },
   educator: { label: "Teacher / Educator", osLabel: "Educator OS", osRoute: "/educator-os", onboarding: true },

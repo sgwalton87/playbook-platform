@@ -1441,3 +1441,6 @@ Unify onboarding role and OS routing
 
 ## 2026-07-22 19:06
 - **precommit**: Integrate Starting Five into learner onboarding
+
+## 2026-07-22 19:20
+- **precommit**: Unify support network and require role tutorials

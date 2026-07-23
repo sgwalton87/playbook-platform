@@ -17,7 +17,7 @@ export type GuidedTourStep = {
 const ROLE_FEATURES: Record<PlaybookRole, GuidedTourStep> = {
   scholar: { id: "record", title: "Build your Scholar Record", body: "Keep academics, activities, goals, evidence, and opportunities connected in one record.", href: "/record" },
   "scholar-athlete": { id: "athlete", title: "Run your Scholar-Athlete OS", body: "Track academic eligibility, recruiting, film, NIL readiness, and life beyond sport.", href: "/scholar-athlete-os" },
-  "transition-youth": { id: "tay", title: "Build your supported next chapter", body: "Connect education, work, goals, opportunities, and your trusted support network.", href: "/dashboard" },
+  "transition-youth": { id: "tay", title: "Build your supported next chapter", body: "Connect education, work, goals, opportunities, and your trusted support network.", href: "/tay-os" },
   family: { id: "family", title: "Support without taking over", body: "See shared deadlines, approved progress, and the actions your scholar wants help with.", href: "/family-os" },
   mentor: { id: "mentor", title: "Coach the next step", body: "Use goals, messages, and permissioned progress to provide focused guidance.", href: "/mentor-os" },
   educator: { id: "educator", title: "Support academic readiness", body: "Review student signals, verify evidence, and coordinate timely interventions.", href: "/educator-os" },

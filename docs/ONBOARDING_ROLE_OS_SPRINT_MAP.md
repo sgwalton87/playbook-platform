@@ -6,6 +6,8 @@
 
 **Exact step catalog:** `docs/ROLE_ONBOARDING_STEP_CATALOG.md`
 
+**Learner OS build map:** `docs/LEARNER_OS_BUILD_MAP.md`
+
 **Current state:** OR-001 merged. OR-002 through OR-007 are built and contract-tested on the local review branch. OR-008 release validation is in progress. Nothing is approved for `main` until desktop review.
 
 **Source of truth:** `docs/PLAYBOOK_MASTER_CHECKLIST.md`, `TECH_DEBT.md`, current architecture documents, and verified application routes on `main`.
@@ -51,6 +53,8 @@
 **Roles:** Scholar, Scholar-Athlete, Transition-Aged Youth, Athlete Abroad.
 
 **Acceptance gates:** complete identity, demographics/support data, academics, goals, activities, athletics/recruiting where applicable, support network, agreement capture, Playbook Record projection, and correct OS landing.
+
+**Local build evidence:** all four learner pathways now project the canonical record into distinct Scholar, Scholar-Athlete, TAY, and Athlete Abroad operating systems. Live persistence, RLS, and browser E2E remain release gates.
 
 ## Sprint OR-004 — Family and trusted-support pathways
 

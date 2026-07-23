@@ -15,6 +15,8 @@ const routes = [
   "app/recommenders/page.tsx",
   "app/portfolio/[shareId]/page.tsx",
   "app/scholar-athlete-os/page.tsx",
+  "app/tay-os/page.tsx",
+  "app/athlete-abroad-os/page.tsx",
   "app/gamification/page.tsx",
   "app/reward-economy/page.tsx",
   "app/economy/page.tsx",

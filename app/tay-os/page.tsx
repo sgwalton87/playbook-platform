@@ -2,6 +2,6 @@
 
 import LearnerOSDashboard from "@/components/learner-os/LearnerOSDashboard";
 
-export default function DashboardPage() {
-  return <LearnerOSDashboard role="scholar" />;
+export default function TAYOSPage() {
+  return <LearnerOSDashboard role="transition-youth" />;
 }

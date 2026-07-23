@@ -1,7 +1,7 @@
 "use client";
 
-import ScholarAthleteDashboard from "@/components/scholar-athlete/ScholarAthleteDashboard";
+import LearnerOSDashboard from "@/components/learner-os/LearnerOSDashboard";
 
 export default function ScholarAthleteOSPage() {
-  return <ScholarAthleteDashboard />;
+  return <LearnerOSDashboard role="scholar-athlete" />;
 }
