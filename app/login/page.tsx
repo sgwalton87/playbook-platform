@@ -1,7 +1,7 @@
 "use client";
 
-import { Suspense, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import { supabase } from "@/lib/supabaseClient";
@@ -9,6 +9,7 @@ import { getUserPathway, USER_PATHWAYS } from "@/lib/auth";
 import { normalizeRole } from "@/lib/onboarding/pathwayMap";
 import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
+import { ROLE_SELECTION_ROUTE } from "@/lib/roles/registry";
 
 export default function LoginPage() {
   return (
@@ -20,7 +21,9 @@ export default function LoginPage() {
 
 function LoginContent() {
   const params = useSearchParams();
+  const router = useRouter();
   const initialMode = params.get("mode") === "signup" ? "signup" : "login";
+  const redirectLegacySignup = initialMode === "signup" && !params.get("invite");
 
   const [mode, setMode] = useState<"login" | "signup">(initialMode);
   const [email, setEmail] = useState(typeof window !== "undefined" ? localStorage.getItem("playbook_saved_email") || "" : "");
@@ -32,6 +35,10 @@ function LoginContent() {
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   const isSignup = mode === "signup";
+
+  useEffect(() => {
+    if (redirectLegacySignup) router.replace(ROLE_SELECTION_ROUTE);
+  }, [redirectLegacySignup, router]);
 
   const copy = useMemo(
     () =>
@@ -48,6 +55,10 @@ function LoginContent() {
           },
     [isSignup]
   );
+
+  if (redirectLegacySignup) {
+    return <main style={{ minHeight: "100vh", display: "grid", placeItems: "center", background: "#F8F7F4", fontWeight: 900 }}>Opening role selection…</main>;
+  }
 
   async function signInWithGoogle() {
     const { error } = await supabase.auth.signInWithOAuth({
@@ -239,7 +250,10 @@ function LoginContent() {
             </span>
             <button
               type="button"
-              onClick={() => setMode(isSignup ? "login" : "signup")}
+              onClick={() => {
+                if (isSignup) setMode("login");
+                else window.location.href = ROLE_SELECTION_ROUTE;
+              }}
               style={switchButton}
             >
               {isSignup ? "Log in" : "Create account"}

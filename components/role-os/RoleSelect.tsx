@@ -24,7 +24,7 @@ export default function RoleSelect() {
     const user = data?.user;
 
     if (!user) {
-      router.push(getOnboardingDestination(role));
+      window.location.assign(getOnboardingDestination(role));
       return;
     }
 
