@@ -1,5 +1,6 @@
 import { getPermissionsForRelationship, type RelationshipKind } from "@/lib/permissions";
 import { getRoleDestination } from "@/lib/role-os/roleRoutes";
+import { normalizePlaybookRole, type PlaybookRole } from "@/lib/roles/registry";
 
 export type InvitationStatus = "pending" | "accepted" | "declined";
 
@@ -10,9 +11,49 @@ export interface SupportInvitation {
   inviteeName: string;
   inviteeEmail: string;
   relationship: RelationshipKind;
+  invitedRole?: PlaybookRole;
   status: InvitationStatus;
   permissions: string[];
   destination: string;
+}
+
+const SUPPORT_ROLES_BY_RELATIONSHIP: Record<RelationshipKind, readonly PlaybookRole[]> = {
+  scholar: ["scholar"],
+  parent_guardian: ["family"],
+  educator: ["educator", "counselor", "coach"],
+  mentor: ["mentor"],
+  district_admin: ["district"],
+  university_partner: ["college-coach", "college-admissions"],
+  employer_partner: ["employer"],
+};
+
+export function roleForSupportInvitation(
+  relationship: RelationshipKind,
+  requestedRole?: string | null,
+): PlaybookRole {
+  const allowed = SUPPORT_ROLES_BY_RELATIONSHIP[relationship];
+  const normalized = normalizePlaybookRole(requestedRole);
+  return allowed.includes(normalized) ? normalized : allowed[0];
+}
+
+export function onboardingDestinationForInvitation(input: {
+  token: string;
+  relationship: RelationshipKind;
+  invitedRole?: string | null;
+}) {
+  const role = roleForSupportInvitation(input.relationship, input.invitedRole);
+  return `/start?role=${encodeURIComponent(role)}&first=1&invite=${encodeURIComponent(input.token)}`;
+}
+
+export function requiresInvitationRoleOnboarding(input: {
+  onboardingCompleted?: boolean | null;
+  profileRole?: string | null;
+  invitedRole: PlaybookRole;
+}) {
+  return (
+    !input.onboardingCompleted ||
+    normalizePlaybookRole(input.profileRole) !== input.invitedRole
+  );
 }
 
 export function createSupportInvitation(input: {
@@ -21,7 +62,9 @@ export function createSupportInvitation(input: {
   inviteeName: string;
   inviteeEmail: string;
   relationship: RelationshipKind;
+  invitedRole?: string | null;
 }): SupportInvitation {
+  const invitedRole = roleForSupportInvitation(input.relationship, input.invitedRole);
   return {
     id: `invite-${input.relationship}-${input.inviteeEmail.toLowerCase().replace(/[^a-z0-9]/g, "-")}`,
     scholarId: input.scholarId || "scholar-maya",
@@ -29,9 +72,10 @@ export function createSupportInvitation(input: {
     inviteeName: input.inviteeName,
     inviteeEmail: input.inviteeEmail,
     relationship: input.relationship,
+    invitedRole,
     status: "pending",
     permissions: getPermissionsForRelationship(input.relationship),
-    destination: destinationForRelationship(input.relationship),
+    destination: getRoleDestination(invitedRole),
   };
 }
 

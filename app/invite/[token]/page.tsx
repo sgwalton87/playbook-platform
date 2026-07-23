@@ -59,13 +59,19 @@ export default function InviteAcceptPage() {
         return;
       }
 
-      window.localStorage.removeItem(INVITE_TOKEN_STORAGE_KEY);
-
       if (status === "declined") {
+        window.localStorage.removeItem(INVITE_TOKEN_STORAGE_KEY);
         setMessage("Invitation declined.");
         return;
       }
 
+      if (json.requiresOnboarding) {
+        window.localStorage.setItem(INVITE_TOKEN_STORAGE_KEY, token);
+        router.push(json.onboardingDestination);
+        return;
+      }
+
+      window.localStorage.removeItem(INVITE_TOKEN_STORAGE_KEY);
       router.push(json.destination || "/role-select");
     } catch {
       setMessage("Unable to process the invitation.");
@@ -82,9 +88,9 @@ export default function InviteAcceptPage() {
         <h1 style={title}>{message}</h1>
 
         <p style={body}>
-          Accepting this invitation connects you to the scholar&apos;s support
-          network with relationship-aware permissions and routes you into the
-          correct Playbook OS.
+          After you accept, Playbook guides you through onboarding for your
+          invited role. Your connection becomes active only after onboarding is
+          complete.
         </p>
 
         <div style={actions}>

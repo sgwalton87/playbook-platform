@@ -4,7 +4,13 @@ import {
   buildInvitationAcceptanceEffects,
 } from "@/lib/invitations/server";
 import type { InvitationStatus } from "@/lib/invitations";
+import {
+  onboardingDestinationForInvitation,
+  requiresInvitationRoleOnboarding,
+  roleForSupportInvitation,
+} from "@/lib/invitations";
 import { invitationEmailMatchesUser } from "@/lib/support-relationships";
+import { normalizePlaybookRole } from "@/lib/roles/registry";
 import { createClient } from "@supabase/supabase-js";
 
 function getSupabaseAdmin() {
@@ -60,6 +66,37 @@ export async function POST(req: NextRequest) {
       const { error } = await supabase.from("support_invitations").update(update).eq("id", invitation.id).eq("status", "pending");
       if (error) return NextResponse.json({ error: error.message }, { status: 400 });
       return NextResponse.json({ ok: true, destination: invitation.destination, invitation: { ...invitation, ...update } });
+    }
+
+    const invitedRole = roleForSupportInvitation(
+      invitation.relationship,
+      invitation.invited_role,
+    );
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role,profile_mode,onboarding_completed")
+      .eq("id", user.id)
+      .maybeSingle();
+    const profileRole = normalizePlaybookRole(
+      profile?.profile_mode || profile?.role,
+    );
+
+    if (requiresInvitationRoleOnboarding({
+      onboardingCompleted: profile?.onboarding_completed,
+      profileRole,
+      invitedRole,
+    })) {
+      return NextResponse.json({
+        ok: true,
+        requiresOnboarding: true,
+        invitedRole,
+        onboardingDestination: onboardingDestinationForInvitation({
+          token,
+          relationship: invitation.relationship,
+          invitedRole,
+        }),
+        destination: invitation.destination,
+      });
     }
 
     const effects = buildInvitationAcceptanceEffects({ invitation, supporterId: user.id });

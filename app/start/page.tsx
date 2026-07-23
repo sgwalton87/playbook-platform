@@ -13,6 +13,7 @@ import type { OnboardingField } from "@/lib/onboarding";
 import OnboardingAccountGate from "@/components/onboarding/OnboardingAccountGate";
 import { withTimeout } from "@/lib/async/withTimeout";
 import { fireConfetti } from "@/lib/confetti";
+import { INVITE_TOKEN_STORAGE_KEY } from "@/lib/invite-auth";
 
 type OnboardingProfile = {
   id: string;
@@ -68,6 +69,7 @@ export default function StartPage() {
 
 function StartContent() {
   const params = useSearchParams();
+  const invitationToken = params.get("invite");
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<OnboardingProfile | null>(null);
   const [stepIndex, setStepIndex] = useState(0);
@@ -149,7 +151,7 @@ function StartContent() {
 
       const onboarding = safeProfile.onboarding_data || {};
       setProfile(safeProfile);
-      setStepIndex(Number(onboarding.onboarding_step_index || 0));
+      setStepIndex(invitationToken ? 0 : Number(onboarding.onboarding_step_index || 0));
 
       setForm({
         full_name: safeProfile.full_name || "",
@@ -187,7 +189,7 @@ function StartContent() {
     }
 
     load();
-  }, [role]);
+  }, [invitationToken, role]);
 
   function update(key: string, value: unknown) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -321,6 +323,14 @@ function StartContent() {
             email: asText(entry.email),
             name: asText(entry.name) || entry.label,
             relationship: entry.role,
+            invitedRole:
+              entry.label === "Parent / Guardian"
+                ? "family"
+                : entry.label === "Coach"
+                  ? "coach"
+                  : entry.label === "Counselor / Educator"
+                    ? "counselor"
+                    : "mentor",
           }))
           .filter((invite) => invite.email)
       : [];
@@ -344,11 +354,42 @@ function StartContent() {
             inviteeEmail: invite.email,
             inviteeName: invite.name,
             relationship: invite.relationship,
+            invitedRole: invite.invitedRole,
             scholarName: asText(form.full_name) || "A Playbook learner",
           }),
         }).catch(() => null)
       )
     );
+  }
+
+  async function activatePendingInvitation() {
+    const token =
+      invitationToken ||
+      window.localStorage.getItem(INVITE_TOKEN_STORAGE_KEY);
+
+    if (!token) return { ok: true, destination: null as string | null };
+
+    const { data } = await supabase.auth.getSession();
+    const response = await fetch("/api/invitations/accept", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${data.session?.access_token || ""}`,
+      },
+      body: JSON.stringify({ token, status: "accepted" }),
+    });
+    const result = await response.json();
+
+    if (!response.ok || result.requiresOnboarding) {
+      return {
+        ok: false,
+        destination: null,
+        error: result.error || "Complete your invited role onboarding before joining the network.",
+      };
+    }
+
+    window.localStorage.removeItem(INVITE_TOKEN_STORAGE_KEY);
+    return { ok: true, destination: (result.destination || null) as string | null };
   }
 
   async function next(skip = false) {
@@ -388,10 +429,17 @@ function StartContent() {
         return;
       }
 
+      const activation = await activatePendingInvitation();
+      if (!activation.ok) {
+        setSaving(false);
+        setFormError(activation.error || "We couldn’t activate your invitation yet.");
+        return;
+      }
+
       setCreated(true);
       fireConfetti();
       setTimeout(() => {
-        const destination = getPathway(role).osRoute;
+        const destination = activation.destination || getPathway(role).osRoute;
         window.location.href = `/tutorial?role=${encodeURIComponent(role)}&destination=${encodeURIComponent(destination)}`;
       }, 2600);
       return;

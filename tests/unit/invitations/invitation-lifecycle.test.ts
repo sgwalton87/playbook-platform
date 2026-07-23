@@ -12,6 +12,11 @@ import {
   buildInvitationRecord,
   generateInviteToken,
 } from "@/lib/invitations/server";
+import {
+  onboardingDestinationForInvitation,
+  requiresInvitationRoleOnboarding,
+  roleForSupportInvitation,
+} from "@/lib/invitations";
 
 describe(
   "Invitation Delivery + Acceptance Flow",
@@ -39,6 +44,38 @@ describe(
       expect(record.destination).toBe(
         "/mentor-os"
       );
+    });
+
+    it("assigns precise Starting Five roles to their onboarding pathways", () => {
+      expect(roleForSupportInvitation("parent_guardian")).toBe("family");
+      expect(roleForSupportInvitation("educator", "coach")).toBe("coach");
+      expect(roleForSupportInvitation("educator", "counselor")).toBe("counselor");
+      expect(roleForSupportInvitation("mentor")).toBe("mentor");
+      expect(roleForSupportInvitation("educator", "scholar")).toBe("educator");
+    });
+
+    it("routes invitees through role onboarding before network activation", () => {
+      expect(onboardingDestinationForInvitation({
+        token: "invite-token",
+        relationship: "educator",
+        invitedRole: "coach",
+      })).toBe("/start?role=coach&first=1&invite=invite-token");
+
+      expect(requiresInvitationRoleOnboarding({
+        onboardingCompleted: false,
+        profileRole: "coach",
+        invitedRole: "coach",
+      })).toBe(true);
+      expect(requiresInvitationRoleOnboarding({
+        onboardingCompleted: true,
+        profileRole: "educator",
+        invitedRole: "coach",
+      })).toBe(true);
+      expect(requiresInvitationRoleOnboarding({
+        onboardingCompleted: true,
+        profileRole: "coach",
+        invitedRole: "coach",
+      })).toBe(false);
     });
 
     it("builds invitation email", () => {

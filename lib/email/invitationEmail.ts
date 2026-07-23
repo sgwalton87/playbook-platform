@@ -17,7 +17,7 @@ ${input.scholarName} invited you to join their Playbook support network as ${rel
 Accept your invitation:
 ${input.url}
 
-After accepting, Playbook will route you to the correct OS experience.
+After accepting, Playbook will guide you through onboarding for your invited role. Your network connection activates after onboarding is complete.
 
 If you have questions, reply to this email.
 
@@ -33,7 +33,7 @@ If you have questions, reply to this email.
           Accept Invitation
         </a>
       </p>
-      <p>After accepting, Playbook will route you to the correct OS experience.</p>
+      <p>After accepting, Playbook will guide you through onboarding for your invited role. Your network connection activates after onboarding is complete.</p>
       <p>If you have questions, reply to this email.</p>
       <p>- Playbook Onboarding</p>
     </div>

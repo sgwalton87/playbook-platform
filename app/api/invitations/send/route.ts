@@ -42,6 +42,7 @@ export async function POST(req: NextRequest) {
       inviteeName: body.inviteeName,
       inviteeEmail: body.inviteeEmail,
       relationship: body.relationship as RelationshipKind,
+      invitedRole: body.invitedRole,
     });
 
     const { error } = await supabase
@@ -53,6 +54,7 @@ export async function POST(req: NextRequest) {
         invitee_name: record.inviteeName,
         invitee_email: record.inviteeEmail,
         relationship: record.relationship,
+        invited_role: record.invitedRole,
         status: record.status,
         token: record.token,
         permissions: record.permissions,

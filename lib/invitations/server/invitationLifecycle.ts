@@ -2,7 +2,6 @@ import crypto from "crypto";
 
 import {
   createSupportInvitation,
-  destinationForRelationship,
   type InvitationStatus,
 } from "@/lib/invitations";
 
@@ -18,6 +17,7 @@ export function buildInvitationRecord(input: {
   inviteeName: string;
   inviteeEmail: string;
   relationship: RelationshipKind;
+  invitedRole?: string | null;
 }) {
   const base = createSupportInvitation(input);
 
@@ -27,7 +27,8 @@ export function buildInvitationRecord(input: {
     scholarId: input.scholarId,
     scholarName: input.scholarName,
     token: generateInviteToken(),
-    destination: destinationForRelationship(input.relationship),
+    destination: base.destination,
+    invitedRole: base.invitedRole,
   };
 }
 
@@ -53,7 +54,7 @@ Accept your invitation here:
 
 ${url}
 
-After accepting, Playbook will connect you to the scholar's support network and route you to the correct Playbook OS experience.
+After accepting, Playbook will guide you through onboarding for your invited role. Your support-network connection activates after onboarding is complete.
 
 - Playbook`,
 
