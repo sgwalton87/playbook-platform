@@ -15,12 +15,24 @@ import { buildLearnerOSProjection, type LearnerOSRole, type LearnerProfile } fro
 import { withTimeout } from "@/lib/async/withTimeout";
 import { supabase } from "@/lib/supabaseClient";
 
+const PREVIEW_PROFILES: Record<LearnerOSRole, LearnerProfile> = {
+  scholar: { full_name: "Jordan Ellis", school: "Playbook Academy", grade: "11", graduation_year: "2027", dream_school: "University of California", onboarding_data: { gpa: "3.7", activities: ["Student leadership"], support_network: [{ email: "family@example.com" }, { email: "mentor@example.com" }] } },
+  "scholar-athlete": { full_name: "Avery Brooks", school: "Playbook Academy", grade: "12", graduation_year: "2026", dream_school: "Target University", onboarding_data: { gpa: "3.5", primary_sport: "Basketball", position: "Guard", current_team: "Playbook Academy", target_division: "NCAA D2", highlight_link: "https://example.com/highlights", support_network: [{ email: "coach@example.com" }, { email: "family@example.com" }, { email: "mentor@example.com" }] } },
+  "transition-youth": { full_name: "Morgan Reed", school: "Community Bridge Program", grade: "Transition-age youth", graduation_year: "Next 12 months", ideal_profession: "Healthcare", onboarding_data: { engagement_preferences: ["Internships", "Mentorship"], activities: ["Community service"], support_network: [{ email: "advocate@example.com" }, { email: "mentor@example.com" }] } },
+  "athlete-abroad": { full_name: "Kai Thompson", school: "Playbook Academy", grade: "Post-grad", graduation_year: "Fall 2027", ideal_profession: "Professional athlete", onboarding_data: { primary_sport: "Soccer", target_countries: ["Spain", "Portugal"], abroad_pathway_goal: "University + sport", passport_status: "Valid passport", desired_start_window: "Fall 2027", international_readiness_needs: ["Housing", "Club vetting"], support_network: [{ email: "guardian@example.com" }, { email: "coach@example.com" }, { email: "advisor@example.com" }] } },
+};
+
 export default function LearnerOSDashboard({ role }: { role: LearnerOSRole }) {
   const [profile, setProfile] = useState<LearnerProfile | null>(null);
   const [state, setState] = useState<"loading" | "ready" | "signed-out" | "error">("loading");
 
   const load = useCallback(async () => {
     setState("loading");
+    if (new URLSearchParams(window.location.search).get("preview") === "1") {
+      setProfile(PREVIEW_PROFILES[role]);
+      setState("ready");
+      return;
+    }
     const session = await withTimeout(
       supabase.auth.getSession().then(({ data }) => data.session),
       1_800,
@@ -44,7 +56,7 @@ export default function LearnerOSDashboard({ role }: { role: LearnerOSRole }) {
 
     setProfile(result.data || {});
     setState("ready");
-  }, []);
+  }, [role]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => { void load(); }, 0);

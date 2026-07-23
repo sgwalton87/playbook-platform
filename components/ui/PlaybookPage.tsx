@@ -2,6 +2,7 @@
 
 import { pageShellStyle, playbookTheme } from "@/lib/design-system/tokens";
 import ExperienceModeBanner from "@/components/experience/ExperienceModeBanner";
+import PlaybookLogo from "@/components/brand/PlaybookLogo";
 
 export function PlaybookPage({
   children,
@@ -35,7 +36,13 @@ export function PlaybookHero({
 }) {
   return (
     <section style={hero}>
-      <p style={eyebrowStyle}>{eyebrow}</p>
+      <div style={heroBrandRow}>
+        <PlaybookLogo size={76} priority />
+        <div>
+          <strong style={heroBrandName}>THE PLAYBOOK</strong>
+          <p style={eyebrowStyle}>{eyebrow}</p>
+        </div>
+      </div>
       <h1 style={titleStyle}>{title}</h1>
       {subtitle && <p style={subtitleStyle}>{subtitle}</p>}
       {children}
@@ -112,9 +119,13 @@ const hero: React.CSSProperties = {
 };
 
 const titleStyle: React.CSSProperties = {
-  margin: "12px 0",
-  fontSize: 54,
-  lineHeight: 1,
+  margin: "20px 0 12px",
+  fontFamily: "'Anton', Impact, sans-serif",
+  fontSize: "clamp(48px,7vw,86px)",
+  fontWeight: 900,
+  letterSpacing: "-.025em",
+  textTransform: "uppercase",
+  lineHeight: .92,
 };
 
 const subtitleStyle: React.CSSProperties = {
@@ -122,6 +133,21 @@ const subtitleStyle: React.CSSProperties = {
   fontSize: 17,
   lineHeight: 1.6,
   maxWidth: 780,
+};
+
+const heroBrandRow: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 16,
+};
+
+const heroBrandName: React.CSSProperties = {
+  display: "block",
+  marginBottom: 5,
+  color: "#FFFFFF",
+  fontFamily: "'Space Mono', monospace",
+  fontSize: 12,
+  letterSpacing: ".18em",
 };
 
 const card: React.CSSProperties = {

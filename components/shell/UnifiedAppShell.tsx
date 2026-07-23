@@ -10,6 +10,31 @@ import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import ProfileAvatar from "@/components/ProfileAvatar";
 import { supabase } from "@/lib/supabaseClient";
 
+const ROUTE_ROLE_HINTS: Record<string, string> = {
+  "/dashboard": "scholar",
+  "/scholar-athlete-os": "scholar-athlete",
+  "/tay-os": "transition-youth",
+  "/athlete-abroad-os": "athlete-abroad",
+  "/family-os": "family",
+  "/mentor-os": "mentor",
+  "/educator-os": "educator",
+  "/university-os": "college-coach",
+  "/brand-partner-os": "brand-partner",
+  "/employer-os": "employer",
+  "/district-os": "district",
+};
+
+type ShellProfile = {
+  id?: string | null;
+  full_name?: string | null;
+  first_name?: string | null;
+  last_name?: string | null;
+  username?: string | null;
+  avatar_url?: string | null;
+  role?: string | null;
+  profile_mode?: string | null;
+};
+
 const AUTH_FULLSCREEN_ROUTES = [
   "/",
   "/login",
@@ -24,7 +49,7 @@ const AUTH_FULLSCREEN_ROUTES = [
 export default function UnifiedAppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<ShellProfile | null>(null);
   const [open, setOpen] = useState(true);
 
   useEffect(() => {
@@ -46,8 +71,17 @@ export default function UnifiedAppShell({ children }: { children: React.ReactNod
   }, []);
 
   const roleNav = useMemo(
-    () => getRoleNavigation(profile?.profile_mode, profile?.role),
-    [profile?.profile_mode, profile?.role]
+    () => {
+      const routeRole = Object.entries(ROUTE_ROLE_HINTS).find(
+        ([route]) => pathname === route || pathname?.startsWith(`${route}/`),
+      )?.[1];
+
+      return getRoleNavigation(
+        profile?.profile_mode || routeRole,
+        profile?.role,
+      );
+    },
+    [pathname, profile?.profile_mode, profile?.role]
   );
 
   const founderNav = useMemo(() => {
