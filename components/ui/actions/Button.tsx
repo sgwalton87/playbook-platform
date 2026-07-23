@@ -30,23 +30,23 @@ export function Button({
 
   const variants = {
     primary: {
-      background: THEME.colors.primary,
+      background: THEME.colors.royal,
       color: "#fff",
       border: "none",
     },
     secondary: {
       background: THEME.colors.surface,
-      color: THEME.colors.text,
+      color: THEME.colors.textPrimary,
       border: `1px solid ${THEME.colors.border}`,
     },
     outline: {
       background: "transparent",
-      color: THEME.colors.primary,
-      border: `2px solid ${THEME.colors.primary}`,
+      color: THEME.colors.royal,
+      border: `2px solid ${THEME.colors.royal}`,
     },
     ghost: {
       background: "transparent",
-      color: THEME.colors.text,
+      color: THEME.colors.textPrimary,
       border: "none",
     },
     danger: {

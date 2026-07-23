@@ -1504,3 +1504,9 @@ Unify onboarding role and OS routing
 
 ## 2026-07-23 14:04
 - **precommit**: feat(design-system): preserve shared UI foundation
+
+## 2026-07-23 14:07
+- **build-pass**: Pre-push tests and build passed.
+
+## 2026-07-23 15:16
+- **precommit**: Add Playbook OS engineering constitution (CODEX.md)
