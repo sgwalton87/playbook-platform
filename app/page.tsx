@@ -29,6 +29,7 @@ export default function HomePage() {
             alt={PLAYBOOK_HERO_VISUALS.home.alt}
             fill
             priority
+            quality={90}
             sizes="(max-width: 760px) 100vw, 48vw"
             style={image}
           />

@@ -1414,3 +1414,6 @@ Unify onboarding role and OS routing
 
 ## 2026-07-22 17:38
 - **precommit**: Route signup through role selection
+
+## 2026-07-22 17:41
+- **precommit**: Integrate account creation into onboarding

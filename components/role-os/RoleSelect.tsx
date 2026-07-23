@@ -75,6 +75,7 @@ export default function RoleSelect() {
             src={PLAYBOOK_HERO_VISUALS.home.image}
             alt={PLAYBOOK_HERO_VISUALS.home.alt}
             fill
+            quality={90}
             sizes="(max-width: 720px) 100vw, 46vw"
             style={image}
           />
