@@ -1,9 +1,15 @@
 export function canAccessScholarNetwork(input: {
-  relationships: any[];
+  relationships: Array<{
+    scholar_id?: string | null;
+    supporter_id?: string | null;
+    supporter_email?: string | null;
+  }>;
   scholarId: string;
   userId?: string | null;
   userEmail?: string | null;
 }) {
+  if (input.userId === input.scholarId) return true;
+
   return input.relationships.some((rel) => {
     const sameScholar = rel.scholar_id === input.scholarId;
     const sameUser = input.userId && rel.supporter_id === input.userId;
@@ -11,7 +17,7 @@ export function canAccessScholarNetwork(input: {
       input.userEmail &&
       rel.supporter_email?.toLowerCase() === input.userEmail.toLowerCase();
 
-    return sameScholar && (sameUser || sameEmail || rel.scholar_id === input.userId);
+    return sameScholar && (sameUser || sameEmail);
   });
 }
 

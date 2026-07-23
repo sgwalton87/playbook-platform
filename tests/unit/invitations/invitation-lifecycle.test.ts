@@ -5,7 +5,9 @@ import {
 } from "vitest";
 
 import {
+  ACCEPTANCE_WELCOME_MESSAGE,
   applyInvitationStatus,
+  buildInvitationAcceptanceEffects,
   buildInvitationEmail,
   buildInvitationRecord,
   generateInviteToken,
@@ -72,6 +74,31 @@ describe(
       expect(
         update.accepted_at
       ).toBeTruthy();
+    });
+
+    it("builds one idempotent relationship, welcome message, event, and inviter notification", () => {
+      const invitation = {
+        id: "00000000-0000-0000-0000-000000000010",
+        scholar_id: "00000000-0000-0000-0000-000000000001",
+        scholar_name: "Maya",
+        invitee_name: "Coach Taylor",
+        invitee_email: "coach@example.com",
+        relationship: "educator",
+      };
+
+      const effects = buildInvitationAcceptanceEffects({
+        invitation,
+        supporterId: "00000000-0000-0000-0000-000000000020",
+      });
+
+      expect(effects.relationship.source_invitation_id).toBe(invitation.id);
+      expect(effects.message.id).toBe(invitation.id);
+      expect(effects.message.body).toBe(ACCEPTANCE_WELCOME_MESSAGE);
+      expect(effects.event.id).toBe(invitation.id);
+      expect(effects.notification.id).toBe(invitation.id);
+      expect(effects.notification.user_id).toBe(invitation.scholar_id);
+      expect(effects.notification.title).toContain("Coach Taylor");
+      expect(effects.invitationUpdate.status).toBe("accepted");
     });
   }
 );

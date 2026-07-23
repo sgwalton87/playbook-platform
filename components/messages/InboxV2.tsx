@@ -1,28 +1,82 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PlaybookHero, PlaybookPage, PlaybookPill } from "@/components/ui";
 import {
   buildConversationMessage,
   getDemoConversationMessages,
   getDemoConversations,
 } from "@/lib/messages";
+import { supabase } from "@/lib/supabaseClient";
+
+type InboxMessage = ReturnType<typeof buildConversationMessage>;
+
+type PersistedSupportMessage = {
+  id: string;
+  sender_role: string;
+  body: string;
+  created_at: string;
+};
 
 export default function InboxV2() {
   const conversations = useMemo(() => getDemoConversations(), []);
   const [activeId, setActiveId] = useState(conversations[0].id);
   const [body, setBody] = useState("");
-  const [messagesByThread, setMessagesByThread] = useState<Record<string, any[]>>({
+  const [messagesByThread, setMessagesByThread] = useState<Record<string, InboxMessage[]>>({
     "support-network": getDemoConversationMessages("support-network"),
     family: getDemoConversationMessages("family"),
     mentor: getDemoConversationMessages("mentor"),
     "fafsa-action": getDemoConversationMessages("fafsa-action"),
   });
+  const [scholarId, setScholarId] = useState("");
+  const [accessToken, setAccessToken] = useState("");
+
+  useEffect(() => {
+    async function loadSupportThread() {
+      const { data } = await supabase.auth.getSession();
+      const user = data.session?.user;
+      if (!user || !data.session?.access_token) return;
+
+      const { data: relationship } = await supabase
+        .from("support_relationships")
+        .select("scholar_id")
+        .eq("supporter_id", user.id)
+        .eq("status", "active")
+        .limit(1)
+        .maybeSingle();
+
+      const resolvedScholarId = relationship?.scholar_id || user.id;
+      setScholarId(resolvedScholarId);
+      setAccessToken(data.session.access_token);
+
+      const response = await fetch(`/api/support-network/messages?scholarId=${encodeURIComponent(resolvedScholarId)}`, {
+        headers: { Authorization: `Bearer ${data.session.access_token}` },
+      });
+      const json = await response.json();
+      if (!response.ok || !json.messages?.length) return;
+
+      const persisted = json.messages.map((message: PersistedSupportMessage) => ({
+        id: message.id,
+        conversationId: "support-network",
+        senderRole: message.sender_role,
+        senderName: message.sender_role.replaceAll("_", " "),
+        body: message.body,
+        actionId: null,
+        source: "app" as const,
+        createdAt: message.created_at,
+        read: false,
+      }));
+
+      setMessagesByThread((current) => ({ ...current, "support-network": persisted }));
+    }
+
+    void loadSupportThread();
+  }, []);
 
   const activeConversation = conversations.find((c) => c.id === activeId) || conversations[0];
   const messages = messagesByThread[activeId] || [];
 
-  function sendMessage() {
+  async function sendMessage() {
     if (!body.trim()) return;
 
     const message = buildConversationMessage({
@@ -38,6 +92,29 @@ export default function InboxV2() {
     });
 
     setBody("");
+
+    if (scholarId && accessToken) {
+      const response = await fetch("/api/support-network/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ scholarId, senderRole: "supporter", body: message.body }),
+      }).catch(() => null);
+
+      if (response?.ok) {
+        const json = await response.json();
+        setMessagesByThread((current) => ({
+          ...current,
+          [activeId]: current[activeId].map((item) =>
+            item.id === message.id
+              ? { ...item, id: json.message.id, createdAt: json.message.created_at }
+              : item,
+          ),
+        }));
+      }
+    }
   }
 
   return (

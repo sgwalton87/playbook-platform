@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 function getSupabaseAdmin() {
@@ -8,12 +8,13 @@ function getSupabaseAdmin() {
   );
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const supabase = getSupabaseAdmin();
 
+  const accessToken = req.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await supabase.auth.getUser(accessToken);
 
   if (!user) {
     return NextResponse.json({ notifications: [] });

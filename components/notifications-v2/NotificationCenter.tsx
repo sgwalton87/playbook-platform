@@ -10,8 +10,23 @@ import {
   sortNotifications,
   type PlaybookNotification,
 } from "@/lib/notifications-v2";
+import { supabase } from "@/lib/supabaseClient";
 
 type Filter = "all" | "unread" | "messages" | "actions" | "intelligence";
+
+type PersistedNotification = {
+  id: string;
+  user_id: string;
+  scholar_id?: string | null;
+  type: PlaybookNotification["type"];
+  title: string;
+  body: string;
+  href: string;
+  priority: PlaybookNotification["priority"];
+  read: boolean;
+  created_at: string;
+  source_event_id?: string | null;
+};
 
 export default function NotificationCenter() {
   const [notifications, setNotifications] =
@@ -22,11 +37,16 @@ export default function NotificationCenter() {
   useEffect(() => {
     async function loadPersistedNotifications() {
       try {
-        const res = await fetch("/api/notifications");
+        const { data } = await supabase.auth.getSession();
+        const res = await fetch("/api/notifications", {
+          headers: data.session?.access_token
+            ? { Authorization: `Bearer ${data.session.access_token}` }
+            : {},
+        });
         const json = await res.json();
 
         if (res.ok && json.notifications?.length) {
-          setNotifications(json.notifications.map((item: any) => ({
+          setNotifications(json.notifications.map((item: PersistedNotification) => ({
             id: item.id,
             userId: item.user_id,
             scholarId: item.scholar_id,

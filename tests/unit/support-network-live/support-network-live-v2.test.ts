@@ -22,6 +22,14 @@ describe("Support Network Messaging v2", () => {
     ).toBe(true);
   });
 
+  it("always lets the scholar open their own network thread", () => {
+    expect(canAccessScholarNetwork({
+      scholarId: "scholar-1",
+      userId: "scholar-1",
+      relationships: [],
+    })).toBe(true);
+  });
+
   it("builds support message record", () => {
     expect(
       buildSupportMessageRecord({

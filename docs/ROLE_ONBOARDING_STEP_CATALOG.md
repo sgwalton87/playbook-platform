@@ -6,6 +6,8 @@
 
 **Network model:** Starting Five is the learner-facing presentation of the canonical Support Network. Both learner and supporter onboarding save one `support_network` collection and use the same invitations, relationships, and permission system. Legacy `starting_five` and `invite_supporters` values are migrated into that collection when a profile loads.
 
+**Invitation acceptance:** `docs/STARTING_FIVE_ACCEPTANCE_LIFECYCLE.md` defines token verification, automatic relationship activation, the first supporter inbox message, and the inviter notification.
+
 ## Shared journey
 
 1. Home page **Sign up** opens `/role-select`.

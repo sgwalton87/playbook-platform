@@ -22,6 +22,19 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Missing scholarId" }, { status: 400 });
   }
 
+  const accessToken = req.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
+  const { data: { user } } = await supabase.auth.getUser(accessToken);
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { data: relationships } = await supabase
+    .from("support_relationships")
+    .select("*")
+    .eq("scholar_id", scholarId);
+
+  if (!canAccessScholarNetwork({ relationships: relationships || [], scholarId, userId: user.id, userEmail: user.email })) {
+    return NextResponse.json({ error: "No relationship access." }, { status: 403 });
+  }
+
   const { data, error } = await supabase
     .from("support_messages")
     .select("*")
@@ -40,9 +53,10 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json();
 
+  const accessToken = req.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await supabase.auth.getUser(accessToken);
 
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
