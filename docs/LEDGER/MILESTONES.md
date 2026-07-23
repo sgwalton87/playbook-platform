@@ -1411,3 +1411,6 @@ Unify onboarding role and OS routing
 
 ## 2026-07-22 17:30
 - **precommit**: Replace soft homepage hero photo
+
+## 2026-07-22 17:38
+- **precommit**: Route signup through role selection

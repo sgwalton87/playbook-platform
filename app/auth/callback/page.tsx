@@ -4,6 +4,7 @@ import { Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { getPathway, normalizeRole } from "@/lib/onboarding/pathwayMap";
+import type { EmailOtpType } from "@supabase/supabase-js";
 
 export default function AuthCallbackPage() {
   return (
@@ -24,7 +25,7 @@ function AuthCallbackContent() {
       if (tokenHash) {
         const { error } = await supabase.auth.verifyOtp({
           token_hash: tokenHash,
-          type: type as any,
+          type: type as EmailOtpType,
         });
 
         if (error) {
@@ -53,6 +54,7 @@ function AuthCallbackContent() {
       }
 
       const role = normalizeRole(
+        params.get("role") ||
         data.user.user_metadata?.profile_mode ||
         data.user.user_metadata?.role ||
         data.user.user_metadata?.requested_role ||

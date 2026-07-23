@@ -2,7 +2,7 @@
 
 import { supabase } from "@/lib/supabaseClient";
 import { roleOptions } from "@/lib/role-os/roleRoutes";
-import { getOnboardingDestination, getSignupDestination } from "@/lib/roles/registry";
+import { getOnboardingDestination } from "@/lib/roles/registry";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
 import { useRouter } from "next/navigation";
@@ -24,7 +24,7 @@ export default function RoleSelect() {
     const user = data?.user;
 
     if (!user) {
-      router.push(getSignupDestination(role));
+      router.push(getOnboardingDestination(role));
       return;
     }
 

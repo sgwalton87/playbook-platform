@@ -2,6 +2,8 @@
 
 **Execution queue:** `docs/sprints/AUTO_BUILD_QUEUE.json`
 
+**Role blueprint:** `docs/ROLE_ONBOARDING_BLUEPRINT.md`
+
 **Current state:** OR-001 merged; OR-002 locally complete and awaiting publish/merge; OR-003 is next after OR-002 merges.
 
 **Source of truth:** `docs/PLAYBOOK_MASTER_CHECKLIST.md`, `TECH_DEBT.md`, current architecture documents, and verified application routes on `main`.
@@ -81,6 +83,7 @@
 ## Current architectural decisions
 
 - `/start` is the canonical onboarding route.
+- Account creation is an integrated onboarding checkpoint for new users; `/login` is reserved for returning users and recovery.
 - `profile_mode` may specialize the experience, but canonical role resolution must remain deterministic.
 - OS dashboards are projections of role, relationships, permissions, and the Playbook Record; they are not separate data owners.
 - Founder/admin access is provisioned and permission-gated, not offered as a public signup role.

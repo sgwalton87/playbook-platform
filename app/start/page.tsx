@@ -10,6 +10,7 @@ import { getPathway, normalizeRole } from "@/lib/onboarding/pathwayMap";
 import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
 import type { User } from "@supabase/supabase-js";
 import type { OnboardingField } from "@/lib/onboarding";
+import OnboardingAccountGate from "@/components/onboarding/OnboardingAccountGate";
 
 type OnboardingProfile = {
   id: string;
@@ -63,6 +64,7 @@ function StartContent() {
   const [created, setCreated] = useState(false);
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [formError, setFormError] = useState("");
+  const [authResolved, setAuthResolved] = useState(false);
   const autosaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const role = normalizeRole(
@@ -103,11 +105,12 @@ function StartContent() {
       const { data: u } = await supabase.auth.getUser();
 
       if (!u.user) {
-        window.location.href = "/login";
+        setAuthResolved(true);
         return;
       }
 
       setUser(u.user);
+      setAuthResolved(true);
 
       const { data: p } = await supabase
         .from("profiles")
@@ -343,6 +346,12 @@ function StartContent() {
     setStepIndex((i) => i + 1);
     setSaving(false);
   }
+
+  if (!authResolved) {
+    return <main style={{ minHeight: "100vh", display: "grid", placeItems: "center", background: "#F8F7F4", fontWeight: 900 }}>Opening your Playbook…</main>;
+  }
+
+  if (!user) return <OnboardingAccountGate role={role} />;
 
   if (!profile) return <main style={{ padding: 40 }}>Loading...</main>;
 
