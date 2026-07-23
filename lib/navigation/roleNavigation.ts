@@ -39,24 +39,24 @@ const SHARED_OPPORTUNITIES: NavItem = {
   icon: "🚀",
 };
 
+const LEARNER_BASELINE_NAVIGATION: NavItem[] = [
+  { label: "Start Here", href: "/start", icon: "▶️" },
+  { label: "Transcript", href: "/transcript", icon: "📄" },
+  { label: "Academic Readiness", href: "/academic-readiness", icon: "📚" },
+  { label: "Compass", href: "/compass", icon: "🧭" },
+  SHARED_OPPORTUNITIES,
+  SHARED_COURSES,
+  SHARED_MESSAGES,
+  SHARED_PROFILE,
+];
+
 export const ROLE_NAVIGATION = {
   scholar: {
     home: "/dashboard",
     label: "Scholar OS",
     items: [
       { label: "Dashboard", href: "/dashboard", icon: "🏠" },
-      { label: "Start Here", href: "/start", icon: "▶️" },
-      { label: "Transcript", href: "/transcript", icon: "📄" },
-      {
-        label: "Academic Readiness",
-        href: "/academic-readiness",
-        icon: "📚",
-      },
-      { label: "Compass", href: "/compass", icon: "🧭" },
-      SHARED_OPPORTUNITIES,
-      SHARED_COURSES,
-      SHARED_MESSAGES,
-      SHARED_PROFILE,
+      ...LEARNER_BASELINE_NAVIGATION,
     ],
   },
 
@@ -69,18 +69,7 @@ export const ROLE_NAVIGATION = {
         href: "/scholar-athlete-os",
         icon: "🏆",
       },
-      { label: "Start Here", href: "/start", icon: "▶️" },
-      { label: "Transcript", href: "/transcript", icon: "📄" },
-      {
-        label: "Academic Readiness",
-        href: "/academic-readiness",
-        icon: "📚",
-      },
-      { label: "Compass", href: "/compass", icon: "🧭" },
-      SHARED_OPPORTUNITIES,
-      SHARED_COURSES,
-      SHARED_MESSAGES,
-      SHARED_PROFILE,
+      ...LEARNER_BASELINE_NAVIGATION,
     ],
   },
 
@@ -222,12 +211,7 @@ export const ROLE_NAVIGATION = {
     label: "TAY OS",
     items: [
       { label: "TAY Dashboard", href: "/tay-os", icon: "🏠" },
-      { label: "Start Here", href: "/start", icon: "▶️" },
-      { label: "Compass", href: "/compass", icon: "🧭" },
-      SHARED_OPPORTUNITIES,
-      SHARED_COURSES,
-      SHARED_MESSAGES,
-      SHARED_PROFILE,
+      ...LEARNER_BASELINE_NAVIGATION,
     ],
   },
 
@@ -263,11 +247,7 @@ export const ROLE_NAVIGATION = {
     label: "Athlete Abroad OS",
     items: [
       { label: "Athlete Abroad", href: "/athlete-abroad-os", icon: "🌍" },
-      { label: "Academic Readiness", href: "/academic-readiness", icon: "📚" },
-      SHARED_OPPORTUNITIES,
-      SHARED_COURSES,
-      SHARED_MESSAGES,
-      SHARED_PROFILE,
+      ...LEARNER_BASELINE_NAVIGATION,
     ],
   },
 

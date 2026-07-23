@@ -69,8 +69,6 @@ export default function LearnerOSDashboard({ role }: { role: LearnerOSRole }) {
 
   const projection = buildLearnerOSProjection(role, profile || {});
   const { definition } = projection;
-  const showAcademicTracker = role === "scholar" || role === "scholar-athlete";
-
   return (
     <PlaybookPage>
       <PlaybookHero eyebrow={`${definition.label} · ${definition.accent}`} title={definition.headline} subtitle={definition.subtitle}>
@@ -108,18 +106,16 @@ export default function LearnerOSDashboard({ role }: { role: LearnerOSRole }) {
         ))}
       </PlaybookGrid>
 
-      {showAcademicTracker && (
-        <section style={trackerWrap}>
-          <div style={sectionHeader}>
-            <div>
-              <p style={kicker}>Live Academic Foundation</p>
-              <h2 style={sectionTitle}>Your A–G readiness remains connected.</h2>
-            </div>
-            <PlaybookButton href="/transcript">Update transcript</PlaybookButton>
+      <section style={trackerWrap}>
+        <div style={sectionHeader}>
+          <div>
+            <p style={kicker}>Live Academic Foundation</p>
+            <h2 style={sectionTitle}>Your A–G readiness remains connected.</h2>
           </div>
-          <AGTracker />
-        </section>
-      )}
+          <PlaybookButton href="/transcript">Update transcript</PlaybookButton>
+        </div>
+        <AGTracker />
+      </section>
 
       <section style={networkCallout}>
         <div>

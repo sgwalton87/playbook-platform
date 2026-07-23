@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildLearnerOSProjection,
   getLearnerOSDefinition,
+  SCHOLAR_BASELINE_MODULES,
   type LearnerOSRole,
 } from "@/lib/learner-os";
 
@@ -17,9 +18,31 @@ describe("learner OS projections", () => {
     const definition = getLearnerOSDefinition(role);
     expect(definition.label).toBeTruthy();
     expect(definition.headline).toBeTruthy();
-    expect(definition.modules).toHaveLength(4);
-    expect(new Set(definition.modules.map((module) => module.title)).size).toBe(4);
+    expect(definition.modules.length).toBeGreaterThanOrEqual(4);
+    expect(new Set(definition.modules.map((module) => module.title)).size).toBe(
+      definition.modules.length,
+    );
   });
+
+  it.each(roles)(
+    "gives %s every Scholar OS baseline module before adding unique capabilities",
+    (role) => {
+      const routes = getLearnerOSDefinition(role).modules.map((module) => module.href);
+
+      for (const capability of SCHOLAR_BASELINE_MODULES) {
+        expect(routes).toContain(capability.href);
+      }
+    },
+  );
+
+  it.each(roles.filter((role) => role !== "scholar"))(
+    "adds unique capabilities to the Scholar baseline for %s",
+    (role) => {
+      expect(getLearnerOSDefinition(role).modules.length).toBeGreaterThan(
+        SCHOLAR_BASELINE_MODULES.length,
+      );
+    },
+  );
 
   it("projects canonical onboarding data without creating another learner record", () => {
     const profile = {

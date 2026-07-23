@@ -64,6 +64,27 @@ describe("canonical Playbook role registry", () => {
   });
 
   it.each([
+    "scholar",
+    "scholar-athlete",
+    "transition-youth",
+    "athlete-abroad",
+  ])("inherits the complete Scholar onboarding baseline for %s", (role) => {
+    const stepIds = getOnboardingSteps(role).map((step) => step.id);
+
+    for (const baselineStep of [
+      "identity",
+      "scholar-support",
+      "scholar-academic",
+      "scholar-goals",
+      "scholar-activities",
+      "starting-five",
+      "community-safety",
+    ]) {
+      expect(stepIds).toContain(baselineStep);
+    }
+  });
+
+  it.each([
     "family",
     "mentor",
     "educator",

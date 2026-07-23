@@ -1450,3 +1450,6 @@ Unify onboarding role and OS routing
 
 ## 2026-07-22 19:49
 - **precommit**: Complete Starting Five acceptance lifecycle
+
+## 2026-07-22 19:54
+- **precommit**: Strengthen OS branding and add visual previews
