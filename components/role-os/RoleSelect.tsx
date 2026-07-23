@@ -1,50 +1,13 @@
 "use client";
 
-import { supabase } from "@/lib/supabaseClient";
 import { roleOptions } from "@/lib/role-os/roleRoutes";
 import { getOnboardingDestination } from "@/lib/roles/registry";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
 
 export default function RoleSelect() {
-  const router = useRouter();
-  const [saving, setSaving] = useState("");
-
-  const [error, setError] = useState("");
-
-  async function choose(role: string) {
-    setSaving(role);
-    setError("");
-
-    const { data } = await supabase.auth.getUser();
-    const user = data?.user;
-
-    if (!user) {
-      window.location.assign(getOnboardingDestination(role));
-      return;
-    }
-
-    const { error: saveError } = await supabase.from("profiles").upsert({
-      id: user.id,
-      role,
-      profile_mode: role,
-      requested_role: role,
-      updated_at: new Date().toISOString(),
-    });
-
-    if (saveError) {
-      setError("We could not save your pathway. Please try again.");
-      setSaving("");
-      return;
-    }
-
-    router.push(getOnboardingDestination(role));
-  }
-
   return (
     <main style={page}>
       <nav style={topBar} aria-label="Welcome navigation">
@@ -90,22 +53,19 @@ export default function RoleSelect() {
         <span style={count}>{roleOptions.length} pathways</span>
       </section>
 
-      {error && <div role="alert" style={errorBanner}>{error}</div>}
-
       <section style={grid}>
         {roleOptions.map((option, index) => (
-          <button
+          <Link
             key={option.role}
-            onClick={() => choose(option.role)}
-            disabled={Boolean(saving)}
+            href={getOnboardingDestination(option.role)}
             style={roleCard}
           >
             <span style={number}>{String(index + 1).padStart(2, "0")}</span>
             <p style={cardEyebrow}>{option.role}</p>
             <h3 style={cardTitle}>{option.label}</h3>
             <p style={cardBody}>{option.description}</p>
-            <strong style={action}>{saving === option.role ? "Preparing your pathway…" : "Build my Playbook →"}</strong>
-          </button>
+            <strong style={action}>Start {option.label} onboarding →</strong>
+          </Link>
         ))}
       </section>
     </main>
@@ -134,10 +94,9 @@ const intro: React.CSSProperties = { maxWidth: 1180, margin: "0 auto 18px", disp
 const sectionTitle: React.CSSProperties = { maxWidth: 760, margin: 0, fontSize: "clamp(24px,3vw,38px)", lineHeight: 1.08 };
 const count: React.CSSProperties = { whiteSpace: "nowrap", border: "1px solid #FED7AA", background: "#FFF7ED", color: "#C2410C", borderRadius: 999, padding: "8px 12px", fontFamily: "'Space Mono', monospace", fontSize: 10, fontWeight: 800, textTransform: "uppercase" };
 const grid: React.CSSProperties = { maxWidth: 1180, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))", gap: 16 };
-const roleCard: React.CSSProperties = { minHeight: 270, position: "relative", textAlign: "left", background: "#FFFFFF", color: "#0F172A", border: "1px solid #E2E8F0", borderRadius: 24, padding: 24, cursor: "pointer", boxShadow: "0 14px 36px rgba(15,23,42,.06)", display: "flex", flexDirection: "column", alignItems: "stretch" };
+const roleCard: React.CSSProperties = { minHeight: 270, position: "relative", textAlign: "left", textDecoration: "none", background: "#FFFFFF", color: "#0F172A", border: "1px solid #E2E8F0", borderRadius: 24, padding: 24, cursor: "pointer", boxShadow: "0 14px 36px rgba(15,23,42,.06)", display: "flex", flexDirection: "column", alignItems: "stretch" };
 const number: React.CSSProperties = { position: "absolute", top: 20, right: 20, fontFamily: "'Anton', sans-serif", color: "#E2E8F0", fontSize: 36 };
 const cardEyebrow: React.CSSProperties = { ...eyebrow, margin: 0, paddingRight: 48 };
 const cardTitle: React.CSSProperties = { margin: "18px 0 10px", fontSize: 27, lineHeight: 1.05 };
 const cardBody: React.CSSProperties = { margin: 0, color: "#64748B", fontSize: 14, lineHeight: 1.6 };
 const action: React.CSSProperties = { marginTop: "auto", paddingTop: 24, color: "#F97316", fontSize: 13 };
-const errorBanner: React.CSSProperties = { maxWidth: 1180, margin: "0 auto 16px", border: "1px solid #FCA5A5", background: "#FEF2F2", color: "#991B1B", borderRadius: 14, padding: "12px 16px", fontWeight: 700 };
