@@ -1495,3 +1495,6 @@ Unify onboarding role and OS routing
 
 ## 2026-07-23 12:32
 - **precommit**: feat(playbook-os): initialize design system foundation
+
+## 2026-07-23 12:40
+- **precommit**: feat(playbook-os): initialize Sprint 1.1 foundation
