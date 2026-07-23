@@ -8,7 +8,7 @@
 
 **Learner OS build map:** `docs/LEARNER_OS_BUILD_MAP.md`
 
-**Current state:** OR-001 merged. OR-002 through OR-007 are built and contract-tested on the local review branch. OR-008 release validation is in progress. Nothing is approved for `main` until desktop review.
+**Current state:** OR-001 merged. OR-002 through OR-007 are locally complete together on `agent/onboarding-premium-shell`; they are not merged or production-approved. OR-008 is the next and highest-value task. It must prove the combined system in a review environment before desktop approval.
 
 **Source of truth:** `docs/PLAYBOOK_MASTER_CHECKLIST.md`, `TECH_DEBT.md`, current architecture documents, and verified application routes on `main`.
 
@@ -58,11 +58,15 @@
 
 ## Sprint OR-004 — Family and trusted-support pathways
 
+**Status:** Locally built and contract-tested; production RLS/E2E pending.
+
 **Roles:** Parent/Guardian and Mentor.
 
 **Acceptance gates:** scholar relationship/invite handoff, consent-aware access, support preferences, verification state, permission-scoped OS landing, and recovery when an invite is missing or expired.
 
 ## Sprint OR-005 — K–12 institutional pathways
+
+**Status:** Locally built and contract-tested; institutional verification and production RLS/E2E pending.
 
 **Roles:** Teacher/Educator, High School Counselor, High School Coach, District/School Administrator.
 
@@ -70,11 +74,15 @@
 
 ## Sprint OR-006 — College pathways
 
+**Status:** Locally built and contract-tested; institutional verification, compliance, and production RLS/E2E pending.
+
 **Roles:** College Coach/Recruiter and College Admissions.
 
 **Acceptance gates:** institutional verification, recruiting/admissions criteria, contact boundaries, opportunity permissions, compliance state, and distinct recruiting/admissions experiences inside University OS.
 
 ## Sprint OR-007 — Opportunity partner pathways
+
+**Status:** Locally built and contract-tested; organization verification, compliance, and production RLS/E2E pending.
 
 **Roles:** Brand Partner and Employer/Workforce Partner.
 
@@ -82,9 +90,19 @@
 
 ## Sprint OR-008 — Governance and release validation
 
+**Status:** Next — highest-value platform task.
+
 **Goal:** Close the onboarding and Role OS release gate.
 
 **Acceptance gates:** centralized permission matrix, role-by-role E2E coverage, RLS verification, audit-ready agreement records, email/invite validation, analytics events, production build, and checklist/architecture/tech-debt reconciliation.
+
+**Execution priority:**
+
+1. Apply all pending migrations to a non-production review database and validate rollback/recovery.
+2. Prove allow/deny RLS behavior for all 14 roles and invitation states.
+3. Run Playwright E2E for signup → role onboarding → tutorial → OS, plus invite → invited-role onboarding → network activation → live message.
+4. Run the critical journeys at desktop and mobile viewport sizes.
+5. Validate real email delivery, token expiry/error recovery, agreement audit records, logging, and production-safe empty states.
 
 ## Current architectural decisions
 

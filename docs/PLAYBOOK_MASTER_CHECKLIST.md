@@ -1,7 +1,7 @@
 # PLAYBOOK OS — MASTER BUILD CHECKLIST
 
-**Overall completion:** 36%
-**Last updated:** 2026-07-22T00:00:00.000Z
+**Overall completion:** 41%
+**Last updated:** 2026-07-22T20:25:00.000Z
 
 **Auto-build control:** `docs/sprints/AUTO_BUILD_CONTROL_BOARD.md` and `docs/sprints/AUTO_BUILD_QUEUE.json`
 
@@ -16,6 +16,12 @@
 ## Definition of Done
 
 A task may be marked complete only after its interface, persistence, permissions, integrations, tests, build, and end-to-end workflow have been validated.
+
+## 2026-07-22 audit conclusion
+
+All 14 public role pathways are locally built on `agent/onboarding-premium-shell`, use canonical role resolution, and pass local contract tests, TypeScript, and production compilation. Four learner OS dashboards and ten non-learner role dashboards now share enforced platform foundations while retaining role-specific modules. Starting Five invitations carry precise invited roles, require matching onboarding before activation, and connect to persisted network messaging.
+
+This is **local build evidence, not production completion**. The highest-value remaining gate is OR-008: apply and verify migrations in a review environment, audit RLS and permission-denied behavior, and run role-by-role browser E2E across desktop and mobile. No item requiring those gates is marked Complete.
 
 # Phase 1 — Identity & Authentication
 
@@ -44,29 +50,29 @@ Notes: Auth interfaces and Supabase flows are present, including login/signup, O
 # Phase 2 — Onboarding
 
 **Status:** 🟨 in progress
-**Completion:** 48%
+**Completion:** 62%
 
-- 🟨 Scholar Onboarding
-- 🟨 Scholar-Athlete Onboarding
-- 🟨 Parent Guardian Onboarding
-- 🟨 Teacher Educator Onboarding
-- 🟨 High School Counselor Onboarding
-- 🟨 Mentor Onboarding
-- 🟨 High School Coach Onboarding
-- 🟨 College Coach Recruiter Onboarding
-- 🟨 College Admissions Onboarding
-- 🟨 Brand Partner Onboarding
-- 🟨 Employer Workforce Partner Onboarding
-- 🟨 District School Administrator Onboarding
-- 🟨 Transition-Aged Youth Onboarding
-- 🟨 Athlete Abroad Enrollment
-- 🟨 Dynamic User Agreement
-- 🟨 Onboarding Autosave
-- 🟨 Profile Creation Animation
+- 🟦 Scholar Onboarding
+- 🟦 Scholar-Athlete Onboarding
+- 🟦 Parent Guardian Onboarding
+- 🟦 Teacher Educator Onboarding
+- 🟦 High School Counselor Onboarding
+- 🟦 Mentor Onboarding
+- 🟦 High School Coach Onboarding
+- 🟦 College Coach Recruiter Onboarding
+- 🟦 College Admissions Onboarding
+- 🟦 Brand Partner Onboarding
+- 🟦 Employer Workforce Partner Onboarding
+- 🟦 District School Administrator Onboarding
+- 🟦 Transition-Aged Youth Onboarding
+- 🟦 Athlete Abroad Enrollment
+- 🟦 Dynamic User Agreement
+- 🟦 Onboarding Autosave
+- 🟦 Profile Creation Animation
 - 🟨 Public Profile Generation
 - 🟦 Onboarding OS Redirects
 
-Notes: All 14 public role schemas, their canonical routes, and OS destinations are now built and contract-tested locally. They remain Partial until persistence/resume, relationship permissions and RLS, institutional verification, agreement audit records, and role-by-role mobile/desktop E2E validation pass. The exact implementation map is `docs/ROLE_ONBOARDING_STEP_CATALOG.md`. Nothing is promoted to Complete or merged before desktop review.
+Notes: All 14 public role schemas, canonical routes, autosave paths, agreement step, tutorials, OS destinations, and role-aware Starting Five handoffs are built and contract-tested locally. They remain in Testing until review-environment persistence/resume, institutional verification, agreement audit records, RLS, and role-by-role mobile/desktop E2E pass.
 
 # Phase 3 — Public Profile
 
@@ -95,33 +101,38 @@ Notes: Profile surfaces and fields are present, but all items remain Partial bec
 
 # Phase 4 — Operating Systems
 
-**Status:** 🟥 needs fix
-**Completion:** 50%
+**Status:** 🟦 testing
+**Completion:** 68%
 
 - 🟦 Scholar OS
 - 🟦 Scholar-Athlete OS
 - 🟦 Transition-Aged Youth OS
-- 🟨 Parent Guardian OS
-- 🟨 Teacher Educator OS
-- 🟨 High School Counselor OS
+- 🟦 Parent Guardian OS
+- 🟦 Teacher Educator OS
+- 🟦 High School Counselor OS
 - 🟦 Mentor OS
-- 🟨 High School Coach OS
-- 🟨 College Coach Recruiter OS
-- 🟨 College Admissions OS
+- 🟦 High School Coach OS
+- 🟦 College Coach Recruiter OS
+- 🟦 College Admissions OS
 - 🟦 Brand Partner OS
 - 🟦 Employer OS
+- 🟦 District School Administrator OS
 - 🟨 Founder OS
 - 🟦 Athlete Abroad OS + Global Hub
 - 🟦 Role-Aware Sidebar Navigation
-- 🟥 Role Permissions
+- 🟦 Role Permissions
 
-Notes: The four learner operating systems now use a shared canonical projection layer with distinct role-specific readiness, modules, actions, destinations, and recovery states. Evidence is recorded in `docs/LEARNER_OS_BUILD_MAP.md`. Needs Fix: live persistence, Role Permissions/RLS, and phone/desktop E2E must be reconciled before any OS item moves to Complete under the Definition of Done.
+Notes: Four learner systems inherit the complete Scholar capability baseline, and ten support/institutional/opportunity roles inherit the live platform baseline with distinct modules, onboarding, tutorials, navigation, and permission relationships. Dashboards use authenticated profile/network/message data; explicit demo tooling remains separate. Production RLS and browser E2E remain open.
 
 # Phase 5 — Network
 
 **Status:** 🟦 testing
-**Completion:** 45%
+**Completion:** 56%
 
+- 🟦 Starting Five Role Selection
+- 🟦 Invitation Token Lifecycle
+- 🟦 Role-Onboarding Activation Gate
+- 🟦 Active Relationship Persistence
 - 🟨 User Search
 - 🟨 Suggested Users
 - 🟦 Connection Requests
@@ -134,7 +145,7 @@ Notes: The four learner operating systems now use a shared canonical projection 
 - 🟨 Network Notifications
 - 🟨 Network Messaging Integration
 
-Notes: Connection request lifecycle evidence exists and is in Testing. Discovery, mutuals, notifications, and messaging links remain Partial until validated across persistence, permissions, and end-to-end flows.
+Notes: Starting Five now selects from ordered canonical roles, excludes the learner’s own role, routes invitees through matching onboarding, and activates the persisted relationship/message/notification only afterward. Search, discovery, mutuals, and production RLS/E2E remain open.
 
 # Phase 6 — Feed
 
@@ -159,20 +170,20 @@ Notes: Feed UI and Supabase-backed post/media paths exist, but feature-level per
 
 # Phase 7 — Messaging
 
-**Status:** 🟨 in progress
-**Completion:** 23%
+**Status:** 🟦 testing
+**Completion:** 31%
 
-- 🟨 Direct Messages
-- 🟨 Group Messages
-- 🟨 Conversation Search
-- 🟨 Attachments
-- 🟨 Read Receipts
+- 🟦 Direct Support Messages
+- 🟦 Support Network Threads
+- ⬜ Conversation Search
+- ⬜ Attachments
+- ⬜ Read Receipts
 - 🟨 Message Notifications
-- 🟨 Block User
-- 🟨 Report User
-- 🟨 Meeting Links
+- ⬜ Block User
+- ⬜ Report User
+- ⬜ Meeting Links
 
-Notes: Inbox and support-message surfaces exist, but message features are Partial until persistence, access controls, safety actions, notification wiring, and end-to-end workflows are validated.
+Notes: Product inbox, thread routes, Support Network, Scholar Network, and support-message routes now use authenticated persisted identities, relationships, and messages. Empty accounts show honest empty states; demo identities are not substituted. Search, attachments, receipts, safety controls, notification delivery, load testing, and production RLS/E2E remain open.
 
 # Phase 8 — Courses
 
@@ -333,6 +344,8 @@ Notes: Founder/admin/studio surfaces exist, but launch-gate admin controls remai
 - ⬜ Employer End-to-End QA
 - 🟨 Founder End-to-End QA
 - ⬜ Athlete Abroad End-to-End QA
+- ⬜ Transition-Aged Youth End-to-End QA
+- ⬜ District Administrator End-to-End QA
 - ⬜ Desktop QA
 - ⬜ Tablet QA
 - ⬜ Mobile QA

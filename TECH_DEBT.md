@@ -6,25 +6,25 @@ This root backlog is consolidated from the current Master Build Checklist and re
 
 ### Validation, Build, and QA Gates
 
-- Restore a clean production build by configuring or guarding the Resend dependency used by `/api/notify-admin` so page data collection does not fail without local secrets.
-- Reduce repo-wide lint failures enough for `npm run lint` to become a reliable release gate, starting with the checked-in backup parse error and high-volume `no-explicit-any` violations.
-- Define and run role-by-role end-to-end QA for Scholar, Scholar-Athlete, Mentor, Founder, and every remaining registry role before moving related checklist items beyond In Progress or Testing.
+- Keep the currently passing local TypeScript, focused/full test, and production-build gates green; CI evidence is still required before merge.
+- Build and run role-by-role browser E2E for all 14 public roles before moving onboarding or OS items beyond Testing.
+- Apply pending migrations to a non-production review database, validate schema compatibility with existing rows, and document rollback/recovery.
 - Complete desktop, tablet, mobile, accessibility, performance, security, and RLS validation for the Final Release Checklist.
 - Add production database, storage, backup, monitoring, and error-logging validation before soft launch.
 
 ### Role Registry, Permissions, and Navigation
 
-- Reconcile every user-facing role in the Role Registry with implemented routes, role selection options, side navigation, OS dashboards, and permission checks.
-- Implement a centralized role-permission matrix that gates dashboards, profile visibility, messaging, network actions, opportunities, admin/founder tools, and support-role workflows.
-- Add tests for role normalization, route access, sidebar visibility, and permission-denied states.
-- Fix Role OS permission gaps identified by the Role OS audit before any Operating Systems phase item is marked Complete.
+- Canonical role routing, OS destinations, shared navigation, onboarding availability, and relationship-permission mappings are locally reconciled for all 14 public roles.
+- Expand the centralized relationship-permission matrix into resource/action-level authorization for dashboards, profile fields, messaging, network actions, opportunities, verification, and founder/admin tools.
+- Add explicit permission-denied UI and browser tests; current contract tests prove mappings but not database enforcement.
+- Audit Supabase RLS allow/deny behavior for every public role, relationship status, invitation state, and cross-scholar access attempt.
 
 ### Onboarding Foundation
 
-- Reconcile onboarding pathways against the Role Registry and Onboarding Audit so every launch role has a complete onboarding path or an explicitly blocked launch decision.
-- Fix Onboarding OS redirects so completed onboarding reliably lands each role in the correct OS/dashboard.
-- Add dynamic user agreement capture to onboarding, including persistence and acceptance auditability.
-- Validate onboarding autosave, profile creation, public profile generation, and failure recovery end to end.
+- All 14 role schemas, redirects, tutorials, OS landings, Starting Five role selection, and invited-role activation gates are locally built and contract-tested.
+- Validate dynamic agreement versioning and acceptance auditability against the review database.
+- Validate autosave/resume, interrupted sessions, duplicate invitation handling, profile creation, and failure recovery in browser E2E.
+- Prove institutional/organization verification workflows for K–12, college, district, brand, and employer roles.
 
 ### Authentication and Email Readiness
 
@@ -54,9 +54,10 @@ This root backlog is consolidated from the current Master Build Checklist and re
 
 ### Messaging and Safety
 
-- Complete direct messages, group messages, conversation search, attachments, read receipts, message notifications, block user, report user, and meeting links.
+- Live authenticated support-network messages and real profile identities now replace demo seeds on product inbox/network routes.
+- Complete general direct messages, group conversations beyond support-network threads, conversation search, attachments, read receipts, message notifications, block user, report user, and meeting links.
 - Connect messaging safety actions to the centralized permissions and moderation model.
-- Validate support-message and role-based messaging flows end to end.
+- Validate support-message access, cross-network denial, notification delivery, and role-based messaging flows end to end.
 
 ### Feed and Timeline
 

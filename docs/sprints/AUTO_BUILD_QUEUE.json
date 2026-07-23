@@ -42,7 +42,7 @@
       "id": "OR-003",
       "title": "Learner pathways",
       "branch": "agent/or-003-learner-pathways",
-      "status": "queued",
+      "status": "local-complete",
       "dependsOn": ["OR-002"],
       "checklistPhases": [2, 3, 4, 9, 10],
       "mergeEvidence": null
@@ -51,7 +51,7 @@
       "id": "OR-004",
       "title": "Family and trusted-support pathways",
       "branch": "agent/or-004-family-support",
-      "status": "queued",
+      "status": "local-complete",
       "dependsOn": ["OR-003"],
       "checklistPhases": [2, 4, 5, 7],
       "mergeEvidence": null
@@ -60,7 +60,7 @@
       "id": "OR-005",
       "title": "K-12 institutional pathways",
       "branch": "agent/or-005-k12-pathways",
-      "status": "queued",
+      "status": "local-complete",
       "dependsOn": ["OR-004"],
       "checklistPhases": [2, 4, 5, 7, 9],
       "mergeEvidence": null
@@ -69,7 +69,7 @@
       "id": "OR-006",
       "title": "College pathways",
       "branch": "agent/or-006-college-pathways",
-      "status": "queued",
+      "status": "local-complete",
       "dependsOn": ["OR-005"],
       "checklistPhases": [2, 4, 9, 10],
       "mergeEvidence": null
@@ -78,7 +78,7 @@
       "id": "OR-007",
       "title": "Opportunity partner pathways",
       "branch": "agent/or-007-opportunity-partners",
-      "status": "queued",
+      "status": "local-complete",
       "dependsOn": ["OR-006"],
       "checklistPhases": [2, 4, 10],
       "mergeEvidence": null
@@ -87,7 +87,7 @@
       "id": "OR-008",
       "title": "Onboarding governance and release validation",
       "branch": "agent/or-008-governance-release",
-      "status": "queued",
+      "status": "in-progress",
       "dependsOn": ["OR-003", "OR-004", "OR-005", "OR-006", "OR-007"],
       "checklistPhases": [1, 2, 3, 4],
       "mergeEvidence": null

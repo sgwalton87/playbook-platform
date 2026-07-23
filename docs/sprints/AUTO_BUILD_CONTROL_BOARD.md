@@ -8,12 +8,12 @@ This board converts the master checklist into an ordered build program. The JSON
 | --- | --- | --- | --- | --- |
 | 1 | OR-001 | Canonical roles and OS routing | Merged in PR #6 | Complete |
 | 2 | OR-002 | Premium shared onboarding shell | Built and validated locally | Publish/merge next |
-| 3 | OR-003 | Scholar, Scholar-Athlete, and transition-aged youth pathways | Queued | After OR-002 merges |
-| 4 | OR-004 | Parent/Guardian and Mentor pathways | Queued | After OR-003 |
-| 5 | OR-005 | Educator, Counselor, Coach, and District pathways | Queued | After OR-004 |
-| 6 | OR-006 | College Coach/Recruiter and Admissions pathways | Queued | After OR-005 |
-| 7 | OR-007 | Brand Partner and Employer pathways | Queued | After OR-006 |
-| 8 | OR-008 | Permissions, RLS, agreements, analytics, and role E2E release gate | Queued | After OR-003–007 |
+| 3 | OR-003 | Four learner pathways and inherited Scholar capabilities | Local-complete on review branch | Review with OR-002–007 |
+| 4 | OR-004 | Parent/Guardian and Mentor pathways | Local-complete on review branch | Review with OR-002–007 |
+| 5 | OR-005 | Educator, Counselor, Coach, and District pathways | Local-complete on review branch | Review with OR-002–007 |
+| 6 | OR-006 | College Coach/Recruiter and Admissions pathways | Local-complete on review branch | Review with OR-002–007 |
+| 7 | OR-007 | Brand Partner and Employer pathways | Local-complete on review branch | Review with OR-002–007 |
+| 8 | OR-008 | Permissions, RLS, migrations, email, and 14-role E2E release gate | Next / in progress | Yes—highest-value task |
 
 After OR-008, the `CORE-001` through `CORE-006` train closes the remaining master-checklist systems in dependency order: authentication, public Playbook Record, network/messaging, community, learning/rewards, and academic/recruiting.
 
