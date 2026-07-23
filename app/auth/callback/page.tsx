@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { getPathway, normalizeRole } from "@/lib/onboarding/pathwayMap";
 import type { EmailOtpType } from "@supabase/supabase-js";
+import { withTimeout } from "@/lib/async/withTimeout";
 
 export default function AuthCallbackPage() {
   return (
@@ -23,10 +24,10 @@ function AuthCallbackContent() {
       const type = params.get("type") || "email";
 
       if (tokenHash) {
-        const { error } = await supabase.auth.verifyOtp({
+        const { error } = await withTimeout(supabase.auth.verifyOtp({
           token_hash: tokenHash,
           type: type as EmailOtpType,
-        });
+        }), 12_000, "Email confirmation is taking too long.");
 
         if (error) {
           console.error("Auth token verification failed:", error.message);
@@ -37,7 +38,7 @@ function AuthCallbackContent() {
         const code = params.get("code");
 
         if (code) {
-          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          const { error } = await withTimeout(supabase.auth.exchangeCodeForSession(code), 12_000, "Sign-in confirmation is taking too long.");
           if (error) {
             console.error("Auth callback exchange failed:", error.message);
             window.location.href = `/login?error=${encodeURIComponent(error.message)}`;
@@ -46,7 +47,7 @@ function AuthCallbackContent() {
         }
       }
 
-      const { data, error } = await supabase.auth.getUser();
+      const { data, error } = await withTimeout(supabase.auth.getUser(), 10_000, "Your session is taking too long to confirm.");
 
       if (error || !data.user) {
         window.location.href = "/login";
@@ -61,13 +62,13 @@ function AuthCallbackContent() {
         "scholar"
       );
 
-      const { data: existing } = await supabase
-        .from("profiles")
-        .select("id,onboarding_completed,profile_mode,role")
-        .eq("id", data.user.id)
-        .maybeSingle();
+      const { data: existing } = await withTimeout(
+        supabase.from("profiles").select("id,onboarding_completed,profile_mode,role").eq("id", data.user.id).maybeSingle(),
+        10_000,
+        "Your Playbook Record is taking too long to load.",
+      );
 
-      await supabase.from("profiles").upsert(
+      await withTimeout(supabase.from("profiles").upsert(
         {
           id: data.user.id,
           email: data.user.email,
@@ -78,7 +79,7 @@ function AuthCallbackContent() {
           onboarding_completed: existing?.onboarding_completed || false,
         },
         { onConflict: "id" }
-      );
+      ), 10_000, "Your Playbook Record is taking too long to save.");
 
       if (existing?.onboarding_completed) {
         window.location.href = getPathway(existing.profile_mode || existing.role || role).osRoute;
@@ -87,7 +88,10 @@ function AuthCallbackContent() {
       }
     }
 
-    finishAuth();
+    finishAuth().catch((error) => {
+      const message = error instanceof Error ? error.message : "Authentication could not finish.";
+      window.location.href = `/login?error=${encodeURIComponent(message)}`;
+    });
   }, [params]);
 
   return (

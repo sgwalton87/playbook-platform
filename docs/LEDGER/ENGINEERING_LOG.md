@@ -1426,3 +1426,6 @@ Unify onboarding role and OS routing
 
 ## 2026-07-22 17:59
 - **precommit**: Make onboarding role cards direct links
+
+## 2026-07-22 18:05
+- **precommit**: Prevent onboarding session stalls

@@ -8,6 +8,7 @@ import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
 import { getRoleDefinition, type PlaybookRole } from "@/lib/roles/registry";
 import { supabase } from "@/lib/supabaseClient";
+import { withTimeout } from "@/lib/async/withTimeout";
 
 export default function OnboardingAccountGate({ role }: { role: PlaybookRole }) {
   const definition = getRoleDefinition(role);
@@ -23,39 +24,51 @@ export default function OnboardingAccountGate({ role }: { role: PlaybookRole }) 
     setStatus("");
 
     const callback = `${window.location.origin}/auth/callback?role=${encodeURIComponent(role)}`;
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: callback,
-        captchaToken: captchaToken || undefined,
-        data: { role, profile_mode: role, requested_role: role },
-      },
-    });
+    try {
+      const { data, error } = await withTimeout(supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: callback,
+          captchaToken: captchaToken || undefined,
+          data: { role, profile_mode: role, requested_role: role },
+        },
+      }), 12_000, "Account creation is taking too long. Check your connection and try again.");
 
-    if (error) {
-      setStatus(error.message);
+      if (error) {
+        setStatus(error.message);
+        setLoading(false);
+        return;
+      }
+
+      if (data.session) {
+        window.location.reload();
+        return;
+      }
+
+      window.location.href = `/check-email?email=${encodeURIComponent(email)}&role=${encodeURIComponent(role)}`;
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "We couldn’t create your account. Please try again.");
       setLoading(false);
-      return;
     }
-
-    if (data.session) {
-      window.location.reload();
-      return;
-    }
-
-    window.location.href = `/check-email?email=${encodeURIComponent(email)}&role=${encodeURIComponent(role)}`;
   }
 
   async function continueWithGoogle() {
     setStatus("");
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?role=${encodeURIComponent(role)}`,
-      },
-    });
-    if (error) setStatus(error.message);
+    setLoading(true);
+    try {
+      const { error } = await withTimeout(supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback?role=${encodeURIComponent(role)}`,
+        },
+      }), 12_000, "Google sign-in is taking too long. Check your connection and try again.");
+      if (error) setStatus(error.message);
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Google sign-in could not start. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -88,7 +101,7 @@ export default function OnboardingAccountGate({ role }: { role: PlaybookRole }) 
 
           <button type="submit" disabled={loading} style={primary}>{loading ? "Creating your Playbook…" : "Create account + continue"}</button>
           <div style={divider}>or</div>
-          <button type="button" onClick={continueWithGoogle} style={google}>Continue with Google</button>
+          <button type="button" onClick={continueWithGoogle} disabled={loading} style={google}>Continue with Google</button>
           <p style={returning}>Already registered? <Link href="/login" style={signIn}>Sign in</Link></p>
         </form>
       </section>

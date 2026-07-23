@@ -10,6 +10,7 @@ import { normalizeRole } from "@/lib/onboarding/pathwayMap";
 import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { ROLE_SELECTION_ROUTE } from "@/lib/roles/registry";
+import { withTimeout } from "@/lib/async/withTimeout";
 
 export default function LoginPage() {
   return (
@@ -61,15 +62,17 @@ function LoginContent() {
   }
 
   async function signInWithGoogle() {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=/start`,
-      },
-    });
-
-    if (error) {
-      setStatus(error.message);
+    setLoading(true);
+    try {
+      const { error } = await withTimeout(supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: `${window.location.origin}/auth/callback?next=/start` },
+      }), 12_000, "Google sign-in is taking too long. Please try again.");
+      if (error) setStatus(error.message);
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Google sign-in could not start.");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -88,7 +91,7 @@ function LoginContent() {
       if (isSignup) {
         const origin = window.location.origin;
 
-        const { error } = await supabase.auth.signUp({
+        const { error } = await withTimeout(supabase.auth.signUp({
           email,
           password,
           options: {
@@ -101,7 +104,7 @@ function LoginContent() {
               verification_status: "email_pending",
             },
           },
-        });
+        }), 12_000, "Account creation is taking too long. Please try again.");
 
         if (error) {
           setStatus(error.message);
@@ -117,10 +120,10 @@ function LoginContent() {
         return;
       }
 
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error } = await withTimeout(supabase.auth.signInWithPassword({
         email,
         password,
-      });
+      }), 12_000, "Sign-in is taking too long. Check your connection and try again.");
 
       if (error) {
         setStatus(error.message);
@@ -128,6 +131,8 @@ function LoginContent() {
       }
 
       window.location.href = "/dashboard";
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "The request could not finish. Please try again.");
     } finally {
       setLoading(false);
     }

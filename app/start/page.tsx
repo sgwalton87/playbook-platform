@@ -11,6 +11,7 @@ import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
 import type { User } from "@supabase/supabase-js";
 import type { OnboardingField } from "@/lib/onboarding";
 import OnboardingAccountGate from "@/components/onboarding/OnboardingAccountGate";
+import { withTimeout } from "@/lib/async/withTimeout";
 
 type OnboardingProfile = {
   id: string;
@@ -102,10 +103,10 @@ function StartContent() {
 
   useEffect(() => {
     async function load() {
-      const sessionData = await Promise.race([
+      const sessionData = await withTimeout(
         supabase.auth.getSession().then(({ data }) => data),
-        new Promise<{ session: null }>((resolve) => setTimeout(() => resolve({ session: null }), 1800)),
-      ]);
+        1800,
+      ).catch(() => ({ session: null }));
       const currentUser = sessionData.session?.user;
 
       if (!currentUser) {
@@ -116,11 +117,12 @@ function StartContent() {
       setUser(currentUser);
       setAuthResolved(true);
 
-      const { data: p } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", currentUser.id)
-        .maybeSingle();
+      const profileResult = await withTimeout(
+        supabase.from("profiles").select("*").eq("id", currentUser.id).maybeSingle(),
+        8_000,
+        "Your profile is taking too long to load.",
+      ).catch(() => ({ data: null }));
+      const p = profileResult.data;
 
       const safeProfile = p || {
         id: currentUser.id,
@@ -148,10 +150,11 @@ function StartContent() {
         ...onboarding,
       });
 
-      const { data: options } = await supabase
-        .from("onboarding_options")
-        .select("type,value")
-        .in("type", ["college", "career", "activity", "district"]);
+      const optionsResult = await withTimeout(
+        supabase.from("onboarding_options").select("type,value").in("type", ["college", "career", "activity", "district"]),
+        8_000,
+      ).catch(() => ({ data: null }));
+      const options = optionsResult.data;
 
       setCustomColleges((options || []).filter((o) => o.type === "college").map((o) => o.value));
       setCustomCareers((options || []).filter((o) => o.type === "career").map((o) => o.value));
