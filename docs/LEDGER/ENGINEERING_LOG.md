@@ -1459,3 +1459,6 @@ Unify onboarding role and OS routing
 
 ## 2026-07-22 20:13
 - **precommit**: Gate Starting Five activation behind role onboarding
+
+## 2026-07-22 20:14
+- **precommit**: Complete 14 role OS family with live messaging
