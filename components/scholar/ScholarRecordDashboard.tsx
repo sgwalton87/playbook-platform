@@ -2,8 +2,10 @@
 
 import ScholarRecordSummary from "@/components/scholar/ScholarRecordSummary";
 
+import type { ScholarRecord } from "@/lib/scholar";
+
 type Props = {
-  record: any;
+  record: ScholarRecord;
 };
 
 function SectionCard({
@@ -64,6 +66,8 @@ export default function ScholarRecordDashboard({ record }: Props) {
   const academics = record?.academics || {};
   const career = record?.career || {};
   const athletics = record?.athletics || {};
+  const goals = record?.goals || {};
+  const social = record?.social || {};
   const service = record?.service || {};
   const achievements = record?.achievements || {};
   const leadership = record?.leadership || {};
@@ -81,17 +85,17 @@ export default function ScholarRecordDashboard({ record }: Props) {
         }}
       >
         <SectionCard title="Academics">
-          <Row label="GPA" value={academics.gpa || academics.weightedGpa || academics.unweightedGpa} />
+          <Row label="GPA" value={academics.gpa} />
           <Row label="Dream School" value={academics.dreamSchool} />
           <Row label="Intended Major" value={academics.intendedMajor} />
           <Row label="SAT" value={academics.sat} />
           <Row label="ACT" value={academics.act} />
         </SectionCard>
 
-        <SectionCard title="Career">
-          <Row label="Ideal Profession" value={career.idealProfession} />
-          <Row label="Salary Goal" value={career.desiredSalaryRange} />
-          <Row label="Career Readiness" value={`${record?.readiness?.careerReadiness ?? 0}%`} />
+        <SectionCard title="College Goals">
+          <Row label="Dream School" value={goals.dreamSchool} />
+          <Row label="Intended Major" value={goals.intendedMajor} />
+          <Row label="Goal Statement" value={goals.collegeGoals} />
         </SectionCard>
       </div>
 
@@ -118,6 +122,41 @@ export default function ScholarRecordDashboard({ record }: Props) {
           <Row label="Leadership Score" value={leadership.leadershipScore ?? 0} />
         </SectionCard>
       </div>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: 14,
+          marginBottom: 14,
+        }}
+      >
+        <SectionCard title="Career">
+          <Row label="Ideal Profession" value={career.idealProfession} />
+          <Row label="Salary Goal" value={career.desiredSalaryRange} />
+          <Row label="Career Readiness" value={`${record?.readiness?.careerReadiness ?? 0}%`} />
+        </SectionCard>
+
+        <SectionCard title="Social Links">
+          <Row label="Instagram" value={social.instagram} />
+          <Row label="TikTok" value={social.tiktok} />
+          <Row label="YouTube" value={social.youtube} />
+          <Row label="LinkedIn" value={social.linkedin} />
+          <Row label="Website" value={social.website} />
+        </SectionCard>
+      </div>
+
+      <SectionCard title="Activities">
+        <Row label="Activities" value={achievements.activities?.length ?? 0} />
+        <Row label="Service Hours" value={service.volunteerHours ?? 0} />
+        <Row label="Extracurriculars" value={record.community.extracurricularActivities.length} />
+      </SectionCard>
+
+      <SectionCard title="Awards + Certifications">
+        <Row label="Awards" value={achievements.awards?.length ?? 0} />
+        <Row label="Community Certifications" value={achievements.certifications?.length ?? 0} />
+        <Row label="Course Certificates" value={achievements.certificates?.length ?? 0} />
+      </SectionCard>
 
       <SectionCard title="Achievements">
         <Row label="Certificates" value={achievements.certificates?.length ?? 0} />

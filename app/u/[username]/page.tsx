@@ -87,9 +87,7 @@ export default function PublicProfilePage() {
       setPosts(feedData||[]);
       setActivities((activityData||[]) as RawCommunityActivity[]);
       const photoPostUrls=(feedData||[]).filter((p:any)=>p.image_url).map((p:any)=>p.image_url);
-      const{data:files}=await supabase.storage.from("photos").list("gallery",{limit:100,sortBy:{column:"created_at",order:"desc"}});
-      const storageUrls=(files||[]).filter((f:any)=>f.name!==".emptyFolderPlaceholder").map((f:any)=>`${SURL}/storage/v1/object/public/photos/gallery/${f.name}`);
-      setGallery([...photoPostUrls,...storageUrls]);
+      setGallery(photoPostUrls);
       setLoading(false);
     })();
   },[username]);
@@ -154,7 +152,9 @@ export default function PublicProfilePage() {
     badges,
     activities,
     posts,
+    gallery,
   });
+  if(!isOwn&&!scholarRecord.visibility.isPublic)return<div style={{padding:40,fontFamily:T.sans}}><h2>Profile is private</h2><button onClick={()=>router.push("/dashboard")}>Back</button></div>;
 
   return(
     <div style={{minHeight:"100vh",background:T.cream,fontFamily:T.sans,color:T.ink,padding:"32px 36px",maxWidth:900,margin:"0 auto"}}>
@@ -163,7 +163,7 @@ export default function PublicProfilePage() {
       {lightbox&&(<div onClick={()=>setLightbox(null)} style={{position:"fixed",inset:0,zIndex:9999,background:"rgba(0,0,0,.93)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}><img src={lightbox} alt="" style={{maxWidth:"90vw",maxHeight:"90vh",objectFit:"contain",borderRadius:12}}/><button onClick={()=>setLightbox(null)} style={{position:"absolute",top:20,right:24,background:"rgba(255,255,255,.15)",border:"none",color:"#fff",fontSize:20,cursor:"pointer",borderRadius:"50%",width:40,height:40}}>✕</button></div>)}
 
       <ProfileHero
-        profile={profile}
+        record={scholarRecord}
         router={router}
       />
 
@@ -175,19 +175,14 @@ export default function PublicProfilePage() {
 
       <PortfolioEngine record={scholarRecord} />
 
-      <ProfileStats
-        profile={profile}
-        certificates={certificates}
-        badges={badges}
-        posts={posts}
-      />
+      <ProfileStats record={scholarRecord} />
 
       {/* 3 — About + Academics */}
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:14}}>
-        <AboutCard profile={profile} />
+        <AboutCard record={scholarRecord} />
         <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:20,padding:"20px 24px"}}>
           <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.14em",textTransform:"uppercase",color:T.muted,marginBottom:12}}>Academics</p>
-          {[["GPA",profile?.gpa],["SAT",profile?.sat_score],["ACT",profile?.act_score],["Dream School",profile?.dream_school],["Coach",profile?.coach_name],["Travel Team",profile?.travel_team]].map(([l,v])=>(
+          {[["GPA",scholarRecord.academics.gpa],["SAT",scholarRecord.academics.sat],["ACT",scholarRecord.academics.act],["Dream School",scholarRecord.academics.dreamSchool],["Coach",scholarRecord.athletics.coachName],["Travel Team",scholarRecord.athletics.travelTeam]].map(([l,v])=>(
             <div key={l} style={{display:"flex",justifyContent:"space-between",padding:"6px 0",borderBottom:`1px solid ${T.line}`}}>
               <span style={{fontSize:12,color:T.muted}}>{l}</span>
               <span style={{fontSize:12,fontWeight:600,color:T.ink}}>{v||"—"}</span>
@@ -200,7 +195,7 @@ export default function PublicProfilePage() {
       <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:20,padding:"20px 24px",marginBottom:14}}>
         <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.14em",textTransform:"uppercase",color:T.muted,marginBottom:12}}>Badges</p>
         <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
-          {badges.length>0?badges.map(badge=>(
+          {scholarRecord.achievements.badges.length>0?scholarRecord.achievements.badges.map((badge:any)=>(
             <span key={badge.id} style={{fontFamily:T.mono,fontSize:10,fontWeight:700,padding:"6px 12px",borderRadius:999,background:T.orangeL,border:`1px solid ${T.orange}22`,color:T.orange}}>🏅 {badge.displayName}</span>
           )):<p style={{fontSize:13,color:T.faint}}>No badges yet.</p>}
         </div>
@@ -210,11 +205,11 @@ export default function PublicProfilePage() {
       <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:20,padding:"20px 24px",marginBottom:14}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
           <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.14em",textTransform:"uppercase",color:T.muted}}>Certificates</p>
-          {certificates.length>0&&<button onClick={()=>router.push("/certificates")} style={{fontFamily:T.mono,fontSize:9,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",color:T.orange,background:"none",border:"none",cursor:"pointer"}}>View all →</button>}
+          {scholarRecord.achievements.certificates.length>0&&<button onClick={()=>router.push("/certificates")} style={{fontFamily:T.mono,fontSize:9,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",color:T.orange,background:"none",border:"none",cursor:"pointer"}}>View all →</button>}
         </div>
-        {certificates.length>0?(
+        {scholarRecord.achievements.certificates.length>0?(
           <div style={{display:"flex",gap:14,flexWrap:"wrap"}}>
-            {certificates.map(cert=>(
+            {scholarRecord.achievements.certificates.map((cert:any)=>(
               <div key={cert.id} className="pb-cert-sm" onClick={()=>router.push("/certificates")} style={{cursor:"pointer"}}>
                 <SmallCertCard cert={cert}/>
                 <div style={{marginTop:8,textAlign:"center"}}>
@@ -239,7 +234,7 @@ export default function PublicProfilePage() {
       <div style={{display:"flex",gap:8,marginBottom:16}}>
         {(["feed","gallery"]as const).map(t=>(
           <button key={t} onClick={()=>setTab(t)} style={{fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:tab===t?T.navy:"transparent",color:tab===t?"#F8F7F4":T.muted,border:`1.5px solid ${tab===t?T.navy:T.line}`,borderRadius:999,padding:"9px 18px",cursor:"pointer",transition:"all 0.15s"}}>
-            {t==="feed"?`📣 Posts (${posts.length})`:`📸 Gallery (${gallery.length})`}
+            {t==="feed"?`📣 Posts (${scholarRecord.stats.posts})`:`📸 Gallery (${scholarRecord.media.gallery.length})`}
           </button>
         ))}
       </div>
@@ -249,7 +244,7 @@ export default function PublicProfilePage() {
           {isOwn&&(
             <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:18,padding:"18px 20px",marginBottom:16}}>
               <div style={{display:"flex",gap:12,alignItems:"flex-start",marginBottom:12}}>
-                <ProfileAvatar src={profile?.avatar_url} name={`${profile?.first_name||""}`} size={40}/>
+                <ProfileAvatar src={scholarRecord.identity.avatarUrl} name={scholarRecord.identity.fullName} size={40}/>
                 <textarea value={newPost} onChange={e=>setNewPost(e.target.value)} placeholder="Post something to your public community feed..." rows={3} style={{flex:1,background:T.surface2,border:`1.5px solid ${T.line}`,borderRadius:12,padding:"10px 14px",fontSize:14,color:T.ink,fontFamily:T.sans,transition:"border-color 0.15s",width:"100%"}}/>
               </div>
               {pendingPhoto&&(
@@ -269,19 +264,19 @@ export default function PublicProfilePage() {
               </div>
             </div>
           )}
-          {posts.length===0?(
+          {scholarRecord.achievements.posts.length===0?(
             <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:16,padding:"48px 24px",textAlign:"center"}}><div style={{fontSize:36,marginBottom:14}}>📣</div><p style={{fontFamily:T.mono,fontSize:12,color:T.faint}}>No public posts yet.</p></div>
           ):(
             <div style={{display:"flex",flexDirection:"column",gap:12}}>
-              {posts.map(post=>(
+              {scholarRecord.achievements.posts.map((post:any)=>(
                 <div key={post.id} className="pb-post" style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:18,overflow:"hidden",transition:"border-color 0.15s"}}>
                   {post.image_url&&(<div style={{position:"relative",maxHeight:280,overflow:"hidden",cursor:"pointer"}} onClick={()=>setLightbox(post.image_url)}><img src={post.image_url} alt="" style={{width:"100%",objectFit:"cover",display:"block",maxHeight:280}}/><div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,transparent 50%,rgba(15,23,42,.5) 100%)"}}/></div>)}
                   <div style={{padding:"16px 18px"}}>
                     <div style={{display:"flex",gap:10,alignItems:"flex-start",marginBottom:10}}>
-                      <ProfileAvatar src={profile?.avatar_url} name={`${profile?.first_name||""}`} size={38}/>
+                      <ProfileAvatar src={scholarRecord.identity.avatarUrl} name={scholarRecord.identity.fullName} size={38}/>
                       <div>
-                        <div style={{fontSize:14,fontWeight:700,color:T.ink}}>{profile?.first_name} {profile?.last_name}</div>
-                        <div style={{fontFamily:T.mono,fontSize:10,color:T.faint}}>@{profile?.username} · {new Date(post.created_at).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}</div>
+                        <div style={{fontSize:14,fontWeight:700,color:T.ink}}>{scholarRecord.identity.fullName}</div>
+                        <div style={{fontFamily:T.mono,fontSize:10,color:T.faint}}>@{scholarRecord.identity.username} · {new Date(post.created_at).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}</div>
                       </div>
                     </div>
                     {post.title&&<div style={{fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>{post.title}</div>}
@@ -313,13 +308,13 @@ export default function PublicProfilePage() {
             </label>
           )}
           <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
-            <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.14em",textTransform:"uppercase",color:T.muted}}>{gallery.length} photos</p>
+            <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.14em",textTransform:"uppercase",color:T.muted}}>{scholarRecord.media.gallery.length} photos</p>
           </div>
-          {gallery.length===0?(
+          {scholarRecord.media.gallery.length===0?(
             <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:16,padding:"48px 24px",textAlign:"center"}}><div style={{fontSize:36,marginBottom:14}}>📷</div><p style={{fontFamily:T.mono,fontSize:12,color:T.faint}}>No photos yet.</p></div>
           ):(
             <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12}}>
-              {gallery.map((img,i)=>(
+              {scholarRecord.media.gallery.map((img,i)=>(
                 <div key={i} onClick={()=>setLightbox(img)} style={{aspectRatio:"1",borderRadius:14,overflow:"hidden",cursor:"pointer",background:T.line}}>
                   <img src={img} alt={`Photo ${i+1}`} className="pb-gal" style={{width:"100%",height:"100%",objectFit:"cover",display:"block",transition:"all 0.2s"}}/>
                 </div>
