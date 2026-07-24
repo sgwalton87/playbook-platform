@@ -1,3 +1,4 @@
+import Image from "next/image";
 type Props = {
   imageSrc: string;
   title: string;
@@ -13,7 +14,7 @@ export default function PlaybookImageCard({
 }: Props) {
   return (
     <article style={card}>
-      <img src={imageSrc} alt="" style={image} />
+      <Image unoptimized width={1200} height={800} src={imageSrc} alt="" style={image} />
       <div style={content}>
         <div style={eyebrowStyle}>{eyebrow}</div>
         <h3 style={titleStyle}>{title}</h3>

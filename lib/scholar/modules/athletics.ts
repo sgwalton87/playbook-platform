@@ -1,4 +1,4 @@
-export function buildAthletics(profile:any){
+export function buildAthletics(profile:LegacyValue){
 
   return{
 

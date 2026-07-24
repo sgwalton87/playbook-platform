@@ -3,7 +3,7 @@
 import { buildTrustReport } from "@/lib/trust";
 
 type Props = {
-  record: any;
+  record: LegacyValue;
 };
 
 export default function TrustScoreCard({ record }: Props) {

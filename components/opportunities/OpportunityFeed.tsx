@@ -3,7 +3,7 @@
 import { buildOpportunityMatches } from "@/lib/opportunities";
 
 type Props = {
-  record: any;
+  record: LegacyValue;
 };
 
 export default function OpportunityFeed({ record }: Props) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   acceptConnectionRequest,
   declineConnectionRequest,
@@ -20,7 +20,7 @@ export default function ConnectionButton({ targetUserId }: Props) {
   const [status, setStatus] = useState<ConnectionStatus>("none");
   const [loading, setLoading] = useState(true);
 
-  async function refresh(userId?: string) {
+  const refresh = useCallback(async (userId?: string) => {
     const id = userId || currentUserId;
     if (!id || !targetUserId) return;
 
@@ -28,7 +28,7 @@ export default function ConnectionButton({ targetUserId }: Props) {
     const next = await getConnectionStatus(id, targetUserId);
     setStatus(next);
     setLoading(false);
-  }
+  }, [currentUserId, targetUserId]);
 
   useEffect(() => {
     async function load() {
@@ -44,7 +44,7 @@ export default function ConnectionButton({ targetUserId }: Props) {
     }
 
     load();
-  }, [targetUserId]);
+  }, [refresh]);
 
   async function act() {
     if (!currentUserId) {

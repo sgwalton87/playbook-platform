@@ -1,4 +1,4 @@
-export function calculateAcademicCompletion(portfolio: any): number {
+export function calculateAcademicCompletion(portfolio: LegacyValue): number {
   const fields = [
     portfolio?.academics?.weightedGpa,
     portfolio?.academics?.unweightedGpa,

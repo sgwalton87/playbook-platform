@@ -8,7 +8,7 @@ import { inferCompassGoals } from "./GoalEngine";
 import { explainCompassScore } from "./Explainability";
 
 export function buildCompassReport(input: {
-  courses?: any[];
+  courses?: LegacyValue[];
   trustScore?: number;
 } = {}): CompassReport {
   const courses = input.courses || [];

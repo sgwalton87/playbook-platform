@@ -11,8 +11,8 @@ const DEMO_SCHOLAR_ID = "scholar-maya";
 
 export default function SupportNetworkLiveCenter() {
   const [body, setBody] = useState("");
-  const [messages, setMessages] = useState<any[]>(getDemoSupportThread());
-  const [actions, setActions] = useState<any[]>(getDemoSharedActions());
+  const [messages, setMessages] = useState<LegacyValue[]>(getDemoSupportThread());
+  const [actions, setActions] = useState<LegacyValue[]>(getDemoSharedActions());
   const [status, setStatus] = useState("Demo data loaded.");
 
   useEffect(() => {
@@ -94,7 +94,7 @@ export default function SupportNetworkLiveCenter() {
           <p style={eyebrow}>Shared Actions</p>
           <h2 style={cardTitle}>Assigned support tasks</h2>
 
-          {actions.map((action: any, index) => (
+          {actions.map((action: LegacyValue, index) => (
             <div key={action.id || action.title} style={item}>
               <strong>{action.title}</strong>
               <span>{action.assigned_role}</span>
@@ -129,7 +129,7 @@ export default function SupportNetworkLiveCenter() {
           <button onClick={sendMessage} style={button}>Send message</button>
 
           <div style={{ display: "grid", gap: 10, marginTop: 16 }}>
-            {messages.map((msg: any, i) => (
+            {messages.map((msg: LegacyValue, i) => (
               <div key={`${msg.sender_role}-${i}`} style={message}>
                 <strong>{msg.sender_role}</strong>
                 <p>{msg.body}</p>

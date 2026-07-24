@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
@@ -65,7 +66,7 @@ export default function CoursesPage() {
 
       const nextProgress: Record<string, number> = {};
 
-      (progressRows || []).forEach((row: any) => {
+      (progressRows || []).forEach((row: LegacyValue) => {
         if (row.completed) {
           const course = FLAGSHIP.find((c) => c.id === row.course_slug);
           nextProgress[row.course_slug] = course?.modules || row.completed_modules?.length || 1;
@@ -77,13 +78,11 @@ export default function CoursesPage() {
       setProgress(nextProgress);
       setLoading(false);
     })();
-  }, []);
+  }, [router]);
 
   if (loading) return <div style={{ minHeight:"100vh", background:"#F8F7F4", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'Space Mono', monospace", fontSize:12, color:"#94A3B8" }}>Loading courses…</div>;
 
   const inProgress = FLAGSHIP.filter(c => progress[c.id] > 0 && progress[c.id] < c.modules && !c.comingSoon);
-  const totalXP = FLAGSHIP.reduce((acc, c) => acc + (progress[c.id] || 0) * 50, 0);
-
   return (
     <>
       <div style={{ fontFamily:"'Hanken Grotesk', system-ui, sans-serif", color:"#0F172A" }}>
@@ -234,7 +233,7 @@ export default function CoursesPage() {
                 <div key={c.id} onClick={() => router.push(`/courses/${c.id}`)}
                   style={{ display:"flex", alignItems:"center", gap:14, background:"#fff", border:"1.5px solid #E2E8F0", borderRadius:22, padding:"16px 18px", cursor:"pointer", marginBottom:8, transition:"border-color 0.15s" }}>
                   <div style={{ width:52, height:52, borderRadius:10, overflow:"hidden", flexShrink:0 }}>
-                    <img src={c.img} alt={c.title} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                    <Image unoptimized width={1200} height={800} src={c.img} alt={c.title} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
                   </div>
                   <div style={{ flex:1 }}>
                     <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:5 }}>
@@ -309,7 +308,7 @@ export default function CoursesPage() {
                 style={{ background:"#fff", border:`1.5px solid ${isComplete ? c.color+"44" : "#E2E8F0"}`, borderRadius:24, overflow:"hidden", transition:"all 0.2s", boxShadow:"0 12px 30px rgba(15,23,42,.04)", cursor:c.comingSoon?"default":"pointer", opacity:c.comingSoon?0.6:1 }}>
                 {/* Photo */}
                 <div style={{ position:"relative", height:160, overflow:"hidden" }}>
-                  <img src={c.img} alt={c.title} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                  <Image unoptimized width={1200} height={800} src={c.img} alt={c.title} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
                   <div style={{ position:"absolute", inset:0, background:"linear-gradient(180deg,transparent 40%,rgba(15,23,42,.75) 100%)" }} />
                   <span style={{ position:"absolute", top:12, left:12, fontFamily:"'Space Mono', monospace", fontSize:9, fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", background:c.color, color:"#fff", padding:"4px 10px", borderRadius:999 }}>{c.pillar}</span>
                   {c.comingSoon && <span style={{ position:"absolute", top:12, right:12, fontFamily:"'Space Mono', monospace", fontSize:9, fontWeight:700, background:"rgba(15,23,42,.8)", color:"#94A3B8", padding:"4px 10px", borderRadius:999 }}>Coming soon</span>}
@@ -360,7 +359,7 @@ export default function CoursesPage() {
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))", gap:18 }}>
             {COMING_SOON.map((c) => (
               <div key={c.id} style={{ background:"#fff", border:"1px solid #E2E8F0", borderRadius:24, overflow:"hidden", opacity:.9, boxShadow:"0 12px 30px rgba(15,23,42,.04)" }}>
-                <img src={c.img} alt={c.title} style={{ width:"100%", height:160, objectFit:"cover" }} />
+                <Image unoptimized width={1200} height={800} src={c.img} alt={c.title} style={{ width:"100%", height:160, objectFit:"cover" }} />
 
                 <div style={{ padding:"16px 18px 18px" }}>
                   <p style={{ fontFamily:"'Space Mono', monospace", fontSize:10, letterSpacing:"0.12em", textTransform:"uppercase", color:c.color, marginBottom:8 }}>

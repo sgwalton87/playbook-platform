@@ -1,6 +1,6 @@
 "use client";
 
-export default function StudioCard({ label, title, value, children }: any) {
+export default function StudioCard({ label, title, value, children }: LegacyValue) {
   return (
     <section style={card}>
       <p style={labelStyle}>{label}</p>

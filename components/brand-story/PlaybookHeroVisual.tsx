@@ -1,3 +1,4 @@
+import Image from "next/image";
 type Props = {
   image: string;
   alt: string;
@@ -15,7 +16,7 @@ export default function PlaybookHeroVisual({ image, alt }: Props) {
         minHeight: 280,
       }}
     >
-      <img
+      <Image unoptimized width={1200} height={800}
         src={image}
         alt={alt}
         style={{

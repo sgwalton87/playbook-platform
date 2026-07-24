@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 type Props = {
@@ -41,7 +42,7 @@ export default function CourseDetailHeader({
           boxShadow: "0 18px 50px rgba(15,23,42,.12)",
         }}
       >
-        <img
+        <Image unoptimized width={1200} height={800}
           src={image}
           alt={title}
           style={{

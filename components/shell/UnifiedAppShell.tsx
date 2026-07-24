@@ -24,7 +24,7 @@ const AUTH_FULLSCREEN_ROUTES = [
 export default function UnifiedAppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<LegacyValue>(null);
   const [open, setOpen] = useState(true);
 
   useEffect(() => {

@@ -1,6 +1,6 @@
 "use client";
 
-export default function AcademicDNAVisualizer({ dna }: { dna: any }) {
+export default function AcademicDNAVisualizer({ dna }: { dna: LegacyValue }) {
   const signals = dna.strengths.slice(0, 7);
 
   return (

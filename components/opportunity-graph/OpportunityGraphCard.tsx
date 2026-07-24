@@ -5,7 +5,7 @@ import { buildAcademicDNA } from "@/lib/academic-intelligence";
 import { useMemo } from "react";
 
 type Props = {
-  courses?: any[];
+  courses?: LegacyValue[];
 };
 
 export default function OpportunityGraphCard({ courses = [] }: Props) {
@@ -49,7 +49,7 @@ export default function OpportunityGraphCard({ courses = [] }: Props) {
         </div>
       ) : (
         <div style={{display:"grid",gap:12}}>
-          {matches.slice(0,4).map((match:any)=>(
+          {matches.slice(0,4).map((match:LegacyValue)=>(
             <div key={match.opportunity.id} style={{border:"1px solid #E2E8F0",borderRadius:16,padding:16}}>
               <div style={{display:"flex",justifyContent:"space-between",gap:12}}>
                 <div>

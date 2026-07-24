@@ -1,8 +1,8 @@
 export function buildNetworkIntelligence(input: {
-  relationships?: any[];
-  messages?: any[];
-  actions?: any[];
-  invitations?: any[];
+  relationships?: LegacyValue[];
+  messages?: LegacyValue[];
+  actions?: LegacyValue[];
+  invitations?: LegacyValue[];
 } = {}) {
   const relationships = input.relationships || [];
   const messages = input.messages || [];

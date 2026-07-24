@@ -1,10 +1,10 @@
 export function buildNotificationDigest(input: {
-  notifications: any[];
+  notifications: LegacyValue[];
   cadence: "daily" | "weekly";
 }) {
   const unread = input.notifications.filter((n) => !n.read);
 
-  const grouped = unread.reduce<Record<string, any[]>>((acc, item) => {
+  const grouped = unread.reduce<Record<string, LegacyValue[]>>((acc, item) => {
     const key = item.type || "general";
     acc[key] ||= [];
     acc[key].push(item);

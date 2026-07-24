@@ -24,7 +24,7 @@ function AuthCallbackContent() {
       if (tokenHash) {
         const { error } = await supabase.auth.verifyOtp({
           token_hash: tokenHash,
-          type: type as any,
+          type: type as LegacyValue,
         });
 
         if (error) {

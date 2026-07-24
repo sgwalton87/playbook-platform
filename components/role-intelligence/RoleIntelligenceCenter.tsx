@@ -31,7 +31,7 @@ export default function RoleIntelligenceCenter() {
         <p style={eyebrow}>Role-Aware Intelligence Platform</p>
         <h1 style={title}>One scholar signal. Seven intelligent experiences.</h1>
         <p style={sub}>
-          Recommendations and scenarios now change based on the user's relationship to the scholar.
+          Recommendations and scenarios now change based on the user&apos;s relationship to the scholar.
         </p>
       </section>
 

@@ -4,7 +4,7 @@ import ProfileAvatar from "@/components/ProfileAvatar";
 
 const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",blue:"#3B82F6",green:"#10B981",purple:"#8B5CF6",mono:"'Space Mono', monospace",sans:"'Hanken Grotesk', system-ui, sans-serif",anton:"'Anton', sans-serif"};
 
-export default function PortfolioHero({scholarRecord,onDashboard}:{scholarRecord:any;onDashboard:()=>void}) {
+export default function PortfolioHero({scholarRecord,onDashboard}:{scholarRecord:LegacyValue;onDashboard:()=>void}) {
   const identity = scholarRecord?.identity || {};
   const intelligence = scholarRecord?.intelligence || {};
   const completion = intelligence?.completion?.percent || 0;

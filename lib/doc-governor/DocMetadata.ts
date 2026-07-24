@@ -44,7 +44,7 @@ export function parseFrontMatter(content: string): {
   const raw = content.slice(3, end).trim();
   const body = content.slice(end + 3).trim();
 
-  const metadata: Record<string, any> = {};
+  const metadata: Record<string, LegacyValue> = {};
 
   raw.split("\n").forEach((line) => {
     const [key, ...rest] = line.split(":");
@@ -98,10 +98,10 @@ export function inferDocMetadata(file: string, content: string): DocMetadata {
   return {
     title: String(title),
     doc_type: String(parsed.metadata.doc_type || inferredType),
-    owner: (parsed.metadata.owner as any) || owner,
-    status: (parsed.metadata.status as any) || status,
+    owner: (parsed.metadata.owner as LegacyValue) || owner,
+    status: (parsed.metadata.status as LegacyValue) || status,
     canonical: parsed.metadata.canonical ?? (status === "canonical" || status === "frozen"),
     auto_update: parsed.metadata.auto_update ?? (owner !== "human"),
-    lifecycle: (parsed.metadata.lifecycle as any) || (status === "deprecated" ? "deprecated" : "active"),
+    lifecycle: (parsed.metadata.lifecycle as LegacyValue) || (status === "deprecated" ? "deprecated" : "active"),
   };
 }

@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 
-const ThemeContext = createContext<any>(null);
+const ThemeContext = createContext<LegacyValue>(null);
 
 export function ThemeProvider({
   children,
@@ -15,7 +15,7 @@ export function ThemeProvider({
     const saved = localStorage.getItem("theme");
 
     if (saved) {
-      setTheme(saved);
+      window.setTimeout(() => setTheme(saved), 0);
     }
   }, []);
 

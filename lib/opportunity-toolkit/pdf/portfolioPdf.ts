@@ -1,8 +1,8 @@
 export function buildPortfolioPdfPayload(input: {
   scholarName: string;
   targetUse: string;
-  resume: any;
-  bragSheet: any;
+  resume: LegacyValue;
+  bragSheet: LegacyValue;
   recommendationLetter?: string;
 }) {
   return {

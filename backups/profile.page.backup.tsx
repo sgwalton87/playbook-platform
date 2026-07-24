@@ -10,7 +10,7 @@ import { checkBadges } from "@/lib/badges";
 export default function ProfilePage() {
   const router = useRouter();
 
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<LegacyValue>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -151,7 +151,7 @@ export default function ProfilePage() {
     }
 
     setAvatarUrl(publicUrl);
-    setProfile((prev: any) => ({ ...prev, avatar_url: publicUrl }));
+    setProfile((prev: LegacyValue) => ({ ...prev, avatar_url: publicUrl }));
   };
 
   const saveProfile = async () => {

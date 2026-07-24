@@ -1,4 +1,4 @@
-export function inferCompassGoals(input: { courses?: any[] }) {
+export function inferCompassGoals(input: { courses?: LegacyValue[] }) {
   const names = (input.courses || []).map(c => String(c.name || "").toLowerCase());
 
   return [

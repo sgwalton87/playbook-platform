@@ -26,7 +26,7 @@ export default function NotificationCenter() {
         const json = await res.json();
 
         if (res.ok && json.notifications?.length) {
-          setNotifications(json.notifications.map((item: any) => ({
+          setNotifications(json.notifications.map((item: LegacyValue) => ({
             id: item.id,
             userId: item.user_id,
             scholarId: item.scholar_id,
@@ -188,64 +188,6 @@ export default function NotificationCenter() {
   );
 }
 
-const page: React.CSSProperties = {
-  minHeight: "100vh",
-  background: "#F8F7F4",
-  padding: 32,
-  fontFamily: "system-ui, sans-serif",
-};
-
-const hero: React.CSSProperties = {
-  maxWidth: 1120,
-  margin: "0 auto 18px",
-  background: "#0F172A",
-  color: "#FFFFFF",
-  borderRadius: 30,
-  padding: 34,
-};
-
-const eyebrow: React.CSSProperties = {
-  fontSize: 11,
-  letterSpacing: ".14em",
-  textTransform: "uppercase",
-  fontWeight: 950,
-  color: "#F97316",
-  margin: 0,
-};
-
-const title: React.CSSProperties = {
-  fontSize: 50,
-  lineHeight: 1,
-  margin: "12px 0",
-};
-
-const sub: React.CSSProperties = {
-  color: "#CBD5E1",
-  fontSize: 17,
-  lineHeight: 1.6,
-  maxWidth: 760,
-};
-
-const heroStats: React.CSSProperties = {
-  display: "flex",
-  gap: 12,
-  flexWrap: "wrap",
-  marginTop: 20,
-};
-
-const heroStat: React.CSSProperties = {
-  display: "grid",
-  gap: 2,
-  background: "rgba(255,255,255,.08)",
-  border: "1px solid rgba(255,255,255,.12)",
-  borderRadius: 16,
-  padding: "12px 16px",
-};
-
-const heroNumber: React.CSSProperties = {
-  fontSize: 24,
-};
-
 const toolbar: React.CSSProperties = {
   maxWidth: 1120,
   margin: "0 auto 16px",
@@ -307,18 +249,6 @@ const cardTop: React.CSSProperties = {
   display: "flex",
   justifyContent: "space-between",
   gap: 16,
-};
-
-const typePill: React.CSSProperties = {
-  display: "inline-flex",
-  background: "#FFF7ED",
-  color: "#9A3412",
-  border: "1px solid #FED7AA",
-  borderRadius: 999,
-  padding: "5px 8px",
-  fontSize: 10,
-  fontWeight: 900,
-  textTransform: "uppercase",
 };
 
 const cardTitle: React.CSSProperties = {

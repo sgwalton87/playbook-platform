@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
@@ -6,51 +7,6 @@ import CollegeSearch from "@/components/CollegeSearch";
 import Confetti from "react-confetti";
 import type { RawCommunityActivity } from "@/lib/scholar";
 
-const ONBOARDING_steps_BY_ROLE = {
-  scholar: [
-    "School & Location",
-    "Academic Profile",
-    "College Goals",
-    "Your Pillars",
-  ],
-
-  scholar_athlete: [
-    "School & Location",
-    "Athletic Profile",
-    "Recruiting Profile",
-    "Academic Profile",
-    "College Goals",
-    "Your Pillars",
-  ],
-
-  tay: [
-    "Background",
-    "Support Needs",
-    "Education Goals",
-    "Your Pillars",
-  ],
-
-  mentor: [
-    "Professional Profile",
-    "Mentorship Focus",
-    "Availability",
-    "Verification",
-  ],
-
-  coach: [
-    "Team / Organization",
-    "Athletic Focus",
-    "Students You Support",
-    "Verification",
-  ],
-
-  academic_advisor: [
-    "Organization",
-    "Caseload",
-    "Academic Focus",
-    "Verification",
-  ],
-};
 const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",blue:"#3B82F6",blueL:"#EFF6FF",green:"#10B981",purple:"#8B5CF6",amber:"#F59E0B",mono:"'Space Mono', monospace",sans:"'Hanken Grotesk', system-ui, sans-serif",anton:"'Anton', sans-serif"};
 const SPORT_CONFIG:Record<string,{label:string;options:string[]}>={
   "Basketball":{label:"Position",options:["Point Guard","Shooting Guard","Small Forward","Power Forward","Center","Guard","Forward","Guard-Forward","Forward-Center"]},
@@ -80,14 +36,6 @@ const HEIGHTS = [
 ];
 
 const WEIGHTS = Array.from({ length: 211 }, (_, i) => `${90 + i} lbs`);
-
-const RECRUITING_INTEREST = [
-  "Actively being recruited",
-  "Interested in playing in college",
-  "Exploring options",
-  "Unsure"
-];
-
 
 const SALARY_RANGES = [
   "Under $35,000",
@@ -134,7 +82,7 @@ function SearchDropdown({options,value,onChange,placeholder,onAddNew}:{options:s
           {filtered.map(o=>(
             <div key={o} onMouseDown={()=>{setQuery(o);onChange(o, "");setOpen(false);}} style={{padding:"11px 14px",fontSize:14,color:T.ink,cursor:"pointer",borderBottom:`1px solid ${T.line}`}} onMouseEnter={e=>(e.currentTarget.style.background=T.orangeL)} onMouseLeave={e=>(e.currentTarget.style.background="transparent")}>{o}</div>
           ))}
-          {showAdd&&<div onMouseDown={()=>{onChange(query, "");onAddNew!(query);setOpen(false);}} style={{padding:"11px 14px",fontSize:14,color:T.orange,cursor:"pointer",fontWeight:700,background:T.orangeL,borderTop:`1px solid ${T.line}`}}>+ Add "{query}"</div>}
+          {showAdd&&<div onMouseDown={()=>{onChange(query, "");onAddNew!(query);setOpen(false);}} style={{padding:"11px 14px",fontSize:14,color:T.orange,cursor:"pointer",fontWeight:700,background:T.orangeL,borderTop:`1px solid ${T.line}`}}>+ Add &quot;{query}&quot;</div>}
         </div>
       )}
     </div>
@@ -299,10 +247,8 @@ export default function OnboardingPage() {
   const [gender,setGender]=useState("");const [race,setRace]=useState("");const [householdIncome,setHouseholdIncome]=useState("");const [firstGen,setFirstGen]=useState(false);const [freeLunch,setFreeLunch]=useState(false);const [migrant,setMigrant]=useState(false);const [fosterYouth,setFosterYouth]=useState(false);const [unhoused,setUnhoused]=useState(false);const [iep,setIep]=useState(false);const [bio,setBio]=useState("");
   const [pillars,setPillars]=useState<string[]>([]);const [username,setUsername]=useState("");const [usernameStatus,setUsernameStatus]=useState<"idle"|"taken"|"available">("idle");
   const [role,setRole]=useState("scholar");
-const [highSchoolTeam,setHighSchoolTeam]=useState("");
 const [athleteEmail,setAthleteEmail]=useState("");
 const [highlightVideo,setHighlightVideo]=useState("");
-const [recruitingInterest,setRecruitingInterest]=useState("");
   const [recruitingStatus,setRecruitingStatus]=useState("");
   const [desiredCollegeLevel,setDesiredCollegeLevel]=useState("");
   const [campsAttended,setCampsAttended]=useState("");
@@ -329,11 +275,10 @@ const [currentMath,setCurrentMath]=useState("");
 const [currentEnglish,setCurrentEnglish]=useState("");
 const [currentScience,setCurrentScience]=useState("");
 
-const [collegeGoal,setCollegeGoal]=useState("");
 const [idealProfession,setIdealProfession]=useState("");
 const [desiredSalaryRange,setDesiredSalaryRange]=useState("");
 const [activities,setActivities]=useState<RawCommunityActivity[]>([]);
-const [careerOptions,setCareerOptions] = useState<any[]>([]);
+const [careerOptions,setCareerOptions] = useState<LegacyValue[]>([]);
 
 const [dreamSchoolName, setDreamSchoolName] = useState("");
 const [dreamSchoolId, setDreamSchoolId] = useState("");
@@ -403,12 +348,12 @@ if (p?.role) {
 
     if (custom) {
       const d = custom
-        .filter((c: any) => c.category === "district")
-        .map((c: any) => c.value);
+        .filter((c: LegacyValue) => c.category === "district")
+        .map((c: LegacyValue) => c.value);
 
       const ci = custom
-        .filter((c: any) => c.category === "city")
-        .map((c: any) => c.value);
+        .filter((c: LegacyValue) => c.category === "city")
+        .map((c: LegacyValue) => c.value);
 
       if (d.length) {
         setDistrictOptions((prev) => [...new Set([...prev, ...d])]);
@@ -879,7 +824,7 @@ const canProceed = requiredByStep[currentStepName]
     <label style={lbl}>Ideal profession</label>
     <select style={sel} value={idealProfession} onChange={e=>setIdealProfession(e.target.value)}>
       <option value="">Select ideal profession...</option>
-      {careerOptions.map((career:any)=>(
+      {careerOptions.map((career:LegacyValue)=>(
         <option key={career.title} value={career.title}>
           {career.title}
         </option>
@@ -968,7 +913,7 @@ const canProceed = requiredByStep[currentStepName]
               <label style={lbl}>Profile photo (optional)</label>
               <div style={{display:"flex",alignItems:"center",gap:16}}>
                 <div style={{width:72,height:72,borderRadius:"50%",background:"#F1F5F9",border:"2px solid #E2E8F0",overflow:"hidden",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
-                  {avatarUrl?<img src={avatarUrl} alt="avatar" style={{width:"100%",height:"100%",objectFit:"cover"}}/>:<span style={{fontSize:28}}>👤</span>}
+                  {avatarUrl?<Image unoptimized width={1200} height={800} src={avatarUrl} alt="avatar" style={{width:"100%",height:"100%",objectFit:"cover"}}/>:<span style={{fontSize:28}}>👤</span>}
                 </div>
                 <div>
                   <label style={{fontFamily:"'Space Mono',monospace",fontSize:11,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:"#0F172A",color:"#F8F7F4",border:"none",borderRadius:10,padding:"10px 16px",cursor:"pointer",display:"inline-block"}}>

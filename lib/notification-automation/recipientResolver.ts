@@ -1,6 +1,6 @@
 export function resolveRecipientsFromRelationships(input: {
   scholarId: string;
-  relationships: any[];
+  relationships: LegacyValue[];
   includeScholar?: boolean;
 }) {
   const recipients = input.relationships

@@ -11,7 +11,7 @@ export const livingScholarDemoCourses = [
 
 export function buildLivingScholarExperience(input: {
   name?: string;
-  courses?: any[];
+  courses?: LegacyValue[];
   trustScore?: number;
 } = {}) {
   const name = input.name || "Maya";

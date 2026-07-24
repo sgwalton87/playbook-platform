@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useState, useCallback } from "react";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import CollegeSearch from "@/components/CollegeSearch";
@@ -32,7 +33,7 @@ const lbl:React.CSSProperties={fontFamily:"'Space Mono',monospace",fontSize:10,l
 
 export default function ProfilePage() {
   const router = useRouter();
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<LegacyValue>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -123,9 +124,9 @@ export default function ProfilePage() {
       setRace(p.race||""); setHouseholdIncome(p.household_income||""); setFirstGen(p.first_generation||false); setFreeLunch(p.free_reduced_lunch||false); setMigrant(p.migrant_student||false); setFosterYouth(p.foster_youth||false); setUnhoused(p.unhoused||false); setIep(p.has_iep||false);
       setLoading(false);
     })();
-  },[]);
+  },[router]);
 
-  const uploadAvatar=useCallback(async(file:File)=>{
+  const uploadAvatar = async (file: File) => {
     if(!profile?.id)return;
     setUploading(true);
     const ext=file.name.split(".").pop();
@@ -133,9 +134,9 @@ export default function ProfilePage() {
     const{error}=await supabase.storage.from("avatars").upload(path,file,{upsert:true});
     if(!error){const{data}=supabase.storage.from("avatars").getPublicUrl(path);setAvatarUrl(data.publicUrl);await supabase.from("profiles").update({avatar_url:data.publicUrl}).eq("id",profile.id);}
     setUploading(false);
-  },[profile?.id]);
+  };
 
-  const save=useCallback(async()=>{
+  const save = async () => {
     if(!profile?.id)return;
     setSaving(true);
     await supabase.from("profiles").update({
@@ -149,7 +150,7 @@ export default function ProfilePage() {
       pillars,race:race||null,household_income:householdIncome||null,first_generation:firstGen,free_reduced_lunch:freeLunch,migrant_student:migrant,foster_youth:fosterYouth,unhoused,has_iep:iep,
     }).eq("id",profile.id);
     setSaving(false);setSaved(true);setTimeout(()=>setSaved(false),3000);
-  },[profile?.id,firstName,lastName,bio,gender,dob,favoriteQuote,school,grade,district,gradYear,weightedGpa,unweightedGpa,city,zipCode,ell,dreamSchool,satScore,actScore,intendedMajor,collegeList,sport,position,height,weight,jerseyNumber,teamLevel,travelTeam,coachName,coachEmail,highlightReelUrl,recruitingStatus,desiredCollegeLevel,athleteEmail,campsAttended,nilInstagram,nilTiktok,nilTwitter,nilFollowerRange,nilBrandInterests,nilWorkedWithBrands,nilDealTypes,instagram,tiktok,twitter,hudl,youtube,pillars,race,householdIncome,firstGen,freeLunch,migrant,fosterYouth,unhoused,iep]);
+  };
 
   if(loading)return<><div style={{padding:40,fontFamily:"'Space Mono',monospace",fontSize:12,color:T.faint}}>Loading profile...</div></>;
 
@@ -207,7 +208,7 @@ export default function ProfilePage() {
             {/* Avatar — larger */}
             <div style={{display:"flex",alignItems:"center",gap:20,marginBottom:24,padding:"20px",background:T.surface2,borderRadius:14}}>
               <div style={{width:110,height:110,borderRadius:"50%",overflow:"hidden",background:T.line,flexShrink:0,border:`3px solid ${T.orange}33`,display:"flex",alignItems:"center",justifyContent:"center"}}>
-                {avatarUrl?<img src={avatarUrl} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>:<span style={{fontFamily:T.anton,fontSize:40,color:T.faint}}>{firstName[0]||"?"}</span>}
+                {avatarUrl?<Image unoptimized width={1200} height={800} src={avatarUrl} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>:<span style={{fontFamily:T.anton,fontSize:40,color:T.faint}}>{firstName[0]||"?"}</span>}
               </div>
               <div>
                 <div style={{fontSize:18,fontWeight:700,color:T.ink,marginBottom:3}}>{firstName} {lastName}</div>
@@ -450,7 +451,7 @@ export default function ProfilePage() {
             <h2 style={{fontFamily:T.anton,fontWeight:400,fontSize:20,textTransform:"uppercase",color:T.ink,marginBottom:4}}>Your Pillars</h2>
             <p style={{fontSize:12,color:T.muted,marginBottom:20}}>Select the areas that interest you most — your dashboard and courses will be personalized around your choices.</p>
             <div style={{display:"flex",flexDirection:"column",gap:12}}>
-              {PILLARS.map((p:any)=>{const a=pillars.includes(p.key);return(
+              {PILLARS.map((p:LegacyValue)=>{const a=pillars.includes(p.key);return(
                 <div key={p.key} onClick={()=>setPillars(prev=>prev.includes(p.key)?prev.filter(x=>x!==p.key):[...prev,p.key])}
                   style={{display:"flex",gap:14,padding:"16px 18px",borderRadius:14,border:`1.5px solid ${a?p.color:T.line}`,background:a?p.color+"0f":"transparent",cursor:"pointer",transition:"all 0.15s"}}>
                   <div style={{width:44,height:44,borderRadius:11,background:a?p.color:T.surface2,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,color:a?"#fff":T.muted,flexShrink:0,transition:"all 0.15s"}}>{p.icon}</div>
@@ -466,8 +467,8 @@ export default function ProfilePage() {
               <div style={{marginTop:16,background:T.navy,borderRadius:12,padding:"12px 16px"}}>
                 <div style={{fontFamily:T.mono,fontSize:10,color:"rgba(248,247,244,.5)",letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:8}}>Your selected pillars</div>
                 <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-                  {pillars.map(k=>{const p=PILLARS.find((x:any)=>x.key===k);if(!p)return null;return(
-                    <span key={k} style={{background:(p as any).color,color:"#fff",borderRadius:999,padding:"4px 12px",fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase"}}>{(p as any).icon} {(p as any).label}</span>
+                  {pillars.map(k=>{const p=PILLARS.find((x:LegacyValue)=>x.key===k);if(!p)return null;return(
+                    <span key={k} style={{background:(p as LegacyValue).color,color:"#fff",borderRadius:999,padding:"4px 12px",fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase"}}>{(p as LegacyValue).icon} {(p as LegacyValue).label}</span>
                   );})}
                 </div>
               </div>

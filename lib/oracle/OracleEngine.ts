@@ -5,7 +5,7 @@ import type { OracleAnswer } from "./types";
 
 export function askOracle(input: {
   question: string;
-  courses?: any[];
+  courses?: LegacyValue[];
   trustScore?: number;
 }): OracleAnswer {
   const type = classifyOracleQuery(input.question);

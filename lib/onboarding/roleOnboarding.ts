@@ -41,7 +41,7 @@ const SCHOLAR_SUPPORT: OnboardingStep = {
   id: "scholar-support",
   phase: "Phase 2 · Support Data",
   title: "Tell us how to support you.",
-  body: "This private information helps us understand who we serve and pursue funding. You may skip any question.",
+  body: "This private information helps us understand who we serve and pursue funding. You may skip LegacyValue question.",
   fields: [
     { key: "race_ethnicity", label: "Race/ethnicity", type: "multi-select", options: ["Black/African American", "Latino/a/e", "Indigenous/Native American", "AAPI", "Pacific Islander", "White", "Multiracial", "Prefer not to say", "Self-describe"] },
     { key: "lgbtqia_affinity", label: "LGBTQIA+ identity or allyship", type: "select", options: ["LGBTQIA+", "Questioning", "Ally", "Prefer not to say"] },
@@ -64,8 +64,8 @@ const SCHOLAR_ACADEMIC: OnboardingStep = {
     { key: "grade", label: "Grade", type: "select", options: ["8", "9", "10", "11", "12", "College", "Transition-age youth", "Other"] },
     { key: "gpa", label: "Current GPA", placeholder: "ex: 3.4" },
     { key: "graduation_year", label: "Graduation year", placeholder: "ex: 2027" },
-    { key: "dream_school", label: "Dream school", type: "college", placeholder: "Start typing any college..." },
-    { key: "top_schools", label: "Top 10 schools", type: "college-list", placeholder: "Start typing any college..." },
+    { key: "dream_school", label: "Dream school", type: "college", placeholder: "Start typing LegacyValue college..." },
+    { key: "top_schools", label: "Top 10 schools", type: "college-list", placeholder: "Start typing LegacyValue college..." },
   ],
 };
 

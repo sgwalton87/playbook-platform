@@ -1,4 +1,4 @@
-export const computeBadges = (profile: any) => {
+export const computeBadges = (profile: LegacyValue) => {
   const badges: string[] = [];
 
   if (profile?.first_name && profile?.last_name) {

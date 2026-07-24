@@ -23,7 +23,7 @@ export default function DemoDirector() {
   );
 }
 
-function Header({ label, title }: any) {
+function Header({ label, title }: LegacyValue) {
   return (
     <header style={{marginBottom:22}}>
       <p style={eyebrow}>{label}</p>

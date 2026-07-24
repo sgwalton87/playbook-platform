@@ -28,7 +28,7 @@ export default function ArchitectureViewer() {
   );
 }
 
-function Header({ label, title }: any) {
+function Header({ label, title }: LegacyValue) {
   return <header style={{marginBottom:22}}><p style={eyebrow}>{label}</p><h1 style={pageTitle}>{title}</h1></header>;
 }
 

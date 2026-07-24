@@ -5,7 +5,7 @@ import { buildAcademicDNA } from "@/lib/academic-intelligence";
 import { matchOpportunitiesFromSignals } from "@/lib/opportunity-graph/matching/OpportunityMatcher";
 
 type Props = {
-  courses?: any[];
+  courses?: LegacyValue[];
 };
 
 const filters = ["all", "scholarship", "internship", "mentor", "college", "career", "summer_program", "nil", "research"];

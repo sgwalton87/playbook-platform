@@ -20,6 +20,7 @@ Files:
 - docs/DECISIONS/ADR-0003-Portfolio-Intelligence.md
 - docs/DECISIONS/ADR-0004-Company-Archive.md
 - docs/DECISIONS/README.md
+- docs/DECISIONS.md
 - docs/FOUNDER/FOUNDER_DECISIONS.md
 - docs/LEDGER/DECISION_LOG.md
 
@@ -37,9 +38,11 @@ Files:
 - docs/ARCHIVIST/SHIP_2026-07-05.md
 - docs/ARCHIVIST/SHIP_2026-07-06.md
 - docs/ARCHIVIST/SHIP_2026-07-07.md
+- docs/ARCHIVIST/SHIP_2026-07-24.md
 - docs/BOARD/README.md
 - docs/COMPANY/OPERATING_SYSTEM.md
 - docs/COMPANY/README.md
+- docs/DATABASE.md
 - docs/DATABASE_BLUEPRINT.md
 - docs/DEPRECATED/OLD_DATA_MODEL.md
 - docs/DEPRECATED/SPRINTS_README.md
@@ -75,10 +78,15 @@ Files:
 - docs/INVESTORS/README.md
 - docs/LEGACY.md
 - docs/LEGAL/README.md
+- docs/MASTER_CHECKLIST.md
+- docs/ONBOARDING_ROLE_OS_SPRINT_MAP.md
 - docs/PARTNERSHIPS/README.md
+- docs/PLATFORM_FUNCTIONAL_AUDIT.md
 - docs/PLAYBOOK_BIBLE.md
+- docs/PLAYBOOK_BUG_TRACKER.md
 - docs/PLAYBOOK_CONSTITUTION.md
 - docs/PLAYBOOK_MANIFESTO.md
+- docs/PLAYBOOK_MASTER_CHECKLIST.md
 - docs/PLAYBOOK_MOATS.md
 - docs/PLAYBOOK_NORTH_STAR.md
 - docs/PLAYBOOK_OS.md
@@ -92,6 +100,7 @@ Files:
 - docs/PRODUCT/PRODUCT_STRATEGY.md
 - docs/PRODUCT/README.md
 - docs/PROJECT_ATLAS.md
+- docs/RECOVERY_AUDIT_2026-07-23.md
 - docs/RESEARCH/README.md
 - docs/REVENUE_MODEL.md
 - docs/TIMELINE/2026.md
@@ -103,6 +112,7 @@ Files:
 - docs/WHY_NOT.md
 - docs/WHY_NOTS/README.md
 - docs/archives/2026-07-07-implementation-archive.md
+- docs/auto_sprint.md
 - docs/sprints/ALPHA_0.6_PLAYBOOK_GRAPH_AND_EVENT_BUS.md
 
 ## architecture
@@ -113,10 +123,21 @@ Confidence: High
 
 Files:
 - docs/AI_ARCHITECTURE.md
+- docs/ARCHITECTURE/COMPONENT_CATALOG.md
+- docs/ARCHITECTURE/CURRENT_ARCHITECTURE.md
+- docs/ARCHITECTURE/DATA_MODEL.md
+- docs/ARCHITECTURE/ENGINE_CATALOG.md
+- docs/ARCHITECTURE/EVENT_CATALOG.md
+- docs/ARCHITECTURE/PLAYBOOK_OS_ALPHA_1.md
+- docs/ARCHITECTURE/REPOSITORY_CATALOG.md
+- docs/ARCHITECTURE/SENTINEL_REPORT.md
+- docs/ARCHITECTURE/SYSTEM_MAP.md
+- docs/ARCHITECTURE.md
 - docs/DEPRECATED/ENGINEERING_ARCHITECTURE.md
 - docs/ENGINE_ARCHITECTURE.md
 - docs/LEDGER/ARCHITECTURE_HISTORY.md
 - docs/MOBILE_ARCHITECTURE.md
+- docs/PLAYBOOK_ARCHITECTURE.md
 - docs/architecture/COMPONENT_CATALOG.md
 - docs/architecture/CURRENT_ARCHITECTURE.md
 - docs/architecture/DATA_MODEL.md
@@ -137,6 +158,10 @@ Files:
 - docs/CHANGELOG.md
 - docs/DEPRECATED/RELEASES_README.md
 - docs/LEDGER/RELEASE_HISTORY.md
+- docs/PLAYBOOK_RELEASE_LOG.md
+- docs/RELEASE_PROCESS.md
+- docs/release-evidence/pbos-engine-v3-release-candidate.md
+- docs/release-evidence/pbos-gate-001-planning.md
 - docs/releases/2026-07-07-onboarding-profile-os-release.md
 - docs/releases/ALPHA_0.1.md
 - docs/releases/BETA_3.3_COMPLETE.md
@@ -168,6 +193,7 @@ Files:
 - docs/DESIGN/MOTION.md
 - docs/DESIGN/PLAYBOOK_DESIGN_SYSTEM.md
 - docs/DESIGN/TYPOGRAPHY.md
+- docs/UI_DESIGN_SYSTEM.md
 
 ## ledger
 
@@ -184,12 +210,16 @@ Files:
 - docs/HISTORY/DAILY_LOGS/2026-07-05.md
 - docs/HISTORY/DAILY_LOGS/2026-07-06.md
 - docs/HISTORY/DAILY_LOGS/2026-07-07.md
+- docs/HISTORY/DAILY_LOGS/2026-07-14.md
+- docs/HISTORY/DAILY_LOGS/2026-07-22.md
+- docs/HISTORY/DAILY_LOGS/2026-07-24.md
 - docs/LEDGER/2026-07-07-build-ledger.md
 - docs/LEDGER/ENGINEERING_LOG.md
 - docs/LEDGER/FOUNDER_JOURNAL.md
 - docs/LEDGER/INNOVATION_LEDGER.md
 - docs/LEDGER/INTELLECTUAL_PROPERTY.md
 - docs/LEDGER/MILESTONES.md
+- docs/LEDGER/PBOS_ENGINE_LEDGER.md
 - docs/LEDGER/PRODUCT_LOG.md
 - docs/LEDGER/UNIFIED_LEDGER.md
 - docs/PLAYBOOK_MASTER_LEDGER.md
@@ -237,7 +267,10 @@ Files:
 - docs/HISTORY/FOUNDERS_JOURNAL/Volume_1_The_Birth_of_Playbook.md
 - docs/HISTORY/FOUNDERS_JOURNAL/Volume_2_The_Playbook_Record.md
 - docs/HISTORY/FOUNDERS_JOURNAL/Volume_3_Building_the_OS.md
+- docs/HISTORY/PBOS_ENGINE_HISTORY.md
 - docs/HISTORY/PLAYBOOK_HISTORY.md
+- docs/PLAYBOOK_FOUNDER_JOURNAL.md
 - docs/PLAYBOOK_HISTORY.md
 - docs/journal/2026-07-07-builder-journal.md
+- docs/journal/next-steps-role-os-testing.md
 

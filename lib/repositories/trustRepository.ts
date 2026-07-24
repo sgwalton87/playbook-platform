@@ -4,7 +4,7 @@ export async function createTrustReport(report: {
   recordId: string;
   trustScore: number;
   trustLevel: string;
-  signals?: any[];
+  signals?: LegacyValue[];
   missing?: string[];
   profileId?: string;
 }) {

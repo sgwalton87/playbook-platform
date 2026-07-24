@@ -3,7 +3,7 @@
 import { buildAcademicIntelligence } from "@/lib/academic-intelligence";
 
 type Props = {
-  courses?: any[];
+  courses?: LegacyValue[];
 };
 
 export default function AcademicIntelligenceSummary({ courses = [] }: Props) {

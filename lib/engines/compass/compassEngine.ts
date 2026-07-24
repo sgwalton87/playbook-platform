@@ -1,6 +1,6 @@
 import { createOpportunityMatch } from "@/lib/repositories/opportunityRepository";
 
-export async function handleAchievementCreatedForCompass(payload: any) {
+export async function handleAchievementCreatedForCompass(payload: LegacyValue) {
   if (!payload?.recordId) return;
 
   return createOpportunityMatch({

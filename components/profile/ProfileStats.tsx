@@ -10,10 +10,10 @@ const T = {
 };
 
 type Props = {
-  profile:any;
-  certificates:any[];
-  badges:any[];
-  posts:any[];
+  profile:LegacyValue;
+  certificates:LegacyValue[];
+  badges:LegacyValue[];
+  posts:LegacyValue[];
 };
 
 export default function ProfileStats({

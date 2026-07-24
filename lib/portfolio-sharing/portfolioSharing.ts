@@ -4,7 +4,7 @@ export function buildPortfolioShare(input: {
   scholarId: string;
   scholarName: string;
   targetUse: "college" | "scholarship" | "internship" | "job" | "recruiting" | "nil";
-  packet: any;
+  packet: LegacyValue;
   expiresAt?: string;
 }) {
   const id = `portfolio-${input.scholarId}`;

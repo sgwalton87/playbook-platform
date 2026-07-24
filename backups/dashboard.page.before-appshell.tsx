@@ -9,7 +9,7 @@ import ProfileAvatar from "@/components/ProfileAvatar";
 export default function DashboardPage() {
   const router = useRouter();
 
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<LegacyValue>(null);
   const [loading, setLoading] = useState(true);
   const [theme, setTheme] = useState<"dark" | "light">("dark");
 
