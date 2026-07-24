@@ -39,7 +39,9 @@
     "founder:bootstrap": "node scripts/founder/bootstrap.mjs",
     "founder:docs": "node scripts/founder/generate-docs.mjs",
     "founder:update": "node scripts/founder/update.mjs",
-    "founder:list": "node scripts/founder/list.mjs"
+    "founder:list": "node scripts/founder/list.mjs",
+    "pbos": "node scripts/pbos.mjs",
+    "test:pbos": "node --test tests/pbos/*.test.mjs"
   },
   "dependencies": {
     "@hcaptcha/react-hcaptcha": "^2.0.2",
@@ -70,6 +72,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
+    "js-yaml": "^4.2.0",
     "jsdom": "^29.1.1",
     "tailwindcss": "^4",
     "tsx": "^4.22.5",
