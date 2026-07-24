@@ -4,6 +4,7 @@ import { Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { getPathway, normalizeRole } from "@/lib/onboarding/pathwayMap";
+import { getCanonicalOnboardingRoute } from "@/lib/onboarding";
 
 export default function AuthCallbackPage() {
   return (
@@ -80,7 +81,7 @@ function AuthCallbackContent() {
       if (existing?.onboarding_completed) {
         window.location.href = getPathway(existing.profile_mode || existing.role || role).osRoute;
       } else {
-        window.location.href = `/start?first=1&role=${encodeURIComponent(role)}`;
+        window.location.href = getCanonicalOnboardingRoute(role);
       }
     }
 

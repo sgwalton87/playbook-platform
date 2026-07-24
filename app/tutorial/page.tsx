@@ -1,7 +1,7 @@
 "use client";
 
-import OnboardingTour from "@/components/tutorial/OnboardingTour";
+import FirstLoginTour from "@/components/tutorial/FirstLoginTour";
 
 export default function TutorialPage() {
-  return <OnboardingTour />;
+  return <FirstLoginTour />;
 }
