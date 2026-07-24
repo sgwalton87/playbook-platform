@@ -68,7 +68,6 @@ function AuthCallbackContent() {
       await supabase.from("profiles").upsert(
         {
           id: data.user.id,
-          email: data.user.email,
           role: role,
           profile_mode: role,
           requested_role: role,

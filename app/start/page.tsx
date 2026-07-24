@@ -180,7 +180,6 @@ function StartContent() {
 
     const payload = {
       id: user.id,
-      email: user.email,
       role,
       profile_mode: role,
       requested_role: role,

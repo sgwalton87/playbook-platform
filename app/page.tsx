@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
 
@@ -22,7 +23,14 @@ export default function HomePage() {
         </div>
 
         <div style={imageWrap}>
-          <img src={PLAYBOOK_HERO_VISUALS.signup.image} alt={PLAYBOOK_HERO_VISUALS.signup.alt} style={image} />
+          <Image
+            src={PLAYBOOK_HERO_VISUALS.home.image}
+            alt={PLAYBOOK_HERO_VISUALS.home.alt}
+            fill
+            priority
+            sizes="(max-width: 720px) 100vw, 50vw"
+            style={image}
+          />
         </div>
       </section>
     </main>
@@ -38,5 +46,5 @@ const subtitle: React.CSSProperties = { fontSize: "clamp(22px,2.4vw,32px)", line
 const buttons: React.CSSProperties = { display: "flex", gap: 14, flexWrap: "wrap", marginTop: 12 };
 const primary: React.CSSProperties = { background: "#F97316", color: "#fff", padding: "18px 40px", borderRadius: 999, textDecoration: "none", fontWeight: 950, fontSize: 24 };
 const secondary: React.CSSProperties = { background: "#0F172A", color: "#fff", padding: "18px 40px", borderRadius: 999, textDecoration: "none", fontWeight: 950, fontSize: 24 };
-const imageWrap: React.CSSProperties = { minHeight: 520, background: "#0F172A" };
-const image: React.CSSProperties = { width: "100%", height: "100%", objectFit: "cover", display: "block" };
+const imageWrap: React.CSSProperties = { minHeight: 520, background: "#0F172A", position: "relative" };
+const image: React.CSSProperties = { width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", display: "block" };
