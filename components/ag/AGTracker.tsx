@@ -16,6 +16,7 @@ type AGRow = {
 type Props = {
   userId?: string;
   compact?: boolean;
+  rows?: AGRow[];
 };
 
 const SUBJECTS = ["A", "B", "C", "D", "E", "F", "G"];
@@ -39,14 +40,17 @@ const COLORS = {
 export default function AGTracker({
   userId,
   compact = false,
+  rows: providedRows,
 }: Props) {
-  const [rows, setRows] = useState<AGRow[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [fetchedRows, setFetchedRows] = useState<AGRow[]>([]);
+  const [loading, setLoading] = useState(!providedRows);
 
   useEffect(() => {
     let active = true;
 
     async function loadProgress() {
+      if (providedRows) return;
+
       setLoading(true);
 
       let resolvedUserId = userId;
@@ -58,7 +62,7 @@ export default function AGTracker({
 
       if (!resolvedUserId) {
         if (active) {
-          setRows([]);
+          setFetchedRows([]);
           setLoading(false);
         }
         return;
@@ -76,7 +80,7 @@ export default function AGTracker({
 
       if (error) {
         console.error("Unable to load A-G progress:", error);
-        setRows([]);
+        setFetchedRows([]);
       } else {
         const latestBySubject = new Map<string, AGRow>();
 
@@ -86,7 +90,7 @@ export default function AGTracker({
           }
         }
 
-        setRows(Array.from(latestBySubject.values()));
+        setFetchedRows(Array.from(latestBySubject.values()));
       }
 
       setLoading(false);
@@ -97,7 +101,9 @@ export default function AGTracker({
     return () => {
       active = false;
     };
-  }, [userId]);
+  }, [providedRows, userId]);
+
+  const rows = providedRows || fetchedRows;
 
   const progress = useMemo(() => {
     return SUBJECTS.map((subject) => {

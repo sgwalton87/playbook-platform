@@ -1,5 +1,6 @@
 import type { ScholarRecord } from "./types";
 import { buildCommunityRecord, type RawCommunityActivity } from "./community";
+import { buildAcademics, buildAthletics, buildCareer, buildIdentity } from "./modules";
 
 interface ScholarProfileInput {
   id?: string;
@@ -16,6 +17,24 @@ interface ScholarProfileInput {
   dream_school?: string | null;
   ideal_profession?: string | null;
   desired_salary_range?: string | null;
+  weighted_gpa?: string | null;
+  unweighted_gpa?: string | null;
+  intended_major?: string | null;
+  sat_score?: string | null;
+  act_score?: string | null;
+  sport?: string | null;
+  position?: string | null;
+  height?: string | null;
+  weight?: string | null;
+  coach_name?: string | null;
+  coach_email?: string | null;
+  travel_team?: string | null;
+  recruiting_status?: string | null;
+  recruiting_interest?: string | null;
+  highlight_video?: string | null;
+  highlight_reel_url?: string | null;
+  coin_balance?: number | string | null;
+  xp?: number | string | null;
 }
 
 
@@ -25,18 +44,24 @@ export function buildScholarRecord({
   badges = [],
   activities = [],
   posts = [],
+  agProgress = [],
+  notifications = [],
+  upcomingDeadlines = [],
 }: {
   profile?: ScholarProfileInput;
   certificates?: unknown[];
   badges?: unknown[];
   activities?: RawCommunityActivity[];
   posts?: unknown[];
+  agProgress?: ScholarRecord["progress"]["ag"];
+  notifications?: ScholarRecord["activity"]["notifications"];
+  upcomingDeadlines?: ScholarRecord["activity"]["upcomingDeadlines"];
 }): ScholarRecord {
-  const fullName =
-    profile.full_name ||
-    [profile.first_name, profile.last_name].filter(Boolean).join(" ") ||
-    profile.username ||
-    "Scholar";
+  const identity = buildIdentity(profile);
+  const fullName = identity.fullName || profile.username || "Scholar";
+  const academics = buildAcademics(profile);
+  const career = buildCareer(profile);
+  const athletics = buildAthletics(profile);
 
   const community = buildCommunityRecord(activities);
   const volunteerHours = community.volunteerHours;
@@ -78,25 +103,52 @@ export function buildScholarRecord({
     )
   );
 
+  const totalRequired = agProgress.reduce((sum, row) => sum + Number(row.years_required ?? 0), 0);
+  const totalCompleted = agProgress.reduce((sum, row) => sum + Math.min(Number(row.years_completed ?? 0), Number(row.years_required ?? 0)), 0);
+  const transcriptCompletion = totalRequired > 0 ? Math.round((totalCompleted / totalRequired) * 100) : 0;
+  const collegeReadiness = Math.round((transcriptCompletion * 0.65) + (opportunityReadiness * 0.35));
+  const recent = [
+    ...activities.slice(0, 3).map((activity, index) => ({
+      id: activity.id || `activity-${index}`,
+      label: activity.activity_name || activity.title || activity.name || "Activity added",
+      detail: activity.activity_type || null,
+      createdAt: activity.created_at || null,
+      href: "/transcript",
+    })),
+    ...certificates.slice(0, 2).map((certificate, index) => {
+      const item = certificate as { id?: string; title?: string; name?: string; issued_at?: string; created_at?: string };
+      return {
+        id: item.id || `certificate-${index}`,
+        label: item.title || item.name || "Certificate earned",
+        detail: "Certificate",
+        createdAt: item.issued_at || item.created_at || null,
+        href: "/certificates",
+      };
+    }),
+  ].slice(0, 5);
+
   return {
     id: profile.id || "",
     identity: {
-      username: profile.username,
-      role: profile.role,
+      username: identity.username,
+      role: identity.role,
       fullName,
-      avatarUrl: profile.avatar_url || null,
+      avatarUrl: identity.avatarUrl || null,
       bio: profile.bio || null,
     },
     academics: {
       school: profile.school || null,
       grade: profile.grade || null,
-      gpa: profile.gpa || null,
-      dreamSchool: profile.dream_school || null,
+      gpa: academics.gpa || null,
+      dreamSchool: academics.dreamSchool || null,
+      weightedGpa: academics.weightedGpa || null,
+      unweightedGpa: academics.unweightedGpa || null,
+      intendedMajor: academics.intendedMajor || null,
+      sat: academics.sat || null,
+      act: academics.act || null,
     },
-    career: {
-      idealProfession: profile.ideal_profession || null,
-      desiredSalaryRange: profile.desired_salary_range || null,
-    },
+    athletics,
+    career,
     achievements: {
       total: achievementsTotal,
       certificates,
@@ -118,6 +170,14 @@ export function buildScholarRecord({
     readiness: {
       portfolioCompletion,
       opportunityReadiness,
+      transcriptCompletion,
+      collegeReadiness,
     },
+    progress: { ag: agProgress },
+    economy: {
+      coins: Number(profile.coin_balance ?? 0),
+      xp: Number(profile.xp ?? 0),
+    },
+    activity: { recent, notifications, upcomingDeadlines },
   };
 }

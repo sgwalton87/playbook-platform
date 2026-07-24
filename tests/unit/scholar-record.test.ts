@@ -62,3 +62,35 @@ describe("buildScholarRecord", () => {
     expect(record.readiness.portfolioCompletion).toBeGreaterThanOrEqual(0);
   });
 });
+
+it("canonicalizes dashboard widgets from ScholarRecord inputs", () => {
+  const record = buildScholarRecord({
+    profile: {
+      id: "scholar-dashboard",
+      sport: "Basketball",
+      coin_balance: 125,
+      xp: 450,
+      weighted_gpa: "4.1",
+      intended_major: "Biology",
+    },
+    certificates: [{ id: "cert-1", title: "CPR" }],
+    badges: [{ id: "badge-1" }],
+    activities: [{ id: "lead-1", activity_type: "Leadership", activity_name: "ASB", total_hours: 10 }],
+    agProgress: [
+      { subject: "A", years_completed: 2, years_required: 2 },
+      { subject: "B", years_completed: 3, years_required: 4, in_progress: true },
+    ],
+    notifications: [{ id: "notice-1", label: "Transcript updated" }],
+    upcomingDeadlines: [{ id: "deadline-1", label: "FAFSA review" }],
+  });
+
+  expect(record.academics.weightedGpa).toBe("4.1");
+  expect(record.academics.intendedMajor).toBe("Biology");
+  expect(record.athletics.sport).toBe("Basketball");
+  expect(record.economy.coins).toBe(125);
+  expect(record.economy.xp).toBe(450);
+  expect(record.readiness.transcriptCompletion).toBe(83);
+  expect(record.activity.recent.map((item) => item.label)).toContain("ASB");
+  expect(record.activity.notifications[0].label).toBe("Transcript updated");
+  expect(record.activity.upcomingDeadlines[0].label).toBe("FAFSA review");
+});
