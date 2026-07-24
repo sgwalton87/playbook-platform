@@ -22,6 +22,7 @@
 
 ### Engineering
 - docs/ENGINEERING/ENGINE_PRINCIPLES.md
+- docs/ENGINEERING/GIT_INTEGRATION_POLICY.md — authoritative policy for canonical remotes, branch roles, approved integration inputs, merge planning and execution, validation, conflict resolution, repository certification, and autonomous PBOS Git operations
 - docs/SDK/PLAYBOOK_SDK.md
 
 ### History
