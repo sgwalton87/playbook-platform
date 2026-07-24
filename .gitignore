@@ -2,5 +2,14 @@ node_modules
 .next
 .env.local
 .DS_Store
-*.zippublic/assets/playbook-promo.mp4
 public/assets/playbook-promo.mp4
+node_modules/
+.next/
+dist/
+build/
+coverage/
+.turbo/
+*.tsbuildinfo
+*.tmp
+package.json.tmp
+*.zip

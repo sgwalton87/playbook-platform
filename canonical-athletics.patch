@@ -1,0 +1,41 @@
+commit 432ddf4df147c06dcf46f9d4481c39fb277b35da
+Author: Stephisha Walton <you@youremail.com>
+Date:   Sat Jul 4 03:27:22 2026 -0700
+
+    Archivist v2 ship update
+
+diff --git a/lib/scholar/modules/athletics.ts b/lib/scholar/modules/athletics.ts
+new file mode 100644
+index 0000000..bd910bc
+--- /dev/null
++++ b/lib/scholar/modules/athletics.ts
+@@ -0,0 +1,29 @@
++export function buildAthletics(profile:any){
++
++  return{
++
++    sport:profile?.sport,
++
++    position:profile?.position,
++
++    height:profile?.height,
++
++    weight:profile?.weight,
++
++    coachName:profile?.coach_name,
++
++    coachEmail:profile?.coach_email,
++
++    travelTeam:profile?.travel_team,
++
++    recruitingStatus:
++      profile?.recruiting_status ||
++      profile?.recruiting_interest,
++
++    highlightVideo:
++      profile?.highlight_video ||
++      profile?.highlight_reel_url,
++
++  };
++
++}
