@@ -15,6 +15,8 @@ describe("buildScholarRecord", () => {
         grade: "11",
         gpa: "3.8",
         dream_school: "UC Berkeley",
+        college_list_2: "UCLA",
+        college_list_3: "Stanford",
         ideal_profession: "Investment Advisor",
         desired_salary_range: "$100k+",
         bio: "Future leader",
@@ -28,6 +30,8 @@ describe("buildScholarRecord", () => {
     expect(record.id).toBe("scholar-1");
     expect(record.identity.fullName).toBe("Test Scholar");
     expect(record.academics.dreamSchool).toBe("UC Berkeley");
+    expect(record.academics.topSchools).toEqual(["UC Berkeley", "UCLA", "Stanford"]);
+    expect(record.academics.collegeList).toEqual(["UCLA", "Stanford"]);
     expect(record.achievements.total).toBe(4);
     expect(record.service.volunteerHours).toBe(5);
     expect(record.community.activities[0].name).toBe("Activity");

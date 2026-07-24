@@ -1,6 +1,7 @@
 export * from "./types";
 export * from "./events";
 export * from "./services/assembler";
+export * from "./services/profile";
 export * from "./services/stats";
 export * from "./services/completion";
 export * from "./services/dna";

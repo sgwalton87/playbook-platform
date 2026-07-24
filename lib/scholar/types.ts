@@ -14,6 +14,8 @@ export interface ScholarRecord {
     grade?: string | null;
     gpa?: string | null;
     dreamSchool?: string | null;
+    topSchools: string[];
+    collegeList: string[];
   };
   career: {
     idealProfession?: string | null;

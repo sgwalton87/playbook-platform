@@ -3,6 +3,34 @@ import { mapProfileToPortfolio } from "./profile";
 import { buildPortfolioIntelligence } from "./intelligence";
 import { buildScholarRecord } from "../scholar-record";
 
+export function assembleScholarRecord(profileData: any, data: { certificates?: unknown[]; badges?: unknown[]; posts?: unknown[]; activities?: unknown[] } = {}) {
+  const portfolio = mapProfileToPortfolio(profileData);
+
+  const intelligence = buildPortfolioIntelligence({
+    rawProfile: profileData,
+    portfolio,
+    certificates: data.certificates || [],
+    badges: data.badges || [],
+    posts: data.posts || [],
+    activities: data.activities || [],
+  });
+
+  const assembled = {
+    rawProfile: profileData,
+    portfolio,
+    intelligence,
+    certificates: data.certificates || [],
+    badgeRows: data.badges || [],
+    posts: data.posts || [],
+    activities: data.activities || [],
+  };
+
+  return {
+    ...assembled,
+    scholarRecord: buildScholarRecord(assembled),
+  };
+}
+
 export async function getPortfolioByUsername(username: string) {
   const { data: profileData, error } = await supabase
     .from("profiles")
@@ -22,29 +50,10 @@ export async function getPortfolioByUsername(username: string) {
       supabase.from("student_activities").select("*").eq("student_id", profileData.id).order("created_at", { ascending: false }),
     ]);
 
-  const portfolio = mapProfileToPortfolio(profileData);
-
-  const intelligence = buildPortfolioIntelligence({
-    rawProfile: profileData,
-    portfolio,
+  return assembleScholarRecord(profileData, {
     certificates: certData || [],
     badges: badgeData || [],
     posts: feedData || [],
     activities: activityData || [],
   });
-
-  const assembled = {
-    rawProfile: profileData,
-    portfolio,
-    intelligence,
-    certificates: certData || [],
-    badgeRows: badgeData || [],
-    posts: feedData || [],
-    activities: activityData || [],
-  };
-
-  return {
-    ...assembled,
-    scholarRecord: buildScholarRecord(assembled),
-  };
 }

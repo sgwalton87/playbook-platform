@@ -14,6 +14,16 @@ interface ScholarProfileInput {
   grade?: string | null;
   gpa?: string | null;
   dream_school?: string | null;
+  college_list_2?: string | null;
+  college_list_3?: string | null;
+  college_list_4?: string | null;
+  college_list_5?: string | null;
+  college_list_6?: string | null;
+  college_list_7?: string | null;
+  college_list_8?: string | null;
+  college_list_9?: string | null;
+  college_list_10?: string | null;
+  onboarding_data?: { top_schools?: unknown } | null;
   ideal_profession?: string | null;
   desired_salary_range?: string | null;
 }
@@ -38,6 +48,29 @@ export function buildScholarRecord({
     profile.username ||
     "Scholar";
 
+  const onboardingTopSchools = Array.isArray(profile.onboarding_data?.top_schools)
+    ? profile.onboarding_data.top_schools.map((school) => String(school || "").trim()).filter(Boolean)
+    : [];
+  const columnCollegeList = [
+    profile.college_list_2,
+    profile.college_list_3,
+    profile.college_list_4,
+    profile.college_list_5,
+    profile.college_list_6,
+    profile.college_list_7,
+    profile.college_list_8,
+    profile.college_list_9,
+    profile.college_list_10,
+  ];
+  const collegeList = (columnCollegeList.some(Boolean) ? columnCollegeList : onboardingTopSchools)
+    .map((school) => String(school || "").trim())
+    .filter(Boolean);
+  const dreamSchool = profile.dream_school || onboardingTopSchools[0] || null;
+  const topSchools = [dreamSchool, ...collegeList]
+    .map((school) => String(school || "").trim())
+    .filter((school, index, schools) => school && schools.findIndex((item) => item.toLowerCase() === school.toLowerCase()) === index)
+    .slice(0, 10);
+
   const community = buildCommunityRecord(activities);
   const volunteerHours = community.volunteerHours;
 
@@ -56,7 +89,7 @@ export function buildScholarRecord({
     profile.school,
     profile.grade,
     profile.gpa,
-    profile.dream_school,
+    dreamSchool,
   ].filter(Boolean).length;
 
   const careerFields = [
@@ -91,7 +124,9 @@ export function buildScholarRecord({
       school: profile.school || null,
       grade: profile.grade || null,
       gpa: profile.gpa || null,
-      dreamSchool: profile.dream_school || null,
+      dreamSchool,
+      topSchools,
+      collegeList,
     },
     career: {
       idealProfession: profile.ideal_profession || null,

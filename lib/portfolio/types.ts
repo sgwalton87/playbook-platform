@@ -29,6 +29,8 @@ export interface PortfolioAcademics {
   weightedGpa?: string | null;
   unweightedGpa?: string | null;
   dreamSchool?: string | null;
+  topSchools: string[];
+  collegeList: string[];
   intendedMajor?: string | null;
   satScore?: string | null;
   actScore?: string | null;

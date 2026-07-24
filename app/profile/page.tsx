@@ -111,8 +111,11 @@ export default function ProfilePage() {
       setProfile(p);
       setFirstName(p.first_name||""); setLastName(p.last_name||""); setBio(p.bio||""); setAvatarUrl(p.avatar_url||""); setGender(p.gender||""); setDob(p.date_of_birth||""); setFavoriteQuote(p.favorite_quote||"");
       setSchool(p.school||""); setGrade(p.grade||""); setDistrict(p.school_district||""); setGradYear(p.grad_year||""); setWeightedGpa(p.weighted_gpa||p.gpa||""); setUnweightedGpa(p.unweighted_gpa||""); setCity(p.city||""); setZipCode(p.zip_code||""); setEll(p.english_language_learner||false); setSatScore(p.sat_score||""); setActScore(p.act_score||""); setIntendedMajor(p.intended_major||"");
-      setDreamSchool(p.dream_school||"");
-      setCollegeList([p.college_list_2||"",p.college_list_3||"",p.college_list_4||"",p.college_list_5||"",p.college_list_6||"",p.college_list_7||"",p.college_list_8||"",p.college_list_9||"",p.college_list_10||""]);
+      const onboardingTopSchools = Array.isArray(p.onboarding_data?.top_schools) ? p.onboarding_data.top_schools : [];
+      setDreamSchool(p.dream_school||onboardingTopSchools[0]||"");
+      setCollegeList([p.college_list_2,p.college_list_3,p.college_list_4,p.college_list_5,p.college_list_6,p.college_list_7,p.college_list_8,p.college_list_9,p.college_list_10].some(Boolean)
+        ? [p.college_list_2||"",p.college_list_3||"",p.college_list_4||"",p.college_list_5||"",p.college_list_6||"",p.college_list_7||"",p.college_list_8||"",p.college_list_9||"",p.college_list_10||""]
+        : [...onboardingTopSchools.filter(Boolean).slice(p.dream_school ? 0 : 1, 9), ...Array(9).fill("")].slice(0, 9));
       setSport(p.sport||""); setPosition(p.position||""); setHeight(p.height||""); setWeight(p.weight||""); setJerseyNumber(p.jersey_number||""); setTeamLevel(p.team_level||""); setTravelTeam(p.travel_team||""); setCoachName(p.coach_name||""); setCoachEmail(p.coach_email||"");
       setHighlightReelUrl(p.highlight_reel_url||""); setRecruitingStatus(p.recruiting_status||""); setDesiredCollegeLevel(p.desired_college_level||""); setAthleteEmail(p.athlete_email||""); setCampsAttended(p.camps_attended||"");
       setNilInstagram(p.nil_instagram||""); setNilTiktok(p.nil_tiktok||""); setNilTwitter(p.nil_twitter||""); setNilFollowerRange(p.nil_follower_range||""); setNilBrandInterests(p.nil_brand_interests||[]); setNilWorkedWithBrands(p.nil_worked_with_brands||false); setNilDealTypes(p.nil_deal_types||[]);
@@ -136,9 +139,10 @@ export default function ProfilePage() {
   const save=useCallback(async()=>{
     if(!profile?.id)return;
     setSaving(true);
+    const topSchools = [dreamSchool, ...collegeList].map(s=>s.trim()).filter(Boolean).filter((school,index,schools)=>schools.findIndex(item=>item.toLowerCase()===school.toLowerCase())===index).slice(0,10);
     await supabase.from("profiles").update({
       first_name:firstName,last_name:lastName,full_name:`${firstName} ${lastName}`.trim(),bio,gender,date_of_birth:dob||null,favorite_quote:favoriteQuote||null,
-      school,grade,school_district:district,grad_year:gradYear,weighted_gpa:weightedGpa||null,unweighted_gpa:unweightedGpa||null,city,zip_code:zipCode,english_language_learner:ell,dream_school:dreamSchool||null,sat_score:satScore||null,act_score:actScore||null,intended_major:intendedMajor||null,
+      school,grade,school_district:district,grad_year:gradYear,weighted_gpa:weightedGpa||null,unweighted_gpa:unweightedGpa||null,city,zip_code:zipCode,english_language_learner:ell,dream_school:dreamSchool||null,sat_score:satScore||null,act_score:actScore||null,intended_major:intendedMajor||null,onboarding_data:{...(profile.onboarding_data||{}),top_schools:topSchools},
       college_list_2:collegeList[0]||null,college_list_3:collegeList[1]||null,college_list_4:collegeList[2]||null,college_list_5:collegeList[3]||null,college_list_6:collegeList[4]||null,college_list_7:collegeList[5]||null,college_list_8:collegeList[6]||null,college_list_9:collegeList[7]||null,college_list_10:collegeList[8]||null,
       sport:sport||null,position:position||null,height:height||null,weight:weight||null,jersey_number:jerseyNumber||null,team_level:teamLevel||null,travel_team:travelTeam||null,coach_name:coachName||null,coach_email:coachEmail||null,
       highlight_reel_url:highlightReelUrl||null,recruiting_status:recruitingStatus||null,desired_college_level:desiredCollegeLevel||null,athlete_email:athleteEmail||null,camps_attended:campsAttended||null,
