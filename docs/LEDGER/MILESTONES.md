@@ -1365,3 +1365,42 @@ Alpha 1.0 Complete — Intelligence OS foundation finished.
 
 ## 2026-07-14 10:23
 - **commit**: Checkpoint before Founder Knowledge Base
+
+## 2026-07-22 11:00
+- **precommit**: Canonicalize scholar community activities (#2)
+
+## 2026-07-22 11:03
+- **precommit**: Canonicalize academic scholar record
+
+## 2026-07-22 11:53
+- **precommit**: Merge pull request #5 from sgwalton87/agent/integrate-sprint-001-004
+
+Integrate Sprint 001.004 academic Scholar Record
+
+## 2026-07-22 11:57
+- **build-pass**: Pre-push tests and build passed.
+
+## 2026-07-22 11:59
+- **precommit**: Unify onboarding role and OS routing
+
+## 2026-07-24 04:20
+
+- Engines changed: 6
+- Repositories changed: 1
+- Event system changed: 2
+- Components changed: 42
+- App routes changed: 22
+- Documentation changed: 3
+
+- Archivist v2 ship cycle completed.
+
+
+## 2026-07-24 04:55
+
+- Tests changed: 1
+- Components changed: 8
+- App routes changed: 19
+- Documentation changed: 1
+
+- Archivist v2 ship cycle completed.
+

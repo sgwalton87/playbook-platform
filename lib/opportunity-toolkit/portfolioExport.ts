@@ -1,7 +1,7 @@
 export function buildPortfolioPacket(input: {
   scholarName: string;
-  resume: any;
-  bragSheet: any;
+  resume: LegacyValue;
+  bragSheet: LegacyValue;
   recommendationLetter?: string;
   evidenceLinks?: string[];
   targetUse: "college" | "scholarship" | "internship" | "job" | "recruiting" | "nil";

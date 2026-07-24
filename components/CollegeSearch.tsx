@@ -21,8 +21,8 @@ export default function CollegeSearch({
 
   useEffect(() => {
     if (!value || value.length < 3) {
-      setResults([]);
-      return;
+      const timer = window.setTimeout(() => setResults([]), 0);
+      return () => window.clearTimeout(timer);
     }
 
     const timer = setTimeout(async () => {

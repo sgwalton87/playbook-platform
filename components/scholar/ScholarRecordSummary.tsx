@@ -1,7 +1,7 @@
 "use client";
 
 type Props = {
-  record: any;
+  record: LegacyValue;
 };
 
 function Bar({label,value}:{label:string;value:number}) {

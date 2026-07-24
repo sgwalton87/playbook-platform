@@ -1,7 +1,7 @@
 import { buildAcademicIntelligence } from "@/lib/academic-intelligence";
 import { createAcademicTimelineEvent } from "@/lib/repositories/academicRepository";
 
-export async function handleTranscriptImportedForAcademic(payload: any) {
+export async function handleTranscriptImportedForAcademic(payload: LegacyValue) {
   if (!payload?.recordId) return;
 
   const report = buildAcademicIntelligence(payload.courses || []);
@@ -16,7 +16,7 @@ export async function handleTranscriptImportedForAcademic(payload: any) {
   return report;
 }
 
-export async function handleCourseCompletedForAcademic(payload: any) {
+export async function handleCourseCompletedForAcademic(payload: LegacyValue) {
   if (!payload?.recordId || !payload?.courseName) return;
 
   await createAcademicTimelineEvent({

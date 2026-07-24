@@ -1,0 +1,24 @@
+{
+  "id": "PBOS-ENGINE-004",
+  "title": "Add controlled implementation adapters",
+  "status": "proposed",
+  "priority": 60,
+  "dependencies": ["PBOS-GATE-001"],
+  "handbook_refs": [
+    "pbos/README.md#pbos-engine-004",
+    "docs/auto_sprint.md#pbos-engine-integration",
+    "docs/RELEASE_PROCESS.md#testing"
+  ],
+  "tasks": [
+    "Design implementation adapters that require validation authorization before modifying files.",
+    "Add adapter-level rollback metadata and interruption recovery.",
+    "Keep implementation mode disabled until safety checks pass."
+  ],
+  "definition_of_done": [
+    "Implementation adapter design is documented.",
+    "Execution authorization rules are test-covered.",
+    "No application feature code is modified by the adapter scaffold."
+  ],
+  "validation": ["docs", "pbos:lint", "pbos:test"],
+  "next_gate": null
+}

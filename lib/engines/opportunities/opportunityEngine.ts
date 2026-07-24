@@ -1,6 +1,6 @@
 import { createOpportunityMatch } from "@/lib/repositories/opportunityRepository";
 
-export async function handleAchievementCreatedForOpportunities(payload: any) {
+export async function handleAchievementCreatedForOpportunities(payload: LegacyValue) {
   if (!payload?.recordId) return;
 
   const opportunityType =

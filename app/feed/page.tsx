@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
@@ -12,7 +13,7 @@ export default function FeedPage() {
   const router=useRouter();
   const postFileRef=useRef<HTMLInputElement>(null);
   const galleryFileRef=useRef<HTMLInputElement>(null);
-  const [posts,setPosts]=useState<any[]>([]);
+  const [posts,setPosts]=useState<LegacyValue[]>([]);
   const [filter,setFilter]=useState("All");
   const [newPost,setNewPost]=useState("");
   const [userName,setUserName]=useState("Scholar");
@@ -27,7 +28,7 @@ export default function FeedPage() {
   const [lightbox,setLightbox]=useState<string|null>(null);
   const [loading,setLoading]=useState(true);
   const [uploading,setUploading]=useState(false);
-  const [commentsByPost,setCommentsByPost]=useState<Record<string,any[]>>({});
+  const [commentsByPost,setCommentsByPost]=useState<Record<string,LegacyValue[]>>({});
 
   useEffect(()=>{
     (async()=>{
@@ -53,17 +54,17 @@ export default function FeedPage() {
       if(error)console.error("Feed error:",error.message);
 
       if(dbPosts&&dbPosts.length>0){
-        const postIds=dbPosts.map((p:any)=>p.id);
+        const postIds=dbPosts.map((p:LegacyValue)=>p.id);
         const{data:reactionRows}=await supabase.from("feed_post_reactions").select("post_id,user_id").in("post_id",postIds);
         const{data:commentRows}=await supabase.from("feed_post_comments").select("id,post_id,user_id,body,created_at").in("post_id",postIds).order("created_at",{ascending:true});
-        const commentAuthorIds=[...new Set((commentRows||[]).map((c:any)=>c.user_id))];
+        const commentAuthorIds=[...new Set((commentRows||[]).map((c:LegacyValue)=>c.user_id))];
         const{data:commentProfiles}=commentAuthorIds.length
           ? await supabase.from("profiles").select("id,first_name,last_name,full_name,username,role,avatar_url").in("id",commentAuthorIds)
-          : {data:[] as any[]};
-        const commentProfileMap:Record<string,any>={};
-        (commentProfiles||[]).forEach((cp:any)=>{commentProfileMap[cp.id]=cp;});
-        const groupedComments:Record<string,any[]>={};
-        (commentRows||[]).forEach((c:any)=>{
+          : {data:[] as LegacyValue[]};
+        const commentProfileMap:Record<string,LegacyValue>={};
+        (commentProfiles||[]).forEach((cp:LegacyValue)=>{commentProfileMap[cp.id]=cp;});
+        const groupedComments:Record<string,LegacyValue[]>={};
+        (commentRows||[]).forEach((c:LegacyValue)=>{
           const cp=commentProfileMap[c.user_id]||{};
           const name=cp.full_name||[cp.first_name,cp.last_name].filter(Boolean).join(" ")||cp.username||"Playbook Member";
           groupedComments[c.post_id]=[
@@ -76,13 +77,13 @@ export default function FeedPage() {
         const reactionCounts:Record<string,number>={};
         const commentCounts:Record<string,number>={};
         const likedByMe=new Set<string>();
-        (reactionRows||[]).forEach((r:any)=>{reactionCounts[r.post_id]=(reactionCounts[r.post_id]||0)+1;if(r.user_id===u.user.id)likedByMe.add(r.post_id);});
-        (commentRows||[]).forEach((c:any)=>{commentCounts[c.post_id]=(commentCounts[c.post_id]||0)+1;});
+        (reactionRows||[]).forEach((r:LegacyValue)=>{reactionCounts[r.post_id]=(reactionCounts[r.post_id]||0)+1;if(r.user_id===u.user.id)likedByMe.add(r.post_id);});
+        (commentRows||[]).forEach((c:LegacyValue)=>{commentCounts[c.post_id]=(commentCounts[c.post_id]||0)+1;});
 
-        const authorIds=[...new Set(dbPosts.map((p:any)=>p.user_id))];
+        const authorIds=[...new Set(dbPosts.map((p:LegacyValue)=>p.user_id))];
         const{data:authorProfiles}=await supabase.from("profiles").select("id,first_name,last_name,full_name,username,role,avatar_url").in("id",authorIds);
         const profileMap:Record<string,{name:string;role:string;avatar_url:string|null;username:string|null}>={};
-        authorProfiles?.forEach((ap:any)=>{
+        authorProfiles?.forEach((ap:LegacyValue)=>{
           profileMap[ap.id]={
             name: ap.full_name || [ap.first_name, ap.last_name].filter(Boolean).join(" ") || ap.username || "Scholar",
             role: ap.role || "Scholar",
@@ -91,7 +92,7 @@ export default function FeedPage() {
           };
         });
 
-        setPosts(dbPosts.map((post:any)=>{
+        setPosts(dbPosts.map((post:LegacyValue)=>{
           const authorProfile=profileMap[post.user_id]||{name:"Scholar",role:"Scholar",avatar_url:null,username:null};
           const authorName=authorProfile.name;
           const initials=authorName.split(" ").map((n:string)=>n[0]).join("").toUpperCase().slice(0,2);
@@ -114,19 +115,19 @@ export default function FeedPage() {
       // Load gallery from Supabase Storage
       const{data:files}=await supabase.storage.from("photos").list("gallery",{limit:100,sortBy:{column:"created_at",order:"desc"}});
       if(files&&files.length>0){
-        setGallery(files.filter((f:any)=>f.name!==".emptyFolderPlaceholder").map((f:any)=>`${SURL}/storage/v1/object/public/photos/gallery/${f.name}`));
+        setGallery(files.filter((f:LegacyValue)=>f.name!==".emptyFolderPlaceholder").map((f:LegacyValue)=>`${SURL}/storage/v1/object/public/photos/gallery/${f.name}`));
       }
 
       // Also pull feed post images into gallery
       const{data:photoPosts}=await supabase.from("feed_posts").select("image_url,media_url").not("image_url","is",null).limit(50);
       if(photoPosts){
-        const photoUrls=photoPosts.map((p:any)=>p.image_url||p.media_url).filter(Boolean);
+        const photoUrls=photoPosts.map((p:LegacyValue)=>p.image_url||p.media_url).filter(Boolean);
         if(photoUrls.length>0)setGallery(prev=>[...photoUrls,...prev]);
       }
 
       setLoading(false);
     })();
-  },[]);
+  },[router]);
 
   const uploadPhoto=async(photoFile:File,folder:string):Promise<string|null>=>{
     const ext=photoFile.name.split(".").pop()||"jpg";
@@ -216,14 +217,14 @@ export default function FeedPage() {
     });
   };
 
-  const editComment=async(postId:string,comment:any)=>{
+  const editComment=async(postId:string,comment:LegacyValue)=>{
     if(!userId||comment.user_id!==userId)return;
     const body=window.prompt("Edit your comment",comment.body);
     if(!body?.trim())return;
 
     setCommentsByPost(current=>({
       ...current,
-      [postId]:(current[postId]||[]).map((c:any)=>c.id===comment.id?{...c,body}:c)
+      [postId]:(current[postId]||[]).map((c:LegacyValue)=>c.id===comment.id?{...c,body}:c)
     }));
 
     await fetch("/api/social/comments",{
@@ -233,13 +234,13 @@ export default function FeedPage() {
     });
   };
 
-  const deleteComment=async(postId:string,comment:any)=>{
+  const deleteComment=async(postId:string,comment:LegacyValue)=>{
     if(!userId||comment.user_id!==userId)return;
     if(!window.confirm("Delete this comment?"))return;
 
     setCommentsByPost(current=>({
       ...current,
-      [postId]:(current[postId]||[]).filter((c:any)=>c.id!==comment.id)
+      [postId]:(current[postId]||[]).filter((c:LegacyValue)=>c.id!==comment.id)
     }));
     setPosts(p=>p.map(x=>x.id===postId?{...x,comments:Math.max(0,x.comments-1)}:x));
 
@@ -269,7 +270,7 @@ export default function FeedPage() {
 
       {lightbox&&(
         <div onClick={()=>setLightbox(null)} style={{position:"fixed",inset:0,zIndex:9999,background:"rgba(0,0,0,.93)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>
-          <img src={lightbox} alt="" style={{maxWidth:"90vw",maxHeight:"90vh",objectFit:"contain",borderRadius:12}}/>
+          <Image unoptimized width={1200} height={800} src={lightbox} alt="" style={{maxWidth:"90vw",maxHeight:"90vh",objectFit:"contain",borderRadius:12}}/>
           <button onClick={()=>setLightbox(null)} style={{position:"absolute",top:20,right:24,background:"rgba(255,255,255,.15)",border:"none",color:"#fff",fontSize:20,cursor:"pointer",borderRadius:"50%",width:40,height:40}}>✕</button>
         </div>
       )}
@@ -300,7 +301,7 @@ export default function FeedPage() {
                 </div>
                 {pendingPhoto&&(
                   <div style={{position:"relative",marginBottom:12,borderRadius:12,overflow:"hidden",maxHeight:220}}>
-                    <img src={pendingPhoto} alt="Preview" style={{width:"100%",objectFit:"cover",display:"block",maxHeight:220}}/>
+                    <Image unoptimized width={1200} height={800} src={pendingPhoto} alt="Preview" style={{width:"100%",objectFit:"cover",display:"block",maxHeight:220}}/>
                     <button onClick={()=>{setPendingPhoto(null);setPendingFile(null);if(postFileRef.current)postFileRef.current.value="";}} style={{position:"absolute",top:8,right:8,background:"rgba(0,0,0,.6)",border:"none",color:"#fff",borderRadius:"50%",width:28,height:28,cursor:"pointer",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
                   </div>
                 )}
@@ -333,7 +334,7 @@ export default function FeedPage() {
                     <div key={post.id} className="pb-post" style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:24,overflow:"hidden",transition:"border-color 0.15s",boxShadow:"0 12px 30px rgba(15,23,42,.04)"}}>
                       {post.coverImg&&(
                         <div style={{position:"relative",maxHeight:280,overflow:"hidden",cursor:"pointer"}} onClick={()=>setLightbox(post.coverImg)}>
-                          <img src={post.coverImg} alt="" style={{width:"100%",objectFit:"cover",display:"block",maxHeight:280}}/>
+                          <Image unoptimized width={1200} height={800} src={post.coverImg} alt="" style={{width:"100%",objectFit:"cover",display:"block",maxHeight:280}}/>
                           <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,transparent 50%,rgba(15,23,42,.6) 100%)"}}/>
                         </div>
                       )}
@@ -358,7 +359,7 @@ export default function FeedPage() {
 
                         {(commentsByPost[post.id]||[]).length>0&&(
                           <div style={{marginTop:12,borderTop:`1px solid ${T.line}`,paddingTop:12,display:"grid",gap:8}}>
-                            {(commentsByPost[post.id]||[]).map((comment:any)=>(
+                            {(commentsByPost[post.id]||[]).map((comment:LegacyValue)=>(
                               <div key={comment.id} style={{background:T.surface2,borderRadius:12,padding:"10px 12px"}}>
                                 <div style={{display:"flex",justifyContent:"space-between",gap:10,marginBottom:4}}>
                                   <strong style={{fontSize:12,color:T.ink}}>{comment.author}</strong>
@@ -393,7 +394,7 @@ export default function FeedPage() {
                 <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:4,marginBottom:10}}>
                   {gallery.slice(0,6).map((img,i)=>(
                     <div key={i} onClick={()=>setLightbox(img)} style={{aspectRatio:"1",borderRadius:8,overflow:"hidden",cursor:"pointer"}}>
-                      <img src={img} alt="" className="pb-gal" style={{width:"100%",height:"100%",objectFit:"cover",display:"block",transition:"all 0.2s"}}/>
+                      <Image unoptimized width={1200} height={800} src={img} alt="" className="pb-gal" style={{width:"100%",height:"100%",objectFit:"cover",display:"block",transition:"all 0.2s"}}/>
                     </div>
                   ))}
                 </div>
@@ -409,7 +410,7 @@ export default function FeedPage() {
                   <div key={l.name} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 0",borderBottom:i<LEADERS.length-1?`1px solid ${T.line}`:"none"}}>
                     <span style={{fontFamily:T.mono,fontSize:11,color:l.rank<=3?T.orange:T.faint,width:18,fontWeight:700}}>{l.rank<=3?["🥇","🥈","🥉"][l.rank-1]:`#${l.rank}`}</span>
                     <div style={{width:30,height:30,borderRadius:"50%",background:l.color,overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:700,color:"#fff",flexShrink:0}}>
-                      {l.img?<img src={l.img} alt={l.name} style={{width:"100%",height:"100%",objectFit:"cover"}}/>:l.initials}
+                      {l.img?<Image unoptimized width={1200} height={800} src={l.img} alt={l.name} style={{width:"100%",height:"100%",objectFit:"cover"}}/>:l.initials}
                     </div>
                     <div style={{flex:1}}>
                       <div style={{fontSize:12,fontWeight:600,color:l.name==="You"?T.orange:T.ink}}>{l.name}</div>
@@ -454,7 +455,7 @@ export default function FeedPage() {
               <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12}}>
                 {gallery.map((img,i)=>(
                   <div key={i} onClick={()=>setLightbox(img)} style={{aspectRatio:"1",borderRadius:14,overflow:"hidden",cursor:"pointer",background:T.line}}>
-                    <img src={img} alt={`Photo ${i+1}`} className="pb-gal" style={{width:"100%",height:"100%",objectFit:"cover",display:"block",transition:"all 0.2s"}}/>
+                    <Image unoptimized width={1200} height={800} src={img} alt={`Photo ${i+1}`} className="pb-gal" style={{width:"100%",height:"100%",objectFit:"cover",display:"block",transition:"all 0.2s"}}/>
                   </div>
                 ))}
               </div>

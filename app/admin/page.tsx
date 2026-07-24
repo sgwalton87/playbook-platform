@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabaseClient";
 
 export default function AdminPage() {
   const router = useRouter();
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<LegacyValue[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

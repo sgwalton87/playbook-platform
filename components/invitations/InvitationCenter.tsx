@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import {
-  createSupportInvitation,
   getDemoInvitations,
   updateInvitationStatus,
   type SupportInvitation,

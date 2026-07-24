@@ -1,7 +1,7 @@
 import { publishEvent } from "./bus";
 import type { PlaybookEventType } from "./types";
 
-export async function emitEvent<TPayload = any>({
+export async function emitEvent<TPayload = LegacyValue>({
   type,
   payload,
   source = "playbook",

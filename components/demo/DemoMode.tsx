@@ -164,7 +164,7 @@ export default function DemoMode() {
   );
 }
 
-function Slide({ eyebrow, title, children }: any) {
+function Slide({ eyebrow, title, children }: LegacyValue) {
   return (
     <section>
       <p style={eyebrowStyle}>{eyebrow}</p>
@@ -174,7 +174,7 @@ function Slide({ eyebrow, title, children }: any) {
   );
 }
 
-function MetricRow({ dna, opps, trust, dollars }: any) {
+function MetricRow({ dna, opps, trust, dollars }: LegacyValue) {
   return (
     <div style={metrics}>
       <Metric label="Academic DNA" value={`${dna}%`} />
@@ -185,7 +185,7 @@ function MetricRow({ dna, opps, trust, dollars }: any) {
   );
 }
 
-function Metric({ label, value }: any) {
+function Metric({ label, value }: LegacyValue) {
   return <div style={metric}><p style={eyebrow}>{label}</p><strong>{value}</strong></div>;
 }
 
@@ -202,7 +202,7 @@ function Meter({ label, value }: { label:string; value:number }) {
   );
 }
 
-function Problem({ children }: any) {
+function Problem({ children }: LegacyValue) {
   return <div style={problem}>{children}</div>;
 }
 

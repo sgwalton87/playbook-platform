@@ -1,4 +1,4 @@
-export function buildPortfolioAIContext(portfolio: any) {
+export function buildPortfolioAIContext(portfolio: LegacyValue) {
   return {
     identity: portfolio.identity,
     academics: portfolio.academics,

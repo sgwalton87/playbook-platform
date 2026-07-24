@@ -1,4 +1,4 @@
-export function buildCareer(profile:any){
+export function buildCareer(profile:LegacyValue){
 
   return{
 

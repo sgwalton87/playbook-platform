@@ -1,4 +1,4 @@
-export function generateResumeDraft(portfolio: any) {
+export function generateResumeDraft(portfolio: LegacyValue) {
   return {
     name: portfolio?.identity?.fullName || "Scholar",
     headline: portfolio?.career?.idealProfession || "Emerging Scholar",

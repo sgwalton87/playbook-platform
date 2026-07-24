@@ -1,13 +1,13 @@
 import type { TimelineEvent } from "./types";
 
-export function buildScholarTimeline(record: any): TimelineEvent[] {
+export function buildScholarTimeline(record: LegacyValue): TimelineEvent[] {
   const certificates = record?.achievements?.certificates || [];
   const badges = record?.achievements?.badges || [];
-  const activities = record?.achievements?.activities || [];
+  const activities = record?.community?.activities || record?.achievements?.activities || [];
   const posts = record?.achievements?.posts || [];
 
   return [
-    ...certificates.map((c: any) => ({
+    ...certificates.map((c: LegacyValue) => ({
       id: `certificate-${c.id}`,
       type: "certificate" as const,
       title: c.certificate_name || "Certificate Earned",
@@ -17,7 +17,7 @@ export function buildScholarTimeline(record: any): TimelineEvent[] {
       verified: true,
     })),
 
-    ...badges.map((b: any) => ({
+    ...badges.map((b: LegacyValue) => ({
       id: `badge-${b.id}`,
       type: "badge" as const,
       title: b.displayName || b.badges?.name || "Badge Earned",
@@ -27,7 +27,7 @@ export function buildScholarTimeline(record: any): TimelineEvent[] {
       verified: true,
     })),
 
-    ...activities.map((a: any) => ({
+    ...activities.map((a: LegacyValue) => ({
       id: `activity-${a.id}`,
       type: "activity" as const,
       title: a.title || a.role_title || a.activity_type || "Activity Logged",
@@ -37,7 +37,7 @@ export function buildScholarTimeline(record: any): TimelineEvent[] {
       verified: Boolean(a.verified),
     })),
 
-    ...posts.map((p: any) => ({
+    ...posts.map((p: LegacyValue) => ({
       id: `post-${p.id}`,
       type: "post" as const,
       title: p.title || "Community Contribution",

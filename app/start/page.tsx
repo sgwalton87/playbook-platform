@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
@@ -18,14 +19,14 @@ export default function StartPage() {
 
 function StartContent() {
   const params = useSearchParams();
-  const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
+  const [user, setUser] = useState<LegacyValue>(null);
+  const [profile, setProfile] = useState<LegacyValue>(null);
   const [stepIndex, setStepIndex] = useState(0);
-  const [form, setForm] = useState<Record<string, any>>({});
+  const [form, setForm] = useState<Record<string, LegacyValue>>({});
   const [customColleges, setCustomColleges] = useState<string[]>([]);
   const [customCareers, setCustomCareers] = useState<string[]>([]);
-  const [customActivities, setCustomActivities] = useState<string[]>([]);
-  const [customDistricts, setCustomDistricts] = useState<string[]>([]);
+  const [, setCustomActivities] = useState<string[]>([]);
+  const [, setCustomDistricts] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const [creating, setCreating] = useState(false);
   const [created, setCreated] = useState(false);
@@ -99,14 +100,12 @@ function StartContent() {
 
       setCustomColleges((options || []).filter((o) => o.type === "college").map((o) => o.value));
       setCustomCareers((options || []).filter((o) => o.type === "career").map((o) => o.value));
-      setCustomActivities((options || []).filter((o) => o.type === "activity").map((o) => o.value));
-      setCustomDistricts((options || []).filter((o) => o.type === "district").map((o) => o.value));
     }
 
     load();
-  }, []);
+  }, [role]);
 
-  function update(key: string, value: any) {
+  function update(key: string, value: LegacyValue) {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
@@ -153,7 +152,7 @@ function StartContent() {
     await persist(false, { avatar_url: data.publicUrl });
   }
 
-  async function persist(complete = false, override: Record<string, any> = {}) {
+  async function persist(complete = false, override: Record<string, LegacyValue> = {}) {
     if (!user?.id) return;
 
     const nextForm = { ...form, ...override };
@@ -180,8 +179,9 @@ function StartContent() {
 
     const payload = {
       id: user.id,
-      email: user.email,
       role,
+      profile_mode: role,
+      requested_role: role,
       full_name: nextForm.full_name || null,
       username: nextForm.username || null,
       avatar_url: nextForm.avatar_url || null,
@@ -195,7 +195,7 @@ function StartContent() {
         top_schools: topSchools,
         activities,
         invite_supporters: inviteSupporters,
-        onboarding_step_index: stepIndex,
+        onboarding_step_index: nextForm.onboarding_step_index ?? stepIndex,
       },
       onboarding_completed: complete,
       onboarding_completed_at: complete ? new Date().toISOString() : null,
@@ -206,7 +206,7 @@ function StartContent() {
     };
 
     await supabase.from("profiles").upsert(payload, { onConflict: "id" });
-    setProfile((prev: any) => ({ ...prev, ...payload }));
+    setProfile((prev: LegacyValue) => ({ ...prev, ...payload }));
   }
 
   async function sendInvites() {
@@ -232,7 +232,10 @@ function StartContent() {
 
   async function next(skip = false) {
     setSaving(true);
-    await persist(false);
+    const stepIncrement = skip ? 1 : 1;
+    await persist(false, {
+      onboarding_step_index: Math.min(stepIndex + stepIncrement, steps.length - 1),
+    });
 
     if (step.id === "network") {
       await sendInvites();
@@ -290,7 +293,7 @@ function StartContent() {
         </div>
 
         <div style={heroImageWrap}>
-          <img
+          <Image unoptimized width={1200} height={800}
             src={role === "scholar-athlete" ? PLAYBOOK_HERO_VISUALS.athlete.image : PLAYBOOK_HERO_VISUALS.signup.image}
             alt="Scholars building their next play"
             style={heroImage}
@@ -332,7 +335,7 @@ function StartContent() {
           {step.id === "identity" && (
             <div style={avatarRow}>
               <div style={avatar}>
-                {form.avatar_url ? <img src={form.avatar_url} style={avatarImg} alt="" /> : "📸"}
+                {form.avatar_url ? <Image unoptimized width={1200} height={800} src={form.avatar_url} style={avatarImg} alt="" /> : "📸"}
               </div>
               <label style={uploadButton}>
                 Upload profile photo
@@ -354,7 +357,7 @@ function StartContent() {
               key={field.key}
               field={field}
               value={form[field.key]}
-              onChange={(value: any) => update(field.key, value)}
+              onChange={(value: LegacyValue) => update(field.key, value)}
               onBlur={(value: string) => {
                 if (field.type === "college") saveCustomOption("college", value);
                 if (field.type === "career") saveCustomOption("career", value);
@@ -383,7 +386,14 @@ function StartContent() {
   );
 }
 
-function FieldRenderer({ field, value, onChange, onBlur }: any) {
+function FieldRenderer({ field, value, onChange, onBlur }: LegacyValue) {
+  const [draft, setDraft] = useState({
+    activity: "",
+    category: "",
+    description: "",
+    hours: "",
+    supervisor: "",
+  });
   if (field.type === "textarea") {
     return (
       <label style={label}>
@@ -499,14 +509,6 @@ function FieldRenderer({ field, value, onChange, onBlur }: any) {
 
   if (field.type === "activity-list") {
     const arr = Array.isArray(value) ? value : [];
-    const [draft, setDraft] = useState({
-      activity: "",
-      category: "",
-      description: "",
-      hours: "",
-      supervisor: "",
-    });
-
     function addActivity() {
       if (!draft.activity.trim()) return;
       onChange([...arr, draft]);
@@ -583,7 +585,7 @@ function FieldRenderer({ field, value, onChange, onBlur }: any) {
           {arr.length === 0 ? (
             <p style={{ color: "#64748B", margin: 0 }}>No activity entries added yet.</p>
           ) : (
-            arr.map((item: any, i: number) => (
+            arr.map((item: LegacyValue, i: number) => (
               <div key={`${item.activity}-${i}`} style={summaryItem}>
                 <div>
                   <strong>{item.activity}</strong>
@@ -595,7 +597,7 @@ function FieldRenderer({ field, value, onChange, onBlur }: any) {
                 <button
                   type="button"
                   style={removeButton}
-                  onClick={() => onChange(arr.filter((_: any, index: number) => index !== i))}
+                  onClick={() => onChange(arr.filter((_: LegacyValue, index: number) => index !== i))}
                 >
                   Remove
                 </button>
@@ -685,28 +687,6 @@ const overlay: React.CSSProperties = { position: "fixed", inset: 0, zIndex: 9999
 const overlayTitle: React.CSSProperties = { fontFamily: "'Anton', sans-serif", fontSize: "clamp(44px,7vw,86px)", textTransform: "uppercase", margin: 0 };
 const overlayText: React.CSSProperties = { fontSize: 22, color: "rgba(248,247,244,.75)" };
 const confetti: React.CSSProperties = { fontSize: 38, marginBottom: 16 };
-
-const activityCategoryGrid: React.CSSProperties = {
-  display: "flex",
-  gap: 8,
-  flexWrap: "wrap",
-  marginBottom: 8,
-};
-
-const activityCategory: React.CSSProperties = {
-  border: "1px solid #CBD5E1",
-  background: "#FFFFFF",
-  borderRadius: 999,
-  padding: "10px 14px",
-  fontWeight: 900,
-  cursor: "pointer",
-};
-
-const addRow: React.CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "1fr auto",
-  gap: 10,
-};
 
 const summaryList: React.CSSProperties = {
   display: "grid",

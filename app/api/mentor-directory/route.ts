@@ -1,6 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
+type MentorDirectoryProfile = {
+  display_name?: string | null;
+  role?: string | null;
+  organization?: string | null;
+  expertise?: string[] | null;
+};
+
+type MentorDirectoryPostBody = {
+  userId?: string;
+  role?: string;
+  displayName?: string;
+  organization?: string;
+  expertise?: string[];
+  searchable?: boolean;
+};
+
 function admin() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -24,7 +40,7 @@ export async function GET(req: NextRequest) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
 
-  const filtered = (data || []).filter((person: any) => {
+  const filtered = ((data || []) as MentorDirectoryProfile[]).filter((person) => {
     if (!q) return true;
     return [
       person.display_name,
@@ -38,7 +54,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const body = await req.json();
+  const body = (await req.json()) as MentorDirectoryPostBody;
 
   const { data, error } = await admin()
     .from("support_directory_profiles")

@@ -1,18 +1,18 @@
-export function calculatePortfolioDNA({ portfolio, certificates = [], activities = [] }: any) {
+export function calculatePortfolioDNA({ portfolio, certificates = [], activities = [] }: LegacyValue) {
   const pillars = portfolio?.pillars || [];
 
   return {
     leadership: score([
       pillars.includes("leadership"),
-      activities.some((a: any) => Boolean(a.role_title)),
+      activities.some((a: LegacyValue) => Boolean(a.role_title)),
     ]),
     financialLiteracy: score([
       pillars.includes("finance"),
-      certificates.some((c: any) => String(c.course_slug || c.certificate_name || "").toLowerCase().includes("money")),
+      certificates.some((c: LegacyValue) => String(c.course_slug || c.certificate_name || "").toLowerCase().includes("money")),
     ]),
     communityImpact: score([
       pillars.includes("civic"),
-      activities.some((a: any) => String(a.activity_type || "").toLowerCase().includes("volunteer")),
+      activities.some((a: LegacyValue) => String(a.activity_type || "").toLowerCase().includes("volunteer")),
     ]),
     wellness: score([pillars.includes("sel")]),
     careerReadiness: score([

@@ -1,6 +1,6 @@
 "use client";
 
-export default function StudioHeader({ status }: any) {
+export default function StudioHeader({ status }: LegacyValue) {
   return (
     <header style={header}>
       <div>

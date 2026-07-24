@@ -1,0 +1,24 @@
+{
+  "id": "PBOS-UI-001",
+  "title": "Audit AppShell and design system consistency",
+  "status": "blocked",
+  "priority": 80,
+  "dependencies": ["PBOS-GATE-001", "PBOS-RLS-001"],
+  "handbook_refs": [
+    "docs/UI_DESIGN_SYSTEM.md#shared-ui-components",
+    "docs/ARCHITECTURE.md#role-dashboard-architecture",
+    "docs/MASTER_CHECKLIST.md#current-priorities"
+  ],
+  "tasks": [
+    "Inventory active dashboards against AppShell usage.",
+    "Identify reusable component opportunities.",
+    "Document accessibility and token adoption risks."
+  ],
+  "definition_of_done": [
+    "Dashboard UI inventory exists.",
+    "Reusable component opportunities are prioritized.",
+    "No route-specific component fork is introduced by the audit."
+  ],
+  "validation": ["docs"],
+  "next_gate": "PBOS-QA-001"
+}

@@ -12,7 +12,7 @@ const demoCourses = [
   { name: "English 9", subject: "english", credits: 10, grade: "A", completed: true },
 ];
 
-export default function PlaybookHome({ courses = demoCourses, name = "Scholar" }: { courses?: any[]; name?: string }) {
+export default function PlaybookHome({ courses = demoCourses, name = "Scholar" }: { courses?: LegacyValue[]; name?: string }) {
   const dna = useMemo(() => buildAcademicDNA(courses), [courses]);
   const compass = useMemo(() => buildCompassReport({ courses, trustScore: 68 }), [courses]);
   const opportunities = useMemo(() => matchOpportunitiesFromSignals({
@@ -91,7 +91,7 @@ export default function PlaybookHome({ courses = demoCourses, name = "Scholar" }
                 </div>
               ))}
             </div>
-            <p style={encouragement}>Keep going. You're building something powerful.</p>
+            <p style={encouragement}>Keep going. You&apos;re building something powerful.</p>
           </Card>
         </section>
 
@@ -123,7 +123,7 @@ function scoreFrom(values:string[], key:string) {
   return values.some(v => v.toLowerCase().includes(key)) ? 92 : 68;
 }
 
-function Card({ icon, label, title, meta, children }: any) {
+function Card({ icon, label, title, meta, children }: LegacyValue) {
   return (
     <section style={card}>
       <div style={cardHead}>

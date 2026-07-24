@@ -1,4 +1,4 @@
-export function createRecommendationContext(portfolio: any) {
+export function createRecommendationContext(portfolio: LegacyValue) {
   return {
     scholarName: portfolio?.identity?.fullName || "Scholar",
     school: portfolio?.identity?.school,

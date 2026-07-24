@@ -1,4 +1,4 @@
-export function buildAcademics(profile:any){
+export function buildAcademics(profile:LegacyValue){
 
   return{
 

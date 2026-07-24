@@ -2,54 +2,113 @@
 
 import { supabase } from "@/lib/supabaseClient";
 import { roleOptions } from "@/lib/role-os/roleRoutes";
+import { getOnboardingDestination } from "@/lib/roles/registry";
+import PlaybookLogo from "@/components/brand/PlaybookLogo";
+import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { useState } from "react";
 
 export default function RoleSelect() {
   const router = useRouter();
   const [saving, setSaving] = useState("");
 
-  async function choose(role: string, href: string) {
+  const [error, setError] = useState("");
+
+  async function choose(role: string) {
     setSaving(role);
+    setError("");
 
     const { data } = await supabase.auth.getUser();
     const user = data?.user;
 
     if (user) {
-      await supabase.from("profiles").upsert({
+      const { error: saveError } = await supabase.from("profiles").upsert({
         id: user.id,
         role,
+        profile_mode: role,
+        requested_role: role,
         updated_at: new Date().toISOString(),
       });
+
+      if (saveError) {
+        setError("We could not save your pathway. Please try again.");
+        setSaving("");
+        return;
+      }
     }
 
-    router.push(href);
+    router.push(getOnboardingDestination(role));
   }
 
   return (
-    <main style={{minHeight:"100vh",background:"#F8F7F4",padding:32,fontFamily:"system-ui, sans-serif"}}>
-      <section style={{maxWidth:1100,margin:"0 auto 22px"}}>
-        <p style={{fontSize:11,letterSpacing:".14em",textTransform:"uppercase",fontWeight:950,color:"#F97316"}}>Choose Your Playbook OS</p>
-        <h1 style={{fontSize:52,lineHeight:1,color:"#0F172A",margin:"8px 0"}}>Every role gets a unique experience.</h1>
-        <p style={{color:"#64748B",fontSize:16,lineHeight:1.6,maxWidth:760}}>
-          Select how you support the scholar. Playbook will route you to the right operating system.
-        </p>
+    <main style={page}>
+      <section style={hero}>
+        <div style={heroCopy}>
+          <PlaybookLogo size={118} priority />
+          <p style={eyebrow}>Choose your Playbook</p>
+          <h1 style={title}>One platform. A purpose-built OS for every role.</h1>
+          <p style={lead}>
+            Choose the role that best describes you. We’ll build the right profile first, then open the operating system designed for your work.
+          </p>
+        </div>
+        <div style={imageWrap}>
+          <Image
+            src={PLAYBOOK_HERO_VISUALS.signup.image}
+            alt={PLAYBOOK_HERO_VISUALS.signup.alt}
+            fill
+            sizes="(max-width: 720px) 100vw, 46vw"
+            style={image}
+          />
+        </div>
       </section>
 
-      <section style={{maxWidth:1100,margin:"0 auto",display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:16}}>
-        {roleOptions.map(option => (
+      <section style={intro}>
+        <div>
+          <p style={eyebrow}>Start with your role</p>
+          <h2 style={sectionTitle}>Your onboarding shapes what you see, what you can do, and who you can support.</h2>
+        </div>
+        <span style={count}>{roleOptions.length} pathways</span>
+      </section>
+
+      {error && <div role="alert" style={errorBanner}>{error}</div>}
+
+      <section style={grid}>
+        {roleOptions.map((option, index) => (
           <button
             key={option.role}
-            onClick={() => choose(option.role, option.href)}
-            style={{textAlign:"left",background:"#fff",border:"1px solid #E2E8F0",borderRadius:24,padding:24,cursor:"pointer",boxShadow:"0 16px 40px rgba(15,23,42,.06)"}}
+            onClick={() => choose(option.role)}
+            disabled={Boolean(saving)}
+            style={roleCard}
           >
-            <p style={{fontSize:11,letterSpacing:".14em",textTransform:"uppercase",fontWeight:950,color:"#F97316",margin:0}}>{option.role}</p>
-            <h2 style={{fontSize:26,color:"#0F172A",margin:"8px 0"}}>{option.label} OS</h2>
-            <p style={{fontSize:14,color:"#64748B",lineHeight:1.55}}>{option.description}</p>
-            <strong style={{color:"#0F172A"}}>{saving === option.role ? "Saving..." : "Enter →"}</strong>
+            <span style={number}>{String(index + 1).padStart(2, "0")}</span>
+            <p style={cardEyebrow}>{option.role}</p>
+            <h3 style={cardTitle}>{option.label}</h3>
+            <p style={cardBody}>{option.description}</p>
+            <strong style={action}>{saving === option.role ? "Preparing your pathway…" : "Build my Playbook →"}</strong>
           </button>
         ))}
       </section>
     </main>
   );
 }
+
+const page: React.CSSProperties = { minHeight: "100vh", background: "#F8F7F4", padding: "clamp(18px,4vw,44px)", fontFamily: "'Hanken Grotesk', system-ui, sans-serif", color: "#0F172A" };
+const hero: React.CSSProperties = { maxWidth: 1180, margin: "0 auto 32px", minHeight: 410, display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,320px),1fr))", overflow: "hidden", borderRadius: 32, background: "#0F172A", boxShadow: "0 30px 80px rgba(15,23,42,.18)" };
+const heroCopy: React.CSSProperties = { padding: "clamp(30px,5vw,64px)", display: "flex", flexDirection: "column", justifyContent: "center" };
+const eyebrow: React.CSSProperties = { margin: "18px 0 8px", fontFamily: "'Space Mono', monospace", fontSize: 10, letterSpacing: ".18em", textTransform: "uppercase", fontWeight: 800, color: "#F97316" };
+const title: React.CSSProperties = { margin: 0, maxWidth: 680, color: "#F8F7F4", fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: "clamp(38px,5.5vw,72px)", lineHeight: .98, textTransform: "uppercase" };
+const lead: React.CSSProperties = { maxWidth: 650, color: "rgba(248,247,244,.7)", fontSize: 16, lineHeight: 1.7, margin: "20px 0 0" };
+const imageWrap: React.CSSProperties = { minHeight: 360, position: "relative", background: "#1E293B" };
+const image: React.CSSProperties = { width: "100%", height: "100%", objectFit: "cover", display: "block" };
+const intro: React.CSSProperties = { maxWidth: 1180, margin: "0 auto 18px", display: "flex", alignItems: "end", justifyContent: "space-between", gap: 24 };
+const sectionTitle: React.CSSProperties = { maxWidth: 760, margin: 0, fontSize: "clamp(24px,3vw,38px)", lineHeight: 1.08 };
+const count: React.CSSProperties = { whiteSpace: "nowrap", border: "1px solid #FED7AA", background: "#FFF7ED", color: "#C2410C", borderRadius: 999, padding: "8px 12px", fontFamily: "'Space Mono', monospace", fontSize: 10, fontWeight: 800, textTransform: "uppercase" };
+const grid: React.CSSProperties = { maxWidth: 1180, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))", gap: 16 };
+const roleCard: React.CSSProperties = { minHeight: 270, position: "relative", textAlign: "left", background: "#FFFFFF", color: "#0F172A", border: "1px solid #E2E8F0", borderRadius: 24, padding: 24, cursor: "pointer", boxShadow: "0 14px 36px rgba(15,23,42,.06)", display: "flex", flexDirection: "column", alignItems: "stretch" };
+const number: React.CSSProperties = { position: "absolute", top: 20, right: 20, fontFamily: "'Anton', sans-serif", color: "#E2E8F0", fontSize: 36 };
+const cardEyebrow: React.CSSProperties = { ...eyebrow, margin: 0, paddingRight: 48 };
+const cardTitle: React.CSSProperties = { margin: "18px 0 10px", fontSize: 27, lineHeight: 1.05 };
+const cardBody: React.CSSProperties = { margin: 0, color: "#64748B", fontSize: 14, lineHeight: 1.6 };
+const action: React.CSSProperties = { marginTop: "auto", paddingTop: 24, color: "#F97316", fontSize: 13 };
+const errorBanner: React.CSSProperties = { maxWidth: 1180, margin: "0 auto 16px", border: "1px solid #FCA5A5", background: "#FEF2F2", color: "#991B1B", borderRadius: 14, padding: "12px 16px", fontWeight: 700 };

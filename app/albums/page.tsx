@@ -1,9 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import {
-  PlaybookButton,
   PlaybookCard,
   PlaybookGrid,
   PlaybookHero,
@@ -16,7 +16,7 @@ const SURL = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 export default function AlbumsPage() {
   const fileRef = useRef<HTMLInputElement | null>(null);
   const [userId, setUserId] = useState("");
-  const [albums, setAlbums] = useState<any[]>([]);
+  const [albums, setAlbums] = useState<LegacyValue[]>([]);
   const [selectedAlbumId, setSelectedAlbumId] = useState("");
   const [title, setTitle] = useState("My Playbook Story");
   const [category, setCategory] = useState("story");
@@ -42,7 +42,13 @@ export default function AlbumsPage() {
       const uid = data.user?.id;
       if (!uid) return;
       setUserId(uid);
-      await loadAlbums(uid);
+      const res = await fetch(`/api/albums?userId=${uid}`);
+      const json = await res.json();
+      setAlbums(json.albums || []);
+
+      if (json.albums?.[0]?.id) {
+        setSelectedAlbumId(json.albums[0].id);
+      }
     }
 
     init();
@@ -137,15 +143,15 @@ export default function AlbumsPage() {
       <section style={albumGrid}>
         {albums.map((album) => (
           <article key={album.id} style={albumCard}>
-            {album.cover_url && <img src={album.cover_url} alt="" style={cover} />}
+            {album.cover_url && <Image unoptimized width={1200} height={800} src={album.cover_url} alt="" style={cover} />}
             <div style={{ padding: 16 }}>
               <h2 style={{ margin: 0 }}>{album.title}</h2>
               <p style={body}>{album.description || "No description yet."}</p>
               <PlaybookPill>{album.category}</PlaybookPill>
               <div style={photoGrid}>
-                {(album.profile_album_photos || []).map((photo: any) => (
+                {(album.profile_album_photos || []).map((photo: LegacyValue) => (
                   <div key={photo.id}>
-                    <img src={photo.image_url} alt="" style={thumb} />
+                    <Image unoptimized width={1200} height={800} src={photo.image_url} alt="" style={thumb} />
                     {photo.caption && <p style={captionStyle}>{photo.caption}</p>}
                   </div>
                 ))}

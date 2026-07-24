@@ -1,23 +1,27 @@
-export function getRoleDestination(role?: string | null) {
-  const key = String(role || "").toLowerCase();
+import {
+  PLAYBOOK_ROLES,
+  PUBLIC_ONBOARDING_ROLES,
+  getRoleDestination,
+} from "@/lib/roles/registry";
 
-  if (["student", "scholar", "learner"].includes(key)) return "/living-scholar";
-  if (["parent", "guardian", "family"].includes(key)) return "/family-os";
-  if (["teacher", "educator", "counselor", "coach"].includes(key)) return "/educator-os";
-  if (["district", "admin", "school_admin"].includes(key)) return "/district-os";
-  if (["university", "college", "admissions"].includes(key)) return "/university-os";
-  if (["employer", "workforce", "partner"].includes(key)) return "/employer-os";
-  if (["mentor", "trusted_adult", "advisor"].includes(key)) return "/mentor-os";
+export { getRoleDestination } from "@/lib/roles/registry";
 
-  return "/home";
-}
+const ROLE_DESCRIPTIONS: Partial<Record<keyof typeof PLAYBOOK_ROLES, string>> = {
+  scholar: "Build your record, find opportunities, and get guidance.",
+  "scholar-athlete": "Connect academics, recruiting, eligibility, and life beyond sport.",
+  "transition-youth": "Build a supported path through education, work, and independent adulthood.",
+  family: "Support your scholar with clear next steps, permissions, and deadlines.",
+  mentor: "Guide scholars through goals, confidence, applications, and opportunity.",
+  educator: "Support students with readiness signals, evidence, and interventions.",
+  coach: "Connect athlete development, academics, recruiting, and advocacy.",
+  "college-coach": "Discover and support verified scholar-athlete talent.",
+  "college-admissions": "Connect verified scholars with institutional pathways.",
+  "brand-partner": "Create responsible campaigns, rewards, internships, and sponsorships.",
+};
 
-export const roleOptions = [
-  { role: "scholar", label: "Scholar", description: "Build your record, find opportunities, and get guidance.", href: "/living-scholar" },
-  { role: "family", label: "Family", description: "Support your scholar with clear next steps and deadlines.", href: "/family-os" },
-  { role: "educator", label: "Educator", description: "Guide students with readiness signals and interventions.", href: "/educator-os" },
-  { role: "district", label: "District", description: "See readiness, equity, and opportunity access across schools.", href: "/district-os" },
-  { role: "university", label: "University", description: "Discover verified learners and readiness pathways.", href: "/university-os" },
-  { role: "employer", label: "Employer", description: "Match verified skills to career-connected opportunities.", href: "/employer-os" },
-  { role: "mentor", label: "Mentor", description: "Support scholars with check-ins, encouragement, and opportunity coaching.", href: "/mentor-os" },
-];
+export const roleOptions = PUBLIC_ONBOARDING_ROLES.map((role) => ({
+  role,
+  label: PLAYBOOK_ROLES[role].label,
+  description: ROLE_DESCRIPTIONS[role] || "Enter your role-aware Playbook experience.",
+  href: getRoleDestination(role),
+}));

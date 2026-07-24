@@ -60,7 +60,7 @@ export default function LeaderboardPage() {
       if (!data.user) router.replace("/login");
       else setAuthed(true);
     });
-  }, []);
+  }, [router]);
 
   const sorted = [...ALL_SCHOLARS]
     .filter((s) => pillarFilter === "All" ? true : s.pillar === pillarFilter)

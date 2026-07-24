@@ -24,7 +24,7 @@ function AuthCallbackContent() {
       if (tokenHash) {
         const { error } = await supabase.auth.verifyOtp({
           token_hash: tokenHash,
-          type: type as any,
+          type: type as LegacyValue,
         });
 
         if (error) {
@@ -68,7 +68,6 @@ function AuthCallbackContent() {
       await supabase.from("profiles").upsert(
         {
           id: data.user.id,
-          email: data.user.email,
           role: role,
           profile_mode: role,
           requested_role: role,

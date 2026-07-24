@@ -7,7 +7,7 @@ import CourseDetailHeader from "@/components/courses/CourseDetailHeader";
 
 const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",blue:"#3B82F6",green:"#10B981",amber:"#F59E0B",purple:"#8B5CF6",mono:"'Space Mono', monospace",sans:"'Hanken Grotesk', system-ui, sans-serif",anton:"'Anton', sans-serif"};
 
-const COURSES:Record<string,any>={
+const COURSES:Record<string,LegacyValue>={
   "college-application-playbook":{title:"College Application Playbook",pillar:"College",pillarColor:"#0EA5E9",img:"https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200&q=80",desc:"Build your college list, complete applications, connect FAFSA, CalKIDS, and scholarship milestones.",xpPerModule:50,coinsPerModule:10,modules:[
     {id:1,title:"Build Your College List",duration:"15 min",type:"Planning",desc:"Identify reach, match, and safety schools that fit your goals."},
     {id:2,title:"Create Your Application Accounts",duration:"20 min",type:"Action Step",desc:"Set up your college application portals and track login milestones."},
@@ -86,7 +86,7 @@ export default function CourseModulePage() {
         .maybeSingle();
 
       if (progressRow?.completed) {
-        setCompletedIds(course.modules.map((m:any) => m.id));
+        setCompletedIds(course.modules.map((m:LegacyValue) => m.id));
         setClaimed(true);
       } else if (progressRow?.completed_modules?.length) {
         setCompletedIds(progressRow.completed_modules);
@@ -148,7 +148,7 @@ export default function CourseModulePage() {
 
     await fireConfetti();
 
-    const allModules = course.modules.map((m:any)=>m.id);
+    const allModules = course.modules.map((m:LegacyValue)=>m.id);
 
     const { error: progressError } = await supabase
       .from("course_progress")
@@ -215,7 +215,7 @@ export default function CourseModulePage() {
   const completedCount=completedIds.length;
   const pct=Math.round((completedCount/totalModules)*100);
   const isComplete=completedCount===totalModules;
-  const nextModuleId=course.modules.find((m:any)=>!completedIds.includes(m.id))?.id;
+  const nextModuleId=course.modules.find((m:LegacyValue)=>!completedIds.includes(m.id))?.id;
 
   if(!authed)return<div style={{minHeight:"100vh",background:T.cream,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:T.mono,fontSize:12,color:T.faint}}>Loading…</div>;
 
@@ -289,7 +289,7 @@ export default function CourseModulePage() {
           <div>
             <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.14em",textTransform:"uppercase",color:T.muted,marginBottom:14}}>Modules</p>
             <div style={{display:"flex",flexDirection:"column",gap:10}}>
-              {course.modules.map((mod:any)=>{
+              {course.modules.map((mod:LegacyValue)=>{
                 const done=completedIds.includes(mod.id);
                 const isNext=mod.id===nextModuleId;
                 const locked=!done&&!isNext&&mod.id>1&&!completedIds.includes(mod.id-1);

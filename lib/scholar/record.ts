@@ -1,5 +1,6 @@
 import { AG_REQUIREMENTS, AG_SUBJECT_NAMES } from "@/lib/agCourses";
 import type { ScholarRecord, ScholarRecordInput, ProfileAcademicForm } from "./types";
+import { buildCommunityRecord } from "./community";
 
 const SUBJECTS = ["A", "B", "C", "D", "E", "F", "G"];
 
@@ -9,6 +10,8 @@ function value<T>(...items: T[]): T | null {
 
 function normalizeAgProgress(rows: any[] = []) {
   const latestBySubject = new Map<string, any>();
+function normalizeAgProgress(rows: LegacyValue[] = []) {
+  const latestBySubject = new Map<string, LegacyValue>();
   for (const row of rows) {
     if (row?.subject && !latestBySubject.has(row.subject)) latestBySubject.set(row.subject, row);
   }
@@ -31,6 +34,7 @@ function normalizeAgProgress(rows: any[] = []) {
 }
 
 function normalizeCourses(courses: any[] = []) {
+function normalizeCourses(courses: LegacyValue[] = []) {
   return courses.map((course, index) => ({
     id: String(value(course.id, `course-${index}`)),
     name: value(course.name, course.title, course.course_name, course.current_course, "Untitled course"),
@@ -59,6 +63,8 @@ export function buildScholarRecord(input: ScholarRecordInput = {}): ScholarRecor
   const totalCompleted = agProgress.reduce((sum, row) => sum + Math.min(row.yearsCompleted, row.yearsRequired), 0);
   const achievements = { certificates: input.certificates || [], badges: input.badges || [], activities: input.activities || [], posts: input.posts || [] };
   const totalAchievements = achievements.certificates.length + achievements.badges.length + achievements.activities.length + achievements.posts.length;
+  const community = buildCommunityRecord(achievements.activities);
+  const volunteerHours = community.volunteerHours;
   const fullName = value(profile.full_name, [profile.first_name, profile.last_name].filter(Boolean).join(" "), profile.username, "Scholar") || "Scholar";
   const academicFields = [profile.school, profile.grade, profile.grad_year, profile.weighted_gpa || profile.gpa, profile.unweighted_gpa, profile.sat_score, profile.act_score, profile.dream_school].filter(Boolean).length;
   const portfolioCompletion = Math.min(100, Math.round((academicFields / 8) * 100));
@@ -92,6 +98,19 @@ export function buildScholarRecord(input: ScholarRecordInput = {}): ScholarRecor
     achievements: { total: totalAchievements, ...achievements },
     service: { volunteerHours: achievements.activities.reduce((sum: number, a: any) => sum + Number(a.hours || a.volunteer_hours || 0), 0) },
     readiness: { portfolioCompletion, opportunityReadiness: Math.min(100, Math.round(portfolioCompletion * 0.65 + Math.min(totalAchievements, 10) * 3.5)) },
+    community,
+    achievements: { total: totalAchievements, ...achievements, activities: community.activities },
+    service: { volunteerHours, activities: community.activities },
+    leadership: {
+      badges: achievements.badges,
+      activities: community.activities,
+      leadershipPositions: community.leadershipPositions,
+      leadershipScore: achievements.badges.length * 10 + community.leadershipPositions.length * 12 + community.activities.length * 3,
+    },
+    readiness: {
+      portfolioCompletion,
+      opportunityReadiness: Math.min(100, Math.round(portfolioCompletion * 0.55 + Math.min(totalAchievements, 10) * 3 + Math.min(volunteerHours, 100) * 0.15)),
+    },
     ai: { academicSummary: null, collegeRecommendations: null, transcriptAnalysis: null, scholarshipEligibility: null, academicCoaching: null, progressForecasting: null },
   };
 }

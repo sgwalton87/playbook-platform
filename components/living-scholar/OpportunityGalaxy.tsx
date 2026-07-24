@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-export default function OpportunityGalaxy({ opportunities }: { opportunities: any }) {
+export default function OpportunityGalaxy({ opportunities }: { opportunities: LegacyValue }) {
   const matches = opportunities.matches.slice(0, 7);
 
   return (
@@ -15,7 +15,7 @@ export default function OpportunityGalaxy({ opportunities }: { opportunities: an
         <div style={orbitTwo} />
         <div style={you}>YOU</div>
 
-        {matches.map((match: any, i: number) => (
+        {matches.map((match: LegacyValue, i: number) => (
           <Link key={match.opportunity.id} href="/opportunities" style={{...star, transform:`rotate(${i*51}deg) translate(125px) rotate(-${i*51}deg)`}}>
             {match.opportunity.type.replace("_", " ")}
           </Link>

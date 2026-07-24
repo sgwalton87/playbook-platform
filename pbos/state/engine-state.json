@@ -1,0 +1,41 @@
+{
+  "currentGate": "PBOS-GATE-001",
+  "completedGates": [],
+  "failedGates": [],
+  "blockedGates": [],
+  "blockedBy": [],
+  "lastRun": "2026-07-24T04:11:58.536Z",
+  "handbookVersion": "2026-07-24",
+  "validationHash": "5f9075ce03b03315b0a08e5a2c622aa9c4bbd97ba91a67f697c9de041de06dab",
+  "configurationHash": null,
+  "futureCompatibility": [
+    "execution",
+    "audit",
+    "doctor",
+    "release",
+    "ship"
+  ],
+  "engineVersion": "3.0.0",
+  "resumeToken": "132b2aead337f087dc21f071",
+  "executionMode": "planning",
+  "release": {
+    "currentState": "PROMOTION_PENDING",
+    "previousState": "ENGINEERING_APPROVED",
+    "transitionTimestamp": "2026-07-24T04:11:58.538Z",
+    "transitionReason": "Engineering review remains valid, but repository promotion is pending because the environment cannot complete remote GitHub operations.",
+    "environment": {
+      "name": "codex",
+      "gitRemoteAvailable": false,
+      "gitCredentialsAvailable": false,
+      "repositoryWritable": true,
+      "pullRequestPossible": false,
+      "tagCreationPossible": false
+    },
+    "blockingConditions": [
+      "Git remote unavailable",
+      "Git credentials unavailable",
+      "Pull Request creation unavailable",
+      "Release tag creation unavailable"
+    ]
+  }
+}

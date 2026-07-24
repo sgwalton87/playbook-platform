@@ -13,7 +13,7 @@ import {
 
 export default function CommunityEventsPage() {
   const [userId, setUserId] = useState("");
-  const [events, setEvents] = useState<any[]>([]);
+  const [events, setEvents] = useState<LegacyValue[]>([]);
   const [title, setTitle] = useState("Financial Literacy Night");
   const [location, setLocation] = useState("");
   const [startsAt, setStartsAt] = useState("");

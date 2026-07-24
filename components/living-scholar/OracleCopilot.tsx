@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-export default function OracleCopilot({ oracle }: { oracle: any }) {
+export default function OracleCopilot({ oracle }: { oracle: LegacyValue }) {
   return (
     <section style={card}>
       <p style={eyebrow}>Oracle Copilot</p>

@@ -34,7 +34,7 @@ function subjectToAG(subject: string) {
   return undefined;
 }
 
-export function buildAcademicIntelligence(courses: any[] = []) {
+export function buildAcademicIntelligence(courses: LegacyValue[] = []) {
   const normalized = courses.map((course, index) => {
     const subject = course.subject || classifyCourseSubject(course.name || "");
 

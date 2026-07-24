@@ -1,4 +1,4 @@
-export function calculatePortfolioCompletion(portfolio: any) {
+export function calculatePortfolioCompletion(portfolio: LegacyValue) {
   const checks = [
     portfolio?.identity?.avatarUrl,
     portfolio?.identity?.bannerUrl,

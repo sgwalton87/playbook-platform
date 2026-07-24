@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Suspense, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
@@ -125,7 +126,7 @@ function LoginContent() {
     <main style={page}>
       <section style={card}>
         <div style={brand}>
-          <img
+          <Image unoptimized width={1200} height={800}
             src={isSignup ? PLAYBOOK_HERO_VISUALS.signup.image : PLAYBOOK_HERO_VISUALS.login.image}
             alt={isSignup ? PLAYBOOK_HERO_VISUALS.signup.alt : PLAYBOOK_HERO_VISUALS.login.alt}
             style={brandImage}

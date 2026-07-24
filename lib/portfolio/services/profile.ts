@@ -1,6 +1,6 @@
 import { Portfolio } from "../types";
 
-export function mapProfileToPortfolio(profile: any): Portfolio {
+export function mapProfileToPortfolio(profile: LegacyValue): Portfolio {
   return {
     identity: {
       id: profile.id,

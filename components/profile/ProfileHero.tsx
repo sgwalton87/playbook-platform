@@ -17,8 +17,8 @@ const T={
 };
 
 type Props={
-  profile:any;
-  router:any;
+  profile:LegacyValue;
+  router:LegacyValue;
 };
 
 export default function ProfileHero({profile,router}:Props){

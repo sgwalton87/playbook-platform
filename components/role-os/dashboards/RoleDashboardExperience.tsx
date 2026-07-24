@@ -32,7 +32,7 @@ export default function RoleDashboardExperience({
       <PlaybookHero
         eyebrow={`${role} OS`}
         title={dashboard.title}
-        subtitle={(dashboard as any).description || (dashboard as any).greeting || (dashboard as any).question || "Role-specific intelligence, actions, and support network coordination."}
+        subtitle={(dashboard as LegacyValue).description || (dashboard as LegacyValue).greeting || (dashboard as LegacyValue).question || "Role-specific intelligence, actions, and support network coordination."}
       >
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 18 }}>
           <PlaybookButton href="/role-intelligence">Open Role Intelligence</PlaybookButton>
@@ -41,7 +41,7 @@ export default function RoleDashboardExperience({
       </PlaybookHero>
 
       <PlaybookMetrics>
-        {(dashboard.metrics || []).map((metric: any) => { const label = Array.isArray(metric) ? metric[0] : metric.label; const value = Array.isArray(metric) ? metric[1] : metric.value; return (
+        {(dashboard.metrics || []).map((metric: LegacyValue) => { const label = Array.isArray(metric) ? metric[0] : metric.label; const value = Array.isArray(metric) ? metric[1] : metric.value; return (
           <PlaybookMetric key={label} label={label} value={String(value)} />
         ); })}
       </PlaybookMetrics>
@@ -85,7 +85,7 @@ export default function RoleDashboardExperience({
           </div>
         </PlaybookCard>
 
-        {((dashboard as any).cards || (dashboard as any).sections || ((dashboard as any).actions || []).map((action: string) => ({ title: action, body: (dashboard as any).insight, label: "Action" }))).map((card: any) => (
+        {((dashboard as LegacyValue).cards || (dashboard as LegacyValue).sections || ((dashboard as LegacyValue).actions || []).map((action: string) => ({ title: action, body: (dashboard as LegacyValue).insight, label: "Action" }))).map((card: LegacyValue) => (
           <PlaybookCard key={card.title} eyebrow={card.label || "Role OS"} title={card.title}>
             <p style={body}>{card.body || card.description || card.detail}</p>
             {card.status && <PlaybookPill>{card.status}</PlaybookPill>}

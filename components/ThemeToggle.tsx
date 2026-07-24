@@ -7,7 +7,9 @@ export default function ThemeToggle() {
 
   useEffect(() => {
     const saved = localStorage.getItem("playbook-theme");
-    if (saved === "dark" || saved === "light") setTheme(saved);
+    if (saved === "dark" || saved === "light") {
+      window.setTimeout(() => setTheme(saved), 0);
+    }
   }, []);
 
   const toggleTheme = () => {

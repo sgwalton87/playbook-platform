@@ -1,19 +1,10 @@
-export function buildService(
-  activities:any[]=[]
-){
+import { buildCommunityRecord, type RawCommunityActivity } from "../community";
 
-  const volunteerHours=
-    activities.reduce(
-      (t,a)=>t+(a.hours||0),
-      0
-    );
+export function buildService(activities: RawCommunityActivity[] = []) {
+  const community = buildCommunityRecord(activities);
 
-  return{
-
-    volunteerHours,
-
-    activities,
-
+  return {
+    volunteerHours: community.volunteerHours,
+    activities: community.activities,
   };
-
 }

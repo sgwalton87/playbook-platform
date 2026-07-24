@@ -12,7 +12,7 @@ export default function InboxV2() {
   const conversations = useMemo(() => getDemoConversations(), []);
   const [activeId, setActiveId] = useState(conversations[0].id);
   const [body, setBody] = useState("");
-  const [messagesByThread, setMessagesByThread] = useState<Record<string, any[]>>({
+  const [messagesByThread, setMessagesByThread] = useState<Record<string, LegacyValue[]>>({
     "support-network": getDemoConversationMessages("support-network"),
     family: getDemoConversationMessages("family"),
     mentor: getDemoConversationMessages("mentor"),

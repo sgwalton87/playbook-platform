@@ -1,11 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import ScholarOpportunityGraphSection from "@/components/scholar/ScholarOpportunityGraphSection";
 import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import ProfileAvatar from "@/components/ProfileAvatar";
-import { ConnectionButton } from "@/components/network";
 import { checkBadges } from "@/lib/badges";
 import ProfileHero from "@/components/profile/ProfileHero";
 import ProfileStats from "@/components/profile/ProfileStats";
@@ -13,7 +13,7 @@ import AboutCard from "@/components/profile/AboutCard";
 import ScholarRecordDashboard from "@/components/scholar/ScholarRecordDashboard";
 import PortfolioEngine from "@/components/portfolio/PortfolioEngine";
 import TrustScoreCard from "@/components/trust/TrustScoreCard";
-import { buildScholarRecord } from "@/lib/scholar";
+import { buildScholarRecord, type RawCommunityActivity } from "@/lib/scholar";
 
 const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",blue:"#3B82F6",green:"#10B981",amber:"#F59E0B",purple:"#8B5CF6",mono:"'Space Mono', monospace",sans:"'Hanken Grotesk', system-ui, sans-serif",anton:"'Anton', sans-serif"};
 const SURL="https://oexgxnybeixwadgtdtzp.supabase.co";
@@ -25,7 +25,7 @@ const CERT_META:Record<string,{color:string;era:string;rarity:string;rarityColor
   "community-leader":{color:T.green,era:"ERA 4/4",rarity:"RARE",rarityColor:T.amber,gradient:"linear-gradient(135deg,#10B981,#3B82F6,#F59E0B,#10B981)"},
 };
 
-function SmallCertCard({cert}:{cert:any}) {
+function SmallCertCard({cert}:{cert:LegacyValue}) {
   const meta=CERT_META[cert.course_slug]||{color:T.orange,era:"ERA 1/4",rarity:"UNCOMMON",rarityColor:T.orange,gradient:"linear-gradient(135deg,#F59E0B,#F97316,#8B5CF6,#3B82F6)"};
   return(
     <div style={{position:"relative",borderRadius:12,padding:2,background:meta.gradient,boxShadow:"0 8px 24px rgba(0,0,0,.2)",width:120,flexShrink:0}}>
@@ -49,12 +49,12 @@ export default function PublicProfilePage() {
   const postFileRef=useRef<HTMLInputElement>(null);
   const galleryFileRef=useRef<HTMLInputElement>(null);
   const [viewerId,setViewerId]=useState("");
-  const [profile,setProfile]=useState<any>(null);
-  const [badges,setBadges]=useState<any[]>([]);
-  const [certificates,setCertificates]=useState<any[]>([]);
-  const [posts,setPosts]=useState<any[]>([]);
+  const [profile,setProfile]=useState<LegacyValue>(null);
+  const [badges,setBadges]=useState<LegacyValue[]>([]);
+  const [certificates,setCertificates]=useState<LegacyValue[]>([]);
+  const [posts,setPosts]=useState<LegacyValue[]>([]);
   const [gallery,setGallery]=useState<string[]>([]);
-  const [activities,setActivities]=useState<any[]>([]);
+  const [activities,setActivities]=useState<RawCommunityActivity[]>([]);
   const [newPost,setNewPost]=useState("");
   const [posting,setPosting]=useState(false);
   const [loading,setLoading]=useState(true);
@@ -79,16 +79,16 @@ export default function PublicProfilePage() {
       const profileBadges=checkBadges(profileData);
       const combinedBadges=[
         ...profileBadges.map((name:string)=>({id:`profile-${name}`,displayName:name})),
-        ...(badgeData||[]).map((item:any)=>({id:item.id,displayName:item.badges?.name})),
+        ...(badgeData||[]).map((item:LegacyValue)=>({id:item.id,displayName:item.badges?.name})),
       ].filter(b=>b.displayName);
       setProfile(profileData);
       setCertificates(certData||[]);
       setBadges(combinedBadges);
       setPosts(feedData||[]);
-      setActivities(activityData||[]);
-      const photoPostUrls=(feedData||[]).filter((p:any)=>p.image_url).map((p:any)=>p.image_url);
+      setActivities((activityData||[]) as RawCommunityActivity[]);
+      const photoPostUrls=(feedData||[]).filter((p:LegacyValue)=>p.image_url).map((p:LegacyValue)=>p.image_url);
       const{data:files}=await supabase.storage.from("photos").list("gallery",{limit:100,sortBy:{column:"created_at",order:"desc"}});
-      const storageUrls=(files||[]).filter((f:any)=>f.name!==".emptyFolderPlaceholder").map((f:any)=>`${SURL}/storage/v1/object/public/photos/gallery/${f.name}`);
+      const storageUrls=(files||[]).filter((f:LegacyValue)=>f.name!==".emptyFolderPlaceholder").map((f:LegacyValue)=>`${SURL}/storage/v1/object/public/photos/gallery/${f.name}`);
       setGallery([...photoPostUrls,...storageUrls]);
       setLoading(false);
     })();
@@ -160,7 +160,7 @@ export default function PublicProfilePage() {
     <div style={{minHeight:"100vh",background:T.cream,fontFamily:T.sans,color:T.ink,padding:"32px 36px",maxWidth:900,margin:"0 auto"}}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}::selection{background:${T.orange};color:#fff;}.pb-post:hover{border-color:${T.orange}!important;}.pb-gal:hover{opacity:.8!important;transform:scale(1.03);}textarea{resize:vertical;}textarea::placeholder{color:${T.faint};}textarea:focus{border-color:${T.orange}!important;outline:none;}.pb-cert-sm{transition:transform 0.2s;}.pb-cert-sm:hover{transform:translateY(-6px) rotate(-1deg);}`}</style>
 
-      {lightbox&&(<div onClick={()=>setLightbox(null)} style={{position:"fixed",inset:0,zIndex:9999,background:"rgba(0,0,0,.93)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}><img src={lightbox} alt="" style={{maxWidth:"90vw",maxHeight:"90vh",objectFit:"contain",borderRadius:12}}/><button onClick={()=>setLightbox(null)} style={{position:"absolute",top:20,right:24,background:"rgba(255,255,255,.15)",border:"none",color:"#fff",fontSize:20,cursor:"pointer",borderRadius:"50%",width:40,height:40}}>✕</button></div>)}
+      {lightbox&&(<div onClick={()=>setLightbox(null)} style={{position:"fixed",inset:0,zIndex:9999,background:"rgba(0,0,0,.93)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}><Image unoptimized width={1200} height={800} src={lightbox} alt="" style={{maxWidth:"90vw",maxHeight:"90vh",objectFit:"contain",borderRadius:12}}/><button onClick={()=>setLightbox(null)} style={{position:"absolute",top:20,right:24,background:"rgba(255,255,255,.15)",border:"none",color:"#fff",fontSize:20,cursor:"pointer",borderRadius:"50%",width:40,height:40}}>✕</button></div>)}
 
       <ProfileHero
         profile={profile}
@@ -254,7 +254,7 @@ export default function PublicProfilePage() {
               </div>
               {pendingPhoto&&(
                 <div style={{position:"relative",marginBottom:12,borderRadius:12,overflow:"hidden",maxHeight:220}}>
-                  <img src={pendingPhoto} alt="Preview" style={{width:"100%",objectFit:"cover",display:"block",maxHeight:220}}/>
+                  <Image unoptimized width={1200} height={800} src={pendingPhoto} alt="Preview" style={{width:"100%",objectFit:"cover",display:"block",maxHeight:220}}/>
                   <button onClick={()=>{setPendingPhoto(null);setPendingFile(null);if(postFileRef.current)postFileRef.current.value="";}} style={{position:"absolute",top:8,right:8,background:"rgba(0,0,0,.6)",border:"none",color:"#fff",borderRadius:"50%",width:28,height:28,cursor:"pointer",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
                 </div>
               )}
@@ -275,7 +275,7 @@ export default function PublicProfilePage() {
             <div style={{display:"flex",flexDirection:"column",gap:12}}>
               {posts.map(post=>(
                 <div key={post.id} className="pb-post" style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:18,overflow:"hidden",transition:"border-color 0.15s"}}>
-                  {post.image_url&&(<div style={{position:"relative",maxHeight:280,overflow:"hidden",cursor:"pointer"}} onClick={()=>setLightbox(post.image_url)}><img src={post.image_url} alt="" style={{width:"100%",objectFit:"cover",display:"block",maxHeight:280}}/><div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,transparent 50%,rgba(15,23,42,.5) 100%)"}}/></div>)}
+                  {post.image_url&&(<div style={{position:"relative",maxHeight:280,overflow:"hidden",cursor:"pointer"}} onClick={()=>setLightbox(post.image_url)}><Image unoptimized width={1200} height={800} src={post.image_url} alt="" style={{width:"100%",objectFit:"cover",display:"block",maxHeight:280}}/><div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,transparent 50%,rgba(15,23,42,.5) 100%)"}}/></div>)}
                   <div style={{padding:"16px 18px"}}>
                     <div style={{display:"flex",gap:10,alignItems:"flex-start",marginBottom:10}}>
                       <ProfileAvatar src={profile?.avatar_url} name={`${profile?.first_name||""}`} size={38}/>
@@ -321,7 +321,7 @@ export default function PublicProfilePage() {
             <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12}}>
               {gallery.map((img,i)=>(
                 <div key={i} onClick={()=>setLightbox(img)} style={{aspectRatio:"1",borderRadius:14,overflow:"hidden",cursor:"pointer",background:T.line}}>
-                  <img src={img} alt={`Photo ${i+1}`} className="pb-gal" style={{width:"100%",height:"100%",objectFit:"cover",display:"block",transition:"all 0.2s"}}/>
+                  <Image unoptimized width={1200} height={800} src={img} alt={`Photo ${i+1}`} className="pb-gal" style={{width:"100%",height:"100%",objectFit:"cover",display:"block",transition:"all 0.2s"}}/>
                 </div>
               ))}
             </div>

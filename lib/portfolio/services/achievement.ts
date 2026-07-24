@@ -1,4 +1,4 @@
-export function getAchievementSummary({ certificates = [], badges = [], activities = [] }: any) {
+export function getAchievementSummary({ certificates = [], badges = [], activities = [] }: LegacyValue) {
   return {
     certificateCount: certificates.length,
     badgeCount: badges.length,

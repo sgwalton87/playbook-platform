@@ -3,11 +3,16 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { AG_SUBJECT_NAMES, AG_REQUIREMENTS } from "@/lib/agCourses";
-import { PlaybookStoryBanner, PlaybookQuote } from "@/components/brand-story";
+import { PlaybookStoryBanner } from "@/components/brand-story";
 import { PLAYBOOK_QUOTES, PLAYBOOK_STORY_IMAGES } from "@/lib/brand-story";
 import TranscriptUploadCard from "@/components/transcript/TranscriptUploadCard";
 import { buildScholarRecord } from "@/lib/scholar";
 import type { ScholarRecord } from "@/lib/scholar";
+import {
+  buildScholarRecord,
+  type CommunityExperience,
+  type ScholarRecord,
+} from "@/lib/scholar";
 
 const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",green:"#10B981",greenL:"#ECFDF5",amber:"#F59E0B",red:"#E24B4A",blue:"#3B82F6",purple:"#8B5CF6",mono:"'Space Mono',monospace",sans:"'Hanken Grotesk',system-ui,sans-serif",anton:"'Anton',sans-serif"};
 
@@ -18,6 +23,10 @@ export default function TranscriptPage() {
   const [agProgress, setAgProgress] = useState<any[]>([]);
   const [certificates, setCertificates] = useState<any[]>([]);
   const [activities, setActivities] = useState<any[]>([]);
+  const [profile, setProfile] = useState<LegacyValue>(null);
+  const [scholarRecord, setScholarRecord] = useState<ScholarRecord | null>(null);
+  const [agProgress, setAgProgress] = useState<LegacyValue[]>([]);
+  const [certificates, setCertificates] = useState<LegacyValue[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -42,15 +51,15 @@ export default function TranscriptPage() {
         current_course: a.currentCourse,
       })));
       setCertificates(certs||[]);
-      setActivities(acts||[]);
       setLoading(false);
     })();
-  }, []);
+  }, [router]);
 
   if (loading) return <><div style={{padding:"28px 32px",fontFamily:T.mono,fontSize:12,color:T.faint}}>Loading transcript...</div></>;
 
   const academic = scholarRecord?.academics;
   const agDone = academic?.agSummary.subjectsMet ?? agProgress.filter(a => a.years_completed >= a.years_required).length;
+  const communityActivities = scholarRecord?.community.activities ?? [];
 
   return (
     <>
@@ -221,12 +230,12 @@ export default function TranscriptPage() {
               <div style={{border:`0.5px solid ${T.line}`,borderRadius:12,overflow:"hidden"}}>
                 <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
                   <thead><tr style={{background:T.navy,color:"#F8F7F4"}}><th style={{padding:"10px 14px",textAlign:"left",fontFamily:T.mono,fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:700}}>Certificate</th><th style={{padding:"10px 14px",textAlign:"left",fontFamily:T.mono,fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:700}}>Issued</th><th style={{padding:"10px 14px",textAlign:"center",fontFamily:T.mono,fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:700}}>Status</th></tr></thead>
-                  <tbody>{certificates.map((c:any,i:number)=><tr key={c.id} style={{borderBottom:`0.5px solid ${T.line}`,background:i%2===0?T.surface:T.surface2}}><td style={{padding:"12px 14px",fontWeight:600,color:T.ink}}>{c.certificate_name||c.course_slug}</td><td style={{padding:"12px 14px",color:T.muted,fontFamily:T.mono,fontSize:12}}>{c.issued_at?new Date(c.issued_at).toLocaleDateString("en",{month:"long",day:"numeric",year:"numeric"}):"—"}</td><td style={{padding:"12px 14px",textAlign:"center"}}><span style={{background:T.greenL,color:T.green,borderRadius:999,padding:"3px 10px",fontSize:11,fontWeight:700,fontFamily:T.mono}}>✓ Earned</span></td></tr>)}</tbody>
+                  <tbody>{certificates.map((c:LegacyValue,i:number)=><tr key={c.id} style={{borderBottom:`0.5px solid ${T.line}`,background:i%2===0?T.surface:T.surface2}}><td style={{padding:"12px 14px",fontWeight:600,color:T.ink}}>{c.certificate_name||c.course_slug}</td><td style={{padding:"12px 14px",color:T.muted,fontFamily:T.mono,fontSize:12}}>{c.issued_at?new Date(c.issued_at).toLocaleDateString("en",{month:"long",day:"numeric",year:"numeric"}):"—"}</td><td style={{padding:"12px 14px",textAlign:"center"}}><span style={{background:T.greenL,color:T.green,borderRadius:999,padding:"3px 10px",fontSize:11,fontWeight:700,fontFamily:T.mono}}>✓ Earned</span></td></tr>)}</tbody>
                 </table>
               </div>
             </div>
           )}
-          {activities.length>0&&(
+          {communityActivities.length>0&&(
             <div style={{marginBottom:24}}>
               <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
                 <div style={{flex:1,height:1,background:T.line}}/>
@@ -236,7 +245,7 @@ export default function TranscriptPage() {
               <div style={{border:`0.5px solid ${T.line}`,borderRadius:12,overflow:"hidden"}}>
                 <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
                   <thead><tr style={{background:T.navy,color:"#F8F7F4"}}><th style={{padding:"10px 14px",textAlign:"left",fontFamily:T.mono,fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:700}}>Activity</th><th style={{padding:"10px 14px",textAlign:"left",fontFamily:T.mono,fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:700}}>Type</th><th style={{padding:"10px 14px",textAlign:"left",fontFamily:T.mono,fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:700}}>Organization</th><th style={{padding:"10px 14px",textAlign:"center",fontFamily:T.mono,fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:700}}>Hours</th></tr></thead>
-                  <tbody>{activities.map((a:any,i:number)=><tr key={a.id} style={{borderBottom:`0.5px solid ${T.line}`,background:i%2===0?T.surface:T.surface2}}><td style={{padding:"12px 14px",fontWeight:600,color:T.ink}}>{a.activity_name}</td><td style={{padding:"12px 14px",color:T.muted,textTransform:"capitalize"}}>{a.activity_type}</td><td style={{padding:"12px 14px",color:T.muted}}>{a.organization||"—"}</td><td style={{padding:"12px 14px",textAlign:"center",fontFamily:T.mono,fontWeight:700,color:T.ink}}>{a.total_hours||"—"}</td></tr>)}</tbody>
+                  <tbody>{communityActivities.map((a:CommunityExperience,i:number)=><tr key={a.id} style={{borderBottom:`0.5px solid ${T.line}`,background:i%2===0?T.surface:T.surface2}}><td style={{padding:"12px 14px",fontWeight:600,color:T.ink}}>{a.name}</td><td style={{padding:"12px 14px",color:T.muted,textTransform:"capitalize"}}>{a.type}</td><td style={{padding:"12px 14px",color:T.muted}}>{a.organization||"—"}</td><td style={{padding:"12px 14px",textAlign:"center",fontFamily:T.mono,fontWeight:700,color:T.ink}}>{a.hours||"—"}</td></tr>)}</tbody>
                 </table>
               </div>
             </div>

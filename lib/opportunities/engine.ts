@@ -1,6 +1,6 @@
 import type { Opportunity } from "./types";
 
-export function buildOpportunityMatches(record: any): Opportunity[] {
+export function buildOpportunityMatches(record: LegacyValue): Opportunity[] {
   const readiness = record?.readiness || {};
   const academics = record?.academics || {};
   const athletics = record?.athletics || {};

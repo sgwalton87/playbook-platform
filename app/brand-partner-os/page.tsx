@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabaseClient";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
 
 export default function BrandPartnerOSPage() {
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<LegacyValue>(null);
 
   useEffect(() => {
     async function load() {

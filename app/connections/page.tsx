@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
@@ -52,16 +52,9 @@ export default function ConnectionsPage() {
   const [search, setSearch] = useState("");
   const [authed, setAuthed] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const [networkLoading, setNetworkLoading] = useState(true);
   const [incoming, setIncoming] = useState<Scholar[]>([]);
 
-  useEffect(() => {
-    loadNetwork();
-  }, []);
-
-  async function loadNetwork() {
-    setNetworkLoading(true);
-
+  const loadNetwork = useCallback(async () => {
     const { data: authData } = await supabase.auth.getUser();
     const me = authData.user;
 
@@ -83,7 +76,7 @@ export default function ConnectionsPage() {
     }
 
     const connectedIds = (connectionRows || []).map(
-      (row: any) => row.connected_user_id
+      (row: LegacyValue) => row.connected_user_id
     );
 
     const { data: sentRows } = await supabase
@@ -93,7 +86,7 @@ export default function ConnectionsPage() {
       .eq("status", "pending");
 
     const sentIds = new Set(
-      (sentRows || []).map((row: any) => row.recipient_id)
+      (sentRows || []).map((row: LegacyValue) => row.recipient_id)
     );
 
     const { data: incomingRows } = await supabase
@@ -103,7 +96,7 @@ export default function ConnectionsPage() {
       .eq("status", "pending");
 
     const incomingIds = (incomingRows || []).map(
-      (row: any) => row.requester_id
+      (row: LegacyValue) => row.requester_id
     );
 
     const { data: profiles, error: profileError } = await supabase
@@ -126,11 +119,10 @@ export default function ConnectionsPage() {
 
     if (profileError) {
       console.error("Profile network load error:", profileError.message);
-      setNetworkLoading(false);
       return;
     }
 
-    const toScholar = (profile: any): Scholar => {
+    const toScholar = (profile: LegacyValue): Scholar => {
       const name =
         profile.full_name ||
         [profile.first_name, profile.last_name].filter(Boolean).join(" ") ||
@@ -182,9 +174,15 @@ export default function ConnectionsPage() {
       )
     );
 
-    setNetworkLoading(false);
-  }
+  }, [router]);
 
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      void loadNetwork();
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, [loadNetwork]);
 
   const sendRequest = async (id: string) => {
     if (!currentUserId) return;

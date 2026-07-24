@@ -35,7 +35,7 @@ const EVENTS: Event[] = [
     id: "2", title: "Financial Game Plan: NIL 101", type: "workshop", pillar: "Finance", pillarColor: "#1D9E75",
     date: "Wed, Jun 25", time: "5:00 PM – 6:30 PM", location: "Virtual · Zoom", host: "M. Alvarez", hostInitials: "MA", hostColor: "#1D9E75",
     spots: 50, spotsLeft: 34, xpReward: 100, coinReward: 20, rsvp: null,
-    description: "Everything scholars and families need to know before signing any NIL deal. Budgeting basics included."
+    description: "Everything scholars and families need to know before signing LegacyValue NIL deal. Budgeting basics included."
   },
   {
     id: "3", title: "Youth Civic Action Day", type: "civic", pillar: "Civic", pillarColor: "#378ADD",
@@ -93,7 +93,7 @@ export default function EventsPage() {
       if (!data.user) router.replace("/login");
       else setAuthed(true);
     });
-  }, []);
+  }, [router]);
 
   const setRSVP = (id: string, status: "going" | "interested" | null) => {
     setEvents((e) => e.map((ev) => ev.id === id
@@ -147,7 +147,7 @@ export default function EventsPage() {
         {/* LEFT */}
         <div>
           <div style={{ marginBottom: 24 }}>
-            <p style={{ fontFamily: mono, fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase", color: accent, marginBottom: 8 }}>What's happening</p>
+            <p style={{ fontFamily: mono, fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase", color: accent, marginBottom: 8 }}>What&apos;s happening</p>
             <h1 style={{ fontFamily: anton, fontWeight: 400, fontSize: "clamp(32px,4vw,52px)", lineHeight: 0.95, textTransform: "uppercase", color: ink, marginBottom: 16 }}>
               Upcoming <span style={{ color: accent }}>events</span>
             </h1>
@@ -233,7 +233,7 @@ export default function EventsPage() {
           <div style={{ background: surface, border: `1px solid ${line}`, borderRadius: 16, padding: "18px 20px" }}>
             <p style={{ fontFamily: mono, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: muted, marginBottom: 14 }}>My upcoming</p>
             {myEvents.length === 0 ? (
-              <p style={{ fontSize: 13, color: faint }}>You haven't RSVP'd to any events yet.</p>
+              <p style={{ fontSize: 13, color: faint }}>You haven&apos;t RSVP&apos;d to LegacyValue events yet.</p>
             ) : myEvents.map((ev) => (
               <div key={ev.id} style={{ padding: "10px 0", borderBottom: `1px solid ${line}` }}>
                 <div style={{ fontSize: 13, fontWeight: 600, color: ink, marginBottom: 3 }}>{ev.title}</div>

@@ -1,4 +1,4 @@
-export function calculatePortfolioStats(portfolio: any) {
+export function calculatePortfolioStats(portfolio: LegacyValue) {
   return {
     level: 8,
     xp: 12450,
