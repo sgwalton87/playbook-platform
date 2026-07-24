@@ -1,0 +1,26 @@
+{
+  "id": "PBOS-GATE-001",
+  "title": "Make release gates trustworthy",
+  "status": "in_progress",
+  "priority": 100,
+  "dependencies": [],
+  "handbook_refs": [
+    "docs/MASTER_CHECKLIST.md#current-sprint",
+    "docs/RELEASE_PROCESS.md#testing",
+    "docs/auto_sprint.md#recommended-first-auto-sprints"
+  ],
+  "tasks": [
+    "Separate environment-only failures from code failures.",
+    "Reduce active-source lint debt in safe, reviewable batches.",
+    "Keep production build and targeted smoke tests passing.",
+    "Archive validation evidence for release-candidate review."
+  ],
+  "definition_of_done": [
+    "npm run build has a documented result.",
+    "npm run lint has a documented result or intentional exclusions are documented.",
+    "Targeted tests have documented evidence.",
+    "MASTER_CHECKLIST.md reflects the current gate state."
+  ],
+  "validation": ["docs", "lint", "build", "test:smoke"],
+  "next_gate": "PBOS-RLS-001"
+}

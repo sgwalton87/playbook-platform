@@ -12,6 +12,11 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Historical snapshots are intentionally kept for recovery and audit,
+    // but they are not active production source for lint gating.
+    ".playbook-backups/**",
+    "scripts/backups/**",
+    "**/*.backup.*",
   ]),
 ]);
 

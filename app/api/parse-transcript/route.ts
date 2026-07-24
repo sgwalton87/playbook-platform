@@ -11,6 +11,22 @@ const AG_SUBJECTS = [
   { key: "G", name: "College-Preparatory Elective", required: 1 },
 ];
 
+type TranscriptParseBody = {
+  base64?: string;
+  mediaType?: string;
+  userId?: string;
+};
+
+type AgSubjectResult = {
+  years_required?: number | string;
+  years_completed?: number | string;
+  in_progress?: boolean;
+  courses_taken?: unknown[];
+  current_course?: string | null;
+};
+
+type AgParseResult = Record<string, AgSubjectResult | undefined>;
+
 const PROMPT = `
 Analyze this student transcript and extract California A-G course completion data.
 
@@ -46,7 +62,7 @@ Return ONLY valid JSON like this:
 
 export async function POST(req: NextRequest) {
   try {
-    const { base64, mediaType, userId } = await req.json();
+    const { base64, mediaType, userId } = (await req.json()) as TranscriptParseBody;
 
     if (!base64 || !mediaType || !userId) {
       return NextResponse.json({ error: "Missing transcript data." }, { status: 400 });
@@ -104,7 +120,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const parsed = JSON.parse(rawJson);
+    const parsed = JSON.parse(rawJson) as AgParseResult;
 
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -120,7 +136,7 @@ export async function POST(req: NextRequest) {
     }
 
     let agUpdates = 0;
-    const saved: any[] = [];
+    const saved: unknown[] = [];
 
     for (const subject of AG_SUBJECTS) {
       const val = parsed[subject.key] || {};
