@@ -2,5 +2,8 @@ node_modules
 .next
 .env.local
 .DS_Store
-*.zippublic/assets/playbook-promo.mp4
+*.zip
 public/assets/playbook-promo.mp4
+
+tsconfig.tsbuildinfo
+*.tsbuildinfo
