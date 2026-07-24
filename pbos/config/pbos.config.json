@@ -1,0 +1,25 @@
+{
+  "version": "3.0.0",
+  "defaultMode": "planning",
+  "supportedModes": [
+    "planning",
+    "execution",
+    "audit",
+    "doctor",
+    "release",
+    "ship"
+  ],
+  "handbook": {
+    "implementationTruth": "docs/MASTER_CHECKLIST.md",
+    "releasePolicy": "docs/RELEASE_PROCESS.md",
+    "sprintSequencing": "docs/auto_sprint.md",
+    "historyDirectory": "docs/HISTORY",
+    "ledgerDirectory": "docs/LEDGER",
+    "futureDirection": "docs/ROADMAP.md"
+  },
+  "gatesDirectory": "pbos/gates",
+  "reportsDirectory": "docs/release-evidence",
+  "stateFile": "pbos/state/engine-state.json",
+  "defaultCommand": "next",
+  "promptsManifest": "pbos/prompts/manifest.json"
+}

@@ -38,6 +38,14 @@ const styles = StyleSheet.create({
   },
 });
 
+type PortfolioPdfRequestBody = {
+  scholarName?: string;
+  targetUse?: string;
+  resume?: unknown;
+  bragSheet?: unknown;
+  recommendationLetter?: string;
+};
+
 function PortfolioDocument({
   scholarName,
   targetUse,
@@ -47,8 +55,8 @@ function PortfolioDocument({
 }: {
   scholarName: string;
   targetUse: string;
-  resume: any;
-  bragSheet: any;
+  resume: unknown;
+  bragSheet: unknown;
   recommendationLetter?: string;
 }) {
   return (
@@ -79,7 +87,7 @@ function PortfolioDocument({
 }
 
 export async function POST(req: NextRequest) {
-  const body = await req.json();
+  const body = (await req.json()) as PortfolioPdfRequestBody;
 
   const scholarName = body.scholarName || "Scholar";
 
