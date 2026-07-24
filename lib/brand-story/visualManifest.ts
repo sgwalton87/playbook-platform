@@ -1,7 +1,7 @@
 export const PLAYBOOK_HERO_VISUALS = {
   home: {
     image:
-      "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1600&q=90",
+      "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=2400&q=95",
     alt: "Graduates celebrating together",
   },
   login: {

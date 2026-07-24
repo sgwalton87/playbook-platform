@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -10,6 +8,8 @@ export async function POST(req: NextRequest) {
     if (!process.env.RESEND_API_KEY) {
       return NextResponse.json({ success: true, skipped: "No RESEND_API_KEY" });
     }
+
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
     await resend.emails.send({
       from: "Playbook Series Inc. <onboarding@resend.dev>",
@@ -26,7 +26,8 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown notification error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
