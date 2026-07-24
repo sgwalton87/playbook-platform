@@ -10,7 +10,7 @@ import {
 } from "@/components/ui";
 
 export default function ModerationPage() {
-  const [reports, setReports] = useState<any[]>([]);
+  const [reports, setReports] = useState<LegacyValue[]>([]);
   const [loading, setLoading] = useState(true);
 
   async function load() {
@@ -24,7 +24,11 @@ export default function ModerationPage() {
   }
 
   useEffect(() => {
-    load();
+    const timer = window.setTimeout(() => {
+      void load();
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, []);
 
 

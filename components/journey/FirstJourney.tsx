@@ -179,7 +179,7 @@ export default function FirstJourney() {
   );
 }
 
-function JourneyPanel({ label, title, body, action }: any) {
+function JourneyPanel({ label, title, body, action }: LegacyValue) {
   return (
     <>
       <p style={eyebrow}>{label}</p>

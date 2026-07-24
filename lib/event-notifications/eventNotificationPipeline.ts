@@ -27,7 +27,7 @@ export function convertEventToNotification(input: {
   event: ReturnType<typeof buildPlaybookEvent>;
   recipientUserId: string;
   recipientRole?: string;
-  preferences?: Record<string, any>;
+  preferences?: Record<string, LegacyValue>;
 }) {
   const role = input.recipientRole || "scholar";
 
@@ -62,12 +62,12 @@ export function convertEventToNotification(input: {
     title: rule.title,
     body: rule.body,
     href: rule.href,
-    priority: rule.priority as any,
+    priority: rule.priority as LegacyValue,
     sourceId: input.eventId,
   });
 
   const deliverNow = shouldDeliverNow({
-    type: notification.type as any,
+    type: notification.type as LegacyValue,
     preferences: input.preferences,
   });
 
@@ -87,7 +87,7 @@ export function convertEventToNotification(input: {
 
 export function resolveRecipients(input: {
   scholarId: string;
-  relationships?: any[];
+  relationships?: LegacyValue[];
   actorRole?: string | null;
 }) {
   return resolveRecipientsFromRelationships({

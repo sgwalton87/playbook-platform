@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 export default function ProfileAvatar({
   src,
   name,
@@ -36,7 +37,7 @@ export default function ProfileAvatar({
       }}
     >
       {src ? (
-        <img
+        <Image unoptimized width={1200} height={800}
           src={src}
           alt={name || "Profile"}
           style={{ width: "100%", height: "100%", objectFit: "cover" }}

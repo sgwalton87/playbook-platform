@@ -1,3 +1,4 @@
+import Image from "next/image";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
 
 type Props = {
@@ -41,7 +42,7 @@ export default function PlaybookStoryBanner({
 
       {imageSrc && (
         <div style={{ minHeight: 320 }}>
-          <img src={imageSrc} alt={imageAlt} style={imageStyle} />
+          <Image unoptimized width={1200} height={800} src={imageSrc} alt={imageAlt} style={imageStyle} />
         </div>
       )}
     </section>

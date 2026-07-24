@@ -33,3 +33,16 @@
 
 ## 2026-07-03 10:47
 - Decision: Froze Alpha architecture
+
+## 2026-07-24 04:20
+
+- Archivist detected architecture-level changes.
+- Review whether a formal ADR is needed.
+
+- Engines changed: 6
+- Repositories changed: 1
+- Event system changed: 2
+- Components changed: 42
+- App routes changed: 22
+- Documentation changed: 3
+

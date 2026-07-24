@@ -9,7 +9,7 @@ const T={
 };
 
 type Props={
-  profile:any;
+  profile:LegacyValue;
 };
 
 export default function AboutCard({profile}:Props){

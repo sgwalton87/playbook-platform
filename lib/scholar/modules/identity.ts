@@ -1,4 +1,4 @@
-export function buildIdentity(profile:any){
+export function buildIdentity(profile:LegacyValue){
   return {
     id: profile?.id,
     username: profile?.username,

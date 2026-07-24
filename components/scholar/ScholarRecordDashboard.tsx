@@ -3,7 +3,7 @@
 import ScholarRecordSummary from "@/components/scholar/ScholarRecordSummary";
 
 type Props = {
-  record: any;
+  record: LegacyValue;
 };
 
 function SectionCard({
@@ -41,7 +41,7 @@ function SectionCard({
   );
 }
 
-function Row({ label, value }: { label: string; value: any }) {
+function Row({ label, value }: { label: string; value: LegacyValue }) {
   return (
     <div
       style={{

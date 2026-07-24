@@ -1,5 +1,5 @@
 export function canAccessScholarNetwork(input: {
-  relationships: any[];
+  relationships: LegacyValue[];
   scholarId: string;
   userId?: string | null;
   userEmail?: string | null;

@@ -65,7 +65,7 @@ export default function CoursesPage() {
 
       const nextProgress: Record<string, number> = {};
 
-      (progressRows || []).forEach((row: any) => {
+      (progressRows || []).forEach((row: LegacyValue) => {
         if (row.completed) {
           const course = FLAGSHIP.find((c) => c.id === row.course_slug);
           nextProgress[row.course_slug] = course?.modules || row.completed_modules?.length || 1;

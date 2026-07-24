@@ -49,7 +49,7 @@ export default function ScenarioLab() {
   );
 }
 
-function ImpactPreview({ impact, changes }: any) {
+function ImpactPreview({ impact, changes }: LegacyValue) {
   return (
     <div style={impactBox}>
       <p style={eyebrow}>Impact Preview</p>

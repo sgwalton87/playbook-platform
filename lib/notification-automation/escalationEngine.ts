@@ -1,5 +1,5 @@
 export function buildEscalation(input: {
-  blocker: any;
+  blocker: LegacyValue;
   ageDays: number;
   assignedRole?: string;
 }) {

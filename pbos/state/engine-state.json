@@ -4,7 +4,7 @@
   "failedGates": [],
   "blockedGates": [],
   "blockedBy": [],
-  "lastRun": "2026-07-24T02:40:56.534Z",
+  "lastRun": "2026-07-24T04:11:58.536Z",
   "handbookVersion": "2026-07-24",
   "validationHash": "5f9075ce03b03315b0a08e5a2c622aa9c4bbd97ba91a67f697c9de041de06dab",
   "configurationHash": null,
@@ -16,12 +16,12 @@
     "ship"
   ],
   "engineVersion": "3.0.0",
-  "resumeToken": "3811b0eac122d265c45a9622",
+  "resumeToken": "132b2aead337f087dc21f071",
   "executionMode": "planning",
   "release": {
     "currentState": "PROMOTION_PENDING",
     "previousState": "ENGINEERING_APPROVED",
-    "transitionTimestamp": "2026-07-24T02:40:56.536Z",
+    "transitionTimestamp": "2026-07-24T04:11:58.538Z",
     "transitionReason": "Engineering review remains valid, but repository promotion is pending because the environment cannot complete remote GitHub operations.",
     "environment": {
       "name": "codex",

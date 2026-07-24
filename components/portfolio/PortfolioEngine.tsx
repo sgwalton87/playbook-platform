@@ -9,7 +9,7 @@ import OpportunityFeed from "@/components/opportunities/OpportunityFeed";
 import { calculatePortfolioStats } from "@/lib/portfolio/services/stats";
 
 type Props = {
-  record: any;
+  record: LegacyValue;
 };
 
 export default function PortfolioEngine({ record }: Props) {

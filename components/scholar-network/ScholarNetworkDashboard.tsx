@@ -33,10 +33,10 @@ export default function ScholarNetworkDashboard() {
       </section>
 
       <section style={grid}>
-        <Panel title="Supporters" items={relationships.map((r: any) => `${r.name} — ${r.relationship}`)} />
-        <Panel title="Invitations" items={invitations.map((i: any) => `${i.inviteeName || i.invitee_name} — ${i.status}`)} />
-        <Panel title="Messages" items={messages.map((m: any) => `${m.sender_role}: ${m.body}`)} />
-        <Panel title="Shared Actions" items={actions.map((a: any) => `${a.assigned_role}: ${a.title}`)} />
+        <Panel title="Supporters" items={relationships.map((r: LegacyValue) => `${r.name} — ${r.relationship}`)} />
+        <Panel title="Invitations" items={invitations.map((i: LegacyValue) => `${i.inviteeName || i.invitee_name} — ${i.status}`)} />
+        <Panel title="Messages" items={messages.map((m: LegacyValue) => `${m.sender_role}: ${m.body}`)} />
+        <Panel title="Shared Actions" items={actions.map((a: LegacyValue) => `${a.assigned_role}: ${a.title}`)} />
       </section>
     </main>
   );

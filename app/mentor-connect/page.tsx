@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   PlaybookButton,
   PlaybookCard,
@@ -15,17 +15,21 @@ const roles = ["", "mentor", "teacher", "counselor", "coach", "administrator"];
 export default function MentorConnectPage() {
   const [q, setQ] = useState("");
   const [role, setRole] = useState("");
-  const [mentors, setMentors] = useState<any[]>([]);
+  const [mentors, setMentors] = useState<LegacyValue[]>([]);
 
-  async function load() {
+  const load = useCallback(async () => {
     const res = await fetch(`/api/mentor-directory?q=${encodeURIComponent(q)}&role=${encodeURIComponent(role)}`);
     const json = await res.json();
     setMentors(json.mentors || []);
-  }
+  }, [q, role]);
 
   useEffect(() => {
-    load();
-  }, [role]);
+    const timer = window.setTimeout(() => {
+      void load();
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, [load]);
 
   return (
     <PlaybookPage>

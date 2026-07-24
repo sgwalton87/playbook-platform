@@ -1,6 +1,6 @@
 import type { CommunityExperience, ScholarCommunityRecord } from "./community";
 
-export type AcademicAssessment = { total?: string | null; composite?: string | null; evidence: any[] };
+export type AcademicAssessment = { total?: string | null; composite?: string | null; evidence: LegacyValue[] };
 
 export interface CanonicalAgProgress {
   subject: string;
@@ -27,29 +27,29 @@ export interface CanonicalCourse {
 }
 
 export interface ScholarRecordInput {
-  profile?: any;
-  rawProfile?: any;
-  certificates?: any[];
-  badges?: any[];
-  activities?: any[];
-  posts?: any[];
-  agProgress?: any[];
-  ag_progress?: any[];
-  courses?: any[];
-  courseHistory?: any[];
-  currentCourses?: any[];
-  semesterHistory?: any[];
+  profile?: LegacyValue;
+  rawProfile?: LegacyValue;
+  certificates?: LegacyValue[];
+  badges?: LegacyValue[];
+  activities?: LegacyValue[];
+  posts?: LegacyValue[];
+  agProgress?: LegacyValue[];
+  ag_progress?: LegacyValue[];
+  courses?: LegacyValue[];
+  courseHistory?: LegacyValue[];
+  currentCourses?: LegacyValue[];
+  semesterHistory?: LegacyValue[];
   transcriptMetadata?: { source?: string; importedAt?: string | null; verified?: boolean };
   academicSummary?: { creditsEarned?: number };
-  ap?: any[];
-  ib?: any[];
-  dualEnrollment?: any[];
-  academicHonors?: any[];
+  ap?: LegacyValue[];
+  ib?: LegacyValue[];
+  dualEnrollment?: LegacyValue[];
+  academicHonors?: LegacyValue[];
 }
 
 export interface ScholarRecord {
   id: string;
-  rawProfile: any;
+  rawProfile: LegacyValue;
   identity: {
     username?: string;
     role?: string;
@@ -76,29 +76,29 @@ export interface ScholarRecord {
     intendedMajor?: string | null;
     sat: AcademicAssessment;
     act: AcademicAssessment;
-    ap: any[];
-    ib: any[];
-    dualEnrollment: any[];
-    academicHonors: any[];
+    ap: LegacyValue[];
+    ib: LegacyValue[];
+    dualEnrollment: LegacyValue[];
+    academicHonors: LegacyValue[];
     agProgress: CanonicalAgProgress[];
     agSummary: { subjectsMet: number; subjectCount: number; totalCompleted: number; totalRequired: number; percent: number };
     currentCourses: CanonicalCourse[];
     courseHistory: CanonicalCourse[];
-    semesterHistory: any[];
+    semesterHistory: LegacyValue[];
     transcriptMetadata: { source: string; importedAt: string | null; lastUpdatedAt?: string | null; verified: boolean };
   };
   career: { idealProfession?: string | null; desiredSalaryRange?: string | null };
   community: ScholarCommunityRecord;
-  achievements: { total: number; certificates: any[]; badges: any[]; activities: CommunityExperience[]; posts: any[] };
+  achievements: { total: number; certificates: LegacyValue[]; badges: LegacyValue[]; activities: CommunityExperience[]; posts: LegacyValue[] };
   service: { volunteerHours: number; activities: CommunityExperience[] };
   leadership: {
-    badges: any[];
+    badges: LegacyValue[];
     activities: CommunityExperience[];
     leadershipPositions: CommunityExperience[];
     leadershipScore: number;
   };
   readiness: { portfolioCompletion: number; opportunityReadiness: number };
-  ai: Record<string, any>;
+  ai: Record<string, LegacyValue>;
 }
 
 export interface ProfileAcademicForm {

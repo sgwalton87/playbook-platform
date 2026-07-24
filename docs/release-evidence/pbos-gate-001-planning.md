@@ -104,12 +104,12 @@
   ],
   "blockers": [],
   "recommendation": "Repository promotion is pending. Resolve promotion blockers before starting another engineering gate: Git remote unavailable, Git credentials unavailable, Pull Request creation unavailable, Release tag creation unavailable.",
-  "duration": 699,
-  "timestamp": "2026-07-24T02:40:56.542Z",
+  "duration": 3314,
+  "timestamp": "2026-07-24T04:11:58.555Z",
   "release": {
     "currentState": "PROMOTION_PENDING",
     "previousState": "ENGINEERING_APPROVED",
-    "transitionTimestamp": "2026-07-24T02:40:56.536Z",
+    "transitionTimestamp": "2026-07-24T04:11:58.538Z",
     "transitionReason": "Engineering review remains valid, but repository promotion is pending because the environment cannot complete remote GitHub operations.",
     "environment": {
       "name": "codex",

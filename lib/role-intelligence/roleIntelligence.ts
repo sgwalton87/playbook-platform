@@ -20,7 +20,7 @@ export function buildRoleRecommendations(role: PlaybookRoleOS) {
     educator: [
       "Verify Biology evidence",
       "Recommend one academic strength",
-      "Flag any A-G readiness concern",
+      "Flag LegacyValue A-G readiness concern",
     ],
     mentor: [
       "Schedule a mock interview",

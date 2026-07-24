@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabaseClient";
 import { createTrustReport } from "@/lib/repositories/trustRepository";
 
-export async function handleAchievementCreatedForTrust(payload: any) {
+export async function handleAchievementCreatedForTrust(payload: LegacyValue) {
   if (!payload?.recordId) return;
 
   const { data: achievements } = await supabase

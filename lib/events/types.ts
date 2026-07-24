@@ -12,7 +12,7 @@ export type PlaybookEventType =
   | "PortfolioUpdated"
   | "TimelineUpdated";
 
-export interface PlaybookEvent<TPayload = any> {
+export interface PlaybookEvent<TPayload = LegacyValue> {
   id: string;
   type: PlaybookEventType;
   payload: TPayload;

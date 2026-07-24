@@ -45,7 +45,7 @@ export default function SessionGuard() {
       const isReloading =
         performance
           .getEntriesByType("navigation")
-          .some((entry: any) => entry.type === "reload");
+          .some((entry: LegacyValue) => entry.type === "reload");
 
       if (!isReloading) {
         navigator.sendBeacon?.("/api/auth/logout-beacon");

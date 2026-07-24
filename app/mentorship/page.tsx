@@ -67,7 +67,7 @@ export default function MentorshipPage() {
       if (!data.user) router.replace("/login");
       else setAuthed(true);
     });
-  }, []);
+  }, [router]);
 
   const toggleJoin = (id: string) => {
     setCircles((c) => c.map((circle) =>

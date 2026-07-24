@@ -1,10 +1,10 @@
 export function buildScholarApplicationData(input: {
-  profile?: any;
-  courses?: any[];
-  certificates?: any[];
-  evidence?: any[];
-  goals?: any[];
-  athletics?: any[];
+  profile?: LegacyValue;
+  courses?: LegacyValue[];
+  certificates?: LegacyValue[];
+  evidence?: LegacyValue[];
+  goals?: LegacyValue[];
+  athletics?: LegacyValue[];
 }) {
   const profile = input.profile || {};
 
@@ -31,11 +31,11 @@ export function buildResumeFromScholarData(data: ReturnType<typeof buildScholarA
     headline: data.headline,
     sections: {
       education: data.education,
-      courses: data.courses.map((c: any) => c.title || c.name).filter(Boolean),
-      certificates: data.certificates.map((c: any) => c.title || c.name).filter(Boolean),
-      evidence: data.evidence.map((e: any) => e.title || e.name).filter(Boolean),
-      goals: data.goals.map((g: any) => g.title || g.name).filter(Boolean),
-      athletics: data.athletics.map((a: any) => a.sport || a.title).filter(Boolean),
+      courses: data.courses.map((c: LegacyValue) => c.title || c.name).filter(Boolean),
+      certificates: data.certificates.map((c: LegacyValue) => c.title || c.name).filter(Boolean),
+      evidence: data.evidence.map((e: LegacyValue) => e.title || e.name).filter(Boolean),
+      goals: data.goals.map((g: LegacyValue) => g.title || g.name).filter(Boolean),
+      athletics: data.athletics.map((a: LegacyValue) => a.sport || a.title).filter(Boolean),
     },
   };
 }

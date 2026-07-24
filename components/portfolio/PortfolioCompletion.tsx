@@ -2,7 +2,7 @@
 
 const T={surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",green:"#10B981",purple:"#8B5CF6",mono:"'Space Mono', monospace",anton:"'Anton', sans-serif"};
 
-export default function PortfolioCompletion({scholarRecord}:{scholarRecord:any}) {
+export default function PortfolioCompletion({scholarRecord}:{scholarRecord:LegacyValue}) {
   const completion = scholarRecord?.intelligence?.completion || {};
   const percent = completion.percent || 0;
 
@@ -46,7 +46,7 @@ export default function PortfolioCompletion({scholarRecord}:{scholarRecord:any})
             Next best actions
           </p>
           <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:8}}>
-            {nextActions.map((action:any)=>(
+            {nextActions.map((action:LegacyValue)=>(
               <div key={action} style={{background:T.surface2,borderRadius:12,padding:"10px 12px",fontSize:13,fontWeight:700,color:T.ink}}>
                 □ {action}
               </div>

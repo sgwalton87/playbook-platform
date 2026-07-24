@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
@@ -69,7 +70,7 @@ export default function FounderCaseStudyPage() {
           </div>
 
           <div style={heroImageFrame}>
-            <img src={heroImage} alt={`${quarter.quarter} archive`} style={heroImageStyle} />
+            <Image unoptimized width={1200} height={800} src={heroImage} alt={`${quarter.quarter} archive`} style={heroImageStyle} />
           </div>
         </section>
 
@@ -108,7 +109,7 @@ export default function FounderCaseStudyPage() {
           <aside style={sideRail}>
             {storyImages.slice(2, 6).map((image, index) => (
               <figure key={image} style={railFigure}>
-                <img src={image} alt={`Founder archive ${index + 1}`} style={railImage} />
+                <Image unoptimized width={1200} height={800} src={image} alt={`Founder archive ${index + 1}`} style={railImage} />
               </figure>
             ))}
           </aside>
@@ -127,7 +128,7 @@ export default function FounderCaseStudyPage() {
 
           {evidenceImages[0] && (
             <div style={featuredEvidence}>
-              <img src={evidenceImages[0]} alt="Featured archive evidence" style={featuredImage} />
+              <Image unoptimized width={1200} height={800} src={evidenceImages[0]} alt="Featured archive evidence" style={featuredImage} />
             </div>
           )}
         </section>
@@ -144,7 +145,7 @@ export default function FounderCaseStudyPage() {
             <div style={evidenceGrid}>
               {evidenceImages.slice(1).map((image) => (
                 <figure key={image} style={evidenceCard}>
-                  <img src={image} alt="Founder archive evidence" style={evidenceImage} />
+                  <Image unoptimized width={1200} height={800} src={image} alt="Founder archive evidence" style={evidenceImage} />
                 </figure>
               ))}
             </div>
@@ -193,7 +194,7 @@ function StoryImage({
 }) {
   return (
     <figure style={storyFigure}>
-      <img src={src} alt="" style={storyImage} />
+      <Image unoptimized width={1200} height={800} src={src} alt="" style={storyImage} />
       <figcaption style={captionStyle}>{caption}</figcaption>
     </figure>
   );

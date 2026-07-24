@@ -40,7 +40,7 @@ export default function CreateAchievementForm({ profileId }: Props) {
       setEvidenceUrl("");
       setReflection("");
       setDone(true);
-    } catch (err: any) {
+    } catch (err: LegacyValue) {
       alert(err.message || "Could not save achievement.");
     } finally {
       setSaving(false);

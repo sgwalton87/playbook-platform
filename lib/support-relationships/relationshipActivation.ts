@@ -2,7 +2,7 @@ import type { RelationshipKind } from "@/lib/permissions";
 import { buildSupportRelationship } from "./supportRelationships";
 
 export function buildAcceptedInvitationRelationship(input: {
-  invitation: any;
+  invitation: LegacyValue;
   supporterId?: string | null;
 }) {
   return buildSupportRelationship({

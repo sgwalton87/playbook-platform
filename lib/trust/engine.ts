@@ -1,14 +1,5 @@
 import type { TrustLevel, TrustReport, TrustSignal } from "./types";
 
-const LEVELS: TrustLevel[] = [
-  "activity",
-  "achievement",
-  "evidence",
-  "verification",
-  "outcome",
-  "impact",
-];
-
 function getTrustLevel(score: number): TrustLevel {
   if (score >= 90) return "impact";
   if (score >= 75) return "outcome";
@@ -18,7 +9,7 @@ function getTrustLevel(score: number): TrustLevel {
   return "activity";
 }
 
-export function buildTrustReport(record: any): TrustReport {
+export function buildTrustReport(record: LegacyValue): TrustReport {
   const achievements = record?.achievements || {};
   const certificates = achievements.certificates || [];
   const badges = achievements.badges || [];
@@ -45,14 +36,14 @@ export function buildTrustReport(record: any): TrustReport {
       label: "Activities logged",
       level: "achievement",
       points: activities.length > 0 ? 15 : 0,
-      verified: activities.some((a: any) => a.verified),
+      verified: activities.some((a: LegacyValue) => a.verified),
     },
     {
       id: "verified-activities",
       label: "Verified activities",
       level: "verification",
-      points: activities.some((a: any) => a.verified) ? 20 : 0,
-      verified: activities.some((a: any) => a.verified),
+      points: activities.some((a: LegacyValue) => a.verified) ? 20 : 0,
+      verified: activities.some((a: LegacyValue) => a.verified),
     },
     {
       id: "community-signals",
@@ -65,14 +56,14 @@ export function buildTrustReport(record: any): TrustReport {
       id: "reflection",
       label: "Reflection evidence",
       level: "evidence",
-      points: activities.some((a: any) => a.reflection || a.reflection_text) ? 10 : 0,
+      points: activities.some((a: LegacyValue) => a.reflection || a.reflection_text) ? 10 : 0,
       verified: false,
     },
     {
       id: "outcomes",
       label: "Outcomes documented",
       level: "outcome",
-      points: activities.some((a: any) => a.outcome || a.outcomes) ? 10 : 0,
+      points: activities.some((a: LegacyValue) => a.outcome || a.outcomes) ? 10 : 0,
       verified: false,
     },
   ];
@@ -86,9 +77,9 @@ export function buildTrustReport(record: any): TrustReport {
     certificates.length === 0 && "Attach certificates or completed course evidence",
     badges.length === 0 && "Earn or attach badges",
     activities.length === 0 && "Log activities, service, leadership, or athletics",
-    !activities.some((a: any) => a.verified) && "Request verification from a trusted adult or organization",
-    !activities.some((a: any) => a.reflection || a.reflection_text) && "Add a reflection to at least one achievement",
-    !activities.some((a: any) => a.outcome || a.outcomes) && "Add outcomes or impact to at least one achievement",
+    !activities.some((a: LegacyValue) => a.verified) && "Request verification from a trusted adult or organization",
+    !activities.some((a: LegacyValue) => a.reflection || a.reflection_text) && "Add a reflection to at least one achievement",
+    !activities.some((a: LegacyValue) => a.outcome || a.outcomes) && "Add outcomes or impact to at least one achievement",
   ].filter(Boolean) as string[];
 
   return {

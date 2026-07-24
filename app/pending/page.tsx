@@ -8,7 +8,7 @@ const ROLE_LABELS:Record<string,string>={"scholar":"Scholar","scholar-athlete":"
 
 export default function PendingPage() {
   const router=useRouter();
-  const [profile,setProfile]=useState<any>(null);
+  const [profile,setProfile]=useState<LegacyValue>(null);
   const [daysLeft,setDaysLeft]=useState<number|null>(null);
   const [loading,setLoading]=useState(true);
 
@@ -26,7 +26,7 @@ export default function PendingPage() {
       }
       setLoading(false);
     })();
-  },[]);
+  },[router]);
 
   if(loading)return<div style={{minHeight:"100vh",background:T.cream,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:T.mono,fontSize:12,color:T.faint}}>Loading...</div>;
 

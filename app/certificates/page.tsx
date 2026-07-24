@@ -56,7 +56,7 @@ export default function CertificatesPage() {
       }
       setLoading(false);
     })();
-  },[]);
+  },[router]);
 
   const earned=ALL.filter(c=>earnedSlugs.includes(c.slug));
   const locked=ALL.filter(c=>!earnedSlugs.includes(c.slug));

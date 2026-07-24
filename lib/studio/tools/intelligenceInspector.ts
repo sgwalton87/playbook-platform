@@ -3,7 +3,7 @@ import { buildCompassReport } from "@/lib/compass";
 import { matchOpportunitiesFromSignals } from "@/lib/opportunity-graph/matching/OpportunityMatcher";
 import { askOracle } from "@/lib/oracle";
 
-export function inspectLearnerIntelligence(courses: any[], trustScore = 78) {
+export function inspectLearnerIntelligence(courses: LegacyValue[], trustScore = 78) {
   const academic = buildAcademicIntelligenceReport(courses);
   const dna = buildAcademicDNA(courses);
   const opportunities = matchOpportunitiesFromSignals({

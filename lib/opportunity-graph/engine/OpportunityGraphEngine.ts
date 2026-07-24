@@ -2,7 +2,7 @@ import { buildAcademicDNA } from "@/lib/academic-intelligence";
 import { matchOpportunitiesFromSignals } from "../matching/OpportunityMatcher";
 import { saveOpportunityGraphMatches } from "@/lib/repositories/opportunityGraphRepository";
 
-export async function handleTranscriptImportedForOpportunityGraph(payload: any) {
+export async function handleTranscriptImportedForOpportunityGraph(payload: LegacyValue) {
   if (!payload?.recordId) return;
 
   const dna = buildAcademicDNA(payload.courses || []);
@@ -26,7 +26,7 @@ export async function handleTranscriptImportedForOpportunityGraph(payload: any) 
 export async function buildOpportunityGraphFromAcademicDNA(input: {
   recordId?: string;
   profileId?: string;
-  courses: any[];
+  courses: LegacyValue[];
 }) {
   const dna = buildAcademicDNA(input.courses || []);
 

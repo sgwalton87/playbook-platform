@@ -1,6 +1,6 @@
 "use client";
 
-export function formatDisplayName(profile: any) {
+export function formatDisplayName(profile: LegacyValue) {
   return (
     profile?.full_name ||
     [profile?.first_name, profile?.last_name].filter(Boolean).join(" ") ||
@@ -9,7 +9,7 @@ export function formatDisplayName(profile: any) {
   );
 }
 
-export function formatRole(profile: any) {
+export function formatRole(profile: LegacyValue) {
   const role = profile?.role || "member";
   return role.replaceAll("_", " ").replaceAll("-", " ");
 }

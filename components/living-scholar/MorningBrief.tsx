@@ -1,6 +1,6 @@
 "use client";
 
-export default function MorningBrief({ brief }: { brief: any }) {
+export default function MorningBrief({ brief }: { brief: LegacyValue }) {
   return (
     <section style={card}>
       <p style={eyebrow}>Morning Brief</p>
@@ -8,7 +8,7 @@ export default function MorningBrief({ brief }: { brief: any }) {
       <p style={body}>{brief.summary}</p>
 
       <div style={focusBox}>
-        <strong>Today's Focus</strong>
+        <strong>Today&apos;s Focus</strong>
         <span>{brief.focus}</span>
       </div>
 

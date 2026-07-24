@@ -8,8 +8,8 @@ function value<T>(...items: T[]): T | null {
   return items.find((item) => item !== undefined && item !== null && item !== "") ?? null;
 }
 
-function normalizeAgProgress(rows: any[] = []) {
-  const latestBySubject = new Map<string, any>();
+function normalizeAgProgress(rows: LegacyValue[] = []) {
+  const latestBySubject = new Map<string, LegacyValue>();
   for (const row of rows) {
     if (row?.subject && !latestBySubject.has(row.subject)) latestBySubject.set(row.subject, row);
   }
@@ -31,7 +31,7 @@ function normalizeAgProgress(rows: any[] = []) {
   });
 }
 
-function normalizeCourses(courses: any[] = []) {
+function normalizeCourses(courses: LegacyValue[] = []) {
   return courses.map((course, index) => ({
     id: String(value(course.id, `course-${index}`)),
     name: value(course.name, course.title, course.course_name, course.current_course, "Untitled course"),

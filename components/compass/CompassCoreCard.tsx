@@ -3,7 +3,7 @@
 import { buildCompassReport } from "@/lib/compass";
 import { useMemo } from "react";
 
-export default function CompassCoreCard({ courses = [], trustScore = 40 }: { courses?: any[]; trustScore?: number }) {
+export default function CompassCoreCard({ courses = [], trustScore = 40 }: { courses?: LegacyValue[]; trustScore?: number }) {
   const report = useMemo(() => buildCompassReport({ courses, trustScore }), [courses, trustScore]);
 
   return (

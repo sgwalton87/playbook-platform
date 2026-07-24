@@ -5,7 +5,7 @@ export type RewardGuardInput = {
 };
 
 export async function hasExistingReward(
-  supabase: any,
+  supabase: LegacyValue,
   input: RewardGuardInput
 ) {
   const { data } = await supabase
@@ -21,7 +21,7 @@ export async function hasExistingReward(
 
 
 export async function countRecentRewards(
-  supabase: any,
+  supabase: LegacyValue,
   input: {
     scholarId: string;
     eventType: string;

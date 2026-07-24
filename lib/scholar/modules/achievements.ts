@@ -3,7 +3,7 @@ export function buildAchievements({
   badges=[],
   posts=[],
   activities=[],
-}:any){
+}:LegacyValue){
 
   return{
 

@@ -3,7 +3,7 @@
 import { buildScholarTimeline } from "@/lib/timeline";
 
 type Props = {
-  record: any;
+  record: LegacyValue;
 };
 
 export default function ScholarTimeline({ record }: Props) {
@@ -19,7 +19,7 @@ export default function ScholarTimeline({ record }: Props) {
         <p style={{fontSize:13,color:"#94A3B8"}}>No timeline events yet.</p>
       ) : (
         <div style={{display:"flex",flexDirection:"column",gap:12}}>
-          {events.map((event:any)=>(
+          {events.map((event:LegacyValue)=>(
             <div key={event.id} style={{borderLeft:"3px solid #F97316",paddingLeft:14}}>
               <div style={{display:"flex",justifyContent:"space-between",gap:12}}>
                 <strong style={{fontSize:14,color:"#0F172A"}}>{event.title}</strong>

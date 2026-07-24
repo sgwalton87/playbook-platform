@@ -1,4 +1,4 @@
-export const getProfileProgress = (profile: any) => {
+export const getProfileProgress = (profile: LegacyValue) => {
   if (!profile) {
     return {
       percent: 0,

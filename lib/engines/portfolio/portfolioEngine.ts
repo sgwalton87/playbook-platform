@@ -1,6 +1,6 @@
 import { createTimelineEvent } from "@/lib/repositories/timelineRepository";
 
-export async function handleAchievementCreatedForPortfolio(payload: any) {
+export async function handleAchievementCreatedForPortfolio(payload: LegacyValue) {
   if (!payload?.recordId) return;
 
   return createTimelineEvent({

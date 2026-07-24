@@ -1,4 +1,4 @@
-export function getOpportunitySignals(portfolio: any) {
+export function getOpportunitySignals(portfolio: LegacyValue) {
   return {
     careerGoal: portfolio?.career?.idealProfession,
     dreamSchool: portfolio?.academics?.dreamSchool,

@@ -3,13 +3,12 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { AG_SUBJECT_NAMES, AG_REQUIREMENTS } from "@/lib/agCourses";
-import { PlaybookStoryBanner, PlaybookQuote } from "@/components/brand-story";
+import { PlaybookStoryBanner } from "@/components/brand-story";
 import { PLAYBOOK_QUOTES, PLAYBOOK_STORY_IMAGES } from "@/lib/brand-story";
 import TranscriptUploadCard from "@/components/transcript/TranscriptUploadCard";
 import {
   buildScholarRecord,
   type CommunityExperience,
-  type RawCommunityActivity,
   type ScholarRecord,
 } from "@/lib/scholar";
 
@@ -17,11 +16,10 @@ const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink
 
 export default function TranscriptPage() {
   const router = useRouter();
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<LegacyValue>(null);
   const [scholarRecord, setScholarRecord] = useState<ScholarRecord | null>(null);
-  const [agProgress, setAgProgress] = useState<any[]>([]);
-  const [certificates, setCertificates] = useState<any[]>([]);
-  const [activities, setActivities] = useState<RawCommunityActivity[]>([]);
+  const [agProgress, setAgProgress] = useState<LegacyValue[]>([]);
+  const [certificates, setCertificates] = useState<LegacyValue[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -46,10 +44,9 @@ export default function TranscriptPage() {
         current_course: a.currentCourse,
       })));
       setCertificates(certs||[]);
-      setActivities((acts || []) as RawCommunityActivity[]);
       setLoading(false);
     })();
-  }, []);
+  }, [router]);
 
   if (loading) return <><div style={{padding:"28px 32px",fontFamily:T.mono,fontSize:12,color:T.faint}}>Loading transcript...</div></>;
 
@@ -226,7 +223,7 @@ export default function TranscriptPage() {
               <div style={{border:`0.5px solid ${T.line}`,borderRadius:12,overflow:"hidden"}}>
                 <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
                   <thead><tr style={{background:T.navy,color:"#F8F7F4"}}><th style={{padding:"10px 14px",textAlign:"left",fontFamily:T.mono,fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:700}}>Certificate</th><th style={{padding:"10px 14px",textAlign:"left",fontFamily:T.mono,fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:700}}>Issued</th><th style={{padding:"10px 14px",textAlign:"center",fontFamily:T.mono,fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:700}}>Status</th></tr></thead>
-                  <tbody>{certificates.map((c:any,i:number)=><tr key={c.id} style={{borderBottom:`0.5px solid ${T.line}`,background:i%2===0?T.surface:T.surface2}}><td style={{padding:"12px 14px",fontWeight:600,color:T.ink}}>{c.certificate_name||c.course_slug}</td><td style={{padding:"12px 14px",color:T.muted,fontFamily:T.mono,fontSize:12}}>{c.issued_at?new Date(c.issued_at).toLocaleDateString("en",{month:"long",day:"numeric",year:"numeric"}):"—"}</td><td style={{padding:"12px 14px",textAlign:"center"}}><span style={{background:T.greenL,color:T.green,borderRadius:999,padding:"3px 10px",fontSize:11,fontWeight:700,fontFamily:T.mono}}>✓ Earned</span></td></tr>)}</tbody>
+                  <tbody>{certificates.map((c:LegacyValue,i:number)=><tr key={c.id} style={{borderBottom:`0.5px solid ${T.line}`,background:i%2===0?T.surface:T.surface2}}><td style={{padding:"12px 14px",fontWeight:600,color:T.ink}}>{c.certificate_name||c.course_slug}</td><td style={{padding:"12px 14px",color:T.muted,fontFamily:T.mono,fontSize:12}}>{c.issued_at?new Date(c.issued_at).toLocaleDateString("en",{month:"long",day:"numeric",year:"numeric"}):"—"}</td><td style={{padding:"12px 14px",textAlign:"center"}}><span style={{background:T.greenL,color:T.green,borderRadius:999,padding:"3px 10px",fontSize:11,fontWeight:700,fontFamily:T.mono}}>✓ Earned</span></td></tr>)}</tbody>
                 </table>
               </div>
             </div>
