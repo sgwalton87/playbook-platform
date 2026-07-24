@@ -7,9 +7,10 @@ import OpportunityMeter from "@/components/portfolio/OpportunityMeter";
 import ScholarTimeline from "@/components/timeline/ScholarTimeline";
 import OpportunityFeed from "@/components/opportunities/OpportunityFeed";
 import { calculatePortfolioStats } from "@/lib/portfolio/services/stats";
+import type { ScholarRecord } from "@/lib/scholar";
 
 type Props = {
-  record: any;
+  record: ScholarRecord;
 };
 
 export default function PortfolioEngine({ record }: Props) {
@@ -19,6 +20,7 @@ export default function PortfolioEngine({ record }: Props) {
       record?.career?.idealProfession,
       record?.athletics?.sport,
       record?.identity?.school,
+      ...(record?.experiences?.all || []).map((experience: { title?: string }) => experience.title),
     ].filter(Boolean),
   });
 

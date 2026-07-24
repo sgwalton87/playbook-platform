@@ -1,9 +1,10 @@
 "use client";
 
 import ScholarRecordSummary from "@/components/scholar/ScholarRecordSummary";
+import type { ScholarRecord } from "@/lib/scholar";
 
 type Props = {
-  record: any;
+  record: ScholarRecord;
 };
 
 function SectionCard({
@@ -41,7 +42,7 @@ function SectionCard({
   );
 }
 
-function Row({ label, value }: { label: string; value: any }) {
+function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div
       style={{
@@ -67,6 +68,7 @@ export default function ScholarRecordDashboard({ record }: Props) {
   const service = record?.service || {};
   const achievements = record?.achievements || {};
   const leadership = record?.leadership || {};
+  const experiences = record?.experiences || {};
 
   return (
     <div style={{ marginBottom: 14 }}>
@@ -118,6 +120,17 @@ export default function ScholarRecordDashboard({ record }: Props) {
           <Row label="Leadership Score" value={leadership.leadershipScore ?? 0} />
         </SectionCard>
       </div>
+
+      <SectionCard title="Canonical Experiences">
+        <Row label="Internships" value={experiences.internships?.length ?? 0} />
+        <Row label="Work Experience" value={experiences.workExperience?.length ?? 0} />
+        <Row label="Entrepreneurship" value={experiences.entrepreneurship?.length ?? 0} />
+        <Row label="Research" value={experiences.research?.length ?? 0} />
+        <Row label="Apprenticeships" value={experiences.apprenticeships?.length ?? 0} />
+        <Row label="Fellowships" value={experiences.fellowships?.length ?? 0} />
+        <Row label="Certifications" value={experiences.certifications?.length ?? 0} />
+        <Row label="Verified Experiences" value={experiences.verifiedTotal ?? 0} />
+      </SectionCard>
 
       <SectionCard title="Achievements">
         <Row label="Certificates" value={achievements.certificates?.length ?? 0} />

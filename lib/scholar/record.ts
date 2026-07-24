@@ -1,5 +1,11 @@
 import type { ScholarRecord } from "./types";
 import { buildCommunityRecord, type RawCommunityActivity } from "./community";
+import {
+  buildExperienceCollection,
+  translateActivitiesToExperiences,
+  translateCertificatesToExperiences,
+  type RawExperienceInput,
+} from "@/lib/experiences";
 
 interface ScholarProfileInput {
   id?: string;
@@ -25,12 +31,14 @@ export function buildScholarRecord({
   badges = [],
   activities = [],
   posts = [],
+  experiences,
 }: {
   profile?: ScholarProfileInput;
   certificates?: unknown[];
   badges?: unknown[];
   activities?: RawCommunityActivity[];
   posts?: unknown[];
+  experiences?: RawExperienceInput[];
 }): ScholarRecord {
   const fullName =
     profile.full_name ||
@@ -39,7 +47,13 @@ export function buildScholarRecord({
     "Scholar";
 
   const community = buildCommunityRecord(activities);
-  const volunteerHours = community.volunteerHours;
+  const experienceRecord = buildExperienceCollection(
+    experiences || [
+      ...translateActivitiesToExperiences(activities),
+      ...translateCertificatesToExperiences(certificates),
+    ]
+  );
+  const volunteerHours = experienceRecord.volunteerHours || community.volunteerHours;
 
   const achievementsTotal =
     certificates.length + badges.length + activities.length + posts.length;
@@ -105,6 +119,7 @@ export function buildScholarRecord({
       posts,
     },
     community,
+    experiences: experienceRecord,
     service: {
       volunteerHours,
       activities: community.activities,
