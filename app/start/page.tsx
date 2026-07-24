@@ -6,7 +6,8 @@ import { useSearchParams } from "next/navigation";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import { supabase } from "@/lib/supabaseClient";
 import { getOnboardingSteps, ALL_COLLEGE_OPTIONS, CAREER_OPTIONS, ACTIVITY_OPTIONS, CALIFORNIA_DISTRICTS } from "@/lib/onboarding";
-import { getPathway, normalizeRole } from "@/lib/onboarding/pathwayMap";
+import { normalizeRole } from "@/lib/onboarding/pathwayMap";
+import { withTutorialRequired } from "@/lib/tutorial";
 import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
 
 export default function StartPage() {
@@ -15,6 +16,13 @@ export default function StartPage() {
       <StartContent />
     </Suspense>
   );
+}
+
+function splitFullName(fullName: LegacyValue) {
+  const clean = String(fullName || "").trim();
+  if (!clean) return { firstName: null, lastName: null };
+  const [firstName, ...rest] = clean.split(/\s+/);
+  return { firstName, lastName: rest.join(" ") || null };
 }
 
 function StartContent() {
@@ -177,26 +185,47 @@ function StartContent() {
       ...(Array.isArray(nextForm.activities) ? nextForm.activities.map((a: string) => saveCustomOption("activity", a)) : []),
     ]);
 
+    const { firstName, lastName } = splitFullName(nextForm.full_name);
+
     const payload = {
       id: user.id,
       role,
       profile_mode: role,
       requested_role: role,
       full_name: nextForm.full_name || null,
+      first_name: firstName,
+      last_name: lastName,
       username: nextForm.username || null,
       avatar_url: nextForm.avatar_url || null,
       bio: nextForm.bio || null,
       school: nextForm.school || null,
+      school_district: nextForm.school_district || null,
       grade: nextForm.grade || null,
+      gpa: nextForm.gpa || null,
+      grad_year: nextForm.graduation_year || null,
+      graduation_year: nextForm.graduation_year || null,
       dream_school: nextForm.dream_school || null,
+      intended_major: nextForm.intended_major || null,
       ideal_profession: nextForm.ideal_profession || null,
-      onboarding_data: {
-        ...nextForm,
-        top_schools: topSchools,
-        activities,
-        invite_supporters: inviteSupporters,
-        onboarding_step_index: nextForm.onboarding_step_index ?? stepIndex,
-      },
+      primary_sport: nextForm.primary_sport || null,
+      position: nextForm.position || null,
+      current_team: nextForm.current_team || null,
+      highlight_reel_url: nextForm.highlight_link || null,
+      onboarding_data: complete
+        ? withTutorialRequired({
+            ...nextForm,
+            top_schools: topSchools,
+            activities,
+            invite_supporters: inviteSupporters,
+            onboarding_step_index: nextForm.onboarding_step_index ?? stepIndex,
+          })
+        : {
+            ...nextForm,
+            top_schools: topSchools,
+            activities,
+            invite_supporters: inviteSupporters,
+            onboarding_step_index: nextForm.onboarding_step_index ?? stepIndex,
+          },
       onboarding_completed: complete,
       onboarding_completed_at: complete ? new Date().toISOString() : null,
       public_profile_complete: Boolean(nextForm.full_name && nextForm.username && nextForm.bio),
@@ -253,7 +282,7 @@ function StartContent() {
       setCreating(false);
       setCreated(true);
       setTimeout(() => {
-        window.location.href = getPathway(role).osRoute;
+        window.location.href = "/tutorial";
       }, 15000);
       return;
     }

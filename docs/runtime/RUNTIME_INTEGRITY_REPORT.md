@@ -169,7 +169,14 @@ Exact missing connection: `/start` final completion calls `window.location.href 
 11. **Which fixes are required?** Decide route ownership; convert `/onboarding` to redirect or remove; map `/start` fields to canonical columns/tables; connect activities to `student_activities`; connect role OS dashboards to authenticated profile/onboarding data; create/route/persist first-login tutorials; remove or gate hardcoded demo data.
 12. **Which fixes require Product Owner approval?** Removing `/onboarding`, deleting/gating demo personas including Maya/Jordan, changing canonical profile schema/columns, changing post-onboarding destination behavior, and deciding whether `/tutorial` is required for all roles.
 
+## PBOS-RUNTIME-002 consolidation update
+- `/onboarding` has been converted from a complete duplicate client implementation into a redirect alias to `/start`.
+- `/tutorial` is reconnected through `profiles.onboarding_data` flags so first-time completed onboarding users are routed to it once and returning users with completed tutorial state bypass it.
+- `/start` now writes core onboarding fields to existing top-level profile columns used by dashboard, profile editor, public profile, and Scholar Record readers while preserving the full onboarding JSON.
+- Shared role OS pages and Scholar-Athlete OS now read the signed-in profile and display honest empty states for unavailable live metrics.
+- Production runtime placeholder leaderboard and inbox demo data were removed from general runtime paths.
+
 ## Final audit status
-- Audit artifacts created: `docs/runtime/ROUTE_RUNTIME_MAP.md` and `docs/runtime/RUNTIME_INTEGRITY_REPORT.md`.
-- No application code was modified.
+- Audit artifacts updated: `docs/runtime/ROUTE_RUNTIME_MAP.md`, `docs/runtime/RUNTIME_INTEGRITY_REPORT.md`, and `docs/runtime/CONSOLIDATION_REPORT.md`.
+- Application code was modified only for runtime consolidation.
 - No runtime browser evidence was captured; therefore all implemented paths remain `IMPLEMENTED, RUNTIME NOT VERIFIED` rather than COMPLETE.

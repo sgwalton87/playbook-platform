@@ -10,17 +10,17 @@ import {
 
 export default function InboxV2() {
   const conversations = useMemo(() => getDemoConversations(), []);
-  const [activeId, setActiveId] = useState(conversations[0].id);
+  const [activeId, setActiveId] = useState(conversations[0]?.id || "");
   const [body, setBody] = useState("");
   const [messagesByThread, setMessagesByThread] = useState<Record<string, LegacyValue[]>>({
-    "support-network": getDemoConversationMessages("support-network"),
-    family: getDemoConversationMessages("family"),
-    mentor: getDemoConversationMessages("mentor"),
-    "fafsa-action": getDemoConversationMessages("fafsa-action"),
+    "support-network": getDemoConversationMessages(),
+    family: getDemoConversationMessages(),
+    mentor: getDemoConversationMessages(),
+    "fafsa-action": getDemoConversationMessages(),
   });
 
-  const activeConversation = conversations.find((c) => c.id === activeId) || conversations[0];
-  const messages = messagesByThread[activeId] || [];
+  const activeConversation = conversations.find((c) => c.id === activeId) || null;
+  const messages = activeId ? messagesByThread[activeId] || [] : [];
 
   function sendMessage() {
     if (!body.trim()) return;
@@ -28,7 +28,7 @@ export default function InboxV2() {
     const message = buildConversationMessage({
       conversationId: activeId,
       senderRole: "scholar",
-      senderName: "Maya",
+      senderName: "Playbook Member",
       body,
     });
 
@@ -72,11 +72,11 @@ export default function InboxV2() {
         </aside>
 
         <section style={thread}>
-          <div style={threadHeader}>
+          {activeConversation ? <div style={threadHeader}>
             <p style={eyebrow}>{activeConversation.kind.replaceAll("_", " ")}</p>
             <h2 style={threadTitle}>{activeConversation.title}</h2>
             <p style={participants}>{activeConversation.participants.join(" • ")}</p>
-          </div>
+          </div> : <div style={threadHeader}><p style={eyebrow}>Empty inbox</p><h2 style={threadTitle}>No live conversations yet.</h2><p style={participants}>Demo message threads have been removed from production runtime.</p></div>}
 
           <div style={composer}>
             <textarea

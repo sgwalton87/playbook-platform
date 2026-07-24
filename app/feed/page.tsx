@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabaseClient";
 
 const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",blue:"#3B82F6",green:"#10B981",purple:"#8B5CF6",mono:"'Space Mono', monospace",sans:"'Hanken Grotesk', system-ui, sans-serif",anton:"'Anton', sans-serif"};
 const FILTERS=["All","Leadership","Finance","Civic","SEL"];
-const LEADERS=[{name:"Jordan M.",initials:"JM",color:T.green,img:"https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&q=80",xp:890,rank:1},{name:"Aisha T.",initials:"AT",color:T.blue,img:"https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&q=80",xp:760,rank:2},{name:"Marcus D.",initials:"MD",color:T.purple,img:null,xp:640,rank:3},{name:"You",initials:"SW",color:T.orange,img:null,xp:340,rank:4}];
+const LEADERS: { name: string; initials: string; color: string; img: string | null; xp: number; rank: number }[] = [];
 const SURL="https://oexgxnybeixwadgtdtzp.supabase.co";
 
 export default function FeedPage() {
@@ -406,19 +406,11 @@ export default function FeedPage() {
 
               <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:16,padding:"16px 18px"}}>
                 <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.12em",textTransform:"uppercase",color:T.muted,marginBottom:14}}>Top scholars</p>
-                {LEADERS.map((l,i)=>(
+                {LEADERS.length > 0 ? LEADERS.map((l,i)=>(
                   <div key={l.name} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 0",borderBottom:i<LEADERS.length-1?`1px solid ${T.line}`:"none"}}>
-                    <span style={{fontFamily:T.mono,fontSize:11,color:l.rank<=3?T.orange:T.faint,width:18,fontWeight:700}}>{l.rank<=3?["🥇","🥈","🥉"][l.rank-1]:`#${l.rank}`}</span>
-                    <div style={{width:30,height:30,borderRadius:"50%",background:l.color,overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:700,color:"#fff",flexShrink:0}}>
-                      {l.img?<Image unoptimized width={1200} height={800} src={l.img} alt={l.name} style={{width:"100%",height:"100%",objectFit:"cover"}}/>:l.initials}
-                    </div>
-                    <div style={{flex:1}}>
-                      <div style={{fontSize:12,fontWeight:600,color:l.name==="You"?T.orange:T.ink}}>{l.name}</div>
-                      <div style={{fontFamily:T.mono,fontSize:10,color:T.faint}}>{l.xp} XP</div>
-                    </div>
+                    <span>{l.rank}</span><span>{l.name}</span>
                   </div>
-                ))}
-                <button onClick={()=>router.push("/leaderboard")} style={{width:"100%",marginTop:12,fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",background:"transparent",border:`1px solid ${T.line}`,color:T.muted,borderRadius:10,padding:"9px",cursor:"pointer"}}>Full leaderboard →</button>
+                )) : <p style={{fontSize:13,color:T.faint,lineHeight:1.5}}>No live leaderboard data is connected yet.</p>}                <button onClick={()=>router.push("/leaderboard")} style={{width:"100%",marginTop:12,fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",background:"transparent",border:`1px solid ${T.line}`,color:T.muted,borderRadius:10,padding:"9px",cursor:"pointer"}}>Full leaderboard →</button>
               </div>
 
               <div style={{background:T.navy,borderRadius:16,padding:"16px 18px"}}>

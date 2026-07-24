@@ -3,7 +3,8 @@
 import { Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
-import { getPathway, normalizeRole } from "@/lib/onboarding/pathwayMap";
+import { normalizeRole } from "@/lib/onboarding/pathwayMap";
+import { getPostOnboardingDestination } from "@/lib/tutorial";
 
 export default function AuthCallbackPage() {
   return (
@@ -61,7 +62,7 @@ function AuthCallbackContent() {
 
       const { data: existing } = await supabase
         .from("profiles")
-        .select("id,onboarding_completed,profile_mode,role")
+        .select("id,onboarding_completed,onboarding_data,profile_mode,role")
         .eq("id", data.user.id)
         .maybeSingle();
 
@@ -78,7 +79,7 @@ function AuthCallbackContent() {
       );
 
       if (existing?.onboarding_completed) {
-        window.location.href = getPathway(existing.profile_mode || existing.role || role).osRoute;
+        window.location.href = getPostOnboardingDestination(existing);
       } else {
         window.location.href = `/start?first=1&role=${encodeURIComponent(role)}`;
       }
