@@ -32,6 +32,9 @@ describe("buildScholarRecord", () => {
     expect(record.service.volunteerHours).toBe(5);
     expect(record.community.activities[0].name).toBe("Activity");
     expect(record.readiness.opportunityReadiness).toBeGreaterThan(0);
+    expect(record.canonicalAIProfile.version).toBe("scholar-ai-foundation.v1");
+    expect(record.canonicalResume.name).toBe("Test Scholar");
+    expect(record.canonicalScholarship.matchingInputs).toContain("Weighted GPA: 3.8");
   });
 
   it("canonicalizes community experiences for AI-ready querying", () => {
@@ -60,5 +63,6 @@ describe("buildScholarRecord", () => {
     expect(record.id).toBe("scholar-2");
     expect(record.achievements.total).toBe(0);
     expect(record.readiness.portfolioCompletion).toBeGreaterThanOrEqual(0);
+    expect(record.canonicalStudentSnapshot.nextBestInputs).toContain("Add transcript courses");
   });
 });

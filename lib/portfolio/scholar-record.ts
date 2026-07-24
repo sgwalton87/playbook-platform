@@ -2,9 +2,12 @@ import { buildPortfolioAIContext } from "./services/ai";
 import { generateResumeDraft } from "./services/resume";
 import { createRecommendationContext } from "./services/recommendation";
 import { getOpportunitySignals } from "./services/opportunity";
+import { buildCanonicalAIProfile } from "./ai-foundation";
 
-export function buildScholarRecord(assembled: any) {
-  const portfolio = assembled.portfolio;
+export function buildScholarRecord(assembled: Record<string, unknown>) {
+  const portfolio = assembled.portfolio as import("./types").Portfolio;
+
+  const canonicalAIProfile = buildCanonicalAIProfile(assembled);
 
   return {
     id: portfolio.identity.id,
@@ -29,5 +32,11 @@ export function buildScholarRecord(assembled: any) {
     recommendationContext: createRecommendationContext(portfolio),
     opportunitySignals: getOpportunitySignals(portfolio),
     aiContext: buildPortfolioAIContext(portfolio),
+    canonicalAIProfile,
+    canonicalResume: canonicalAIProfile.resume,
+    canonicalScholarship: canonicalAIProfile.scholarship,
+    canonicalRecruiting: canonicalAIProfile.recruiting,
+    canonicalAcademicSummary: canonicalAIProfile.academics,
+    canonicalStudentSnapshot: canonicalAIProfile.studentSnapshot,
   };
 }

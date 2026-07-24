@@ -1,5 +1,6 @@
 import type { ScholarRecord } from "./types";
 import { buildCommunityRecord, type RawCommunityActivity } from "./community";
+import { buildCanonicalAIProfile } from "../portfolio/ai-foundation";
 
 interface ScholarProfileInput {
   id?: string;
@@ -78,6 +79,44 @@ export function buildScholarRecord({
     )
   );
 
+  const canonicalAIProfile = buildCanonicalAIProfile({
+    rawProfile: profile,
+    portfolio: {
+      identity: {
+        id: profile.id || "",
+        username: profile.username,
+        role: profile.role,
+        firstName: profile.first_name,
+        lastName: profile.last_name,
+        fullName,
+        avatarUrl: profile.avatar_url || null,
+        bio: profile.bio || null,
+        school: profile.school || null,
+        grade: profile.grade || null,
+      },
+      academics: {
+        weightedGpa: profile.gpa || null,
+        unweightedGpa: null,
+        dreamSchool: profile.dream_school || null,
+        intendedMajor: null,
+        satScore: null,
+        actScore: null,
+      },
+      career: {
+        idealProfession: profile.ideal_profession || null,
+        desiredSalaryRange: profile.desired_salary_range || null,
+      },
+      athletics: {},
+      pillars: [],
+    },
+    certificates,
+    badges,
+    badgeRows: badges,
+    activities,
+    posts,
+    intelligence: { completion: { percent: portfolioCompletion } },
+  });
+
   return {
     id: profile.id || "",
     identity: {
@@ -119,5 +158,11 @@ export function buildScholarRecord({
       portfolioCompletion,
       opportunityReadiness,
     },
+    canonicalAIProfile,
+    canonicalResume: canonicalAIProfile.resume,
+    canonicalScholarship: canonicalAIProfile.scholarship,
+    canonicalRecruiting: canonicalAIProfile.recruiting,
+    canonicalAcademicSummary: canonicalAIProfile.academics,
+    canonicalStudentSnapshot: canonicalAIProfile.studentSnapshot,
   };
 }

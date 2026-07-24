@@ -1,4 +1,5 @@
 import type { CommunityExperience, ScholarCommunityRecord } from "./community";
+import type { CanonicalAIProfile } from "../portfolio/ai-foundation";
 
 export interface ScholarRecord {
   id: string;
@@ -41,4 +42,10 @@ export interface ScholarRecord {
     portfolioCompletion: number;
     opportunityReadiness: number;
   };
+  canonicalAIProfile: CanonicalAIProfile;
+  canonicalResume: CanonicalAIProfile["resume"];
+  canonicalScholarship: CanonicalAIProfile["scholarship"];
+  canonicalRecruiting: CanonicalAIProfile["recruiting"];
+  canonicalAcademicSummary: CanonicalAIProfile["academics"];
+  canonicalStudentSnapshot: CanonicalAIProfile["studentSnapshot"];
 }
