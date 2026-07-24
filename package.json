@@ -34,7 +34,9 @@
     "founder:bootstrap": "node scripts/founder/bootstrap.mjs",
     "founder:docs": "node scripts/founder/generate-docs.mjs",
     "founder:update": "node scripts/founder/update.mjs",
-    "founder:list": "node scripts/founder/list.mjs"
+    "founder:list": "node scripts/founder/list.mjs",
+    "pbos:next": "tsx pbos/commands/next.ts",
+    "pbos:status": "tsx pbos/commands/status.ts"
   },
   "dependencies": {
     "@hcaptcha/react-hcaptcha": "^2.0.2",

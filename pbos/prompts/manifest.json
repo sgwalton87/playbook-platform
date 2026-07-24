@@ -1,0 +1,24 @@
+{
+  "prompts": [
+    {
+      "name": "PBOS-ENGINE-EXECUTION",
+      "version": "3.0.0",
+      "compatibleEngineVersion": "3.0.0",
+      "minimumHandbookVersion": "2026-07-24",
+      "status": "active",
+      "lastUpdated": "2026-07-24",
+      "owningSubsystem": "PBOS Engine",
+      "path": "pbos/prompts/PBOS-ENGINE-EXECUTION.md"
+    },
+    {
+      "name": "PBOS-ENGINE",
+      "version": "2.0.0",
+      "compatibleEngineVersion": "2.0.0",
+      "minimumHandbookVersion": "2026-07-24",
+      "status": "historic",
+      "lastUpdated": "2026-07-24",
+      "owningSubsystem": "PBOS Engine",
+      "path": "pbos/prompts/PBOS-ENGINE.md"
+    }
+  ]
+}

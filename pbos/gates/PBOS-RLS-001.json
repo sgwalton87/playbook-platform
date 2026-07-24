@@ -1,0 +1,24 @@
+{
+  "id": "PBOS-RLS-001",
+  "title": "Validate production RLS and role access",
+  "status": "blocked",
+  "priority": 90,
+  "dependencies": ["PBOS-GATE-001"],
+  "handbook_refs": [
+    "docs/DATABASE.md#rls-policies",
+    "docs/MASTER_CHECKLIST.md#current-blockers",
+    "docs/auto_sprint.md#recommended-first-auto-sprints"
+  ],
+  "tasks": [
+    "Create a role-by-table RLS validation matrix.",
+    "Review policies for Scholar-owned data and delegated access.",
+    "Capture SQL or test evidence for critical data paths."
+  ],
+  "definition_of_done": [
+    "RLS matrix is documented.",
+    "Critical policies have evidence.",
+    "Service-role usage is reviewed for audited server boundaries."
+  ],
+  "validation": ["docs"],
+  "next_gate": "PBOS-UI-001"
+}

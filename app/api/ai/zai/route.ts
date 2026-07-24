@@ -1,9 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { callZaiChat } from "@/lib/zai";
 
+type ZaiRequestBody = {
+  prompt?: string;
+  model?: string;
+  temperature?: number;
+};
+
+function getErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : "Unable to call Z.ai.";
+}
+
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    const body = (await req.json()) as ZaiRequestBody;
 
     if (!body.prompt?.trim()) {
       return NextResponse.json(
@@ -32,9 +42,9 @@ export async function POST(req: NextRequest) {
       ok: true,
       text: result.text,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
-      { error: error.message || "Unable to call Z.ai." },
+      { error: getErrorMessage(error) },
       { status: 500 }
     );
   }
