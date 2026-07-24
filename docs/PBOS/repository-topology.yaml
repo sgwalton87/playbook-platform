@@ -1,0 +1,37 @@
+schema_version: "1.0"
+gate: PBOS-GATE-001
+observed_at: "2026-07-24"
+source_commit: b33fd695b794954f10b9207ce8d82f9bf3e20914
+history_complete: false
+shallow_boundaries:
+  - 432ddf4df147c06dcf46f9d4481c39fb277b35da
+  - ac1466a93a1f319d04a8b5c633f3253aab9751da
+local_branches:
+  - {name: work, oid: b33fd695b794954f10b9207ce8d82f9bf3e20914, current: true, upstream: null}
+remote_branches: []
+remotes: []
+remote_head: null
+counts:
+  available_commits: 104
+  available_merges: 2
+  tags: 0
+  tracked_paths: 1226
+merges:
+  - oid: 3a49993af860a823cd295ef9c96a9da3f6d4bf04
+    parents: [1fb73bd1bb38058c6c39640801ba0d7ef76d5858, bb8400fdb95a15cb0849d0a69e0abe825a5ed2b0]
+    discoverable_pr: 5
+    source_text: sgwalton87/agent/integrate-sprint-001-004
+  - oid: ada2871c59aa9ea9cd0f1358de00f68243c8e841
+    parents: [3a49993af860a823cd295ef9c96a9da3f6d4bf04, 84035c24bc5d108f9235a21e394dac2e8e6bdb4e]
+    discoverable_pr: 6
+    source_text: sgwalton87/agent/onboarding-role-os-foundation
+integrity:
+  fsck_exit: 0
+  dangling_commits: [b23df99c8366adfd1531136b710758557e258fc9]
+  unmerged_index_entries: 0
+unknown:
+  - complete ancestry
+  - remote and default branch
+  - branch protection
+  - complete pull request history
+  - hosting releases

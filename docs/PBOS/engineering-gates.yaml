@@ -1,0 +1,22 @@
+schema_version: "1.0"
+gate: PBOS-GATE-001
+execution_authorized: false
+ordered_gates:
+  - {order: 1, id: PBOS-GOV-001, depends_on: [human_identity_decisions], exit: canonical identity and governance verified}
+  - {order: 2, id: PBOS-DEPENDENCY-001, depends_on: [PBOS-GOV-001], exit: clean install and npm dependency tree pass}
+  - {order: 3, id: PBOS-ENVIRONMENT-001, depends_on: [PBOS-GOV-001], exit: approved non-secret environment contract validates}
+  - {order: 4, id: PBOS-TS-001, depends_on: [PBOS-DEPENDENCY-001], exit: npx tsc --noEmit exits zero}
+  - {order: 5, id: PBOS-TS-002, depends_on: [PBOS-DEPENDENCY-001], exit: E2E types resolve and TypeScript exits zero}
+  - {order: 6, id: PBOS-BUILD-001, depends_on: [PBOS-TS-001, PBOS-TS-002], exit: npm run build exits zero}
+  - {order: 7, id: PBOS-TEST-001, depends_on: [PBOS-DEPENDENCY-001], exit: npm test exits zero with deterministic scope}
+  - {order: 8, id: PBOS-LINT-001, depends_on: [PBOS-TS-001, PBOS-TEST-001], exit: explicit-any package dispositioned and lint passes}
+  - {order: 9, id: PBOS-LINT-002, depends_on: [PBOS-TEST-001], exit: React correctness lint findings dispositioned and lint passes}
+  - {order: 10, id: PBOS-LINT-003, depends_on: [PBOS-LINT-001, PBOS-LINT-002], exit: remaining lint findings dispositioned and lint passes}
+  - {order: 11, id: PBOS-E2E-001, depends_on: [PBOS-BUILD-001, PBOS-ENVIRONMENT-001], exit: desktop mobile and accessibility E2E pass}
+  - {order: 12, id: PBOS-DOCUMENTATION-001, depends_on: [PBOS-GOV-001], exit: canonical documentation reconciled and validation passes}
+  - {order: 13, id: PBOS-ARCHITECTURE-001, depends_on: [PBOS-DOCUMENTATION-001], exit: canonical architecture approved and validated}
+  - {order: 14, id: PBOS-DATABASE-001, depends_on: [PBOS-ENVIRONMENT-001], exit: local and authorized remote migration checks pass}
+  - {order: 15, id: PBOS-SECURITY-001, depends_on: [PBOS-DEPENDENCY-001], exit: approved security checks complete with dispositions}
+  - {order: 16, id: PBOS-CODE-QUALITY-001, depends_on: [PBOS-BUILD-001, PBOS-TEST-001, PBOS-ARCHITECTURE-001], exit: static topology checks execute with reviewed findings}
+  - {order: 17, id: PBOS-DUPLICATE-001, depends_on: [PBOS-DOCUMENTATION-001, PBOS-ARCHITECTURE-001], exit: exact duplicates are reviewed against canonical ownership}
+recommended_next_gate: PBOS-GATE-002

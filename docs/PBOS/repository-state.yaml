@@ -1,0 +1,49 @@
+schema_version: "1.0"
+gate: PBOS-GATE-001
+observed_at: "2026-07-24"
+source_commit: b33fd695b794954f10b9207ce8d82f9bf3e20914
+state_vocabulary: [VERIFIED, CONFIGURED, MISSING, UNKNOWN]
+assumptions_permitted: false
+repository:
+  root:
+    state: VERIFIED
+    value: /workspace/playbook-platform
+    portability: environment-specific
+  name:
+    state: VERIFIED
+    value: playbook-platform
+  owner: {state: UNKNOWN, evidence_required: canonical remote or host metadata}
+  organization: {state: UNKNOWN, evidence_required: canonical remote or host metadata}
+  host: {state: UNKNOWN, evidence_required: canonical remote or host metadata}
+  visibility: {state: UNKNOWN, evidence_required: host repository settings}
+  canonical_remote: {state: MISSING, value: null}
+  configured_remotes: {state: VERIFIED, value: []}
+  current_branch: {state: VERIFIED, value: work}
+  default_branch: {state: UNKNOWN, evidence_required: remote HEAD or host metadata}
+  development_branch:
+    state: CONFIGURED
+    value: playbook-os-v1
+    present_in_available_refs: false
+    source: CODEX.md
+  integration_branch: {state: UNKNOWN, evidence_required: Git Integration Policy}
+  release_branch: {state: UNKNOWN, evidence_required: Git Integration Policy}
+  protected_branches: {state: UNKNOWN, evidence_required: host rulesets}
+  shallow: {state: VERIFIED, value: true}
+  lfs: {state: VERIFIED, repository_configuration_present: false, tracked_files: 0}
+  submodules: {state: VERIFIED, value: []}
+governance:
+  git_integration_policy: {state: MISSING, path: docs/ENGINEERING/GIT_INTEGRATION_POLICY.md}
+  codeowners: {state: MISSING}
+  issue_templates: {state: MISSING}
+  pull_request_template: {state: MISSING}
+  github_actions: {state: MISSING}
+  labels: {state: UNKNOWN, evidence_required: host metadata}
+  projects: {state: UNKNOWN, evidence_required: host metadata}
+  milestones: {state: UNKNOWN, evidence_required: host metadata}
+  approval_authority: {state: UNKNOWN, evidence_required: policy and host rulesets}
+operations:
+  release_strategy: {state: PARTIAL, evidence: scripts and documentation exist; no tags or hosted workflow available}
+  deployment_strategy: {state: UNKNOWN, evidence_required: canonical deployment policy}
+  environment_strategy: {state: MISSING, evidence_required: approved non-secret environment contract}
+readiness: BLOCKED
+human_decisions: [H-001, H-002, H-003, H-004, H-005, H-006, H-007]

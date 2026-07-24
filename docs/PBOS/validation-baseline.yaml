@@ -1,0 +1,61 @@
+schema_version: "1.0"
+gate: PBOS-GATE-001
+observed_at: "2026-07-24"
+source_commit: b33fd695b794954f10b9207ce8d82f9bf3e20914
+validations:
+  lint:
+    command: npm run lint
+    status: FAIL
+    exit_code: 1
+    findings: {total: 402, errors: 311, warnings: 91, file_result_blocks: 144}
+  typescript:
+    command: npx tsc --noEmit
+    status: FAIL
+    exit_code: 2
+    causes: [four empty UI index files are not modules, E2E dependency types unavailable]
+  build:
+    command: npm run build
+    status: FAIL
+    exit_code: 1
+    stage: type_check
+  vitest:
+    command: npm test
+    status: FAIL
+    exit_code: 1
+    passed_files: 97
+    failed_files: 1
+    passed_tests: 431
+    cause: E2E suite import resolution
+  jest: {status: NOT_AVAILABLE, reason: no script configuration or dependency}
+  playwright: {status: BLOCKED, reason: declared packages absent from installed tree and build prerequisite fails}
+  dependencies:
+    command: npm ls --all
+    status: FAIL
+    exit_code: 1
+    missing: ['@axe-core/playwright', '@playwright/test']
+    extraneous_reported: ['@emnapi/core', '@emnapi/runtime', '@emnapi/wasi-threads', '@napi-rs/wasm-runtime', '@tybys/wasm-util']
+  package_lock_dry_run:
+    command: npm install --package-lock-only --ignore-scripts --dry-run
+    status: PASS_LIMITED
+    exit_code: 0
+  security_audit:
+    command: npm audit --json
+    status: BLOCKED_ENVIRONMENT
+    exit_code: 1
+    reason: registry advisory endpoint HTTP 403
+  dead_code: {status: NOT_AVAILABLE, reason: no dedicated configured tool}
+  circular_dependencies: {status: NOT_AVAILABLE, reason: no dedicated configured tool}
+  unused_exports: {status: NOT_AVAILABLE, reason: no dedicated configured tool}
+  unused_dependencies: {status: PARTIAL, reason: npm tree only; no source usage analyzer}
+  missing_dependencies: {status: FAIL, evidence: npm tree and TypeScript import failures}
+  broken_imports: {status: FAIL_PARTIAL, evidence: TypeScript and Vitest failures}
+  duplicate_files: {status: DEGRADED, method: SHA-256 exact tracked-content grouping}
+  database_migrations: {status: INVENTORIED_ONLY, count: 20}
+  supabase_consistency: {status: UNKNOWN, reason: no config target or validation command}
+  documentation_validation: {status: DEGRADED_STATIC_ONLY, docs: 191, empty: 49, under_ten_lines: 60}
+  git_integrity:
+    command: git fsck --full --no-progress
+    status: PASS_LIMITED
+    exit_code: 0
+    limitation: shallow history
+  environment_validation: {status: BLOCKED, reason: no environment contract or env example}

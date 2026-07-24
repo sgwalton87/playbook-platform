@@ -1,0 +1,25 @@
+schema_version: "1.0"
+gate: PBOS-GATE-001
+observed_at: "2026-07-24"
+source_commit: b33fd695b794954f10b9207ce8d82f9bf3e20914
+score:
+  value: null
+  state: NOT_SCORED
+  reason: Canonical rubric, complete topology, security, deployment, and database evidence are unavailable.
+areas:
+  documentation: {status: DEGRADED, evidence: "191 docs; 49 empty; 60 under ten lines; required policy and architecture missing"}
+  architecture: {status: UNKNOWN, evidence: canonical architecture paths are absent}
+  code: {status: DEGRADED, evidence: "eslint reports 311 errors and 91 warnings"}
+  typescript: {status: BLOCKED, evidence: UI barrel non-modules and unavailable E2E types}
+  testing: {status: DEGRADED, evidence: "97 files and 431 tests pass; one suite import fails"}
+  build: {status: BLOCKED, evidence: production build fails during type checking}
+  dependencies: {status: DEGRADED, evidence: npm ls reports missing and extraneous packages}
+  database: {status: UNKNOWN, evidence: 20 migrations exist without config or execution/drift evidence}
+  security: {status: UNKNOWN, evidence: npm audit endpoint returned HTTP 403}
+  performance: {status: UNKNOWN, evidence: no runtime or bundle performance baseline}
+  maintainability: {status: DEGRADED, evidence: lint debt, duplicates, backups, and missing topology tooling}
+  operational_readiness: {status: BLOCKED, evidence: governance incomplete and core validation gates fail}
+defect_packages:
+  critical: [PBOS-BUILD-001]
+  high: [PBOS-GOV-001, PBOS-DOCUMENTATION-001, PBOS-DEPENDENCY-001, PBOS-TS-001, PBOS-TS-002, PBOS-TEST-001, PBOS-E2E-001, PBOS-DATABASE-001, PBOS-ARCHITECTURE-001, PBOS-SECURITY-001, PBOS-ENVIRONMENT-001]
+  medium: [PBOS-LINT-001, PBOS-LINT-002, PBOS-LINT-003, PBOS-CODE-QUALITY-001, PBOS-DUPLICATE-001]
