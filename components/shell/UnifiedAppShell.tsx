@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { shouldUseAppShell } from "@/lib/app-shell";
 import { getNavigationForRole } from "@/lib/core-journey/navigation";
-import { getRoleNavigation } from "@/lib/navigation";
+import { getRoleNavigation, type NavItem } from "@/lib/navigation";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import ProfileAvatar from "@/components/ProfileAvatar";
 import { supabase } from "@/lib/supabaseClient";
@@ -74,278 +74,104 @@ export default function UnifiedAppShell({ children }: { children: React.ReactNod
     profile?.username ||
     "Playbook User";
 
+  const mobileItems = roleNav.items.slice(0, 4);
+  const profileItem: NavItem = { label: "Profile", href: "/profile", icon: "👤" };
+
   return (
     <div
-      style={{
-        ...shell,
-        gridTemplateColumns: open ? "280px 1fr" : "86px 1fr",
-      }}
+      className="playbook-app-shell"
+      style={{ gridTemplateColumns: open ? "var(--pb-sidebar-width) 1fr" : "var(--pb-sidebar-compact) 1fr" }}
     >
-      <aside style={sidebar} data-playbook-sidebar="true">
-        <button
-          onClick={() => setOpen((v) => !v)}
-          style={collapseButton}
-          aria-label="Toggle sidebar"
-        >
-          {open ? "←" : "→"}
+      <aside className="playbook-sidebar" data-playbook-sidebar="true">
+        <button onClick={() => setOpen((v) => !v)} className="playbook-sidebar__toggle" aria-label="Toggle sidebar">
+          {open ? "← Collapse" : "→"}
         </button>
 
-        <Link href={roleNav.home} style={brand}>
+        <Link href={roleNav.home} className="playbook-brand">
           <PlaybookLogo size={open ? 46 : 42} priority />
           {open && (
             <span>
               <strong>Playbook OS</strong>
-              <small style={brandSub}>{roleNav.label}</small>
+              <small>{roleNav.label}</small>
             </span>
           )}
         </Link>
 
-        <Link href="/profile" style={profileCard}>
+        <Link href="/profile" className="playbook-profile-card">
           <ProfileAvatar src={profile?.avatar_url} name={displayName} size={open ? 46 : 42} />
           {open && (
             <span style={{ minWidth: 0 }}>
-              <strong style={profileName}>{displayName}</strong>
-              <small style={roleBadge}>{roleNav.label}</small>
+              <strong className="playbook-profile-name">{displayName}</strong>
+              <small className="playbook-role-badge">{roleNav.label}</small>
             </span>
           )}
         </Link>
 
-        <nav style={nav}>
-          {roleNav.items.map((item) => {
-            const active = pathname === item.href || pathname?.startsWith(item.href + "/");
+        <ShellNav items={roleNav.items} pathname={pathname} compact={!open} />
 
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                style={{
-                  ...navItem,
-                  justifyContent: open ? "flex-start" : "center",
-                  ...(active ? activeNavItem : {}),
-                }}
-              >
-                <span>{item.icon}</span>
-                {open && <span>{item.label}</span>}
-              </Link>
-            );
-          })}
-
-          <button
-            onClick={handleSignOut}
-            style={{
-              ...signOutButton,
-              justifyContent: open ? "flex-start" : "center",
-            }}
-          >
-            <span>↪</span>
-            {open && <span>Sign Out</span>}
-          </button>
-        </nav>
+        <button onClick={handleSignOut} className="playbook-signout" style={{ justifyContent: open ? "flex-start" : "center" }}>
+          <span>↪</span>
+          {open && <span>Sign Out</span>}
+        </button>
 
         {open && founderNav.length > 0 && (
-          <div style={founderSection}>
-            <div style={sectionLabel}>Founder Tools</div>
-
-            <nav style={nav}>
-              {founderNav.map((item) => {
-                const active = pathname === item.href || pathname?.startsWith(item.href + "/");
-
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    style={{
-                      ...navItem,
-                      ...(active ? activeNavItem : {}),
-                    }}
-                  >
-                    <span>{item.icon}</span>
-                    <span>{item.label}</span>
-                  </Link>
-                );
-              })}
-            </nav>
+          <div className="playbook-founder-section">
+            <div className="playbook-section-label">Founder Tools</div>
+            <ShellNav items={founderNav} pathname={pathname} />
           </div>
         )}
       </aside>
 
-      <section style={main}>
-        <header style={topbar}>
-          <button onClick={() => router.back()} style={backButton}>
-            ← Back
-          </button>
-
-          <Link href={roleNav.home} style={menuButton}>
-            {roleNav.label}
+      <section className="playbook-main">
+        <header className="playbook-mobile-header">
+          <Link href={roleNav.home} className="playbook-brand" style={{ marginBottom: 0 }}>
+            <PlaybookLogo size={38} priority />
+            <span><strong>Playbook</strong><small>{roleNav.label}</small></span>
           </Link>
+          <ProfileAvatar src={profile?.avatar_url} name={displayName} size={38} />
+        </header>
+
+        <header className="playbook-topbar">
+          <button onClick={() => router.back()} className="playbook-topbar__back">← Back</button>
+          <Link href={roleNav.home} className="playbook-topbar__mode">{roleNav.label}</Link>
         </header>
 
         {children}
+
+        <nav className="playbook-mobile-bottom-nav" aria-label="Primary mobile navigation">
+          {[...mobileItems, profileItem].map((item) => {
+            const active = pathname === item.href || pathname?.startsWith(item.href + "/");
+            return (
+              <Link key={item.href} href={item.href} data-active={active}>
+                <span aria-hidden="true">{item.icon}</span>
+                <span>{item.label.replace(" Dashboard", "")}</span>
+              </Link>
+            );
+          })}
+        </nav>
       </section>
     </div>
   );
 }
 
-const shell: React.CSSProperties = {
-  minHeight: "100vh",
-  display: "grid",
-  background: "#F8F7F4",
-  transition: "grid-template-columns .2s ease",
-};
-
-const sidebar: React.CSSProperties = {
-  position: "sticky",
-  top: 0,
-  height: "100vh",
-  background: "#0F172A",
-  color: "#FFFFFF",
-  padding: 18,
-  boxSizing: "border-box",
-  overflowY: "auto",
-};
-
-const collapseButton: React.CSSProperties = {
-  width: "100%",
-  border: "1px solid rgba(255,255,255,.12)",
-  background: "rgba(255,255,255,.06)",
-  color: "#F8F7F4",
-  borderRadius: 14,
-  padding: "9px 10px",
-  cursor: "pointer",
-  fontWeight: 950,
-  marginBottom: 14,
-};
-
-const brand: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 10,
-  color: "#FFFFFF",
-  textDecoration: "none",
-  marginBottom: 18,
-};
-
-const brandSub: React.CSSProperties = {
-  display: "block",
-  color: "#F97316",
-  fontSize: 10,
-  fontWeight: 900,
-  textTransform: "uppercase",
-  letterSpacing: ".08em",
-};
-
-const profileCard: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 10,
-  color: "#FFFFFF",
-  textDecoration: "none",
-  background: "rgba(255,255,255,.06)",
-  border: "1px solid rgba(255,255,255,.10)",
-  borderRadius: 18,
-  padding: 10,
-  marginBottom: 18,
-};
-
-const profileName: React.CSSProperties = {
-  display: "block",
-  overflow: "hidden",
-  whiteSpace: "nowrap",
-  textOverflow: "ellipsis",
-};
-
-const roleBadge: React.CSSProperties = {
-  display: "block",
-  color: "rgba(248,247,244,.62)",
-  fontSize: 11,
-  marginTop: 2,
-};
-
-const nav: React.CSSProperties = {
-  display: "grid",
-  gap: 8,
-};
-
-const navItem: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 10,
-  color: "rgba(248,247,244,.78)",
-  textDecoration: "none",
-  borderRadius: 14,
-  padding: "11px 12px",
-  fontWeight: 900,
-};
-
-const activeNavItem: React.CSSProperties = {
-  background: "#F97316",
-  color: "#FFFFFF",
-};
-
-const signOutButton: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 10,
-  width: "100%",
-  background: "#FFFFFF",
-  color: "#0F172A",
-  border: "1px solid rgba(15,23,42,.15)",
-  borderRadius: 999,
-  padding: "10px 14px",
-  fontWeight: 900,
-  cursor: "pointer",
-  marginTop: 8,
-};
-
-const founderSection: React.CSSProperties = {
-  marginTop: 24,
-  paddingTop: 16,
-  borderTop: "1px solid rgba(255,255,255,.12)",
-};
-
-const sectionLabel: React.CSSProperties = {
-  fontSize: 10,
-  fontWeight: 950,
-  color: "rgba(248,247,244,.5)",
-  textTransform: "uppercase",
-  letterSpacing: ".14em",
-  marginBottom: 10,
-};
-
-const main: React.CSSProperties = {
-  minWidth: 0,
-};
-
-const topbar: React.CSSProperties = {
-  minHeight: 68,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  padding: "14px 22px",
-  borderBottom: "1px solid #E2E8F0",
-  background: "rgba(248,247,244,.86)",
-  backdropFilter: "blur(10px)",
-  position: "sticky",
-  top: 0,
-  zIndex: 10,
-};
-
-const backButton: React.CSSProperties = {
-  border: "1px solid #CBD5E1",
-  background: "#FFFFFF",
-  color: "#0F172A",
-  borderRadius: 999,
-  padding: "10px 14px",
-  fontWeight: 900,
-  cursor: "pointer",
-};
-
-const menuButton: React.CSSProperties = {
-  border: "none",
-  background: "#0F172A",
-  color: "#FFFFFF",
-  borderRadius: 999,
-  padding: "10px 16px",
-  fontWeight: 950,
-  textDecoration: "none",
-};
+function ShellNav({ items, pathname, compact = false }: { items: NavItem[]; pathname: string | null; compact?: boolean }) {
+  return (
+    <nav>
+      {items.map((item) => {
+        const active = pathname === item.href || pathname?.startsWith(item.href + "/");
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={`playbook-nav-item${active ? " playbook-nav-item--active" : ""}`}
+            style={{ justifyContent: compact ? "center" : "flex-start" }}
+            title={compact ? item.label : undefined}
+          >
+            <span aria-hidden="true">{item.icon}</span>
+            {!compact && <span>{item.label}</span>}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}

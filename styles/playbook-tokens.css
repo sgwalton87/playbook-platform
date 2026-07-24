@@ -1,0 +1,273 @@
+:root {
+  --pb-navy: #10233f;
+  --pb-navy-dark: #071427;
+  --pb-orange: #f97316;
+  --pb-orange-hover: #ea580c;
+  --pb-cream: #fff7ed;
+  --pb-warm-white: #fffaf4;
+  --pb-white: #ffffff;
+  --pb-slate: #203047;
+  --pb-muted: #64748b;
+  --pb-success: #10b981;
+  --pb-warning: #f59e0b;
+  --pb-error: #dc2626;
+  --pb-info: #2563eb;
+  --pb-border: #e7dccd;
+  --pb-bg: #f8f3ea;
+  --pb-radius-sm: 12px;
+  --pb-radius-md: 18px;
+  --pb-radius-lg: 24px;
+  --pb-radius-xl: 32px;
+  --pb-radius-pill: 999px;
+  --pb-shadow-card: 0 18px 45px rgba(16, 35, 63, .10);
+  --pb-shadow-hero: 0 30px 80px rgba(7, 20, 39, .24);
+  --pb-shadow-soft: 0 10px 28px rgba(16, 35, 63, .08);
+  --pb-space-1: 4px;
+  --pb-space-2: 8px;
+  --pb-space-3: 12px;
+  --pb-space-4: 16px;
+  --pb-space-5: 20px;
+  --pb-space-6: 24px;
+  --pb-space-8: 32px;
+  --pb-space-10: 40px;
+  --pb-text-xs: 12px;
+  --pb-text-sm: 14px;
+  --pb-text-base: 16px;
+  --pb-text-lg: 18px;
+  --pb-text-xl: 22px;
+  --pb-text-2xl: 30px;
+  --pb-text-3xl: clamp(36px, 6vw, 64px);
+  --pb-content-max: 1180px;
+  --pb-sidebar-width: 292px;
+  --pb-sidebar-compact: 88px;
+  --pb-mobile-nav-height: 78px;
+  --pb-font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.playbook-app-shell {
+  min-height: 100vh;
+  display: grid;
+  background:
+    radial-gradient(circle at top left, rgba(249, 115, 22, .12), transparent 32rem),
+    linear-gradient(135deg, var(--pb-bg), #fffaf4 48%, #f1f5f9);
+  transition: grid-template-columns .22s ease;
+}
+
+.playbook-sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  color: var(--pb-white);
+  padding: 18px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(249, 115, 22, .26), transparent 18rem),
+    linear-gradient(180deg, var(--pb-navy), var(--pb-navy-dark));
+  border-right: 1px solid rgba(255, 255, 255, .10);
+  box-shadow: 16px 0 44px rgba(7, 20, 39, .16);
+}
+
+.playbook-sidebar__toggle,
+.playbook-topbar__back,
+.playbook-topbar__mode,
+.playbook-signout {
+  min-height: 42px;
+  border-radius: var(--pb-radius-pill);
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.playbook-sidebar__toggle {
+  width: 100%;
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.08);
+  color: var(--pb-cream);
+  margin-bottom: 14px;
+}
+
+.playbook-brand, .playbook-profile-card, .playbook-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.playbook-brand {
+  margin-bottom: 18px;
+}
+
+.playbook-brand strong { letter-spacing: -.03em; }
+.playbook-brand small, .playbook-section-label {
+  display: block;
+  color: var(--pb-orange);
+  font-size: 10px;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+}
+
+.playbook-profile-card {
+  background: rgba(255,255,255,.09);
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 22px;
+  padding: 10px;
+  margin-bottom: 18px;
+  box-shadow: inset 0 1px rgba(255,255,255,.08);
+}
+
+.playbook-profile-name {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.playbook-role-badge {
+  display: inline-flex;
+  color: rgba(255,247,237,.72);
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.playbook-sidebar nav { display: grid; gap: 8px; }
+.playbook-nav-item {
+  border-radius: 16px;
+  padding: 11px 12px;
+  color: rgba(255,250,244,.80);
+  font-weight: 900;
+  transition: background .16s ease, color .16s ease, transform .16s ease;
+}
+.playbook-nav-item:hover { background: rgba(255,255,255,.10); transform: translateX(2px); }
+.playbook-nav-item--active {
+  background: linear-gradient(135deg, var(--pb-orange), #fb923c);
+  color: var(--pb-white);
+  box-shadow: 0 12px 28px rgba(249, 115, 22, .30);
+}
+.playbook-signout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  border: 1px solid rgba(15,23,42,.15);
+  background: var(--pb-white);
+  color: var(--pb-navy-dark);
+  padding: 10px 14px;
+  margin-top: 10px;
+}
+.playbook-founder-section { margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.12); }
+.playbook-section-label { color: rgba(255,250,244,.56); margin-bottom: 10px; }
+
+.playbook-main { min-width: 0; }
+.playbook-topbar {
+  min-height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 24px;
+  border-bottom: 1px solid rgba(231, 220, 205, .88);
+  background: rgba(255,250,244,.86);
+  backdrop-filter: blur(16px);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.playbook-topbar__back { border: 1px solid var(--pb-border); background: var(--pb-white); color: var(--pb-navy); padding: 10px 14px; }
+.playbook-topbar__mode { background: var(--pb-navy); color: var(--pb-white); padding: 10px 16px; text-decoration: none; }
+.playbook-mobile-header, .playbook-mobile-bottom-nav { display: none; }
+
+.pb-card, .playbook-card {
+  background: rgba(255,255,255,.92);
+  border: 1px solid var(--pb-border);
+  border-radius: var(--pb-radius-lg);
+  box-shadow: var(--pb-shadow-card);
+}
+.pb-button, .playbook-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  border: 0;
+  border-radius: var(--pb-radius-pill);
+  background: var(--pb-orange);
+  color: white;
+  padding: 10px 18px;
+  font-weight: 950;
+  text-decoration: none;
+}
+.pb-button:hover, .playbook-button:hover { background: var(--pb-orange-hover); }
+
+@media (max-width: 900px) {
+  .playbook-app-shell { display: block !important; padding-bottom: calc(var(--pb-mobile-nav-height) + env(safe-area-inset-bottom)); }
+  .playbook-sidebar, .playbook-topbar { display: none; }
+  .playbook-mobile-header {
+    display: flex;
+    position: sticky;
+    top: 0;
+    z-index: 25;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, var(--pb-navy), var(--pb-navy-dark));
+    color: var(--pb-white);
+    box-shadow: var(--pb-shadow-soft);
+  }
+  .playbook-mobile-bottom-nav {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
+    position: fixed;
+    left: 10px;
+    right: 10px;
+    bottom: max(10px, env(safe-area-inset-bottom));
+    z-index: 30;
+    min-height: var(--pb-mobile-nav-height);
+    padding: 8px;
+    border-radius: 24px;
+    background: rgba(7, 20, 39, .95);
+    box-shadow: 0 18px 50px rgba(7, 20, 39, .30);
+  }
+  .playbook-mobile-bottom-nav a {
+    display: grid;
+    place-items: center;
+    gap: 2px;
+    color: rgba(255,250,244,.74);
+    text-decoration: none;
+    border-radius: 16px;
+    font-size: 10px;
+    font-weight: 900;
+  }
+  .playbook-mobile-bottom-nav a[data-active="true"] { background: var(--pb-orange); color: var(--pb-white); }
+}
+.playbook-button--secondary { background: var(--pb-white); color: var(--pb-navy); border: 1px solid var(--pb-border); }
+.playbook-button--ghost { background: transparent; color: var(--pb-navy); border: 1px solid var(--pb-border); }
+.playbook-card { padding: 24px; }
+.playbook-badge { display: inline-flex; align-items: center; border-radius: var(--pb-radius-pill); padding: 6px 10px; font-size: 11px; font-weight: 950; text-transform: uppercase; letter-spacing: .08em; }
+.playbook-badge--orange { background: var(--pb-cream); color: #9a3412; border: 1px solid #fed7aa; }
+.playbook-badge--navy { background: var(--pb-navy); color: white; }
+.playbook-badge--success { background: #ecfdf5; color: #047857; }
+.playbook-badge--warning { background: #fffbeb; color: #b45309; }
+.playbook-badge--error { background: #fef2f2; color: #b91c1c; }
+.playbook-badge--info { background: #eff6ff; color: #1d4ed8; }
+.playbook-progress { height: 12px; background: #f1e7da; border-radius: var(--pb-radius-pill); overflow: hidden; }
+.playbook-progress span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--pb-orange), #fbbf24); }
+.playbook-metric-card { padding: 20px; border: 1px solid var(--pb-border); border-radius: var(--pb-radius-lg); background: var(--pb-white); box-shadow: var(--pb-shadow-card); }
+.playbook-metric-card span, .playbook-metric-card small { display: block; color: var(--pb-muted); font-weight: 850; }
+.playbook-metric-card strong { display: block; color: var(--pb-navy-dark); font-size: 30px; margin: 8px 0 4px; }
+.playbook-page-header { max-width: var(--pb-content-max); margin: 0 auto 20px; display: flex; align-items: end; justify-content: space-between; gap: 18px; }
+.playbook-page-header p { margin: 0 0 8px; color: var(--pb-orange); font-size: 11px; font-weight: 950; text-transform: uppercase; letter-spacing: .14em; }
+.playbook-page-header h1 { margin: 0; color: var(--pb-navy-dark); font-size: clamp(34px, 5vw, 58px); line-height: .95; letter-spacing: -.06em; }
+.playbook-page-header span { display: block; margin-top: 10px; color: var(--pb-muted); font-size: 17px; line-height: 1.55; }
+.playbook-empty-state, .playbook-modal { padding: 28px; border: 1px dashed var(--pb-border); border-radius: var(--pb-radius-xl); background: rgba(255,255,255,.78); text-align: center; }
+.playbook-empty-state div { margin: 0 auto 12px; width: 52px; height: 52px; display: grid; place-items: center; border-radius: 18px; background: var(--pb-cream); color: var(--pb-orange); font-size: 28px; }
+.playbook-skeleton { display: grid; gap: 10px; }
+.playbook-skeleton span { height: 16px; border-radius: 999px; background: linear-gradient(90deg, #f4eadc, #fffaf4, #f4eadc); background-size: 200% 100%; animation: pb-shimmer 1.4s infinite; }
+@keyframes pb-shimmer { to { background-position: -200% 0; } }
+.playbook-tabs { display: inline-flex; padding: 5px; border: 1px solid var(--pb-border); border-radius: var(--pb-radius-pill); background: var(--pb-white); gap: 4px; }
+.playbook-tabs button { border: 0; border-radius: var(--pb-radius-pill); background: transparent; padding: 9px 14px; font-weight: 900; color: var(--pb-muted); }
+.playbook-tabs button[aria-selected="true"] { background: var(--pb-navy); color: white; }
+.playbook-input { min-height: 46px; width: 100%; border: 1px solid var(--pb-border); border-radius: var(--pb-radius-md); background: var(--pb-white); color: var(--pb-slate); padding: 10px 14px; }
+@media (max-width: 700px) { .playbook-page-header { display: block; } .playbook-card { padding: 18px; } }
