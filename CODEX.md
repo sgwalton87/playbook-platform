@@ -255,3 +255,8 @@ Playbook OS values craftsmanship over shortcuts.
 - Commit created with a conventional message.
 - Branch pushed.
 - Pull request opened with summary, testing, and risk notes.
+## Overnight Sprint Standards
+Future overnight sprints must be branch-aware and verification-first. Every sprint must work on exactly one branch, state the branch before coding, run `git branch --show-current` before beginning, run `git log --oneline --decorate -10` before finishing, run `git status` before reporting completion, and never report commits that cannot be verified locally.
+
+A sprint may only report `COMPLETE` when build, TypeScript, lint, and runtime verification evidence are all satisfied. Otherwise report `IMPLEMENTED, NOT YET VERIFIED`. Overnight automation must not open merge-ready PRs automatically; PRs should remain draft/review artifacts until Product Owner approval. Every overnight sprint must update `OVERNIGHT_HANDOFF.md`, `PROJECT_STATUS.md`, `NEXT_SPRINTS.md`, `OVERNIGHT_PROGRESS.md`, and `ENGINEERING_CHANGELOG.md`.
+

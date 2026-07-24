@@ -7,6 +7,7 @@ import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import { supabase } from "@/lib/supabaseClient";
 import { USER_PATHWAYS } from "@/lib/auth";
 import { normalizeRole } from "@/lib/onboarding/pathwayMap";
+import { getPostOnboardingDestination } from "@/lib/tutorial";
 import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 
@@ -116,7 +117,21 @@ function LoginContent() {
         return;
       }
 
-      window.location.href = "/dashboard";
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData.user) {
+        window.location.href = "/login";
+        return;
+      }
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("onboarding_completed,onboarding_data,profile_mode,role")
+        .eq("id", userData.user.id)
+        .maybeSingle();
+
+      window.location.href = profile?.onboarding_completed
+        ? getPostOnboardingDestination(profile)
+        : "/start";
     } finally {
       setLoading(false);
     }

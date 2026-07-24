@@ -4,6 +4,8 @@ export type ConversationKind =
   | "action_thread"
   | "mail_gateway";
 
+export type Conversation = ReturnType<typeof buildConversation>;
+
 export function buildConversation(input: {
   id: string;
   scholarId: string;
@@ -47,71 +49,12 @@ export function buildConversationMessage(input: {
   };
 }
 
-export function getDemoConversations() {
-  return [
-    buildConversation({
-      id: "support-network",
-      scholarId: "scholar-maya",
-      title: "Maya's Support Network",
-      kind: "support_network",
-      participants: ["Scholar", "Family", "Mentor", "Educator"],
-      unreadCount: 3,
-      lastMessage: "I can help gather the FAFSA documents tonight.",
-    }),
-    buildConversation({
-      id: "family",
-      scholarId: "scholar-maya",
-      title: "Family Thread",
-      kind: "direct",
-      participants: ["Scholar", "Family"],
-      unreadCount: 1,
-      lastMessage: "Let's review the college night RSVP.",
-    }),
-    buildConversation({
-      id: "mentor",
-      scholarId: "scholar-maya",
-      title: "Mentor Thread",
-      kind: "direct",
-      participants: ["Scholar", "Mentor"],
-      unreadCount: 0,
-      lastMessage: "Mock interview this weekend works.",
-    }),
-    buildConversation({
-      id: "fafsa-action",
-      scholarId: "scholar-maya",
-      title: "FAFSA Shared Action",
-      kind: "action_thread",
-      participants: ["Scholar", "Family", "Educator"],
-      unreadCount: 2,
-      lastMessage: "Documents uploaded. Can someone verify?",
-    }),
-  ];
+export function getDemoConversations(): Conversation[] {
+  return [];
 }
 
-export function getDemoConversationMessages(conversationId = "support-network") {
-  return [
-    buildConversationMessage({
-      conversationId,
-      senderRole: "family",
-      senderName: "Parent / Guardian",
-      body: "I can help gather the FAFSA documents tonight.",
-      actionId: "fafsa-docs",
-    }),
-    buildConversationMessage({
-      conversationId,
-      senderRole: "mentor",
-      senderName: "Coach Taylor",
-      body: "I can schedule a mock interview this weekend.",
-      actionId: "mock-interview",
-    }),
-    buildConversationMessage({
-      conversationId,
-      senderRole: "educator",
-      senderName: "Ms. Rivera",
-      body: "I verified the Biology evidence.",
-      source: "app",
-    }),
-  ];
+export function getDemoConversationMessages(): ReturnType<typeof buildConversationMessage>[] {
+  return [];
 }
 
 export function attachMessageToSharedAction(input: {
