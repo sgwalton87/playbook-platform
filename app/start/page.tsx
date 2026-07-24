@@ -5,8 +5,8 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import { supabase } from "@/lib/supabaseClient";
-import { getOnboardingSteps, ALL_COLLEGE_OPTIONS, CAREER_OPTIONS, ACTIVITY_OPTIONS, CALIFORNIA_DISTRICTS } from "@/lib/onboarding";
-import { getPathway, normalizeRole } from "@/lib/onboarding/pathwayMap";
+import { ALL_COLLEGE_OPTIONS, CAREER_OPTIONS, ACTIVITY_OPTIONS, CALIFORNIA_DISTRICTS, createInitialOnboardingData, getOnboardingCompletionDestination, getOnboardingSteps, mapOnboardingToProfilePayload, validateOnboardingStep } from "@/lib/onboarding";
+import { normalizeRole } from "@/lib/onboarding/pathwayMap";
 import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
 
 export default function StartPage() {
@@ -78,20 +78,7 @@ function StartContent() {
       setProfile(safeProfile);
       setStepIndex(Number(onboarding.onboarding_step_index || 0));
 
-      setForm({
-        full_name: safeProfile.full_name || "",
-        username: safeProfile.username || "",
-        avatar_url: safeProfile.avatar_url || "",
-        bio: safeProfile.bio || "",
-        school: safeProfile.school || "",
-        grade: safeProfile.grade || "",
-        dream_school: safeProfile.dream_school || "",
-        ideal_profession: safeProfile.ideal_profession || "",
-        top_schools: onboarding.top_schools || Array(10).fill(""),
-        activities: onboarding.activities || Array(8).fill(""),
-        invite_supporters: onboarding.invite_supporters || Array(5).fill(""),
-        ...onboarding,
-      });
+      setForm(createInitialOnboardingData(safeProfile));
 
       const { data: options } = await supabase
         .from("onboarding_options")
@@ -161,14 +148,6 @@ function StartContent() {
       ? nextForm.top_schools.filter(Boolean)
       : [];
 
-    const activities = Array.isArray(nextForm.activities)
-      ? nextForm.activities.filter(Boolean)
-      : [];
-
-    const inviteSupporters = Array.isArray(nextForm.invite_supporters)
-      ? nextForm.invite_supporters.filter(Boolean)
-      : [];
-
     await Promise.all([
       ...topSchools.map((school: string) => saveCustomOption("college", school)),
       saveCustomOption("college", nextForm.dream_school),
@@ -177,33 +156,13 @@ function StartContent() {
       ...(Array.isArray(nextForm.activities) ? nextForm.activities.map((a: string) => saveCustomOption("activity", a)) : []),
     ]);
 
-    const payload = {
-      id: user.id,
+    const payload = mapOnboardingToProfilePayload({
+      userId: user.id,
       role,
-      profile_mode: role,
-      requested_role: role,
-      full_name: nextForm.full_name || null,
-      username: nextForm.username || null,
-      avatar_url: nextForm.avatar_url || null,
-      bio: nextForm.bio || null,
-      school: nextForm.school || null,
-      grade: nextForm.grade || null,
-      dream_school: nextForm.dream_school || null,
-      ideal_profession: nextForm.ideal_profession || null,
-      onboarding_data: {
-        ...nextForm,
-        top_schools: topSchools,
-        activities,
-        invite_supporters: inviteSupporters,
-        onboarding_step_index: nextForm.onboarding_step_index ?? stepIndex,
-      },
-      onboarding_completed: complete,
-      onboarding_completed_at: complete ? new Date().toISOString() : null,
-      public_profile_complete: Boolean(nextForm.full_name && nextForm.username && nextForm.bio),
-      community_safety_agreed: Boolean(nextForm.community_safety_agreed),
-      community_safety_agreed_at: nextForm.community_safety_agreed ? new Date().toISOString() : null,
-      community_safety_policy_version: nextForm.community_safety_agreed ? "playbook-safety-v1" : null,
-    };
+      data: nextForm,
+      stepIndex: Number(nextForm.onboarding_step_index ?? stepIndex),
+      complete,
+    });
 
     await supabase.from("profiles").upsert(payload, { onConflict: "id" });
     setProfile((prev: LegacyValue) => ({ ...prev, ...payload }));
@@ -241,8 +200,9 @@ function StartContent() {
       await sendInvites();
     }
 
-    if (isLast && !form.community_safety_agreed) {
-      alert("Please read and agree to The Playbook Community Safety Agreement before creating your profile.");
+    const validationErrors = validateOnboardingStep(step, form);
+    if (isLast && validationErrors.length > 0) {
+      alert(validationErrors[0]);
       setSaving(false);
       return;
     }
@@ -253,7 +213,7 @@ function StartContent() {
       setCreating(false);
       setCreated(true);
       setTimeout(() => {
-        window.location.href = getPathway(role).osRoute;
+        window.location.href = getOnboardingCompletionDestination(role);
       }, 15000);
       return;
     }

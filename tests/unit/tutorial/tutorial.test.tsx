@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getFirstLoginTutorial, getTutorialProgress } from "@/lib/tutorial";
-import OnboardingTour from "@/components/tutorial/OnboardingTour";
+import FirstLoginTour from "@/components/tutorial/FirstLoginTour";
 
 describe("Tutorial", () => {
   it("returns first login steps", () => {
@@ -12,6 +12,6 @@ describe("Tutorial", () => {
   });
 
   it("component is defined", () => {
-    expect(OnboardingTour).toBeTruthy();
+    expect(FirstLoginTour).toBeTruthy();
   });
 });

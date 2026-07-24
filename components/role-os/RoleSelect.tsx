@@ -66,7 +66,7 @@ export default function RoleSelect() {
       <section style={intro}>
         <div>
           <p style={eyebrow}>Start with your role</p>
-          <h2 style={sectionTitle}>Your onboarding shapes what you see, what you can do, and who you can support.</h2>
+          <h2 style={sectionTitle}>Your role shapes what you see, what you can do, and who you can support.</h2>
         </div>
         <span style={count}>{roleOptions.length} pathways</span>
       </section>

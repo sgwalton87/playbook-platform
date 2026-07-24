@@ -3,7 +3,7 @@
 import { getFirstLoginTutorial, getTutorialProgress } from "@/lib/tutorial";
 import { PlaybookButton, PlaybookCard, PlaybookGrid, PlaybookHero, PlaybookMetric, PlaybookMetrics, PlaybookPage } from "@/components/ui";
 
-export default function OnboardingTour() {
+export default function FirstLoginTour() {
   const steps = getFirstLoginTutorial();
   const progress = getTutorialProgress(["home", "record"]);
 

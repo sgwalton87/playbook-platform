@@ -1,0 +1,1 @@
+export { ROLE_ONBOARDING as COMMUNITY_PARTNER_ONBOARDING } from "./roleConfigs";

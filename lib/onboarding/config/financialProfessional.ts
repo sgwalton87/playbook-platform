@@ -1,0 +1,1 @@
+export { ROLE_ONBOARDING as FINANCIAL_PROFESSIONAL_ONBOARDING } from "./roleConfigs";
