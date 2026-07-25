@@ -1430,3 +1430,12 @@ docs: add canonical Playbook implementation roadmap and engine dependency graph
 
 ## 2026-07-24 23:47
 - **precommit**: feat(pbos): implement Engine Registry (PBOS-011)
+
+## 2026-07-24 23:55
+- **build-pass**: Pre-push tests and build passed.
+
+## 2026-07-25 01:35
+- **precommit**: refactor(pbos): integrate Kernel Lite across core engines
+
+## 2026-07-25 01:35
+- **precommit**: refactor(pbos): integrate Kernel Lite across core engines

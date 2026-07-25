@@ -1,0 +1,40 @@
+{
+  "workflowId": "PBOS-GATE-001",
+  "status": "READY",
+  "steps": [
+    {
+      "id": "STEP-1",
+      "engine": "pbos",
+      "description": "Separate environment-only failures from code failures.",
+      "status": "PENDING",
+      "dependsOn": []
+    },
+    {
+      "id": "STEP-2",
+      "engine": "pbos",
+      "description": "Reduce active-source lint debt in safe, reviewable batches.",
+      "status": "PENDING",
+      "dependsOn": [
+        "STEP-1"
+      ]
+    },
+    {
+      "id": "STEP-3",
+      "engine": "pbos",
+      "description": "Keep production build and targeted smoke tests passing.",
+      "status": "PENDING",
+      "dependsOn": [
+        "STEP-2"
+      ]
+    },
+    {
+      "id": "STEP-4",
+      "engine": "pbos",
+      "description": "Archive validation evidence for release-candidate review.",
+      "status": "PENDING",
+      "dependsOn": [
+        "STEP-3"
+      ]
+    }
+  ]
+}

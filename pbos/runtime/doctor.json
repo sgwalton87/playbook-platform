@@ -1,0 +1,24 @@
+{
+  "status": "HEALTHY",
+  "generatedAt": "2026-07-25T07:28:20.679Z",
+  "checks": [
+    {
+      "id": "filesystem",
+      "name": "Filesystem",
+      "status": "PASS",
+      "message": "Kernel and runtime directories found."
+    },
+    {
+      "id": "registry",
+      "name": "Engine Registry",
+      "status": "PASS",
+      "message": "6 engines registered."
+    },
+    {
+      "id": "runtime",
+      "name": "Runtime Artifacts",
+      "status": "PASS",
+      "message": "All runtime artifacts present."
+    }
+  ]
+}

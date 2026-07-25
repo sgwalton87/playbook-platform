@@ -35,3 +35,9 @@ Alpha 1.0 Complete — Intelligence OS foundation finished.
 **Type:** demo
 
 Demo Mode upgraded into keynote-style investor and district presentation flow.
+
+## 2026-07-25T08:08:06.458Z
+
+**Type:** milestone
+
+PBOS Runtime Engine v1 - Canonical Runtime Lifecycle Operational

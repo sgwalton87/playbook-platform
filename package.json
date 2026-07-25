@@ -36,6 +36,7 @@
     "founder:update": "node scripts/founder/update.mjs",
     "founder:list": "node scripts/founder/list.mjs",
     "pbos:next": "tsx pbos/commands/next.ts",
+    "pbos": "tsx pbos/main.ts",
     "pbos:status": "tsx pbos/commands/status.ts"
   },
   "dependencies": {

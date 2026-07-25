@@ -1,14 +1,10 @@
 export interface BranchInfo {
   name: string;
   current: boolean;
-  classification?: string;
-
   ahead: number;
   behind: number;
-
   latestCommit: string;
   latestCommitSha: string;
-
   changedFiles: string[];
 }
 

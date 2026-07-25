@@ -22,6 +22,7 @@ Playbook SDK
 - app/admin/page.tsx
 - app/albums/page.tsx
 - app/application-workspaces/page.tsx
+- app/athlete-abroad-os/page.tsx
 - app/auth/callback/page.tsx
 - app/badges/page.tsx
 - app/brand-partner-os/page.tsx
@@ -32,6 +33,7 @@ Playbook SDK
 - app/compass/page.tsx
 - app/connections/page.tsx
 - app/courses/[slug]/page.tsx
+- app/courses/athletes-abroad-global-hub/page.tsx
 - app/courses/community-safety-no-bullying/page.tsx
 - app/courses/page.tsx
 - app/dashboard/page.tsx
@@ -61,7 +63,6 @@ Playbook SDK
 - app/messages/page.tsx
 - app/network-intelligence/page.tsx
 - app/notifications/page.tsx
-- app/onboarding/page.tsx
 - app/opportunities/page.tsx
 - app/opportunity-toolkit/page.tsx
 - app/page.tsx
@@ -187,6 +188,8 @@ Playbook SDK
 - tests/unit/network-intelligence/network-intelligence.test.tsx
 - tests/unit/notification-automation/notification-automation.test.ts
 - tests/unit/notifications-v2/notifications-v2.test.tsx
+- tests/unit/onboarding/profile-schema-contract.test.ts
+- tests/unit/onboarding/role-registry.test.ts
 - tests/unit/opportunity-graph/opportunity-graph-card.test.tsx
 - tests/unit/opportunity-graph/opportunity-graph.test.ts
 - tests/unit/opportunity-marketplace/opportunity-marketplace.test.tsx
