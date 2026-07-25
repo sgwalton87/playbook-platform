@@ -44,7 +44,9 @@ This file defines:
 
 When uncertainty exists:
 
-Follow this document.
+Follow the authority order in `docs/DOCUMENTATION/CANONICAL_DOCS.md`, which has the highest documentation authority.
+
+Repository integration is governed by `docs/ENGINEERING/GIT_INTEGRATION_POLICY.md`. Codex must not invent remotes, source branches, destination branches, or merge order.
 
 If this document conflicts with repository documentation, follow the repository documentation.
 
@@ -554,6 +556,8 @@ Architecture Decisions
 ---
 
 # GIT RULES
+
+Before any repository integration action, follow `docs/ENGINEERING/GIT_INTEGRATION_POLICY.md`. The canonical documentation map remains the highest documentation authority, and Codex must not invent remotes, source branches, destination branches, or merge order.
 
 Always verify:
 
