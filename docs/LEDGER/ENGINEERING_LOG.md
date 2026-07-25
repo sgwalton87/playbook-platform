@@ -1442,3 +1442,6 @@ docs: add canonical Playbook implementation roadmap and engine dependency graph
 
 ## 2026-07-25 01:36
 - **precommit**: PBOS-ARCH-002: establish canonical engine registry documentation
+
+## 2026-07-25 01:36
+- **precommit**: PBOS-ARCH-003: define world model v2
