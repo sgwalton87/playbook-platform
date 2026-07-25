@@ -3,7 +3,7 @@ import { getEngineRegistry } from "../registry";
 export function runPBOS() {
   console.log("");
   console.log("===================================");
-  console.log("PBOS ENGINE v0.2");
+  console.log("PBOS ENGINE v0.3");
   console.log("RUN IT!");
   console.log("===================================");
   console.log("");
@@ -15,9 +15,7 @@ export function runPBOS() {
 
   for (const engine of registry) {
     console.log("===================================");
-    console.log(
-      `[${engine.order}] ${engine.name} (${engine.id})`
-    );
+    console.log(`[${engine.order}] ${engine.name}`);
     console.log("===================================");
     console.log("");
 

@@ -1,28 +1,36 @@
-import { writeFileSync } from "node:fs";
 import { runRuntimeValidator } from "../validator";
+import {
+  Artifacts,
+  Logger,
+  Results,
+  Runtime,
+} from "../kernel";
 
 export function runValidator() {
+  const result = runRuntimeValidator();
 
-    const result = runRuntimeValidator();
+  Runtime.save(Artifacts.validation, result);
 
-    writeFileSync(
-        "pbos/runtime/validation.json",
-        JSON.stringify(result, null, 2)
+  Logger.blank();
+  Logger.section("PBOS Runtime Validator");
+
+  for (const check of result.checks) {
+    Logger.info(
+      `${check.name.padEnd(24, ".")} ${check.status}`
     );
+  }
 
-    console.log("");
-    console.log("PBOS Runtime Validator");
-    console.log("----------------------");
+  Logger.blank();
+  Logger.info(`Validation: ${result.status}`);
 
-    for (const check of result.checks) {
-        console.log(
-            `${check.name.padEnd(24, ".")} ${check.status}`
-        );
-    }
+  Logger.blank();
+  Logger.info("Runtime model written:");
+  Logger.info(Artifacts.validation);
 
-    console.log("");
-    console.log(`Validation: ${result.status}`);
-    console.log("");
-    console.log("Runtime model written:");
-    console.log("pbos/runtime/validation.json");
+  return Results.success(
+    "validator",
+    result,
+    Artifacts.validation,
+    "Runtime validation completed."
+  );
 }

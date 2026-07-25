@@ -1,6 +1,11 @@
-import { writeFileSync } from "node:fs";
 import { loadGates } from "../planner/load";
 import { analyzeGates } from "../planner/analyze";
+import {
+  Artifacts,
+  Logger,
+  Results,
+  Runtime,
+} from "../kernel";
 
 export function runPlanner() {
   const gates = loadGates();
@@ -16,28 +21,31 @@ export function runPlanner() {
     blocked: analysis.blocked.map(g => g.id),
   };
 
-  writeFileSync(
-    "pbos/runtime/next-gate.json",
-    JSON.stringify(output, null, 2)
-  );
+  Runtime.save(Artifacts.planning, output);
 
-  console.log("");
-  console.log("PBOS Planning Engine");
-  console.log("--------------------");
+  Logger.blank();
+  Logger.section("PBOS Planning Engine");
 
   if (selected) {
-    console.log(`Selected Gate : ${selected.id}`);
-    console.log(`Title         : ${selected.title}`);
-    console.log(`Priority      : ${selected.priority}`);
+    Logger.keyValue("Selected Gate", selected.id);
+    Logger.keyValue("Title", selected.title);
+    Logger.keyValue("Priority", selected.priority);
   } else {
-    console.log("No eligible gate found.");
+    Logger.info("No eligible gate found.");
   }
 
-  console.log("");
-  console.log(`Eligible : ${analysis.eligible.length}`);
-  console.log(`Blocked  : ${analysis.blocked.length}`);
+  Logger.blank();
+  Logger.keyValue("Eligible", analysis.eligible.length);
+  Logger.keyValue("Blocked", analysis.blocked.length);
 
-  console.log("");
-  console.log("Planning model written to:");
-  console.log("pbos/runtime/next-gate.json");
+  Logger.blank();
+  Logger.info("Planning model written to:");
+  Logger.info(Artifacts.planning);
+
+  return Results.success(
+    "planner",
+    output,
+    Artifacts.planning,
+    "Planning completed."
+  );
 }

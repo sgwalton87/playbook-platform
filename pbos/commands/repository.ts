@@ -1,36 +1,45 @@
-import { writeFileSync } from "node:fs";
 import { analyzeRepository, recommend } from "../repository";
+import {
+  Artifacts,
+  Logger,
+  Results,
+  Runtime,
+} from "../kernel";
 
 export function runRepositoryAnalysis() {
   const model = analyzeRepository();
 
-  writeFileSync(
-    "pbos/runtime/repository.json",
-    JSON.stringify(model, null, 2)
-  );
+  Runtime.save(Artifacts.repository, model);
 
-  console.log("");
-  console.log("PBOS Repository Intelligence");
-  console.log("----------------------------");
-  console.log(`Current Branch : ${model.currentBranch}`);
-  console.log(`Production     : ${model.productionBranch}`);
-  console.log(`Branches Found : ${model.branches.length}`);
+  Logger.blank();
+  Logger.section("PBOS Repository Intelligence");
+
+  Logger.keyValue("Current Branch", model.currentBranch);
+  Logger.keyValue("Production", model.productionBranch);
+  Logger.keyValue("Branches Found", model.branches.length);
 
   const recommendation = recommend(model);
 
   if (recommendation) {
-    console.log(`Recommended    : ${recommendation.branch.name}`);
-    console.log(`Score          : ${recommendation.score}`);
+    Logger.keyValue("Recommended", recommendation.branch.name);
+    Logger.keyValue("Score", recommendation.score);
 
-    console.log("");
-    console.log("Reasons:");
+    Logger.blank();
+    Logger.info("Reasons:");
 
     for (const reason of recommendation.reasons) {
-      console.log(`  • ${reason}`);
+      Logger.info(`  • ${reason}`);
     }
   }
 
-  console.log("");
-  console.log("Repository model written to:");
-  console.log("pbos/runtime/repository.json");
+  Logger.blank();
+  Logger.info("Repository model written to:");
+  Logger.info(Artifacts.repository);
+
+  return Results.success(
+    "repository",
+    model,
+    Artifacts.repository,
+    "Repository analysis completed."
+  );
 }

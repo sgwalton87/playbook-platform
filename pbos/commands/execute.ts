@@ -1,32 +1,54 @@
-import { writeFileSync } from "node:fs";
 import { runExecutionEngine } from "../execution";
 
+import {
+  Artifacts,
+  Logger,
+  Results,
+  Runtime,
+} from "../kernel";
+
 export function runExecute() {
-  console.log("");
-  console.log("PBOS Execution Engine");
-  console.log("---------------------");
+  Logger.blank();
+  Logger.section("PBOS Execution Engine");
 
   const execution = runExecutionEngine();
 
-  console.log("");
-  console.log(
-    `Execution Status.... ${execution.status}`
+  Logger.blank();
+
+  Logger.keyValue(
+    "Execution Status",
+    execution.status
   );
 
-  console.log(
-    `Selected Gate....... ${execution.gate}`
+  Logger.keyValue(
+    "Selected Gate",
+    execution.gate
   );
 
-  console.log(
-    `Tasks............... ${execution.tasks.length}`
+  Logger.keyValue(
+    "Tasks",
+    execution.tasks.length
   );
 
-  writeFileSync(
-    "pbos/runtime/execution.json",
-    JSON.stringify(execution, null, 2)
+  Runtime.save(
+    Artifacts.execution,
+    execution
   );
 
-  console.log("");
-  console.log("Runtime model written:");
-  console.log("pbos/runtime/execution.json");
+  Logger.blank();
+
+  Logger.info(
+    "Runtime model written:"
+  );
+
+  Logger.info(
+    Artifacts.execution
+  );
+
+  return Results.success(
+    "execution",
+    execution,
+    Artifacts.execution,
+    "Execution plan generated."
+  );
 }
