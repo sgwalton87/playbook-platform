@@ -1,3 +1,5 @@
+import type { PlanningDecision } from "../planner/types";
+
 export interface ValidationCheck {
   name: string;
   status: "PASS" | "FAIL";
@@ -5,8 +7,8 @@ export interface ValidationCheck {
 }
 
 export interface ValidationContext {
-  repository: any;
-  planning: any;
+  repository: unknown;
+  planning: PlanningDecision;
 }
 
 export interface ValidationResult {

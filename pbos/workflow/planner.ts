@@ -1,7 +1,8 @@
+import type { ExecutionPlan } from "../execution/types";
 import { WorkflowModel } from "./types";
 
 export function buildWorkflow(
-  execution: any
+  execution: ExecutionPlan
 ): WorkflowModel {
 
   return {

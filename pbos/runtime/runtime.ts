@@ -5,9 +5,10 @@ import {
 } from "./state-manager";
 
 import { runPhase } from "./phase-runner";
-import { RuntimePhase } from "./state";
+import type { EnginePhase } from "../engine";
+import { buildWorld } from "../world";
 
-const PHASES: RuntimePhase[] = [
+const PHASES: EnginePhase[] = [
   "observe",
   "understand",
   "reason",
@@ -19,21 +20,18 @@ const PHASES: RuntimePhase[] = [
 ];
 
 export async function runRuntime() {
-
   let state = loadRuntimeState();
 
   for (const phase of PHASES) {
-
     beginPhase(phase);
 
-    await runPhase(phase, state);
+const world = buildWorld();
 
+    await runPhase(phase, world);
     completePhase(phase);
 
     state = loadRuntimeState();
-
   }
 
   return state;
-
 }

@@ -75,7 +75,7 @@
       "message": "HandbookVerification passed.",
       "remediation": "No remediation required.",
       "handbookReference": "docs/auto_sprint.md#canonical-source-hierarchy",
-      "command": "python scripts/verify-handbook.py"
+      "command": "python3 scripts/verify-handbook.py"
     },
     {
       "id": "PlanningSafeExecutionAdapter",
@@ -103,28 +103,23 @@
     }
   ],
   "blockers": [],
-  "recommendation": "Repository promotion is pending. Resolve promotion blockers before starting another engineering gate: Git remote unavailable, Git credentials unavailable, Pull Request creation unavailable, Release tag creation unavailable.",
-  "duration": 3314,
-  "timestamp": "2026-07-24T04:11:58.555Z",
+  "recommendation": "Complete PBOS-GATE-001, then evaluate PBOS-RLS-001. PBOS-RLS-001 is next because it follows PBOS-GATE-001 in the machine-readable gate sequence without skipping dependencies.",
+  "duration": 427,
+  "timestamp": "2026-07-25T11:47:34.658Z",
   "release": {
-    "currentState": "PROMOTION_PENDING",
-    "previousState": "ENGINEERING_APPROVED",
-    "transitionTimestamp": "2026-07-24T04:11:58.538Z",
-    "transitionReason": "Engineering review remains valid, but repository promotion is pending because the environment cannot complete remote GitHub operations.",
+    "currentState": "PROMOTION_COMPLETE",
+    "previousState": "PROMOTION_PENDING",
+    "transitionTimestamp": "2026-07-25T09:55:41.131Z",
+    "transitionReason": "Repository promotion can complete in this environment.",
     "environment": {
-      "name": "codex",
-      "gitRemoteAvailable": false,
-      "gitCredentialsAvailable": false,
+      "name": "local",
+      "gitRemoteAvailable": true,
+      "gitCredentialsAvailable": true,
       "repositoryWritable": true,
-      "pullRequestPossible": false,
-      "tagCreationPossible": false
+      "pullRequestPossible": true,
+      "tagCreationPossible": true
     },
-    "blockingConditions": [
-      "Git remote unavailable",
-      "Git credentials unavailable",
-      "Pull Request creation unavailable",
-      "Release tag creation unavailable"
-    ]
+    "blockingConditions": []
   }
 }
 ```
@@ -158,7 +153,7 @@
 - PASS: HandbookVerification [info] — HandbookVerification passed.
   - Remediation: No remediation required.
   - Handbook: docs/auto_sprint.md#canonical-source-hierarchy
-  - Command: python scripts/verify-handbook.py
+  - Command: python3 scripts/verify-handbook.py
 - PASS: PlanningSafeExecutionAdapter [info] — Execution adapter remained planning-safe and did not modify application code.
   - Remediation: No remediation required.
   - Handbook: pbos/README.md#architecture
@@ -173,4 +168,4 @@
 - None from planning validation.
 
 ## Recommendation
-Repository promotion is pending. Resolve promotion blockers before starting another engineering gate: Git remote unavailable, Git credentials unavailable, Pull Request creation unavailable, Release tag creation unavailable.
+Complete PBOS-GATE-001, then evaluate PBOS-RLS-001. PBOS-RLS-001 is next because it follows PBOS-GATE-001 in the machine-readable gate sequence without skipping dependencies.

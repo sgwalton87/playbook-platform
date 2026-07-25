@@ -52,10 +52,14 @@ const state: EngineState = {
   },
 };
 
-const gate = (overrides: Partial<GateDefinition> & Pick<GateDefinition, "id" | "priority">): GateDefinition => ({
+const gate = (
+  overrides: Partial<GateDefinition> &
+    Pick<GateDefinition, "id" | "priority">
+): GateDefinition => ({
   title: overrides.id,
   status: "pending",
   dependencies: [],
+  handbook_refs: [], // <-- ADD THIS LINE
   tasks: ["Plan one safe sprint."],
   definition_of_done: ["Report generated."],
   validation: ["docs"],

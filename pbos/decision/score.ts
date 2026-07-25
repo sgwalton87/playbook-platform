@@ -1,6 +1,10 @@
 import { PBOSWorld } from "../world";
 import { DecisionOption } from "./types";
 
+interface SuccessResult {
+  success: boolean;
+}
+
 export function scoreWorld(
   world: PBOSWorld
 ): DecisionOption[] {
@@ -10,7 +14,7 @@ export function scoreWorld(
   // Validation failed
   if (
     world.validation &&
-    (world.validation as any).success === false
+    (world.validation as SuccessResult).success === false
   ) {
     decisions.push({
       id: "fix-validation",
@@ -25,7 +29,7 @@ export function scoreWorld(
   // Doctor failed
   if (
     world.doctor &&
-    (world.doctor as any).success === false
+    (world.doctor as SuccessResult).success === false
   ) {
     decisions.push({
       id: "repair-health",

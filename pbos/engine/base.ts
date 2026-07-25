@@ -1,26 +1,18 @@
-import { PBOSEngine } from "./types";
+import type { PBOSWorld } from "../world";
+import type { EngineResult, EnginePhase, PBOSEngine } from "./types";
 
-export abstract class BaseEngine
-  implements PBOSEngine {
-
+export abstract class BaseEngine implements PBOSEngine {
   abstract id: string;
 
   abstract name: string;
 
-  abstract phase:
-    | "observe"
-    | "understand"
-    | "reason"
-    | "plan"
-    | "validate"
-    | "execute"
-    | "verify"
-    | "learn";
+  abstract phase: EnginePhase;
 
   enabled = true;
 
   dependsOn: string[] = [];
 
-  abstract run(world: any): any;
-
+  abstract run(
+    world: PBOSWorld
+  ): Promise<EngineResult> | EngineResult;
 }

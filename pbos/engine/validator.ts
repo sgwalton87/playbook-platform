@@ -41,7 +41,14 @@ export async function validateGatePlanning(gate: GateDefinition | null, config: 
   results.push(await verifyPromptCompatibility(config));
 
   if (gate?.validation.includes("docs")) {
-    results.push(await runCommand("HandbookVerification", "python", ["scripts/verify-handbook.py"], "docs/auto_sprint.md#canonical-source-hierarchy"));
+    results.push(
+  await runCommand(
+    "HandbookVerification",
+    "python3",
+    ["scripts/verify-handbook.py"],
+    "docs/auto_sprint.md#canonical-source-hierarchy"
+  )
+);
   }
 
   return results;

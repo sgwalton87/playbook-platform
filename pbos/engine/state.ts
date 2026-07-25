@@ -66,12 +66,19 @@ export function updateStateForPlanning(state: EngineState, selectedGate: string 
     lastRun: new Date().toISOString(),
     validationHash,
     resumeToken: createResumeToken(),
-    release: createTransition({
-      previousState: "ENGINEERING_APPROVED",
-      currentState: promotion.state,
-      transitionReason: promotion.reason,
-      environment,
-      blockingConditions: promotion.blockers,
-    }),
+   release:
+  state.release.currentState === promotion.state
+    ? {
+        ...state.release,
+        environment,
+        blockingConditions: promotion.blockers,
+      }
+    : createTransition({
+        previousState: state.release.currentState,
+        currentState: promotion.state,
+        transitionReason: promotion.reason,
+        environment,
+        blockingConditions: promotion.blockers,
+      }),
   };
 }
