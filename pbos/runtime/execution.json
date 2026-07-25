@@ -1,0 +1,10 @@
+{
+  "status": "READY",
+  "gate": "PBOS-GATE-001",
+  "tasks": [
+    "Separate environment-only failures from code failures.",
+    "Reduce active-source lint debt in safe, reviewable batches.",
+    "Keep production build and targeted smoke tests passing.",
+    "Archive validation evidence for release-candidate review."
+  ]
+}

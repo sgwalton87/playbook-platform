@@ -1,6 +1,7 @@
 import { runRepositoryAnalysis } from "./repository";
 import { runPlanner } from "./planner";
 import { runValidator } from "./validator";
+import { runExecute } from "./execute";
 
 export function runPBOS() {
   console.log("");
@@ -28,6 +29,13 @@ export function runPBOS() {
   // Engine 3 — Runtime Validator
   //
   runValidator();
+
+  console.log("");
+
+  //
+  // Engine 4 — Execution Engine
+  //
+  runExecute();
 
   console.log("");
 

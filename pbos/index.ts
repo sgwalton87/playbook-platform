@@ -1,9 +1,8 @@
 import { runRepositoryAnalysis } from "./commands/repository";
-// import { runPlanner } from "./commands/planner";
-// import { runValidator } from "./commands/validator";
 import { runPlanner } from "./commands/planner";
-import { runPBOS } from "./commands/run";
 import { runValidator } from "./commands/validator";
+import { runExecute } from "./commands/execute";
+import { runPBOS } from "./commands/run";
 
 const command = process.argv[2] ?? "run";
 
@@ -13,8 +12,16 @@ switch (command) {
     break;
 
   case "planner":
-  runPlanner();
-  break;
+    runPlanner();
+    break;
+
+  case "validator":
+    runValidator();
+    break;
+
+  case "execute":
+    runExecute();
+    break;
 
   case "validate":
     console.log("Validation command coming soon.");
@@ -24,14 +31,9 @@ switch (command) {
     console.log("Status command coming soon.");
     break;
 
-  // "next" becomes an alias for "run"
   case "run":
-case "next":
-  runPBOS();
-  break;
-
-  case "validator":
-    runValidator();
+  case "next":
+    runPBOS();
     break;
 
   default:
@@ -42,8 +44,8 @@ case "next":
     console.log("Usage:");
     console.log("  npx tsx pbos/index.ts repository");
     console.log("  npx tsx pbos/index.ts planner");
-    console.log("  npx tsx pbos/index.ts validate");
-    console.log("  npx tsx pbos/index.ts status");
+    console.log("  npx tsx pbos/index.ts validator");
+    console.log("  npx tsx pbos/index.ts execute");
     console.log("  npx tsx pbos/index.ts run");
     console.log("");
 }
