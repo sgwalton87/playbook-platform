@@ -1445,3 +1445,6 @@ PBOS Runtime Engine v1 - Canonical Runtime Lifecycle Operational
 
 ## 2026-07-25 01:35
 - **precommit**: refactor(pbos): integrate Kernel Lite across core engines
+
+## 2026-07-25 01:36
+- **precommit**: PBOS-ARCH-002: establish canonical engine registry documentation
