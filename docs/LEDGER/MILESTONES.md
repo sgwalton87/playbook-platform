@@ -1467,3 +1467,10 @@ PBOS Runtime Engine v1 - Canonical Runtime Lifecycle Operational
 
 ## 2026-07-25 05:55
 - **precommit**: PBOS-S2: add repository planner and validator adapters
+
+## 2026-07-25 06:06
+
+- Documentation changed: 12
+
+- Archivist v2 ship cycle completed.
+

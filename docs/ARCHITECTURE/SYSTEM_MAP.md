@@ -63,7 +63,6 @@ Playbook SDK
 - app/messages/page.tsx
 - app/network-intelligence/page.tsx
 - app/notifications/page.tsx
-- app/onboarding/page.tsx
 - app/opportunities/page.tsx
 - app/opportunity-toolkit/page.tsx
 - app/page.tsx

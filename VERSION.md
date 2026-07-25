@@ -1473,3 +1473,10 @@ Stephisha's Founder Case Study is the canonical Demo Mode story.
 
 - Archivist v2 ship cycle completed.
 
+
+## 2026-07-25 06:06
+
+- Documentation changed: 12
+
+- Archivist v2 ship cycle completed.
+

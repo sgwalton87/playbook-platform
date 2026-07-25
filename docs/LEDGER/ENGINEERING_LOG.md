@@ -1461,3 +1461,10 @@ docs: add canonical Playbook implementation roadmap and engine dependency graph
 
 ## 2026-07-25 05:55
 - **precommit**: PBOS-S2: add repository planner and validator adapters
+
+## 2026-07-25 06:06
+
+- Documentation changed: 12
+
+- Archivist v2 ship cycle completed.
+

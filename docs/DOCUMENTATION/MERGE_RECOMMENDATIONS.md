@@ -156,6 +156,17 @@ Confidence: High
 
 Files:
 - docs/AI_ARCHITECTURE.md
+- docs/ARCHITECTURE/COMPONENT_CATALOG.md
+- docs/ARCHITECTURE/CURRENT_ARCHITECTURE.md
+- docs/ARCHITECTURE/DATA_MODEL.md
+- docs/ARCHITECTURE/ENGINE_CATALOG.md
+- docs/ARCHITECTURE/ENGINE_REGISTRY.md
+- docs/ARCHITECTURE/EVENT_CATALOG.md
+- docs/ARCHITECTURE/PBOS_ARCHITECTURE.md
+- docs/ARCHITECTURE/PLAYBOOK_OS_ALPHA_1.md
+- docs/ARCHITECTURE/REPOSITORY_CATALOG.md
+- docs/ARCHITECTURE/SENTINEL_REPORT.md
+- docs/ARCHITECTURE/SYSTEM_MAP.md
 - docs/ARCHITECTURE.md
 - docs/DEPRECATED/ENGINEERING_ARCHITECTURE.md
 - docs/ENGINE_ARCHITECTURE.md
@@ -163,17 +174,6 @@ Files:
 - docs/LEDGER/ARCHITECTURE_HISTORY.md
 - docs/MOBILE_ARCHITECTURE.md
 - docs/PLAYBOOK_ARCHITECTURE.md
-- docs/architecture/COMPONENT_CATALOG.md
-- docs/architecture/CURRENT_ARCHITECTURE.md
-- docs/architecture/DATA_MODEL.md
-- docs/architecture/ENGINE_CATALOG.md
-- docs/architecture/ENGINE_REGISTRY.md
-- docs/architecture/EVENT_CATALOG.md
-- docs/architecture/PBOS_ARCHITECTURE.md
-- docs/architecture/PLAYBOOK_OS_ALPHA_1.md
-- docs/architecture/REPOSITORY_CATALOG.md
-- docs/architecture/SENTINEL_REPORT.md
-- docs/architecture/SYSTEM_MAP.md
 
 ## release
 
