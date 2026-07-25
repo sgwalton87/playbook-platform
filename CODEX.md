@@ -7,7 +7,7 @@ CODEX.md is the governing engineering constitution for Playbook OS. It defines h
 Owned by Playbook OS Engineering. Product, design, data, and AI agent contributors must follow this constitution when working in this repository.
 
 ## Last Updated
-July 23, 2026
+July 24, 2026
 
 ## Related Documents
 - Agent execution rules: [AGENTS.md](./AGENTS.md)
@@ -19,9 +19,10 @@ July 23, 2026
 - Architecture decisions: [docs/DECISIONS.md](./docs/DECISIONS.md)
 - Release process: [docs/RELEASE_PROCESS.md](./docs/RELEASE_PROCESS.md)
 - Auto sprint system: [docs/auto_sprint.md](./docs/auto_sprint.md)
+- Intelligence architecture: [docs/INTELLIGENCE/ARCHITECTURE.md](./docs/INTELLIGENCE/ARCHITECTURE.md)
 
 ## Canonical Handbook Inventory
-The Playbook OS engineering manual consists of 10 canonical documents:
+The Playbook OS engineering manual consists of 11 canonical documents:
 
 1. [CODEX.md](./CODEX.md) — engineering constitution and operating standard.
 2. [AGENTS.md](./AGENTS.md) — AI coding-agent instructions.
@@ -33,6 +34,7 @@ The Playbook OS engineering manual consists of 10 canonical documents:
 8. [docs/DECISIONS.md](./docs/DECISIONS.md) — architecture decision records and principles.
 9. [docs/RELEASE_PROCESS.md](./docs/RELEASE_PROCESS.md) — release lifecycle and production gates.
 10. [docs/auto_sprint.md](./docs/auto_sprint.md) — auto sprint operating system for reliable AI-assisted delivery.
+11. [docs/INTELLIGENCE/ARCHITECTURE.md](./docs/INTELLIGENCE/ARCHITECTURE.md) — constitutional specification for intelligence that interprets the Scholar Record and produces explainable, human-controlled guidance.
 
 ## Mission
 Build the world's premier Operating System for Scholars.
@@ -220,6 +222,11 @@ Playbook UI must be accessible, responsive, and consistent with [docs/UI_DESIGN_
 - Domain engines before page logic: durable business rules belong in `lib/`, not scattered in route components.
 - Reuse before building new components.
 - Document decisions: material tradeoffs belong in [docs/DECISIONS.md](./docs/DECISIONS.md).
+
+## Playbook Intelligence Architecture
+Playbook intelligence transforms the Canonical Student Record—implemented in Playbook terminology as the Scholar Record—into timely, explainable guidance. It exists to answer what a Scholar should do next across educational, professional, financial, and personal-development journeys while strengthening, never replacing, the Scholar's Starting Five and wider support network.
+
+All intelligence engines must consume permission-authorized record data, preserve provenance and uncertainty, separate recommendations from decisions, and return explanations that identify the governing goal, supporting evidence, material gaps, deadline, and available human escalation. AI may draft, rank, summarize, and simulate; Scholars and authorized humans retain control of consequential actions. The canonical engine boundaries, shared contracts, diagrams, implementation stages, and open questions are defined in [docs/INTELLIGENCE/ARCHITECTURE.md](./docs/INTELLIGENCE/ARCHITECTURE.md). Changes to those boundaries require an architecture decision record and constitutional review.
 
 ## Database Principles
 Database changes must be migration-based, reversible in operational practice, and documented in [docs/DATABASE.md](./docs/DATABASE.md). Tables use explicit ownership, timestamps, indexes for high-traffic lookups, and Row Level Security for user data.
