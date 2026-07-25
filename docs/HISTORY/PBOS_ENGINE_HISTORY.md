@@ -70,3 +70,147 @@ July 24, 2026
 - PBOS Engine 3.0.0 ran in planning mode.
 - Selected gate: PBOS-GATE-001.
 - Recommendation: Repository promotion is pending. Resolve promotion blockers before starting another engineering gate: Git remote unavailable, Git credentials unavailable, Pull Request creation unavailable, Release tag creation unavailable.
+---
+
+# 2026-07-24 — PBOS v0.1.0 Repository & Planning Foundation
+
+## Summary
+
+PBOS achieved its first fully orchestrated engineering execution pipeline.
+
+The PBOS kernel now coordinates multiple engines through a single command, establishing the initial operating system architecture for autonomous engineering workflows.
+
+The following commands now execute successfully:
+
+```bash
+npx tsx pbos/index.ts run
+npx tsx pbos/index.ts next
+```
+
+Both commands produce identical deterministic execution results.
+
+---
+
+## Engines Introduced
+
+### PBOS Kernel
+
+Status: ✅ Operational
+
+Responsibilities:
+
+- Central command dispatcher
+- Engine orchestration
+- Runtime sequencing
+
+---
+
+### Repository Intelligence Engine
+
+Status: ✅ Operational
+
+Capabilities:
+
+- Repository analysis
+- Branch discovery
+- Explainable branch scoring
+- Repository recommendation
+- Runtime model generation
+
+Runtime Artifact:
+
+```
+pbos/runtime/repository.json
+```
+
+---
+
+### Planning Engine
+
+Status: ✅ Operational
+
+Capabilities:
+
+- Gate loading
+- Gate analysis
+- Eligibility classification
+- Priority selection
+- Planning model generation
+
+Runtime Artifact:
+
+```
+pbos/runtime/next-gate.json
+```
+
+---
+
+## Runtime Pipeline
+
+```
+PBOS Kernel
+      │
+      ▼
+Repository Intelligence
+      │
+      ▼
+repository.json
+      │
+      ▼
+Planning Engine
+      │
+      ▼
+next-gate.json
+      │
+      ▼
+Run Complete
+```
+
+---
+
+## Runtime Validation
+
+Repository Engine
+
+- PASS
+
+Planning Engine
+
+- PASS
+
+Kernel Orchestration
+
+- PASS
+
+Runtime Artifact Generation
+
+- PASS
+
+---
+
+## Architectural Milestone
+
+This release marks PBOS's transition from independent engineering utilities into an orchestrated engineering operating system.
+
+For the first time:
+
+- multiple engines execute through a single kernel command;
+- runtime artifacts become standardized contracts between engines;
+- engineering decisions are explainable and deterministic;
+- PBOS begins serving as the execution layer for Playbook engineering.
+
+---
+
+## Next Milestone
+
+Target Release:
+
+**PBOS v0.2.0**
+
+Planned additions:
+
+- Validator Engine
+- Dependency resolution
+- Cross-engine validation
+- Execution readiness analysis
+- Engine registry architecture
