@@ -1,0 +1,26 @@
+{
+  "status": "PASS",
+  "selectedGate": "PBOS-GATE-001",
+  "checks": [
+    {
+      "name": "Repository Artifact",
+      "status": "PASS",
+      "message": "repository.json loaded"
+    },
+    {
+      "name": "Planning Artifact",
+      "status": "PASS",
+      "message": "next-gate.json loaded"
+    },
+    {
+      "name": "Selected Gate",
+      "status": "PASS",
+      "message": "PBOS-GATE-001"
+    },
+    {
+      "name": "Planning Eligible",
+      "status": "PASS",
+      "message": "in_progress"
+    }
+  ]
+}

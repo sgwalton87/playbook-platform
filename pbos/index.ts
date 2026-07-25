@@ -3,6 +3,7 @@ import { runRepositoryAnalysis } from "./commands/repository";
 // import { runValidator } from "./commands/validator";
 import { runPlanner } from "./commands/planner";
 import { runPBOS } from "./commands/run";
+import { runValidator } from "./commands/validator";
 
 const command = process.argv[2] ?? "run";
 
@@ -28,6 +29,10 @@ switch (command) {
 case "next":
   runPBOS();
   break;
+
+  case "validator":
+    runValidator();
+    break;
 
   default:
     console.log("");
