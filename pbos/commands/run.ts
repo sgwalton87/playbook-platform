@@ -1,43 +1,30 @@
-import { runRepositoryAnalysis } from "./repository";
-import { runPlanner } from "./planner";
-import { runValidator } from "./validator";
-import { runExecute } from "./execute";
+import { getEngineRegistry } from "../registry";
 
 export function runPBOS() {
   console.log("");
   console.log("===================================");
-  console.log("PBOS ENGINE v0.1");
+  console.log("PBOS ENGINE v0.2");
   console.log("RUN IT!");
   console.log("===================================");
   console.log("");
 
-  //
-  // Engine 1 — Repository Intelligence
-  //
-  runRepositoryAnalysis();
+  const registry = getEngineRegistry();
 
+  console.log(`Engines Loaded : ${registry.length}`);
   console.log("");
 
-  //
-  // Engine 2 — Planning
-  //
-  runPlanner();
+  for (const engine of registry) {
+    console.log("===================================");
+    console.log(
+      `[${engine.order}] ${engine.name} (${engine.id})`
+    );
+    console.log("===================================");
+    console.log("");
 
-  console.log("");
+    engine.run();
 
-  //
-  // Engine 3 — Runtime Validator
-  //
-  runValidator();
-
-  console.log("");
-
-  //
-  // Engine 4 — Execution Engine
-  //
-  runExecute();
-
-  console.log("");
+    console.log("");
+  }
 
   console.log("===================================");
   console.log("PBOS RUN COMPLETE");
