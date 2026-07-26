@@ -1,0 +1,54 @@
+{
+  "version": "1.0.0",
+  "library": "Playbook Platform Specification",
+  "status": "Canonical",
+  "currentVolume": "Volume 0 - Constitution",
+  "articles": [
+    {
+      "id": "ARTICLE-I",
+      "title": "Platform",
+      "documents": [
+        "PPS-000",
+        "PPS-001",
+        "PPS-002"
+      ]
+    },
+    {
+      "id": "ARTICLE-II",
+      "title": "Experience",
+      "documents": [
+        "PPS-003",
+        "PPS-004"
+      ]
+    },
+    {
+      "id": "ARTICLE-III",
+      "title": "Intelligence",
+      "documents": [
+        "PPS-005",
+        "PPS-006"
+      ]
+    },
+    {
+      "id": "ARTICLE-IV",
+      "title": "Governance",
+      "documents": [
+        "PPS-007",
+        "PPS-008",
+        "PPS-009",
+        "PPS-010",
+        "PPS-011",
+        "PPS-012",
+        "PPS-013",
+        "PPS-014"
+      ]
+    },
+    {
+      "id": "ARTICLE-V",
+      "title": "Constitutional Governance",
+      "documents": [
+        "PPS-015"
+      ]
+    }
+  ]
+}

@@ -1468,3 +1468,6 @@ docs: add canonical Playbook implementation roadmap and engine dependency graph
 
 - Archivist v2 ship cycle completed.
 
+
+## 2026-07-25 22:28
+- **precommit**: Archivist v2 ship update

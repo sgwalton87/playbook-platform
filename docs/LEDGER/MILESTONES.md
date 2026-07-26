@@ -1474,3 +1474,6 @@ PBOS Runtime Engine v1 - Canonical Runtime Lifecycle Operational
 
 - Archivist v2 ship cycle completed.
 
+
+## 2026-07-25 22:28
+- **precommit**: Archivist v2 ship update
