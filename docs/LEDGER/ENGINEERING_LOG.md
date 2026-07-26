@@ -1471,3 +1471,9 @@ docs: add canonical Playbook implementation roadmap and engine dependency graph
 
 ## 2026-07-25 22:28
 - **precommit**: Archivist v2 ship update
+
+## 2026-07-25 23:12
+- **build-pass**: Pre-push tests and build passed.
+
+## 2026-07-25 23:43
+- **precommit**: Register canonical PPS constitutional library
