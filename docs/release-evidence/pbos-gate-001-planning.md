@@ -104,8 +104,8 @@
   ],
   "blockers": [],
   "recommendation": "Complete PBOS-GATE-001, then evaluate PBOS-RLS-001. PBOS-RLS-001 is next because it follows PBOS-GATE-001 in the machine-readable gate sequence without skipping dependencies.",
-  "duration": 141,
-  "timestamp": "2026-07-26T07:38:22.271Z",
+  "duration": 508,
+  "timestamp": "2026-07-27T02:45:12.890Z",
   "release": {
     "currentState": "PROMOTION_COMPLETE",
     "previousState": "PROMOTION_PENDING",
