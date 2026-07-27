@@ -6,9 +6,10 @@
 {
   "engineVersion": "3.0.0",
   "executionMode": "planning",
-  "selectedGate": null,
+  "selectedGate": "PBOS-ENGINE-005",
   "completedTasks": [
-    "No eligible gate was selected."
+    "Selected PBOS-ENGINE-005 as the next eligible production-safe sprint.",
+    "Stopped before application code changes because PBOS Engine v3 is still planning-first."
   ],
   "validationResults": [
     {
@@ -23,7 +24,7 @@
       "id": "SingleSprintRule",
       "severity": "info",
       "passed": true,
-      "message": "PBOS is idle with all configured gates complete.",
+      "message": "PBOS has exactly one authorized active sprint.",
       "remediation": "Ensure PBOS has either one active sprint or a fully completed idle state.",
       "handbookReference": "docs/auto_sprint.md#required-output-format"
     },
@@ -68,6 +69,15 @@
       "handbookReference": "pbos/README.md#execution-modes"
     },
     {
+      "id": "HandbookVerification",
+      "severity": "info",
+      "passed": true,
+      "message": "HandbookVerification passed.",
+      "remediation": "No remediation required.",
+      "handbookReference": "docs/auto_sprint.md#canonical-source-hierarchy",
+      "command": "python3 scripts/verify-handbook.py"
+    },
+    {
       "id": "PlanningSafeExecutionAdapter",
       "severity": "info",
       "passed": true,
@@ -93,9 +103,9 @@
     }
   ],
   "blockers": [],
-  "recommendation": "No eligible gate was selected, so PBOS recommends repairing gate dependencies or adding an approved gate.",
-  "duration": 96,
-  "timestamp": "2026-07-27T17:24:01.816Z",
+  "recommendation": "PBOS-ENGINE-005 has no configured next gate.",
+  "duration": 461,
+  "timestamp": "2026-07-27T17:26:46.193Z",
   "release": {
     "currentState": "PROMOTION_COMPLETE",
     "previousState": "PROMOTION_PENDING",
@@ -115,13 +125,14 @@
 ```
 
 ## Completed Tasks
-- No eligible gate was selected.
+- Selected PBOS-ENGINE-005 as the next eligible production-safe sprint.
+- Stopped before application code changes because PBOS Engine v3 is still planning-first.
 
 ## Validation Results
 - PASS: NoSkippedDependencies [info] — No blocked dependency chains were selected.
   - Remediation: Complete prerequisite gates before selecting dependent gates.
   - Handbook: docs/auto_sprint.md#sprint-selection-algorithm
-- PASS: SingleSprintRule [info] — PBOS is idle with all configured gates complete.
+- PASS: SingleSprintRule [info] — PBOS has exactly one authorized active sprint.
   - Remediation: Ensure PBOS has either one active sprint or a fully completed idle state.
   - Handbook: docs/auto_sprint.md#required-output-format
 - PASS: DocumentationRule [info] — Handbook authority paths are configured.
@@ -139,6 +150,10 @@
 - PASS: PromptCompatibility [info] — Active prompt PBOS-ENGINE-EXECUTION is compatible with PBOS Engine 3.0.0.
   - Remediation: No remediation required.
   - Handbook: pbos/README.md#execution-modes
+- PASS: HandbookVerification [info] — HandbookVerification passed.
+  - Remediation: No remediation required.
+  - Handbook: docs/auto_sprint.md#canonical-source-hierarchy
+  - Command: python3 scripts/verify-handbook.py
 - PASS: PlanningSafeExecutionAdapter [info] — Execution adapter remained planning-safe and did not modify application code.
   - Remediation: No remediation required.
   - Handbook: pbos/README.md#architecture
@@ -153,4 +168,4 @@
 - None from planning validation.
 
 ## Recommendation
-No eligible gate was selected, so PBOS recommends repairing gate dependencies or adding an approved gate.
+PBOS-ENGINE-005 has no configured next gate.

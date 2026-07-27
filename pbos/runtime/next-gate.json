@@ -1,6 +1,39 @@
 {
-  "selectedGate": null,
-  "eligible": [],
+  "selectedGate": {
+    "id": "PBOS-ENGINE-005",
+    "title": "Create Governed Codex Execution Pipeline",
+    "status": "in_progress",
+    "priority": 95,
+    "dependencies": [
+      "PBOS-AUDIT-001"
+    ],
+    "handbook_refs": [
+      "pbos/README.md#architecture",
+      "docs/RELEASE_PROCESS.md#testing"
+    ],
+    "tasks": [
+      "Create execution contract schema between PBOS and Codex.",
+      "Define authorized change boundaries.",
+      "Create Codex work package generation.",
+      "Add execution approval validation.",
+      "Preserve rollback and evidence requirements."
+    ],
+    "definition_of_done": [
+      "Execution contracts are versioned.",
+      "Unauthorized execution remains blocked.",
+      "Codex work packages can be generated.",
+      "Validation requirements are attached to every execution request."
+    ],
+    "validation": [
+      "docs",
+      "pbos:test",
+      "pbos:lint"
+    ],
+    "next_gate": null
+  },
+  "eligible": [
+    "PBOS-ENGINE-005"
+  ],
   "blocked": [],
-  "state": "VALID_IDLE"
+  "state": "ACTIVE_SPRINT"
 }

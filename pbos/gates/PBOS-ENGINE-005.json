@@ -1,7 +1,7 @@
 {
   "id": "PBOS-ENGINE-005",
   "title": "Create Governed Codex Execution Pipeline",
-  "status": "proposed",
+  "status": "in_progress",
   "priority": 95,
   "dependencies": [
     "PBOS-AUDIT-001"
