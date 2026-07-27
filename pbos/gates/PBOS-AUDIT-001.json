@@ -1,0 +1,32 @@
+{
+  "id": "PBOS-AUDIT-001",
+  "title": "Certify PBOS Engine v3 Governance Integrity",
+  "status": "in_progress",
+  "priority": 75,
+  "dependencies": [
+    "PBOS-ENGINE-004"
+  ],
+  "handbook_refs": [
+    "docs/RELEASE_PROCESS.md#testing",
+    "pbos/README.md#architecture"
+  ],
+  "tasks": [
+    "Audit lifecycle transition integrity.",
+    "Validate runtime artifact synchronization.",
+    "Verify planner active sprint and valid idle states.",
+    "Review adapter execution safety boundaries.",
+    "Generate PBOS Engine v3 certification report."
+  ],
+  "definition_of_done": [
+    "Certification report exists.",
+    "Lifecycle behavior is verified.",
+    "Known limitations are documented.",
+    "ENGINE-005 readiness recommendation is issued."
+  ],
+  "validation": [
+    "docs",
+    "pbos:test",
+    "pbos:lint"
+  ],
+  "next_gate": "PBOS-ENGINE-005"
+}
