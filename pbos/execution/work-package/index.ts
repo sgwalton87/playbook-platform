@@ -11,3 +11,5 @@ export {
 } from "./validator";
 
 export type { WorkPackageValidationResult } from "./validator";
+
+export type { CodexWorkPackage } from "./types";

@@ -1,10 +1,18 @@
 import type { ExecutionContract } from "../contracts";
+import type { CodexWorkPackage } from "../work-package";
 import type {
   ExecutionAuthorizationRecord,
 } from "./types";
 
+/**
+ * Build an authorization record from contract and work package.
+ *
+ * Layer 6: Creates a new authorization record in PENDING state.
+ * This record is later approved or denied in the authorization decision flow.
+ */
 export function buildExecutionAuthorization(
-  contract: ExecutionContract
+  contract: ExecutionContract,
+  workPackage: CodexWorkPackage
 ): ExecutionAuthorizationRecord {
 
   return {
@@ -13,6 +21,8 @@ export function buildExecutionAuthorization(
     version: "1.0.0",
 
     contractId: contract.id,
+
+    workPackageId: workPackage.id,
 
     gateId: contract.gateId,
 

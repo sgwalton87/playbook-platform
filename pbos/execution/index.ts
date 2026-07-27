@@ -7,6 +7,11 @@ import {
 import {
   generateCodexWorkPackage,
 } from "./work-package";
+import {
+  generateExecutionAuthorization,
+  loadExecutionAuthorizationOrUndefined,
+  validateExecutionAuthorization,
+} from "./authorization";
 import type { ExecutionPlan } from "./types";
 
 export function runExecutionEngine(): ExecutionPlan {
@@ -24,11 +29,11 @@ export function runExecutionEngine(): ExecutionPlan {
     );
 
     // Layer 5: Validate contract before generating work package
-    const validation = validateExecutionContract(
+    const contractValidation = validateExecutionContract(
       contract
     );
 
-    if (!validation.passed) {
+    if (!contractValidation.passed) {
       return {
         status: "BLOCKED",
         gate: plan.gate,
@@ -38,9 +43,36 @@ export function runExecutionEngine(): ExecutionPlan {
 
     // Layer 5: Only generate work package after validation passes
     // This ensures fail-closed behavior if contract is invalid
-    generateCodexWorkPackage(
+    const workPackage = generateCodexWorkPackage(
       contract
     );
+
+    // Layer 6: Generate authorization record
+    // Sets initial status to PENDING; external systems update to AUTHORIZED/DENIED
+    generateExecutionAuthorization(
+      contract,
+      workPackage
+    );
+
+    // Layer 7: Load authorization from runtime artifact
+    // This allows external authorization systems to update status between
+    // generation (Layer 6) and validation (Layer 7)
+    const authorization = loadExecutionAuthorizationOrUndefined();
+
+    // Layer 7: Validate authorization enforcement
+    // Fail closed: only AUTHORIZED status permits execution eligibility
+    // Missing, PENDING, or DENIED authorization blocks execution
+    const authorizationValidation = validateExecutionAuthorization(
+      authorization
+    );
+
+    if (!authorizationValidation.valid) {
+      return {
+        status: "BLOCKED",
+        gate: plan.gate,
+        tasks: [],
+      };
+    }
   }
 
   return {

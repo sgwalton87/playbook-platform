@@ -1,0 +1,105 @@
+import path from "node:path";
+import { Runtime, Artifacts } from "../../kernel";
+import type { ExecutionAuthorizationRecord, AuthorizationStatus } from "./types";
+
+/**
+ * Approve an execution authorization record.
+ *
+ * Layer 7 Enforcement: Updates authorization status to AUTHORIZED.
+ * This simulates an approval decision and is used for testing and
+ * integration with external authorization systems.
+ *
+ * In production, this would be called by an authorization service
+ * after governance review.
+ */
+export function approveExecutionAuthorization(
+  approvedBy: string,
+  approvalReason: string
+): ExecutionAuthorizationRecord {
+  const artifactPath = path.join(
+    process.cwd(),
+    Artifacts.executionAuthorization
+  );
+
+  const authorization = Runtime.load<ExecutionAuthorizationRecord>(
+    artifactPath
+  );
+
+  const approved: ExecutionAuthorizationRecord = {
+    ...authorization,
+    status: "AUTHORIZED",
+    approvedBy,
+    approvalReason,
+    authorizedAt: new Date().toISOString(),
+  };
+
+  Runtime.save(artifactPath, approved);
+
+  return approved;
+}
+
+/**
+ * Deny an execution authorization record.
+ *
+ * Layer 7 Enforcement: Updates authorization status to DENIED.
+ * This documents an approval rejection.
+ */
+export function denyExecutionAuthorization(
+  deniedBy: string,
+  denialReason: string
+): ExecutionAuthorizationRecord {
+  const artifactPath = path.join(
+    process.cwd(),
+    Artifacts.executionAuthorization
+  );
+
+  const authorization = Runtime.load<ExecutionAuthorizationRecord>(
+    artifactPath
+  );
+
+  const denied: ExecutionAuthorizationRecord = {
+    ...authorization,
+    status: "DENIED",
+    approvedBy: deniedBy,
+    approvalReason: denialReason,
+    authorizedAt: new Date().toISOString(),
+  };
+
+  Runtime.save(artifactPath, denied);
+
+  return denied;
+}
+
+/**
+ * Set authorization status explicitly.
+ *
+ * For testing and advanced authorization workflows.
+ */
+export function setAuthorizationStatus(
+  status: AuthorizationStatus,
+  metadata: {
+    approvedBy?: string | null;
+    approvalReason?: string | null;
+  } = {}
+): ExecutionAuthorizationRecord {
+  const artifactPath = path.join(
+    process.cwd(),
+    Artifacts.executionAuthorization
+  );
+
+  const authorization = Runtime.load<ExecutionAuthorizationRecord>(
+    artifactPath
+  );
+
+  const updated: ExecutionAuthorizationRecord = {
+    ...authorization,
+    status,
+    approvedBy: metadata.approvedBy ?? authorization.approvedBy,
+    approvalReason: metadata.approvalReason ?? authorization.approvalReason,
+    authorizedAt: status !== "PENDING" ? (new Date().toISOString()) : null,
+  };
+
+  Runtime.save(artifactPath, updated);
+
+  return updated;
+}

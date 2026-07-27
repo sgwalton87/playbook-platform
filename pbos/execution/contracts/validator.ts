@@ -16,13 +16,6 @@ export function validateExecutionContract(
     };
   }
 
-  if (contract.authorization !== "AUTHORIZED") {
-    return {
-      passed: false,
-      message: "Execution blocked: contract is not authorized.",
-    };
-  }
-
   if (!contract.gateId) {
     return {
       passed: false,
