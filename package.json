@@ -37,7 +37,12 @@
     "founder:list": "node scripts/founder/list.mjs",
     "pbos:next": "tsx pbos/commands/next.ts",
     "pbos": "tsx pbos/main.ts",
-    "pbos:status": "tsx pbos/commands/status.ts"
+    "pbos:status": "tsx pbos/commands/status.ts",
+    "pbos:release": "tsx pbos/commands/release.ts",
+    "pbos:promote": "tsx pbos/commands/promote.ts",
+    "pbos:complete": "tsx pbos/commands/complete.ts",
+    "pbos:activate": "tsx pbos/commands/activate.ts",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@hcaptcha/react-hcaptcha": "^2.0.2",
@@ -56,6 +61,7 @@
     "stripe": "^22.2.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.51.1",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",

@@ -1,9 +1,12 @@
 {
   "id": "PBOS-UI-001",
   "title": "Audit AppShell and design system consistency",
-  "status": "blocked",
+  "status": "complete",
   "priority": 80,
-  "dependencies": ["PBOS-GATE-001", "PBOS-RLS-001"],
+  "dependencies": [
+    "PBOS-GATE-001",
+    "PBOS-RLS-001"
+  ],
   "handbook_refs": [
     "docs/UI_DESIGN_SYSTEM.md#shared-ui-components",
     "docs/ARCHITECTURE.md#role-dashboard-architecture",
@@ -19,6 +22,8 @@
     "Reusable component opportunities are prioritized.",
     "No route-specific component fork is introduced by the audit."
   ],
-  "validation": ["docs"],
+  "validation": [
+    "docs"
+  ],
   "next_gate": "PBOS-QA-001"
 }

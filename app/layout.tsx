@@ -1,6 +1,12 @@
 import { ThemeProvider } from "@/components/ThemeProvider";
 import UnifiedAppShell from "@/components/shell/UnifiedAppShell";
 
+export const metadata = {
+  title: "The Playbook",
+  description:
+    "The operating system for scholars, scholar-athletes, mentors, families, and communities.",
+};
+
 export default function RootLayout({
   children,
 }: {

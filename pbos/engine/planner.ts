@@ -55,7 +55,7 @@ export function selectNextGate(gates: GateDefinition[], config: PbosConfig, stat
     .map((gate) => ({ gate, missingDependencies: gate.dependencies.filter((dependency) => !completed.has(dependency)) }))
     .filter(({ gate, missingDependencies }) => gate.status !== "complete" && missingDependencies.length > 0);
   const eligibleGates = gates
-    .filter((gate) => gate.status !== "complete" && gate.status !== "proposed" && gate.status !== "blocked")
+    .filter((gate) => gate.status !== "complete" && gate.status !== "proposed")
     .filter((gate) => gate.dependencies.every((dependency) => completed.has(dependency)))
     .sort((a, b) => b.priority - a.priority || a.id.localeCompare(b.id));
 

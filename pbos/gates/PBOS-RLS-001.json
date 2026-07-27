@@ -1,9 +1,11 @@
 {
   "id": "PBOS-RLS-001",
   "title": "Validate production RLS and role access",
-  "status": "in_progress",
+  "status": "complete",
   "priority": 90,
-  "dependencies": ["PBOS-GATE-001"],
+  "dependencies": [
+    "PBOS-GATE-001"
+  ],
   "handbook_refs": [
     "docs/DATABASE.md#rls-policies",
     "docs/MASTER_CHECKLIST.md#current-blockers",
@@ -19,6 +21,8 @@
     "Critical policies have evidence.",
     "Service-role usage is reviewed for audited server boundaries."
   ],
-  "validation": ["docs"],
+  "validation": [
+    "docs"
+  ],
   "next_gate": "PBOS-UI-001"
 }

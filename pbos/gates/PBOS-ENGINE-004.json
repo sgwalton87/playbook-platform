@@ -1,9 +1,11 @@
 {
   "id": "PBOS-ENGINE-004",
   "title": "Add controlled implementation adapters",
-  "status": "proposed",
+  "status": "complete",
   "priority": 60,
-  "dependencies": ["PBOS-GATE-001"],
+  "dependencies": [
+    "PBOS-GATE-001"
+  ],
   "handbook_refs": [
     "pbos/README.md#pbos-engine-004",
     "docs/auto_sprint.md#pbos-engine-integration",
@@ -19,6 +21,10 @@
     "Execution authorization rules are test-covered.",
     "No application feature code is modified by the adapter scaffold."
   ],
-  "validation": ["docs", "pbos:lint", "pbos:test"],
+  "validation": [
+    "docs",
+    "pbos:lint",
+    "pbos:test"
+  ],
   "next_gate": null
 }
