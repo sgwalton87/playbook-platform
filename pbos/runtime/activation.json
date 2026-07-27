@@ -1,0 +1,10 @@
+{
+  "gateId": "PBOS-ENGINE-004",
+  "from": "proposed",
+  "to": "in_progress",
+  "reason": "Gate activated after dependency completion review.",
+  "evidence": [
+    "pbos/gates/PBOS-GATE-001.json"
+  ],
+  "timestamp": "2026-07-27T15:12:10.070Z"
+}

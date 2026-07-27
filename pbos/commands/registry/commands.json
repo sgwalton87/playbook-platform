@@ -1,10 +1,56 @@
 [
-  { "name": "next", "description": "Select exactly one eligible gate and generate planning evidence.", "mode": "planning", "status": "active" },
-  { "name": "status", "description": "Report engine health, state, commands, adapters, rules, and gate status.", "mode": "planning", "status": "active" },
-  { "name": "audit", "description": "Reserved future command for repository and handbook audits.", "mode": "audit", "status": "reserved" },
-  { "name": "doctor", "description": "Reserved future command for PBOS health repair recommendations.", "mode": "doctor", "status": "reserved" },
-  { "name": "validate", "description": "Reserved future command for standalone validation adapters.", "mode": "planning", "status": "reserved" },
-  { "name": "recover", "description": "Reserved future command for interrupted execution recovery.", "mode": "doctor", "status": "reserved" },
-  { "name": "release", "description": "Reserved future command for release evidence and readiness orchestration.", "mode": "release", "status": "reserved" },
-  { "name": "ship", "description": "Reserved future command for final ship-mode orchestration.", "mode": "ship", "status": "reserved" }
+  {
+    "name": "next",
+    "description": "Select exactly one eligible gate and generate planning evidence.",
+    "mode": "planning",
+    "status": "active"
+  },
+  {
+    "name": "status",
+    "description": "Report engine health, state, commands, adapters, rules, and gate status.",
+    "mode": "planning",
+    "status": "active"
+  },
+  {
+    "name": "audit",
+    "description": "Reserved future command for repository and handbook audits.",
+    "mode": "audit",
+    "status": "reserved"
+  },
+  {
+    "name": "doctor",
+    "description": "Reserved future command for PBOS health repair recommendations.",
+    "mode": "doctor",
+    "status": "reserved"
+  },
+  {
+    "name": "validate",
+    "description": "Reserved future command for standalone validation adapters.",
+    "mode": "planning",
+    "status": "reserved"
+  },
+  {
+    "name": "recover",
+    "description": "Reserved future command for interrupted execution recovery.",
+    "mode": "doctor",
+    "status": "reserved"
+  },
+  {
+    "name": "release",
+    "description": "Reserved future command for release evidence and readiness orchestration.",
+    "mode": "release",
+    "status": "reserved"
+  },
+  {
+    "name": "ship",
+    "description": "Reserved future command for final ship-mode orchestration.",
+    "mode": "ship",
+    "status": "reserved"
+  },
+  {
+    "name": "promote",
+    "description": "Promote a validated release contract into PBOS lifecycle state.",
+    "mode": "release",
+    "status": "active"
+  }
 ]

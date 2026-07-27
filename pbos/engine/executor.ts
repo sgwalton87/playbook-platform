@@ -5,6 +5,7 @@ import { loadGates, selectNextGate } from "./planner";
 import { createReport, writeReport } from "./reporter";
 import { loadState, saveState, updateStateForPlanning } from "./state";
 import { validateGatePlanning } from "./validator";
+import { refreshPlanningArtifact } from "./planning-refresh";
 import type { ExecutionMode } from "./types";
 
 function parseMode(mode: string | undefined): ExecutionMode {
@@ -39,6 +40,7 @@ export async function runNext(rootDir = process.cwd(), requestedMode?: string): 
   const allValidationResults = [...validationResults, ...adapterValidationResults];
   const blockers = allValidationResults.filter((result) => !result.passed).map((result) => result.id);
   const nextState = updateStateForPlanning(state, plan.selectedGate?.id ?? null, blockers);
+  await refreshPlanningArtifact(rootDir);
   await saveState(config, nextState, rootDir);
   const report = createReport({ config, mode, selectedGate: plan.selectedGate, validationResults: allValidationResults, duration: Date.now() - startedAt, release: nextState.release });
   await writeReport(report, config, rootDir);

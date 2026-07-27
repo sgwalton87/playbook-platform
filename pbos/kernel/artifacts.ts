@@ -12,6 +12,7 @@ export const Artifacts = {
   workflow: "pbos/runtime/workflow.json",
   doctor: "pbos/runtime/doctor.json",
   manifest: "pbos/runtime/manifest.json",
+  promotion: "pbos/runtime/promotion.json",
 } as const;
 
 export type ArtifactName = keyof typeof Artifacts;

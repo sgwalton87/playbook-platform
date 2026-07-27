@@ -2,6 +2,7 @@
 
 import path from "node:path";
 import { transitionGate } from "../lifecycle";
+import { refreshPlanningArtifact } from "../engine/planning-refresh";
 import fs from "node:fs";
 
 async function main() {
@@ -83,6 +84,9 @@ async function main() {
   console.log(`Transition: ${result.from} → ${result.to}`);
   console.log(`Reason: ${result.reason}`);
   console.log("");
+  await refreshPlanningArtifact(root);
+
+  console.log("Planning artifact refreshed.");
   console.log("Completion artifact generated.");
 
 }
