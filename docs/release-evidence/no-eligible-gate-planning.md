@@ -94,8 +94,8 @@
   ],
   "blockers": [],
   "recommendation": "No eligible gate was selected, so PBOS recommends repairing gate dependencies or adding an approved gate.",
-  "duration": 131,
-  "timestamp": "2026-07-27T17:00:07.218Z",
+  "duration": 105,
+  "timestamp": "2026-07-27T17:01:24.647Z",
   "release": {
     "currentState": "PROMOTION_COMPLETE",
     "previousState": "PROMOTION_PENDING",

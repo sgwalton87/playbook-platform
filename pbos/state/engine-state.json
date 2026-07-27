@@ -4,7 +4,7 @@
   "failedGates": [],
   "blockedGates": [],
   "blockedBy": [],
-  "lastRun": "2026-07-27T17:00:07.212Z",
+  "lastRun": "2026-07-27T17:01:24.632Z",
   "handbookVersion": "2026-07-24",
   "validationHash": "c66c4031f18056b0c99df2bfb7c8eb4ea9f9c214b3dd7f8ce3fb035209aba91d",
   "configurationHash": null,
@@ -16,7 +16,7 @@
     "ship"
   ],
   "engineVersion": "3.0.0",
-  "resumeToken": "ebcfd29fe62f2f8a69aaefae",
+  "resumeToken": "2238b1a2f22fa8a45fa8172e",
   "executionMode": "planning",
   "release": {
     "currentState": "PROMOTION_COMPLETE",
