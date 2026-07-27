@@ -1,0 +1,3 @@
+import { digestValue } from "../context";
+import type { AcademicAdvisor, AdvisorDraft } from "./contracts";
+export function createAcademicAdvisors(drafts: AdvisorDraft[], studentIdentity: string): AcademicAdvisor[] { return drafts.map((draft) => { const body = { ...draft, permissions: [...draft.permissions].sort(), relationshipEvidenceReferences: [...draft.relationshipEvidenceReferences].sort(), studentIdentity, accessAuthorized: true as const, decisionAuthority: false as const }; return { advisorRecordId: `PBOS-ACAD-ADV-${digestValue(body).slice(0, 16).toUpperCase()}`, ...body }; }).sort((a, b) => a.advisorRecordId.localeCompare(b.advisorRecordId)); }

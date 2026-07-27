@@ -13,7 +13,8 @@ depends_on:
   - PPS-2004
 related:
   - PPS-2000
-last_updated: 2026-07-25
+  - PPS-2003
+last_updated: 2026-07-26
 ---
 
 # Purpose
@@ -237,4 +238,3 @@ Future generations may extend this Constitution through the approved amendment p
 - PPS-2000 Constitutional Evolution and Future Systems
 - PPS-2004 Artificial Intelligence Evolution Architecture
 - PPS-2008 Constitutional Review Architecture
-

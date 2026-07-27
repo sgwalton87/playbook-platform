@@ -1,0 +1,1 @@
+export { validateCommunicationInput } from "./validation";

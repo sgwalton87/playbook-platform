@@ -1,0 +1,3 @@
+import type { AthleticGovernanceAction } from "./contracts";
+const routes: Record<AthleticGovernanceAction, string> = { "recruiting-decision": "team-recruiting-authority", contract: "athlete-and-contracting-organization", representation: "athlete-and-verified-representative", "eligibility-decision": "eligibility-authority", "team-selection": "team-selection-authority", admissions: "institutional-admissions-authority", "employment-decision": "employer-authority" };
+export const routeAthleticGovernance = (actions: AthleticGovernanceAction[]): string[] => [...new Set(actions.map((action) => routes[action]))].sort();

@@ -1,0 +1,6 @@
+import { digestValue } from "../context";
+import { createAssumptions } from "./assumptions";
+import type { ScenarioDraft, SimulationProvenance, SimulationScenario } from "./contracts";
+import { createOutcomes } from "./outcomes";
+import { createPathways } from "./pathways";
+export function createScenario(question: string, draft: ScenarioDraft, provenance: SimulationProvenance): SimulationScenario { const assumptions = createAssumptions(draft.assumptions); const pathways = createPathways(draft.pathways); const identity = digestValue({ question, description: draft.description, supportingEvidence: [...draft.supportingEvidence].sort() }).slice(0, 16).toUpperCase(); const scenarioId = `PBOS-SIM-SCN-${identity}`; const possibleOutcomes = createOutcomes(scenarioId, draft.outcomes, assumptions); return { scenarioId, scenarioDescription: draft.description, originatingQuestion: question, supportingEvidence: [...draft.supportingEvidence].sort(), assumptions, constraints: [...draft.constraints].sort(), variables: [...draft.variables].sort(), possibleOutcomes, pathways, risks: [...draft.risks].sort(), limitations: [...draft.limitations].sort(), confidenceClassification: draft.supportingEvidence.length > 2 ? "HIGH" : "MEDIUM", disclaimer: "This scenario represents a possible future state and is not a prediction.", provenance }; }

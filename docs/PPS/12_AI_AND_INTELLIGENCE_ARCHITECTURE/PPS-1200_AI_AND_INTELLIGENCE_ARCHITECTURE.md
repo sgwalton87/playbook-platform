@@ -22,7 +22,8 @@ related:
   - PPS-1207
   - PPS-1208
   - PPS-1209
-last_updated: 2026-07-25
+  - PPS-2003
+last_updated: 2026-07-26
 ---
 
 # Purpose
@@ -94,4 +95,3 @@ Every intelligence capability operates within constitutional governance while pr
 
 - PPS-902 Canonical Scholar Record
 - PPS-1100 Security and Trust Architecture
-

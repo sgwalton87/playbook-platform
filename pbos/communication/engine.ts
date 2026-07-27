@@ -1,0 +1,17 @@
+import { digestValue } from "../context";
+import type { CommunicationInput, CommunicationReport, MessageRecord, NotificationRecord, ReminderRecord, CommunicationWorkflow } from "./contracts";
+import { validateCommunicationInput } from "./validation";
+
+const id = (prefix: string, value: unknown): string => `${prefix}-${digestValue(value).slice(0, 16).toUpperCase()}`;
+export function createCommunicationReport(input: CommunicationInput): CommunicationReport {
+  const context = validateCommunicationInput(input);
+  const messages: MessageRecord[] = input.messageDrafts.map((draft) => { const sender = input.participants.find(({ personIdentity }) => personIdentity === draft.senderIdentity)!; const recipient = input.participants.find(({ personIdentity }) => personIdentity === draft.recipientIdentity)!; const evidenceReferences = [...draft.evidenceReferences].sort(); const body = { ...draft, evidenceReferences, permissions: ["CONNECT", "SHARE"] as Array<"CONNECT" | "SHARE">, state: "AUTHORIZED" as const, provenance: { runtimeContextDigest: context.contextDigest, senderRoleId: sender.roleId, recipientRoleId: recipient.roleId, consentId: draft.consentId, relationshipId: draft.relationshipId, evidenceReferences } }; return { messageId: id("PBOS-COMM-MSG", body), ...body }; }).sort((a, b) => a.messageId.localeCompare(b.messageId));
+  const notifications: NotificationRecord[] = input.notificationDrafts.map((draft) => { const body = { ...draft, evidenceReferences: [...draft.evidenceReferences].sort(), provenance: [...draft.evidenceReferences, draft.sourceReference].sort() }; return { notificationId: id("PBOS-COMM-NOTICE", body), ...body }; }).sort((a, b) => a.notificationId.localeCompare(b.notificationId));
+  const reminders: ReminderRecord[] = input.reminderDrafts.map((draft) => ({ reminderId: id("PBOS-COMM-REMINDER", draft), ...draft, evidenceReferences: [...draft.evidenceReferences].sort() })).sort((a, b) => a.reminderId.localeCompare(b.reminderId));
+  const workflows: CommunicationWorkflow[] = input.workflowDrafts.map((draft) => ({ workflowId: id("PBOS-COMM-WORKFLOW", draft), ...draft, evidenceReferences: [...draft.evidenceReferences].sort(), authorized: true as const })).sort((a, b) => a.workflowId.localeCompare(b.workflowId));
+  const participants = [...input.participants].sort((a, b) => a.personIdentity.localeCompare(b.personIdentity)); const consentRecords = [...input.consents].sort((a, b) => a.consentId.localeCompare(b.consentId));
+  const relationshipIds = [...new Set([...messages.map(({ relationshipId }) => relationshipId), ...workflows.map(({ relationshipId }) => relationshipId)])].sort();
+  const evidenceBundle = [...new Set([...messages.flatMap(({ evidenceReferences }) => evidenceReferences), ...notifications.flatMap(({ evidenceReferences }) => evidenceReferences), ...reminders.flatMap(({ evidenceReferences }) => evidenceReferences), ...workflows.flatMap(({ evidenceReferences }) => evidenceReferences), ...consentRecords.flatMap(({ evidenceReferences }) => evidenceReferences)])].sort();
+  const body = { generatedAt: input.generatedAt, runtimeContextDigest: context.contextDigest, participants, messages, consentRecords, relationshipIds, notifications, reminders, workflows, evidenceBundle, limitations: ["Communication is private, purpose-specific, consent-based, and limited to verified relationships.", "PBOS delivers authorized communication but does not impersonate people, manipulate behavior, or replace human judgment."] };
+  return { reportId: id("PBOS-COMM-REPORT", body), ...body };
+}

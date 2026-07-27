@@ -1,6 +1,6 @@
 ---
 id: PPS-2010
-title: Letter From The Founder: The Story Behind The Playbook
+title: "Letter From The Founder: The Story Behind The Playbook"
 version: 1.0.0
 status: Canonical
 classification: Foundational Declaration
@@ -384,4 +384,3 @@ With gratitude,
 
 Founder  
 Playbook Platform
-

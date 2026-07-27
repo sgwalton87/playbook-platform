@@ -1,0 +1,3 @@
+import { digestValue } from "../context";
+import type { EcosystemEntity, EcosystemProvenance, EntityDraft } from "./contracts";
+export function createEntities(drafts: EntityDraft[], provenance: EcosystemProvenance): EcosystemEntity[] { return drafts.map((draft) => { const body = { ...draft, evidenceReferences: [...draft.evidenceReferences].sort(), permissions: [...draft.permissions].sort(), limitations: [...draft.limitations].sort(), provenance: { ...provenance, sourceReferences: [draft.sourceReference], evidenceReferences: [...draft.evidenceReferences].sort() } }; return { entityId: `PBOS-ECO-ENT-${digestValue(body).slice(0, 16).toUpperCase()}`, ...body }; }).sort((a, b) => a.entityId.localeCompare(b.entityId)); }

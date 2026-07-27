@@ -21,7 +21,8 @@ related:
   - PPS-907
   - PPS-908
   - PPS-909
-last_updated: 2026-07-25
+  - PPS-2003
+last_updated: 2026-07-26
 ---
 
 # Purpose
@@ -168,4 +169,3 @@ Future versions may introduce semantic models, graph representations, distribute
 
 - PPS-700 PBOS Runtime
 - PPS-708 State Management Runtime
-

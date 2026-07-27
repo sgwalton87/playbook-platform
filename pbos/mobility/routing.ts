@@ -1,0 +1,2 @@
+import type { MobilityCategory } from "./contracts";
+export function routeMobilityGovernance(category: MobilityCategory): string[] { const route = category === "ACADEMIC_TRANSITION" ? "HUMAN_ADMISSIONS_AUTHORITY" : category === "ATHLETIC_TRANSITION" ? "HUMAN_RECRUITING_AUTHORITY" : category === "CAREER_TRANSITION" ? "HUMAN_EMPLOYMENT_AUTHORITY" : category === "INTERNATIONAL_TRANSITION" ? "QUALIFIED_LEGAL_OR_IMMIGRATION_PROFESSIONAL" : "PERSON_CONTROLLED_TRANSITION_REVIEW"; return [route, "PRIVACY_CONSENT_AND_EVIDENCE_REVIEW"]; }

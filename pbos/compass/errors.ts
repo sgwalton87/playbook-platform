@@ -1,0 +1,1 @@
+import type{CompassFailure,CompassFailureCode}from"./contracts"; export class CompassError extends Error{constructor(public readonly failures:CompassFailure[]){super(failures.map(x=>`${x.code}: ${x.message}`).join("; "));this.name="CompassError"}} export const compassFailure=(code:CompassFailureCode,message:string):CompassFailure=>({code,message});

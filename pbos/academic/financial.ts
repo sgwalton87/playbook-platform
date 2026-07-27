@@ -1,0 +1,3 @@
+import { digestValue } from "../context";
+import type { FinancialMilestoneDraft, FinancialReadinessMilestone } from "./contracts";
+export function createFinancialReadiness(drafts: FinancialMilestoneDraft[]): FinancialReadinessMilestone[] { return drafts.map((draft) => { const body = { ...draft, evidenceReferences: [...draft.evidenceReferences].sort(), informationalOnly: true as const, aidOutcomeGuaranteed: false as const, financialAdviceProvided: false as const }; return { milestoneId: `PBOS-ACAD-FIN-${digestValue(body).slice(0, 16).toUpperCase()}`, ...body }; }).sort((a, b) => a.milestoneId.localeCompare(b.milestoneId)); }

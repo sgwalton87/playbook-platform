@@ -1,0 +1,3 @@
+import { digestValue } from "../context";
+import type { Organization, OrganizationDraft, OpportunityProvenance } from "./contracts";
+export function createOrganizations(drafts: OrganizationDraft[], provenance: OpportunityProvenance): Organization[] { return drafts.map((draft) => { const body = { ...draft, authority: [...draft.authority].sort(), contactInformation: [...draft.contactInformation].sort(), evidenceReferences: [...draft.evidenceReferences].sort(), provenance: { ...provenance, sourceReferences: [draft.sourceReference], evidenceReferences: [...draft.evidenceReferences].sort() } }; return { organizationId: `PBOS-OPP-ORG-${digestValue(body).slice(0, 16).toUpperCase()}`, ...body }; }).sort((a, b) => a.organizationId.localeCompare(b.organizationId)); }

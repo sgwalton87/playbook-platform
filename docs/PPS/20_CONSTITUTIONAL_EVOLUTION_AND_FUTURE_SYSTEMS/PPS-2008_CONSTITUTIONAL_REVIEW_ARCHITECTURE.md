@@ -13,7 +13,8 @@ depends_on:
   - PPS-2007
 related:
   - PPS-2009
-last_updated: 2026-07-25
+  - PPS-2003
+last_updated: 2026-07-26
 ---
 
 # Purpose
@@ -250,4 +251,3 @@ Future versions may include:
 - PPS-2000 Constitutional Evolution and Future Systems
 - PPS-2001 Amendment and Change Management Architecture
 - PPS-2007 Long-Term Stewardship Architecture
-

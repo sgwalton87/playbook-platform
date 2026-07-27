@@ -1,9 +1,9 @@
 {
-  "version": "2.0.0",
+  "version": "2.0.1",
   "library": "Playbook Platform Specification",
   "status": "Canonical",
   "currentVolume": "Volume 20 - Constitutional Evolution & Future Systems",
-  "statusDescription": "Complete 20-volume constitutional specification library",
+  "statusDescription": "Canonical volume registry; Volume 03 recovery remains pending",
   "volumes": [
     {
       "volume": 0,
@@ -58,38 +58,38 @@
     },
     {
       "volume": 10,
-      "title": "Intelligence Architecture",
-      "path": "10_INTELLIGENCE_ARCHITECTURE"
+      "title": "Integration Architecture",
+      "path": "10_INTEGRATION_ARCHITECTURE"
     },
     {
       "volume": 11,
-      "title": "Experience Intelligence",
-      "path": "11_EXPERIENCE_INTELLIGENCE"
+      "title": "Security and Trust Architecture",
+      "path": "11_SECURITY_AND_TRUST"
     },
     {
       "volume": 12,
-      "title": "AI Systems Architecture",
-      "path": "12_AI_SYSTEMS_ARCHITECTURE"
+      "title": "AI and Intelligence Architecture",
+      "path": "12_AI_AND_INTELLIGENCE_ARCHITECTURE"
     },
     {
       "volume": 13,
-      "title": "Security Architecture",
-      "path": "13_SECURITY_ARCHITECTURE"
+      "title": "Experience and UX Architecture",
+      "path": "13_EXPERIENCE_AND_UX_ARCHITECTURE"
     },
     {
       "volume": 14,
-      "title": "Learning Architecture",
-      "path": "14_LEARNING_ARCHITECTURE"
+      "title": "Learning and Curriculum Architecture",
+      "path": "14_LEARNING_AND_CURRICULUM_ARCHITECTURE"
     },
     {
       "volume": 15,
-      "title": "Community Architecture",
-      "path": "15_COMMUNITY_ARCHITECTURE"
+      "title": "Community and Social Architecture",
+      "path": "15_COMMUNITY_AND_SOCIAL_ARCHITECTURE"
     },
     {
       "volume": 16,
-      "title": "Opportunity Architecture",
-      "path": "16_OPPORTUNITY_ARCHITECTURE"
+      "title": "Opportunity and Ecosystem Architecture",
+      "path": "16_OPPORTUNITY_AND_ECOSYSTEM_ARCHITECTURE"
     },
     {
       "volume": 17,

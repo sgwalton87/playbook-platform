@@ -1,0 +1,46 @@
+{
+  "manifest_id": "PBOS-CONST-002",
+  "status": "governance_decision_required",
+  "authority": "evidence_record_only",
+  "generated_on": "2026-07-26",
+  "volume": {
+    "number": 3,
+    "indexed_title": "Platform Architecture",
+    "indexed_path": "docs/PPS/03_PLATFORM_ARCHITECTURE",
+    "historical_taxonomy_conflict": "Volume 3 — Features",
+    "artifact_found": false,
+    "restored": false
+  },
+  "search_result": {
+    "tracked_candidate_count": 0,
+    "historical_canonical_candidate_count": 0,
+    "rename_or_supersession_record_count": 0,
+    "existing_equivalent_authority_count": 0,
+    "non_candidate_name_matches": [
+      "docs/PPS/00_CONSTITUTION/PPS-003_EXPERIENCE_PRINCIPLES.md",
+      "docs/HISTORY/FOUNDERS_JOURNAL/Volume_3_Building_the_OS.md"
+    ]
+  },
+  "dependency_impact": {
+    "repository_unresolved_before": 42,
+    "volume_03_edges": 32,
+    "resolved_by_recovery": 0,
+    "repository_unresolved_after": 42
+  },
+  "identifiers": [
+    {"id": "PPS-300", "dependency_edges": 3, "related_edges": 0, "disposition": "GOVERNANCE_DECISION_REQUIRED"},
+    {"id": "PPS-301", "dependency_edges": 10, "related_edges": 0, "disposition": "GOVERNANCE_DECISION_REQUIRED"},
+    {"id": "PPS-302", "dependency_edges": 3, "related_edges": 0, "disposition": "GOVERNANCE_DECISION_REQUIRED"},
+    {"id": "PPS-303", "dependency_edges": 4, "related_edges": 0, "disposition": "GOVERNANCE_DECISION_REQUIRED"},
+    {"id": "PPS-304", "dependency_edges": 3, "related_edges": 0, "disposition": "GOVERNANCE_DECISION_REQUIRED"},
+    {"id": "PPS-305", "dependency_edges": 5, "related_edges": 0, "disposition": "GOVERNANCE_DECISION_REQUIRED"},
+    {"id": "PPS-306", "dependency_edges": 0, "related_edges": 0, "disposition": "INSUFFICIENT_EVIDENCE"},
+    {"id": "PPS-307", "dependency_edges": 4, "related_edges": 0, "disposition": "GOVERNANCE_DECISION_REQUIRED"}
+  ],
+  "prohibitions": [
+    "Do not treat PPS-003 as Volume 03.",
+    "Do not restore or redirect without affirmative authority.",
+    "Do not remove dependency edges to reduce verifier findings.",
+    "Do not present newly authored content as recovered history."
+  ]
+}

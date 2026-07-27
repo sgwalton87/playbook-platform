@@ -37,7 +37,8 @@
     "founder:list": "node scripts/founder/list.mjs",
     "pbos:next": "tsx pbos/commands/next.ts",
     "pbos": "tsx pbos/main.ts",
-    "pbos:status": "tsx pbos/commands/status.ts"
+    "pbos:status": "tsx pbos/commands/status.ts",
+    "pbos:constitution:verify": "python3 scripts/verify-pps-constitution.py"
   },
   "dependencies": {
     "@hcaptcha/react-hcaptcha": "^2.0.2",

@@ -1,0 +1,3 @@
+import { digestValue } from "../context";
+import type { AssumptionDraft, SimulationAssumption } from "./contracts";
+export function createAssumptions(drafts: AssumptionDraft[]): SimulationAssumption[] { return drafts.map((draft) => ({ assumptionId: `PBOS-SIM-ASM-${digestValue({ ...draft, sourceEvidence: [...draft.sourceEvidence].sort(), limitations: [...draft.limitations].sort() }).slice(0, 16).toUpperCase()}`, ...draft, sourceEvidence: [...draft.sourceEvidence].sort(), limitations: [...draft.limitations].sort(), artifactType: "ASSUMPTION_NOT_FACT" as const })).sort((a, b) => a.assumptionId.localeCompare(b.assumptionId)); }

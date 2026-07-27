@@ -11,7 +11,7 @@ parent: Volume 15
 depends_on:
   - PPS-1508
 related:
-  - PPS-0000
+  - PPS-000
 last_updated: 2026-07-25
 ---
 
@@ -157,8 +157,7 @@ Future revisions may include:
 
 # References
 
-- PPS-0000 Constitution
+- PPS-000 Constitution
 - PPS-1100 Security and Trust Architecture
 - PPS-1500 Community and Social Architecture
 - PPS-1508 Reputation, Moderation and Trust
-

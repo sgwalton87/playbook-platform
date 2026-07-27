@@ -1,0 +1,3 @@
+import { digestValue } from "../context";
+import type { AcademicProvenance, CourseworkDraft, CourseworkRecord } from "./contracts";
+export function createCoursework(drafts: CourseworkDraft[], studentIdentity: string, provenance: AcademicProvenance): CourseworkRecord[] { return drafts.map((draft) => { const body = { ...draft, evidenceReferences: [...draft.evidenceReferences].sort(), studentIdentity, provenance: { ...provenance, sourceReferences: [draft.sourceAuthority ?? draft.institutionIdentity], evidenceReferences: [...draft.evidenceReferences].sort() } }; return { courseworkId: `PBOS-ACAD-COURSE-${digestValue(body).slice(0, 16).toUpperCase()}`, ...body }; }).sort((a, b) => a.courseworkId.localeCompare(b.courseworkId)); }

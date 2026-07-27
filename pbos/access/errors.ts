@@ -1,0 +1,1 @@
+import type { AccessFailure,AccessFailureCode } from "./contracts"; export class AccessError extends Error{constructor(public failures:AccessFailure[]){super(failures.map(f=>f.message).join("; "));this.name="AccessError"}} export const accessFailure=(code:AccessFailureCode,message:string):AccessFailure=>({code,message});

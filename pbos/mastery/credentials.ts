@@ -1,0 +1,3 @@
+import { digestValue } from "../context";
+import type { Credential, CredentialDraft } from "./contracts";
+export function createCredentials(drafts: CredentialDraft[]): Credential[] { return drafts.map((draft) => { const body = { ...draft, requirements: [...draft.requirements].sort(), evidenceIds: [...draft.evidenceIds].sort(), associatedCompetencyNames: [...draft.associatedCompetencyNames].sort(), demonstrated: false as const, mastered: false as const, completionIsNotMastery: true as const }; return { credentialId: `PBOS-MAST-CRED-${digestValue(body).slice(0, 16).toUpperCase()}`, ...body }; }).sort((a, b) => a.credentialId.localeCompare(b.credentialId)); }

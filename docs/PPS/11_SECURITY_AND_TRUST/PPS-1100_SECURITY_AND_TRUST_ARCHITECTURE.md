@@ -20,7 +20,8 @@ related:
   - PPS-1107
   - PPS-1108
   - PPS-1109
-last_updated: 2026-07-25
+  - PPS-2003
+last_updated: 2026-07-26
 ---
 
 # Purpose
@@ -84,4 +85,3 @@ Every platform component satisfies constitutional security requirements.
 # References
 
 - PPS-907 Data Security and Privacy
-
