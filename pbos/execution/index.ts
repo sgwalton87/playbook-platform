@@ -23,10 +23,7 @@ export function runExecutionEngine(): ExecutionPlan {
       context.planning.selectedGate
     );
 
-    generateCodexWorkPackage(
-      contract
-    );
-
+    // Layer 5: Validate contract before generating work package
     const validation = validateExecutionContract(
       contract
     );
@@ -38,6 +35,12 @@ export function runExecutionEngine(): ExecutionPlan {
         tasks: [],
       };
     }
+
+    // Layer 5: Only generate work package after validation passes
+    // This ensures fail-closed behavior if contract is invalid
+    generateCodexWorkPackage(
+      contract
+    );
   }
 
   return {
