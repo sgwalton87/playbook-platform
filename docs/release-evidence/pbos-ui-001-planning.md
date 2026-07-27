@@ -6,9 +6,9 @@
 {
   "engineVersion": "3.0.0",
   "executionMode": "planning",
-  "selectedGate": "PBOS-RLS-001",
+  "selectedGate": "PBOS-UI-001",
   "completedTasks": [
-    "Selected PBOS-RLS-001 as the next eligible production-safe sprint.",
+    "Selected PBOS-UI-001 as the next eligible production-safe sprint.",
     "Stopped before application code changes because PBOS Engine v3 is still planning-first."
   ],
   "validationResults": [
@@ -16,7 +16,7 @@
       "id": "NoSkippedDependencies",
       "severity": "warning",
       "passed": true,
-      "message": "2 gate(s) are blocked by incomplete dependencies and will not be selected.",
+      "message": "1 gate(s) are blocked by incomplete dependencies and will not be selected.",
       "remediation": "Complete prerequisite gates before selecting dependent gates.",
       "handbookReference": "docs/auto_sprint.md#sprint-selection-algorithm"
     },
@@ -103,9 +103,9 @@
     }
   ],
   "blockers": [],
-  "recommendation": "Complete PBOS-RLS-001, then evaluate PBOS-UI-001. PBOS-UI-001 is next because it follows PBOS-RLS-001 in the machine-readable gate sequence without skipping dependencies.",
-  "duration": 431,
-  "timestamp": "2026-07-27T12:01:40.204Z",
+  "recommendation": "Complete PBOS-UI-001, then evaluate PBOS-QA-001. PBOS-QA-001 is next because it follows PBOS-UI-001 in the machine-readable gate sequence without skipping dependencies.",
+  "duration": 605,
+  "timestamp": "2026-07-27T12:06:19.570Z",
   "release": {
     "currentState": "PROMOTION_COMPLETE",
     "previousState": "PROMOTION_PENDING",
@@ -125,11 +125,11 @@
 ```
 
 ## Completed Tasks
-- Selected PBOS-RLS-001 as the next eligible production-safe sprint.
+- Selected PBOS-UI-001 as the next eligible production-safe sprint.
 - Stopped before application code changes because PBOS Engine v3 is still planning-first.
 
 ## Validation Results
-- PASS: NoSkippedDependencies [warning] — 2 gate(s) are blocked by incomplete dependencies and will not be selected.
+- PASS: NoSkippedDependencies [warning] — 1 gate(s) are blocked by incomplete dependencies and will not be selected.
   - Remediation: Complete prerequisite gates before selecting dependent gates.
   - Handbook: docs/auto_sprint.md#sprint-selection-algorithm
 - PASS: SingleSprintRule [info] — Planner will select exactly one eligible gate.
@@ -168,4 +168,4 @@
 - None from planning validation.
 
 ## Recommendation
-Complete PBOS-RLS-001, then evaluate PBOS-UI-001. PBOS-UI-001 is next because it follows PBOS-RLS-001 in the machine-readable gate sequence without skipping dependencies.
+Complete PBOS-UI-001, then evaluate PBOS-QA-001. PBOS-QA-001 is next because it follows PBOS-UI-001 in the machine-readable gate sequence without skipping dependencies.

@@ -1,0 +1,24 @@
+{
+  "gateId": "PBOS-UI-001",
+  "status": "complete",
+  "title": "Audit AppShell and design system consistency",
+  "evidence": [
+    "components/shell/UnifiedAppShell.tsx",
+    "components/layout/AppShell.tsx",
+    "tests/unit/app-shell/app-shell.test.ts",
+    "route inventory generated from app directory",
+    "component inventory generated from components directory"
+  ],
+  "findings": {
+    "canonicalShell": "components/shell/UnifiedAppShell.tsx",
+    "compatibilityExport": "components/layout/AppShell.tsx",
+    "deprecatedShell": "components/AppShell.tsx",
+    "routeForksIntroduced": false
+  },
+  "definitionOfDone": [
+    "Dashboard UI inventory exists.",
+    "Reusable component opportunities are prioritized.",
+    "No route-specific component fork is introduced by the audit."
+  ],
+  "timestamp": "2026-07-27T12:00:00.000Z"
+}

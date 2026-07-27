@@ -19,14 +19,36 @@ const noSkippedDependencies: Rule = ({ blockedGates }) => ({
   handbookReference: "docs/auto_sprint.md#sprint-selection-algorithm",
 });
 
-const singleSprintRule: Rule = ({ eligibleGates }) => ({
-  id: "SingleSprintRule",
-  severity: "info",
-  passed: eligibleGates.length >= 1,
-  message: eligibleGates.length >= 1 ? "Planner will select exactly one eligible gate." : "No eligible gates are available for selection.",
-  remediation: "If no eligible gate exists, unblock dependencies or add a valid gate definition.",
-  handbookReference: "docs/auto_sprint.md#required-output-format",
-});
+const singleSprintRule: Rule = ({ eligibleGates, gates }) => {
+  const activeGates = gates.filter(
+    (gate) => gate.status === "in_progress"
+  );
+
+  const validIdle =
+    activeGates.length === 0 &&
+    eligibleGates.length === 0 &&
+    gates.every((gate) => gate.status === "complete");
+
+  const validSprint =
+    activeGates.length === 1 &&
+    eligibleGates.length === 1;
+
+  const passed = validIdle || validSprint;
+
+  return {
+    id: "SingleSprintRule",
+    severity: passed ? "info" : "error",
+    passed,
+    message: validIdle
+      ? "PBOS is idle with all configured gates complete."
+      : validSprint
+        ? "PBOS has exactly one authorized active sprint."
+        : "PBOS detected an invalid sprint state.",
+    remediation:
+      "Ensure PBOS has either one active sprint or a fully completed idle state.",
+    handbookReference: "docs/auto_sprint.md#required-output-format",
+  };
+};
 
 const documentationRule: Rule = ({ config }) => {
   const hasAuthority = Boolean(config.handbook.implementationTruth && config.handbook.releasePolicy && config.handbook.sprintSequencing);

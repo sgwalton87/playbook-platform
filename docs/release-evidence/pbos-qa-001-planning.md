@@ -6,17 +6,17 @@
 {
   "engineVersion": "3.0.0",
   "executionMode": "planning",
-  "selectedGate": "PBOS-RLS-001",
+  "selectedGate": "PBOS-QA-001",
   "completedTasks": [
-    "Selected PBOS-RLS-001 as the next eligible production-safe sprint.",
+    "Selected PBOS-QA-001 as the next eligible production-safe sprint.",
     "Stopped before application code changes because PBOS Engine v3 is still planning-first."
   ],
   "validationResults": [
     {
       "id": "NoSkippedDependencies",
-      "severity": "warning",
+      "severity": "info",
       "passed": true,
-      "message": "2 gate(s) are blocked by incomplete dependencies and will not be selected.",
+      "message": "No blocked dependency chains were selected.",
       "remediation": "Complete prerequisite gates before selecting dependent gates.",
       "handbookReference": "docs/auto_sprint.md#sprint-selection-algorithm"
     },
@@ -103,9 +103,9 @@
     }
   ],
   "blockers": [],
-  "recommendation": "Complete PBOS-RLS-001, then evaluate PBOS-UI-001. PBOS-UI-001 is next because it follows PBOS-RLS-001 in the machine-readable gate sequence without skipping dependencies.",
-  "duration": 431,
-  "timestamp": "2026-07-27T12:01:40.204Z",
+  "recommendation": "PBOS-QA-001 has no configured next gate.",
+  "duration": 141,
+  "timestamp": "2026-07-27T14:28:57.919Z",
   "release": {
     "currentState": "PROMOTION_COMPLETE",
     "previousState": "PROMOTION_PENDING",
@@ -125,11 +125,11 @@
 ```
 
 ## Completed Tasks
-- Selected PBOS-RLS-001 as the next eligible production-safe sprint.
+- Selected PBOS-QA-001 as the next eligible production-safe sprint.
 - Stopped before application code changes because PBOS Engine v3 is still planning-first.
 
 ## Validation Results
-- PASS: NoSkippedDependencies [warning] — 2 gate(s) are blocked by incomplete dependencies and will not be selected.
+- PASS: NoSkippedDependencies [info] — No blocked dependency chains were selected.
   - Remediation: Complete prerequisite gates before selecting dependent gates.
   - Handbook: docs/auto_sprint.md#sprint-selection-algorithm
 - PASS: SingleSprintRule [info] — Planner will select exactly one eligible gate.
@@ -168,4 +168,4 @@
 - None from planning validation.
 
 ## Recommendation
-Complete PBOS-RLS-001, then evaluate PBOS-UI-001. PBOS-UI-001 is next because it follows PBOS-RLS-001 in the machine-readable gate sequence without skipping dependencies.
+PBOS-QA-001 has no configured next gate.

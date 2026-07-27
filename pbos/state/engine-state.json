@@ -1,12 +1,12 @@
 {
-  "currentGate": "PBOS-RLS-001",
+  "currentGate": null,
   "completedGates": [],
   "failedGates": [],
   "blockedGates": [],
   "blockedBy": [],
-  "lastRun": "2026-07-27T04:40:50.739Z",
+  "lastRun": "2026-07-27T17:00:07.212Z",
   "handbookVersion": "2026-07-24",
-  "validationHash": "d8590c6a6bc7bb015bf807dcf69ca4a455d05b9f71ca7641498920e8d2a340d9",
+  "validationHash": "c66c4031f18056b0c99df2bfb7c8eb4ea9f9c214b3dd7f8ce3fb035209aba91d",
   "configurationHash": null,
   "futureCompatibility": [
     "execution",
@@ -16,7 +16,7 @@
     "ship"
   ],
   "engineVersion": "3.0.0",
-  "resumeToken": "f4fcb891f8e8449ab662ff13",
+  "resumeToken": "ebcfd29fe62f2f8a69aaefae",
   "executionMode": "planning",
   "release": {
     "currentState": "PROMOTION_COMPLETE",
