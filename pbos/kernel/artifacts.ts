@@ -10,6 +10,7 @@ export const Artifacts = {
   validation: "pbos/runtime/validation.json",
   execution: "pbos/runtime/execution.json",
   executionContract: "pbos/runtime/execution-contract.json",
+  workPackage: "pbos/runtime/work-package.json",
   workflow: "pbos/runtime/workflow.json",
   doctor: "pbos/runtime/doctor.json",
   manifest: "pbos/runtime/manifest.json",

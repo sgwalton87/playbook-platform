@@ -4,6 +4,9 @@ import {
   generateExecutionContract,
   validateExecutionContract,
 } from "./contracts";
+import {
+  generateCodexWorkPackage,
+} from "./work-package";
 import type { ExecutionPlan } from "./types";
 
 export function runExecutionEngine(): ExecutionPlan {
@@ -18,6 +21,10 @@ export function runExecutionEngine(): ExecutionPlan {
   ) {
     const contract = generateExecutionContract(
       context.planning.selectedGate
+    );
+
+    generateCodexWorkPackage(
+      contract
     );
 
     const validation = validateExecutionContract(

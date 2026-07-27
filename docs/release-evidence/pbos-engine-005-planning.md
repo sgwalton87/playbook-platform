@@ -104,8 +104,8 @@
   ],
   "blockers": [],
   "recommendation": "PBOS-ENGINE-005 has no configured next gate.",
-  "duration": 461,
-  "timestamp": "2026-07-27T17:26:46.193Z",
+  "duration": 489,
+  "timestamp": "2026-07-27T18:05:34.418Z",
   "release": {
     "currentState": "PROMOTION_COMPLETE",
     "previousState": "PROMOTION_PENDING",

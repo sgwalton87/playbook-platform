@@ -1,9 +1,9 @@
 {
-  "id": "execution-PBOS-ENGINE-005",
+  "id": "work-package-PBOS-ENGINE-005",
   "version": "1.0.0",
   "gateId": "PBOS-ENGINE-005",
-  "authorization": "PENDING",
   "objective": "Create Governed Codex Execution Pipeline",
+  "authorizationRequired": true,
   "allowedFiles": [
     "pbos/execution/**",
     "pbos/adapters/**",
@@ -20,17 +20,22 @@
     "RUN_VALIDATION",
     "GENERATE_EVIDENCE"
   ],
+  "tasks": [
+    "Review execution contract.",
+    "Prepare governed implementation plan.",
+    "docs",
+    "pbos:test",
+    "pbos:lint"
+  ],
   "requiredValidation": [
     "docs",
     "pbos:test",
     "pbos:lint"
   ],
-  "rollbackReference": null,
   "evidenceRequirements": [
     "execution-report",
     "validation-results",
     "change-summary"
   ],
-  "createdAt": "2026-07-27T18:28:57.304Z",
-  "completedAt": null
+  "createdAt": "2026-07-27T18:28:57.426Z"
 }

@@ -1,3 +1,8 @@
+export type {
+  ExecutionContract,
+  ExecutionAuthorization,
+} from "./types";
+
 export {
   buildExecutionContract,
 } from "./builder";
