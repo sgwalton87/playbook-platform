@@ -1,12 +1,14 @@
 {
-  "currentGate": "PBOS-GATE-001",
-  "completedGates": [],
+  "currentGate": "PBOS-RLS-001",
+  "completedGates": [
+    "PBOS-GATE-001"
+  ],
   "failedGates": [],
   "blockedGates": [],
   "blockedBy": [],
-  "lastRun": "2026-07-26T07:38:22.268Z",
+  "lastRun": "2026-07-27T02:51:02.624Z",
   "handbookVersion": "2026-07-24",
-  "validationHash": "5f9075ce03b03315b0a08e5a2c622aa9c4bbd97ba91a67f697c9de041de06dab",
+  "validationHash": "d8590c6a6bc7bb015bf807dcf69ca4a455d05b9f71ca7641498920e8d2a340d9",
   "configurationHash": null,
   "futureCompatibility": [
     "execution",
@@ -16,7 +18,7 @@
     "ship"
   ],
   "engineVersion": "3.0.0",
-  "resumeToken": "6321794d9ada26ed55ea175c",
+  "resumeToken": "e2a7c8922776bd01e4aeded5",
   "executionMode": "planning",
   "release": {
     "currentState": "PROMOTION_COMPLETE",
@@ -24,7 +26,7 @@
     "transitionTimestamp": "2026-07-25T09:55:41.131Z",
     "transitionReason": "Repository promotion can complete in this environment.",
     "environment": {
-      "name": "local",
+      "name": "codex",
       "gitRemoteAvailable": true,
       "gitCredentialsAvailable": true,
       "repositoryWritable": true,

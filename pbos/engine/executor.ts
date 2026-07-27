@@ -38,7 +38,7 @@ export async function runNext(rootDir = process.cwd(), requestedMode?: string): 
   }));
   const allValidationResults = [...validationResults, ...adapterValidationResults];
   const blockers = allValidationResults.filter((result) => !result.passed).map((result) => result.id);
-  const nextState = updateStateForPlanning(state, plan.selectedGate?.id ?? null, blockers);
+  const nextState = updateStateForPlanning(state, plan.selectedGate?.id ?? null, blockers, plan.completedGateIds);
   await saveState(config, nextState, rootDir);
   const report = createReport({ config, mode, selectedGate: plan.selectedGate, validationResults: allValidationResults, duration: Date.now() - startedAt, release: nextState.release });
   await writeReport(report, config, rootDir);

@@ -1,7 +1,7 @@
 {
   "id": "PBOS-GATE-001",
   "title": "Make release gates trustworthy",
-  "status": "in_progress",
+  "status": "complete",
   "priority": 100,
   "dependencies": [],
   "handbook_refs": [

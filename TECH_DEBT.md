@@ -7,10 +7,22 @@ This root backlog is consolidated from the current Master Build Checklist and re
 ### Validation, Build, and QA Gates
 
 - Restore a clean production build by configuring or guarding the Resend dependency used by `/api/notify-admin` so page data collection does not fail without local secrets.
-- Reduce repo-wide lint failures enough for `npm run lint` to become a reliable release gate, starting with the checked-in backup parse error and high-volume `no-explicit-any` violations.
 - Define and run role-by-role end-to-end QA for Scholar, Scholar-Athlete, Mentor, Founder, and every remaining registry role before moving related checklist items beyond In Progress or Testing.
 - Complete desktop, tablet, mobile, accessibility, performance, security, and RLS validation for the Final Release Checklist.
 - Add production database, storage, backup, monitoring, and error-logging validation before soft launch.
+
+#### Completed Validation Debt
+
+- ✅ **Resolved July 27, 2026:** Repo-wide lint failures previously caused by the checked-in backup parse error and high-volume `no-explicit-any` violations no longer block the release gate. `npm run lint` now completes successfully with no reported ESLint violations.
+
+#### Active RLS and Authorization Debt
+
+- **Missing RLS policies:** Complete deployed-catalog reconciliation and add reviewed, operation-specific policies for sensitive tables, views, functions, and storage objects that lack owner, delegated, organization, visibility, age, consent, and lifecycle enforcement.
+- **Missing relationship tables and semantics:** Canonicalize status, scope, verification, expiry, revocation, consent linkage, and organization provenance for existing relationships; define currently unsupported coach, recruiting, admissions, brand, counselor, Transition-Aged Youth, and community access before granting it.
+- **Missing audit events:** Add append-oriented evidence for role and permission changes, organization membership, relationships, consent, protected delegated access, administrative actions, service-role operations, moderation, export, correction, deletion, and authorization denials required for monitoring.
+- **Missing permission schemas:** Establish authoritative schemas for approved roles, relationship permissions, organization membership, consent, age-policy state, visibility, and administrative purpose without relying on client-supplied roles or route destinations.
+- **Missing authorization tests:** Implement positive and negative owner, non-owner, delegated, expired, revoked, public/private, cross-organization, youth, administrator, intelligence-inheritance, and lifecycle scenarios defined in the PBOS RLS validation matrix.
+- **Missing service-role controls:** Review all 22 documented `SUPABASE_SERVICE_ROLE_KEY` API routes, replace bypass with user-context RLS where possible, and require explicit caller authorization, bounded access, idempotency where relevant, data minimization, and audit logging for remaining privileged workflows.
 
 ### Role Registry, Permissions, and Navigation
 

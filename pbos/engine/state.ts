@@ -54,13 +54,19 @@ export async function saveState(config: PbosConfig, state: EngineState, rootDir 
   await writeFile(statePath, `${JSON.stringify(state, null, 2)}\n`);
 }
 
-export function updateStateForPlanning(state: EngineState, selectedGate: string | null, blockers: string[]): EngineState {
+export function updateStateForPlanning(
+  state: EngineState,
+  selectedGate: string | null,
+  blockers: string[],
+  completedGates: string[] = state.completedGates,
+): EngineState {
   const validationHash = crypto.createHash("sha256").update(JSON.stringify({ selectedGate, blockers })).digest("hex");
   const environment = detectReleaseEnvironment();
   const promotion = resolvePromotionState(environment);
   return {
     ...state,
     currentGate: selectedGate,
+    completedGates,
     blockedBy: blockers,
     blockedGates: blockers,
     lastRun: new Date().toISOString(),

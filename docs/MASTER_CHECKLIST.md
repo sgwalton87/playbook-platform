@@ -12,7 +12,7 @@ Owned by Playbook OS Engineering with Product, Design, Data, Security, and Opera
 
 # Last Updated
 
-July 23, 2026
+July 27, 2026
 
 # Related Documents
 
@@ -49,7 +49,7 @@ Every Scholar should leave Playbook more confident than when they arrived. The o
 - **Current Sprint:** Documentation System Hardening and Platform Launch Readiness.
 - **Production Readiness:** Not launch-ready until RLS validation, role-by-role QA, monitoring, browser E2E coverage, and soft-launch readiness are complete.
 - **Build Status:** Production build passes in the current release-candidate environment; Supabase public keys still use build-safe placeholder warnings when not configured locally.
-- **Lint Status:** Active API routes now pass targeted ESLint, and historical backup snapshots are excluded from lint scope; repository-wide lint still requires cleanup of remaining active-source errors and no new ESLint warnings from new work.
+- **Lint Status:** Validated July 27, 2026: `npm run lint` completes successfully across the configured repository scope with no reported ESLint violations. The previous active-source lint debt is resolved; new work must keep the release gate clean.
 - **TypeScript Status:** Requires no new TypeScript warnings and continued strict typing improvements.
 - **Deployment Status:** Pre-launch; deployment requires release gates in [RELEASE_PROCESS.md](./RELEASE_PROCESS.md).
 - **Current Release Candidate:** Playbook OS v1 soft-launch candidate.

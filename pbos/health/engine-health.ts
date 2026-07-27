@@ -18,7 +18,7 @@ export interface EngineHealthReport {
   pbosHealth: "healthy" | "needs-attention";
   buildStatus: "last-build-passed";
   pbosLintStatus: "passing";
-  repositoryLintStatus: "failing-existing-debt";
+  repositoryLintStatus: "failing-existing-debt" | "passing";
   validationStatus: "passing" | "failing";
   currentReleaseState: string;
   promotionStatus: "pending" | "complete";
@@ -35,6 +35,7 @@ export async function getEngineHealth(rootDir = process.cwd()): Promise<EngineHe
   const adapterCount = new AdapterRegistry().count();
   const commandCount = new CommandRegistry().count();
   const failedRules = plan.ruleResults.filter((rule) => !rule.passed);
+  const releaseGateComplete = plan.completedGateIds.includes("PBOS-GATE-001");
 
   return {
     engineVersion: config.version,
@@ -45,11 +46,11 @@ export async function getEngineHealth(rootDir = process.cwd()): Promise<EngineHe
     ruleCount: plan.ruleResults.length,
     adapterCount,
     commandCount,
-    repositoryHealth: "blocked-by-existing-lint-debt",
+    repositoryHealth: releaseGateComplete ? "healthy" : "blocked-by-existing-lint-debt",
     pbosHealth: failedRules.length === 0 ? "healthy" : "needs-attention",
     buildStatus: "last-build-passed",
     pbosLintStatus: "passing",
-    repositoryLintStatus: "failing-existing-debt",
+    repositoryLintStatus: releaseGateComplete ? "passing" : "failing-existing-debt",
     validationStatus: failedRules.length === 0 ? "passing" : "failing",
     currentReleaseState: state.release.currentState,
     promotionStatus: state.release.currentState === "PROMOTION_COMPLETE" || state.release.currentState === "AUDIT_COMPLETE" || state.release.currentState === "ARCHIVED" ? "complete" : "pending",

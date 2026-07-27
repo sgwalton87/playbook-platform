@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { selectNextGate } from "./planner";
+import { updateStateForPlanning } from "./state";
 import type { EngineState, GateDefinition, PbosConfig } from "./types";
 
 const config: PbosConfig = {
@@ -95,6 +96,18 @@ describe("PBOS planner", () => {
 
     expect(result.selectedGate?.id).toBe("PBOS-SECOND-001");
     expect(result.completedGateIds).toContain("PBOS-FIRST-001");
+  });
+
+  it("persists completed gates when planning the next eligible gate", () => {
+    const nextState = updateStateForPlanning(
+      state,
+      "PBOS-SECOND-001",
+      [],
+      ["PBOS-FIRST-001"],
+    );
+
+    expect(nextState.currentGate).toBe("PBOS-SECOND-001");
+    expect(nextState.completedGates).toEqual(["PBOS-FIRST-001"]);
   });
 
   it("returns structured rule results", () => {
