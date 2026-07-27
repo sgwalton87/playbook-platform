@@ -45,10 +45,12 @@ export function runExecute() {
     Artifacts.execution
   );
 
-  return Results.success(
+    return Results.success(
     "execution",
     execution,
     Artifacts.execution,
     "Execution plan generated."
   );
 }
+
+runExecute();

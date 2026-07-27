@@ -42,6 +42,7 @@
     "pbos:promote": "tsx pbos/commands/promote.ts",
     "pbos:complete": "tsx pbos/commands/complete.ts",
     "pbos:activate": "tsx pbos/commands/activate.ts",
+    "pbos:execute": "tsx pbos/commands/execute.ts",
     "test:e2e": "playwright test"
   },
   "dependencies": {
