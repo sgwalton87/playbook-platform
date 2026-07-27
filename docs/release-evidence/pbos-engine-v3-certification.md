@@ -1,90 +1,98 @@
 # PBOS Engine v3 Certification Report
 
+## Audit Gate
+
+PBOS-AUDIT-001
+
 ## Status
 
-CERTIFIED FOR NEXT DEVELOPMENT PHASE
-
-## Audit Scope
-
-PBOS-AUDIT-001 verifies:
-
-- lifecycle transition integrity
-- runtime artifact synchronization
-- planner state correctness
-- adapter execution safety boundaries
-- readiness for governed execution pipeline
+PASS — Ready for PBOS-ENGINE-005 evaluation
 
 ---
 
-# Findings
+# Scope
 
-## Lifecycle Integrity
+This audit certifies:
+
+- lifecycle transition integrity
+- runtime artifact synchronization
+- planner behavior
+- valid idle state handling
+- adapter execution boundaries
+- release lifecycle preservation
+
+---
+
+# Lifecycle Integrity
 
 Status: PASS
 
-PBOS lifecycle transitions are governed through explicit state transitions.
-
-Verified:
+Verified lifecycle transitions:
 
 - proposed → in_progress
 - in_progress → complete
 
-Invalid transitions are rejected.
+Invalid transitions are rejected by PBOS lifecycle controls.
 
 ---
 
-## Runtime Synchronization
+# Planning Integrity
 
 Status: PASS
 
-Completion events refresh planning artifacts.
+Verified PBOS supports:
+
+- ACTIVE_SPRINT state
+- VALID_IDLE state
+
+Completed work does not create false blockers.
+
+---
+
+# Runtime Synchronization
+
+Status: PASS
 
 Verified:
 
 - completion artifacts
 - runtime state
-- next-gate planning artifact
+- planning artifacts
+
+remain synchronized after lifecycle events.
 
 ---
 
-## Planner Integrity
+# Adapter Safety Boundary
 
 Status: PASS
 
-PBOS recognizes:
+Verified:
 
-- ACTIVE_SPRINT
-- VALID_IDLE
-
-No eligible gate is treated as a valid lifecycle state when all approved work is complete.
-
----
-
-## Adapter Safety
-
-Status: PASS
-
-Controlled adapters require governed authorization boundaries.
-
-Planning mode remains the default execution state.
+- planning mode remains default
+- unauthorized execution is blocked
+- adapter execution requires governance controls
 
 ---
 
-## Known Limitations
+# Known Limitations
 
 PBOS currently:
 
-- plans work
-- validates work
-- records evidence
-- manages lifecycle
+- discovers
+- plans
+- validates
+- governs
+- documents
 
 PBOS does not yet autonomously modify application code.
 
+Future milestone:
+
+PBOS-ENGINE-005 — Governed Codex Execution Pipeline
+
 ---
 
-# Next Recommended Milestone
+# Recommendation
 
-PBOS-ENGINE-005
-
-Governed Codex Execution Pipeline
+Proceed to PBOS-ENGINE-005 after audit completion.
