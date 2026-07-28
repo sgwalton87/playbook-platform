@@ -1,4 +1,7 @@
 import type { ExecutionAuthorizationRecord } from "./types";
+import type { ExecutionContract } from "../contracts";
+import type { CodexWorkPackage } from "../work-package";
+import { Artifacts, artifactDigest } from "../../kernel";
 
 export interface AuthorizationValidationResult {
   valid: boolean;
@@ -22,7 +25,9 @@ export interface AuthorizationValidationResult {
  * Only status = "AUTHORIZED" permits execution.
  */
 export function validateExecutionAuthorization(
-  authorization: ExecutionAuthorizationRecord | undefined
+  authorization: ExecutionAuthorizationRecord | undefined,
+  contract?: ExecutionContract,
+  workPackage?: CodexWorkPackage
 ): AuthorizationValidationResult {
   const errors: string[] = [];
 
@@ -33,6 +38,18 @@ export function validateExecutionAuthorization(
         "Execution blocked: authorization record is missing.",
       ],
     };
+  }
+
+  if (!contract) {
+    errors.push(
+      "Execution blocked: referenced execution contract is missing."
+    );
+  }
+
+  if (!workPackage) {
+    errors.push(
+      "Execution blocked: referenced work package is missing."
+    );
   }
 
   // Fail closed: only AUTHORIZED status passes
@@ -75,6 +92,54 @@ export function validateExecutionAuthorization(
     );
   }
 
+  if (
+    !authorization.contract ||
+    authorization.contract.artifact !== Artifacts.executionContract ||
+    authorization.contract.id !== authorization.contractId
+  ) {
+    errors.push(
+      "Execution blocked: authorization contract identity is invalid."
+    );
+  }
+
+  if (
+    !authorization.workPackage ||
+    authorization.workPackage.artifact !== Artifacts.workPackage ||
+    authorization.workPackage.id !== authorization.workPackageId
+  ) {
+    errors.push(
+      "Execution blocked: authorization work package identity is invalid."
+    );
+  }
+
+  if (
+    contract &&
+    (
+      authorization.contractId !== contract.id ||
+      authorization.gateId !== contract.gateId ||
+      authorization.contract.version !== contract.version ||
+      authorization.contract.digest !== artifactDigest(contract)
+    )
+  ) {
+    errors.push(
+      "Execution blocked: authorization does not match the immutable execution contract."
+    );
+  }
+
+  if (
+    workPackage &&
+    (
+      authorization.workPackageId !== workPackage.id ||
+      authorization.gateId !== workPackage.gateId ||
+      authorization.workPackage.version !== workPackage.version ||
+      authorization.workPackage.digest !== artifactDigest(workPackage)
+    )
+  ) {
+    errors.push(
+      "Execution blocked: authorization does not match the immutable work package."
+    );
+  }
+
   if (!authorization.gateId || authorization.gateId.trim() === "") {
     errors.push(
       "Execution blocked: authorization gateId is missing or empty."
@@ -97,6 +162,18 @@ export function validateExecutionAuthorization(
   ) {
     errors.push(
       "Execution blocked: authorization is AUTHORIZED but authorizedAt timestamp is missing."
+    );
+  }
+
+  if (
+    authorization.status === "AUTHORIZED" &&
+    (
+      !authorization.approvedBy ||
+      !authorization.approvalReason
+    )
+  ) {
+    errors.push(
+      "Execution blocked: authorized decision metadata is incomplete."
     );
   }
 

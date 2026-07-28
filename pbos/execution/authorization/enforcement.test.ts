@@ -1,12 +1,18 @@
-import { describe, expect, it, beforeEach, afterEach } from "vitest";
-import { existsSync, rmSync } from "fs";
+import {
+  existsSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "fs";
 import path from "path";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Runtime, Artifacts } from "../../kernel";
 import {
   loadExecutionAuthorizationOrUndefined,
   setAuthorizationStatus,
 } from "../authorization";
 import type { ExecutionAuthorizationRecord } from "../authorization";
+import { runExecutionEngine } from "../index";
 
 /**
  * Layer 7 Enforcement Tests
@@ -23,6 +29,14 @@ const testAuthorizationPath = path.join(
   Artifacts.executionAuthorization
 );
 
+const managedArtifactPaths = [
+  Artifacts.executionContract,
+  Artifacts.workPackage,
+  Artifacts.executionAuthorization,
+];
+
+const originalArtifacts = new Map<string, string | undefined>();
+
 const createTestAuthorization = (
   status: "PENDING" | "AUTHORIZED" | "DENIED"
 ): ExecutionAuthorizationRecord => ({
@@ -30,6 +44,18 @@ const createTestAuthorization = (
   version: "1.0.0",
   contractId: "execution-TEST-LAYER-7",
   workPackageId: "work-package-TEST-LAYER-7",
+  contract: {
+    artifact: Artifacts.executionContract,
+    id: "execution-TEST-LAYER-7",
+    version: "1.0.0",
+    digest: "contract-digest",
+  },
+  workPackage: {
+    artifact: Artifacts.workPackage,
+    id: "work-package-TEST-LAYER-7",
+    version: "1.0.0",
+    digest: "work-package-digest",
+  },
   gateId: "TEST-LAYER-7",
   status,
   approvedBy: status === "AUTHORIZED" ? "test-approver" : null,
@@ -44,17 +70,29 @@ const createTestAuthorization = (
 
 describe("PBOS Layer 7: Execution Authorization Enforcement", () => {
   beforeEach(() => {
-    // Clean up any existing test artifact
-    if (existsSync(testAuthorizationPath)) {
-      rmSync(testAuthorizationPath);
+    for (const artifact of managedArtifactPaths) {
+      originalArtifacts.set(
+        artifact,
+        existsSync(artifact)
+          ? readFileSync(artifact, "utf8")
+          : undefined
+      );
+      rmSync(artifact, { force: true });
     }
   });
 
   afterEach(() => {
-    // Clean up test artifact
-    if (existsSync(testAuthorizationPath)) {
-      rmSync(testAuthorizationPath);
+    for (const artifact of managedArtifactPaths) {
+      const original = originalArtifacts.get(artifact);
+
+      if (original === undefined) {
+        rmSync(artifact, { force: true });
+      } else {
+        writeFileSync(artifact, original, "utf8");
+      }
     }
+
+    originalArtifacts.clear();
   });
 
   describe("Load authorization from runtime", () => {
@@ -125,14 +163,13 @@ describe("PBOS Layer 7: Execution Authorization Enforcement", () => {
       expect(updated.approvalReason).toBe("Security review failed");
     });
 
-    it("reverts authorization to PENDING", () => {
+    it("does not revert a terminal authorization to PENDING", () => {
       const testAuth = createTestAuthorization("AUTHORIZED");
       Runtime.save(testAuthorizationPath, testAuth);
 
-      const updated = setAuthorizationStatus("PENDING");
-
-      expect(updated.status).toBe("PENDING");
-      expect(updated.authorizedAt).toBeNull();
+      expect(() => setAuthorizationStatus("PENDING")).toThrow(
+        "Authorization decision is immutable after status AUTHORIZED."
+      );
     });
   });
 
@@ -233,6 +270,90 @@ describe("PBOS Layer 7: Execution Authorization Enforcement", () => {
       expect(approved.approvalReason).toBe("Passed review");
       expect(approved.authorizedAt).toBeDefined();
       expect(approved.authorizedAt).not.toBeNull();
+    });
+
+    it("does not overwrite an existing approval", () => {
+      const testAuth = createTestAuthorization("AUTHORIZED");
+      Runtime.save(testAuthorizationPath, testAuth);
+
+      const before = JSON.stringify(
+        loadExecutionAuthorizationOrUndefined()
+      );
+      const updated = setAuthorizationStatus("AUTHORIZED", {
+        approvedBy: "different-reviewer",
+        approvalReason: "Replacement decision",
+      });
+      const after = JSON.stringify(
+        loadExecutionAuthorizationOrUndefined()
+      );
+
+      expect(updated.approvedBy).toBe("test-approver");
+      expect(after).toBe(before);
+    });
+
+    it("does not overwrite a denied decision", () => {
+      const testAuth = createTestAuthorization("DENIED");
+      Runtime.save(testAuthorizationPath, testAuth);
+
+      expect(() => setAuthorizationStatus("AUTHORIZED")).toThrow(
+        "Authorization decision is immutable after status DENIED."
+      );
+    });
+  });
+
+  describe("Resumable execution lifecycle", () => {
+    it("pending authorization blocks execution and adapter dispatch", () => {
+      const dispatch = vi.fn((plan) => plan);
+
+      const result = runExecutionEngine(dispatch);
+
+      expect(result.status).toBe("BLOCKED");
+      expect(loadExecutionAuthorizationOrUndefined()?.status).toBe(
+        "PENDING"
+      );
+      expect(dispatch).not.toHaveBeenCalled();
+    });
+
+    it("approved authorization survives and permits dispatch", () => {
+      runExecutionEngine();
+      setAuthorizationStatus("AUTHORIZED", {
+        approvedBy: "governance-reviewer",
+        approvalReason: "Immutable artifacts reviewed",
+      });
+      const approved = readFileSync(
+        Artifacts.executionAuthorization,
+        "utf8"
+      );
+      const dispatch = vi.fn((plan) => plan);
+
+      const result = runExecutionEngine(dispatch);
+
+      expect(result.status).toBe("READY");
+      expect(dispatch).toHaveBeenCalledOnce();
+      expect(
+        readFileSync(Artifacts.executionAuthorization, "utf8")
+      ).toBe(approved);
+    });
+
+    it("denied authorization survives and blocks dispatch", () => {
+      runExecutionEngine();
+      setAuthorizationStatus("DENIED", {
+        approvedBy: "governance-reviewer",
+        approvalReason: "Governance requirements not met",
+      });
+      const denied = readFileSync(
+        Artifacts.executionAuthorization,
+        "utf8"
+      );
+      const dispatch = vi.fn((plan) => plan);
+
+      const result = runExecutionEngine(dispatch);
+
+      expect(result.status).toBe("BLOCKED");
+      expect(dispatch).not.toHaveBeenCalled();
+      expect(
+        readFileSync(Artifacts.executionAuthorization, "utf8")
+      ).toBe(denied);
     });
   });
 });

@@ -1,15 +1,47 @@
 import { describe, expect, it } from "vitest";
-import { validateExecutionAuthorization } from "../authorization/validator";
+import {
+  buildExecutionAuthorization,
+  validateExecutionAuthorization as validateAuthorization,
+} from "../authorization";
 import type { ExecutionAuthorizationRecord } from "../authorization";
+import type { ExecutionContract } from "../contracts";
+import type { CodexWorkPackage } from "../work-package";
+
+const contract: ExecutionContract = {
+  id: "execution-PBOS-ENGINE-005",
+  version: "1.0.0",
+  gateId: "PBOS-ENGINE-005",
+  authorization: "PENDING",
+  objective: "Test governed execution",
+  allowedFiles: ["pbos/execution/**"],
+  blockedFiles: ["app/**"],
+  allowedOperations: ["UPDATE_FILE"],
+  requiredValidation: ["pbos:test"],
+  rollbackReference: null,
+  evidenceRequirements: ["validation-results"],
+  createdAt: "2026-07-27T00:00:00.000Z",
+  completedAt: null,
+};
+
+const workPackage: CodexWorkPackage = {
+  id: "work-package-PBOS-ENGINE-005",
+  version: "1.0.0",
+  gateId: "PBOS-ENGINE-005",
+  objective: contract.objective,
+  authorizationRequired: true,
+  allowedFiles: contract.allowedFiles,
+  blockedFiles: contract.blockedFiles,
+  allowedOperations: contract.allowedOperations,
+  tasks: ["Review execution contract."],
+  requiredValidation: contract.requiredValidation,
+  evidenceRequirements: contract.evidenceRequirements,
+  createdAt: "2026-07-27T00:00:01.000Z",
+};
 
 const validAuthorization = (
   overrides?: Partial<ExecutionAuthorizationRecord>
 ): ExecutionAuthorizationRecord => ({
-  id: "authorization-PBOS-ENGINE-005",
-  version: "1.0.0",
-  contractId: "execution-PBOS-ENGINE-005",
-  workPackageId: "work-package-PBOS-ENGINE-005",
-  gateId: "PBOS-ENGINE-005",
+  ...buildExecutionAuthorization(contract, workPackage),
   status: "AUTHORIZED",
   approvedBy: "test-approver",
   approvalReason: "Test approval",
@@ -21,6 +53,10 @@ const validAuthorization = (
   authorizedAt: "2026-07-27T00:00:01.000Z",
   ...overrides,
 });
+
+const validateExecutionAuthorization = (
+  authorization: ExecutionAuthorizationRecord | undefined
+) => validateAuthorization(authorization, contract, workPackage);
 
 describe("PBOS Layer 6: Execution Authorization Validation", () => {
   it("AUTHORIZED status passes validation", () => {
@@ -142,6 +178,31 @@ describe("PBOS Layer 6: Execution Authorization Validation", () => {
     expect(result.valid).toBe(false);
     expect(result.errors).toContain(
       "Execution blocked: authorization version is missing or empty."
+    );
+  });
+
+  it("contract digest mismatch fails validation", () => {
+    const authorization = validAuthorization();
+    authorization.contract.digest = "tampered";
+
+    const result = validateExecutionAuthorization(authorization);
+
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContain(
+      "Execution blocked: authorization does not match the immutable execution contract."
+    );
+  });
+
+  it("work package identity mismatch fails validation", () => {
+    const authorization = validAuthorization({
+      workPackageId: "work-package-other",
+    });
+
+    const result = validateExecutionAuthorization(authorization);
+
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContain(
+      "Execution blocked: authorization work package identity is invalid."
     );
   });
 });

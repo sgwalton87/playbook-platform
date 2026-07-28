@@ -1,0 +1,28 @@
+{
+  "id": "authorization-PBOS-ENGINE-005",
+  "version": "1.0.0",
+  "contractId": "execution-PBOS-ENGINE-005",
+  "workPackageId": "work-package-PBOS-ENGINE-005",
+  "contract": {
+    "artifact": "pbos/runtime/execution-contract.json",
+    "id": "execution-PBOS-ENGINE-005",
+    "version": "1.0.0",
+    "digest": "da26cc7ab003476f0820a31ac95202c22372abd1a0b7d68a0a81ed702465ea5d"
+  },
+  "workPackage": {
+    "artifact": "pbos/runtime/work-package.json",
+    "id": "work-package-PBOS-ENGINE-005",
+    "version": "1.0.0",
+    "digest": "a2e870a81380a262126f3c23eb50b10d934608ea05942a7678f9521b1b8a39b6"
+  },
+  "gateId": "PBOS-ENGINE-005",
+  "status": "PENDING",
+  "approvedBy": null,
+  "approvalReason": null,
+  "evidenceReviewed": [
+    "execution-contract.json",
+    "work-package.json"
+  ],
+  "createdAt": "2026-07-28T18:15:32.140Z",
+  "authorizedAt": null
+}

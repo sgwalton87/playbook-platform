@@ -7,7 +7,7 @@ This document explains the Playbook OS platform architecture for engineers, revi
 Owned by Playbook OS Engineering. Security-sensitive architecture changes require review from the platform owner and must be recorded in [DECISIONS.md](./DECISIONS.md).
 
 ## Last Updated
-July 23, 2026
+July 28, 2026
 
 ## Related Documents
 - Constitution: [../CODEX.md](../CODEX.md)
@@ -54,6 +54,17 @@ If a feature accomplishes none of these objectives, reconsider whether it belong
 | `supabase/migrations/` | SQL migrations for schema, indexes, functions, and RLS policies |
 | `docs/` | Engineering handbook, product records, architecture records, release history, and historical context |
 | `tests/` | Test guidance and test-supporting documentation |
+
+## PBOS Governed Execution
+PBOS separates planning from authorized execution through a durable artifact handoff:
+
+Gate → Context → Contract → Work Package → Authorization Pending → Authorization Decision → Validation → Execution Eligibility → Adapter Dispatch.
+
+An execution attempt first loads any existing authorization record. When no record exists, PBOS creates the execution contract and Codex work package, binds both artifacts into a `PENDING` authorization record, and stops before dispatch. The binding includes canonical artifact paths, IDs, versions, and SHA-256 content digests.
+
+Governance may transition a pending record once to `AUTHORIZED` or `DENIED`. Terminal decisions are immutable. On resume, PBOS loads the persisted contract and work package, verifies their identities and digests against the authorization, and dispatches only an authorized, matching work package. Missing, pending, denied, stale, or modified artifacts fail closed.
+
+Runtime handoff artifacts live under `pbos/runtime/`. Domain implementation remains constrained by the contract's allowed files, blocked files, operations, validation requirements, rollback reference, and evidence requirements.
 
 ## App Router
 Routes are implemented under `app/`. Page files compose feature experiences, layout files define shared shells, and route handlers under `app/api/` expose server-side API surfaces. Sensitive logic should remain in server contexts, while client components should focus on interaction and presentation.

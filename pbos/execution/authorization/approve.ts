@@ -25,6 +25,12 @@ export function approveExecutionAuthorization(
     artifactPath
   );
 
+  assertDecisionTransition(authorization, "AUTHORIZED");
+
+  if (authorization.status === "AUTHORIZED") {
+    return authorization;
+  }
+
   const approved: ExecutionAuthorizationRecord = {
     ...authorization,
     status: "AUTHORIZED",
@@ -56,6 +62,12 @@ export function denyExecutionAuthorization(
   const authorization = Runtime.load<ExecutionAuthorizationRecord>(
     artifactPath
   );
+
+  assertDecisionTransition(authorization, "DENIED");
+
+  if (authorization.status === "DENIED") {
+    return authorization;
+  }
 
   const denied: ExecutionAuthorizationRecord = {
     ...authorization,
@@ -91,6 +103,12 @@ export function setAuthorizationStatus(
     artifactPath
   );
 
+  assertDecisionTransition(authorization, status);
+
+  if (authorization.status === status) {
+    return authorization;
+  }
+
   const updated: ExecutionAuthorizationRecord = {
     ...authorization,
     status,
@@ -102,4 +120,18 @@ export function setAuthorizationStatus(
   Runtime.save(artifactPath, updated);
 
   return updated;
+}
+
+function assertDecisionTransition(
+  authorization: ExecutionAuthorizationRecord,
+  nextStatus: AuthorizationStatus
+): void {
+  if (
+    authorization.status !== "PENDING" &&
+    authorization.status !== nextStatus
+  ) {
+    throw new Error(
+      `Authorization decision is immutable after status ${authorization.status}.`
+    );
+  }
 }

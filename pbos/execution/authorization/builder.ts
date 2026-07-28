@@ -1,5 +1,6 @@
 import type { ExecutionContract } from "../contracts";
 import type { CodexWorkPackage } from "../work-package";
+import { Artifacts, artifactDigest } from "../../kernel";
 import type {
   ExecutionAuthorizationRecord,
 } from "./types";
@@ -23,6 +24,20 @@ export function buildExecutionAuthorization(
     contractId: contract.id,
 
     workPackageId: workPackage.id,
+
+    contract: {
+      artifact: Artifacts.executionContract,
+      id: contract.id,
+      version: contract.version,
+      digest: artifactDigest(contract),
+    },
+
+    workPackage: {
+      artifact: Artifacts.workPackage,
+      id: workPackage.id,
+      version: workPackage.version,
+      digest: artifactDigest(workPackage),
+    },
 
     gateId: contract.gateId,
 

@@ -12,6 +12,13 @@ export type AuthorizationStatus =
   | "AUTHORIZED"
   | "DENIED";
 
+export interface ImmutableArtifactReference {
+  artifact: string;
+  id: string;
+  version: string;
+  digest: string;
+}
+
 /**
  * Execution authorization record.
  *
@@ -34,6 +41,10 @@ export interface ExecutionAuthorizationRecord {
   contractId: string;
 
   workPackageId: string;
+
+  contract: ImmutableArtifactReference;
+
+  workPackage: ImmutableArtifactReference;
 
   gateId: string;
 

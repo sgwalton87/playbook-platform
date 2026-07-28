@@ -12,9 +12,18 @@ import {
   loadExecutionAuthorizationOrUndefined,
   validateExecutionAuthorization,
 } from "./authorization";
+import { Artifacts, Runtime } from "../kernel";
+import type { ExecutionContract } from "./contracts";
+import type { CodexWorkPackage } from "./work-package";
+import {
+  dispatchExecutionAdapter,
+  type ExecutionDispatcher,
+} from "./dispatch";
 import type { ExecutionPlan } from "./types";
 
-export function runExecutionEngine(): ExecutionPlan {
+export function runExecutionEngine(
+  dispatch: ExecutionDispatcher = dispatchExecutionAdapter
+): ExecutionPlan {
   const context = loadExecutionContext();
 
   const plan = createExecutionPlan(context);
@@ -24,46 +33,63 @@ export function runExecutionEngine(): ExecutionPlan {
     plan.gate !== "NONE" &&
     context.planning.selectedGate
   ) {
-    const contract = generateExecutionContract(
-      context.planning.selectedGate
-    );
+    const existingAuthorization =
+      loadExecutionAuthorizationOrUndefined();
 
-    // Layer 5: Validate contract before generating work package
-    const contractValidation = validateExecutionContract(
-      contract
-    );
+    let contract: ExecutionContract;
+    let workPackage: CodexWorkPackage;
 
-    if (!contractValidation.passed) {
-      return {
-        status: "BLOCKED",
-        gate: plan.gate,
-        tasks: [],
-      };
+    if (existingAuthorization) {
+      if (
+        !Runtime.exists(Artifacts.executionContract) ||
+        !Runtime.exists(Artifacts.workPackage)
+      ) {
+        return {
+          status: "BLOCKED",
+          gate: plan.gate,
+          tasks: [],
+        };
+      }
+
+      contract = Runtime.load<ExecutionContract>(
+        Artifacts.executionContract
+      );
+      workPackage = Runtime.load<CodexWorkPackage>(
+        Artifacts.workPackage
+      );
+    } else {
+      contract = generateExecutionContract(
+        context.planning.selectedGate
+      );
+
+      const contractValidation = validateExecutionContract(
+        contract
+      );
+
+      if (!contractValidation.passed) {
+        return {
+          status: "BLOCKED",
+          gate: plan.gate,
+          tasks: [],
+        };
+      }
+
+      workPackage = generateCodexWorkPackage(
+        contract
+      );
+
+      generateExecutionAuthorization(
+        contract,
+        workPackage
+      );
     }
 
-    // Layer 5: Only generate work package after validation passes
-    // This ensures fail-closed behavior if contract is invalid
-    const workPackage = generateCodexWorkPackage(
-      contract
-    );
-
-    // Layer 6: Generate authorization record
-    // Sets initial status to PENDING; external systems update to AUTHORIZED/DENIED
-    generateExecutionAuthorization(
-      contract,
-      workPackage
-    );
-
-    // Layer 7: Load authorization from runtime artifact
-    // This allows external authorization systems to update status between
-    // generation (Layer 6) and validation (Layer 7)
     const authorization = loadExecutionAuthorizationOrUndefined();
 
-    // Layer 7: Validate authorization enforcement
-    // Fail closed: only AUTHORIZED status permits execution eligibility
-    // Missing, PENDING, or DENIED authorization blocks execution
     const authorizationValidation = validateExecutionAuthorization(
-      authorization
+      authorization,
+      contract,
+      workPackage
     );
 
     if (!authorizationValidation.valid) {
@@ -75,9 +101,15 @@ export function runExecutionEngine(): ExecutionPlan {
     }
   }
 
-  return {
+  const eligiblePlan: ExecutionPlan = {
     status: plan.status,
     gate: plan.gate,
     tasks: plan.tasks,
   };
+
+  return eligiblePlan.status === "READY"
+    ? dispatch(eligiblePlan)
+    : eligiblePlan;
 }
+
+export type { ExecutionDispatcher } from "./dispatch";

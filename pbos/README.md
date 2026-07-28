@@ -7,7 +7,7 @@ PBOS Engine v3 is the deterministic, adapter-driven, resumable engineering orche
 Owned by Playbook OS Engineering.
 
 ## Last Updated
-July 24, 2026
+July 28, 2026
 
 ## Related Documents
 - Implementation authority: [../docs/MASTER_CHECKLIST.md](../docs/MASTER_CHECKLIST.md)
@@ -57,7 +57,15 @@ If state is missing, PBOS creates it before planning. Each planning run updates 
 ## Execution Modes
 PBOS recognizes these reusable mode names: `planning`, `execution`, `audit`, `doctor`, `release`, and `ship`.
 
-PBOS Engine v3 authorizes planning mode only. Other modes are reserved extension points for later milestones and fail safely if requested.
+PBOS Engine v3 uses planning mode as its default. The execution engine can prepare a governed handoff, but it remains fail-closed until an authorization decision is persisted and validated.
+
+The governed execution lifecycle is:
+
+Gate → Context → Contract → Work Package → Authorization Pending → Authorization Decision → Validation → Execution Eligibility → Adapter Dispatch.
+
+The first execution attempt persists a versioned contract, work package, and `PENDING` authorization, then stops. A governance system may transition that authorization once to `AUTHORIZED` or `DENIED`. Later attempts load the existing authorization before resolving its referenced artifacts. Terminal decisions are immutable and are never regenerated or overwritten.
+
+Authorization records bind the contract and work package by canonical artifact path, ID, version, and SHA-256 content digest. Execution eligibility requires the persisted artifacts to match those immutable references. Only an identity-matched `AUTHORIZED` record reaches adapter dispatch.
 
 ## Gate Discovery
 The engine loads `pbos/config/pbos.config.json`, reads the configured `gatesDirectory`, and parses every `.json` file as a gate definition. Gate files must include `id`, `title`, `status`, `priority`, `dependencies`, `tasks`, `definition_of_done`, and `next_gate`.
