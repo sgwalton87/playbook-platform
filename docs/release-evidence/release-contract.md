@@ -1,8 +1,8 @@
 # PBOS Release Contract
 
 - Version: 3.0.0
-- Gate: PBOS-RLS-001
-- Generated: 2026-07-27T11:59:53.872Z
+- Gate: PBOS-ENGINE-005
+- Generated: 2026-07-28T18:37:00.146Z
 - Overall status: PASS
 - Promotion ready: yes
 
@@ -12,8 +12,8 @@
 
 - ID: repository
 - Status: PASS
-- Executed: 2026-07-27T11:58:18.659Z
-- Duration: 8 ms
+- Executed: 2026-07-28T18:34:46.424Z
+- Duration: 3 ms
 - Summary: Repository structure verified.
 
 Evidence:
@@ -28,8 +28,8 @@ Evidence:
 
 - ID: lint
 - Status: PASS
-- Executed: 2026-07-27T11:58:18.667Z
-- Duration: 33160 ms
+- Executed: 2026-07-28T18:34:46.427Z
+- Duration: 37388 ms
 - Summary: Repository lint passed.
 
 Evidence:
@@ -42,8 +42,8 @@ Evidence:
 
 - ID: typescript
 - Status: PASS
-- Executed: 2026-07-27T11:58:51.828Z
-- Duration: 7319 ms
+- Executed: 2026-07-28T18:35:23.815Z
+- Duration: 25916 ms
 - Summary: TypeScript compilation passed.
 
 Evidence:
@@ -54,8 +54,8 @@ Evidence:
 
 - ID: build
 - Status: PASS
-- Executed: 2026-07-27T11:58:59.147Z
-- Duration: 54725 ms
+- Executed: 2026-07-28T18:35:49.731Z
+- Duration: 70414 ms
 - Summary: Production build completed successfully.
 
 Evidence:
@@ -66,15 +66,15 @@ Evidence:
 - ▲ Next.js 16.2.9 (Turbopack)
 - - Environments: .env.local
 - Creating an optimized production build ...
-- ✓ Compiled successfully in 21.7s
+- ✓ Compiled successfully in 25.4s
 - Running TypeScript ...
-- Finished TypeScript in 23.0s ...
+- Finished TypeScript in 31.0s ...
 - Collecting page data using 3 workers ...
 - Generating static pages using 3 workers (0/122) ...
 - Generating static pages using 3 workers (30/122)
 - Generating static pages using 3 workers (60/122)
 - Generating static pages using 3 workers (91/122)
-- ✓ Generating static pages using 3 workers (122/122) in 2.9s
+- ✓ Generating static pages using 3 workers (122/122) in 4.8s
 - Finalizing page optimization ...
 - Route (app)
 - ┌ ○ /

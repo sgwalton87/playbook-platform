@@ -39,6 +39,28 @@ export async function promoteGate(
     );
   }
 
+  const gatePath = path.join(
+    rootDir,
+    "pbos/gates",
+    `${contract.gateId}.json`
+  );
+  const gate = JSON.parse(
+    await readFile(gatePath, "utf8")
+  ) as { id: string; status: string };
+
+  if (
+    gate.id !== contract.gateId ||
+    gate.status !== "in_progress"
+  ) {
+    return {
+      gateId: contract.gateId,
+      promoted: false,
+      reason:
+        "Promotion denied: release contract gate is not in_progress.",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
 
   if (
     contract.overallStatus !== "PASS" ||

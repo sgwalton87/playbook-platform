@@ -1,5 +1,5 @@
 {
-  "gateId": "PBOS-AUDIT-001",
+  "gateId": "PBOS-ENGINE-005",
   "from": "in_progress",
   "to": "complete",
   "reason": "Gate completed after successful PBOS release validation and promotion.",
@@ -7,5 +7,5 @@
     "docs/release-evidence/release-contract.json",
     "pbos/runtime/promotion.json"
   ],
-  "timestamp": "2026-07-27T17:19:26.212Z"
+  "timestamp": "2026-07-28T18:37:32.344Z"
 }

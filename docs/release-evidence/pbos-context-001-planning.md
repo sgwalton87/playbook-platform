@@ -6,25 +6,25 @@
 {
   "engineVersion": "3.0.0",
   "executionMode": "planning",
-  "selectedGate": "PBOS-ENGINE-005",
+  "selectedGate": "PBOS-CONTEXT-001",
   "completedTasks": [
-    "Selected PBOS-ENGINE-005 as the next eligible production-safe sprint.",
+    "Selected PBOS-CONTEXT-001 as the next eligible production-safe sprint.",
     "Stopped before application code changes because PBOS Engine v3 is still planning-first."
   ],
   "validationResults": [
     {
       "id": "NoSkippedDependencies",
-      "severity": "warning",
+      "severity": "info",
       "passed": true,
-      "message": "1 gate(s) are blocked by incomplete dependencies and will not be selected.",
+      "message": "No blocked dependency chains were selected.",
       "remediation": "Complete prerequisite gates before selecting dependent gates.",
       "handbookReference": "docs/auto_sprint.md#sprint-selection-algorithm"
     },
     {
       "id": "SingleSprintRule",
-      "severity": "info",
-      "passed": true,
-      "message": "PBOS has exactly one authorized active sprint.",
+      "severity": "error",
+      "passed": false,
+      "message": "PBOS detected an invalid sprint state.",
       "remediation": "Ensure PBOS has either one active sprint or a fully completed idle state.",
       "handbookReference": "docs/auto_sprint.md#required-output-format"
     },
@@ -69,15 +69,6 @@
       "handbookReference": "pbos/README.md#execution-modes"
     },
     {
-      "id": "HandbookVerification",
-      "severity": "info",
-      "passed": true,
-      "message": "HandbookVerification passed.",
-      "remediation": "No remediation required.",
-      "handbookReference": "docs/auto_sprint.md#canonical-source-hierarchy",
-      "command": "python3 scripts/verify-handbook.py"
-    },
-    {
       "id": "PlanningSafeExecutionAdapter",
       "severity": "info",
       "passed": true,
@@ -102,10 +93,12 @@
       "handbookReference": "pbos/README.md#architecture"
     }
   ],
-  "blockers": [],
-  "recommendation": "PBOS-ENGINE-005 has no configured next gate.",
-  "duration": 579,
-  "timestamp": "2026-07-28T18:25:11.694Z",
+  "blockers": [
+    "SingleSprintRule: PBOS detected an invalid sprint state. Remediation: Ensure PBOS has either one active sprint or a fully completed idle state."
+  ],
+  "recommendation": "PBOS-CONTEXT-001 has no configured next gate.",
+  "duration": 213,
+  "timestamp": "2026-07-28T18:42:23.538Z",
   "release": {
     "currentState": "PROMOTION_COMPLETE",
     "previousState": "PROMOTION_PENDING",
@@ -125,14 +118,14 @@
 ```
 
 ## Completed Tasks
-- Selected PBOS-ENGINE-005 as the next eligible production-safe sprint.
+- Selected PBOS-CONTEXT-001 as the next eligible production-safe sprint.
 - Stopped before application code changes because PBOS Engine v3 is still planning-first.
 
 ## Validation Results
-- PASS: NoSkippedDependencies [warning] — 1 gate(s) are blocked by incomplete dependencies and will not be selected.
+- PASS: NoSkippedDependencies [info] — No blocked dependency chains were selected.
   - Remediation: Complete prerequisite gates before selecting dependent gates.
   - Handbook: docs/auto_sprint.md#sprint-selection-algorithm
-- PASS: SingleSprintRule [info] — PBOS has exactly one authorized active sprint.
+- FAIL: SingleSprintRule [error] — PBOS detected an invalid sprint state.
   - Remediation: Ensure PBOS has either one active sprint or a fully completed idle state.
   - Handbook: docs/auto_sprint.md#required-output-format
 - PASS: DocumentationRule [info] — Handbook authority paths are configured.
@@ -150,10 +143,6 @@
 - PASS: PromptCompatibility [info] — Active prompt PBOS-ENGINE-EXECUTION is compatible with PBOS Engine 3.0.0.
   - Remediation: No remediation required.
   - Handbook: pbos/README.md#execution-modes
-- PASS: HandbookVerification [info] — HandbookVerification passed.
-  - Remediation: No remediation required.
-  - Handbook: docs/auto_sprint.md#canonical-source-hierarchy
-  - Command: python3 scripts/verify-handbook.py
 - PASS: PlanningSafeExecutionAdapter [info] — Execution adapter remained planning-safe and did not modify application code.
   - Remediation: No remediation required.
   - Handbook: pbos/README.md#architecture
@@ -165,7 +154,7 @@
   - Handbook: pbos/README.md#architecture
 
 ## Blockers
-- None from planning validation.
+- SingleSprintRule: PBOS detected an invalid sprint state. Remediation: Ensure PBOS has either one active sprint or a fully completed idle state.
 
 ## Recommendation
-PBOS-ENGINE-005 has no configured next gate.
+PBOS-CONTEXT-001 has no configured next gate.

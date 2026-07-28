@@ -1,12 +1,18 @@
 {
-  "currentGate": "PBOS-ENGINE-005",
-  "completedGates": [],
+  "currentGate": "PBOS-CONTEXT-001",
+  "completedGates": [
+    "PBOS-ENGINE-005"
+  ],
   "failedGates": [],
-  "blockedGates": [],
-  "blockedBy": [],
-  "lastRun": "2026-07-27T18:05:34.403Z",
+  "blockedGates": [
+    "SingleSprintRule"
+  ],
+  "blockedBy": [
+    "SingleSprintRule"
+  ],
+  "lastRun": "2026-07-28T18:42:23.526Z",
   "handbookVersion": "2026-07-24",
-  "validationHash": "f3439b5c1feedd5f390db1442b6a30b18cd2f4f8566499367f179d95b550d04b",
+  "validationHash": "11f79d561208f25fb63abb1bab9336ec2d5c897ff6edccf45f59a6596edd5511",
   "configurationHash": null,
   "futureCompatibility": [
     "execution",
@@ -16,7 +22,7 @@
     "ship"
   ],
   "engineVersion": "3.0.0",
-  "resumeToken": "a05b8c936d0b48ca659879b9",
+  "resumeToken": "f294649752ea9e74c7952553",
   "executionMode": "planning",
   "release": {
     "currentState": "PROMOTION_COMPLETE",

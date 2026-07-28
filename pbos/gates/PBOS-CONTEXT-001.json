@@ -1,31 +1,33 @@
 {
   "id": "PBOS-CONTEXT-001",
   "title": "Repository Context Verification",
-  "version": "1.0.0",
-  "objective": "Verify repository identity, branch, commit, active gate, required artifacts, and runtime state before PBOS execution.",
-  "allowedFiles": [
-    "pbos/context/**",
-    "pbos/runtime/**",
-    "docs/**"
+  "status": "ready",
+  "priority": 100,
+  "dependencies": [
+    "PBOS-ENGINE-005"
   ],
-  "blockedFiles": [
-    ".env",
-    "supabase/migrations/**",
-    "app/**"
+  "handbook_refs": [
+    "pbos/README.md#architecture",
+    "docs/ARCHITECTURE.md#pbos"
   ],
-  "allowedOperations": [
-    "CREATE_FILE",
-    "UPDATE_FILE",
-    "RUN_VALIDATION",
-    "GENERATE_EVIDENCE"
+  "tasks": [
+    "Create repository context verification contract.",
+    "Verify repository identity before PBOS execution.",
+    "Verify current branch and commit alignment.",
+    "Verify required runtime artifacts.",
+    "Verify active PBOS gate state.",
+    "Block execution when context validation fails."
   ],
-  "requiredValidation": [
+  "definition_of_done": [
+    "Repository context is validated before execution.",
+    "Branch and commit mismatches fail closed.",
+    "Required artifacts are verified.",
+    "Runtime state consistency is enforced.",
+    "Context validation evidence is generated."
+  ],
+  "validation": [
     "pbos:test",
     "pbos:lint"
   ],
-  "evidenceRequirements": [
-    "context-report",
-    "validation-results",
-    "change-summary"
-  ]
+  "next_gate": null
 }

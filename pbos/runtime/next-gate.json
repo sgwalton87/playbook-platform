@@ -1,38 +1,39 @@
 {
   "selectedGate": {
-    "id": "PBOS-ENGINE-005",
-    "title": "Create Governed Codex Execution Pipeline",
-    "status": "in_progress",
-    "priority": 95,
+    "id": "PBOS-CONTEXT-001",
+    "title": "Repository Context Verification",
+    "status": "ready",
+    "priority": 100,
     "dependencies": [
-      "PBOS-AUDIT-001"
+      "PBOS-ENGINE-005"
     ],
     "handbook_refs": [
       "pbos/README.md#architecture",
-      "docs/RELEASE_PROCESS.md#testing"
+      "docs/ARCHITECTURE.md#pbos"
     ],
     "tasks": [
-      "Create execution contract schema between PBOS and Codex.",
-      "Define authorized change boundaries.",
-      "Create Codex work package generation.",
-      "Add execution approval validation.",
-      "Preserve rollback and evidence requirements."
+      "Create repository context verification contract.",
+      "Verify repository identity before PBOS execution.",
+      "Verify current branch and commit alignment.",
+      "Verify required runtime artifacts.",
+      "Verify active PBOS gate state.",
+      "Block execution when context validation fails."
     ],
     "definition_of_done": [
-      "Execution contracts are versioned.",
-      "Unauthorized execution remains blocked.",
-      "Codex work packages can be generated.",
-      "Validation requirements are attached to every execution request."
+      "Repository context is validated before execution.",
+      "Branch and commit mismatches fail closed.",
+      "Required artifacts are verified.",
+      "Runtime state consistency is enforced.",
+      "Context validation evidence is generated."
     ],
     "validation": [
-      "docs",
       "pbos:test",
       "pbos:lint"
     ],
     "next_gate": null
   },
   "eligible": [
-    "PBOS-ENGINE-005"
+    "PBOS-CONTEXT-001"
   ],
   "blocked": [],
   "state": "ACTIVE_SPRINT"
