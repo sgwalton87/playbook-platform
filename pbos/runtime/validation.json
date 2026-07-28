@@ -1,6 +1,6 @@
 {
   "status": "PASS",
-  "selectedGate": "PBOS-GATE-001",
+  "selectedGate": "PBOS-CONTEXT-001",
   "checks": [
     {
       "name": "Repository Artifact",
@@ -15,7 +15,7 @@
     {
       "name": "Selected Gate",
       "status": "PASS",
-      "message": "PBOS-GATE-001"
+      "message": "PBOS-CONTEXT-001"
     },
     {
       "name": "Planning Eligible",

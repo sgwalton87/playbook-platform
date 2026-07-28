@@ -57,7 +57,7 @@ const gate = (
     Pick<GateDefinition, "id" | "priority">
 ): GateDefinition => ({
   title: overrides.id,
-  status: "pending",
+  status: "in_progress",
   dependencies: [],
   handbook_refs: [], // <-- ADD THIS LINE
   tasks: ["Plan one safe sprint."],
@@ -108,5 +108,22 @@ describe("PBOS planner", () => {
     const result = selectNextGate([gate({ id: "PBOS-ENGINE-004", priority: 200, status: "proposed" })], config, state);
 
     expect(result.selectedGate).toBeNull();
+  });
+
+  it("does not select undocumented lifecycle states", () => {
+    const result = selectNextGate(
+      [
+        gate({
+          id: "PBOS-CONTEXT-001",
+          priority: 200,
+          status: "ready",
+        }),
+      ],
+      config,
+      state
+    );
+
+    expect(result.selectedGate).toBeNull();
+    expect(result.eligibleGates).toEqual([]);
   });
 });

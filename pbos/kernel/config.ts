@@ -7,6 +7,7 @@
 export const PBOSConfig = {
   name: "PBOS",
   version: "0.4.0",
+  engineVersion: "3.0.0",
 
   runtime: {
     directory: "pbos/runtime",
@@ -14,6 +15,8 @@ export const PBOSConfig = {
 
   repository: {
     productionBranch: "main",
+    remote: "origin",
+    url: "https://github.com/sgwalton87/playbook-platform.git",
   },
 
   logging: {

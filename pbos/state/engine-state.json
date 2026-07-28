@@ -4,15 +4,11 @@
     "PBOS-ENGINE-005"
   ],
   "failedGates": [],
-  "blockedGates": [
-    "SingleSprintRule"
-  ],
-  "blockedBy": [
-    "SingleSprintRule"
-  ],
-  "lastRun": "2026-07-28T18:42:23.526Z",
+  "blockedGates": [],
+  "blockedBy": [],
+  "lastRun": "2026-07-28T20:29:47.395Z",
   "handbookVersion": "2026-07-24",
-  "validationHash": "11f79d561208f25fb63abb1bab9336ec2d5c897ff6edccf45f59a6596edd5511",
+  "validationHash": "f4f134bf86b0bdbf13e07b9e7163993c6fe01d27ab80e883dfefdfe12fbdb03c",
   "configurationHash": null,
   "futureCompatibility": [
     "execution",
@@ -22,7 +18,7 @@
     "ship"
   ],
   "engineVersion": "3.0.0",
-  "resumeToken": "f294649752ea9e74c7952553",
+  "resumeToken": "96c0ff8ffa574f19d9287a63",
   "executionMode": "planning",
   "release": {
     "currentState": "PROMOTION_COMPLETE",

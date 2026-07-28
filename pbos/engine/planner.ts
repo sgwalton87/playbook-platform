@@ -2,6 +2,10 @@ import { readdir, readFile } from "node:fs/promises";
 import * as path from "node:path";
 import type { EngineState, GateDefinition, PbosConfig, PlannerResult } from "./types";
 import { RuleEngine } from "./rules";
+import {
+  isGateStatus,
+  isPlanningEligibleStatus,
+} from "../lifecycle/status";
 
 function isGateDefinition(value: unknown): value is GateDefinition {
   const gate = value as GateDefinition;
@@ -9,7 +13,7 @@ function isGateDefinition(value: unknown): value is GateDefinition {
     gate &&
       typeof gate.id === "string" &&
       typeof gate.title === "string" &&
-      typeof gate.status === "string" &&
+      isGateStatus(gate.status) &&
       typeof gate.priority === "number" &&
       Array.isArray(gate.dependencies) &&
       Array.isArray(gate.tasks) &&
@@ -55,7 +59,7 @@ export function selectNextGate(gates: GateDefinition[], config: PbosConfig, stat
     .map((gate) => ({ gate, missingDependencies: gate.dependencies.filter((dependency) => !completed.has(dependency)) }))
     .filter(({ gate, missingDependencies }) => gate.status !== "complete" && missingDependencies.length > 0);
   const eligibleGates = gates
-    .filter((gate) => gate.status !== "complete" && gate.status !== "proposed")
+    .filter((gate) => isPlanningEligibleStatus(gate.status))
     .filter((gate) => gate.dependencies.every((dependency) => completed.has(dependency)))
     .sort((a, b) => b.priority - a.priority || a.id.localeCompare(b.id));
 

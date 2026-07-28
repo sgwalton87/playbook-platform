@@ -1,8 +1,6 @@
-export type GateStatus =
-  | "proposed"
-  | "in_progress"
-  | "complete"
-  | "blocked";
+import type { GateStatus } from "./status";
+
+export type { GateStatus } from "./status";
 
 export interface GateTransition {
   gateId: string;

@@ -66,6 +66,16 @@ Governance may transition a pending record once to `AUTHORIZED` or `DENIED`. Ter
 
 Runtime handoff artifacts live under `pbos/runtime/`. Domain implementation remains constrained by the contract's allowed files, blocked files, operations, validation requirements, rollback reference, and evidence requirements.
 
+### Repository Context Boundary
+Before the PBOS runtime enters its execution phase, it validates `pbos/runtime/repository-context.json`. The captured context binds the canonical repository identity, remote, branch, commit, working-tree state, PBOS runtime state, and required runtime artifacts through deterministic SHA-256 identities.
+
+Context validation is fail-closed and precedes execution authorization. Missing, stale, changed, or conflicting context prevents execution engines from running and records a runtime blocker. PBOS never refreshes context implicitly during execution; an intentional repository or runtime transition requires an explicit new capture.
+
+### Canonical Gate Lifecycle
+PBOS gates use exactly four lifecycle states: `proposed`, `in_progress`, `blocked`, and `complete`. The canonical transitions are `proposed → in_progress`, `in_progress → blocked`, `blocked → in_progress`, and `in_progress → complete`.
+
+Only `in_progress` is planning eligible. The planner, runtime validator, lifecycle transition service, and gate schema validation share this definition. Unknown or undocumented states fail closed and cannot become eligible through permissive fallback logic.
+
 ## App Router
 Routes are implemented under `app/`. Page files compose feature experiences, layout files define shared shells, and route handlers under `app/api/` expose server-side API surfaces. Sensitive logic should remain in server contexts, while client components should focus on interaction and presentation.
 

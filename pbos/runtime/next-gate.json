@@ -2,7 +2,7 @@
   "selectedGate": {
     "id": "PBOS-CONTEXT-001",
     "title": "Repository Context Verification",
-    "status": "ready",
+    "status": "in_progress",
     "priority": 100,
     "dependencies": [
       "PBOS-ENGINE-005"

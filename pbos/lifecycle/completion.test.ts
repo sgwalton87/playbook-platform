@@ -43,7 +43,7 @@ async function arrange(): Promise<string> {
     ...gate,
     id: "PBOS-CONTEXT-001",
     title: "Context",
-    status: "ready",
+    status: "in_progress",
     priority: 100,
     dependencies: ["PBOS-ENGINE-005"],
   };

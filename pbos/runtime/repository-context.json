@@ -1,0 +1,94 @@
+{
+  "version": "1.0.0",
+  "capturedAt": "2026-07-28T20:38:49.674Z",
+  "snapshot": {
+    "repositoryRoot": "/Users/bulletproof/playbook-platform",
+    "remoteName": "origin",
+    "remoteUrl": "https://github.com/sgwalton87/playbook-platform.git",
+    "repositoryIdentity": "playbook-platform",
+    "git": {
+      "branch": "pbos/post-pps300-convergence",
+      "commitSha": "49be9b246b96eda26a2a497e41dc73d6406a56f6",
+      "upstream": "origin/pbos/post-pps300-convergence",
+      "ahead": 0,
+      "behind": 0,
+      "workingTreeClean": false,
+      "workingTreeDigest": "8ae02f678962914b713d71ec324bc7778323b6574474cb181e8942d88e4aa4a7"
+    },
+    "runtime": {
+      "engineVersion": "3.0.0",
+      "currentGate": "PBOS-CONTEXT-001",
+      "completedGates": [
+        "PBOS-ENGINE-005"
+      ],
+      "activeSprint": "PBOS-CONTEXT-001",
+      "executionMode": "planning"
+    },
+    "artifacts": [
+      {
+        "path": "pbos/runtime/repository.json",
+        "exists": true,
+        "gateId": null,
+        "branch": "pbos/post-pps300-convergence",
+        "status": null,
+        "generatedAt": "2026-07-28T20:30:08.440Z",
+        "digest": "e6b1b32a0892075bfcf4a7f9f0050c75d06ef4cec54c2e9f840018a6d8782b21"
+      },
+      {
+        "path": "pbos/runtime/next-gate.json",
+        "exists": true,
+        "gateId": "PBOS-CONTEXT-001",
+        "branch": null,
+        "status": null,
+        "generatedAt": null,
+        "digest": "a45c219466329e7a63f5d74da591243d488908ccb12c421bf08c641fa3ac587f"
+      },
+      {
+        "path": "pbos/runtime/validation.json",
+        "exists": true,
+        "gateId": "PBOS-CONTEXT-001",
+        "branch": null,
+        "status": "PASS",
+        "generatedAt": null,
+        "digest": "7145aa52ea94dcbfe4beda9249c81589247951a06744ef9bc7ce71b359c2773a"
+      },
+      {
+        "path": "pbos/runtime/execution.json",
+        "exists": true,
+        "gateId": "PBOS-ENGINE-005",
+        "branch": null,
+        "status": "BLOCKED",
+        "generatedAt": null,
+        "digest": "280ae445031421beacc8ca33f4da783b9885054abf57a7215918014838cd7b3f"
+      },
+      {
+        "path": "pbos/runtime/execution-contract.json",
+        "exists": true,
+        "gateId": "PBOS-ENGINE-005",
+        "branch": null,
+        "status": null,
+        "generatedAt": "2026-07-28T18:15:32.116Z",
+        "digest": "da26cc7ab003476f0820a31ac95202c22372abd1a0b7d68a0a81ed702465ea5d"
+      },
+      {
+        "path": "pbos/runtime/work-package.json",
+        "exists": true,
+        "gateId": "PBOS-ENGINE-005",
+        "branch": null,
+        "status": null,
+        "generatedAt": "2026-07-28T18:15:32.121Z",
+        "digest": "a2e870a81380a262126f3c23eb50b10d934608ea05942a7678f9521b1b8a39b6"
+      },
+      {
+        "path": "pbos/runtime/execution-authorization.json",
+        "exists": true,
+        "gateId": "PBOS-ENGINE-005",
+        "branch": null,
+        "status": "PENDING",
+        "generatedAt": "2026-07-28T18:15:32.140Z",
+        "digest": "e9660ce2fa360155bc1e34780a3f99047a8bc618334cb0c2e1b4560a4c30843d"
+      }
+    ]
+  },
+  "identity": "46ef5602513109aa08aea74f8c8d26ae6dc45bfc346099d3e97cf5d9159c5f34"
+}

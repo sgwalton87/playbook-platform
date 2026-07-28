@@ -70,6 +70,8 @@ Authorization records bind the contract and work package by canonical artifact p
 ## Gate Discovery
 The engine loads `pbos/config/pbos.config.json`, reads the configured `gatesDirectory`, and parses every `.json` file as a gate definition. Gate files must include `id`, `title`, `status`, `priority`, `dependencies`, `tasks`, `definition_of_done`, and `next_gate`.
 
+Gate status is constitutional data. The only valid states are `proposed`, `in_progress`, `blocked`, and `complete`. Only `in_progress` gates are planning eligible. Activation, planning, validation, blocking, resumption, and completion use the shared lifecycle status model; undocumented states fail schema validation.
+
 ## How `next` Works
 Run:
 

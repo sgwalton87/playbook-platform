@@ -22,9 +22,9 @@
     },
     {
       "id": "SingleSprintRule",
-      "severity": "error",
-      "passed": false,
-      "message": "PBOS detected an invalid sprint state.",
+      "severity": "info",
+      "passed": true,
+      "message": "PBOS has exactly one authorized active sprint.",
       "remediation": "Ensure PBOS has either one active sprint or a fully completed idle state.",
       "handbookReference": "docs/auto_sprint.md#required-output-format"
     },
@@ -93,12 +93,10 @@
       "handbookReference": "pbos/README.md#architecture"
     }
   ],
-  "blockers": [
-    "SingleSprintRule: PBOS detected an invalid sprint state. Remediation: Ensure PBOS has either one active sprint or a fully completed idle state."
-  ],
+  "blockers": [],
   "recommendation": "PBOS-CONTEXT-001 has no configured next gate.",
-  "duration": 213,
-  "timestamp": "2026-07-28T18:42:23.538Z",
+  "duration": 150,
+  "timestamp": "2026-07-28T20:29:47.407Z",
   "release": {
     "currentState": "PROMOTION_COMPLETE",
     "previousState": "PROMOTION_PENDING",
@@ -125,7 +123,7 @@
 - PASS: NoSkippedDependencies [info] — No blocked dependency chains were selected.
   - Remediation: Complete prerequisite gates before selecting dependent gates.
   - Handbook: docs/auto_sprint.md#sprint-selection-algorithm
-- FAIL: SingleSprintRule [error] — PBOS detected an invalid sprint state.
+- PASS: SingleSprintRule [info] — PBOS has exactly one authorized active sprint.
   - Remediation: Ensure PBOS has either one active sprint or a fully completed idle state.
   - Handbook: docs/auto_sprint.md#required-output-format
 - PASS: DocumentationRule [info] — Handbook authority paths are configured.
@@ -154,7 +152,7 @@
   - Handbook: pbos/README.md#architecture
 
 ## Blockers
-- SingleSprintRule: PBOS detected an invalid sprint state. Remediation: Ensure PBOS has either one active sprint or a fully completed idle state.
+- None from planning validation.
 
 ## Recommendation
 PBOS-CONTEXT-001 has no configured next gate.

@@ -1,4 +1,5 @@
 import { ValidationCheck, ValidationContext } from "./types";
+import { isPlanningEligibleStatus } from "../lifecycle/status";
 
 export function runChecks(ctx: ValidationContext): ValidationCheck[] {
   const checks: ValidationCheck[] = [];
@@ -25,11 +26,9 @@ export function runChecks(ctx: ValidationContext): ValidationCheck[] {
 
   checks.push({
     name: "Planning Eligible",
-    status:
-      gate?.status === "in_progress" ||
-      gate?.status === "proposed"
-        ? "PASS"
-        : "FAIL",
+    status: isPlanningEligibleStatus(gate?.status)
+      ? "PASS"
+      : "FAIL",
     message: gate?.status ?? "Unknown",
   });
 
