@@ -30,17 +30,31 @@ PBOS reads authority in this order:
 `ROADMAP.md` must never justify implementation by itself.
 
 ## Runtime Architecture
+
+### Constitutional Planning
+
+`pbos/planner/` is the canonical next-gate planning boundary. It builds the
+dependency graph from strict gate metadata and selects exactly one eligible
+gate by lifecycle stage, priority, and canonical identifier. Repository
+context, required artifacts, runtime validation identity, release state,
+dependency integrity, and gate blocking conditions must all pass. Otherwise,
+the planner returns a deterministic no-gate explanation.
+
+No command or engine support module may independently select a gate.
+`next-gate.json` and `constitutional-planning.json` are emitted from the same
+constitutional decision. Completion history is derived from gate metadata, and
+repository context hashes changed file content in addition to Git status.
 PBOS coordinates a reusable execution pipeline: Planner → Validator → Execution Adapter → Verifier → Documentation Adapter → History Adapter → Ledger Adapter → Release Evidence Adapter → Reporting Adapter → Recommendation Engine → STOP.
 
 PBOS separates orchestration responsibilities into focused modules:
 
-- `engine/planner.ts` loads structured gates and selects the highest-priority eligible gate without skipping dependencies.
+- `planner/index.ts` is the sole gate-selection authority and emits both planning artifacts.
+- `engine/planner.ts` evaluates support rules against the constitutional decision without selecting gates.
 - `engine/rules.ts` evaluates reusable rules such as dependency safety, single-sprint selection, documentation authority, validation requirements, and release constraints.
 - `adapters/registry.ts` registers planning-safe adapters for execution boundaries, documentation handoff, and release evidence.
 - `commands/registry/commands.json` declares active and reserved PBOS commands, and `command-registry.ts` loads them without planner changes.
 - `engine/prompts.ts` verifies prompt manifest compatibility before execution proceeds.
-- `engine/recommendation.ts` generates the recommended next gate and reason.
-- `engine/state.ts` maintains persistent state under `pbos/state/` so PBOS can resume after interruption.
+- `engine/state.ts` maintains resumable operational state while completion history remains canonical in gate metadata.
 - `engine/executor.ts` coordinates the lifecycle: planner, validator, executor boundary, documentation, ledger, report, recommendation, and stop.
 - `engine/validator.ts` returns structured validation results with remediation and handbook references.
 - `engine/docs.ts` verifies handbook discovery and appends PBOS history and ledger records.

@@ -56,6 +56,21 @@ If a feature accomplishes none of these objectives, reconsider whether it belong
 | `tests/` | Test guidance and test-supporting documentation |
 
 ## PBOS Governed Execution
+
+PBOS constitutional planning is implemented in `pbos/planner/`. It strictly
+loads gate metadata, validates the dependency graph, evaluates repository
+context, runtime validation, release state, required artifacts, lifecycle
+state, and declared blockers, then deterministically selects at most one gate.
+`pbos next` and `pbos status` consume this result. Planning failures remain
+fail-closed and are recorded in
+`pbos/runtime/constitutional-planning.json`.
+
+The constitutional planner is the sole gate-selection authority. Engine rules
+validate its decision but cannot select gates. Gate metadata is also the sole
+completed-gate history. Required artifacts undergo schema, gate identity,
+content identity, digest, and freshness checks where applicable. Repository
+context binds both Git state classification and the content identity of tracked
+and untracked changes.
 PBOS separates planning from authorized execution through a durable artifact handoff:
 
 Gate → Context → Contract → Work Package → Authorization Pending → Authorization Decision → Validation → Execution Eligibility → Adapter Dispatch.

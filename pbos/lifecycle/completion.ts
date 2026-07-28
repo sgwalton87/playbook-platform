@@ -108,9 +108,6 @@ export async function completePromotedGate(options: {
       ...state,
       currentGate:
         state.currentGate === gateId ? null : state.currentGate,
-      completedGates: Array.from(
-        new Set([...state.completedGates, gateId])
-      ),
     },
     rootDir
   );
@@ -120,9 +117,6 @@ export async function completePromotedGate(options: {
     {
       ...state,
       currentGate: planning.selectedGate?.id ?? null,
-      completedGates: Array.from(
-        new Set([...state.completedGates, gateId])
-      ),
     },
     rootDir
   );

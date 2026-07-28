@@ -1,9 +1,15 @@
 {
   "id": "PBOS-GATE-001",
   "title": "Make release gates trustworthy",
+  "description": "Establish trustworthy release validation and evidence.",
   "status": "complete",
   "priority": 100,
+  "lifecycle_stage": 10,
   "dependencies": [],
+  "produces": ["docs/RELEASE_PROCESS.md"],
+  "requires": ["docs/MASTER_CHECKLIST.md"],
+  "blocking_conditions": [],
+  "completion_state": "satisfied",
   "handbook_refs": [
     "docs/MASTER_CHECKLIST.md#current-sprint",
     "docs/RELEASE_PROCESS.md#testing",

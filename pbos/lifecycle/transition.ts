@@ -51,6 +51,10 @@ export function transitionGate(
 
 
   gate.status = request.nextStatus;
+  if ("completion_state" in gate) {
+    gate.completion_state =
+      request.nextStatus === "complete" ? "satisfied" : "pending";
+  }
 
   fs.writeFileSync(
     request.gatePath,

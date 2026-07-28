@@ -1,12 +1,18 @@
 {
   "id": "PBOS-UI-001",
   "title": "Audit AppShell and design system consistency",
+  "description": "Audit shared application shell and design-system consistency.",
   "status": "complete",
   "priority": 80,
+  "lifecycle_stage": 30,
   "dependencies": [
     "PBOS-GATE-001",
     "PBOS-RLS-001"
   ],
+  "produces": ["docs/UI_DESIGN_SYSTEM.md"],
+  "requires": ["docs/DATABASE.md"],
+  "blocking_conditions": [],
+  "completion_state": "satisfied",
   "handbook_refs": [
     "docs/UI_DESIGN_SYSTEM.md#shared-ui-components",
     "docs/ARCHITECTURE.md#role-dashboard-architecture",

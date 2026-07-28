@@ -1,4 +1,4 @@
-export const REPOSITORY_CONTEXT_VERSION = "1.0.0";
+export const REPOSITORY_CONTEXT_VERSION = "1.1.0";
 export const DEFAULT_CONTEXT_MAX_AGE_MS = 24 * 60 * 60 * 1000;
 
 export interface GitContext {
@@ -9,6 +9,7 @@ export interface GitContext {
   behind: number;
   workingTreeClean: boolean;
   workingTreeDigest: string;
+  workingTreeContentDigest: string;
 }
 
 export interface RuntimeContext {

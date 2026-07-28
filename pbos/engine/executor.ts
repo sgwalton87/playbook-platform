@@ -1,11 +1,11 @@
 import { AdapterRegistry } from "../adapters/registry";
+import { planConstitutionalGate } from "../planner";
 import { appendHistoryAndLedger } from "./docs";
 import { loadConfig } from "./config";
-import { loadGates, selectNextGate } from "./planner";
+import { evaluatePlanningRules, loadGates } from "./planner";
 import { createReport, writeReport } from "./reporter";
 import { loadState, saveState, updateStateForPlanning } from "./state";
 import { validateGatePlanning } from "./validator";
-import { refreshPlanningArtifact } from "./planning-refresh";
 import type { ExecutionMode } from "./types";
 
 function parseMode(mode: string | undefined): ExecutionMode {
@@ -26,8 +26,14 @@ export async function runNext(rootDir = process.cwd(), requestedMode?: string): 
 
   const state = await loadState(config, mode, rootDir);
   const gates = await loadGates(config, rootDir);
-  const plan = selectNextGate(gates, config, state);
-  const validationResults = await validateGatePlanning(plan.selectedGate, config, plan.ruleResults);
+  const plan = await planConstitutionalGate({ rootDir });
+  const ruleResults = evaluatePlanningRules({
+    gates,
+    config,
+    state,
+    plan,
+  });
+  const validationResults = await validateGatePlanning(plan.selectedGate, config, ruleResults);
   const adapterResults = await Promise.all(new AdapterRegistry().all().map((adapter) => adapter.run({ config, rootDir })));
   const adapterValidationResults = adapterResults.map((result) => ({
     id: result.id,
@@ -40,9 +46,16 @@ export async function runNext(rootDir = process.cwd(), requestedMode?: string): 
   const allValidationResults = [...validationResults, ...adapterValidationResults];
   const blockers = allValidationResults.filter((result) => !result.passed).map((result) => result.id);
   const nextState = updateStateForPlanning(state, plan.selectedGate?.id ?? null, blockers);
-  await refreshPlanningArtifact(rootDir);
   await saveState(config, nextState, rootDir);
-  const report = createReport({ config, mode, selectedGate: plan.selectedGate, validationResults: allValidationResults, duration: Date.now() - startedAt, release: nextState.release });
+  const report = createReport({
+    config,
+    mode,
+    selectedGate: plan.selectedGate,
+    validationResults: allValidationResults,
+    duration: Date.now() - startedAt,
+    planningRecommendation: plan.reasonSelected,
+    release: nextState.release,
+  });
   await writeReport(report, config, rootDir);
   await appendHistoryAndLedger(report, config, rootDir);
 
@@ -51,13 +64,16 @@ export async function runNext(rootDir = process.cwd(), requestedMode?: string): 
     `Mode: ${mode}; no application code changes were made.`,
     "",
     "Eligible gates:",
-    ...(plan.eligibleGates.length > 0 ? plan.eligibleGates.map((gate) => `- ${gate.id} (${gate.status}, priority ${gate.priority})`) : ["- None"]),
+    ...(plan.eligibleGates.length > 0 ? plan.eligibleGates.map((gateId) => `- ${gateId}`) : ["- None"]),
     "",
     "Blocked gates:",
     ...(plan.blockedGates.length > 0
-      ? plan.blockedGates.map(({ gate, missingDependencies }) => `- ${gate.id}: waiting on ${missingDependencies.join(", ")}`)
+      ? plan.blockedGates.map(({ gateId, reasons }) => `- ${gateId}: ${reasons.map((reason) => reason.message).join(" ")}`)
       : ["- None"]),
     "",
-    `Recommendation: ${report.recommendation}`,
+    `Dependency Graph: ${plan.dependencyGraphSummary.nodeCount} nodes, ${plan.dependencyGraphSummary.edgeCount} edges`,
+    `Required Artifacts: ${plan.requiredArtifacts.join(", ") || "none"}`,
+    `Expected Deliverables: ${plan.expectedDeliverables.join(", ") || "none"}`,
+    `Recommendation: ${plan.reasonSelected}`,
   ].join("\n");
 }

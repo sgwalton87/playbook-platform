@@ -1,6 +1,5 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import * as path from "node:path";
-import { recommendNextGate } from "./recommendation";
 import type { ExecutionMode, ExecutionReport, GateDefinition, PbosConfig, ValidationResult } from "./types";
 
 export function createReport(args: {
@@ -9,10 +8,10 @@ export function createReport(args: {
   selectedGate: GateDefinition | null;
   validationResults: ValidationResult[];
   duration: number;
+  planningRecommendation: string;
   release?: import("../release/state-machine").ReleaseTransition;
 }): ExecutionReport {
   const blockers = args.validationResults.filter((result) => !result.passed).map((result) => `${result.id}: ${result.message} Remediation: ${result.remediation}`);
-  const recommendation = recommendNextGate(args.selectedGate, args.release);
   return {
     engineVersion: args.config.version,
     executionMode: args.mode,
@@ -25,7 +24,7 @@ export function createReport(args: {
       : ["No eligible gate was selected."],
     validationResults: args.validationResults,
     blockers,
-    recommendation: args.selectedGate && recommendation.recommendedNextGate ? `Complete ${args.selectedGate.id}, then evaluate ${recommendation.recommendedNextGate}. ${recommendation.reason}` : recommendation.reason,
+    recommendation: args.planningRecommendation,
     duration: args.duration,
     timestamp: new Date().toISOString(),
     release: args.release,

@@ -94,9 +94,9 @@
     }
   ],
   "blockers": [],
-  "recommendation": "PBOS-CONTEXT-001 has no configured next gate.",
-  "duration": 150,
-  "timestamp": "2026-07-28T20:29:47.407Z",
+  "recommendation": "PBOS-CONTEXT-001 is the first dependency-safe gate by lifecycle stage, priority, and canonical identifier.",
+  "duration": 1281,
+  "timestamp": "2026-07-28T21:36:41.882Z",
   "release": {
     "currentState": "PROMOTION_COMPLETE",
     "previousState": "PROMOTION_PENDING",
@@ -155,4 +155,4 @@
 - None from planning validation.
 
 ## Recommendation
-PBOS-CONTEXT-001 has no configured next gate.
+PBOS-CONTEXT-001 is the first dependency-safe gate by lifecycle stage, priority, and canonical identifier.

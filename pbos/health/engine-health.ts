@@ -1,8 +1,9 @@
 import { AdapterRegistry } from "../adapters/registry";
 import { CommandRegistry } from "../commands/registry/command-registry";
 import { loadConfig } from "../engine/config";
-import { loadGates, selectNextGate } from "../engine/planner";
+import { evaluatePlanningRules, loadGates } from "../engine/planner";
 import { loadState } from "../engine/state";
+import { planConstitutionalGate } from "../planner";
 import type { ExecutionMode } from "../engine/types";
 
 export interface EngineHealthReport {
@@ -25,24 +26,37 @@ export interface EngineHealthReport {
   auditStatus: "pending" | "complete";
   blockingConditions: string[];
   recommendation: string;
+  currentConstitutionalPosition: string;
+  currentDependencyNode: string | null;
+  planningHealth: "HEALTHY" | "BLOCKED";
+  planningRecommendation: string;
 }
 
 export async function getEngineHealth(rootDir = process.cwd()): Promise<EngineHealthReport> {
   const config = await loadConfig(rootDir);
   const state = await loadState(config, config.defaultMode, rootDir);
   const gates = await loadGates(config, rootDir);
-  const plan = selectNextGate(gates, config, state);
+  const constitutionalPlan = await planConstitutionalGate({
+    rootDir,
+    persist: false,
+  });
   const adapterCount = new AdapterRegistry().count();
   const commandCount = new CommandRegistry().count();
-  const failedRules = plan.ruleResults.filter((rule) => !rule.passed);
+  const ruleResults = evaluatePlanningRules({
+    gates,
+    config,
+    state,
+    plan: constitutionalPlan,
+  });
+  const failedRules = ruleResults.filter((rule) => !rule.passed);
 
   return {
     engineVersion: config.version,
     executionMode: state.executionMode,
-    currentGate: plan.selectedGate?.id ?? state.currentGate,
-    completedGates: plan.completedGateIds,
-    blockedGates: plan.blockedGates.map(({ gate }) => gate.id),
-    ruleCount: plan.ruleResults.length,
+    currentGate: constitutionalPlan.selectedGate?.id ?? state.currentGate,
+    completedGates: constitutionalPlan.completedGates,
+    blockedGates: constitutionalPlan.blockedGates.map(({ gateId }) => gateId),
+    ruleCount: ruleResults.length,
     adapterCount,
     commandCount,
     repositoryHealth: "blocked-by-existing-lint-debt",
@@ -55,9 +69,14 @@ export async function getEngineHealth(rootDir = process.cwd()): Promise<EngineHe
     promotionStatus: state.release.currentState === "PROMOTION_COMPLETE" || state.release.currentState === "AUDIT_COMPLETE" || state.release.currentState === "ARCHIVED" ? "complete" : "pending",
     auditStatus: state.release.currentState === "AUDIT_COMPLETE" || state.release.currentState === "ARCHIVED" ? "complete" : "pending",
     blockingConditions: state.release.blockingConditions,
-    recommendation: state.release.currentState === "PROMOTION_PENDING"
-      ? `Repository promotion is pending. Resolve: ${state.release.blockingConditions.join(", ") || "none"}.`
-      : plan.selectedGate?.next_gate ? `Complete ${plan.selectedGate.id}, then evaluate ${plan.selectedGate.next_gate}.` : "No next gate is configured.",
+    recommendation: constitutionalPlan.reasonSelected,
+    currentConstitutionalPosition:
+      constitutionalPlan.recommendedNextGate ??
+      state.currentGate ??
+      "No eligible constitutional gate",
+    currentDependencyNode: constitutionalPlan.currentDependencyNode,
+    planningHealth: constitutionalPlan.planningHealth,
+    planningRecommendation: constitutionalPlan.reasonSelected,
   };
 }
 
@@ -66,6 +85,10 @@ export function formatEngineHealth(report: EngineHealthReport): string {
     `Engine Version: ${report.engineVersion}`,
     `Execution Mode: ${report.executionMode}`,
     `Current Gate: ${report.currentGate ?? "none"}`,
+    `Current Constitutional Position: ${report.currentConstitutionalPosition}`,
+    `Current Dependency Node: ${report.currentDependencyNode ?? "none"}`,
+    `Planning Health: ${report.planningHealth}`,
+    `Planning Recommendation: ${report.planningRecommendation}`,
     `Completed Gates: ${report.completedGates.join(", ") || "none"}`,
     `Blocked Gates: ${report.blockedGates.join(", ") || "none"}`,
     `Rule Count: ${report.ruleCount}`,

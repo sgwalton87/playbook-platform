@@ -1,12 +1,9 @@
 {
   "currentGate": "PBOS-CONTEXT-001",
-  "completedGates": [
-    "PBOS-ENGINE-005"
-  ],
   "failedGates": [],
   "blockedGates": [],
   "blockedBy": [],
-  "lastRun": "2026-07-28T20:29:47.395Z",
+  "lastRun": "2026-07-28T21:36:41.860Z",
   "handbookVersion": "2026-07-24",
   "validationHash": "f4f134bf86b0bdbf13e07b9e7163993c6fe01d27ab80e883dfefdfe12fbdb03c",
   "configurationHash": null,
@@ -18,7 +15,7 @@
     "ship"
   ],
   "engineVersion": "3.0.0",
-  "resumeToken": "96c0ff8ffa574f19d9287a63",
+  "resumeToken": "8067b5e986aa9d310901b967",
   "executionMode": "planning",
   "release": {
     "currentState": "PROMOTION_COMPLETE",

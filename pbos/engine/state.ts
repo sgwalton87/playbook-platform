@@ -13,7 +13,6 @@ export function createInitialState(config: PbosConfig, mode: ExecutionMode): Eng
   const promotion = resolvePromotionState(environment);
   return {
     currentGate: null,
-    completedGates: [],
     failedGates: [],
     blockedGates: [],
     blockedBy: [],
@@ -39,8 +38,16 @@ export async function loadState(config: PbosConfig, mode: ExecutionMode, rootDir
   const statePath = path.join(rootDir, config.stateFile);
   try {
     const raw = await readFile(statePath, "utf8");
-    const parsed = JSON.parse(raw) as EngineState;
-    return { ...parsed, executionMode: mode, engineVersion: config.version };
+    const parsed = JSON.parse(raw) as EngineState & {
+      completedGates?: string[];
+    };
+    const state = { ...parsed };
+    delete state.completedGates;
+    return {
+      ...state,
+      executionMode: mode,
+      engineVersion: config.version,
+    };
   } catch {
     const initialState = createInitialState(config, mode);
     await saveState(config, initialState, rootDir);

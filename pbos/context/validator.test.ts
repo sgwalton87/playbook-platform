@@ -8,6 +8,7 @@ import type {
   RepositoryContextArtifact,
   RepositoryContextSnapshot,
 } from "./schema";
+import { REPOSITORY_CONTEXT_VERSION } from "./schema";
 import { validateRepositoryContext } from "./validator";
 
 const now = new Date("2026-07-28T12:00:00.000Z");
@@ -26,6 +27,10 @@ function snapshot(): RepositoryContextSnapshot {
       behind: 0,
       workingTreeClean: true,
       workingTreeDigest: artifactDigest(""),
+      workingTreeContentDigest: artifactDigest({
+        trackedDiff: "",
+        untrackedFiles: [],
+      }),
     },
     runtime: {
       engineVersion: PBOSConfig.engineVersion,
@@ -68,7 +73,7 @@ function artifact(
   value = snapshot()
 ): RepositoryContextArtifact {
   return {
-    version: "1.0.0",
+    version: REPOSITORY_CONTEXT_VERSION,
     capturedAt: "2026-07-28T11:30:00.000Z",
     snapshot: value,
     identity: artifactDigest(value),
@@ -122,6 +127,17 @@ describe("PBOS repository context validation", () => {
 
     expect(validate(artifact(), observed).errors).toContain(
       "Context validation failed: commit identity mismatches."
+    );
+  });
+
+  it("rejects changed content with unchanged Git status classification", () => {
+    const observed = snapshot();
+    observed.git.workingTreeContentDigest = artifactDigest(
+      "changed file content"
+    );
+
+    expect(validate(artifact(), observed).errors).toContain(
+      "Context validation failed: working tree state changed after capture."
     );
   });
 

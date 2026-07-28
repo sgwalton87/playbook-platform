@@ -123,7 +123,9 @@ export function validateRepositoryContext(options: {
     artifact.snapshot.git.workingTreeClean !==
       observed.git.workingTreeClean ||
     artifact.snapshot.git.workingTreeDigest !==
-      observed.git.workingTreeDigest
+      observed.git.workingTreeDigest ||
+    artifact.snapshot.git.workingTreeContentDigest !==
+      observed.git.workingTreeContentDigest
   ) {
     errors.push(
       "Context validation failed: working tree state changed after capture."

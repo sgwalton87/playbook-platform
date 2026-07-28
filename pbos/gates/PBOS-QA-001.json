@@ -1,13 +1,19 @@
 {
   "id": "PBOS-QA-001",
   "title": "Establish browser E2E launch smoke coverage",
+  "description": "Establish browser end-to-end launch smoke coverage.",
   "status": "complete",
   "priority": 70,
+  "lifecycle_stage": 40,
   "dependencies": [
     "PBOS-GATE-001",
     "PBOS-RLS-001",
     "PBOS-UI-001"
   ],
+  "produces": ["docs/RELEASE_PROCESS.md"],
+  "requires": ["docs/UI_DESIGN_SYSTEM.md"],
+  "blocking_conditions": [],
+  "completion_state": "satisfied",
   "handbook_refs": [
     "docs/MASTER_CHECKLIST.md#current-priorities",
     "docs/RELEASE_PROCESS.md#testing",

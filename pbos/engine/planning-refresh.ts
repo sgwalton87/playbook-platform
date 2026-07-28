@@ -1,45 +1,16 @@
-import path from "node:path";
-import { loadConfig } from "./config";
-import { loadGates, selectNextGate } from "./planner";
-import { loadState } from "./state";
-import { Artifacts, Runtime } from "../kernel";
+import { planConstitutionalGate } from "../planner";
 
-export async function refreshPlanningArtifact(rootDir = process.cwd()) {
-  const config = await loadConfig(rootDir);
-  const state = await loadState(
-    config,
-    "planning",
-    rootDir
-  );
-
-  const gates = await loadGates(
-    config,
-    rootDir
-  );
-
-  const plan = selectNextGate(
-    gates,
-    config,
-    state
-  );
-
-  const artifact = {
-    selectedGate: plan.selectedGate,
-    eligible: plan.eligibleGates.map(
-      (gate) => gate.id
-    ),
-    blocked: plan.blockedGates.map(
-      ({ gate }) => gate.id
-    ),
-    state: plan.selectedGate
-      ? "ACTIVE_SPRINT"
-      : "VALID_IDLE",
+/** @deprecated Planning refresh delegates to the constitutional planner. */
+export async function refreshPlanningArtifact(
+  rootDir = process.cwd()
+) {
+  const report = await planConstitutionalGate({ rootDir });
+  return {
+    selectedGate: report.selectedGate,
+    eligible: report.eligibleGates,
+    blocked: report.blockedGates.map(({ gateId }) => gateId),
+    completed: report.completedGates,
+    state: report.selectedGate ? "ACTIVE_SPRINT" : "VALID_IDLE",
+    authority: "constitutional-planner" as const,
   };
-
-  Runtime.save(
-    path.join(rootDir, Artifacts.planning),
-    artifact
-  );
-
-  return artifact;
 }

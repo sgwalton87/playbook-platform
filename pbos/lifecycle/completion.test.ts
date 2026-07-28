@@ -30,9 +30,15 @@ async function arrange(): Promise<string> {
   const gate = {
     id: "PBOS-ENGINE-005",
     title: "Governed execution",
+    description: "Governed execution lifecycle.",
     status: "in_progress",
     priority: 95,
+    lifecycle_stage: 70,
     dependencies: [],
+    produces: [],
+    requires: [],
+    blocking_conditions: [],
+    completion_state: "pending",
     handbook_refs: [],
     tasks: ["Complete lifecycle"],
     definition_of_done: ["Lifecycle complete"],
@@ -83,7 +89,6 @@ async function arrange(): Promise<string> {
   });
   await writeJson(root, "pbos/state/engine-state.json", {
     currentGate: "PBOS-ENGINE-005",
-    completedGates: ["PBOS-AUDIT-001"],
     failedGates: [],
     blockedGates: [],
     blockedBy: [],
@@ -122,7 +127,7 @@ afterEach(async () => {
 });
 
 describe("PBOS gate completion", () => {
-  it("preserves history and unlocks the dependent next gate", async () => {
+  it("records completion in gate metadata and refreshes fail closed", async () => {
     const root = await arrange();
 
     await completePromotedGate({
@@ -137,21 +142,27 @@ describe("PBOS gate completion", () => {
       )
     ) as {
       currentGate: string | null;
-      completedGates: string[];
     };
     const planning = JSON.parse(
       await readFile(
         path.join(root, "pbos/runtime/next-gate.json"),
         "utf8"
       )
-    ) as { selectedGate: { id: string } };
+    ) as { selectedGate: { id: string } | null };
+    const completedGate = JSON.parse(
+      await readFile(
+        path.join(root, "pbos/gates/PBOS-ENGINE-005.json"),
+        "utf8"
+      )
+    ) as {
+      status: string;
+      completion_state: string;
+    };
 
-    expect(state.completedGates).toEqual([
-      "PBOS-AUDIT-001",
-      "PBOS-ENGINE-005",
-    ]);
-    expect(state.currentGate).toBe("PBOS-CONTEXT-001");
-    expect(planning.selectedGate.id).toBe("PBOS-CONTEXT-001");
+    expect(completedGate.status).toBe("complete");
+    expect(completedGate.completion_state).toBe("satisfied");
+    expect(state.currentGate).toBeNull();
+    expect(planning.selectedGate).toBeNull();
   });
 
   it("rejects stale promotion identity", async () => {

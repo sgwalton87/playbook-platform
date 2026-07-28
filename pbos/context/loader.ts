@@ -15,11 +15,11 @@ import type {
   RepositoryContextSnapshot,
   RuntimeContext,
 } from "./schema";
+import { loadConstitutionalGates } from "../planner/load";
 
 interface EngineStateArtifact {
   engineVersion: string;
   currentGate: string | null;
-  completedGates: string[];
   executionMode: string;
 }
 
@@ -140,11 +140,19 @@ function loadRuntimeContext(rootDir: string): RuntimeContext {
       "utf8"
     )
   ) as PlanningArtifact;
+  const completedGates = loadConstitutionalGates(rootDir)
+    .filter(
+      (gate) =>
+        gate.status === "complete" &&
+        gate.completion_state === "satisfied"
+    )
+    .map((gate) => gate.id)
+    .sort();
 
   return {
     engineVersion: state.engineVersion,
     currentGate: state.currentGate,
-    completedGates: [...state.completedGates].sort(),
+    completedGates,
     activeSprint: planning.selectedGate?.id ?? null,
     executionMode: state.executionMode,
   };
@@ -201,6 +209,32 @@ export function loadRepositoryContextSnapshot(
         !line.endsWith(Artifacts.repositoryContext)
     )
     .join("\n");
+  const trackedDiff = git(repositoryRoot, [
+    "diff",
+    "--binary",
+    "HEAD",
+    "--",
+    ".",
+    `:(exclude)${Artifacts.repositoryContext}`,
+  ]);
+  const untrackedFiles = git(repositoryRoot, [
+    "ls-files",
+    "--others",
+    "--exclude-standard",
+  ])
+    .split("\n")
+    .filter(
+      (relativePath) =>
+        relativePath.length > 0 &&
+        relativePath !== Artifacts.repositoryContext
+    )
+    .sort()
+    .map((relativePath) => ({
+      path: relativePath,
+      digest: artifactDigest(
+        readFileSync(path.join(repositoryRoot, relativePath))
+      ),
+    }));
 
   const requiredArtifacts = [
     Artifacts.repository,
@@ -225,6 +259,10 @@ export function loadRepositoryContextSnapshot(
       behind,
       workingTreeClean: workingTree.length === 0,
       workingTreeDigest: artifactDigest(workingTree),
+      workingTreeContentDigest: artifactDigest({
+        trackedDiff,
+        untrackedFiles,
+      }),
     },
     runtime: loadRuntimeContext(repositoryRoot),
     artifacts: requiredArtifacts.map((artifact) =>

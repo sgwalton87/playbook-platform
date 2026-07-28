@@ -1,11 +1,17 @@
 {
   "id": "PBOS-ENGINE-004",
   "title": "Add controlled implementation adapters",
+  "description": "Add controlled implementation adapters with authorization boundaries.",
   "status": "complete",
   "priority": 60,
+  "lifecycle_stage": 50,
   "dependencies": [
     "PBOS-GATE-001"
   ],
+  "produces": ["pbos/adapters/registry.ts"],
+  "requires": ["docs/RELEASE_PROCESS.md"],
+  "blocking_conditions": [],
+  "completion_state": "satisfied",
   "handbook_refs": [
     "pbos/README.md#pbos-engine-004",
     "docs/auto_sprint.md#pbos-engine-integration",

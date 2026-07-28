@@ -1,4 +1,35 @@
 {
+  "version": "1.0.0",
+  "generatedAt": "2026-07-28T21:36:41.598Z",
+  "engineVersion": "3.0.0",
+  "repositoryContext": {
+    "valid": true,
+    "errors": []
+  },
+  "currentLifecycle": {
+    "releaseState": "PROMOTION_COMPLETE",
+    "releasePermitsExecution": true
+  },
+  "currentDependencyNode": "PBOS-CONTEXT-001",
+  "completedGates": [
+    "PBOS-AUDIT-001",
+    "PBOS-ENGINE-004",
+    "PBOS-ENGINE-005",
+    "PBOS-GATE-001",
+    "PBOS-QA-001",
+    "PBOS-RLS-001",
+    "PBOS-UI-001"
+  ],
+  "eligibleGates": [
+    "PBOS-CONTEXT-001"
+  ],
+  "blockedGates": [],
+  "dependencyGraphSummary": {
+    "nodeCount": 8,
+    "edgeCount": 10,
+    "missingDependencies": [],
+    "cycles": []
+  },
   "selectedGate": {
     "id": "PBOS-CONTEXT-001",
     "title": "Repository Context Verification",
@@ -45,19 +76,22 @@
     ],
     "next_gate": null
   },
-  "eligible": [
-    "PBOS-CONTEXT-001"
+  "reasonSelected": "PBOS-CONTEXT-001 is the first dependency-safe gate by lifecycle stage, priority, and canonical identifier.",
+  "requiredArtifacts": [
+    "pbos/runtime/repository.json",
+    "pbos/runtime/validation.json",
+    "pbos/runtime/promotion.json"
   ],
-  "blocked": [],
-  "completed": [
-    "PBOS-AUDIT-001",
-    "PBOS-ENGINE-004",
-    "PBOS-ENGINE-005",
-    "PBOS-GATE-001",
-    "PBOS-QA-001",
-    "PBOS-RLS-001",
-    "PBOS-UI-001"
+  "validationResults": {
+    "passed": true,
+    "gateId": "PBOS-CONTEXT-001"
+  },
+  "recommendedNextGate": "PBOS-CONTEXT-001",
+  "expectedDeliverables": [
+    "pbos/runtime/repository-context.json",
+    "docs/release-evidence/pbos-context-001-validation.md"
   ],
-  "state": "ACTIVE_SPRINT",
-  "authority": "constitutional-planner"
+  "estimatedImpact": "Verify repository identity, Git state, and PBOS runtime context before execution.",
+  "blockingConditions": [],
+  "planningHealth": "HEALTHY"
 }

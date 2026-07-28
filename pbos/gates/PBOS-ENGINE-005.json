@@ -1,11 +1,17 @@
 {
   "id": "PBOS-ENGINE-005",
   "title": "Create Governed Codex Execution Pipeline",
+  "description": "Create a durable governed execution pipeline for Codex work packages.",
   "status": "complete",
   "priority": 95,
+  "lifecycle_stage": 70,
   "dependencies": [
     "PBOS-AUDIT-001"
   ],
+  "produces": ["pbos/runtime/execution-contract.json", "pbos/runtime/work-package.json", "pbos/runtime/execution-authorization.json"],
+  "requires": ["pbos/runtime/promotion.json"],
+  "blocking_conditions": [],
+  "completion_state": "satisfied",
   "handbook_refs": [
     "pbos/README.md#architecture",
     "docs/RELEASE_PROCESS.md#testing"

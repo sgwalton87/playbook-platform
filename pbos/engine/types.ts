@@ -91,7 +91,6 @@ export interface ExecutionReport {
 
 export interface EngineState {
   currentGate: string | null;
-  completedGates: string[];
   failedGates: string[];
   blockedGates: string[];
   blockedBy: string[];
@@ -104,17 +103,6 @@ export interface EngineState {
   resumeToken: string;
   executionMode: ExecutionMode;
   release: ReleaseTransition;
-}
-
-export interface PlannerResult {
-  selectedGate: GateDefinition | null;
-  eligibleGates: GateDefinition[];
-  blockedGates: Array<{
-    gate: GateDefinition;
-    missingDependencies: string[];
-  }>;
-  completedGateIds: string[];
-  ruleResults: RuleResult[];
 }
 
 export type { GateDefinition };

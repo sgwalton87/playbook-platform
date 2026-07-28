@@ -1,11 +1,17 @@
 {
   "id": "PBOS-RLS-001",
   "title": "Validate production RLS and role access",
+  "description": "Validate production row-level security and role boundaries.",
   "status": "complete",
   "priority": 90,
+  "lifecycle_stage": 20,
   "dependencies": [
     "PBOS-GATE-001"
   ],
+  "produces": ["docs/DATABASE.md"],
+  "requires": ["docs/RELEASE_PROCESS.md"],
+  "blocking_conditions": [],
+  "completion_state": "satisfied",
   "handbook_refs": [
     "docs/DATABASE.md#rls-policies",
     "docs/MASTER_CHECKLIST.md#current-blockers",

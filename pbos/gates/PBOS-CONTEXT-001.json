@@ -1,11 +1,17 @@
 {
   "id": "PBOS-CONTEXT-001",
   "title": "Repository Context Verification",
+  "description": "Verify repository identity, Git state, and PBOS runtime context before execution.",
   "status": "in_progress",
   "priority": 100,
+  "lifecycle_stage": 80,
   "dependencies": [
     "PBOS-ENGINE-005"
   ],
+  "produces": ["pbos/runtime/repository-context.json", "docs/release-evidence/pbos-context-001-validation.md"],
+  "requires": ["pbos/runtime/repository.json", "pbos/runtime/validation.json", "pbos/runtime/promotion.json"],
+  "blocking_conditions": [],
+  "completion_state": "pending",
   "handbook_refs": [
     "pbos/README.md#architecture",
     "docs/ARCHITECTURE.md#pbos"

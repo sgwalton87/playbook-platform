@@ -1,6 +1,6 @@
 {
-  "version": "1.0.0",
-  "capturedAt": "2026-07-28T20:38:49.674Z",
+  "version": "1.1.0",
+  "capturedAt": "2026-07-28T21:37:31.675Z",
   "snapshot": {
     "repositoryRoot": "/Users/bulletproof/playbook-platform",
     "remoteName": "origin",
@@ -8,18 +8,25 @@
     "repositoryIdentity": "playbook-platform",
     "git": {
       "branch": "pbos/post-pps300-convergence",
-      "commitSha": "49be9b246b96eda26a2a497e41dc73d6406a56f6",
+      "commitSha": "5fa6699b5b4034cb11b4b95bdb81a8dd3491f4b1",
       "upstream": "origin/pbos/post-pps300-convergence",
-      "ahead": 0,
+      "ahead": 1,
       "behind": 0,
       "workingTreeClean": false,
-      "workingTreeDigest": "8ae02f678962914b713d71ec324bc7778323b6574474cb181e8942d88e4aa4a7"
+      "workingTreeDigest": "7a670510901187748cda2e355f1aaeb97b2f4b9ed845848e2d291fd2fc4ed125",
+      "workingTreeContentDigest": "7428f85182b0e4f9d26c0fd870e0e13e1c0ffa8734e0ca89ceb6bae7201a7340"
     },
     "runtime": {
       "engineVersion": "3.0.0",
       "currentGate": "PBOS-CONTEXT-001",
       "completedGates": [
-        "PBOS-ENGINE-005"
+        "PBOS-AUDIT-001",
+        "PBOS-ENGINE-004",
+        "PBOS-ENGINE-005",
+        "PBOS-GATE-001",
+        "PBOS-QA-001",
+        "PBOS-RLS-001",
+        "PBOS-UI-001"
       ],
       "activeSprint": "PBOS-CONTEXT-001",
       "executionMode": "planning"
@@ -31,8 +38,8 @@
         "gateId": null,
         "branch": "pbos/post-pps300-convergence",
         "status": null,
-        "generatedAt": "2026-07-28T20:30:08.440Z",
-        "digest": "e6b1b32a0892075bfcf4a7f9f0050c75d06ef4cec54c2e9f840018a6d8782b21"
+        "generatedAt": "2026-07-28T21:37:08.908Z",
+        "digest": "170cee54aa4593eeea2f8d44c685d3bdae0c46b2d860e6ade171462efbe7d5ff"
       },
       {
         "path": "pbos/runtime/next-gate.json",
@@ -41,7 +48,7 @@
         "branch": null,
         "status": null,
         "generatedAt": null,
-        "digest": "a45c219466329e7a63f5d74da591243d488908ccb12c421bf08c641fa3ac587f"
+        "digest": "99b5f215c302d05a24955852c904b3d56dfe154aca422d1732e3bba2ba68eb98"
       },
       {
         "path": "pbos/runtime/validation.json",
@@ -55,11 +62,11 @@
       {
         "path": "pbos/runtime/execution.json",
         "exists": true,
-        "gateId": "PBOS-ENGINE-005",
+        "gateId": "PBOS-CONTEXT-001",
         "branch": null,
         "status": "BLOCKED",
         "generatedAt": null,
-        "digest": "280ae445031421beacc8ca33f4da783b9885054abf57a7215918014838cd7b3f"
+        "digest": "a0c5cba56efcf0dcb383550affaff5867becf6b317f37bbc4efda59d06caf2e9"
       },
       {
         "path": "pbos/runtime/execution-contract.json",
@@ -90,5 +97,5 @@
       }
     ]
   },
-  "identity": "46ef5602513109aa08aea74f8c8d26ae6dc45bfc346099d3e97cf5d9159c5f34"
+  "identity": "2c899391c128b7748ae37e8a6b9e5a1fac713cc8d57de112bc6392bd211faa39"
 }

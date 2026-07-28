@@ -7,6 +7,7 @@
 export const Artifacts = {
   repository: "pbos/runtime/repository.json",
   planning: "pbos/runtime/next-gate.json",
+  constitutionalPlanning: "pbos/runtime/constitutional-planning.json",
   validation: "pbos/runtime/validation.json",
   execution: "pbos/runtime/execution.json",
   executionContract: "pbos/runtime/execution-contract.json",

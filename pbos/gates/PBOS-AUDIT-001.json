@@ -1,11 +1,17 @@
 {
   "id": "PBOS-AUDIT-001",
   "title": "Certify PBOS Engine v3 Governance Integrity",
+  "description": "Certify PBOS Engine v3 lifecycle and governance integrity.",
   "status": "complete",
   "priority": 75,
+  "lifecycle_stage": 60,
   "dependencies": [
     "PBOS-ENGINE-004"
   ],
+  "produces": ["docs/release-evidence/pbos-engine-v3-certification.md"],
+  "requires": ["pbos/adapters/registry.ts"],
+  "blocking_conditions": [],
+  "completion_state": "satisfied",
   "handbook_refs": [
     "docs/RELEASE_PROCESS.md#testing",
     "pbos/README.md#architecture"
