@@ -1,0 +1,96 @@
+{
+  "version": "1.0.0",
+  "owner": "planning-handoff",
+  "latest": {
+    "version": "1.0.0",
+    "generatedAt": "2026-07-29T08:42:40.954Z",
+    "owner": "planning-handoff",
+    "authorization": {
+      "authorized": true,
+      "authorityModel": "registered-objectives-only"
+    },
+    "context": {
+      "valid": true,
+      "artifactHealth": "VALID"
+    },
+    "lineage": {
+      "repositoryIdentity": "playbook-platform",
+      "repositoryCommit": "b7e13bc7d3569534c245aa1f51fddca106aa12e0",
+      "contextIdentity": "b867273e5fd22807c97a973564cfe65f18aeba0ddce1ca415ed774e9db54d052",
+      "objectiveIdentity": null,
+      "registryIdentity": "aec61d2be59dcf3749208e63aa4a926f1ead726f20e55a89d7caa2b065954e6d",
+      "dependencySnapshotIdentity": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "evidenceIdentity": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "lifecycleState": null
+    },
+    "decision": {
+      "status": "GOVERNED_IDLE",
+      "selectedObjective": null,
+      "evaluations": [],
+      "reason": "No constitutional objectives are registered. PBOS remains in governed idle state."
+    },
+    "recordId": "959d439b777135d9eeb397dfb2550ff7b511f74052bcfdbb6556f448bda81972"
+  },
+  "history": [
+    {
+      "version": "1.0.0",
+      "generatedAt": "2026-07-29T08:32:02.765Z",
+      "owner": "planning-handoff",
+      "authorization": {
+        "authorized": true,
+        "authorityModel": "registered-objectives-only"
+      },
+      "context": {
+        "valid": true,
+        "artifactHealth": "VALID"
+      },
+      "lineage": {
+        "repositoryIdentity": "playbook-platform",
+        "repositoryCommit": "b7e13bc7d3569534c245aa1f51fddca106aa12e0",
+        "contextIdentity": "1e6baf5970b54fbfad1433c0b9125ac9473df5d6b4d4ff9bff51e2c612538d3e",
+        "objectiveIdentity": null,
+        "registryIdentity": "aec61d2be59dcf3749208e63aa4a926f1ead726f20e55a89d7caa2b065954e6d",
+        "dependencySnapshotIdentity": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "evidenceIdentity": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "lifecycleState": null
+      },
+      "decision": {
+        "status": "GOVERNED_IDLE",
+        "selectedObjective": null,
+        "evaluations": [],
+        "reason": "No constitutional objectives are registered. PBOS remains in governed idle state."
+      },
+      "recordId": "169b38e1783aa7146b79060c609b06b141390737a179f756d7bbab968c054764"
+    },
+    {
+      "version": "1.0.0",
+      "generatedAt": "2026-07-29T08:42:40.954Z",
+      "owner": "planning-handoff",
+      "authorization": {
+        "authorized": true,
+        "authorityModel": "registered-objectives-only"
+      },
+      "context": {
+        "valid": true,
+        "artifactHealth": "VALID"
+      },
+      "lineage": {
+        "repositoryIdentity": "playbook-platform",
+        "repositoryCommit": "b7e13bc7d3569534c245aa1f51fddca106aa12e0",
+        "contextIdentity": "b867273e5fd22807c97a973564cfe65f18aeba0ddce1ca415ed774e9db54d052",
+        "objectiveIdentity": null,
+        "registryIdentity": "aec61d2be59dcf3749208e63aa4a926f1ead726f20e55a89d7caa2b065954e6d",
+        "dependencySnapshotIdentity": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "evidenceIdentity": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "lifecycleState": null
+      },
+      "decision": {
+        "status": "GOVERNED_IDLE",
+        "selectedObjective": null,
+        "evaluations": [],
+        "reason": "No constitutional objectives are registered. PBOS remains in governed idle state."
+      },
+      "recordId": "959d439b777135d9eeb397dfb2550ff7b511f74052bcfdbb6556f448bda81972"
+    }
+  ]
+}

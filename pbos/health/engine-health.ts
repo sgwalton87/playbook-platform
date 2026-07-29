@@ -16,6 +16,10 @@ import { inspectArtifactConsistency } from "../reconciliation";
 import {
   type LifecycleGovernanceArtifact,
 } from "../lifecycle";
+import {
+  validatePlanningHistory,
+  type PlanningHandoffArtifact,
+} from "../planning/handoff";
 
 export interface EngineHealthReport {
   engineVersion: string;
@@ -49,6 +53,7 @@ export interface EngineHealthReport {
   artifactConflictCount: number;
   lifecycleHealth: "VALID" | "INVALID";
   lifecycleSynchronized: boolean;
+  planningGovernance: "GOVERNED" | "INVALID";
 }
 
 export async function getEngineHealth(rootDir = process.cwd()): Promise<EngineHealthReport> {
@@ -91,6 +96,22 @@ export async function getEngineHealth(rootDir = process.cwd()): Promise<EngineHe
       ? gate.completion_state === "satisfied"
       : gate.completion_state === "pending"
   );
+  const handoffPath = path.join(rootDir, Artifacts.planningHandoff);
+  let planningGovernance: "GOVERNED" | "INVALID" = "INVALID";
+  if (Runtime.exists(handoffPath)) {
+    try {
+      const handoff =
+        Runtime.load<PlanningHandoffArtifact>(handoffPath);
+      validatePlanningHistory(handoff);
+      planningGovernance =
+        handoff.latest.lineage.contextIdentity ===
+        contextArtifact?.identity
+          ? "GOVERNED"
+          : "INVALID";
+    } catch {
+      planningGovernance = "INVALID";
+    }
+  }
 
   return {
     engineVersion: config.version,
@@ -130,6 +151,7 @@ export async function getEngineHealth(rootDir = process.cwd()): Promise<EngineHe
     lifecycleSynchronized:
       lifecycleConsistent &&
       (lifecycle?.completed !== false),
+    planningGovernance,
   };
 }
 
@@ -142,6 +164,7 @@ export function formatEngineHealth(report: EngineHealthReport): string {
     `Current Dependency Node: ${report.currentDependencyNode ?? "none"}`,
     `Planning Health: ${report.planningHealth}`,
     `Planning Recommendation: ${report.planningRecommendation}`,
+    `Planning Governance: ${report.planningGovernance}`,
     `Context Health: ${report.contextHealth}`,
     `Context Identity: ${report.contextIdentity ?? "none"}`,
     `Last Refresh: ${report.lastContextRefresh ?? "none"}`,

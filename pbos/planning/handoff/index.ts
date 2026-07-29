@@ -10,6 +10,7 @@ import {
   artifactDigest,
 } from "../../kernel";
 import { inspectArtifactConsistency } from "../../reconciliation";
+import { assertPlanningPrerequisites } from "./authorization";
 import { evaluateObjectives } from "./evaluator";
 import { appendPlanningHistory } from "./history";
 import {
@@ -28,11 +29,11 @@ export function runPlanningHandoff(
   generatedAt = new Date().toISOString()
 ): PlanningHandoffRecord {
   const contextValidation = verifyStoredRepositoryContext(rootDir);
-  if (!contextValidation.valid) {
-    throw new Error(
-      `Planning handoff denied: repository context is invalid.\n${contextValidation.errors.join("\n")}`
-    );
-  }
+  assertPlanningPrerequisites({
+    contextValid: contextValidation.valid,
+    contextErrors: contextValidation.errors,
+    artifactConflicts: [],
+  });
   const context = loadRepositoryContextArtifact(rootDir);
   if (!context) {
     throw new Error(
@@ -44,15 +45,14 @@ export function runPlanningHandoff(
       artifactPath !== Artifacts.repositoryContext &&
       classification !== "valid"
   );
-  if (artifactConflicts.length > 0) {
-    throw new Error(
-      `Planning handoff denied: artifact health is invalid.\n${artifactConflicts
-        .map(({ path: artifactPath, reasons }) =>
-          `${artifactPath}: ${reasons.join(" ")}`
-        )
-        .join("\n")}`
-    );
-  }
+  assertPlanningPrerequisites({
+    contextValid: true,
+    contextErrors: [],
+    artifactConflicts: artifactConflicts.map(
+      ({ path: artifactPath, reasons }) =>
+        `${artifactPath}: ${reasons.join(" ")}`
+    ),
+  });
 
   const registry = loadObjectiveRegistry(rootDir);
   const decision = evaluateObjectives(registry, rootDir);
@@ -113,3 +113,4 @@ export * from "./lineage";
 export * from "./registry";
 export * from "./reports";
 export * from "./types";
+export * from "./transitions";

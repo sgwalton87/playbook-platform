@@ -2,14 +2,12 @@
   "version": "1.0.0",
   "owner": "repository-context",
   "latest": {
-    "id": "b9f8ce9cafe3b8f49c2002a59fe40c6181caa4b24765e96daa4d8e688f66e1ba",
-    "previousContextIdentity": "aecdc3e3fe19e0bcfffff2830fe5440c217a290cfaefe1d452d52d1ef41edc0a",
-    "newContextIdentity": "461682112049af6d5c2f5f32253a0c69e37e3b9dcf110fd8a684c5d732be075d",
+    "id": "d6d490ddd5387f1827c8a85cbf66acc2ba7785906cd0d80dd361e6be6164f324",
+    "previousContextIdentity": "b867273e5fd22807c97a973564cfe65f18aeba0ddce1ca415ed774e9db54d052",
+    "newContextIdentity": "b867273e5fd22807c97a973564cfe65f18aeba0ddce1ca415ed774e9db54d052",
     "reason": "Operator-requested repository context synchronization.",
-    "triggeringConditions": [
-      "Context validation failed: working tree state changed after capture."
-    ],
-    "timestamp": "2026-07-29T07:39:08.291Z",
+    "triggeringConditions": [],
+    "timestamp": "2026-07-29T08:42:48.824Z",
     "validator": {
       "id": "PBOS-CONTEXT-VALIDATOR",
       "version": "1.1.0"
@@ -284,6 +282,65 @@
         "Context validation failed: working tree state changed after capture."
       ],
       "timestamp": "2026-07-29T07:39:08.291Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "da0539ce09600dc94a99c09476101dec94dfcae2f36029fb0aacfa259fdbf311",
+      "previousContextIdentity": "461682112049af6d5c2f5f32253a0c69e37e3b9dcf110fd8a684c5d732be075d",
+      "newContextIdentity": "a3fe63da298c0070f4ea61db6d78d94ac8c3e437d6d47735359762339d773801",
+      "reason": "Operator-requested repository context synchronization.",
+      "triggeringConditions": [
+        "Context validation failed: commit identity mismatches.",
+        "Context validation failed: working tree state changed after capture."
+      ],
+      "timestamp": "2026-07-29T08:31:01.516Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "a06356a6bdf5214bb3dbbe69418c3a84956e4a044cd148fb252b563954e4dea5",
+      "previousContextIdentity": "a3fe63da298c0070f4ea61db6d78d94ac8c3e437d6d47735359762339d773801",
+      "newContextIdentity": "1e6baf5970b54fbfad1433c0b9125ac9473df5d6b4d4ff9bff51e2c612538d3e",
+      "reason": "Operator-requested repository context synchronization.",
+      "triggeringConditions": [
+        "Context validation failed: working tree state changed after capture."
+      ],
+      "timestamp": "2026-07-29T08:31:50.130Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "7fa5a32a218e316cb744c45987473f16777bed2da2cdf8b743453dcf69f1f7fb",
+      "previousContextIdentity": "1e6baf5970b54fbfad1433c0b9125ac9473df5d6b4d4ff9bff51e2c612538d3e",
+      "newContextIdentity": "b867273e5fd22807c97a973564cfe65f18aeba0ddce1ca415ed774e9db54d052",
+      "reason": "Operator-requested repository context synchronization.",
+      "triggeringConditions": [
+        "Context validation failed: working tree state changed after capture."
+      ],
+      "timestamp": "2026-07-29T08:42:31.890Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "d6d490ddd5387f1827c8a85cbf66acc2ba7785906cd0d80dd361e6be6164f324",
+      "previousContextIdentity": "b867273e5fd22807c97a973564cfe65f18aeba0ddce1ca415ed774e9db54d052",
+      "newContextIdentity": "b867273e5fd22807c97a973564cfe65f18aeba0ddce1ca415ed774e9db54d052",
+      "reason": "Operator-requested repository context synchronization.",
+      "triggeringConditions": [],
+      "timestamp": "2026-07-29T08:42:48.824Z",
       "validator": {
         "id": "PBOS-CONTEXT-VALIDATOR",
         "version": "1.1.0"

@@ -2,6 +2,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { artifactDigest } from "../../kernel";
+import { assertPlanningPrerequisites } from "./authorization";
 import { evaluateObjectives } from "./evaluator";
 import {
   appendPlanningHistory,
@@ -17,6 +18,7 @@ import type {
   ObjectiveRegistryEntry,
   PlanningHandoffRecord,
 } from "./types";
+import { assertObjectiveTransition } from "./transitions";
 
 const roots: string[] = [];
 
@@ -185,6 +187,27 @@ describe("objective eligibility", () => {
 });
 
 describe("planning lineage and recovery", () => {
+  it("rejects stale repository context before evaluation", () => {
+    expect(() =>
+      assertPlanningPrerequisites({
+        contextValid: false,
+        contextErrors: ["Context artifact is stale."],
+        artifactConflicts: [],
+      })
+    ).toThrow("repository context is invalid");
+  });
+
+  it("rejects skipped objective lifecycle transitions", () => {
+    expect(() =>
+      assertObjectiveTransition("REGISTERED", "PLANNED")
+    ).toThrow(
+      "Invalid objective lifecycle transition: REGISTERED -> PLANNED"
+    );
+    expect(() =>
+      assertObjectiveTransition("REGISTERED", "ELIGIBLE")
+    ).not.toThrow();
+  });
+
   it("binds the plan to context, objective, dependencies, and evidence", () => {
     const directory = root();
     writeFileSync(path.join(directory, "evidence.md"), "evidence");
