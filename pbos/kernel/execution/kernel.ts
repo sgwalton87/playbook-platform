@@ -1,4 +1,4 @@
-import { artifactDigest } from "../identity";
+import { artifactDigest, canonicalJson } from "../identity";
 import { DependencyGraph } from "./dependency-graph";
 import {
   createExecutionPlan,
@@ -20,23 +20,6 @@ import {
   type StateCoordinator,
   type StateTransitionRequest,
 } from "./types";
-
-function canonicalize(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(canonicalize);
-  if (value && typeof value === "object") {
-    return Object.fromEntries(
-      Object.entries(value)
-        .filter(([, entry]) => entry !== undefined)
-        .sort(([a], [b]) => a.localeCompare(b))
-        .map(([key, entry]) => [key, canonicalize(entry)])
-    );
-  }
-  return value;
-}
-
-export function canonicalJson(value: unknown): string {
-  return JSON.stringify(canonicalize(value), null, 2);
-}
 
 export class GovernedStateCoordinator implements StateCoordinator {
   request(
@@ -146,23 +129,29 @@ export class ConstitutionalExecutionKernel implements ExecutionKernel {
       STATE_TRANSITION: transition,
     };
     const objectiveId = decision.selectedObjectiveId;
-    const events: KernelEvent[] = KERNEL_STAGES.map((stage) => ({
-      timestamp: input.observedAt,
-      correlationId,
-      executionId,
-      objectiveId,
-      stage,
-      inputDigest,
-      outputDigest: artifactDigest(stageOutputs[stage]),
-      validator: `pbos.kernel.${stage.toLowerCase()}.v1`,
-      durationMs: 0,
-      status: this.stagePassed(stage, input, graph.valid, certification) ? "PASS" : "FAIL",
-      evidence: [
-        input.constitution.digest,
-        input.registry.digest,
-        input.repository.contentDigest,
-      ].sort(),
-    }));
+    let pipelineHealthy = true;
+    const events: KernelEvent[] = KERNEL_STAGES.map((stage) => {
+      pipelineHealthy =
+        pipelineHealthy &&
+        this.stagePassed(stage, input, graph.valid, certification);
+      return {
+        timestamp: input.observedAt,
+        correlationId,
+        executionId,
+        objectiveId,
+        stage,
+        inputDigest,
+        outputDigest: artifactDigest(stageOutputs[stage]),
+        validator: `pbos.kernel.${stage.toLowerCase()}.v1`,
+        durationMs: 0,
+        status: pipelineHealthy ? "PASS" : "FAIL",
+        evidence: [
+          input.constitution.digest,
+          input.registry.digest,
+          input.repository.contentDigest,
+        ].sort(),
+      };
+    });
 
     const reportBody = {
       version: "1.0.0" as const,
@@ -176,7 +165,7 @@ export class ConstitutionalExecutionKernel implements ExecutionKernel {
       transition,
       events,
     };
-    const json = canonicalJson(reportBody);
+    const json = canonicalJson(reportBody, 2);
     const markdown = this.markdown(reportBody);
     return {
       ...reportBody,

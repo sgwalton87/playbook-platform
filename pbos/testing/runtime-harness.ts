@@ -45,10 +45,6 @@ export class PbosRuntimeTestHarness {
     );
   }
 
-  load<T>(relativePath: string): T {
-    return Runtime.load<T>(this.resolve(relativePath));
-  }
-
   readText(relativePath: string): string {
     return readFileSync(this.resolve(relativePath), "utf8");
   }

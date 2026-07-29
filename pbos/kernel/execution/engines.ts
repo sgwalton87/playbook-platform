@@ -53,13 +53,22 @@ export class DeterministicEligibilityEngine implements EligibilityEngine {
 
 export class DeterministicPriorityEngine implements PriorityEngine {
   score(objectives: KernelObjective[], weights: PriorityWeights): PriorityResult[] {
-    const total = Object.values(weights).reduce((sum, value) => sum + value, 0);
+    const total =
+      weights.constitutional +
+      weights.strategic +
+      weights.engineering +
+      weights.business +
+      weights.operational;
     if (total !== 100) throw new Error(`Priority weights must total 100; received ${total}.`);
     return objectives.map((objective) => {
-      const score = (Object.keys(weights) as Array<keyof PriorityWeights>).reduce(
-        (sum, key) => sum + objective.priority[key] * weights[key],
-        0
-      ) / 100;
+      const score =
+        (
+          objective.priority.constitutional * weights.constitutional +
+          objective.priority.strategic * weights.strategic +
+          objective.priority.engineering * weights.engineering +
+          objective.priority.business * weights.business +
+          objective.priority.operational * weights.operational
+        ) / 100;
       return { objectiveId: objective.id, score, dimensions: objective.priority };
     });
   }

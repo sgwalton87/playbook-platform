@@ -130,6 +130,11 @@ describe("ConstitutionalExecutionKernel", () => {
     expect(result.certification.findings).toContain("REPOSITORY:HEAD mismatch");
     expect(result.plan).toBeNull();
     expect(result.transition).toBeNull();
+    expect(
+      result.events
+        .slice(result.events.findIndex((event) => event.status === "FAIL"))
+        .every((event) => event.status === "FAIL")
+    ).toBe(true);
   });
 
   it("rejects registry content identity mismatch", () => {

@@ -2,6 +2,26 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { dirname } from "path";
 import { RuntimeArtifactOwnership } from "./artifact-ownership";
 
+export type JsonPrimitive = string | number | boolean | null;
+export type JsonValue =
+  | JsonPrimitive
+  | { readonly [key: string]: JsonValue }
+  | readonly JsonValue[];
+
+function isJsonValue(value: unknown): value is JsonValue {
+  if (
+    value === null ||
+    typeof value === "string" ||
+    typeof value === "boolean"
+  ) {
+    return true;
+  }
+  if (typeof value === "number") return Number.isFinite(value);
+  if (Array.isArray(value)) return value.every(isJsonValue);
+  if (typeof value !== "object") return false;
+  return Object.values(value).every(isJsonValue);
+}
+
 function runtimeGovernance(path: string) {
   const normalized = path.replaceAll("\\", "/");
   const governance = Object.values(RuntimeArtifactOwnership).find(
@@ -24,16 +44,16 @@ function runtimeGovernance(path: string) {
 }
 
 export class Runtime {
-  /**
-   * Read a runtime JSON artifact.
-   */
-  static load<T>(path: string): T {
+  static load(path: string): JsonValue {
     runtimeGovernance(path);
     if (!existsSync(path)) {
       throw new Error(`Runtime artifact not found: ${path}`);
     }
-
-    return JSON.parse(readFileSync(path, "utf8")) as T;
+    const value: unknown = JSON.parse(readFileSync(path, "utf8"));
+    if (!isJsonValue(value)) {
+      throw new Error(`Runtime artifact is not valid JSON data: ${path}`);
+    }
+    return value;
   }
 
   /**
@@ -61,16 +81,5 @@ export class Runtime {
   static exists(path: string): boolean {
     runtimeGovernance(path);
     return existsSync(path);
-  }
-
-  /**
-   * Convenience helper to read or return a fallback value.
-   */
-  static loadOrDefault<T>(path: string, fallback: T): T {
-    if (!existsSync(path)) {
-      return fallback;
-    }
-
-    return this.load<T>(path);
   }
 }
