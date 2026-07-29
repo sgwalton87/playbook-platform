@@ -15,6 +15,7 @@ depends_on:
 related:
   - PPS-006
   - PPS-2004
+  - PPS-3655
 last_updated: 2026-07-29
 ---
 

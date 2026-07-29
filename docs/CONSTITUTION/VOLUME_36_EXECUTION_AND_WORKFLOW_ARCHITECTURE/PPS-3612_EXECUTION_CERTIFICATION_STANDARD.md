@@ -16,6 +16,7 @@ depends_on:
 related:
   - PPS-3613
   - PPS-3615
+  - PPS-3654
 last_updated: 2026-07-29
 ---
 

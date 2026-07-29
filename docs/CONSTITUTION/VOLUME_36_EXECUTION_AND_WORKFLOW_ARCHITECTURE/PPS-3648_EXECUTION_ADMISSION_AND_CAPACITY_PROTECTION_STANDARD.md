@@ -17,6 +17,7 @@ related:
   - PPS-3617
   - PPS-3645
   - PPS-3646
+  - PPS-3656
 last_updated: 2026-07-29
 ---
 
@@ -197,6 +198,44 @@ Admission and capacity evidence shall include:
 - Fairness and starvation evaluation
 - Recovery reserve impact
 - Final disposition
+
+---
+
+# Enterprise Scale Assurance
+
+Scale conformance certifies that increased workload does not weaken governance.
+
+Every implementation profile shall declare:
+
+- Supported execution, organization, tenant, region, queue, and evidence volumes
+- Per-tenant and shared capacity envelopes
+- Maximum admission-decision, policy, identity, revocation, and state staleness
+- Control-plane and recovery reserves
+- Isolation, fairness, starvation, and noisy-neighbor objectives
+- Evidence throughput, durability, and backpressure limits
+- Failure-containment and blast-radius boundaries
+- Dependency, region, and overload assumptions
+- Degraded-operation and recovery criteria
+
+Scale certification requires measured evidence for:
+
+- Admission denial at declared limits
+- Bounded queues and retry suppression
+- Tenant isolation and fair allocation
+- Priority without authority bypass
+- Recovery capacity under concurrent failure
+- Evidence preservation under saturation
+- Revocation and security control latency
+- Regional and dependency failure containment
+- Sustained overload and return to normal operation
+
+Tests shall include representative low, expected, peak, overload, and recovery loads.
+
+Extrapolation, simulation, or benchmark evidence shall be labeled with assumptions and cannot establish unsupported deployment capacity.
+
+No profile may claim one million executions, thousands of organizations, or any enterprise class without truthful measured conformance evidence for that scope.
+
+Operational readiness is not inferred from this constitutional standard.
 
 ---
 

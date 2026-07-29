@@ -159,6 +159,18 @@ These authorities remain governed by Volume 36 and PPS-3614.
 
 Registration does not constitute certification or implementation.
 
+Execution Assurance Authorities
+
+- PPS-3652_EXCEPTIONAL_WORKFLOW_TRANSITION_GOVERNANCE_STANDARD.md
+- PPS-3653_EVIDENCE_TRUST_AND_DISPUTE_RESOLUTION_STANDARD.md
+- PPS-3654_CERTIFICATION_INVALIDATION_AND_REVOCATION_STANDARD.md
+- PPS-3655_AI_EXECUTION_GOVERNANCE_STANDARD.md
+- PPS-3656_EXECUTION_RECOVERY_AND_DISASTER_CONFORMANCE_STANDARD.md
+
+These authorities specialize existing workflow, evidence, certification, AI, recovery, and capacity governance.
+
+They do not create duplicate authority or change Volume 36 certification status.
+
 ------------------------------------------------------------
 
 Canonical Domains
