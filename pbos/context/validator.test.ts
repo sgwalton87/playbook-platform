@@ -202,6 +202,40 @@ describe("PBOS repository context validation", () => {
     );
   });
 
+  it("preserves durable governed evidence beyond snapshot freshness", () => {
+    const observed = snapshot();
+    for (const artifactPath of [
+      Artifacts.executionContract,
+      Artifacts.workPackage,
+      Artifacts.executionAuthorization,
+    ]) {
+      const runtimeArtifact = observed.artifacts.find(
+        ({ path }) => path === artifactPath
+      );
+      if (!runtimeArtifact) {
+        throw new Error(`Test artifact is missing: ${artifactPath}`);
+      }
+      runtimeArtifact.generatedAt = "2026-07-20T00:00:00.000Z";
+    }
+
+    expect(validate(artifact(observed), observed).valid).toBe(true);
+  });
+
+  it("continues to reject stale replaceable runtime snapshots", () => {
+    const observed = snapshot();
+    const planning = observed.artifacts.find(
+      ({ path }) => path === Artifacts.planning
+    );
+    if (!planning) {
+      throw new Error(`Test artifact is missing: ${Artifacts.planning}`);
+    }
+    planning.generatedAt = "2026-07-20T00:00:00.000Z";
+
+    expect(validate(artifact(observed), observed).errors).toContain(
+      `Context validation failed: required artifact is stale: ${Artifacts.planning}.`
+    );
+  });
+
   it("rejects context identity tampering", () => {
     const tampered = artifact();
     tampered.identity = "invalid";

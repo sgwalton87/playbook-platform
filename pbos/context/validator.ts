@@ -209,7 +209,10 @@ export function validateRepositoryContext(options: {
       );
     }
 
-    if (current.generatedAt) {
+    if (
+      governance?.persistence === "replaceable" &&
+      current.generatedAt
+    ) {
       const generatedAt = Date.parse(current.generatedAt);
       if (
         !Number.isFinite(generatedAt) ||

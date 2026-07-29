@@ -2,15 +2,15 @@
   "version": "1.0.0",
   "owner": "repository-context",
   "latest": {
-    "id": "c26308fdffb45cb7d7fd2056b34db02aac074d1b1aed17ed45030bf746aba42f",
-    "previousContextIdentity": "22a939f42080b0ef33ceba31ba108d5d43574310a0993a110754d90ee8e51ea8",
-    "newContextIdentity": "070a3247199e3f933147c46e79c57dcdb04ba7ac6bea151530f544af7b9e73df",
-    "reason": "Operator-requested repository context synchronization.",
+    "id": "b017a1babc96f288f16ba0f5964f2deb89c6b0c7169f42b7a2668f06206d73bf",
+    "previousContextIdentity": "423a09b83f9751ae3bee142e8ad9e68db001db256a2337252a1e3c3c26fbec7e",
+    "newContextIdentity": "000e6cfab6c1a18f2e62a2de3ebc886269cf4e3949cf645f59af1e0d1cec0013",
+    "reason": "Canonical recapture after final concurrent repository advancement.",
     "triggeringConditions": [
       "Context validation failed: commit identity mismatches.",
       "Context validation failed: working tree state changed after capture."
     ],
-    "timestamp": "2026-07-29T10:25:29.823Z",
+    "timestamp": "2026-07-29T18:54:26.537Z",
     "validator": {
       "id": "PBOS-CONTEXT-VALIDATOR",
       "version": "1.1.0"
@@ -423,6 +423,100 @@
         "Context validation failed: working tree state changed after capture."
       ],
       "timestamp": "2026-07-29T10:25:29.823Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "adbf7359f14e937c2182ce054b36c087c118635a03c157a46378813bda6eb5ba",
+      "previousContextIdentity": "070a3247199e3f933147c46e79c57dcdb04ba7ac6bea151530f544af7b9e73df",
+      "newContextIdentity": "5c63ba3bff2ad1f5e99a157f10856bd8e20322c64eb0fc2999bec8d288eb16b6",
+      "reason": "Kernel convergence context authority reconciliation after durable evidence freshness correction.",
+      "triggeringConditions": [
+        "Context validation failed: commit identity mismatches.",
+        "Context validation failed: working tree state changed after capture."
+      ],
+      "timestamp": "2026-07-29T18:46:25.430Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "474aaaeea514d406bfdd389a88fd3f650c6534a32c84ad743da60043df8332db",
+      "previousContextIdentity": "5c63ba3bff2ad1f5e99a157f10856bd8e20322c64eb0fc2999bec8d288eb16b6",
+      "newContextIdentity": "b9e1f76dd9e9d060f85741c90bbc66fb234e303fec5ff5575feefad35ec7c030",
+      "reason": "Diagnose refresh output isolation during governed reconciliation.",
+      "triggeringConditions": [
+        "Context validation failed: working tree state changed after capture."
+      ],
+      "timestamp": "2026-07-29T18:47:35.641Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "6de7d47271d5bcf605ffaaee09b404dbbdb49de5f75a9d64aa03831379bced3b",
+      "previousContextIdentity": "b9e1f76dd9e9d060f85741c90bbc66fb234e303fec5ff5575feefad35ec7c030",
+      "newContextIdentity": "4b4f1f35745ca85426279934efb8a19291e87d280fd4fad64c85a5fd928bff9c",
+      "reason": "Final context capture after reconciliation implementation, review evidence, and validation.",
+      "triggeringConditions": [
+        "Context validation failed: commit identity mismatches.",
+        "Context validation failed: working tree state changed after capture."
+      ],
+      "timestamp": "2026-07-29T18:52:15.610Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "3c9d351b55b10492412cc7b5a134004009170767db33bc487866845673bb60e2",
+      "previousContextIdentity": "4b4f1f35745ca85426279934efb8a19291e87d280fd4fad64c85a5fd928bff9c",
+      "newContextIdentity": "4571ca81838c56ca95ef1fddfdb1012b661e06d16bd168c712f1c4be6b009606",
+      "reason": "Final authoritative capture after reconciling concurrent repository advancement.",
+      "triggeringConditions": [
+        "Context validation failed: working tree state changed after capture."
+      ],
+      "timestamp": "2026-07-29T18:52:50.564Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "895f3060d710fa49a2aaf787f4593716cfe30218788e9c0bcefccd1c363f9f94",
+      "previousContextIdentity": "4571ca81838c56ca95ef1fddfdb1012b661e06d16bd168c712f1c4be6b009606",
+      "newContextIdentity": "423a09b83f9751ae3bee142e8ad9e68db001db256a2337252a1e3c3c26fbec7e",
+      "reason": "Authoritative reconciliation capture after concurrent repository migrations settled.",
+      "triggeringConditions": [
+        "Context validation failed: commit identity mismatches.",
+        "Context validation failed: working tree state changed after capture."
+      ],
+      "timestamp": "2026-07-29T18:53:54.637Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "b017a1babc96f288f16ba0f5964f2deb89c6b0c7169f42b7a2668f06206d73bf",
+      "previousContextIdentity": "423a09b83f9751ae3bee142e8ad9e68db001db256a2337252a1e3c3c26fbec7e",
+      "newContextIdentity": "000e6cfab6c1a18f2e62a2de3ebc886269cf4e3949cf645f59af1e0d1cec0013",
+      "reason": "Canonical recapture after final concurrent repository advancement.",
+      "triggeringConditions": [
+        "Context validation failed: commit identity mismatches.",
+        "Context validation failed: working tree state changed after capture."
+      ],
+      "timestamp": "2026-07-29T18:54:26.537Z",
       "validator": {
         "id": "PBOS-CONTEXT-VALIDATOR",
         "version": "1.1.0"

@@ -29,12 +29,10 @@ Repository identity is internally consistent:
 - Root: `/Users/bulletproof/playbook-platform`
 - Remote: `origin` at `https://github.com/sgwalton87/playbook-platform.git`
 - Branch: `pbos/post-pps300-convergence`
-- HEAD: `2ed024203a59bd0d1fe710b0804def0a3138dec9`
 - Upstream: `origin/pbos/post-pps300-convergence`
-- Ahead of upstream: `1`
 - Behind upstream: `0`
 
-The invalid context was caused by legitimate repository evolution without a later context capture, compounded by an incorrect freshness policy for durable evidence. No competing context owner or refresh implementation was found.
+The exact HEAD and upstream distance are intentionally recorded in the machine-readable repository context rather than duplicated as static review claims. The invalid context was caused by legitimate repository evolution without a later context capture, compounded by an incorrect freshness policy for durable evidence. No competing context owner or refresh implementation was found.
 
 ## Context Authority Model
 
