@@ -8,17 +8,17 @@ import type { ExecutionMode } from "../engine/types";
 import {
   loadRepositoryContextArtifact,
   verifyStoredRepositoryContext,
-  type ContextRefreshArtifact,
 } from "../context";
 import { Artifacts, Runtime } from "../kernel";
+import {
+  decodeContextRefreshArtifact,
+  decodeLifecycleGovernanceArtifact,
+  decodePlanningHandoffArtifact,
+} from "../runtime/artifact-decoders";
 import path from "node:path";
 import { inspectArtifactConsistency } from "../reconciliation";
 import {
-  type LifecycleGovernanceArtifact,
-} from "../lifecycle";
-import {
   validatePlanningHistory,
-  type PlanningHandoffArtifact,
 } from "../planning/handoff";
 
 export interface EngineHealthReport {
@@ -77,7 +77,7 @@ export async function getEngineHealth(rootDir = process.cwd()): Promise<EngineHe
   const contextArtifact = loadRepositoryContextArtifact(rootDir);
   const refreshPath = path.join(rootDir, Artifacts.contextRefresh);
   const refresh = Runtime.exists(refreshPath)
-    ? Runtime.load<ContextRefreshArtifact>(refreshPath)
+    ? decodeContextRefreshArtifact(Runtime.load(refreshPath))
     : null;
   const artifactConflicts = inspectArtifactConsistency(rootDir).filter(
     ({ path: artifactPath, classification }) =>
@@ -89,7 +89,7 @@ export async function getEngineHealth(rootDir = process.cwd()): Promise<EngineHe
     Artifacts.lifecycleGovernance
   );
   const lifecycle = Runtime.exists(lifecyclePath)
-    ? Runtime.load<LifecycleGovernanceArtifact>(lifecyclePath)
+    ? decodeLifecycleGovernanceArtifact(Runtime.load(lifecyclePath))
     : null;
   const lifecycleConsistent = gates.every((gate) =>
     gate.status === "complete"
@@ -101,7 +101,7 @@ export async function getEngineHealth(rootDir = process.cwd()): Promise<EngineHe
   if (Runtime.exists(handoffPath)) {
     try {
       const handoff =
-        Runtime.load<PlanningHandoffArtifact>(handoffPath);
+        decodePlanningHandoffArtifact(Runtime.load(handoffPath));
       validatePlanningHistory(handoff);
       planningGovernance =
         handoff.latest.lineage.contextIdentity ===

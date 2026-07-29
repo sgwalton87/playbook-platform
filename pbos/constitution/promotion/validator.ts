@@ -3,9 +3,9 @@ import path from "node:path";
 import {
   computeInterfaceImplementationDigest,
   validateInterfaceCertificationHistory,
-  type InterfaceCertificationArtifact,
 } from "../../interface-certification";
 import { Artifacts, Runtime } from "../../kernel";
+import { decodeInterfaceCertificationArtifact } from "../../runtime/artifact-decoders";
 import { isConstitutionalLifecycleTransitionAllowed } from "../lifecycle";
 import type {
   CertificationRuleId,
@@ -228,7 +228,7 @@ export function validateVolumePromotion(
       );
     } else {
       const interfaceCertification =
-        Runtime.load<InterfaceCertificationArtifact>(interfacePath);
+        decodeInterfaceCertificationArtifact(Runtime.load(interfacePath));
       validateInterfaceCertificationHistory(interfaceCertification);
       if (
         interfaceCertification.volume !== volume.id ||

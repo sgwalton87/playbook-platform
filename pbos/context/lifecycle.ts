@@ -1,6 +1,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { Artifacts, Runtime, artifactDigest } from "../kernel";
+import { decodeContextRefreshArtifact } from "../runtime/artifact-decoders";
 import { certifyRepositoryContext } from "./certification";
 import { buildRepositoryContextArtifact } from "./generator";
 import { appendContextRefreshHistory } from "./history";
@@ -81,7 +82,7 @@ export function refreshRepositoryContext(options: {
   };
   const refreshPath = path.join(rootDir, Artifacts.contextRefresh);
   const existing = Runtime.exists(refreshPath)
-    ? Runtime.load<ContextRefreshArtifact>(refreshPath)
+    ? decodeContextRefreshArtifact(Runtime.load(refreshPath))
     : null;
   const refresh = appendContextRefreshHistory(existing, record);
 

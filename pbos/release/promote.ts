@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { Artifacts, Runtime, artifactDigest } from "../kernel";
+import { decodeReleasePromotionArtifact } from "../runtime/artifact-decoders";
 
 export interface PromotionResult {
   gateId: string;
@@ -9,12 +10,6 @@ export interface PromotionResult {
   timestamp: string;
   gateDigest?: string;
   contractDigest?: string;
-}
-
-interface PromotionArtifact extends PromotionResult {
-  schemaVersion?: 1;
-  owner?: "release-promotion";
-  history?: PromotionResult[];
 }
 
 interface ReleaseContract {
@@ -97,7 +92,7 @@ export async function promoteGate(
 
   const artifactPath = path.join(rootDir, Artifacts.promotion);
   const existing = Runtime.exists(artifactPath)
-    ? Runtime.load<PromotionArtifact>(artifactPath)
+    ? decodeReleasePromotionArtifact(Runtime.load(artifactPath))
     : null;
   if (
     existing?.history &&

@@ -1,6 +1,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { Artifacts, Runtime } from "../kernel";
+import { decodeVolumeCertificationArtifact } from "../runtime/artifact-decoders";
 import {
   buildConstitutionalDocumentIndex,
   discoverConstitutionalVolume,
@@ -93,7 +94,7 @@ export function certifyConstitutionalVolume(
     Artifacts.volumeCertification
   );
   const history = Runtime.exists(artifactPath)
-    ? Runtime.load<VolumeCertificationArtifact>(artifactPath)
+    ? decodeVolumeCertificationArtifact(Runtime.load(artifactPath))
     : null;
   if (history) {
     validateExistingArtifact(history);

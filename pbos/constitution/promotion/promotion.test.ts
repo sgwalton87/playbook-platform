@@ -9,6 +9,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { Artifacts, Runtime } from "../../kernel";
+import { decodeVolumePromotionArtifact } from "../../runtime/artifact-decoders";
 import { discoverConstitutionalVolume } from "../discovery";
 import type {
   CertificationRuleResult,
@@ -199,8 +200,8 @@ describe("constitutional volume promotion", () => {
     expect(
       discoverConstitutionalVolume(34, root).lifecycle
     ).toBe("architecture_complete");
-    const artifact = Runtime.load<VolumePromotionArtifact>(
-      path.join(root, Artifacts.volumePromotion)
+    const artifact = decodeVolumePromotionArtifact(
+      Runtime.load(path.join(root, Artifacts.volumePromotion))
     );
     expect(artifact.history).toHaveLength(1);
     expect(artifact.latest.contentDigestAfter).not.toBeNull();

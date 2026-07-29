@@ -1,10 +1,13 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { Artifacts, Runtime } from "../../kernel";
+import {
+  decodeVolumeCertificationArtifact,
+  decodeVolumePromotionArtifact,
+} from "../../runtime/artifact-decoders";
 import { discoverConstitutionalVolume } from "../discovery";
 import type {
   ConstitutionalVolumeLifecycle,
-  VolumeCertificationArtifact,
 } from "../types";
 import { validateVolumePromotionHistory } from "./history";
 import { transitionConstitutionalVolume } from "./transition";
@@ -104,10 +107,10 @@ export function promoteConstitutionalVolume(
     Artifacts.volumePromotion
   );
   const certificationArtifact = Runtime.exists(certificationPath)
-    ? Runtime.load<VolumeCertificationArtifact>(certificationPath)
+    ? decodeVolumeCertificationArtifact(Runtime.load(certificationPath))
     : null;
   const promotionArtifact = Runtime.exists(promotionPath)
-    ? Runtime.load<VolumePromotionArtifact>(promotionPath)
+    ? decodeVolumePromotionArtifact(Runtime.load(promotionPath))
     : null;
   if (promotionArtifact) {
     validateVolumePromotionHistory(promotionArtifact);

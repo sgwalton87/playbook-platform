@@ -3,6 +3,7 @@ import path from "node:path";
 import { loadConfig } from "../engine/config";
 import { loadState, saveState } from "../engine/state";
 import { Artifacts, Runtime, artifactDigest } from "../kernel";
+import { decodeGateCompletionArtifact } from "../runtime/artifact-decoders";
 import { refreshPlanningArtifact } from "../engine/planning-refresh";
 import type { GateTransition } from "./contracts";
 import { transitionGate } from "./transition";
@@ -105,13 +106,7 @@ export async function completePromotedGate(options: {
 
   const completionPath = path.join(rootDir, Artifacts.completion);
   const existing = Runtime.exists(completionPath)
-    ? Runtime.load<
-        GateTransition & {
-          schemaVersion?: 1;
-          owner?: "gate-lifecycle";
-          history?: GateTransition[];
-        }
-      >(completionPath)
+    ? decodeGateCompletionArtifact(Runtime.load(completionPath))
     : null;
   if (
     existing?.history &&

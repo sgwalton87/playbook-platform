@@ -5,6 +5,7 @@ import {
   verifyStoredRepositoryContext,
 } from "../../context";
 import { Artifacts, Runtime, artifactDigest } from "../../kernel";
+import { decodeLifecycleGovernanceArtifact } from "../../runtime/artifact-decoders";
 import { planConstitutionalGate } from "../../planner";
 import type { GateDefinition } from "../../planner";
 import { reconcileRuntimeArtifacts } from "../../reconciliation";
@@ -21,7 +22,6 @@ import { evaluateGateCompletionEvidence } from "./evidence";
 import { appendLifecycleGovernanceHistory } from "./history";
 import { renderLifecycleGovernanceReport } from "./report";
 import type {
-  LifecycleGovernanceArtifact,
   LifecycleGovernanceRun,
 } from "./types";
 
@@ -44,7 +44,7 @@ function persistRun(
     Artifacts.lifecycleGovernance
   );
   const existing = Runtime.exists(artifactPath)
-    ? Runtime.load<LifecycleGovernanceArtifact>(artifactPath)
+    ? decodeLifecycleGovernanceArtifact(Runtime.load(artifactPath))
     : null;
   const artifact = appendLifecycleGovernanceHistory(existing, run);
   Runtime.save(artifactPath, artifact, "lifecycle-governance");
@@ -90,7 +90,7 @@ export async function governGateLifecycle(
   );
   if (Runtime.exists(existingPath)) {
     const existing =
-      Runtime.load<LifecycleGovernanceArtifact>(existingPath);
+      decodeLifecycleGovernanceArtifact(Runtime.load(existingPath));
     const latest = existing.history.at(-1);
     if (latest?.gateId === gateId && latest.completed) {
       throw new Error(

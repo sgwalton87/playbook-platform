@@ -1,14 +1,14 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { runExecutionEngine } from "../execution";
+import { evaluateExecutionEligibility } from "../execution";
 import { Artifacts, Runtime, artifactDigest } from "../kernel";
+import { decodeArtifactReconciliationArtifact } from "../runtime/artifact-decoders";
 import { planConstitutionalGate } from "../planner";
 import { runRuntimeValidator } from "../validator";
 import { appendArtifactReconciliationHistory } from "./history";
 import { inspectArtifactConsistency } from "./inspect";
 import { renderArtifactConsistencyReport } from "./report";
 import type {
-  ArtifactReconciliationArtifact,
   ArtifactReconciliationRun,
 } from "./types";
 
@@ -45,10 +45,7 @@ export async function reconcileRuntimeArtifacts(
     validation,
     "runtime-validator"
   );
-  const execution = runExecutionEngine(
-    (plan) => plan,
-    rootDir
-  );
+  const execution = evaluateExecutionEligibility(rootDir);
   Runtime.save(
     path.join(rootDir, Artifacts.execution),
     execution,
@@ -124,7 +121,7 @@ export async function reconcileRuntimeArtifacts(
     Artifacts.artifactReconciliation
   );
   const existing = Runtime.exists(artifactPath)
-    ? Runtime.load<ArtifactReconciliationArtifact>(artifactPath)
+    ? decodeArtifactReconciliationArtifact(Runtime.load(artifactPath))
     : null;
   const evidence = appendArtifactReconciliationHistory(existing, run);
   Runtime.save(
