@@ -218,3 +218,18 @@ Volume 36 certification remains **WITHHELD**, and the existing certification dec
 - Kernel enforcement consumes the required assurance contracts
 - Truthful operational evidence validates claimed identity, lifecycle, evidence, certification, AI, recovery, and scale controls
 - A separate governed certification decision is issued
+
+## Validation Results
+
+- `npm test`: PASS, 117 test files and 462 tests
+- `npx tsc --noEmit --incremental false`: PASS
+- `npm run pbos:status`: PASS; PBOS health healthy
+- Lifecycle health: `VALID` and synchronized
+- Artifact health: `VALID` with zero conflicts
+- Volume 36 structure: 57 standards, 57 unique identities, 57 registry entries, zero orphans, zero unresolved internal references, and zero dependency cycles
+- Cross-volume authority review: no duplicate authority, circular dependency, conflicting owner, or undefined trust boundary identified
+- Runtime integrity: all 29 inspected runtime file digests were identical before and after status inspection
+- Application or Supabase changes: none
+- Runtime, lifecycle, or certification transitions caused by this work: none
+
+Repository context health is `INVALID`, and refresh is required because the constitutional corpus differs from the last governed repository-context snapshot. Planning remains blocked and Kernel certification remains `REJECTED`. Context was not refreshed, repaired, bypassed, or forced.
