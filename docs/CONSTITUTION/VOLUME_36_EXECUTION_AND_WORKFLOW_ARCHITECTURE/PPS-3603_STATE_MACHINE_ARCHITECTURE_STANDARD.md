@@ -122,7 +122,7 @@ Evidence shall include:
 - Timestamp
 - Actor
 - Authorization
-- Certification reference
+- Eligibility, execution, outcome, and evidence certification references as applicable
 
 ---
 
@@ -133,4 +133,3 @@ State machines constitute constitutional infrastructure.
 Engineering implementations may vary.
 
 Constitutional behavior shall remain invariant.
-

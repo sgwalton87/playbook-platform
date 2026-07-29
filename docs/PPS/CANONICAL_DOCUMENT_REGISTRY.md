@@ -21,7 +21,7 @@ docs/PPS
 
 Specification Range
 
-Volume 0 through Volume 20 and constitutional expansion Volumes 30 through 34
+Volume 0 through Volume 20 and constitutional expansion Volumes 30 through 36
 
 Status
 
@@ -118,6 +118,36 @@ Volume 33 User Experience Architecture defines human experience outcomes.
 Volume 34 Interface System Architecture defines interface implementation standards.
 
 Volume 35 Platform Experience Architecture inherits from these foundations.
+
+Volume 36 — Execution and Workflow Architecture
+
+Canonical Location
+
+docs/CONSTITUTION/VOLUME_36_EXECUTION_AND_WORKFLOW_ARCHITECTURE
+
+Authority
+
+PPS-3600_EXECUTION_AND_WORKFLOW_ARCHITECTURE_OVERVIEW.md
+
+Canonical Membership Authority
+
+VOLUME_36_INDEX.md
+
+Owner
+
+PBOS
+
+Certification Report
+
+docs/REVIEWS/PBOS_VOLUME_36_CONSTITUTIONAL_CERTIFICATION_REVIEW_001.md
+
+Status
+
+Constitutional corpus registered; permanent certification denied pending recorded remediation
+
+Volume 36 defines governed execution and workflow architecture.
+
+Volume 36 does not acquire permanent certification through registry presence.
 
 ------------------------------------------------------------
 

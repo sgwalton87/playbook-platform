@@ -29,6 +29,10 @@ Like every constitutional asset, it progresses through an explicit lifecycle.
 
 # Workflow Lifecycle
 
+This lifecycle governs workflow definitions.
+
+Workflow instance lifecycle is governed by PPS-3602.
+
 Every workflow shall progress through:
 
 Draft
@@ -85,6 +89,18 @@ Every transition requires:
 - Governance approval
 - Immutable history
 
+Lifecycle transition authority is:
+
+- The workflow owner proposes creation, modification, deprecation, or retirement.
+- The workflow steward validates definition, dependency, version, and evidence integrity.
+- The constitutional approval authority approves publication, activation, deprecation, retirement, and archival.
+- The execution governance authority determines whether an active workflow definition is eligible for use.
+- Runtime execution may observe lifecycle state but shall not modify workflow definition lifecycle.
+
+Workflow definition state shall not be inferred from workflow instance or execution attempt state.
+
+Workflow instance state shall not promote, deprecate, retire, or archive a workflow definition.
+
 ---
 
 # Prohibited Behavior
@@ -101,4 +117,3 @@ Workflow lifecycle transitions shall never:
 # Governance
 
 Workflow lifecycle management preserves constitutional stability while enabling controlled evolution.
-

@@ -67,10 +67,14 @@ Every execution progresses through the following constitutional states:
 2. Authorized
 3. Planned
 4. Validated
-5. Certified
+5. Eligibility Certified
 6. Executing
 7. Observed
-8. Completed
+8. Completion Evaluated
+9. Evidence Certified
+10. Execution Certified
+11. Outcome Certified
+12. Completed
 
 Exceptional states include:
 
@@ -93,7 +97,10 @@ Every execution possesses:
 - Lifecycle state
 - Provenance
 - Authorization record
-- Certification record
+- Eligibility certification record
+- Execution certification record
+- Outcome certification record
+- Evidence certification record
 - Observability record
 - Recovery record
 
@@ -133,7 +140,10 @@ No execution model may bypass:
 
 - Authorization
 - Validation
-- Certification
+- Eligibility certification
+- Execution certification
+- Outcome certification
+- Evidence certification
 - Governance
 - Observability
 
@@ -144,4 +154,3 @@ These stages remain constitutionally mandatory.
 # Future Evolution
 
 Future execution technologies may extend implementation capabilities without altering the constitutional lifecycle defined within this standard.
-

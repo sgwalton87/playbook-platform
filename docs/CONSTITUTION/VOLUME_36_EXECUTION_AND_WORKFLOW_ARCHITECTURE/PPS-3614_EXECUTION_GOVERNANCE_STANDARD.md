@@ -13,10 +13,10 @@ depends_on:
   - PPS-3608
   - PPS-3610
   - PPS-3611
-  - PPS-3612
 related:
   - PPS-3602
   - PPS-3609
+  - PPS-3612
   - PPS-3613
   - PPS-3615
   - PPS-3625
@@ -28,7 +28,7 @@ last_updated: 2026-07-29
 
 Establish the constitutional governance authority for execution throughout the Playbook Platform.
 
-Execution governance determines whether authorized intent is constitutionally eligible to execute, which boundaries apply, and how execution remains accountable from admission through final certification.
+Execution governance determines whether authorized intent is constitutionally eligible to execute, which boundaries apply, and how execution remains accountable from admission through evidence, execution, and outcome certification.
 
 Governance authorizes and constrains execution.
 
@@ -57,7 +57,7 @@ Applies to:
 
 # Constitutional Authority
 
-This standard is the root constitutional authority for execution admission, ownership, boundaries, deterministic governance, interruption, recovery oversight, evidence sufficiency, and certification separation.
+This standard is the root constitutional authority for execution admission, ownership, boundaries, deterministic governance, interruption, recovery oversight, evidence sufficiency, and separation of the four certification types.
 
 PPS-3600 establishes Volume 36 authority.
 
@@ -83,7 +83,7 @@ Where execution rules conflict, constitutional precedence shall be:
 
 Lower authority shall never override higher authority.
 
-Unresolved conflict shall block admission, continuation, completion recognition, and certification.
+Unresolved conflict shall block admission, continuation, completion recognition, eligibility certification, execution certification, outcome certification, and evidence certification.
 
 ---
 
@@ -101,11 +101,11 @@ Execution governance shall preserve:
 - Immutable evidence
 - Organizational isolation
 - Independent validation
-- Independent certification
+- Independent eligibility, execution, outcome, and evidence certification
 - Recoverable failure
 - No hidden execution
 
-Authority, eligibility, execution, validation, and certification are distinct constitutional responsibilities.
+Authority, eligibility, execution, validation, and each certification type are distinct constitutional responsibilities.
 
 No subsystem may acquire another responsibility through technical capability alone.
 
@@ -205,7 +205,7 @@ Admission shall require:
 - Passing policy evaluation
 - Available evidence requirements
 - Declared failure and recovery behavior
-- Satisfied pre-execution certification requirements
+- Satisfied eligibility certification requirements
 - No unresolved blocking condition
 
 Admission shall produce an immutable eligibility decision.
@@ -320,7 +320,7 @@ Replay for audit or analysis shall not create production side effects.
 
 Replay intended to create effects shall constitute a new authorized execution linked to the original.
 
-Replay shall never rewrite original evidence, lifecycle state, certification, or outcome.
+Replay shall never rewrite original evidence, lifecycle state, certification decisions, or outcome.
 
 If required replay inputs are missing, unverifiable, or incompatible, replay shall fail closed and record the insufficiency.
 
@@ -421,7 +421,7 @@ Every governed execution shall preserve evidence sufficient to prove:
 - Cancellation or interruption
 - Failure, compensation, and recovery
 - Completion decision
-- Eligibility and outcome certification references
+- Eligibility, evidence, execution, and outcome certification references
 
 Evidence shall be immutable, attributable, ordered, correlated, access-governed, and retained according to constitutional and applicable organizational requirements.
 
@@ -431,7 +431,7 @@ Missing, conflicting, or unverifiable required evidence shall fail closed.
 
 # Certification Separation
 
-Pre-execution eligibility certification and post-execution outcome certification are distinct constitutional decisions.
+Eligibility, execution, outcome, and evidence certification are distinct constitutional decisions.
 
 Eligibility certification verifies that execution may begin.
 
@@ -446,6 +446,19 @@ It evaluates:
 - Dependencies
 - Admission requirements
 
+Execution certification verifies that execution followed its governing requirements.
+
+It evaluates:
+
+- Eligibility certification
+- Ordered transitions
+- Execution boundaries
+- Actor and attempt identities
+- Policy compliance
+- Side effects
+- Interruption and cancellation
+- Failure and recovery
+
 Outcome certification verifies whether completed execution may become recognized constitutional truth.
 
 It evaluates:
@@ -458,15 +471,31 @@ It evaluates:
 - Policy compliance throughout execution
 - Final validation
 
-Execution shall not self-certify either decision.
+Evidence certification verifies that the evidence supporting every decision is complete, authentic, attributable, ordered, and retained.
+
+It evaluates:
+
+- Evidence identity
+- Provenance
+- Completeness
+- Ordering and correlation
+- Integrity
+- Access governance
+- Retention
+
+Execution shall not self-certify any decision.
 
 The execution owner, executor, validator, and certifier shall remain separate wherever constitutional risk requires separation of duties.
 
 Eligibility certification does not guarantee outcome certification.
 
+Execution certification does not guarantee outcome certification.
+
+Evidence certification does not replace eligibility, execution, or outcome certification.
+
 Outcome certification shall not retroactively authorize execution.
 
-Rejected, deferred, conditional, or revoked certification shall preserve all execution history.
+Every rejected, deferred, conditional, or revoked typed certification decision shall preserve all execution history.
 
 ---
 
@@ -483,7 +512,7 @@ Execution governance responsibilities are:
 - The executor performs admitted work.
 - Observability records evidence.
 - Recovery restores consistency through new execution.
-- Certification independently recognizes eligibility or outcome.
+- Certification authorities independently recognize eligibility, execution conformance, outcome validity, and evidence integrity within their assigned certification types.
 - Audit evaluates the preserved record.
 
 No responsibility may override another responsibility's constitutional decision.
@@ -510,8 +539,8 @@ Execution governance shall never permit:
 - Silent cancellation
 - Recovery that erases failure
 - Self-validation
-- Self-certification
-- Certification without required evidence
+- Self-issued certification decisions
+- Any certification decision without its required evidence
 - Organizational boundary expansion without authority
 - Runtime configuration overriding constitutional policy
 
@@ -527,7 +556,7 @@ They shall not weaken this authority.
 
 When implementation cannot prove compliance, execution shall fail closed.
 
-Execution governance may evolve only through constitutional amendment while preserving historical truth, authority, accountability, determinism, evidence, and certification independence.
+Execution governance may evolve only through constitutional amendment while preserving historical truth, authority, accountability, determinism, evidence, and independence of every certification type.
 
 ---
 
@@ -535,4 +564,4 @@ Execution governance may evolve only through constitutional amendment while pres
 
 Future runtimes, orchestrators, intelligence systems, automation systems, and execution technologies may extend how work is performed.
 
-They shall preserve the authority boundaries, deterministic constitutional decisions, evidence requirements, recovery guarantees, and certification separation defined within this standard.
+They shall preserve the authority boundaries, deterministic constitutional decisions, evidence requirements, recovery guarantees, and typed certification separation defined within this standard.

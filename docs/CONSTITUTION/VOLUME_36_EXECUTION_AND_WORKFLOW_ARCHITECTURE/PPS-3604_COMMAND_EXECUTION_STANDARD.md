@@ -90,11 +90,27 @@ Validated
 
 ↓
 
-Certified
+Eligibility Certified
 
 ↓
 
 Executing
+
+↓
+
+Completion Evaluated
+
+↓
+
+Evidence Certified
+
+↓
+
+Execution Certified
+
+↓
+
+Outcome Certified
 
 ↓
 
@@ -141,4 +157,3 @@ Commands shall never:
 # Governance
 
 Every command shall remain subject to constitutional execution governance regardless of implementation technology.
-

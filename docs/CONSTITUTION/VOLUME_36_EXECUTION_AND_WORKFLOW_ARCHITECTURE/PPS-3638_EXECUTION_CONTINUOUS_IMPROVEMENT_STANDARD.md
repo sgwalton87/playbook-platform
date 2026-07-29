@@ -46,7 +46,7 @@ Continuous improvement may utilize:
 - Human feedback
 - AI recommendations
 - Governance reviews
-- Certification outcomes
+- Eligibility, execution, outcome, and evidence certification decisions
 
 ---
 
@@ -66,4 +66,3 @@ Continuous improvement shall never:
 Improvement evolves execution.
 
 Constitutional authority evolves only through constitutional amendment.
-

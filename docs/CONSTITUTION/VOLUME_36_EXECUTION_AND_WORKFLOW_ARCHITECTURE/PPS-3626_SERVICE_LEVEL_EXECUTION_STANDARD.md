@@ -58,7 +58,7 @@ Execution service levels may define:
 - Completion targets
 - Reliability
 - Recovery objectives
-- Certification targets
+- Eligibility, execution, outcome, and evidence certification service targets
 - Governance thresholds
 
 ---
@@ -83,4 +83,3 @@ Execution performance shall remain observable against established service object
 # Governance
 
 Service levels support operational excellence while remaining subordinate to constitutional governance.
-

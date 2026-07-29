@@ -31,7 +31,7 @@ Portability shall preserve:
 - Security
 - Authorization
 - Observability
-- Certification
+- Eligibility, execution, outcome, and evidence certification meaning
 
 ---
 
@@ -40,4 +40,3 @@ Portability shall preserve:
 Infrastructure may change.
 
 Constitutional execution shall remain invariant.
-

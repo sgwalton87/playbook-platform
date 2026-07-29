@@ -255,6 +255,34 @@ Enforcement and operational evidence remain implementation responsibilities outs
 7. A new constitutional certification review is required after remaining amendments.
 8. Repository context must be refreshed through the governed context lifecycle after all constitutional changes are final.
 
+## Validation Results
+
+- Structural inventory: PASS
+- PPS files: `45`
+- Registered PPS standards: `45`
+- Unique identities: `45`
+- Missing internal parents or dependencies: `0`
+- Dependency cycles: `0`
+- Zero-byte standards: `0`
+- `npm run docs:governor`: PASS
+- Generated Volume 36 discovery entries: `46` including the index
+- `npm test`: PASS, 117 test files and 462 tests
+- `npx tsc --noEmit --incremental false`: PASS
+- `npm run pbos:status`: completed successfully
+- PBOS Health: `healthy`
+- Validation Status: `passing`
+- Artifact Health: `VALID`
+- Artifact Conflicts: `0`
+- Lifecycle Health: `VALID`
+- Lifecycle Synchronized: `YES`
+- Context Health: `INVALID`
+- Refresh Required: `YES`
+- Kernel Certification: `REJECTED`
+
+Context invalidation is the expected fail-closed response to changed constitutional content.
+
+No runtime behavior, lifecycle state, gate state, or certification result was modified.
+
 ## Updated Readiness Assessment
 
 | Domain | Previous | Current |

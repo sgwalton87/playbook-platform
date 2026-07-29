@@ -98,7 +98,7 @@ Execution monitoring shall detect:
 - Policy violations
 - Unauthorized execution attempts
 - Recovery operations
-- Certification failures
+- Eligibility, execution, outcome, and evidence certification failures
 
 Monitoring shall inform governance without altering constitutional truth.
 
@@ -121,4 +121,3 @@ Constitutional stakeholders shall be able to determine:
 # Governance
 
 Observability exists to preserve trust, accountability, transparency, and constitutional integrity.
-

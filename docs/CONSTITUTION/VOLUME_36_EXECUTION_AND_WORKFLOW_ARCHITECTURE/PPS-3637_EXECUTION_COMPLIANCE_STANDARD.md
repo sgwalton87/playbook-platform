@@ -55,7 +55,7 @@ Execution compliance shall verify:
 - Constitutional conformance
 - Organizational policy
 - Security requirements
-- Certification status
+- Eligibility, execution, outcome, and evidence certification status
 - Authorization validity
 
 ---
@@ -65,4 +65,3 @@ Execution compliance shall verify:
 Compliance validates execution.
 
 Governance defines compliance.
-

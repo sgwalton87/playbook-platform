@@ -69,7 +69,8 @@ Recovery consists of:
 - Recovery authorization
 - Recovery execution
 - Compensation (when required)
-- Certification
+- Eligibility certification before recovery execution
+- Evidence, execution, and outcome certification after recovery execution
 - Completion
 
 Recovery itself is governed execution.
@@ -115,4 +116,3 @@ Recovery does not replace execution history.
 # Governance
 
 Recovery exists to preserve constitutional continuity while maintaining complete trust in execution history.
-

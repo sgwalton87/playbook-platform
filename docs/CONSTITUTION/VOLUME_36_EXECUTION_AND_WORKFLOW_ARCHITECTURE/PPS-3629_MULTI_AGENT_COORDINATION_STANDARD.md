@@ -34,7 +34,7 @@ Applies to:
 - Intelligence agents
 - Planning agents
 - Validation agents
-- Certification agents
+- Agents delegated to one explicit certification type
 - Enterprise agent ecosystems
 - Future autonomous coordination systems
 
@@ -98,4 +98,3 @@ Every coordinated execution shall preserve:
 # Governance
 
 Multi-agent systems extend execution capacity while preserving constitutional governance.
-

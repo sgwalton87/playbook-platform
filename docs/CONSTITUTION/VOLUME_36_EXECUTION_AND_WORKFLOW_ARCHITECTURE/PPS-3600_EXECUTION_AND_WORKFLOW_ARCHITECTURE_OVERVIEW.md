@@ -93,7 +93,7 @@ Validation
 
 ↓
 
-Certification
+Eligibility Certification
 
 ↓
 
@@ -109,7 +109,19 @@ Recovery (if necessary)
 
 ↓
 
-Completion
+Completion Evaluation
+
+↓
+
+Evidence Certification
+
+↓
+
+Execution Certification
+
+↓
+
+Outcome Certification
 
 No execution may bypass any required constitutional stage.
 
@@ -129,7 +141,10 @@ Execution throughout Playbook shall always satisfy:
 - Every execution possesses constitutional identity.
 - Execution remains observable.
 - Authorization precedes execution.
-- Certification precedes activation.
+- Eligibility certification precedes activation.
+- Execution certification follows execution evidence.
+- Outcome certification follows completion evaluation.
+- Evidence certification verifies the record supporting constitutional recognition.
 - Hidden execution state is prohibited.
 
 ---
@@ -142,11 +157,15 @@ Execution architecture consists of:
 2. Authorization Layer
 3. Planning Layer
 4. Validation Layer
-5. Certification Layer
+5. Eligibility Certification Layer
 6. Execution Layer
 7. Observation Layer
 8. Recovery Layer
-9. Governance Layer
+9. Completion Evaluation Layer
+10. Evidence Certification Layer
+11. Execution Certification Layer
+12. Outcome Certification Layer
+13. Governance Layer
 
 Each layer has independent constitutional responsibilities.
 
@@ -191,4 +210,3 @@ Volume 40 implements execution through PBOS.
 Execution architecture shall evolve only through constitutional amendment.
 
 Engineering implementations may improve without changing constitutional authority.
-

@@ -77,7 +77,7 @@ Artificial intelligence shall never independently redefine constitutional author
 AI execution shall never:
 
 - Self-authorize
-- Self-certify
+- Issue its own eligibility, execution, outcome, or evidence certification
 - Amend constitutional policy
 - Conceal reasoning
 - Rewrite historical evidence
@@ -103,4 +103,3 @@ Every AI execution shall preserve:
 Artificial intelligence remains an execution participant.
 
 Constitutional authority remains human.
-

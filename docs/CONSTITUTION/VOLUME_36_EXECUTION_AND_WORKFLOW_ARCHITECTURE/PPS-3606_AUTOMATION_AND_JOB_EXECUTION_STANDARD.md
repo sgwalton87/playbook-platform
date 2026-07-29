@@ -119,5 +119,4 @@ Automation failures shall:
 
 # Governance
 
-Every automated execution remains subject to constitutional review, certification, observability, and audit.
-
+Every automated execution remains subject to constitutional review, eligibility certification, execution certification, outcome certification, evidence certification, observability, and audit as applicable.

@@ -36,7 +36,7 @@ Future execution technologies shall preserve:
 - Historical truth
 - Security
 - Recovery
-- Certification
+- Eligibility, execution, outcome, and evidence certification
 
 ---
 
@@ -57,4 +57,3 @@ Execution architecture shall remain independent of:
 Technology evolves.
 
 Constitutional authority remains stable.
-

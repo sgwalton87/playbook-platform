@@ -14,7 +14,7 @@ depends_on:
 related:
   - PPS-3607
   - PPS-3612
-  - PPS-5000
+  - PPS-012
 last_updated: 2026-07-29
 ---
 
@@ -107,11 +107,10 @@ Security-relevant execution shall produce immutable evidence for:
 - Escalations
 - Administrative overrides
 - Recovery operations
-- Certification failures
+- Eligibility, execution, outcome, and evidence certification failures
 
 ---
 
 # Governance
 
 Execution security remains subordinate to constitutional authority while protecting constitutional integrity.
-

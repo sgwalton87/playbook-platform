@@ -71,7 +71,7 @@ Each registry entry shall define:
 - Required authorization
 - Required context
 - Dependencies
-- Certification requirements
+- Required certification types
 - Governance authority
 - Version history
 
@@ -126,7 +126,7 @@ The registry enables:
 - Discovery
 - Governance
 - Dependency analysis
-- Certification
+- Eligibility, execution, outcome, and evidence certification discovery
 - Audit
 - Impact assessment
 - Platform evolution
@@ -140,4 +140,3 @@ The Execution Registry constitutes constitutional infrastructure.
 No executable capability shall exist outside the registry.
 
 Registry evolution shall follow the Constitutional Amendment Process.
-

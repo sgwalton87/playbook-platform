@@ -313,7 +313,7 @@ Workflow actors may include:
 
 Every actor shall possess verified identity, organization scope, delegated authority, and accountable responsibility.
 
-No actor may approve, validate, certify, or execute beyond granted authority.
+No actor may approve, validate, issue a typed certification decision, or execute beyond granted authority.
 
 Separation of duties shall apply wherever an actor's combined responsibilities could compromise constitutional trust.
 
@@ -416,7 +416,7 @@ Technical termination alone does not establish constitutional completion.
 
 Partial success shall be represented explicitly and shall not be reported as completion unless the workflow definition constitutionally permits that outcome.
 
-Completion recognition remains separate from post-execution certification.
+Completion recognition remains separate from execution certification and outcome certification.
 
 ---
 
@@ -440,11 +440,14 @@ Every workflow shall preserve evidence sufficient to reconstruct:
 - Failures and recovery
 - Outputs
 - Completion decision
-- Certification references
+- Eligibility certification reference
+- Evidence certification reference
+- Execution certification reference
+- Outcome certification reference
 
 Evidence shall be immutable, ordered, correlated, access-governed, and retained according to applicable constitutional requirements.
 
-Missing or unverifiable evidence shall prevent completion recognition and certification.
+Missing or unverifiable evidence shall prevent completion recognition and every certification decision that requires that evidence.
 
 ---
 

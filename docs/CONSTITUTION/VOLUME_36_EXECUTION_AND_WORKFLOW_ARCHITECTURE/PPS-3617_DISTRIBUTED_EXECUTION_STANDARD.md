@@ -53,7 +53,10 @@ Distributed execution shall preserve:
 - Provenance
 - Ordering
 - Recovery
-- Certification
+- Eligibility certification
+- Execution certification
+- Outcome certification
+- Evidence certification
 - Governance
 
 ---
@@ -74,4 +77,3 @@ Distributed failures shall:
 Distributed execution extends constitutional execution.
 
 It does not establish independent constitutional authority.
-
