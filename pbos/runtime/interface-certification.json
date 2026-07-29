@@ -1,0 +1,1532 @@
+{
+  "schemaVersion": 1,
+  "owner": "interface-certification",
+  "runId": "VOLUME-34:400cacfd935b9b1e98ec1df7741118740c55e1d1032bdb25da78baf534a2f5cb:94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8:2026-07-29T04:58:54.751Z",
+  "volume": "VOLUME-34",
+  "volumeDigest": "94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8",
+  "implementation": "playbook-platform-interface",
+  "digest": "400cacfd935b9b1e98ec1df7741118740c55e1d1032bdb25da78baf534a2f5cb",
+  "validationComplete": false,
+  "domains": {
+    "IC-001": {
+      "id": "IC-001",
+      "name": "Design System Compliance",
+      "passed": false,
+      "score": 0,
+      "requiredControls": [
+        "approved_design_system_usage",
+        "visual_consistency",
+        "component_reuse",
+        "prohibited_duplication_absent"
+      ],
+      "evidence": [
+        {
+          "path": "docs/release-evidence/volume-34-golden-interface-reference.md",
+          "digest": "48a24b7b127df3791f5602a816a846384eb8ed69726bf5e71dd65b4174834e7a",
+          "capturedAt": "2026-07-29T04:39:47Z"
+        },
+        {
+          "path": "docs/release-evidence/volume-34-golden-interface-reference.json",
+          "digest": "793fd99cd08d6cb64d28723767ee0a10e9c809ec9727affd58f6c71f7f8739be",
+          "capturedAt": "2026-07-29T04:39:47Z"
+        }
+      ],
+      "blockingConditions": [
+        "IC-001 control is not proven: approved_design_system_usage.",
+        "IC-001 control is not proven: visual_consistency.",
+        "IC-001 control is not proven: component_reuse.",
+        "IC-001 control is not proven: prohibited_duplication_absent.",
+        "IC-001: The governed design-system reference is defined; repository-wide implementation adoption remains unverified."
+      ]
+    },
+    "IC-002": {
+      "id": "IC-002",
+      "name": "Component Architecture Compliance",
+      "passed": false,
+      "score": 0,
+      "requiredControls": [
+        "component_ownership",
+        "component_versioning",
+        "composition_rules",
+        "lifecycle_management"
+      ],
+      "evidence": [
+        {
+          "path": "docs/release-evidence/volume-34-golden-interface-reference.md",
+          "digest": "48a24b7b127df3791f5602a816a846384eb8ed69726bf5e71dd65b4174834e7a",
+          "capturedAt": "2026-07-29T04:39:47Z"
+        },
+        {
+          "path": "docs/release-evidence/volume-34-golden-interface-reference.json",
+          "digest": "793fd99cd08d6cb64d28723767ee0a10e9c809ec9727affd58f6c71f7f8739be",
+          "capturedAt": "2026-07-29T04:39:47Z"
+        }
+      ],
+      "blockingConditions": [
+        "IC-002 control is not proven: component_ownership.",
+        "IC-002 control is not proven: component_versioning.",
+        "IC-002 control is not proven: composition_rules.",
+        "IC-002 control is not proven: lifecycle_management.",
+        "IC-002: The governed component model is defined; implementation ownership, versioning, composition, and lifecycle compliance remain unverified."
+      ]
+    },
+    "IC-003": {
+      "id": "IC-003",
+      "name": "Design Token Compliance",
+      "passed": false,
+      "score": 0,
+      "requiredControls": [
+        "spacing_tokens",
+        "typography_tokens",
+        "color_tokens",
+        "theme_tokens",
+        "responsive_tokens",
+        "token_reuse"
+      ],
+      "evidence": [
+        {
+          "path": "docs/release-evidence/volume-34-golden-interface-reference.md",
+          "digest": "48a24b7b127df3791f5602a816a846384eb8ed69726bf5e71dd65b4174834e7a",
+          "capturedAt": "2026-07-29T04:39:47Z"
+        },
+        {
+          "path": "docs/release-evidence/volume-34-golden-interface-reference.json",
+          "digest": "793fd99cd08d6cb64d28723767ee0a10e9c809ec9727affd58f6c71f7f8739be",
+          "capturedAt": "2026-07-29T04:39:47Z"
+        }
+      ],
+      "blockingConditions": [
+        "IC-003 control is not proven: spacing_tokens.",
+        "IC-003 control is not proven: typography_tokens.",
+        "IC-003 control is not proven: color_tokens.",
+        "IC-003 control is not proven: theme_tokens.",
+        "IC-003 control is not proven: responsive_tokens.",
+        "IC-003 control is not proven: token_reuse.",
+        "IC-003: The governed token model is defined; implementation usage, reuse, and duplication audits remain unverified."
+      ]
+    },
+    "IC-004": {
+      "id": "IC-004",
+      "name": "Accessibility Compliance",
+      "passed": false,
+      "score": 0,
+      "requiredControls": [
+        "wcag_alignment",
+        "keyboard_navigation",
+        "screen_reader_support",
+        "cognitive_accessibility",
+        "inclusive_interaction"
+      ],
+      "evidence": [
+        {
+          "path": "docs/release-evidence/volume-34-golden-interface-reference.md",
+          "digest": "48a24b7b127df3791f5602a816a846384eb8ed69726bf5e71dd65b4174834e7a",
+          "capturedAt": "2026-07-29T04:39:47Z"
+        },
+        {
+          "path": "docs/release-evidence/volume-34-golden-interface-reference.json",
+          "digest": "793fd99cd08d6cb64d28723767ee0a10e9c809ec9727affd58f6c71f7f8739be",
+          "capturedAt": "2026-07-29T04:39:47Z"
+        }
+      ],
+      "blockingConditions": [
+        "IC-004 control is not proven: wcag_alignment.",
+        "IC-004 control is not proven: keyboard_navigation.",
+        "IC-004 control is not proven: screen_reader_support.",
+        "IC-004 control is not proven: cognitive_accessibility.",
+        "IC-004 control is not proven: inclusive_interaction.",
+        "IC-004: The governed accessibility model is defined; automated and manual implementation results remain unverified."
+      ]
+    },
+    "IC-005": {
+      "id": "IC-005",
+      "name": "Responsive and Device Compliance",
+      "passed": false,
+      "score": 0,
+      "requiredControls": [
+        "mobile",
+        "tablet",
+        "desktop",
+        "future_device_compatibility",
+        "adaptive_layouts"
+      ],
+      "evidence": [
+        {
+          "path": "docs/release-evidence/volume-34-golden-interface-reference.md",
+          "digest": "48a24b7b127df3791f5602a816a846384eb8ed69726bf5e71dd65b4174834e7a",
+          "capturedAt": "2026-07-29T04:39:47Z"
+        },
+        {
+          "path": "docs/release-evidence/volume-34-golden-interface-reference.json",
+          "digest": "793fd99cd08d6cb64d28723767ee0a10e9c809ec9727affd58f6c71f7f8739be",
+          "capturedAt": "2026-07-29T04:39:47Z"
+        }
+      ],
+      "blockingConditions": [
+        "IC-005 control is not proven: mobile.",
+        "IC-005 control is not proven: tablet.",
+        "IC-005 control is not proven: desktop.",
+        "IC-005 control is not proven: future_device_compatibility.",
+        "IC-005 control is not proven: adaptive_layouts.",
+        "IC-005: The governed responsive model is defined; identity-bound mobile, tablet, desktop, and adaptive implementation results remain unverified."
+      ]
+    },
+    "IC-006": {
+      "id": "IC-006",
+      "name": "Interaction Pattern Compliance",
+      "passed": false,
+      "score": 0,
+      "requiredControls": [
+        "approved_interaction_patterns",
+        "navigation_consistency",
+        "feedback_behavior",
+        "user_decision_support"
+      ],
+      "evidence": [
+        {
+          "path": "docs/release-evidence/volume-34-golden-interface-reference.md",
+          "digest": "48a24b7b127df3791f5602a816a846384eb8ed69726bf5e71dd65b4174834e7a",
+          "capturedAt": "2026-07-29T04:39:47Z"
+        },
+        {
+          "path": "docs/release-evidence/volume-34-golden-interface-reference.json",
+          "digest": "793fd99cd08d6cb64d28723767ee0a10e9c809ec9727affd58f6c71f7f8739be",
+          "capturedAt": "2026-07-29T04:39:47Z"
+        }
+      ],
+      "blockingConditions": [
+        "IC-006 control is not proven: approved_interaction_patterns.",
+        "IC-006 control is not proven: navigation_consistency.",
+        "IC-006 control is not proven: feedback_behavior.",
+        "IC-006 control is not proven: user_decision_support.",
+        "IC-006: The governed interaction model is defined; implemented workflows remain unverified against approved patterns."
+      ]
+    },
+    "IC-007": {
+      "id": "IC-007",
+      "name": "Interface State Compliance",
+      "passed": false,
+      "score": 0,
+      "requiredControls": [
+        "loading",
+        "empty",
+        "success",
+        "failure",
+        "recovery",
+        "permission",
+        "offline"
+      ],
+      "evidence": [
+        {
+          "path": "docs/release-evidence/volume-34-golden-interface-reference.md",
+          "digest": "48a24b7b127df3791f5602a816a846384eb8ed69726bf5e71dd65b4174834e7a",
+          "capturedAt": "2026-07-29T04:39:47Z"
+        },
+        {
+          "path": "docs/release-evidence/volume-34-golden-interface-reference.json",
+          "digest": "793fd99cd08d6cb64d28723767ee0a10e9c809ec9727affd58f6c71f7f8739be",
+          "capturedAt": "2026-07-29T04:39:47Z"
+        }
+      ],
+      "blockingConditions": [
+        "IC-007 control is not proven: loading.",
+        "IC-007 control is not proven: empty.",
+        "IC-007 control is not proven: success.",
+        "IC-007 control is not proven: failure.",
+        "IC-007 control is not proven: recovery.",
+        "IC-007 control is not proven: permission.",
+        "IC-007 control is not proven: offline.",
+        "IC-007: The governed state model is defined; loading, empty, success, failure, recovery, permission, and offline implementation results remain unverified."
+      ]
+    },
+    "IC-008": {
+      "id": "IC-008",
+      "name": "Performance and Observability Compliance",
+      "passed": false,
+      "score": 0,
+      "requiredControls": [
+        "performance_expectations",
+        "analytics_requirements",
+        "error_monitoring",
+        "user_behavior_understanding",
+        "system_health_visibility"
+      ],
+      "evidence": [
+        {
+          "path": "docs/release-evidence/volume-34-golden-interface-reference.md",
+          "digest": "48a24b7b127df3791f5602a816a846384eb8ed69726bf5e71dd65b4174834e7a",
+          "capturedAt": "2026-07-29T04:39:47Z"
+        },
+        {
+          "path": "docs/release-evidence/volume-34-golden-interface-reference.json",
+          "digest": "793fd99cd08d6cb64d28723767ee0a10e9c809ec9727affd58f6c71f7f8739be",
+          "capturedAt": "2026-07-29T04:39:47Z"
+        }
+      ],
+      "blockingConditions": [
+        "IC-008 control is not proven: performance_expectations.",
+        "IC-008 control is not proven: analytics_requirements.",
+        "IC-008 control is not proven: error_monitoring.",
+        "IC-008 control is not proven: user_behavior_understanding.",
+        "IC-008 control is not proven: system_health_visibility.",
+        "IC-008: The governed performance and observability model is defined; implementation measurements and operational results remain unverified."
+      ]
+    }
+  },
+  "score": 0,
+  "status": "pending",
+  "certificationTimestamp": "2026-07-29T04:58:54.751Z",
+  "validator": {
+    "id": "PBOS-INTERFACE-CERTIFICATION",
+    "version": "1.0.0"
+  },
+  "measurement": {
+    "runId": "VOLUME-34:400cacfd935b9b1e98ec1df7741118740c55e1d1032bdb25da78baf534a2f5cb:94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8:2026-07-29T04:58:54.751Z",
+    "implementationDigest": "400cacfd935b9b1e98ec1df7741118740c55e1d1032bdb25da78baf534a2f5cb",
+    "measurementComplete": true,
+    "certificationEligible": false
+  },
+  "blockingConditions": [
+    "IC-001 control is not proven: approved_design_system_usage.",
+    "IC-001 control is not proven: visual_consistency.",
+    "IC-001 control is not proven: component_reuse.",
+    "IC-001 control is not proven: prohibited_duplication_absent.",
+    "IC-001: The governed design-system reference is defined; repository-wide implementation adoption remains unverified.",
+    "IC-002 control is not proven: component_ownership.",
+    "IC-002 control is not proven: component_versioning.",
+    "IC-002 control is not proven: composition_rules.",
+    "IC-002 control is not proven: lifecycle_management.",
+    "IC-002: The governed component model is defined; implementation ownership, versioning, composition, and lifecycle compliance remain unverified.",
+    "IC-003 control is not proven: spacing_tokens.",
+    "IC-003 control is not proven: typography_tokens.",
+    "IC-003 control is not proven: color_tokens.",
+    "IC-003 control is not proven: theme_tokens.",
+    "IC-003 control is not proven: responsive_tokens.",
+    "IC-003 control is not proven: token_reuse.",
+    "IC-003: The governed token model is defined; implementation usage, reuse, and duplication audits remain unverified.",
+    "IC-004 control is not proven: wcag_alignment.",
+    "IC-004 control is not proven: keyboard_navigation.",
+    "IC-004 control is not proven: screen_reader_support.",
+    "IC-004 control is not proven: cognitive_accessibility.",
+    "IC-004 control is not proven: inclusive_interaction.",
+    "IC-004: The governed accessibility model is defined; automated and manual implementation results remain unverified.",
+    "IC-005 control is not proven: mobile.",
+    "IC-005 control is not proven: tablet.",
+    "IC-005 control is not proven: desktop.",
+    "IC-005 control is not proven: future_device_compatibility.",
+    "IC-005 control is not proven: adaptive_layouts.",
+    "IC-005: The governed responsive model is defined; identity-bound mobile, tablet, desktop, and adaptive implementation results remain unverified.",
+    "IC-006 control is not proven: approved_interaction_patterns.",
+    "IC-006 control is not proven: navigation_consistency.",
+    "IC-006 control is not proven: feedback_behavior.",
+    "IC-006 control is not proven: user_decision_support.",
+    "IC-006: The governed interaction model is defined; implemented workflows remain unverified against approved patterns.",
+    "IC-007 control is not proven: loading.",
+    "IC-007 control is not proven: empty.",
+    "IC-007 control is not proven: success.",
+    "IC-007 control is not proven: failure.",
+    "IC-007 control is not proven: recovery.",
+    "IC-007 control is not proven: permission.",
+    "IC-007 control is not proven: offline.",
+    "IC-007: The governed state model is defined; loading, empty, success, failure, recovery, permission, and offline implementation results remain unverified.",
+    "IC-008 control is not proven: performance_expectations.",
+    "IC-008 control is not proven: analytics_requirements.",
+    "IC-008 control is not proven: error_monitoring.",
+    "IC-008 control is not proven: user_behavior_understanding.",
+    "IC-008 control is not proven: system_health_visibility.",
+    "IC-008: The governed performance and observability model is defined; implementation measurements and operational results remain unverified.",
+    "Interface validation is not complete."
+  ],
+  "history": [
+    {
+      "runId": "VOLUME-34:400cacfd935b9b1e98ec1df7741118740c55e1d1032bdb25da78baf534a2f5cb:94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8:2026-07-29T04:26:02.443Z",
+      "volume": "VOLUME-34",
+      "volumeDigest": "94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8",
+      "implementation": "playbook-platform-interface",
+      "digest": "400cacfd935b9b1e98ec1df7741118740c55e1d1032bdb25da78baf534a2f5cb",
+      "validationComplete": false,
+      "domains": {
+        "IC-001": {
+          "id": "IC-001",
+          "name": "Design System Compliance",
+          "passed": false,
+          "score": 0,
+          "requiredControls": [
+            "approved_design_system_usage",
+            "visual_consistency",
+            "component_reuse",
+            "prohibited_duplication_absent"
+          ],
+          "evidence": [],
+          "blockingConditions": [
+            "IC-001 control is not proven: approved_design_system_usage.",
+            "IC-001 control is not proven: visual_consistency.",
+            "IC-001 control is not proven: component_reuse.",
+            "IC-001 control is not proven: prohibited_duplication_absent.",
+            "IC-001 has no implementation evidence.",
+            "IC-001: Repository-wide design system adoption evidence has not been generated."
+          ]
+        },
+        "IC-002": {
+          "id": "IC-002",
+          "name": "Component Architecture Compliance",
+          "passed": false,
+          "score": 0,
+          "requiredControls": [
+            "component_ownership",
+            "component_versioning",
+            "composition_rules",
+            "lifecycle_management"
+          ],
+          "evidence": [],
+          "blockingConditions": [
+            "IC-002 control is not proven: component_ownership.",
+            "IC-002 control is not proven: component_versioning.",
+            "IC-002 control is not proven: composition_rules.",
+            "IC-002 control is not proven: lifecycle_management.",
+            "IC-002 has no implementation evidence.",
+            "IC-002: Component ownership, versioning, composition, and lifecycle evidence is incomplete."
+          ]
+        },
+        "IC-003": {
+          "id": "IC-003",
+          "name": "Design Token Compliance",
+          "passed": false,
+          "score": 0,
+          "requiredControls": [
+            "spacing_tokens",
+            "typography_tokens",
+            "color_tokens",
+            "theme_tokens",
+            "responsive_tokens",
+            "token_reuse"
+          ],
+          "evidence": [],
+          "blockingConditions": [
+            "IC-003 control is not proven: spacing_tokens.",
+            "IC-003 control is not proven: typography_tokens.",
+            "IC-003 control is not proven: color_tokens.",
+            "IC-003 control is not proven: theme_tokens.",
+            "IC-003 control is not proven: responsive_tokens.",
+            "IC-003 control is not proven: token_reuse.",
+            "IC-003 has no implementation evidence.",
+            "IC-003: A complete design-token usage and duplication audit is unavailable."
+          ]
+        },
+        "IC-004": {
+          "id": "IC-004",
+          "name": "Accessibility Compliance",
+          "passed": false,
+          "score": 0,
+          "requiredControls": [
+            "wcag_alignment",
+            "keyboard_navigation",
+            "screen_reader_support",
+            "cognitive_accessibility",
+            "inclusive_interaction"
+          ],
+          "evidence": [],
+          "blockingConditions": [
+            "IC-004 control is not proven: wcag_alignment.",
+            "IC-004 control is not proven: keyboard_navigation.",
+            "IC-004 control is not proven: screen_reader_support.",
+            "IC-004 control is not proven: cognitive_accessibility.",
+            "IC-004 control is not proven: inclusive_interaction.",
+            "IC-004 has no implementation evidence.",
+            "IC-004: Complete automated and manual accessibility evidence is unavailable."
+          ]
+        },
+        "IC-005": {
+          "id": "IC-005",
+          "name": "Responsive and Device Compliance",
+          "passed": false,
+          "score": 0,
+          "requiredControls": [
+            "mobile",
+            "tablet",
+            "desktop",
+            "future_device_compatibility",
+            "adaptive_layouts"
+          ],
+          "evidence": [],
+          "blockingConditions": [
+            "IC-005 control is not proven: mobile.",
+            "IC-005 control is not proven: tablet.",
+            "IC-005 control is not proven: desktop.",
+            "IC-005 control is not proven: future_device_compatibility.",
+            "IC-005 control is not proven: adaptive_layouts.",
+            "IC-005 has no implementation evidence.",
+            "IC-005: Identity-bound mobile, tablet, desktop, and adaptive-layout evidence is incomplete."
+          ]
+        },
+        "IC-006": {
+          "id": "IC-006",
+          "name": "Interaction Pattern Compliance",
+          "passed": false,
+          "score": 0,
+          "requiredControls": [
+            "approved_interaction_patterns",
+            "navigation_consistency",
+            "feedback_behavior",
+            "user_decision_support"
+          ],
+          "evidence": [],
+          "blockingConditions": [
+            "IC-006 control is not proven: approved_interaction_patterns.",
+            "IC-006 control is not proven: navigation_consistency.",
+            "IC-006 control is not proven: feedback_behavior.",
+            "IC-006 control is not proven: user_decision_support.",
+            "IC-006 has no implementation evidence.",
+            "IC-006: Implemented workflows have not been fully traced to approved interaction patterns."
+          ]
+        },
+        "IC-007": {
+          "id": "IC-007",
+          "name": "Interface State Compliance",
+          "passed": false,
+          "score": 0,
+          "requiredControls": [
+            "loading",
+            "empty",
+            "success",
+            "failure",
+            "recovery",
+            "permission",
+            "offline"
+          ],
+          "evidence": [],
+          "blockingConditions": [
+            "IC-007 control is not proven: loading.",
+            "IC-007 control is not proven: empty.",
+            "IC-007 control is not proven: success.",
+            "IC-007 control is not proven: failure.",
+            "IC-007 control is not proven: recovery.",
+            "IC-007 control is not proven: permission.",
+            "IC-007 control is not proven: offline.",
+            "IC-007 has no implementation evidence.",
+            "IC-007: Complete loading, empty, success, failure, recovery, permission, and offline state evidence is unavailable."
+          ]
+        },
+        "IC-008": {
+          "id": "IC-008",
+          "name": "Performance and Observability Compliance",
+          "passed": false,
+          "score": 0,
+          "requiredControls": [
+            "performance_expectations",
+            "analytics_requirements",
+            "error_monitoring",
+            "user_behavior_understanding",
+            "system_health_visibility"
+          ],
+          "evidence": [],
+          "blockingConditions": [
+            "IC-008 control is not proven: performance_expectations.",
+            "IC-008 control is not proven: analytics_requirements.",
+            "IC-008 control is not proven: error_monitoring.",
+            "IC-008 control is not proven: user_behavior_understanding.",
+            "IC-008 control is not proven: system_health_visibility.",
+            "IC-008 has no implementation evidence.",
+            "IC-008: Performance, analytics, monitoring, behavior, and system-health evidence is incomplete."
+          ]
+        }
+      },
+      "score": 0,
+      "status": "failed",
+      "certificationTimestamp": "2026-07-29T04:26:02.443Z",
+      "validator": {
+        "id": "PBOS-INTERFACE-CERTIFICATION",
+        "version": "1.0.0"
+      },
+      "blockingConditions": [
+        "IC-001 control is not proven: approved_design_system_usage.",
+        "IC-001 control is not proven: visual_consistency.",
+        "IC-001 control is not proven: component_reuse.",
+        "IC-001 control is not proven: prohibited_duplication_absent.",
+        "IC-001 has no implementation evidence.",
+        "IC-001: Repository-wide design system adoption evidence has not been generated.",
+        "IC-002 control is not proven: component_ownership.",
+        "IC-002 control is not proven: component_versioning.",
+        "IC-002 control is not proven: composition_rules.",
+        "IC-002 control is not proven: lifecycle_management.",
+        "IC-002 has no implementation evidence.",
+        "IC-002: Component ownership, versioning, composition, and lifecycle evidence is incomplete.",
+        "IC-003 control is not proven: spacing_tokens.",
+        "IC-003 control is not proven: typography_tokens.",
+        "IC-003 control is not proven: color_tokens.",
+        "IC-003 control is not proven: theme_tokens.",
+        "IC-003 control is not proven: responsive_tokens.",
+        "IC-003 control is not proven: token_reuse.",
+        "IC-003 has no implementation evidence.",
+        "IC-003: A complete design-token usage and duplication audit is unavailable.",
+        "IC-004 control is not proven: wcag_alignment.",
+        "IC-004 control is not proven: keyboard_navigation.",
+        "IC-004 control is not proven: screen_reader_support.",
+        "IC-004 control is not proven: cognitive_accessibility.",
+        "IC-004 control is not proven: inclusive_interaction.",
+        "IC-004 has no implementation evidence.",
+        "IC-004: Complete automated and manual accessibility evidence is unavailable.",
+        "IC-005 control is not proven: mobile.",
+        "IC-005 control is not proven: tablet.",
+        "IC-005 control is not proven: desktop.",
+        "IC-005 control is not proven: future_device_compatibility.",
+        "IC-005 control is not proven: adaptive_layouts.",
+        "IC-005 has no implementation evidence.",
+        "IC-005: Identity-bound mobile, tablet, desktop, and adaptive-layout evidence is incomplete.",
+        "IC-006 control is not proven: approved_interaction_patterns.",
+        "IC-006 control is not proven: navigation_consistency.",
+        "IC-006 control is not proven: feedback_behavior.",
+        "IC-006 control is not proven: user_decision_support.",
+        "IC-006 has no implementation evidence.",
+        "IC-006: Implemented workflows have not been fully traced to approved interaction patterns.",
+        "IC-007 control is not proven: loading.",
+        "IC-007 control is not proven: empty.",
+        "IC-007 control is not proven: success.",
+        "IC-007 control is not proven: failure.",
+        "IC-007 control is not proven: recovery.",
+        "IC-007 control is not proven: permission.",
+        "IC-007 control is not proven: offline.",
+        "IC-007 has no implementation evidence.",
+        "IC-007: Complete loading, empty, success, failure, recovery, permission, and offline state evidence is unavailable.",
+        "IC-008 control is not proven: performance_expectations.",
+        "IC-008 control is not proven: analytics_requirements.",
+        "IC-008 control is not proven: error_monitoring.",
+        "IC-008 control is not proven: user_behavior_understanding.",
+        "IC-008 control is not proven: system_health_visibility.",
+        "IC-008 has no implementation evidence.",
+        "IC-008: Performance, analytics, monitoring, behavior, and system-health evidence is incomplete.",
+        "Interface validation is not complete."
+      ]
+    },
+    {
+      "runId": "VOLUME-34:400cacfd935b9b1e98ec1df7741118740c55e1d1032bdb25da78baf534a2f5cb:94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8:2026-07-29T04:32:57.170Z",
+      "volume": "VOLUME-34",
+      "volumeDigest": "94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8",
+      "implementation": "playbook-platform-interface",
+      "digest": "400cacfd935b9b1e98ec1df7741118740c55e1d1032bdb25da78baf534a2f5cb",
+      "validationComplete": false,
+      "domains": {
+        "IC-001": {
+          "id": "IC-001",
+          "name": "Design System Compliance",
+          "passed": false,
+          "score": 0,
+          "requiredControls": [
+            "approved_design_system_usage",
+            "visual_consistency",
+            "component_reuse",
+            "prohibited_duplication_absent"
+          ],
+          "evidence": [],
+          "blockingConditions": [
+            "IC-001 control is not proven: approved_design_system_usage.",
+            "IC-001 control is not proven: visual_consistency.",
+            "IC-001 control is not proven: component_reuse.",
+            "IC-001 control is not proven: prohibited_duplication_absent.",
+            "IC-001 has no implementation evidence.",
+            "IC-001: Repository-wide design system adoption evidence has not been generated."
+          ]
+        },
+        "IC-002": {
+          "id": "IC-002",
+          "name": "Component Architecture Compliance",
+          "passed": false,
+          "score": 0,
+          "requiredControls": [
+            "component_ownership",
+            "component_versioning",
+            "composition_rules",
+            "lifecycle_management"
+          ],
+          "evidence": [],
+          "blockingConditions": [
+            "IC-002 control is not proven: component_ownership.",
+            "IC-002 control is not proven: component_versioning.",
+            "IC-002 control is not proven: composition_rules.",
+            "IC-002 control is not proven: lifecycle_management.",
+            "IC-002 has no implementation evidence.",
+            "IC-002: Component ownership, versioning, composition, and lifecycle evidence is incomplete."
+          ]
+        },
+        "IC-003": {
+          "id": "IC-003",
+          "name": "Design Token Compliance",
+          "passed": false,
+          "score": 0,
+          "requiredControls": [
+            "spacing_tokens",
+            "typography_tokens",
+            "color_tokens",
+            "theme_tokens",
+            "responsive_tokens",
+            "token_reuse"
+          ],
+          "evidence": [],
+          "blockingConditions": [
+            "IC-003 control is not proven: spacing_tokens.",
+            "IC-003 control is not proven: typography_tokens.",
+            "IC-003 control is not proven: color_tokens.",
+            "IC-003 control is not proven: theme_tokens.",
+            "IC-003 control is not proven: responsive_tokens.",
+            "IC-003 control is not proven: token_reuse.",
+            "IC-003 has no implementation evidence.",
+            "IC-003: A complete design-token usage and duplication audit is unavailable."
+          ]
+        },
+        "IC-004": {
+          "id": "IC-004",
+          "name": "Accessibility Compliance",
+          "passed": false,
+          "score": 0,
+          "requiredControls": [
+            "wcag_alignment",
+            "keyboard_navigation",
+            "screen_reader_support",
+            "cognitive_accessibility",
+            "inclusive_interaction"
+          ],
+          "evidence": [],
+          "blockingConditions": [
+            "IC-004 control is not proven: wcag_alignment.",
+            "IC-004 control is not proven: keyboard_navigation.",
+            "IC-004 control is not proven: screen_reader_support.",
+            "IC-004 control is not proven: cognitive_accessibility.",
+            "IC-004 control is not proven: inclusive_interaction.",
+            "IC-004 has no implementation evidence.",
+            "IC-004: Complete automated and manual accessibility evidence is unavailable."
+          ]
+        },
+        "IC-005": {
+          "id": "IC-005",
+          "name": "Responsive and Device Compliance",
+          "passed": false,
+          "score": 0,
+          "requiredControls": [
+            "mobile",
+            "tablet",
+            "desktop",
+            "future_device_compatibility",
+            "adaptive_layouts"
+          ],
+          "evidence": [],
+          "blockingConditions": [
+            "IC-005 control is not proven: mobile.",
+            "IC-005 control is not proven: tablet.",
+            "IC-005 control is not proven: desktop.",
+            "IC-005 control is not proven: future_device_compatibility.",
+            "IC-005 control is not proven: adaptive_layouts.",
+            "IC-005 has no implementation evidence.",
+            "IC-005: Identity-bound mobile, tablet, desktop, and adaptive-layout evidence is incomplete."
+          ]
+        },
+        "IC-006": {
+          "id": "IC-006",
+          "name": "Interaction Pattern Compliance",
+          "passed": false,
+          "score": 0,
+          "requiredControls": [
+            "approved_interaction_patterns",
+            "navigation_consistency",
+            "feedback_behavior",
+            "user_decision_support"
+          ],
+          "evidence": [],
+          "blockingConditions": [
+            "IC-006 control is not proven: approved_interaction_patterns.",
+            "IC-006 control is not proven: navigation_consistency.",
+            "IC-006 control is not proven: feedback_behavior.",
+            "IC-006 control is not proven: user_decision_support.",
+            "IC-006 has no implementation evidence.",
+            "IC-006: Implemented workflows have not been fully traced to approved interaction patterns."
+          ]
+        },
+        "IC-007": {
+          "id": "IC-007",
+          "name": "Interface State Compliance",
+          "passed": false,
+          "score": 0,
+          "requiredControls": [
+            "loading",
+            "empty",
+            "success",
+            "failure",
+            "recovery",
+            "permission",
+            "offline"
+          ],
+          "evidence": [],
+          "blockingConditions": [
+            "IC-007 control is not proven: loading.",
+            "IC-007 control is not proven: empty.",
+            "IC-007 control is not proven: success.",
+            "IC-007 control is not proven: failure.",
+            "IC-007 control is not proven: recovery.",
+            "IC-007 control is not proven: permission.",
+            "IC-007 control is not proven: offline.",
+            "IC-007 has no implementation evidence.",
+            "IC-007: Complete loading, empty, success, failure, recovery, permission, and offline state evidence is unavailable."
+          ]
+        },
+        "IC-008": {
+          "id": "IC-008",
+          "name": "Performance and Observability Compliance",
+          "passed": false,
+          "score": 0,
+          "requiredControls": [
+            "performance_expectations",
+            "analytics_requirements",
+            "error_monitoring",
+            "user_behavior_understanding",
+            "system_health_visibility"
+          ],
+          "evidence": [],
+          "blockingConditions": [
+            "IC-008 control is not proven: performance_expectations.",
+            "IC-008 control is not proven: analytics_requirements.",
+            "IC-008 control is not proven: error_monitoring.",
+            "IC-008 control is not proven: user_behavior_understanding.",
+            "IC-008 control is not proven: system_health_visibility.",
+            "IC-008 has no implementation evidence.",
+            "IC-008: Performance, analytics, monitoring, behavior, and system-health evidence is incomplete."
+          ]
+        }
+      },
+      "score": 0,
+      "status": "pending",
+      "certificationTimestamp": "2026-07-29T04:32:57.170Z",
+      "validator": {
+        "id": "PBOS-INTERFACE-CERTIFICATION",
+        "version": "1.0.0"
+      },
+      "blockingConditions": [
+        "IC-001 control is not proven: approved_design_system_usage.",
+        "IC-001 control is not proven: visual_consistency.",
+        "IC-001 control is not proven: component_reuse.",
+        "IC-001 control is not proven: prohibited_duplication_absent.",
+        "IC-001 has no implementation evidence.",
+        "IC-001: Repository-wide design system adoption evidence has not been generated.",
+        "IC-002 control is not proven: component_ownership.",
+        "IC-002 control is not proven: component_versioning.",
+        "IC-002 control is not proven: composition_rules.",
+        "IC-002 control is not proven: lifecycle_management.",
+        "IC-002 has no implementation evidence.",
+        "IC-002: Component ownership, versioning, composition, and lifecycle evidence is incomplete.",
+        "IC-003 control is not proven: spacing_tokens.",
+        "IC-003 control is not proven: typography_tokens.",
+        "IC-003 control is not proven: color_tokens.",
+        "IC-003 control is not proven: theme_tokens.",
+        "IC-003 control is not proven: responsive_tokens.",
+        "IC-003 control is not proven: token_reuse.",
+        "IC-003 has no implementation evidence.",
+        "IC-003: A complete design-token usage and duplication audit is unavailable.",
+        "IC-004 control is not proven: wcag_alignment.",
+        "IC-004 control is not proven: keyboard_navigation.",
+        "IC-004 control is not proven: screen_reader_support.",
+        "IC-004 control is not proven: cognitive_accessibility.",
+        "IC-004 control is not proven: inclusive_interaction.",
+        "IC-004 has no implementation evidence.",
+        "IC-004: Complete automated and manual accessibility evidence is unavailable.",
+        "IC-005 control is not proven: mobile.",
+        "IC-005 control is not proven: tablet.",
+        "IC-005 control is not proven: desktop.",
+        "IC-005 control is not proven: future_device_compatibility.",
+        "IC-005 control is not proven: adaptive_layouts.",
+        "IC-005 has no implementation evidence.",
+        "IC-005: Identity-bound mobile, tablet, desktop, and adaptive-layout evidence is incomplete.",
+        "IC-006 control is not proven: approved_interaction_patterns.",
+        "IC-006 control is not proven: navigation_consistency.",
+        "IC-006 control is not proven: feedback_behavior.",
+        "IC-006 control is not proven: user_decision_support.",
+        "IC-006 has no implementation evidence.",
+        "IC-006: Implemented workflows have not been fully traced to approved interaction patterns.",
+        "IC-007 control is not proven: loading.",
+        "IC-007 control is not proven: empty.",
+        "IC-007 control is not proven: success.",
+        "IC-007 control is not proven: failure.",
+        "IC-007 control is not proven: recovery.",
+        "IC-007 control is not proven: permission.",
+        "IC-007 control is not proven: offline.",
+        "IC-007 has no implementation evidence.",
+        "IC-007: Complete loading, empty, success, failure, recovery, permission, and offline state evidence is unavailable.",
+        "IC-008 control is not proven: performance_expectations.",
+        "IC-008 control is not proven: analytics_requirements.",
+        "IC-008 control is not proven: error_monitoring.",
+        "IC-008 control is not proven: user_behavior_understanding.",
+        "IC-008 control is not proven: system_health_visibility.",
+        "IC-008 has no implementation evidence.",
+        "IC-008: Performance, analytics, monitoring, behavior, and system-health evidence is incomplete.",
+        "Interface validation is not complete."
+      ]
+    },
+    {
+      "runId": "VOLUME-34:400cacfd935b9b1e98ec1df7741118740c55e1d1032bdb25da78baf534a2f5cb:94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8:2026-07-29T04:42:02.114Z",
+      "volume": "VOLUME-34",
+      "volumeDigest": "94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8",
+      "implementation": "playbook-platform-interface",
+      "digest": "400cacfd935b9b1e98ec1df7741118740c55e1d1032bdb25da78baf534a2f5cb",
+      "validationComplete": false,
+      "domains": {
+        "IC-001": {
+          "id": "IC-001",
+          "name": "Design System Compliance",
+          "passed": false,
+          "score": 0,
+          "requiredControls": [
+            "approved_design_system_usage",
+            "visual_consistency",
+            "component_reuse",
+            "prohibited_duplication_absent"
+          ],
+          "evidence": [
+            {
+              "path": "docs/release-evidence/volume-34-golden-interface-reference.md",
+              "digest": "48a24b7b127df3791f5602a816a846384eb8ed69726bf5e71dd65b4174834e7a",
+              "capturedAt": "2026-07-29T04:39:47Z"
+            },
+            {
+              "path": "docs/release-evidence/volume-34-golden-interface-reference.json",
+              "digest": "793fd99cd08d6cb64d28723767ee0a10e9c809ec9727affd58f6c71f7f8739be",
+              "capturedAt": "2026-07-29T04:39:47Z"
+            }
+          ],
+          "blockingConditions": [
+            "IC-001 control is not proven: approved_design_system_usage.",
+            "IC-001 control is not proven: visual_consistency.",
+            "IC-001 control is not proven: component_reuse.",
+            "IC-001 control is not proven: prohibited_duplication_absent.",
+            "IC-001: The governed design-system reference is defined; repository-wide implementation adoption remains unverified."
+          ]
+        },
+        "IC-002": {
+          "id": "IC-002",
+          "name": "Component Architecture Compliance",
+          "passed": false,
+          "score": 0,
+          "requiredControls": [
+            "component_ownership",
+            "component_versioning",
+            "composition_rules",
+            "lifecycle_management"
+          ],
+          "evidence": [
+            {
+              "path": "docs/release-evidence/volume-34-golden-interface-reference.md",
+              "digest": "48a24b7b127df3791f5602a816a846384eb8ed69726bf5e71dd65b4174834e7a",
+              "capturedAt": "2026-07-29T04:39:47Z"
+            },
+            {
+              "path": "docs/release-evidence/volume-34-golden-interface-reference.json",
+              "digest": "793fd99cd08d6cb64d28723767ee0a10e9c809ec9727affd58f6c71f7f8739be",
+              "capturedAt": "2026-07-29T04:39:47Z"
+            }
+          ],
+          "blockingConditions": [
+            "IC-002 control is not proven: component_ownership.",
+            "IC-002 control is not proven: component_versioning.",
+            "IC-002 control is not proven: composition_rules.",
+            "IC-002 control is not proven: lifecycle_management.",
+            "IC-002: The governed component model is defined; implementation ownership, versioning, composition, and lifecycle compliance remain unverified."
+          ]
+        },
+        "IC-003": {
+          "id": "IC-003",
+          "name": "Design Token Compliance",
+          "passed": false,
+          "score": 0,
+          "requiredControls": [
+            "spacing_tokens",
+            "typography_tokens",
+            "color_tokens",
+            "theme_tokens",
+            "responsive_tokens",
+            "token_reuse"
+          ],
+          "evidence": [
+            {
+              "path": "docs/release-evidence/volume-34-golden-interface-reference.md",
+              "digest": "48a24b7b127df3791f5602a816a846384eb8ed69726bf5e71dd65b4174834e7a",
+              "capturedAt": "2026-07-29T04:39:47Z"
+            },
+            {
+              "path": "docs/release-evidence/volume-34-golden-interface-reference.json",
+              "digest": "793fd99cd08d6cb64d28723767ee0a10e9c809ec9727affd58f6c71f7f8739be",
+              "capturedAt": "2026-07-29T04:39:47Z"
+            }
+          ],
+          "blockingConditions": [
+            "IC-003 control is not proven: spacing_tokens.",
+            "IC-003 control is not proven: typography_tokens.",
+            "IC-003 control is not proven: color_tokens.",
+            "IC-003 control is not proven: theme_tokens.",
+            "IC-003 control is not proven: responsive_tokens.",
+            "IC-003 control is not proven: token_reuse.",
+            "IC-003: The governed token model is defined; implementation usage, reuse, and duplication audits remain unverified."
+          ]
+        },
+        "IC-004": {
+          "id": "IC-004",
+          "name": "Accessibility Compliance",
+          "passed": false,
+          "score": 0,
+          "requiredControls": [
+            "wcag_alignment",
+            "keyboard_navigation",
+            "screen_reader_support",
+            "cognitive_accessibility",
+            "inclusive_interaction"
+          ],
+          "evidence": [
+            {
+              "path": "docs/release-evidence/volume-34-golden-interface-reference.md",
+              "digest": "48a24b7b127df3791f5602a816a846384eb8ed69726bf5e71dd65b4174834e7a",
+              "capturedAt": "2026-07-29T04:39:47Z"
+            },
+            {
+              "path": "docs/release-evidence/volume-34-golden-interface-reference.json",
+              "digest": "793fd99cd08d6cb64d28723767ee0a10e9c809ec9727affd58f6c71f7f8739be",
+              "capturedAt": "2026-07-29T04:39:47Z"
+            }
+          ],
+          "blockingConditions": [
+            "IC-004 control is not proven: wcag_alignment.",
+            "IC-004 control is not proven: keyboard_navigation.",
+            "IC-004 control is not proven: screen_reader_support.",
+            "IC-004 control is not proven: cognitive_accessibility.",
+            "IC-004 control is not proven: inclusive_interaction.",
+            "IC-004: The governed accessibility model is defined; automated and manual implementation results remain unverified."
+          ]
+        },
+        "IC-005": {
+          "id": "IC-005",
+          "name": "Responsive and Device Compliance",
+          "passed": false,
+          "score": 0,
+          "requiredControls": [
+            "mobile",
+            "tablet",
+            "desktop",
+            "future_device_compatibility",
+            "adaptive_layouts"
+          ],
+          "evidence": [
+            {
+              "path": "docs/release-evidence/volume-34-golden-interface-reference.md",
+              "digest": "48a24b7b127df3791f5602a816a846384eb8ed69726bf5e71dd65b4174834e7a",
+              "capturedAt": "2026-07-29T04:39:47Z"
+            },
+            {
+              "path": "docs/release-evidence/volume-34-golden-interface-reference.json",
+              "digest": "793fd99cd08d6cb64d28723767ee0a10e9c809ec9727affd58f6c71f7f8739be",
+              "capturedAt": "2026-07-29T04:39:47Z"
+            }
+          ],
+          "blockingConditions": [
+            "IC-005 control is not proven: mobile.",
+            "IC-005 control is not proven: tablet.",
+            "IC-005 control is not proven: desktop.",
+            "IC-005 control is not proven: future_device_compatibility.",
+            "IC-005 control is not proven: adaptive_layouts.",
+            "IC-005: The governed responsive model is defined; identity-bound mobile, tablet, desktop, and adaptive implementation results remain unverified."
+          ]
+        },
+        "IC-006": {
+          "id": "IC-006",
+          "name": "Interaction Pattern Compliance",
+          "passed": false,
+          "score": 0,
+          "requiredControls": [
+            "approved_interaction_patterns",
+            "navigation_consistency",
+            "feedback_behavior",
+            "user_decision_support"
+          ],
+          "evidence": [
+            {
+              "path": "docs/release-evidence/volume-34-golden-interface-reference.md",
+              "digest": "48a24b7b127df3791f5602a816a846384eb8ed69726bf5e71dd65b4174834e7a",
+              "capturedAt": "2026-07-29T04:39:47Z"
+            },
+            {
+              "path": "docs/release-evidence/volume-34-golden-interface-reference.json",
+              "digest": "793fd99cd08d6cb64d28723767ee0a10e9c809ec9727affd58f6c71f7f8739be",
+              "capturedAt": "2026-07-29T04:39:47Z"
+            }
+          ],
+          "blockingConditions": [
+            "IC-006 control is not proven: approved_interaction_patterns.",
+            "IC-006 control is not proven: navigation_consistency.",
+            "IC-006 control is not proven: feedback_behavior.",
+            "IC-006 control is not proven: user_decision_support.",
+            "IC-006: The governed interaction model is defined; implemented workflows remain unverified against approved patterns."
+          ]
+        },
+        "IC-007": {
+          "id": "IC-007",
+          "name": "Interface State Compliance",
+          "passed": false,
+          "score": 0,
+          "requiredControls": [
+            "loading",
+            "empty",
+            "success",
+            "failure",
+            "recovery",
+            "permission",
+            "offline"
+          ],
+          "evidence": [
+            {
+              "path": "docs/release-evidence/volume-34-golden-interface-reference.md",
+              "digest": "48a24b7b127df3791f5602a816a846384eb8ed69726bf5e71dd65b4174834e7a",
+              "capturedAt": "2026-07-29T04:39:47Z"
+            },
+            {
+              "path": "docs/release-evidence/volume-34-golden-interface-reference.json",
+              "digest": "793fd99cd08d6cb64d28723767ee0a10e9c809ec9727affd58f6c71f7f8739be",
+              "capturedAt": "2026-07-29T04:39:47Z"
+            }
+          ],
+          "blockingConditions": [
+            "IC-007 control is not proven: loading.",
+            "IC-007 control is not proven: empty.",
+            "IC-007 control is not proven: success.",
+            "IC-007 control is not proven: failure.",
+            "IC-007 control is not proven: recovery.",
+            "IC-007 control is not proven: permission.",
+            "IC-007 control is not proven: offline.",
+            "IC-007: The governed state model is defined; loading, empty, success, failure, recovery, permission, and offline implementation results remain unverified."
+          ]
+        },
+        "IC-008": {
+          "id": "IC-008",
+          "name": "Performance and Observability Compliance",
+          "passed": false,
+          "score": 0,
+          "requiredControls": [
+            "performance_expectations",
+            "analytics_requirements",
+            "error_monitoring",
+            "user_behavior_understanding",
+            "system_health_visibility"
+          ],
+          "evidence": [
+            {
+              "path": "docs/release-evidence/volume-34-golden-interface-reference.md",
+              "digest": "48a24b7b127df3791f5602a816a846384eb8ed69726bf5e71dd65b4174834e7a",
+              "capturedAt": "2026-07-29T04:39:47Z"
+            },
+            {
+              "path": "docs/release-evidence/volume-34-golden-interface-reference.json",
+              "digest": "793fd99cd08d6cb64d28723767ee0a10e9c809ec9727affd58f6c71f7f8739be",
+              "capturedAt": "2026-07-29T04:39:47Z"
+            }
+          ],
+          "blockingConditions": [
+            "IC-008 control is not proven: performance_expectations.",
+            "IC-008 control is not proven: analytics_requirements.",
+            "IC-008 control is not proven: error_monitoring.",
+            "IC-008 control is not proven: user_behavior_understanding.",
+            "IC-008 control is not proven: system_health_visibility.",
+            "IC-008: The governed performance and observability model is defined; implementation measurements and operational results remain unverified."
+          ]
+        }
+      },
+      "score": 0,
+      "status": "pending",
+      "certificationTimestamp": "2026-07-29T04:42:02.114Z",
+      "validator": {
+        "id": "PBOS-INTERFACE-CERTIFICATION",
+        "version": "1.0.0"
+      },
+      "blockingConditions": [
+        "IC-001 control is not proven: approved_design_system_usage.",
+        "IC-001 control is not proven: visual_consistency.",
+        "IC-001 control is not proven: component_reuse.",
+        "IC-001 control is not proven: prohibited_duplication_absent.",
+        "IC-001: The governed design-system reference is defined; repository-wide implementation adoption remains unverified.",
+        "IC-002 control is not proven: component_ownership.",
+        "IC-002 control is not proven: component_versioning.",
+        "IC-002 control is not proven: composition_rules.",
+        "IC-002 control is not proven: lifecycle_management.",
+        "IC-002: The governed component model is defined; implementation ownership, versioning, composition, and lifecycle compliance remain unverified.",
+        "IC-003 control is not proven: spacing_tokens.",
+        "IC-003 control is not proven: typography_tokens.",
+        "IC-003 control is not proven: color_tokens.",
+        "IC-003 control is not proven: theme_tokens.",
+        "IC-003 control is not proven: responsive_tokens.",
+        "IC-003 control is not proven: token_reuse.",
+        "IC-003: The governed token model is defined; implementation usage, reuse, and duplication audits remain unverified.",
+        "IC-004 control is not proven: wcag_alignment.",
+        "IC-004 control is not proven: keyboard_navigation.",
+        "IC-004 control is not proven: screen_reader_support.",
+        "IC-004 control is not proven: cognitive_accessibility.",
+        "IC-004 control is not proven: inclusive_interaction.",
+        "IC-004: The governed accessibility model is defined; automated and manual implementation results remain unverified.",
+        "IC-005 control is not proven: mobile.",
+        "IC-005 control is not proven: tablet.",
+        "IC-005 control is not proven: desktop.",
+        "IC-005 control is not proven: future_device_compatibility.",
+        "IC-005 control is not proven: adaptive_layouts.",
+        "IC-005: The governed responsive model is defined; identity-bound mobile, tablet, desktop, and adaptive implementation results remain unverified.",
+        "IC-006 control is not proven: approved_interaction_patterns.",
+        "IC-006 control is not proven: navigation_consistency.",
+        "IC-006 control is not proven: feedback_behavior.",
+        "IC-006 control is not proven: user_decision_support.",
+        "IC-006: The governed interaction model is defined; implemented workflows remain unverified against approved patterns.",
+        "IC-007 control is not proven: loading.",
+        "IC-007 control is not proven: empty.",
+        "IC-007 control is not proven: success.",
+        "IC-007 control is not proven: failure.",
+        "IC-007 control is not proven: recovery.",
+        "IC-007 control is not proven: permission.",
+        "IC-007 control is not proven: offline.",
+        "IC-007: The governed state model is defined; loading, empty, success, failure, recovery, permission, and offline implementation results remain unverified.",
+        "IC-008 control is not proven: performance_expectations.",
+        "IC-008 control is not proven: analytics_requirements.",
+        "IC-008 control is not proven: error_monitoring.",
+        "IC-008 control is not proven: user_behavior_understanding.",
+        "IC-008 control is not proven: system_health_visibility.",
+        "IC-008: The governed performance and observability model is defined; implementation measurements and operational results remain unverified.",
+        "Interface validation is not complete."
+      ]
+    },
+    {
+      "runId": "VOLUME-34:400cacfd935b9b1e98ec1df7741118740c55e1d1032bdb25da78baf534a2f5cb:94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8:2026-07-29T04:58:54.751Z",
+      "volume": "VOLUME-34",
+      "volumeDigest": "94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8",
+      "implementation": "playbook-platform-interface",
+      "digest": "400cacfd935b9b1e98ec1df7741118740c55e1d1032bdb25da78baf534a2f5cb",
+      "validationComplete": false,
+      "domains": {
+        "IC-001": {
+          "id": "IC-001",
+          "name": "Design System Compliance",
+          "passed": false,
+          "score": 0,
+          "requiredControls": [
+            "approved_design_system_usage",
+            "visual_consistency",
+            "component_reuse",
+            "prohibited_duplication_absent"
+          ],
+          "evidence": [
+            {
+              "path": "docs/release-evidence/volume-34-golden-interface-reference.md",
+              "digest": "48a24b7b127df3791f5602a816a846384eb8ed69726bf5e71dd65b4174834e7a",
+              "capturedAt": "2026-07-29T04:39:47Z"
+            },
+            {
+              "path": "docs/release-evidence/volume-34-golden-interface-reference.json",
+              "digest": "793fd99cd08d6cb64d28723767ee0a10e9c809ec9727affd58f6c71f7f8739be",
+              "capturedAt": "2026-07-29T04:39:47Z"
+            }
+          ],
+          "blockingConditions": [
+            "IC-001 control is not proven: approved_design_system_usage.",
+            "IC-001 control is not proven: visual_consistency.",
+            "IC-001 control is not proven: component_reuse.",
+            "IC-001 control is not proven: prohibited_duplication_absent.",
+            "IC-001: The governed design-system reference is defined; repository-wide implementation adoption remains unverified."
+          ]
+        },
+        "IC-002": {
+          "id": "IC-002",
+          "name": "Component Architecture Compliance",
+          "passed": false,
+          "score": 0,
+          "requiredControls": [
+            "component_ownership",
+            "component_versioning",
+            "composition_rules",
+            "lifecycle_management"
+          ],
+          "evidence": [
+            {
+              "path": "docs/release-evidence/volume-34-golden-interface-reference.md",
+              "digest": "48a24b7b127df3791f5602a816a846384eb8ed69726bf5e71dd65b4174834e7a",
+              "capturedAt": "2026-07-29T04:39:47Z"
+            },
+            {
+              "path": "docs/release-evidence/volume-34-golden-interface-reference.json",
+              "digest": "793fd99cd08d6cb64d28723767ee0a10e9c809ec9727affd58f6c71f7f8739be",
+              "capturedAt": "2026-07-29T04:39:47Z"
+            }
+          ],
+          "blockingConditions": [
+            "IC-002 control is not proven: component_ownership.",
+            "IC-002 control is not proven: component_versioning.",
+            "IC-002 control is not proven: composition_rules.",
+            "IC-002 control is not proven: lifecycle_management.",
+            "IC-002: The governed component model is defined; implementation ownership, versioning, composition, and lifecycle compliance remain unverified."
+          ]
+        },
+        "IC-003": {
+          "id": "IC-003",
+          "name": "Design Token Compliance",
+          "passed": false,
+          "score": 0,
+          "requiredControls": [
+            "spacing_tokens",
+            "typography_tokens",
+            "color_tokens",
+            "theme_tokens",
+            "responsive_tokens",
+            "token_reuse"
+          ],
+          "evidence": [
+            {
+              "path": "docs/release-evidence/volume-34-golden-interface-reference.md",
+              "digest": "48a24b7b127df3791f5602a816a846384eb8ed69726bf5e71dd65b4174834e7a",
+              "capturedAt": "2026-07-29T04:39:47Z"
+            },
+            {
+              "path": "docs/release-evidence/volume-34-golden-interface-reference.json",
+              "digest": "793fd99cd08d6cb64d28723767ee0a10e9c809ec9727affd58f6c71f7f8739be",
+              "capturedAt": "2026-07-29T04:39:47Z"
+            }
+          ],
+          "blockingConditions": [
+            "IC-003 control is not proven: spacing_tokens.",
+            "IC-003 control is not proven: typography_tokens.",
+            "IC-003 control is not proven: color_tokens.",
+            "IC-003 control is not proven: theme_tokens.",
+            "IC-003 control is not proven: responsive_tokens.",
+            "IC-003 control is not proven: token_reuse.",
+            "IC-003: The governed token model is defined; implementation usage, reuse, and duplication audits remain unverified."
+          ]
+        },
+        "IC-004": {
+          "id": "IC-004",
+          "name": "Accessibility Compliance",
+          "passed": false,
+          "score": 0,
+          "requiredControls": [
+            "wcag_alignment",
+            "keyboard_navigation",
+            "screen_reader_support",
+            "cognitive_accessibility",
+            "inclusive_interaction"
+          ],
+          "evidence": [
+            {
+              "path": "docs/release-evidence/volume-34-golden-interface-reference.md",
+              "digest": "48a24b7b127df3791f5602a816a846384eb8ed69726bf5e71dd65b4174834e7a",
+              "capturedAt": "2026-07-29T04:39:47Z"
+            },
+            {
+              "path": "docs/release-evidence/volume-34-golden-interface-reference.json",
+              "digest": "793fd99cd08d6cb64d28723767ee0a10e9c809ec9727affd58f6c71f7f8739be",
+              "capturedAt": "2026-07-29T04:39:47Z"
+            }
+          ],
+          "blockingConditions": [
+            "IC-004 control is not proven: wcag_alignment.",
+            "IC-004 control is not proven: keyboard_navigation.",
+            "IC-004 control is not proven: screen_reader_support.",
+            "IC-004 control is not proven: cognitive_accessibility.",
+            "IC-004 control is not proven: inclusive_interaction.",
+            "IC-004: The governed accessibility model is defined; automated and manual implementation results remain unverified."
+          ]
+        },
+        "IC-005": {
+          "id": "IC-005",
+          "name": "Responsive and Device Compliance",
+          "passed": false,
+          "score": 0,
+          "requiredControls": [
+            "mobile",
+            "tablet",
+            "desktop",
+            "future_device_compatibility",
+            "adaptive_layouts"
+          ],
+          "evidence": [
+            {
+              "path": "docs/release-evidence/volume-34-golden-interface-reference.md",
+              "digest": "48a24b7b127df3791f5602a816a846384eb8ed69726bf5e71dd65b4174834e7a",
+              "capturedAt": "2026-07-29T04:39:47Z"
+            },
+            {
+              "path": "docs/release-evidence/volume-34-golden-interface-reference.json",
+              "digest": "793fd99cd08d6cb64d28723767ee0a10e9c809ec9727affd58f6c71f7f8739be",
+              "capturedAt": "2026-07-29T04:39:47Z"
+            }
+          ],
+          "blockingConditions": [
+            "IC-005 control is not proven: mobile.",
+            "IC-005 control is not proven: tablet.",
+            "IC-005 control is not proven: desktop.",
+            "IC-005 control is not proven: future_device_compatibility.",
+            "IC-005 control is not proven: adaptive_layouts.",
+            "IC-005: The governed responsive model is defined; identity-bound mobile, tablet, desktop, and adaptive implementation results remain unverified."
+          ]
+        },
+        "IC-006": {
+          "id": "IC-006",
+          "name": "Interaction Pattern Compliance",
+          "passed": false,
+          "score": 0,
+          "requiredControls": [
+            "approved_interaction_patterns",
+            "navigation_consistency",
+            "feedback_behavior",
+            "user_decision_support"
+          ],
+          "evidence": [
+            {
+              "path": "docs/release-evidence/volume-34-golden-interface-reference.md",
+              "digest": "48a24b7b127df3791f5602a816a846384eb8ed69726bf5e71dd65b4174834e7a",
+              "capturedAt": "2026-07-29T04:39:47Z"
+            },
+            {
+              "path": "docs/release-evidence/volume-34-golden-interface-reference.json",
+              "digest": "793fd99cd08d6cb64d28723767ee0a10e9c809ec9727affd58f6c71f7f8739be",
+              "capturedAt": "2026-07-29T04:39:47Z"
+            }
+          ],
+          "blockingConditions": [
+            "IC-006 control is not proven: approved_interaction_patterns.",
+            "IC-006 control is not proven: navigation_consistency.",
+            "IC-006 control is not proven: feedback_behavior.",
+            "IC-006 control is not proven: user_decision_support.",
+            "IC-006: The governed interaction model is defined; implemented workflows remain unverified against approved patterns."
+          ]
+        },
+        "IC-007": {
+          "id": "IC-007",
+          "name": "Interface State Compliance",
+          "passed": false,
+          "score": 0,
+          "requiredControls": [
+            "loading",
+            "empty",
+            "success",
+            "failure",
+            "recovery",
+            "permission",
+            "offline"
+          ],
+          "evidence": [
+            {
+              "path": "docs/release-evidence/volume-34-golden-interface-reference.md",
+              "digest": "48a24b7b127df3791f5602a816a846384eb8ed69726bf5e71dd65b4174834e7a",
+              "capturedAt": "2026-07-29T04:39:47Z"
+            },
+            {
+              "path": "docs/release-evidence/volume-34-golden-interface-reference.json",
+              "digest": "793fd99cd08d6cb64d28723767ee0a10e9c809ec9727affd58f6c71f7f8739be",
+              "capturedAt": "2026-07-29T04:39:47Z"
+            }
+          ],
+          "blockingConditions": [
+            "IC-007 control is not proven: loading.",
+            "IC-007 control is not proven: empty.",
+            "IC-007 control is not proven: success.",
+            "IC-007 control is not proven: failure.",
+            "IC-007 control is not proven: recovery.",
+            "IC-007 control is not proven: permission.",
+            "IC-007 control is not proven: offline.",
+            "IC-007: The governed state model is defined; loading, empty, success, failure, recovery, permission, and offline implementation results remain unverified."
+          ]
+        },
+        "IC-008": {
+          "id": "IC-008",
+          "name": "Performance and Observability Compliance",
+          "passed": false,
+          "score": 0,
+          "requiredControls": [
+            "performance_expectations",
+            "analytics_requirements",
+            "error_monitoring",
+            "user_behavior_understanding",
+            "system_health_visibility"
+          ],
+          "evidence": [
+            {
+              "path": "docs/release-evidence/volume-34-golden-interface-reference.md",
+              "digest": "48a24b7b127df3791f5602a816a846384eb8ed69726bf5e71dd65b4174834e7a",
+              "capturedAt": "2026-07-29T04:39:47Z"
+            },
+            {
+              "path": "docs/release-evidence/volume-34-golden-interface-reference.json",
+              "digest": "793fd99cd08d6cb64d28723767ee0a10e9c809ec9727affd58f6c71f7f8739be",
+              "capturedAt": "2026-07-29T04:39:47Z"
+            }
+          ],
+          "blockingConditions": [
+            "IC-008 control is not proven: performance_expectations.",
+            "IC-008 control is not proven: analytics_requirements.",
+            "IC-008 control is not proven: error_monitoring.",
+            "IC-008 control is not proven: user_behavior_understanding.",
+            "IC-008 control is not proven: system_health_visibility.",
+            "IC-008: The governed performance and observability model is defined; implementation measurements and operational results remain unverified."
+          ]
+        }
+      },
+      "score": 0,
+      "status": "pending",
+      "certificationTimestamp": "2026-07-29T04:58:54.751Z",
+      "validator": {
+        "id": "PBOS-INTERFACE-CERTIFICATION",
+        "version": "1.0.0"
+      },
+      "measurement": {
+        "runId": "VOLUME-34:400cacfd935b9b1e98ec1df7741118740c55e1d1032bdb25da78baf534a2f5cb:94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8:2026-07-29T04:58:54.751Z",
+        "implementationDigest": "400cacfd935b9b1e98ec1df7741118740c55e1d1032bdb25da78baf534a2f5cb",
+        "measurementComplete": true,
+        "certificationEligible": false
+      },
+      "blockingConditions": [
+        "IC-001 control is not proven: approved_design_system_usage.",
+        "IC-001 control is not proven: visual_consistency.",
+        "IC-001 control is not proven: component_reuse.",
+        "IC-001 control is not proven: prohibited_duplication_absent.",
+        "IC-001: The governed design-system reference is defined; repository-wide implementation adoption remains unverified.",
+        "IC-002 control is not proven: component_ownership.",
+        "IC-002 control is not proven: component_versioning.",
+        "IC-002 control is not proven: composition_rules.",
+        "IC-002 control is not proven: lifecycle_management.",
+        "IC-002: The governed component model is defined; implementation ownership, versioning, composition, and lifecycle compliance remain unverified.",
+        "IC-003 control is not proven: spacing_tokens.",
+        "IC-003 control is not proven: typography_tokens.",
+        "IC-003 control is not proven: color_tokens.",
+        "IC-003 control is not proven: theme_tokens.",
+        "IC-003 control is not proven: responsive_tokens.",
+        "IC-003 control is not proven: token_reuse.",
+        "IC-003: The governed token model is defined; implementation usage, reuse, and duplication audits remain unverified.",
+        "IC-004 control is not proven: wcag_alignment.",
+        "IC-004 control is not proven: keyboard_navigation.",
+        "IC-004 control is not proven: screen_reader_support.",
+        "IC-004 control is not proven: cognitive_accessibility.",
+        "IC-004 control is not proven: inclusive_interaction.",
+        "IC-004: The governed accessibility model is defined; automated and manual implementation results remain unverified.",
+        "IC-005 control is not proven: mobile.",
+        "IC-005 control is not proven: tablet.",
+        "IC-005 control is not proven: desktop.",
+        "IC-005 control is not proven: future_device_compatibility.",
+        "IC-005 control is not proven: adaptive_layouts.",
+        "IC-005: The governed responsive model is defined; identity-bound mobile, tablet, desktop, and adaptive implementation results remain unverified.",
+        "IC-006 control is not proven: approved_interaction_patterns.",
+        "IC-006 control is not proven: navigation_consistency.",
+        "IC-006 control is not proven: feedback_behavior.",
+        "IC-006 control is not proven: user_decision_support.",
+        "IC-006: The governed interaction model is defined; implemented workflows remain unverified against approved patterns.",
+        "IC-007 control is not proven: loading.",
+        "IC-007 control is not proven: empty.",
+        "IC-007 control is not proven: success.",
+        "IC-007 control is not proven: failure.",
+        "IC-007 control is not proven: recovery.",
+        "IC-007 control is not proven: permission.",
+        "IC-007 control is not proven: offline.",
+        "IC-007: The governed state model is defined; loading, empty, success, failure, recovery, permission, and offline implementation results remain unverified.",
+        "IC-008 control is not proven: performance_expectations.",
+        "IC-008 control is not proven: analytics_requirements.",
+        "IC-008 control is not proven: error_monitoring.",
+        "IC-008 control is not proven: user_behavior_understanding.",
+        "IC-008 control is not proven: system_health_visibility.",
+        "IC-008: The governed performance and observability model is defined; implementation measurements and operational results remain unverified.",
+        "Interface validation is not complete."
+      ]
+    }
+  ]
+}
