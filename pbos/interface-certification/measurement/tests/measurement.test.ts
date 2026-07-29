@@ -8,10 +8,10 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { Artifacts, Runtime } from "../../../kernel";
+import { decodeInterfaceMeasurementArtifact } from "../../../runtime/artifact-decoders";
 import {
   evaluateInterfaceMeasurement,
   measureInterfaceImplementation,
-  type InterfaceMeasurementArtifact,
 } from "..";
 
 const roots: string[] = [];
@@ -132,8 +132,8 @@ export function Status() {
       root,
       "2026-07-29T05:01:00.000Z"
     );
-    const artifact = Runtime.load<InterfaceMeasurementArtifact>(
-      path.join(root, Artifacts.interfaceMeasurement)
+    const artifact = decodeInterfaceMeasurementArtifact(
+      Runtime.load(path.join(root, Artifacts.interfaceMeasurement))
     );
 
     expect(artifact.history).toHaveLength(2);

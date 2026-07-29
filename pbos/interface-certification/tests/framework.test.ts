@@ -12,11 +12,11 @@ import {
   discoverConstitutionalVolume,
 } from "../../constitution";
 import { Artifacts, Runtime } from "../../kernel";
+import { decodeInterfaceCertificationArtifact } from "../../runtime/artifact-decoders";
 import {
   certifyInterfaceImplementation,
   computeInterfaceImplementationDigest,
   evaluateInterfaceCertification,
-  type InterfaceCertificationArtifact,
   type InterfaceCertificationDomainId,
 } from "..";
 
@@ -232,8 +232,8 @@ describe("PBOS interface certification framework", () => {
     expect(first.score).toBe(100);
     expect(first.measurement?.measurementComplete).toBe(true);
     expect(first.measurement?.certificationEligible).toBe(false);
-    const artifact = Runtime.load<InterfaceCertificationArtifact>(
-      path.join(root, Artifacts.interfaceCertification)
+    const artifact = decodeInterfaceCertificationArtifact(
+      Runtime.load(path.join(root, Artifacts.interfaceCertification))
     );
     expect(artifact.history).toHaveLength(2);
     expect(artifact.runId).toBe(second.runId);

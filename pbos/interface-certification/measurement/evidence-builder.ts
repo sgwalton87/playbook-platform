@@ -2,6 +2,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { discoverConstitutionalVolume } from "../../constitution/discovery";
 import { Artifacts, Runtime } from "../../kernel";
+import { decodeInterfaceMeasurementArtifact } from "../../runtime/artifact-decoders";
 import { computeInterfaceImplementationDigest } from "../evidence-loader";
 import { analyzeInterfaceImplementation } from "./analyzers";
 import { validateInterfaceMeasurementHistory } from "./history";
@@ -68,7 +69,7 @@ export function measureInterfaceImplementation(
     Artifacts.interfaceMeasurement
   );
   const existing = Runtime.exists(artifactPath)
-    ? Runtime.load<InterfaceMeasurementArtifact>(artifactPath)
+    ? decodeInterfaceMeasurementArtifact(Runtime.load(artifactPath))
     : null;
   if (existing) {
     validateInterfaceMeasurementHistory(existing);

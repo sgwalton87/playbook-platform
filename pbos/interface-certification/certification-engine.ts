@@ -3,6 +3,7 @@ import path from "node:path";
 import { discoverConstitutionalVolume } from "../constitution/discovery";
 import type { ConstitutionalVolume } from "../constitution/types";
 import { Artifacts, Runtime } from "../kernel";
+import { decodeInterfaceCertificationArtifact } from "../runtime/artifact-decoders";
 import { loadInterfaceEvidence } from "./evidence-loader";
 import { validateInterfaceCertificationHistory } from "./history";
 import {
@@ -182,7 +183,7 @@ export function certifyInterfaceImplementation(
     Artifacts.interfaceCertification
   );
   const existing = Runtime.exists(artifactPath)
-    ? Runtime.load<InterfaceCertificationArtifact>(artifactPath)
+    ? decodeInterfaceCertificationArtifact(Runtime.load(artifactPath))
     : null;
   if (existing) {
     validateInterfaceCertificationHistory(existing);
