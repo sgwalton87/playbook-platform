@@ -1,9 +1,10 @@
 #!/usr/bin/env tsx
-import { runNext } from "../engine/executor";
+import { dispatchKernelCommand } from "./kernel-command-bus";
 
-runNext(process.cwd(), process.argv[2])
-  .then((output) => {
-    console.log(output);
+dispatchKernelCommand("next")
+  .then((result) => {
+    console.log(result.output);
+    if (!result.successful) process.exitCode = 1;
   })
   .catch((error: unknown) => {
     console.error(error instanceof Error ? error.message : String(error));

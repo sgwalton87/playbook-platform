@@ -1,15 +1,9 @@
 #!/usr/bin/env tsx
-import { CommandRegistry } from "./registry/command-registry";
-import { formatEngineHealth, getEngineHealth } from "../health/engine-health";
+import { dispatchKernelCommand } from "./kernel-command-bus";
 
 async function main(): Promise<void> {
-  const health = await getEngineHealth();
-  const commands = new CommandRegistry().all();
-  console.log(formatEngineHealth(health));
-  console.log("Commands:");
-  for (const command of commands) {
-    console.log(`- ${command.name}: ${command.status} (${command.mode}) — ${command.description}`);
-  }
+  const result = await dispatchKernelCommand("status");
+  console.log(result.output);
 }
 
 main().catch((error: unknown) => {
