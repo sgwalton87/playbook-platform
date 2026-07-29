@@ -163,6 +163,10 @@ Execution behavior shall remain constitutionally consistent across all volumes.
 | PPS-3642 | Execution Interoperability Standard |
 | PPS-3643 | Execution Stewardship Standard |
 | PPS-3644 | Execution Evolution Standard |
+| PPS-3645 | Execution Concurrency and Idempotency Standard |
+| PPS-3646 | Execution Interruption, Cancellation, and Continuation Standard |
+| PPS-3647 | Execution Evidence and Replay Standard |
+| PPS-3648 | Execution Admission and Capacity Protection Standard |
 
 ---
 
@@ -296,6 +300,7 @@ The following relationship profiles apply:
 | PPS-3619 through PPS-3627 | Orchestration, scheduling, resource, failure, approval, service, and organization authority | Supplies eligibility and execution certification constraints and evidence |
 | PPS-3628 through PPS-3634 | AI, autonomy, intelligence, optimization, analytics, and adaptation authority | Requires eligibility and execution certification; supplies outcome and evidence certification inputs |
 | PPS-3635 through PPS-3644 | Policy, future technology, compliance, improvement, risk, dependency, portability, interoperability, stewardship, and evolution authority | Governs validation and evidence requirements applicable to all four certification types |
+| PPS-3645 through PPS-3648 | Concurrency, idempotency, interruption, replay evidence, admission, and capacity authority | Defines distributed trust constraints and evidence required by eligibility, execution, outcome, and evidence certification |
 
 ---
 
