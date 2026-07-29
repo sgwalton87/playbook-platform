@@ -149,6 +149,16 @@ Volume 36 defines governed execution and workflow architecture.
 
 Volume 36 does not acquire permanent certification through registry presence.
 
+Trust Foundation Authorities
+
+- PPS-3649_SECURITY_TRUST_AND_IDENTITY_CONTRACT_STANDARD.md
+- PPS-3650_MULTI_ORGANIZATION_EXECUTION_GOVERNANCE_STANDARD.md
+- PPS-3651_DISTRIBUTED_CONSISTENCY_AND_PARTITION_GOVERNANCE_STANDARD.md
+
+These authorities remain governed by Volume 36 and PPS-3614.
+
+Registration does not constitute certification or implementation.
+
 ------------------------------------------------------------
 
 Canonical Domains

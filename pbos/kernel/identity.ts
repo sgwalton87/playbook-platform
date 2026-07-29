@@ -16,8 +16,12 @@ function canonicalize(value: unknown): unknown {
   return value;
 }
 
+export function canonicalJson(value: unknown, spaces?: number): string {
+  return JSON.stringify(canonicalize(value), null, spaces);
+}
+
 export function artifactDigest(value: unknown): string {
   return createHash("sha256")
-    .update(JSON.stringify(canonicalize(value)))
+    .update(canonicalJson(value))
     .digest("hex");
 }

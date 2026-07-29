@@ -27,6 +27,7 @@ export const Artifacts = {
   runtimeState: "pbos/runtime/runtime-state.json",
   repositoryAnalysis: "pbos/runtime/repository-analysis.json",
   executionHistory: "pbos/runtime/execution-history.json",
+  kernelExecutionHistory: "pbos/runtime/kernel-execution-history.json",
   volumeCertification: "pbos/runtime/volume-certification.json",
   volumePromotion: "pbos/runtime/volume-promotion.json",
   interfaceCertification: "pbos/runtime/interface-certification.json",
@@ -34,10 +35,3 @@ export const Artifacts = {
 } as const;
 
 export type ArtifactName = keyof typeof Artifacts;
-
-/**
- * Resolve an artifact name to its runtime path.
- */
-export function artifactPath(name: ArtifactName): string {
-  return Artifacts[name];
-}

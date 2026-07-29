@@ -189,6 +189,14 @@ export const RuntimeArtifactOwnership: Record<
     persistence: "durable",
     cleanup: "governed-transition",
   },
+  kernelExecutionHistory: {
+    path: Artifacts.kernelExecutionHistory,
+    owner: "kernel-runtime",
+    producer: "PBOSKernelRuntime.execute",
+    consumers: ["kernel-runtime", "certification", "operator", "recovery"],
+    persistence: "durable",
+    cleanup: "governed-transition",
+  },
   volumeCertification: {
     path: Artifacts.volumeCertification,
     owner: "volume-certification",

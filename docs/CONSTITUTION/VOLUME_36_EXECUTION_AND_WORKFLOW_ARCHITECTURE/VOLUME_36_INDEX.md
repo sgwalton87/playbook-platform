@@ -167,6 +167,9 @@ Execution behavior shall remain constitutionally consistent across all volumes.
 | PPS-3646 | Execution Interruption, Cancellation, and Continuation Standard |
 | PPS-3647 | Execution Evidence and Replay Standard |
 | PPS-3648 | Execution Admission and Capacity Protection Standard |
+| PPS-3649 | Security Trust and Identity Contract Standard |
+| PPS-3650 | Multi-Organization Execution Governance Standard |
+| PPS-3651 | Distributed Consistency and Partition Governance Standard |
 
 ---
 
@@ -181,6 +184,10 @@ Playbook Constitution
         -> PPS-3601 Common Execution Lifecycle
         -> PPS-3602 Workflow Architecture
         -> PPS-3614 Execution Governance
+           -> Trust Foundation
+              -> PPS-3649 Security Trust and Identity
+              -> PPS-3650 Multi-Organization Execution Governance
+              -> PPS-3651 Distributed Consistency and Partition Governance
         -> Supporting Execution Standards
         -> Specialized Governance Standards
 ```
@@ -190,6 +197,18 @@ PPS-3601 governs the common execution lifecycle.
 PPS-3602 governs workflow definitions and workflow instances.
 
 PPS-3614 governs execution eligibility, boundaries, deterministic decisions, and separation of all four certification types.
+
+The Trust Foundation governs identity authenticity, multi-organization authority exchange, and distributed constitutional truth.
+
+PPS-3649 inherits execution security authority from PPS-3611.
+
+PPS-3650 inherits cross-organization authority from PPS-3627.
+
+PPS-3651 inherits distributed execution authority from PPS-3617.
+
+Trust Foundation standards constrain execution under PPS-3614.
+
+They do not create an alternate execution path or Kernel authority.
 
 Supporting and specialized standards may add constraints within their declared scope.
 
@@ -301,6 +320,7 @@ The following relationship profiles apply:
 | PPS-3628 through PPS-3634 | AI, autonomy, intelligence, optimization, analytics, and adaptation authority | Requires eligibility and execution certification; supplies outcome and evidence certification inputs |
 | PPS-3635 through PPS-3644 | Policy, future technology, compliance, improvement, risk, dependency, portability, interoperability, stewardship, and evolution authority | Governs validation and evidence requirements applicable to all four certification types |
 | PPS-3645 through PPS-3648 | Concurrency, idempotency, interruption, replay evidence, admission, and capacity authority | Defines distributed trust constraints and evidence required by eligibility, execution, outcome, and evidence certification |
+| PPS-3649 through PPS-3651 | Identity authenticity, multi-organization trust, and distributed truth authority | Defines trust evidence required for identity, authority, tenant, consistency, execution, and certification decisions |
 
 ---
 

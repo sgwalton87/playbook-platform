@@ -14,6 +14,7 @@ depends_on:
 related:
   - PPS-3614
   - PPS-3615
+  - PPS-3650
 last_updated: 2026-07-29
 ---
 
@@ -91,4 +92,3 @@ Cross-organization execution shall never:
 # Governance
 
 Cross-organization execution extends constitutional trust across organizational boundaries while preserving independent constitutional authority.
-

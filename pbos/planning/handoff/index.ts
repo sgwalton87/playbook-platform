@@ -9,6 +9,7 @@ import {
   Runtime,
   artifactDigest,
 } from "../../kernel";
+import { decodePlanningHandoffArtifact } from "../../runtime/artifact-decoders";
 import { inspectArtifactConsistency } from "../../reconciliation";
 import { assertPlanningPrerequisites } from "./authorization";
 import { evaluateObjectives } from "./evaluator";
@@ -20,7 +21,6 @@ import {
 import { loadObjectiveRegistry } from "./registry";
 import { renderPlanningHandoffReport } from "./reports";
 import type {
-  PlanningHandoffArtifact,
   PlanningHandoffRecord,
 } from "./types";
 
@@ -89,7 +89,7 @@ export function runPlanningHandoff(
     Artifacts.planningHandoff
   );
   const existing = Runtime.exists(artifactPath)
-    ? Runtime.load<PlanningHandoffArtifact>(artifactPath)
+    ? decodePlanningHandoffArtifact(Runtime.load(artifactPath))
     : null;
   Runtime.save(
     artifactPath,
