@@ -33,6 +33,7 @@ const CONTEXT_OUTPUTS = new Set([
   Artifacts.contextRefresh,
   "docs/release-evidence/pbos-context-refresh.md",
   "docs/release-evidence/pbos-lifecycle-governance-report.md",
+  "docs/release-evidence/pbos-planning-handoff-report.md",
 ]);
 
 function isGovernedRuntimeOutput(relativePath: string): boolean {

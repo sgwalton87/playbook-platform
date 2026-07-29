@@ -109,6 +109,14 @@ export const RuntimeArtifactOwnership: Record<
     persistence: "durable",
     cleanup: "governed-transition",
   },
+  planningHandoff: {
+    path: Artifacts.planningHandoff,
+    owner: "planning-handoff",
+    producer: "pbos planning-handoff",
+    consumers: ["constitutional-planner", "governance-audit", "operator"],
+    persistence: "durable",
+    cleanup: "governed-transition",
+  },
   workflow: {
     path: Artifacts.workflow,
     owner: "workflow-engine",

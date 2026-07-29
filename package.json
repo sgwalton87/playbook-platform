@@ -41,6 +41,7 @@
     "pbos:context": "tsx pbos/commands/context.ts",
     "pbos:reconcile-artifacts": "tsx pbos/commands/reconcile-artifacts.ts",
     "pbos:govern-lifecycle": "tsx pbos/commands/govern-lifecycle.ts",
+    "pbos:planning-handoff": "tsx pbos/commands/planning-handoff.ts",
     "pbos:release": "tsx pbos/commands/release.ts",
     "pbos:promote": "tsx pbos/commands/promote.ts",
     "pbos:complete": "tsx pbos/commands/complete.ts",

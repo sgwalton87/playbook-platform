@@ -17,6 +17,7 @@ export const Artifacts = {
   contextRefresh: "pbos/runtime/context-refresh.json",
   artifactReconciliation: "pbos/runtime/artifact-reconciliation.json",
   lifecycleGovernance: "pbos/runtime/lifecycle-governance.json",
+  planningHandoff: "pbos/runtime/planning-handoff.json",
   workflow: "pbos/runtime/workflow.json",
   doctor: "pbos/runtime/doctor.json",
   manifest: "pbos/runtime/manifest.json",
