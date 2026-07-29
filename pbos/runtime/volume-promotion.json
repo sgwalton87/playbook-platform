@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "owner": "volume-promotion",
+  "latest": {
+    "promotionId": "VOLUME-34:architecture_complete:implementation_ready:0fd5e5f0f04a47fc51d8fbce20211e5d1d61357ecd6d31071fe14fcaa1c274a8:2026-07-29T03:21:46.543Z",
+    "volume": 34,
+    "volumeId": "VOLUME-34",
+    "from": "architecture_complete",
+    "to": "implementation_ready",
+    "evidence": [
+      "pbos/runtime/volume-certification.json",
+      "docs/release-evidence/volume-34-implementation-readiness.md"
+    ],
+    "certificationRunId": "VOLUME-34:0fd5e5f0f04a47fc51d8fbce20211e5d1d61357ecd6d31071fe14fcaa1c274a8:2026-07-29T03:18:36.805Z",
+    "contentDigestBefore": "0fd5e5f0f04a47fc51d8fbce20211e5d1d61357ecd6d31071fe14fcaa1c274a8",
+    "timestamp": "2026-07-29T03:21:46.543Z",
+    "approved": true,
+    "contentDigestAfter": "94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8",
+    "blockingConditions": [],
+    "reason": "Promotion approved from current certification evidence and applied through the governed lifecycle transition."
+  },
+  "history": [
+    {
+      "promotionId": "VOLUME-34:draft:architecture_complete:1e9915ba4299bc846b12c8b91d075dc0c2b542c97d47430252fa7ab141174700:2026-07-29T03:13:22.027Z",
+      "volume": 34,
+      "volumeId": "VOLUME-34",
+      "from": "draft",
+      "to": "architecture_complete",
+      "evidence": [
+        "pbos/runtime/volume-certification.json"
+      ],
+      "certificationRunId": "VOLUME-34:1e9915ba4299bc846b12c8b91d075dc0c2b542c97d47430252fa7ab141174700:2026-07-29T02:59:21.833Z",
+      "contentDigestBefore": "1e9915ba4299bc846b12c8b91d075dc0c2b542c97d47430252fa7ab141174700",
+      "timestamp": "2026-07-29T03:13:22.027Z",
+      "approved": true,
+      "contentDigestAfter": "0fd5e5f0f04a47fc51d8fbce20211e5d1d61357ecd6d31071fe14fcaa1c274a8",
+      "blockingConditions": [],
+      "reason": "Promotion approved from current certification evidence and applied through the governed lifecycle transition."
+    },
+    {
+      "promotionId": "VOLUME-34:architecture_complete:architecture_complete:0fd5e5f0f04a47fc51d8fbce20211e5d1d61357ecd6d31071fe14fcaa1c274a8:2026-07-29T03:18:24.860Z",
+      "volume": 34,
+      "volumeId": "VOLUME-34",
+      "from": "architecture_complete",
+      "to": "architecture_complete",
+      "evidence": [
+        "pbos/runtime/volume-certification.json"
+      ],
+      "certificationRunId": "VOLUME-34:0fd5e5f0f04a47fc51d8fbce20211e5d1d61357ecd6d31071fe14fcaa1c274a8:2026-07-29T03:13:31.569Z",
+      "contentDigestBefore": "0fd5e5f0f04a47fc51d8fbce20211e5d1d61357ecd6d31071fe14fcaa1c274a8",
+      "timestamp": "2026-07-29T03:18:24.860Z",
+      "approved": false,
+      "contentDigestAfter": null,
+      "blockingConditions": [
+        "Skipped or invalid lifecycle transition: architecture_complete -> architecture_complete."
+      ],
+      "reason": "Promotion denied because one or more governed prerequisites failed."
+    },
+    {
+      "promotionId": "VOLUME-34:architecture_complete:implementation_ready:0fd5e5f0f04a47fc51d8fbce20211e5d1d61357ecd6d31071fe14fcaa1c274a8:2026-07-29T03:21:46.543Z",
+      "volume": 34,
+      "volumeId": "VOLUME-34",
+      "from": "architecture_complete",
+      "to": "implementation_ready",
+      "evidence": [
+        "pbos/runtime/volume-certification.json",
+        "docs/release-evidence/volume-34-implementation-readiness.md"
+      ],
+      "certificationRunId": "VOLUME-34:0fd5e5f0f04a47fc51d8fbce20211e5d1d61357ecd6d31071fe14fcaa1c274a8:2026-07-29T03:18:36.805Z",
+      "contentDigestBefore": "0fd5e5f0f04a47fc51d8fbce20211e5d1d61357ecd6d31071fe14fcaa1c274a8",
+      "timestamp": "2026-07-29T03:21:46.543Z",
+      "approved": true,
+      "contentDigestAfter": "94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8",
+      "blockingConditions": [],
+      "reason": "Promotion approved from current certification evidence and applied through the governed lifecycle transition."
+    }
+  ]
+}

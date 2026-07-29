@@ -1,0 +1,2604 @@
+{
+  "schemaVersion": 1,
+  "owner": "volume-certification",
+  "latest": {
+    "runId": "VOLUME-34:94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8:2026-07-29T04:58:54.751Z",
+    "volume": 34,
+    "volumeId": "VOLUME-34",
+    "volumePath": "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE",
+    "authorityId": "PPS-3400",
+    "lifecycle": "implementation_ready",
+    "lifecycleSource": "implementation_ready",
+    "contentDigest": "94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8",
+    "evaluatedAt": "2026-07-29T04:58:54.751Z",
+    "status": "FAIL",
+    "certificationScore": 90,
+    "rules": [
+      {
+        "id": "INT-001",
+        "name": "Authority Integrity",
+        "passed": true,
+        "evidence": [
+          "Expected authority: PPS-3400",
+          "Discovered path: docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE"
+        ],
+        "blockingConditions": []
+      },
+      {
+        "id": "INT-002",
+        "name": "Architecture Completeness",
+        "passed": true,
+        "evidence": [
+          "11 documents discovered.",
+          "10 documents declared by authority."
+        ],
+        "blockingConditions": []
+      },
+      {
+        "id": "INT-003",
+        "name": "Internal Consistency",
+        "passed": true,
+        "evidence": [
+          "Document identities and parent relationships compared."
+        ],
+        "blockingConditions": []
+      },
+      {
+        "id": "INT-004",
+        "name": "Ecosystem Compatibility",
+        "passed": true,
+        "evidence": [
+          "11 declared dependencies evaluated."
+        ],
+        "blockingConditions": []
+      },
+      {
+        "id": "INT-005",
+        "name": "Multi Operating System Compatibility",
+        "passed": true,
+        "evidence": [
+          "Explicit multi-operating-system contract searched."
+        ],
+        "blockingConditions": []
+      },
+      {
+        "id": "INT-006",
+        "name": "Accessibility Standard",
+        "passed": true,
+        "evidence": [
+          "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3405_ACCESSIBILITY_INTERFACE_STANDARD.md"
+        ],
+        "blockingConditions": []
+      },
+      {
+        "id": "INT-007",
+        "name": "Experience State Coverage",
+        "passed": true,
+        "evidence": [
+          "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3406_UI_STATE_ARCHITECTURE.md"
+        ],
+        "blockingConditions": []
+      },
+      {
+        "id": "INT-008",
+        "name": "Enterprise Quality Standard",
+        "passed": true,
+        "evidence": [
+          "Enterprise quality headings evaluated across the volume."
+        ],
+        "blockingConditions": []
+      },
+      {
+        "id": "INT-009",
+        "name": "PBOS Governance Integration",
+        "passed": true,
+        "evidence": [
+          "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3409_INTERFACE_CERTIFICATION_FRAMEWORK.md"
+        ],
+        "blockingConditions": []
+      },
+      {
+        "id": "INT-010",
+        "name": "Canonical Promotion Readiness",
+        "passed": false,
+        "evidence": [
+          "Current lifecycle: implementation_ready",
+          "Canonical promotion requires explicit certified status.",
+          "pbos/runtime/interface-certification.json"
+        ],
+        "blockingConditions": [
+          "Lifecycle implementation_ready is not eligible for canonical promotion.",
+          "IC-001 control is not proven: approved_design_system_usage.",
+          "IC-001 control is not proven: visual_consistency.",
+          "IC-001 control is not proven: component_reuse.",
+          "IC-001 control is not proven: prohibited_duplication_absent.",
+          "IC-001: The governed design-system reference is defined; repository-wide implementation adoption remains unverified.",
+          "IC-002 control is not proven: component_ownership.",
+          "IC-002 control is not proven: component_versioning.",
+          "IC-002 control is not proven: composition_rules.",
+          "IC-002 control is not proven: lifecycle_management.",
+          "IC-002: The governed component model is defined; implementation ownership, versioning, composition, and lifecycle compliance remain unverified.",
+          "IC-003 control is not proven: spacing_tokens.",
+          "IC-003 control is not proven: typography_tokens.",
+          "IC-003 control is not proven: color_tokens.",
+          "IC-003 control is not proven: theme_tokens.",
+          "IC-003 control is not proven: responsive_tokens.",
+          "IC-003 control is not proven: token_reuse.",
+          "IC-003: The governed token model is defined; implementation usage, reuse, and duplication audits remain unverified.",
+          "IC-004 control is not proven: wcag_alignment.",
+          "IC-004 control is not proven: keyboard_navigation.",
+          "IC-004 control is not proven: screen_reader_support.",
+          "IC-004 control is not proven: cognitive_accessibility.",
+          "IC-004 control is not proven: inclusive_interaction.",
+          "IC-004: The governed accessibility model is defined; automated and manual implementation results remain unverified.",
+          "IC-005 control is not proven: mobile.",
+          "IC-005 control is not proven: tablet.",
+          "IC-005 control is not proven: desktop.",
+          "IC-005 control is not proven: future_device_compatibility.",
+          "IC-005 control is not proven: adaptive_layouts.",
+          "IC-005: The governed responsive model is defined; identity-bound mobile, tablet, desktop, and adaptive implementation results remain unverified.",
+          "IC-006 control is not proven: approved_interaction_patterns.",
+          "IC-006 control is not proven: navigation_consistency.",
+          "IC-006 control is not proven: feedback_behavior.",
+          "IC-006 control is not proven: user_decision_support.",
+          "IC-006: The governed interaction model is defined; implemented workflows remain unverified against approved patterns.",
+          "IC-007 control is not proven: loading.",
+          "IC-007 control is not proven: empty.",
+          "IC-007 control is not proven: success.",
+          "IC-007 control is not proven: failure.",
+          "IC-007 control is not proven: recovery.",
+          "IC-007 control is not proven: permission.",
+          "IC-007 control is not proven: offline.",
+          "IC-007: The governed state model is defined; loading, empty, success, failure, recovery, permission, and offline implementation results remain unverified.",
+          "IC-008 control is not proven: performance_expectations.",
+          "IC-008 control is not proven: analytics_requirements.",
+          "IC-008 control is not proven: error_monitoring.",
+          "IC-008 control is not proven: user_behavior_understanding.",
+          "IC-008 control is not proven: system_health_visibility.",
+          "IC-008: The governed performance and observability model is defined; implementation measurements and operational results remain unverified.",
+          "Interface validation is not complete.",
+          "All interface certification domains must PASS."
+        ]
+      }
+    ],
+    "passedRules": [
+      "INT-001",
+      "INT-002",
+      "INT-003",
+      "INT-004",
+      "INT-005",
+      "INT-006",
+      "INT-007",
+      "INT-008",
+      "INT-009"
+    ],
+    "failedRules": [
+      "INT-010"
+    ],
+    "blockingConditions": [
+      "Lifecycle implementation_ready is not eligible for canonical promotion.",
+      "IC-001 control is not proven: approved_design_system_usage.",
+      "IC-001 control is not proven: visual_consistency.",
+      "IC-001 control is not proven: component_reuse.",
+      "IC-001 control is not proven: prohibited_duplication_absent.",
+      "IC-001: The governed design-system reference is defined; repository-wide implementation adoption remains unverified.",
+      "IC-002 control is not proven: component_ownership.",
+      "IC-002 control is not proven: component_versioning.",
+      "IC-002 control is not proven: composition_rules.",
+      "IC-002 control is not proven: lifecycle_management.",
+      "IC-002: The governed component model is defined; implementation ownership, versioning, composition, and lifecycle compliance remain unverified.",
+      "IC-003 control is not proven: spacing_tokens.",
+      "IC-003 control is not proven: typography_tokens.",
+      "IC-003 control is not proven: color_tokens.",
+      "IC-003 control is not proven: theme_tokens.",
+      "IC-003 control is not proven: responsive_tokens.",
+      "IC-003 control is not proven: token_reuse.",
+      "IC-003: The governed token model is defined; implementation usage, reuse, and duplication audits remain unverified.",
+      "IC-004 control is not proven: wcag_alignment.",
+      "IC-004 control is not proven: keyboard_navigation.",
+      "IC-004 control is not proven: screen_reader_support.",
+      "IC-004 control is not proven: cognitive_accessibility.",
+      "IC-004 control is not proven: inclusive_interaction.",
+      "IC-004: The governed accessibility model is defined; automated and manual implementation results remain unverified.",
+      "IC-005 control is not proven: mobile.",
+      "IC-005 control is not proven: tablet.",
+      "IC-005 control is not proven: desktop.",
+      "IC-005 control is not proven: future_device_compatibility.",
+      "IC-005 control is not proven: adaptive_layouts.",
+      "IC-005: The governed responsive model is defined; identity-bound mobile, tablet, desktop, and adaptive implementation results remain unverified.",
+      "IC-006 control is not proven: approved_interaction_patterns.",
+      "IC-006 control is not proven: navigation_consistency.",
+      "IC-006 control is not proven: feedback_behavior.",
+      "IC-006 control is not proven: user_decision_support.",
+      "IC-006: The governed interaction model is defined; implemented workflows remain unverified against approved patterns.",
+      "IC-007 control is not proven: loading.",
+      "IC-007 control is not proven: empty.",
+      "IC-007 control is not proven: success.",
+      "IC-007 control is not proven: failure.",
+      "IC-007 control is not proven: recovery.",
+      "IC-007 control is not proven: permission.",
+      "IC-007 control is not proven: offline.",
+      "IC-007: The governed state model is defined; loading, empty, success, failure, recovery, permission, and offline implementation results remain unverified.",
+      "IC-008 control is not proven: performance_expectations.",
+      "IC-008 control is not proven: analytics_requirements.",
+      "IC-008 control is not proven: error_monitoring.",
+      "IC-008 control is not proven: user_behavior_understanding.",
+      "IC-008 control is not proven: system_health_visibility.",
+      "IC-008: The governed performance and observability model is defined; implementation measurements and operational results remain unverified.",
+      "Interface validation is not complete.",
+      "All interface certification domains must PASS."
+    ],
+    "promotionRecommendation": {
+      "eligible": false,
+      "action": "BLOCKED",
+      "targetLifecycle": null,
+      "reason": "Promotion is blocked until every required certification rule has explicit passing evidence."
+    }
+  },
+  "history": [
+    {
+      "runId": "VOLUME-34:b4b768a8bf0d963a0e535c96fb43e25eb4b787c70f9de77bfcea11199755f8fe:2026-07-29T02:44:37.338Z",
+      "volume": 34,
+      "volumeId": "VOLUME-34",
+      "volumePath": "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE",
+      "authorityId": "PPS-3400",
+      "lifecycle": "draft",
+      "lifecycleSource": "Draft Constitutional",
+      "contentDigest": "b4b768a8bf0d963a0e535c96fb43e25eb4b787c70f9de77bfcea11199755f8fe",
+      "evaluatedAt": "2026-07-29T02:44:37.338Z",
+      "status": "FAIL",
+      "certificationScore": 60,
+      "rules": [
+        {
+          "id": "INT-001",
+          "name": "Authority Integrity",
+          "passed": true,
+          "evidence": [
+            "Expected authority: PPS-3400",
+            "Discovered path: docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-002",
+          "name": "Architecture Completeness",
+          "passed": true,
+          "evidence": [
+            "11 documents discovered.",
+            "10 documents declared by authority."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-003",
+          "name": "Internal Consistency",
+          "passed": true,
+          "evidence": [
+            "Document identities and parent relationships compared."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-004",
+          "name": "Ecosystem Compatibility",
+          "passed": true,
+          "evidence": [
+            "11 declared dependencies evaluated."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-005",
+          "name": "Multi Operating System Compatibility",
+          "passed": false,
+          "evidence": [
+            "Explicit multi-operating-system contract searched."
+          ],
+          "blockingConditions": [
+            "No explicit Multi Operating System Compatibility section exists."
+          ]
+        },
+        {
+          "id": "INT-006",
+          "name": "Accessibility Standard",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3405_ACCESSIBILITY_INTERFACE_STANDARD.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-007",
+          "name": "Experience State Coverage",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3406_UI_STATE_ARCHITECTURE.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-008",
+          "name": "Enterprise Quality Standard",
+          "passed": false,
+          "evidence": [
+            "Enterprise quality headings evaluated across the volume."
+          ],
+          "blockingConditions": [
+            "No explicit Security standard section exists.",
+            "No explicit Analytics standard section exists.",
+            "No explicit Observability standard section exists."
+          ]
+        },
+        {
+          "id": "INT-009",
+          "name": "PBOS Governance Integration",
+          "passed": false,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3409_INTERFACE_CERTIFICATION_FRAMEWORK.md"
+          ],
+          "blockingConditions": [
+            "PBOS governance evidence is missing fail.closed."
+          ]
+        },
+        {
+          "id": "INT-010",
+          "name": "Canonical Promotion Readiness",
+          "passed": false,
+          "evidence": [
+            "Current lifecycle: draft",
+            "Canonical promotion requires explicit certified status."
+          ],
+          "blockingConditions": [
+            "One or more prerequisite certification rules failed.",
+            "Lifecycle draft is not eligible for canonical promotion."
+          ]
+        }
+      ],
+      "passedRules": [
+        "INT-001",
+        "INT-002",
+        "INT-003",
+        "INT-004",
+        "INT-006",
+        "INT-007"
+      ],
+      "failedRules": [
+        "INT-005",
+        "INT-008",
+        "INT-009",
+        "INT-010"
+      ],
+      "blockingConditions": [
+        "No explicit Multi Operating System Compatibility section exists.",
+        "No explicit Security standard section exists.",
+        "No explicit Analytics standard section exists.",
+        "No explicit Observability standard section exists.",
+        "PBOS governance evidence is missing fail.closed.",
+        "One or more prerequisite certification rules failed.",
+        "Lifecycle draft is not eligible for canonical promotion."
+      ],
+      "promotionRecommendation": {
+        "eligible": false,
+        "action": "BLOCKED",
+        "targetLifecycle": null,
+        "reason": "Promotion is blocked until every required certification rule has explicit passing evidence."
+      }
+    },
+    {
+      "runId": "VOLUME-34:dd936b5f787c3e74da4da1bd67cabdeb54b1d67ecea689314b35a2574e527339:2026-07-29T02:58:59.217Z",
+      "volume": 34,
+      "volumeId": "VOLUME-34",
+      "volumePath": "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE",
+      "authorityId": "PPS-3400",
+      "lifecycle": "draft",
+      "lifecycleSource": "Draft Constitutional",
+      "contentDigest": "dd936b5f787c3e74da4da1bd67cabdeb54b1d67ecea689314b35a2574e527339",
+      "evaluatedAt": "2026-07-29T02:58:59.217Z",
+      "status": "FAIL",
+      "certificationScore": 80,
+      "rules": [
+        {
+          "id": "INT-001",
+          "name": "Authority Integrity",
+          "passed": true,
+          "evidence": [
+            "Expected authority: PPS-3400",
+            "Discovered path: docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-002",
+          "name": "Architecture Completeness",
+          "passed": true,
+          "evidence": [
+            "11 documents discovered.",
+            "10 documents declared by authority."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-003",
+          "name": "Internal Consistency",
+          "passed": true,
+          "evidence": [
+            "Document identities and parent relationships compared."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-004",
+          "name": "Ecosystem Compatibility",
+          "passed": true,
+          "evidence": [
+            "11 declared dependencies evaluated."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-005",
+          "name": "Multi Operating System Compatibility",
+          "passed": false,
+          "evidence": [
+            "Explicit multi-operating-system contract searched."
+          ],
+          "blockingConditions": [
+            "No explicit Multi Operating System Compatibility section exists."
+          ]
+        },
+        {
+          "id": "INT-006",
+          "name": "Accessibility Standard",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3405_ACCESSIBILITY_INTERFACE_STANDARD.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-007",
+          "name": "Experience State Coverage",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3406_UI_STATE_ARCHITECTURE.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-008",
+          "name": "Enterprise Quality Standard",
+          "passed": true,
+          "evidence": [
+            "Enterprise quality headings evaluated across the volume."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-009",
+          "name": "PBOS Governance Integration",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3409_INTERFACE_CERTIFICATION_FRAMEWORK.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-010",
+          "name": "Canonical Promotion Readiness",
+          "passed": false,
+          "evidence": [
+            "Current lifecycle: draft",
+            "Canonical promotion requires explicit certified status."
+          ],
+          "blockingConditions": [
+            "One or more prerequisite certification rules failed.",
+            "Lifecycle draft is not eligible for canonical promotion."
+          ]
+        }
+      ],
+      "passedRules": [
+        "INT-001",
+        "INT-002",
+        "INT-003",
+        "INT-004",
+        "INT-006",
+        "INT-007",
+        "INT-008",
+        "INT-009"
+      ],
+      "failedRules": [
+        "INT-005",
+        "INT-010"
+      ],
+      "blockingConditions": [
+        "No explicit Multi Operating System Compatibility section exists.",
+        "One or more prerequisite certification rules failed.",
+        "Lifecycle draft is not eligible for canonical promotion."
+      ],
+      "promotionRecommendation": {
+        "eligible": false,
+        "action": "BLOCKED",
+        "targetLifecycle": null,
+        "reason": "Promotion is blocked until every required certification rule has explicit passing evidence."
+      }
+    },
+    {
+      "runId": "VOLUME-34:1e9915ba4299bc846b12c8b91d075dc0c2b542c97d47430252fa7ab141174700:2026-07-29T02:59:21.833Z",
+      "volume": 34,
+      "volumeId": "VOLUME-34",
+      "volumePath": "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE",
+      "authorityId": "PPS-3400",
+      "lifecycle": "draft",
+      "lifecycleSource": "Draft Constitutional",
+      "contentDigest": "1e9915ba4299bc846b12c8b91d075dc0c2b542c97d47430252fa7ab141174700",
+      "evaluatedAt": "2026-07-29T02:59:21.833Z",
+      "status": "FAIL",
+      "certificationScore": 90,
+      "rules": [
+        {
+          "id": "INT-001",
+          "name": "Authority Integrity",
+          "passed": true,
+          "evidence": [
+            "Expected authority: PPS-3400",
+            "Discovered path: docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-002",
+          "name": "Architecture Completeness",
+          "passed": true,
+          "evidence": [
+            "11 documents discovered.",
+            "10 documents declared by authority."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-003",
+          "name": "Internal Consistency",
+          "passed": true,
+          "evidence": [
+            "Document identities and parent relationships compared."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-004",
+          "name": "Ecosystem Compatibility",
+          "passed": true,
+          "evidence": [
+            "11 declared dependencies evaluated."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-005",
+          "name": "Multi Operating System Compatibility",
+          "passed": true,
+          "evidence": [
+            "Explicit multi-operating-system contract searched."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-006",
+          "name": "Accessibility Standard",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3405_ACCESSIBILITY_INTERFACE_STANDARD.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-007",
+          "name": "Experience State Coverage",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3406_UI_STATE_ARCHITECTURE.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-008",
+          "name": "Enterprise Quality Standard",
+          "passed": true,
+          "evidence": [
+            "Enterprise quality headings evaluated across the volume."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-009",
+          "name": "PBOS Governance Integration",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3409_INTERFACE_CERTIFICATION_FRAMEWORK.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-010",
+          "name": "Canonical Promotion Readiness",
+          "passed": false,
+          "evidence": [
+            "Current lifecycle: draft",
+            "Canonical promotion requires explicit certified status."
+          ],
+          "blockingConditions": [
+            "Lifecycle draft is not eligible for canonical promotion."
+          ]
+        }
+      ],
+      "passedRules": [
+        "INT-001",
+        "INT-002",
+        "INT-003",
+        "INT-004",
+        "INT-005",
+        "INT-006",
+        "INT-007",
+        "INT-008",
+        "INT-009"
+      ],
+      "failedRules": [
+        "INT-010"
+      ],
+      "blockingConditions": [
+        "Lifecycle draft is not eligible for canonical promotion."
+      ],
+      "promotionRecommendation": {
+        "eligible": true,
+        "action": "REVIEW_TRANSITION",
+        "targetLifecycle": "architecture_complete",
+        "reason": "Evidence supports human review of the next governed lifecycle transition; no transition was applied."
+      }
+    },
+    {
+      "runId": "VOLUME-34:0fd5e5f0f04a47fc51d8fbce20211e5d1d61357ecd6d31071fe14fcaa1c274a8:2026-07-29T03:13:31.569Z",
+      "volume": 34,
+      "volumeId": "VOLUME-34",
+      "volumePath": "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE",
+      "authorityId": "PPS-3400",
+      "lifecycle": "architecture_complete",
+      "lifecycleSource": "architecture_complete",
+      "contentDigest": "0fd5e5f0f04a47fc51d8fbce20211e5d1d61357ecd6d31071fe14fcaa1c274a8",
+      "evaluatedAt": "2026-07-29T03:13:31.569Z",
+      "status": "FAIL",
+      "certificationScore": 90,
+      "rules": [
+        {
+          "id": "INT-001",
+          "name": "Authority Integrity",
+          "passed": true,
+          "evidence": [
+            "Expected authority: PPS-3400",
+            "Discovered path: docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-002",
+          "name": "Architecture Completeness",
+          "passed": true,
+          "evidence": [
+            "11 documents discovered.",
+            "10 documents declared by authority."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-003",
+          "name": "Internal Consistency",
+          "passed": true,
+          "evidence": [
+            "Document identities and parent relationships compared."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-004",
+          "name": "Ecosystem Compatibility",
+          "passed": true,
+          "evidence": [
+            "11 declared dependencies evaluated."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-005",
+          "name": "Multi Operating System Compatibility",
+          "passed": true,
+          "evidence": [
+            "Explicit multi-operating-system contract searched."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-006",
+          "name": "Accessibility Standard",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3405_ACCESSIBILITY_INTERFACE_STANDARD.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-007",
+          "name": "Experience State Coverage",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3406_UI_STATE_ARCHITECTURE.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-008",
+          "name": "Enterprise Quality Standard",
+          "passed": true,
+          "evidence": [
+            "Enterprise quality headings evaluated across the volume."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-009",
+          "name": "PBOS Governance Integration",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3409_INTERFACE_CERTIFICATION_FRAMEWORK.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-010",
+          "name": "Canonical Promotion Readiness",
+          "passed": false,
+          "evidence": [
+            "Current lifecycle: architecture_complete",
+            "Canonical promotion requires explicit certified status."
+          ],
+          "blockingConditions": [
+            "Lifecycle architecture_complete is not eligible for canonical promotion."
+          ]
+        }
+      ],
+      "passedRules": [
+        "INT-001",
+        "INT-002",
+        "INT-003",
+        "INT-004",
+        "INT-005",
+        "INT-006",
+        "INT-007",
+        "INT-008",
+        "INT-009"
+      ],
+      "failedRules": [
+        "INT-010"
+      ],
+      "blockingConditions": [
+        "Lifecycle architecture_complete is not eligible for canonical promotion."
+      ],
+      "promotionRecommendation": {
+        "eligible": true,
+        "action": "REVIEW_TRANSITION",
+        "targetLifecycle": "implementation_ready",
+        "reason": "Evidence supports human review of the next governed lifecycle transition; no transition was applied."
+      }
+    },
+    {
+      "runId": "VOLUME-34:0fd5e5f0f04a47fc51d8fbce20211e5d1d61357ecd6d31071fe14fcaa1c274a8:2026-07-29T03:18:36.805Z",
+      "volume": 34,
+      "volumeId": "VOLUME-34",
+      "volumePath": "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE",
+      "authorityId": "PPS-3400",
+      "lifecycle": "architecture_complete",
+      "lifecycleSource": "architecture_complete",
+      "contentDigest": "0fd5e5f0f04a47fc51d8fbce20211e5d1d61357ecd6d31071fe14fcaa1c274a8",
+      "evaluatedAt": "2026-07-29T03:18:36.805Z",
+      "status": "FAIL",
+      "certificationScore": 90,
+      "rules": [
+        {
+          "id": "INT-001",
+          "name": "Authority Integrity",
+          "passed": true,
+          "evidence": [
+            "Expected authority: PPS-3400",
+            "Discovered path: docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-002",
+          "name": "Architecture Completeness",
+          "passed": true,
+          "evidence": [
+            "11 documents discovered.",
+            "10 documents declared by authority."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-003",
+          "name": "Internal Consistency",
+          "passed": true,
+          "evidence": [
+            "Document identities and parent relationships compared."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-004",
+          "name": "Ecosystem Compatibility",
+          "passed": true,
+          "evidence": [
+            "11 declared dependencies evaluated."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-005",
+          "name": "Multi Operating System Compatibility",
+          "passed": true,
+          "evidence": [
+            "Explicit multi-operating-system contract searched."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-006",
+          "name": "Accessibility Standard",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3405_ACCESSIBILITY_INTERFACE_STANDARD.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-007",
+          "name": "Experience State Coverage",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3406_UI_STATE_ARCHITECTURE.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-008",
+          "name": "Enterprise Quality Standard",
+          "passed": true,
+          "evidence": [
+            "Enterprise quality headings evaluated across the volume."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-009",
+          "name": "PBOS Governance Integration",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3409_INTERFACE_CERTIFICATION_FRAMEWORK.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-010",
+          "name": "Canonical Promotion Readiness",
+          "passed": false,
+          "evidence": [
+            "Current lifecycle: architecture_complete",
+            "Canonical promotion requires explicit certified status."
+          ],
+          "blockingConditions": [
+            "Lifecycle architecture_complete is not eligible for canonical promotion."
+          ]
+        }
+      ],
+      "passedRules": [
+        "INT-001",
+        "INT-002",
+        "INT-003",
+        "INT-004",
+        "INT-005",
+        "INT-006",
+        "INT-007",
+        "INT-008",
+        "INT-009"
+      ],
+      "failedRules": [
+        "INT-010"
+      ],
+      "blockingConditions": [
+        "Lifecycle architecture_complete is not eligible for canonical promotion."
+      ],
+      "promotionRecommendation": {
+        "eligible": true,
+        "action": "REVIEW_TRANSITION",
+        "targetLifecycle": "implementation_ready",
+        "reason": "Evidence supports human review of the next governed lifecycle transition; no transition was applied."
+      }
+    },
+    {
+      "runId": "VOLUME-34:94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8:2026-07-29T03:21:58.177Z",
+      "volume": 34,
+      "volumeId": "VOLUME-34",
+      "volumePath": "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE",
+      "authorityId": "PPS-3400",
+      "lifecycle": "implementation_ready",
+      "lifecycleSource": "implementation_ready",
+      "contentDigest": "94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8",
+      "evaluatedAt": "2026-07-29T03:21:58.177Z",
+      "status": "FAIL",
+      "certificationScore": 90,
+      "rules": [
+        {
+          "id": "INT-001",
+          "name": "Authority Integrity",
+          "passed": true,
+          "evidence": [
+            "Expected authority: PPS-3400",
+            "Discovered path: docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-002",
+          "name": "Architecture Completeness",
+          "passed": true,
+          "evidence": [
+            "11 documents discovered.",
+            "10 documents declared by authority."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-003",
+          "name": "Internal Consistency",
+          "passed": true,
+          "evidence": [
+            "Document identities and parent relationships compared."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-004",
+          "name": "Ecosystem Compatibility",
+          "passed": true,
+          "evidence": [
+            "11 declared dependencies evaluated."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-005",
+          "name": "Multi Operating System Compatibility",
+          "passed": true,
+          "evidence": [
+            "Explicit multi-operating-system contract searched."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-006",
+          "name": "Accessibility Standard",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3405_ACCESSIBILITY_INTERFACE_STANDARD.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-007",
+          "name": "Experience State Coverage",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3406_UI_STATE_ARCHITECTURE.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-008",
+          "name": "Enterprise Quality Standard",
+          "passed": true,
+          "evidence": [
+            "Enterprise quality headings evaluated across the volume."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-009",
+          "name": "PBOS Governance Integration",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3409_INTERFACE_CERTIFICATION_FRAMEWORK.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-010",
+          "name": "Canonical Promotion Readiness",
+          "passed": false,
+          "evidence": [
+            "Current lifecycle: implementation_ready",
+            "Canonical promotion requires explicit certified status."
+          ],
+          "blockingConditions": [
+            "Lifecycle implementation_ready is not eligible for canonical promotion."
+          ]
+        }
+      ],
+      "passedRules": [
+        "INT-001",
+        "INT-002",
+        "INT-003",
+        "INT-004",
+        "INT-005",
+        "INT-006",
+        "INT-007",
+        "INT-008",
+        "INT-009"
+      ],
+      "failedRules": [
+        "INT-010"
+      ],
+      "blockingConditions": [
+        "Lifecycle implementation_ready is not eligible for canonical promotion."
+      ],
+      "promotionRecommendation": {
+        "eligible": true,
+        "action": "REVIEW_TRANSITION",
+        "targetLifecycle": "certified",
+        "reason": "Evidence supports human review of the next governed lifecycle transition; no transition was applied."
+      }
+    },
+    {
+      "runId": "VOLUME-34:94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8:2026-07-29T03:25:30.218Z",
+      "volume": 34,
+      "volumeId": "VOLUME-34",
+      "volumePath": "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE",
+      "authorityId": "PPS-3400",
+      "lifecycle": "implementation_ready",
+      "lifecycleSource": "implementation_ready",
+      "contentDigest": "94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8",
+      "evaluatedAt": "2026-07-29T03:25:30.218Z",
+      "status": "FAIL",
+      "certificationScore": 90,
+      "rules": [
+        {
+          "id": "INT-001",
+          "name": "Authority Integrity",
+          "passed": true,
+          "evidence": [
+            "Expected authority: PPS-3400",
+            "Discovered path: docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-002",
+          "name": "Architecture Completeness",
+          "passed": true,
+          "evidence": [
+            "11 documents discovered.",
+            "10 documents declared by authority."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-003",
+          "name": "Internal Consistency",
+          "passed": true,
+          "evidence": [
+            "Document identities and parent relationships compared."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-004",
+          "name": "Ecosystem Compatibility",
+          "passed": true,
+          "evidence": [
+            "11 declared dependencies evaluated."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-005",
+          "name": "Multi Operating System Compatibility",
+          "passed": true,
+          "evidence": [
+            "Explicit multi-operating-system contract searched."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-006",
+          "name": "Accessibility Standard",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3405_ACCESSIBILITY_INTERFACE_STANDARD.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-007",
+          "name": "Experience State Coverage",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3406_UI_STATE_ARCHITECTURE.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-008",
+          "name": "Enterprise Quality Standard",
+          "passed": true,
+          "evidence": [
+            "Enterprise quality headings evaluated across the volume."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-009",
+          "name": "PBOS Governance Integration",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3409_INTERFACE_CERTIFICATION_FRAMEWORK.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-010",
+          "name": "Canonical Promotion Readiness",
+          "passed": false,
+          "evidence": [
+            "Current lifecycle: implementation_ready",
+            "Canonical promotion requires explicit certified status."
+          ],
+          "blockingConditions": [
+            "Lifecycle implementation_ready is not eligible for canonical promotion."
+          ]
+        }
+      ],
+      "passedRules": [
+        "INT-001",
+        "INT-002",
+        "INT-003",
+        "INT-004",
+        "INT-005",
+        "INT-006",
+        "INT-007",
+        "INT-008",
+        "INT-009"
+      ],
+      "failedRules": [
+        "INT-010"
+      ],
+      "blockingConditions": [
+        "Lifecycle implementation_ready is not eligible for canonical promotion."
+      ],
+      "promotionRecommendation": {
+        "eligible": true,
+        "action": "REVIEW_TRANSITION",
+        "targetLifecycle": "certified",
+        "reason": "Evidence supports human review of the next governed lifecycle transition; no transition was applied."
+      }
+    },
+    {
+      "runId": "VOLUME-34:94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8:2026-07-29T03:54:19.146Z",
+      "volume": 34,
+      "volumeId": "VOLUME-34",
+      "volumePath": "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE",
+      "authorityId": "PPS-3400",
+      "lifecycle": "implementation_ready",
+      "lifecycleSource": "implementation_ready",
+      "contentDigest": "94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8",
+      "evaluatedAt": "2026-07-29T03:54:19.146Z",
+      "status": "FAIL",
+      "certificationScore": 90,
+      "rules": [
+        {
+          "id": "INT-001",
+          "name": "Authority Integrity",
+          "passed": true,
+          "evidence": [
+            "Expected authority: PPS-3400",
+            "Discovered path: docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-002",
+          "name": "Architecture Completeness",
+          "passed": true,
+          "evidence": [
+            "11 documents discovered.",
+            "10 documents declared by authority."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-003",
+          "name": "Internal Consistency",
+          "passed": true,
+          "evidence": [
+            "Document identities and parent relationships compared."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-004",
+          "name": "Ecosystem Compatibility",
+          "passed": true,
+          "evidence": [
+            "11 declared dependencies evaluated."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-005",
+          "name": "Multi Operating System Compatibility",
+          "passed": true,
+          "evidence": [
+            "Explicit multi-operating-system contract searched."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-006",
+          "name": "Accessibility Standard",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3405_ACCESSIBILITY_INTERFACE_STANDARD.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-007",
+          "name": "Experience State Coverage",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3406_UI_STATE_ARCHITECTURE.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-008",
+          "name": "Enterprise Quality Standard",
+          "passed": true,
+          "evidence": [
+            "Enterprise quality headings evaluated across the volume."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-009",
+          "name": "PBOS Governance Integration",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3409_INTERFACE_CERTIFICATION_FRAMEWORK.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-010",
+          "name": "Canonical Promotion Readiness",
+          "passed": false,
+          "evidence": [
+            "Current lifecycle: implementation_ready",
+            "Canonical promotion requires explicit certified status."
+          ],
+          "blockingConditions": [
+            "Lifecycle implementation_ready is not eligible for canonical promotion."
+          ]
+        }
+      ],
+      "passedRules": [
+        "INT-001",
+        "INT-002",
+        "INT-003",
+        "INT-004",
+        "INT-005",
+        "INT-006",
+        "INT-007",
+        "INT-008",
+        "INT-009"
+      ],
+      "failedRules": [
+        "INT-010"
+      ],
+      "blockingConditions": [
+        "Lifecycle implementation_ready is not eligible for canonical promotion."
+      ],
+      "promotionRecommendation": {
+        "eligible": true,
+        "action": "REVIEW_TRANSITION",
+        "targetLifecycle": "certified",
+        "reason": "Evidence supports human review of the next governed lifecycle transition; no transition was applied."
+      }
+    },
+    {
+      "runId": "VOLUME-34:94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8:2026-07-29T04:07:35.958Z",
+      "volume": 34,
+      "volumeId": "VOLUME-34",
+      "volumePath": "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE",
+      "authorityId": "PPS-3400",
+      "lifecycle": "implementation_ready",
+      "lifecycleSource": "implementation_ready",
+      "contentDigest": "94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8",
+      "evaluatedAt": "2026-07-29T04:07:35.958Z",
+      "status": "FAIL",
+      "certificationScore": 90,
+      "rules": [
+        {
+          "id": "INT-001",
+          "name": "Authority Integrity",
+          "passed": true,
+          "evidence": [
+            "Expected authority: PPS-3400",
+            "Discovered path: docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-002",
+          "name": "Architecture Completeness",
+          "passed": true,
+          "evidence": [
+            "11 documents discovered.",
+            "10 documents declared by authority."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-003",
+          "name": "Internal Consistency",
+          "passed": true,
+          "evidence": [
+            "Document identities and parent relationships compared."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-004",
+          "name": "Ecosystem Compatibility",
+          "passed": true,
+          "evidence": [
+            "11 declared dependencies evaluated."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-005",
+          "name": "Multi Operating System Compatibility",
+          "passed": true,
+          "evidence": [
+            "Explicit multi-operating-system contract searched."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-006",
+          "name": "Accessibility Standard",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3405_ACCESSIBILITY_INTERFACE_STANDARD.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-007",
+          "name": "Experience State Coverage",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3406_UI_STATE_ARCHITECTURE.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-008",
+          "name": "Enterprise Quality Standard",
+          "passed": true,
+          "evidence": [
+            "Enterprise quality headings evaluated across the volume."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-009",
+          "name": "PBOS Governance Integration",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3409_INTERFACE_CERTIFICATION_FRAMEWORK.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-010",
+          "name": "Canonical Promotion Readiness",
+          "passed": false,
+          "evidence": [
+            "Current lifecycle: implementation_ready",
+            "Canonical promotion requires explicit certified status.",
+            "docs/release-evidence/volume-34-implementation-validation.json"
+          ],
+          "blockingConditions": [
+            "Lifecycle implementation_ready is not eligible for canonical promotion.",
+            "Design System Adoption implementation validation is INCOMPLETE.",
+            "Component Architecture Compliance implementation validation is INCOMPLETE.",
+            "Design Token Compliance implementation validation is INCOMPLETE.",
+            "Accessibility Compliance implementation validation is INCOMPLETE.",
+            "Responsive Behavior implementation validation is INCOMPLETE.",
+            "Interaction Pattern Compliance implementation validation is INCOMPLETE.",
+            "UI State Coverage implementation validation is INCOMPLETE.",
+            "Performance and Observability implementation validation is INCOMPLETE.",
+            "All eight implementation-validation domains require identity-bound passing evidence.",
+            "Critical accessibility, responsive, state, performance, and observability validation remains incomplete.",
+            "Implementation validation is not complete."
+          ]
+        }
+      ],
+      "passedRules": [
+        "INT-001",
+        "INT-002",
+        "INT-003",
+        "INT-004",
+        "INT-005",
+        "INT-006",
+        "INT-007",
+        "INT-008",
+        "INT-009"
+      ],
+      "failedRules": [
+        "INT-010"
+      ],
+      "blockingConditions": [
+        "Lifecycle implementation_ready is not eligible for canonical promotion.",
+        "Design System Adoption implementation validation is INCOMPLETE.",
+        "Component Architecture Compliance implementation validation is INCOMPLETE.",
+        "Design Token Compliance implementation validation is INCOMPLETE.",
+        "Accessibility Compliance implementation validation is INCOMPLETE.",
+        "Responsive Behavior implementation validation is INCOMPLETE.",
+        "Interaction Pattern Compliance implementation validation is INCOMPLETE.",
+        "UI State Coverage implementation validation is INCOMPLETE.",
+        "Performance and Observability implementation validation is INCOMPLETE.",
+        "All eight implementation-validation domains require identity-bound passing evidence.",
+        "Critical accessibility, responsive, state, performance, and observability validation remains incomplete.",
+        "Implementation validation is not complete."
+      ],
+      "promotionRecommendation": {
+        "eligible": true,
+        "action": "REVIEW_TRANSITION",
+        "targetLifecycle": "certified",
+        "reason": "Evidence supports human review of the next governed lifecycle transition; no transition was applied."
+      }
+    },
+    {
+      "runId": "VOLUME-34:94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8:2026-07-29T04:08:57.126Z",
+      "volume": 34,
+      "volumeId": "VOLUME-34",
+      "volumePath": "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE",
+      "authorityId": "PPS-3400",
+      "lifecycle": "implementation_ready",
+      "lifecycleSource": "implementation_ready",
+      "contentDigest": "94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8",
+      "evaluatedAt": "2026-07-29T04:08:57.126Z",
+      "status": "FAIL",
+      "certificationScore": 90,
+      "rules": [
+        {
+          "id": "INT-001",
+          "name": "Authority Integrity",
+          "passed": true,
+          "evidence": [
+            "Expected authority: PPS-3400",
+            "Discovered path: docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-002",
+          "name": "Architecture Completeness",
+          "passed": true,
+          "evidence": [
+            "11 documents discovered.",
+            "10 documents declared by authority."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-003",
+          "name": "Internal Consistency",
+          "passed": true,
+          "evidence": [
+            "Document identities and parent relationships compared."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-004",
+          "name": "Ecosystem Compatibility",
+          "passed": true,
+          "evidence": [
+            "11 declared dependencies evaluated."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-005",
+          "name": "Multi Operating System Compatibility",
+          "passed": true,
+          "evidence": [
+            "Explicit multi-operating-system contract searched."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-006",
+          "name": "Accessibility Standard",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3405_ACCESSIBILITY_INTERFACE_STANDARD.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-007",
+          "name": "Experience State Coverage",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3406_UI_STATE_ARCHITECTURE.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-008",
+          "name": "Enterprise Quality Standard",
+          "passed": true,
+          "evidence": [
+            "Enterprise quality headings evaluated across the volume."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-009",
+          "name": "PBOS Governance Integration",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3409_INTERFACE_CERTIFICATION_FRAMEWORK.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-010",
+          "name": "Canonical Promotion Readiness",
+          "passed": false,
+          "evidence": [
+            "Current lifecycle: implementation_ready",
+            "Canonical promotion requires explicit certified status.",
+            "docs/release-evidence/volume-34-implementation-validation.json"
+          ],
+          "blockingConditions": [
+            "Lifecycle implementation_ready is not eligible for canonical promotion.",
+            "Design System Adoption implementation validation is INCOMPLETE.",
+            "Component Architecture Compliance implementation validation is INCOMPLETE.",
+            "Design Token Compliance implementation validation is INCOMPLETE.",
+            "Accessibility Compliance implementation validation is INCOMPLETE.",
+            "Responsive Behavior implementation validation is INCOMPLETE.",
+            "Interaction Pattern Compliance implementation validation is INCOMPLETE.",
+            "UI State Coverage implementation validation is INCOMPLETE.",
+            "Performance and Observability implementation validation is INCOMPLETE.",
+            "All eight implementation-validation domains require identity-bound passing evidence.",
+            "Critical accessibility, responsive, state, performance, and observability validation remains incomplete.",
+            "Implementation validation is not complete."
+          ]
+        }
+      ],
+      "passedRules": [
+        "INT-001",
+        "INT-002",
+        "INT-003",
+        "INT-004",
+        "INT-005",
+        "INT-006",
+        "INT-007",
+        "INT-008",
+        "INT-009"
+      ],
+      "failedRules": [
+        "INT-010"
+      ],
+      "blockingConditions": [
+        "Lifecycle implementation_ready is not eligible for canonical promotion.",
+        "Design System Adoption implementation validation is INCOMPLETE.",
+        "Component Architecture Compliance implementation validation is INCOMPLETE.",
+        "Design Token Compliance implementation validation is INCOMPLETE.",
+        "Accessibility Compliance implementation validation is INCOMPLETE.",
+        "Responsive Behavior implementation validation is INCOMPLETE.",
+        "Interaction Pattern Compliance implementation validation is INCOMPLETE.",
+        "UI State Coverage implementation validation is INCOMPLETE.",
+        "Performance and Observability implementation validation is INCOMPLETE.",
+        "All eight implementation-validation domains require identity-bound passing evidence.",
+        "Critical accessibility, responsive, state, performance, and observability validation remains incomplete.",
+        "Implementation validation is not complete."
+      ],
+      "promotionRecommendation": {
+        "eligible": false,
+        "action": "BLOCKED",
+        "targetLifecycle": null,
+        "reason": "Promotion is blocked until every required certification rule has explicit passing evidence."
+      }
+    },
+    {
+      "runId": "VOLUME-34:94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8:2026-07-29T04:26:02.443Z",
+      "volume": 34,
+      "volumeId": "VOLUME-34",
+      "volumePath": "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE",
+      "authorityId": "PPS-3400",
+      "lifecycle": "implementation_ready",
+      "lifecycleSource": "implementation_ready",
+      "contentDigest": "94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8",
+      "evaluatedAt": "2026-07-29T04:26:02.443Z",
+      "status": "FAIL",
+      "certificationScore": 90,
+      "rules": [
+        {
+          "id": "INT-001",
+          "name": "Authority Integrity",
+          "passed": true,
+          "evidence": [
+            "Expected authority: PPS-3400",
+            "Discovered path: docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-002",
+          "name": "Architecture Completeness",
+          "passed": true,
+          "evidence": [
+            "11 documents discovered.",
+            "10 documents declared by authority."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-003",
+          "name": "Internal Consistency",
+          "passed": true,
+          "evidence": [
+            "Document identities and parent relationships compared."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-004",
+          "name": "Ecosystem Compatibility",
+          "passed": true,
+          "evidence": [
+            "11 declared dependencies evaluated."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-005",
+          "name": "Multi Operating System Compatibility",
+          "passed": true,
+          "evidence": [
+            "Explicit multi-operating-system contract searched."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-006",
+          "name": "Accessibility Standard",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3405_ACCESSIBILITY_INTERFACE_STANDARD.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-007",
+          "name": "Experience State Coverage",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3406_UI_STATE_ARCHITECTURE.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-008",
+          "name": "Enterprise Quality Standard",
+          "passed": true,
+          "evidence": [
+            "Enterprise quality headings evaluated across the volume."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-009",
+          "name": "PBOS Governance Integration",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3409_INTERFACE_CERTIFICATION_FRAMEWORK.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-010",
+          "name": "Canonical Promotion Readiness",
+          "passed": false,
+          "evidence": [
+            "Current lifecycle: implementation_ready",
+            "Canonical promotion requires explicit certified status.",
+            "pbos/runtime/interface-certification.json"
+          ],
+          "blockingConditions": [
+            "Lifecycle implementation_ready is not eligible for canonical promotion.",
+            "IC-001 control is not proven: approved_design_system_usage.",
+            "IC-001 control is not proven: visual_consistency.",
+            "IC-001 control is not proven: component_reuse.",
+            "IC-001 control is not proven: prohibited_duplication_absent.",
+            "IC-001 has no implementation evidence.",
+            "IC-001: Repository-wide design system adoption evidence has not been generated.",
+            "IC-002 control is not proven: component_ownership.",
+            "IC-002 control is not proven: component_versioning.",
+            "IC-002 control is not proven: composition_rules.",
+            "IC-002 control is not proven: lifecycle_management.",
+            "IC-002 has no implementation evidence.",
+            "IC-002: Component ownership, versioning, composition, and lifecycle evidence is incomplete.",
+            "IC-003 control is not proven: spacing_tokens.",
+            "IC-003 control is not proven: typography_tokens.",
+            "IC-003 control is not proven: color_tokens.",
+            "IC-003 control is not proven: theme_tokens.",
+            "IC-003 control is not proven: responsive_tokens.",
+            "IC-003 control is not proven: token_reuse.",
+            "IC-003 has no implementation evidence.",
+            "IC-003: A complete design-token usage and duplication audit is unavailable.",
+            "IC-004 control is not proven: wcag_alignment.",
+            "IC-004 control is not proven: keyboard_navigation.",
+            "IC-004 control is not proven: screen_reader_support.",
+            "IC-004 control is not proven: cognitive_accessibility.",
+            "IC-004 control is not proven: inclusive_interaction.",
+            "IC-004 has no implementation evidence.",
+            "IC-004: Complete automated and manual accessibility evidence is unavailable.",
+            "IC-005 control is not proven: mobile.",
+            "IC-005 control is not proven: tablet.",
+            "IC-005 control is not proven: desktop.",
+            "IC-005 control is not proven: future_device_compatibility.",
+            "IC-005 control is not proven: adaptive_layouts.",
+            "IC-005 has no implementation evidence.",
+            "IC-005: Identity-bound mobile, tablet, desktop, and adaptive-layout evidence is incomplete.",
+            "IC-006 control is not proven: approved_interaction_patterns.",
+            "IC-006 control is not proven: navigation_consistency.",
+            "IC-006 control is not proven: feedback_behavior.",
+            "IC-006 control is not proven: user_decision_support.",
+            "IC-006 has no implementation evidence.",
+            "IC-006: Implemented workflows have not been fully traced to approved interaction patterns.",
+            "IC-007 control is not proven: loading.",
+            "IC-007 control is not proven: empty.",
+            "IC-007 control is not proven: success.",
+            "IC-007 control is not proven: failure.",
+            "IC-007 control is not proven: recovery.",
+            "IC-007 control is not proven: permission.",
+            "IC-007 control is not proven: offline.",
+            "IC-007 has no implementation evidence.",
+            "IC-007: Complete loading, empty, success, failure, recovery, permission, and offline state evidence is unavailable.",
+            "IC-008 control is not proven: performance_expectations.",
+            "IC-008 control is not proven: analytics_requirements.",
+            "IC-008 control is not proven: error_monitoring.",
+            "IC-008 control is not proven: user_behavior_understanding.",
+            "IC-008 control is not proven: system_health_visibility.",
+            "IC-008 has no implementation evidence.",
+            "IC-008: Performance, analytics, monitoring, behavior, and system-health evidence is incomplete.",
+            "Interface validation is not complete.",
+            "All interface certification domains must PASS."
+          ]
+        }
+      ],
+      "passedRules": [
+        "INT-001",
+        "INT-002",
+        "INT-003",
+        "INT-004",
+        "INT-005",
+        "INT-006",
+        "INT-007",
+        "INT-008",
+        "INT-009"
+      ],
+      "failedRules": [
+        "INT-010"
+      ],
+      "blockingConditions": [
+        "Lifecycle implementation_ready is not eligible for canonical promotion.",
+        "IC-001 control is not proven: approved_design_system_usage.",
+        "IC-001 control is not proven: visual_consistency.",
+        "IC-001 control is not proven: component_reuse.",
+        "IC-001 control is not proven: prohibited_duplication_absent.",
+        "IC-001 has no implementation evidence.",
+        "IC-001: Repository-wide design system adoption evidence has not been generated.",
+        "IC-002 control is not proven: component_ownership.",
+        "IC-002 control is not proven: component_versioning.",
+        "IC-002 control is not proven: composition_rules.",
+        "IC-002 control is not proven: lifecycle_management.",
+        "IC-002 has no implementation evidence.",
+        "IC-002: Component ownership, versioning, composition, and lifecycle evidence is incomplete.",
+        "IC-003 control is not proven: spacing_tokens.",
+        "IC-003 control is not proven: typography_tokens.",
+        "IC-003 control is not proven: color_tokens.",
+        "IC-003 control is not proven: theme_tokens.",
+        "IC-003 control is not proven: responsive_tokens.",
+        "IC-003 control is not proven: token_reuse.",
+        "IC-003 has no implementation evidence.",
+        "IC-003: A complete design-token usage and duplication audit is unavailable.",
+        "IC-004 control is not proven: wcag_alignment.",
+        "IC-004 control is not proven: keyboard_navigation.",
+        "IC-004 control is not proven: screen_reader_support.",
+        "IC-004 control is not proven: cognitive_accessibility.",
+        "IC-004 control is not proven: inclusive_interaction.",
+        "IC-004 has no implementation evidence.",
+        "IC-004: Complete automated and manual accessibility evidence is unavailable.",
+        "IC-005 control is not proven: mobile.",
+        "IC-005 control is not proven: tablet.",
+        "IC-005 control is not proven: desktop.",
+        "IC-005 control is not proven: future_device_compatibility.",
+        "IC-005 control is not proven: adaptive_layouts.",
+        "IC-005 has no implementation evidence.",
+        "IC-005: Identity-bound mobile, tablet, desktop, and adaptive-layout evidence is incomplete.",
+        "IC-006 control is not proven: approved_interaction_patterns.",
+        "IC-006 control is not proven: navigation_consistency.",
+        "IC-006 control is not proven: feedback_behavior.",
+        "IC-006 control is not proven: user_decision_support.",
+        "IC-006 has no implementation evidence.",
+        "IC-006: Implemented workflows have not been fully traced to approved interaction patterns.",
+        "IC-007 control is not proven: loading.",
+        "IC-007 control is not proven: empty.",
+        "IC-007 control is not proven: success.",
+        "IC-007 control is not proven: failure.",
+        "IC-007 control is not proven: recovery.",
+        "IC-007 control is not proven: permission.",
+        "IC-007 control is not proven: offline.",
+        "IC-007 has no implementation evidence.",
+        "IC-007: Complete loading, empty, success, failure, recovery, permission, and offline state evidence is unavailable.",
+        "IC-008 control is not proven: performance_expectations.",
+        "IC-008 control is not proven: analytics_requirements.",
+        "IC-008 control is not proven: error_monitoring.",
+        "IC-008 control is not proven: user_behavior_understanding.",
+        "IC-008 control is not proven: system_health_visibility.",
+        "IC-008 has no implementation evidence.",
+        "IC-008: Performance, analytics, monitoring, behavior, and system-health evidence is incomplete.",
+        "Interface validation is not complete.",
+        "All interface certification domains must PASS."
+      ],
+      "promotionRecommendation": {
+        "eligible": false,
+        "action": "BLOCKED",
+        "targetLifecycle": null,
+        "reason": "Promotion is blocked until every required certification rule has explicit passing evidence."
+      }
+    },
+    {
+      "runId": "VOLUME-34:94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8:2026-07-29T04:32:57.170Z",
+      "volume": 34,
+      "volumeId": "VOLUME-34",
+      "volumePath": "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE",
+      "authorityId": "PPS-3400",
+      "lifecycle": "implementation_ready",
+      "lifecycleSource": "implementation_ready",
+      "contentDigest": "94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8",
+      "evaluatedAt": "2026-07-29T04:32:57.170Z",
+      "status": "FAIL",
+      "certificationScore": 90,
+      "rules": [
+        {
+          "id": "INT-001",
+          "name": "Authority Integrity",
+          "passed": true,
+          "evidence": [
+            "Expected authority: PPS-3400",
+            "Discovered path: docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-002",
+          "name": "Architecture Completeness",
+          "passed": true,
+          "evidence": [
+            "11 documents discovered.",
+            "10 documents declared by authority."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-003",
+          "name": "Internal Consistency",
+          "passed": true,
+          "evidence": [
+            "Document identities and parent relationships compared."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-004",
+          "name": "Ecosystem Compatibility",
+          "passed": true,
+          "evidence": [
+            "11 declared dependencies evaluated."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-005",
+          "name": "Multi Operating System Compatibility",
+          "passed": true,
+          "evidence": [
+            "Explicit multi-operating-system contract searched."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-006",
+          "name": "Accessibility Standard",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3405_ACCESSIBILITY_INTERFACE_STANDARD.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-007",
+          "name": "Experience State Coverage",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3406_UI_STATE_ARCHITECTURE.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-008",
+          "name": "Enterprise Quality Standard",
+          "passed": true,
+          "evidence": [
+            "Enterprise quality headings evaluated across the volume."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-009",
+          "name": "PBOS Governance Integration",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3409_INTERFACE_CERTIFICATION_FRAMEWORK.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-010",
+          "name": "Canonical Promotion Readiness",
+          "passed": false,
+          "evidence": [
+            "Current lifecycle: implementation_ready",
+            "Canonical promotion requires explicit certified status.",
+            "pbos/runtime/interface-certification.json"
+          ],
+          "blockingConditions": [
+            "Lifecycle implementation_ready is not eligible for canonical promotion.",
+            "IC-001 control is not proven: approved_design_system_usage.",
+            "IC-001 control is not proven: visual_consistency.",
+            "IC-001 control is not proven: component_reuse.",
+            "IC-001 control is not proven: prohibited_duplication_absent.",
+            "IC-001 has no implementation evidence.",
+            "IC-001: Repository-wide design system adoption evidence has not been generated.",
+            "IC-002 control is not proven: component_ownership.",
+            "IC-002 control is not proven: component_versioning.",
+            "IC-002 control is not proven: composition_rules.",
+            "IC-002 control is not proven: lifecycle_management.",
+            "IC-002 has no implementation evidence.",
+            "IC-002: Component ownership, versioning, composition, and lifecycle evidence is incomplete.",
+            "IC-003 control is not proven: spacing_tokens.",
+            "IC-003 control is not proven: typography_tokens.",
+            "IC-003 control is not proven: color_tokens.",
+            "IC-003 control is not proven: theme_tokens.",
+            "IC-003 control is not proven: responsive_tokens.",
+            "IC-003 control is not proven: token_reuse.",
+            "IC-003 has no implementation evidence.",
+            "IC-003: A complete design-token usage and duplication audit is unavailable.",
+            "IC-004 control is not proven: wcag_alignment.",
+            "IC-004 control is not proven: keyboard_navigation.",
+            "IC-004 control is not proven: screen_reader_support.",
+            "IC-004 control is not proven: cognitive_accessibility.",
+            "IC-004 control is not proven: inclusive_interaction.",
+            "IC-004 has no implementation evidence.",
+            "IC-004: Complete automated and manual accessibility evidence is unavailable.",
+            "IC-005 control is not proven: mobile.",
+            "IC-005 control is not proven: tablet.",
+            "IC-005 control is not proven: desktop.",
+            "IC-005 control is not proven: future_device_compatibility.",
+            "IC-005 control is not proven: adaptive_layouts.",
+            "IC-005 has no implementation evidence.",
+            "IC-005: Identity-bound mobile, tablet, desktop, and adaptive-layout evidence is incomplete.",
+            "IC-006 control is not proven: approved_interaction_patterns.",
+            "IC-006 control is not proven: navigation_consistency.",
+            "IC-006 control is not proven: feedback_behavior.",
+            "IC-006 control is not proven: user_decision_support.",
+            "IC-006 has no implementation evidence.",
+            "IC-006: Implemented workflows have not been fully traced to approved interaction patterns.",
+            "IC-007 control is not proven: loading.",
+            "IC-007 control is not proven: empty.",
+            "IC-007 control is not proven: success.",
+            "IC-007 control is not proven: failure.",
+            "IC-007 control is not proven: recovery.",
+            "IC-007 control is not proven: permission.",
+            "IC-007 control is not proven: offline.",
+            "IC-007 has no implementation evidence.",
+            "IC-007: Complete loading, empty, success, failure, recovery, permission, and offline state evidence is unavailable.",
+            "IC-008 control is not proven: performance_expectations.",
+            "IC-008 control is not proven: analytics_requirements.",
+            "IC-008 control is not proven: error_monitoring.",
+            "IC-008 control is not proven: user_behavior_understanding.",
+            "IC-008 control is not proven: system_health_visibility.",
+            "IC-008 has no implementation evidence.",
+            "IC-008: Performance, analytics, monitoring, behavior, and system-health evidence is incomplete.",
+            "Interface validation is not complete.",
+            "All interface certification domains must PASS."
+          ]
+        }
+      ],
+      "passedRules": [
+        "INT-001",
+        "INT-002",
+        "INT-003",
+        "INT-004",
+        "INT-005",
+        "INT-006",
+        "INT-007",
+        "INT-008",
+        "INT-009"
+      ],
+      "failedRules": [
+        "INT-010"
+      ],
+      "blockingConditions": [
+        "Lifecycle implementation_ready is not eligible for canonical promotion.",
+        "IC-001 control is not proven: approved_design_system_usage.",
+        "IC-001 control is not proven: visual_consistency.",
+        "IC-001 control is not proven: component_reuse.",
+        "IC-001 control is not proven: prohibited_duplication_absent.",
+        "IC-001 has no implementation evidence.",
+        "IC-001: Repository-wide design system adoption evidence has not been generated.",
+        "IC-002 control is not proven: component_ownership.",
+        "IC-002 control is not proven: component_versioning.",
+        "IC-002 control is not proven: composition_rules.",
+        "IC-002 control is not proven: lifecycle_management.",
+        "IC-002 has no implementation evidence.",
+        "IC-002: Component ownership, versioning, composition, and lifecycle evidence is incomplete.",
+        "IC-003 control is not proven: spacing_tokens.",
+        "IC-003 control is not proven: typography_tokens.",
+        "IC-003 control is not proven: color_tokens.",
+        "IC-003 control is not proven: theme_tokens.",
+        "IC-003 control is not proven: responsive_tokens.",
+        "IC-003 control is not proven: token_reuse.",
+        "IC-003 has no implementation evidence.",
+        "IC-003: A complete design-token usage and duplication audit is unavailable.",
+        "IC-004 control is not proven: wcag_alignment.",
+        "IC-004 control is not proven: keyboard_navigation.",
+        "IC-004 control is not proven: screen_reader_support.",
+        "IC-004 control is not proven: cognitive_accessibility.",
+        "IC-004 control is not proven: inclusive_interaction.",
+        "IC-004 has no implementation evidence.",
+        "IC-004: Complete automated and manual accessibility evidence is unavailable.",
+        "IC-005 control is not proven: mobile.",
+        "IC-005 control is not proven: tablet.",
+        "IC-005 control is not proven: desktop.",
+        "IC-005 control is not proven: future_device_compatibility.",
+        "IC-005 control is not proven: adaptive_layouts.",
+        "IC-005 has no implementation evidence.",
+        "IC-005: Identity-bound mobile, tablet, desktop, and adaptive-layout evidence is incomplete.",
+        "IC-006 control is not proven: approved_interaction_patterns.",
+        "IC-006 control is not proven: navigation_consistency.",
+        "IC-006 control is not proven: feedback_behavior.",
+        "IC-006 control is not proven: user_decision_support.",
+        "IC-006 has no implementation evidence.",
+        "IC-006: Implemented workflows have not been fully traced to approved interaction patterns.",
+        "IC-007 control is not proven: loading.",
+        "IC-007 control is not proven: empty.",
+        "IC-007 control is not proven: success.",
+        "IC-007 control is not proven: failure.",
+        "IC-007 control is not proven: recovery.",
+        "IC-007 control is not proven: permission.",
+        "IC-007 control is not proven: offline.",
+        "IC-007 has no implementation evidence.",
+        "IC-007: Complete loading, empty, success, failure, recovery, permission, and offline state evidence is unavailable.",
+        "IC-008 control is not proven: performance_expectations.",
+        "IC-008 control is not proven: analytics_requirements.",
+        "IC-008 control is not proven: error_monitoring.",
+        "IC-008 control is not proven: user_behavior_understanding.",
+        "IC-008 control is not proven: system_health_visibility.",
+        "IC-008 has no implementation evidence.",
+        "IC-008: Performance, analytics, monitoring, behavior, and system-health evidence is incomplete.",
+        "Interface validation is not complete.",
+        "All interface certification domains must PASS."
+      ],
+      "promotionRecommendation": {
+        "eligible": false,
+        "action": "BLOCKED",
+        "targetLifecycle": null,
+        "reason": "Promotion is blocked until every required certification rule has explicit passing evidence."
+      }
+    },
+    {
+      "runId": "VOLUME-34:94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8:2026-07-29T04:42:02.114Z",
+      "volume": 34,
+      "volumeId": "VOLUME-34",
+      "volumePath": "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE",
+      "authorityId": "PPS-3400",
+      "lifecycle": "implementation_ready",
+      "lifecycleSource": "implementation_ready",
+      "contentDigest": "94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8",
+      "evaluatedAt": "2026-07-29T04:42:02.114Z",
+      "status": "FAIL",
+      "certificationScore": 90,
+      "rules": [
+        {
+          "id": "INT-001",
+          "name": "Authority Integrity",
+          "passed": true,
+          "evidence": [
+            "Expected authority: PPS-3400",
+            "Discovered path: docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-002",
+          "name": "Architecture Completeness",
+          "passed": true,
+          "evidence": [
+            "11 documents discovered.",
+            "10 documents declared by authority."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-003",
+          "name": "Internal Consistency",
+          "passed": true,
+          "evidence": [
+            "Document identities and parent relationships compared."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-004",
+          "name": "Ecosystem Compatibility",
+          "passed": true,
+          "evidence": [
+            "11 declared dependencies evaluated."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-005",
+          "name": "Multi Operating System Compatibility",
+          "passed": true,
+          "evidence": [
+            "Explicit multi-operating-system contract searched."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-006",
+          "name": "Accessibility Standard",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3405_ACCESSIBILITY_INTERFACE_STANDARD.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-007",
+          "name": "Experience State Coverage",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3406_UI_STATE_ARCHITECTURE.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-008",
+          "name": "Enterprise Quality Standard",
+          "passed": true,
+          "evidence": [
+            "Enterprise quality headings evaluated across the volume."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-009",
+          "name": "PBOS Governance Integration",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3409_INTERFACE_CERTIFICATION_FRAMEWORK.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-010",
+          "name": "Canonical Promotion Readiness",
+          "passed": false,
+          "evidence": [
+            "Current lifecycle: implementation_ready",
+            "Canonical promotion requires explicit certified status.",
+            "pbos/runtime/interface-certification.json"
+          ],
+          "blockingConditions": [
+            "Lifecycle implementation_ready is not eligible for canonical promotion.",
+            "IC-001 control is not proven: approved_design_system_usage.",
+            "IC-001 control is not proven: visual_consistency.",
+            "IC-001 control is not proven: component_reuse.",
+            "IC-001 control is not proven: prohibited_duplication_absent.",
+            "IC-001: The governed design-system reference is defined; repository-wide implementation adoption remains unverified.",
+            "IC-002 control is not proven: component_ownership.",
+            "IC-002 control is not proven: component_versioning.",
+            "IC-002 control is not proven: composition_rules.",
+            "IC-002 control is not proven: lifecycle_management.",
+            "IC-002: The governed component model is defined; implementation ownership, versioning, composition, and lifecycle compliance remain unverified.",
+            "IC-003 control is not proven: spacing_tokens.",
+            "IC-003 control is not proven: typography_tokens.",
+            "IC-003 control is not proven: color_tokens.",
+            "IC-003 control is not proven: theme_tokens.",
+            "IC-003 control is not proven: responsive_tokens.",
+            "IC-003 control is not proven: token_reuse.",
+            "IC-003: The governed token model is defined; implementation usage, reuse, and duplication audits remain unverified.",
+            "IC-004 control is not proven: wcag_alignment.",
+            "IC-004 control is not proven: keyboard_navigation.",
+            "IC-004 control is not proven: screen_reader_support.",
+            "IC-004 control is not proven: cognitive_accessibility.",
+            "IC-004 control is not proven: inclusive_interaction.",
+            "IC-004: The governed accessibility model is defined; automated and manual implementation results remain unverified.",
+            "IC-005 control is not proven: mobile.",
+            "IC-005 control is not proven: tablet.",
+            "IC-005 control is not proven: desktop.",
+            "IC-005 control is not proven: future_device_compatibility.",
+            "IC-005 control is not proven: adaptive_layouts.",
+            "IC-005: The governed responsive model is defined; identity-bound mobile, tablet, desktop, and adaptive implementation results remain unverified.",
+            "IC-006 control is not proven: approved_interaction_patterns.",
+            "IC-006 control is not proven: navigation_consistency.",
+            "IC-006 control is not proven: feedback_behavior.",
+            "IC-006 control is not proven: user_decision_support.",
+            "IC-006: The governed interaction model is defined; implemented workflows remain unverified against approved patterns.",
+            "IC-007 control is not proven: loading.",
+            "IC-007 control is not proven: empty.",
+            "IC-007 control is not proven: success.",
+            "IC-007 control is not proven: failure.",
+            "IC-007 control is not proven: recovery.",
+            "IC-007 control is not proven: permission.",
+            "IC-007 control is not proven: offline.",
+            "IC-007: The governed state model is defined; loading, empty, success, failure, recovery, permission, and offline implementation results remain unverified.",
+            "IC-008 control is not proven: performance_expectations.",
+            "IC-008 control is not proven: analytics_requirements.",
+            "IC-008 control is not proven: error_monitoring.",
+            "IC-008 control is not proven: user_behavior_understanding.",
+            "IC-008 control is not proven: system_health_visibility.",
+            "IC-008: The governed performance and observability model is defined; implementation measurements and operational results remain unverified.",
+            "Interface validation is not complete.",
+            "All interface certification domains must PASS."
+          ]
+        }
+      ],
+      "passedRules": [
+        "INT-001",
+        "INT-002",
+        "INT-003",
+        "INT-004",
+        "INT-005",
+        "INT-006",
+        "INT-007",
+        "INT-008",
+        "INT-009"
+      ],
+      "failedRules": [
+        "INT-010"
+      ],
+      "blockingConditions": [
+        "Lifecycle implementation_ready is not eligible for canonical promotion.",
+        "IC-001 control is not proven: approved_design_system_usage.",
+        "IC-001 control is not proven: visual_consistency.",
+        "IC-001 control is not proven: component_reuse.",
+        "IC-001 control is not proven: prohibited_duplication_absent.",
+        "IC-001: The governed design-system reference is defined; repository-wide implementation adoption remains unverified.",
+        "IC-002 control is not proven: component_ownership.",
+        "IC-002 control is not proven: component_versioning.",
+        "IC-002 control is not proven: composition_rules.",
+        "IC-002 control is not proven: lifecycle_management.",
+        "IC-002: The governed component model is defined; implementation ownership, versioning, composition, and lifecycle compliance remain unverified.",
+        "IC-003 control is not proven: spacing_tokens.",
+        "IC-003 control is not proven: typography_tokens.",
+        "IC-003 control is not proven: color_tokens.",
+        "IC-003 control is not proven: theme_tokens.",
+        "IC-003 control is not proven: responsive_tokens.",
+        "IC-003 control is not proven: token_reuse.",
+        "IC-003: The governed token model is defined; implementation usage, reuse, and duplication audits remain unverified.",
+        "IC-004 control is not proven: wcag_alignment.",
+        "IC-004 control is not proven: keyboard_navigation.",
+        "IC-004 control is not proven: screen_reader_support.",
+        "IC-004 control is not proven: cognitive_accessibility.",
+        "IC-004 control is not proven: inclusive_interaction.",
+        "IC-004: The governed accessibility model is defined; automated and manual implementation results remain unverified.",
+        "IC-005 control is not proven: mobile.",
+        "IC-005 control is not proven: tablet.",
+        "IC-005 control is not proven: desktop.",
+        "IC-005 control is not proven: future_device_compatibility.",
+        "IC-005 control is not proven: adaptive_layouts.",
+        "IC-005: The governed responsive model is defined; identity-bound mobile, tablet, desktop, and adaptive implementation results remain unverified.",
+        "IC-006 control is not proven: approved_interaction_patterns.",
+        "IC-006 control is not proven: navigation_consistency.",
+        "IC-006 control is not proven: feedback_behavior.",
+        "IC-006 control is not proven: user_decision_support.",
+        "IC-006: The governed interaction model is defined; implemented workflows remain unverified against approved patterns.",
+        "IC-007 control is not proven: loading.",
+        "IC-007 control is not proven: empty.",
+        "IC-007 control is not proven: success.",
+        "IC-007 control is not proven: failure.",
+        "IC-007 control is not proven: recovery.",
+        "IC-007 control is not proven: permission.",
+        "IC-007 control is not proven: offline.",
+        "IC-007: The governed state model is defined; loading, empty, success, failure, recovery, permission, and offline implementation results remain unverified.",
+        "IC-008 control is not proven: performance_expectations.",
+        "IC-008 control is not proven: analytics_requirements.",
+        "IC-008 control is not proven: error_monitoring.",
+        "IC-008 control is not proven: user_behavior_understanding.",
+        "IC-008 control is not proven: system_health_visibility.",
+        "IC-008: The governed performance and observability model is defined; implementation measurements and operational results remain unverified.",
+        "Interface validation is not complete.",
+        "All interface certification domains must PASS."
+      ],
+      "promotionRecommendation": {
+        "eligible": false,
+        "action": "BLOCKED",
+        "targetLifecycle": null,
+        "reason": "Promotion is blocked until every required certification rule has explicit passing evidence."
+      }
+    },
+    {
+      "runId": "VOLUME-34:94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8:2026-07-29T04:58:54.751Z",
+      "volume": 34,
+      "volumeId": "VOLUME-34",
+      "volumePath": "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE",
+      "authorityId": "PPS-3400",
+      "lifecycle": "implementation_ready",
+      "lifecycleSource": "implementation_ready",
+      "contentDigest": "94df621cd06d9ae6a9d06f8aa160f8790a2ab060c8db5d7ad33b63606ca145f8",
+      "evaluatedAt": "2026-07-29T04:58:54.751Z",
+      "status": "FAIL",
+      "certificationScore": 90,
+      "rules": [
+        {
+          "id": "INT-001",
+          "name": "Authority Integrity",
+          "passed": true,
+          "evidence": [
+            "Expected authority: PPS-3400",
+            "Discovered path: docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-002",
+          "name": "Architecture Completeness",
+          "passed": true,
+          "evidence": [
+            "11 documents discovered.",
+            "10 documents declared by authority."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-003",
+          "name": "Internal Consistency",
+          "passed": true,
+          "evidence": [
+            "Document identities and parent relationships compared."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-004",
+          "name": "Ecosystem Compatibility",
+          "passed": true,
+          "evidence": [
+            "11 declared dependencies evaluated."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-005",
+          "name": "Multi Operating System Compatibility",
+          "passed": true,
+          "evidence": [
+            "Explicit multi-operating-system contract searched."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-006",
+          "name": "Accessibility Standard",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3405_ACCESSIBILITY_INTERFACE_STANDARD.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-007",
+          "name": "Experience State Coverage",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3406_UI_STATE_ARCHITECTURE.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-008",
+          "name": "Enterprise Quality Standard",
+          "passed": true,
+          "evidence": [
+            "Enterprise quality headings evaluated across the volume."
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-009",
+          "name": "PBOS Governance Integration",
+          "passed": true,
+          "evidence": [
+            "docs/CONSTITUTION/VOLUME_34_INTERFACE_SYSTEM_ARCHITECTURE/PPS-3409_INTERFACE_CERTIFICATION_FRAMEWORK.md"
+          ],
+          "blockingConditions": []
+        },
+        {
+          "id": "INT-010",
+          "name": "Canonical Promotion Readiness",
+          "passed": false,
+          "evidence": [
+            "Current lifecycle: implementation_ready",
+            "Canonical promotion requires explicit certified status.",
+            "pbos/runtime/interface-certification.json"
+          ],
+          "blockingConditions": [
+            "Lifecycle implementation_ready is not eligible for canonical promotion.",
+            "IC-001 control is not proven: approved_design_system_usage.",
+            "IC-001 control is not proven: visual_consistency.",
+            "IC-001 control is not proven: component_reuse.",
+            "IC-001 control is not proven: prohibited_duplication_absent.",
+            "IC-001: The governed design-system reference is defined; repository-wide implementation adoption remains unverified.",
+            "IC-002 control is not proven: component_ownership.",
+            "IC-002 control is not proven: component_versioning.",
+            "IC-002 control is not proven: composition_rules.",
+            "IC-002 control is not proven: lifecycle_management.",
+            "IC-002: The governed component model is defined; implementation ownership, versioning, composition, and lifecycle compliance remain unverified.",
+            "IC-003 control is not proven: spacing_tokens.",
+            "IC-003 control is not proven: typography_tokens.",
+            "IC-003 control is not proven: color_tokens.",
+            "IC-003 control is not proven: theme_tokens.",
+            "IC-003 control is not proven: responsive_tokens.",
+            "IC-003 control is not proven: token_reuse.",
+            "IC-003: The governed token model is defined; implementation usage, reuse, and duplication audits remain unverified.",
+            "IC-004 control is not proven: wcag_alignment.",
+            "IC-004 control is not proven: keyboard_navigation.",
+            "IC-004 control is not proven: screen_reader_support.",
+            "IC-004 control is not proven: cognitive_accessibility.",
+            "IC-004 control is not proven: inclusive_interaction.",
+            "IC-004: The governed accessibility model is defined; automated and manual implementation results remain unverified.",
+            "IC-005 control is not proven: mobile.",
+            "IC-005 control is not proven: tablet.",
+            "IC-005 control is not proven: desktop.",
+            "IC-005 control is not proven: future_device_compatibility.",
+            "IC-005 control is not proven: adaptive_layouts.",
+            "IC-005: The governed responsive model is defined; identity-bound mobile, tablet, desktop, and adaptive implementation results remain unverified.",
+            "IC-006 control is not proven: approved_interaction_patterns.",
+            "IC-006 control is not proven: navigation_consistency.",
+            "IC-006 control is not proven: feedback_behavior.",
+            "IC-006 control is not proven: user_decision_support.",
+            "IC-006: The governed interaction model is defined; implemented workflows remain unverified against approved patterns.",
+            "IC-007 control is not proven: loading.",
+            "IC-007 control is not proven: empty.",
+            "IC-007 control is not proven: success.",
+            "IC-007 control is not proven: failure.",
+            "IC-007 control is not proven: recovery.",
+            "IC-007 control is not proven: permission.",
+            "IC-007 control is not proven: offline.",
+            "IC-007: The governed state model is defined; loading, empty, success, failure, recovery, permission, and offline implementation results remain unverified.",
+            "IC-008 control is not proven: performance_expectations.",
+            "IC-008 control is not proven: analytics_requirements.",
+            "IC-008 control is not proven: error_monitoring.",
+            "IC-008 control is not proven: user_behavior_understanding.",
+            "IC-008 control is not proven: system_health_visibility.",
+            "IC-008: The governed performance and observability model is defined; implementation measurements and operational results remain unverified.",
+            "Interface validation is not complete.",
+            "All interface certification domains must PASS."
+          ]
+        }
+      ],
+      "passedRules": [
+        "INT-001",
+        "INT-002",
+        "INT-003",
+        "INT-004",
+        "INT-005",
+        "INT-006",
+        "INT-007",
+        "INT-008",
+        "INT-009"
+      ],
+      "failedRules": [
+        "INT-010"
+      ],
+      "blockingConditions": [
+        "Lifecycle implementation_ready is not eligible for canonical promotion.",
+        "IC-001 control is not proven: approved_design_system_usage.",
+        "IC-001 control is not proven: visual_consistency.",
+        "IC-001 control is not proven: component_reuse.",
+        "IC-001 control is not proven: prohibited_duplication_absent.",
+        "IC-001: The governed design-system reference is defined; repository-wide implementation adoption remains unverified.",
+        "IC-002 control is not proven: component_ownership.",
+        "IC-002 control is not proven: component_versioning.",
+        "IC-002 control is not proven: composition_rules.",
+        "IC-002 control is not proven: lifecycle_management.",
+        "IC-002: The governed component model is defined; implementation ownership, versioning, composition, and lifecycle compliance remain unverified.",
+        "IC-003 control is not proven: spacing_tokens.",
+        "IC-003 control is not proven: typography_tokens.",
+        "IC-003 control is not proven: color_tokens.",
+        "IC-003 control is not proven: theme_tokens.",
+        "IC-003 control is not proven: responsive_tokens.",
+        "IC-003 control is not proven: token_reuse.",
+        "IC-003: The governed token model is defined; implementation usage, reuse, and duplication audits remain unverified.",
+        "IC-004 control is not proven: wcag_alignment.",
+        "IC-004 control is not proven: keyboard_navigation.",
+        "IC-004 control is not proven: screen_reader_support.",
+        "IC-004 control is not proven: cognitive_accessibility.",
+        "IC-004 control is not proven: inclusive_interaction.",
+        "IC-004: The governed accessibility model is defined; automated and manual implementation results remain unverified.",
+        "IC-005 control is not proven: mobile.",
+        "IC-005 control is not proven: tablet.",
+        "IC-005 control is not proven: desktop.",
+        "IC-005 control is not proven: future_device_compatibility.",
+        "IC-005 control is not proven: adaptive_layouts.",
+        "IC-005: The governed responsive model is defined; identity-bound mobile, tablet, desktop, and adaptive implementation results remain unverified.",
+        "IC-006 control is not proven: approved_interaction_patterns.",
+        "IC-006 control is not proven: navigation_consistency.",
+        "IC-006 control is not proven: feedback_behavior.",
+        "IC-006 control is not proven: user_decision_support.",
+        "IC-006: The governed interaction model is defined; implemented workflows remain unverified against approved patterns.",
+        "IC-007 control is not proven: loading.",
+        "IC-007 control is not proven: empty.",
+        "IC-007 control is not proven: success.",
+        "IC-007 control is not proven: failure.",
+        "IC-007 control is not proven: recovery.",
+        "IC-007 control is not proven: permission.",
+        "IC-007 control is not proven: offline.",
+        "IC-007: The governed state model is defined; loading, empty, success, failure, recovery, permission, and offline implementation results remain unverified.",
+        "IC-008 control is not proven: performance_expectations.",
+        "IC-008 control is not proven: analytics_requirements.",
+        "IC-008 control is not proven: error_monitoring.",
+        "IC-008 control is not proven: user_behavior_understanding.",
+        "IC-008 control is not proven: system_health_visibility.",
+        "IC-008: The governed performance and observability model is defined; implementation measurements and operational results remain unverified.",
+        "Interface validation is not complete.",
+        "All interface certification domains must PASS."
+      ],
+      "promotionRecommendation": {
+        "eligible": false,
+        "action": "BLOCKED",
+        "targetLifecycle": null,
+        "reason": "Promotion is blocked until every required certification rule has explicit passing evidence."
+      }
+    }
+  ]
+}
