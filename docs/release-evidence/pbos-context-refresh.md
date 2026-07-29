@@ -2,26 +2,25 @@
 
 ## Identity
 
-- Context identity: `9a7833ecf698a15deb24099ba6993599a72e0f77364b40ab752f2fadcc0b8177`
-- Previous identity: `6e11408c4eb3237eca472882222c09c0d7b95fe4ce9fd700ac52c6d7b84f5aa3`
+- Context identity: `461682112049af6d5c2f5f32253a0c69e37e3b9dcf110fd8a684c5d732be075d`
+- Previous identity: `aecdc3e3fe19e0bcfffff2830fe5440c217a290cfaefe1d452d52d1ef41edc0a`
 - Repository: playbook-platform
 - Root: `/Users/bulletproof/playbook-platform`
 - Remote: origin (https://github.com/sgwalton87/playbook-platform.git)
 - Branch: pbos/post-pps300-convergence
-- Commit: `133eef20802f536e00aed91d3cad0133612f176f`
-- Working tree digest: `35eb3a1a798a65496b71989487f914b20db030683b64a1e96741444a892a1720`
-- Captured at: 2026-07-29T07:18:04.993Z
+- Commit: `f27ac2104460d80b403ed8d9d813e04dac500531`
+- Working tree digest: `b8fa2aef3db95c7b1ec291f7f898e4f78d6ab58ce6d44d95aac93396467c66e4`
+- Captured at: 2026-07-29T07:39:08.291Z
 
 ## Refresh
 
-- Reason: PBOS-LIFECYCLE-GOVERNANCE-001 post-commit synchronization
+- Reason: Operator-requested repository context synchronization.
 - Validator: PBOS-CONTEXT-VALIDATOR@1.1.0
 - Generation result: PASS
-- History entries: 15
+- History entries: 17
 
 ## Triggering Conditions
 
-- Context validation failed: commit identity mismatches.
 - Context validation failed: working tree state changed after capture.
 
 ## Runtime Artifact Inventory
