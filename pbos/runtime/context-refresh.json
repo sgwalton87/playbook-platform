@@ -2,15 +2,15 @@
   "version": "1.0.0",
   "owner": "repository-context",
   "latest": {
-    "id": "0521af1caccb3afcbeba3d699bfe048367cad315bcedd9f69a4f03b4a2899bfd",
-    "previousContextIdentity": "b28403a003b897586d71260646d2bb3f15df029fec8efbcfc5c382e6bd30601e",
-    "newContextIdentity": "22a939f42080b0ef33ceba31ba108d5d43574310a0993a110754d90ee8e51ea8",
+    "id": "c26308fdffb45cb7d7fd2056b34db02aac074d1b1aed17ed45030bf746aba42f",
+    "previousContextIdentity": "22a939f42080b0ef33ceba31ba108d5d43574310a0993a110754d90ee8e51ea8",
+    "newContextIdentity": "070a3247199e3f933147c46e79c57dcdb04ba7ac6bea151530f544af7b9e73df",
     "reason": "Operator-requested repository context synchronization.",
     "triggeringConditions": [
       "Context validation failed: commit identity mismatches.",
       "Context validation failed: working tree state changed after capture."
     ],
-    "timestamp": "2026-07-29T10:10:18.697Z",
+    "timestamp": "2026-07-29T10:25:29.823Z",
     "validator": {
       "id": "PBOS-CONTEXT-VALIDATOR",
       "version": "1.1.0"
@@ -407,6 +407,22 @@
         "Context validation failed: working tree state changed after capture."
       ],
       "timestamp": "2026-07-29T10:10:18.697Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "c26308fdffb45cb7d7fd2056b34db02aac074d1b1aed17ed45030bf746aba42f",
+      "previousContextIdentity": "22a939f42080b0ef33ceba31ba108d5d43574310a0993a110754d90ee8e51ea8",
+      "newContextIdentity": "070a3247199e3f933147c46e79c57dcdb04ba7ac6bea151530f544af7b9e73df",
+      "reason": "Operator-requested repository context synchronization.",
+      "triggeringConditions": [
+        "Context validation failed: commit identity mismatches.",
+        "Context validation failed: working tree state changed after capture."
+      ],
+      "timestamp": "2026-07-29T10:25:29.823Z",
       "validator": {
         "id": "PBOS-CONTEXT-VALIDATOR",
         "version": "1.1.0"

@@ -261,7 +261,7 @@ Required:
 
 # Certification Lifecycle
 
-The certification lifecycle is:
+The following is the internal lifecycle of a certification attempt, not the canonical objective lifecycle:
 
 
 PROPOSED
@@ -292,6 +292,8 @@ REVOKED
 
 
 Skipped lifecycle transitions are prohibited.
+
+Only a valid certification result may provide evidence for the objective transition `VALIDATING → CERTIFIED`. Certification cannot write objective state.
 
 
 ---

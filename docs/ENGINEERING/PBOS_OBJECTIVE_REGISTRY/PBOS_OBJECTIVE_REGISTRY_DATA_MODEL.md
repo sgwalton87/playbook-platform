@@ -283,15 +283,17 @@ Required:
 Example states:
 
 - PROPOSED
-- SUBMITTED
 - REVIEWED
-- APPROVED
 - REGISTERED
 - ELIGIBLE
-- HANDOFF_READY
-- CONSUMED
-- COMPLETED
+- PLANNED
+- AUTHORIZED
+- EXECUTING
+- VALIDATING
+- CERTIFIED
 - ARCHIVED
+
+This list is normative through `PBOS_OBJECTIVE_REGISTRY_LIFECYCLE_ALIGNMENT_STANDARD.md`. Subsystem-local and retired terms cannot be stored as current objective state.
 
 ---
 
@@ -417,4 +419,3 @@ The Objective Registry Data Model succeeds when every objective can answer:
 - What evidence supports it?
 - Where is it in its lifecycle?
 - What happened historically?
-

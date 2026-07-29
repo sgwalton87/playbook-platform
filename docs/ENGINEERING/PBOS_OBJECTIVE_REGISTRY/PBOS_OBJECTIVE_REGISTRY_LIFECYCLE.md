@@ -2,10 +2,11 @@
 
 ## Document Status
 
-Status: Canonical Draft  
+Status: Superseded Draft
 Authority: Playbook Operating System (PBOS)  
 Layer: Governance Lifecycle  
 Parent System: PBOS Objective Registry
+Superseded By: PBOS Objective Registry Lifecycle Alignment Standard
 
 Dependencies:
 
@@ -14,6 +15,10 @@ Dependencies:
 - PBOS Lifecycle Governance Architecture
 
 ---
+
+## Canonical Alignment Notice
+
+The state vocabulary and transitions in this draft are retained as historical foundation material. Current objective state is governed exclusively by `PBOS_OBJECTIVE_REGISTRY_LIFECYCLE_ALIGNMENT_STANDARD.md`. Terms such as `SUBMITTED`, `APPROVED`, `HANDOFF_READY`, `CONSUMED`, and `COMPLETED` are not writable current objective states.
 
 # Purpose
 
@@ -344,4 +349,3 @@ The Objective Registry Lifecycle succeeds when PBOS can answer:
 4. What dependencies exist?
 5. Is it ready?
 6. What evidence proves completion?
-

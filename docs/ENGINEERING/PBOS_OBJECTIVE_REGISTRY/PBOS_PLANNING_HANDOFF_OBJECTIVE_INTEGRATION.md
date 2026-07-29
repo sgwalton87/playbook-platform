@@ -275,10 +275,14 @@ Any attempt must fail closed.
 
 # Lifecycle Relationship
 
-The objective lifecycle is:
+The canonical objective lifecycle is:
 
 
 PROPOSED
+
+↓
+
+REVIEWED
 
 ↓
 
@@ -286,15 +290,7 @@ REGISTERED
 
 ↓
 
-EVALUATED
-
-↓
-
 ELIGIBLE
-
-↓
-
-HANDED OFF
 
 ↓
 
@@ -302,18 +298,26 @@ PLANNED
 
 ↓
 
+AUTHORIZED
+
+↓
+
 EXECUTING
 
 ↓
 
-COMPLETED
+VALIDATING
+
+↓
+
+CERTIFIED
 
 ↓
 
 ARCHIVED
 
 
-Transitions must remain governed by authorized systems.
+Planning Handoff produces eligibility and planning evidence. It does not own a `HANDED_OFF` objective state and cannot persist transitions. All transitions remain governed by `PBOS_OBJECTIVE_REGISTRY_LIFECYCLE_ALIGNMENT_STANDARD.md`.
 
 
 ---

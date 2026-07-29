@@ -2,22 +2,22 @@
 
 ## Identity
 
-- Context identity: `22a939f42080b0ef33ceba31ba108d5d43574310a0993a110754d90ee8e51ea8`
-- Previous identity: `b28403a003b897586d71260646d2bb3f15df029fec8efbcfc5c382e6bd30601e`
+- Context identity: `070a3247199e3f933147c46e79c57dcdb04ba7ac6bea151530f544af7b9e73df`
+- Previous identity: `22a939f42080b0ef33ceba31ba108d5d43574310a0993a110754d90ee8e51ea8`
 - Repository: playbook-platform
 - Root: `/Users/bulletproof/playbook-platform`
 - Remote: origin (https://github.com/sgwalton87/playbook-platform.git)
 - Branch: pbos/post-pps300-convergence
-- Commit: `bf22a1764e40dd84923ae5b176039f1b60887779`
-- Working tree digest: `25028581e2ec7995407fa9f49391b358a4fec856b773dc57d10277e412152906`
-- Captured at: 2026-07-29T10:10:18.697Z
+- Commit: `b155ccc9e629bf3da3dfd296e3b968a33b1cce69`
+- Working tree digest: `ed4ccabef8bb193ff5eee64176e5c966de34ac7bdf962c77bf0fb1a8fa9afac2`
+- Captured at: 2026-07-29T10:25:29.823Z
 
 ## Refresh
 
 - Reason: Operator-requested repository context synchronization.
 - Validator: PBOS-CONTEXT-VALIDATOR@1.1.0
 - Generation result: PASS
-- History entries: 25
+- History entries: 26
 
 ## Triggering Conditions
 

@@ -46,11 +46,11 @@ The implementation must never bypass PBOS governance.
 The Objective Registry implementation owns:
 
 - objective storage model,
-- objective lifecycle management,
+- objective state custody and State Writer implementation,
 - objective identity,
 - objective lineage,
 - objective evidence requirements,
-- objective evaluation.
+- objective evaluation artifact storage.
 
 The implementation does not own:
 
@@ -70,7 +70,7 @@ Responsible for:
 
 - creating objectives,
 - retrieving objectives,
-- maintaining objective state,
+- persisting objective state only from a Lifecycle Governance-approved transition envelope,
 - preserving objective history.
 
 ---
@@ -86,15 +86,16 @@ Responsible for:
 
 ---
 
-## Objective Lifecycle Manager
+## Objective State Writer And Transition Validator
 
 Responsible for:
 
-- enforcing allowed transitions,
+- validating approved adjacent transition envelopes,
 - rejecting invalid transitions,
-- preserving lifecycle history.
+- preserving lifecycle history,
+- performing idempotent compare-and-append persistence.
 
-The lifecycle manager must fail closed.
+It does not decide transitions. PBOS Lifecycle Governance is the sole transition decision authority. The State Writer must fail closed.
 
 ---
 
@@ -296,4 +297,3 @@ The Objective Registry implementation succeeds when PBOS can:
 The Objective Registry is not an automation shortcut.
 
 It is the governance foundation that allows PBOS to scale responsibly.
-

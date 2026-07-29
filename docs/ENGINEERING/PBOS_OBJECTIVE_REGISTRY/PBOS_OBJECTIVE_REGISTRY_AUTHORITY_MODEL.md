@@ -2,10 +2,11 @@
 
 ## Document Status
 
-Status: Canonical Draft  
+Status: Superseded Draft
 Authority: Playbook Operating System (PBOS)  
 Layer: Governance Architecture  
 Parent System: PBOS Objective Registry
+Superseded By: PBOS Objective State Authority Contract
 
 Dependencies:
 
@@ -15,6 +16,10 @@ Dependencies:
 - PBOS Planning Handoff Architecture
 
 ---
+
+## Canonical Authority Notice
+
+This draft is retained as foundation history. `PBOS_OBJECTIVE_STATE_AUTHORITY_CONTRACT.md` is the canonical authority for objective decisions, transitions, evidence, persistence, audit, and conflict resolution.
 
 # Purpose
 
@@ -258,4 +263,3 @@ The authority model succeeds when any stakeholder can ask:
 "Who owns this decision?"
 
 and PBOS can provide an unambiguous answer.
-
