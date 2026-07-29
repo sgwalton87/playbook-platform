@@ -21,9 +21,12 @@ import {
 } from "./dispatch";
 import type { ExecutionPlan } from "./types";
 import path from "node:path";
+import {
+  decodeCodexWorkPackage,
+  decodeExecutionContract,
+} from "../runtime/artifact-decoders";
 
-export function runExecutionEngine(
-  dispatch: ExecutionDispatcher = dispatchExecutionAdapter,
+export function evaluateExecutionEligibility(
   rootDir = process.cwd()
 ): ExecutionPlan {
   const context = loadExecutionContext(rootDir);
@@ -53,11 +56,11 @@ export function runExecutionEngine(
         };
       }
 
-      contract = Runtime.load<ExecutionContract>(
-        path.join(rootDir, Artifacts.executionContract)
+      contract = decodeExecutionContract(
+        Runtime.load(path.join(rootDir, Artifacts.executionContract))
       );
-      workPackage = Runtime.load<CodexWorkPackage>(
-        path.join(rootDir, Artifacts.workPackage)
+      workPackage = decodeCodexWorkPackage(
+        Runtime.load(path.join(rootDir, Artifacts.workPackage))
       );
     } else {
       contract = generateExecutionContract(
@@ -112,6 +115,14 @@ export function runExecutionEngine(
     tasks: plan.tasks,
   };
 
+  return eligiblePlan;
+}
+
+export function runExecutionEngine(
+  dispatch: ExecutionDispatcher = dispatchExecutionAdapter,
+  rootDir = process.cwd()
+): ExecutionPlan {
+  const eligiblePlan = evaluateExecutionEligibility(rootDir);
   return eligiblePlan.status === "READY"
     ? dispatch(eligiblePlan)
     : eligiblePlan;

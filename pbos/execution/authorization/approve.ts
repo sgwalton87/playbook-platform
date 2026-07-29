@@ -1,5 +1,6 @@
 import path from "node:path";
 import { Runtime, Artifacts } from "../../kernel";
+import { decodeExecutionAuthorization } from "../../runtime/artifact-decoders";
 import type { ExecutionAuthorizationRecord, AuthorizationStatus } from "./types";
 
 /**
@@ -22,9 +23,7 @@ export function approveExecutionAuthorization(
     Artifacts.executionAuthorization
   );
 
-  const authorization = Runtime.load<ExecutionAuthorizationRecord>(
-    artifactPath
-  );
+  const authorization = decodeExecutionAuthorization(Runtime.load(artifactPath));
 
   assertDecisionTransition(authorization, "AUTHORIZED");
 
@@ -61,9 +60,7 @@ export function denyExecutionAuthorization(
     Artifacts.executionAuthorization
   );
 
-  const authorization = Runtime.load<ExecutionAuthorizationRecord>(
-    artifactPath
-  );
+  const authorization = decodeExecutionAuthorization(Runtime.load(artifactPath));
 
   assertDecisionTransition(authorization, "DENIED");
 
@@ -102,9 +99,7 @@ export function setAuthorizationStatus(
     Artifacts.executionAuthorization
   );
 
-  const authorization = Runtime.load<ExecutionAuthorizationRecord>(
-    artifactPath
-  );
+  const authorization = decodeExecutionAuthorization(Runtime.load(artifactPath));
 
   assertDecisionTransition(authorization, status);
 

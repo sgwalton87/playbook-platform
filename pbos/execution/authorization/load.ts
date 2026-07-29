@@ -1,5 +1,6 @@
 import path from "node:path";
 import { Runtime, Artifacts } from "../../kernel";
+import { decodeExecutionAuthorization } from "../../runtime/artifact-decoders";
 import type { ExecutionAuthorizationRecord } from "./types";
 
 /**
@@ -19,9 +20,7 @@ export function loadExecutionAuthorization(
     Artifacts.executionAuthorization
   );
 
-  return Runtime.load<ExecutionAuthorizationRecord>(
-    artifactPath
-  );
+  return decodeExecutionAuthorization(Runtime.load(artifactPath));
 }
 
 /**
@@ -42,7 +41,5 @@ export function loadExecutionAuthorizationOrUndefined(
     return undefined;
   }
 
-  return Runtime.load<ExecutionAuthorizationRecord>(
-    artifactPath
-  );
+  return decodeExecutionAuthorization(Runtime.load(artifactPath));
 }
