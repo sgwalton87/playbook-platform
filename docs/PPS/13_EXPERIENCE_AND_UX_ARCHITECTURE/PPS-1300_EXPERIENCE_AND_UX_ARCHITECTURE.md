@@ -22,6 +22,7 @@ related:
   - PPS-1307
   - PPS-1308
   - PPS-1309
+  - PPS-3300
 last_updated: 2026-07-25
 ---
 
@@ -35,13 +36,13 @@ The objective is to deliver experiences that are intuitive, inclusive, consisten
 
 # Scope
 
-Applies to every interface, workflow, dashboard, interaction, operating system, device, notification, onboarding flow, accessibility feature, and future user experience.
+This document preserves the Volume 13 domain architecture that informed the canonical User Experience Architecture. PPS-3300 governs every interface, workflow, dashboard, interaction, operating system, device, notification, onboarding flow, accessibility feature, and future user experience.
 
 ---
 
 # Authority
 
-Every user experience shall conform to constitutional experience principles regardless of implementation technology.
+PPS-3300 is the exclusive constitutional authority for human experience. PPS-1300 and PPS-1301 through PPS-1310 remain canonical upstream domain standards and repository evidence subordinate to PPS-3300 where user-experience authority is concerned.
 
 ---
 
@@ -95,4 +96,4 @@ Every user experience follows constitutional UX standards across every Playbook 
 
 - PPS-600 Platform Architecture
 - PPS-1200 AI and Intelligence Architecture
-
+- PPS-3300 User Experience Constitutional Framework

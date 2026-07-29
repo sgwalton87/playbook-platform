@@ -43,6 +43,8 @@
     "pbos:complete": "tsx pbos/commands/complete.ts",
     "pbos:activate": "tsx pbos/commands/activate.ts",
     "pbos:execute": "tsx pbos/commands/execute.ts",
+    "pbos:certify-volume": "tsx pbos/commands/certify-volume.ts",
+    "pbos:promote-volume": "tsx pbos/commands/promote-volume.ts",
     "test:e2e": "playwright test"
   },
   "dependencies": {

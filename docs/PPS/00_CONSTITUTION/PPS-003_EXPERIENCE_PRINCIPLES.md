@@ -179,6 +179,10 @@ PBOS shall:
 - Verify required user feedback states.
 - Ensure constitutional compliance.
 
+Volume 33 Integration
+
+PPS-3300 inherits and normalizes these foundational principles as the exclusive constitutional User Experience Architecture. PPS-003 remains the upstream principle source; Volume 33 provides deterministic journey, workflow, interaction, feedback, continuity, accessibility, quality, authority, and PBOS certification contracts.
+
 Definition of Done
 
 Experience philosophy established.
@@ -190,4 +194,3 @@ Accessibility requirements defined.
 Feedback requirements defined.
 
 Recognition framework established.
-

@@ -86,6 +86,11 @@ Before the PBOS runtime enters its execution phase, it validates `pbos/runtime/r
 
 Context validation is fail-closed and precedes execution authorization. Missing, stale, changed, or conflicting context prevents execution engines from running and records a runtime blocker. PBOS never refreshes context implicitly during execution; an intentional repository or runtime transition requires an explicit new capture.
 
+PBOS runtime artifact ownership and test isolation are governed by
+[`docs/ENGINEERING/PBOS_RUNTIME_ISOLATION.md`](./ENGINEERING/PBOS_RUNTIME_ISOLATION.md).
+Runtime tests use explicit temporary roots and may not consume repository
+runtime state.
+
 ### Canonical Gate Lifecycle
 PBOS gates use exactly four lifecycle states: `proposed`, `in_progress`, `blocked`, and `complete`. The canonical transitions are `proposed → in_progress`, `in_progress → blocked`, `blocked → in_progress`, and `in_progress → complete`.
 
