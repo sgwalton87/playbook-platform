@@ -88,6 +88,20 @@ Each Role Operating System shall declare:
 
 Every child Role Operating System specification shall contain the section structure defined by the Volume 31 README and shall provide role-specific constitutional framing in every section. Empty headings are invalid.
 
+# Child Role Specification Dependency Contract
+
+PPS-3100 is the canonical parent and shared authority for all child Role Operating System specifications. It establishes the universal role contract but does not, by itself, certify any individual role experience.
+
+Every future child specification shall:
+
+- Declare PPS-3100 as its parent and resolve all inherited dependencies.
+- Define the role's authorized responsibilities, goals, permissions, application composition, workflows, data visibility, relationships, accessibility obligations, and validation evidence.
+- Inherit PPS-3100 and applicable Volume 33 experience invariants without weakening either authority.
+- Use registered product and application identifiers rather than inventing capabilities.
+- Remain incomplete for implementation authorization until its identity, dependencies, and evidence validate.
+
+Volume 33 consumes PPS-3100 for universal role-aware experience rules and consumes the applicable child specification for concrete role journeys, navigation, permissions, and handoffs. Until child specifications exist, PBOS shall classify role-specific certification as an incomplete future dependency, not as a defect in PPS-3100 or Volume 33.
+
 # Operating System Lifecycle
 
 Role Operating System specifications use the document lifecycle defined by PPS-008:
@@ -149,9 +163,9 @@ Role Operating Systems consume identity, the Scholar Record, shared experiences,
 
 Volume 30 defines product artifact registries. Volume 31 binds registered artifacts to role responsibilities and permission contexts. A child specification shall reference Volume 30 identifiers rather than invent product architecture.
 
-# Relationship to Future Platform Application Architecture
+# Relationship to Platform Application Architecture
 
-Future application architecture may map Role Operating System contracts to routes, modules, services, deployment units, and runtime composition. It shall preserve the authority, permissions, reuse requirements, and cross-OS contracts established here.
+Volume 32 maps Role Operating System contracts to shared Platform Applications and their governed composition. It shall preserve the authority, permissions, reuse requirements, and cross-OS contracts established here. Implementation details remain governed by downstream specifications.
 
 # PBOS Responsibilities
 
@@ -210,3 +224,4 @@ PPS-3100 is complete when the Role Operating System contract, inheritance rules,
 - PPS-500 Operating Systems Architecture
 - PPS-3000 Product Architecture Overview
 - PPS-3190 through PPS-3195 Volume 31 Standards
+- PPS-3200 Platform Application Constitutional Framework

@@ -29,7 +29,8 @@ export function runDoctorCommand() {
 
   Runtime.save(
     Artifacts.doctor,
-    report
+    report,
+    "doctor-engine"
   );
 
   Logger.blank();

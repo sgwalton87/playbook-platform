@@ -3,6 +3,7 @@
 import path from "node:path";
 import fs from "node:fs";
 import { transitionGate } from "../lifecycle";
+import { Artifacts, Runtime } from "../kernel";
 
 async function main() {
 
@@ -93,18 +94,14 @@ async function main() {
 
   const artifactPath = path.join(
     root,
-    "pbos/runtime",
-    "activation.json"
+    Artifacts.activation
   );
 
 
-  fs.writeFileSync(
+  Runtime.save(
     artifactPath,
-    JSON.stringify(
-      result,
-      null,
-      2
-    ) + "\n"
+    result,
+    "gate-lifecycle"
   );
 
 

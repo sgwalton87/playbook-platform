@@ -1,18 +1,14 @@
-import fs from "fs";
-
 import { RepositoryAnalysis } from "./types";
+import { Artifacts, Runtime } from "../kernel";
 
 export function writeRepositoryAnalysis(
   report: RepositoryAnalysis
 ) {
 
-  fs.mkdirSync("pbos/runtime",{
-    recursive:true,
-  });
-
-  fs.writeFileSync(
-    "pbos/runtime/repository-analysis.json",
-    JSON.stringify(report,null,2)
+  Runtime.save(
+    Artifacts.repositoryAnalysis,
+    report,
+    "repository-inspector"
   );
 
 }

@@ -7,6 +7,7 @@ import { createReport, writeReport } from "./reporter";
 import { loadState, saveState, updateStateForPlanning } from "./state";
 import { validateGatePlanning } from "./validator";
 import type { ExecutionMode } from "./types";
+import { verifyStoredRepositoryContext } from "../context";
 
 function parseMode(mode: string | undefined): ExecutionMode {
   const requested = mode ?? "planning";
@@ -18,6 +19,12 @@ function parseMode(mode: string | undefined): ExecutionMode {
 
 export async function runNext(rootDir = process.cwd(), requestedMode?: string): Promise<string> {
   const startedAt = Date.now();
+  const context = verifyStoredRepositoryContext(rootDir);
+  if (!context.valid) {
+    throw new Error(
+      `PBOS planning denied: repository context is invalid.\n${context.errors.join("\n")}`
+    );
+  }
   const config = await loadConfig(rootDir);
   const mode = parseMode(requestedMode ?? config.defaultMode);
   if (mode !== "planning") {

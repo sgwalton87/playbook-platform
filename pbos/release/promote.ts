@@ -1,5 +1,6 @@
-import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { Artifacts, Runtime } from "../kernel";
 
 export interface PromotionResult {
   gateId: string;
@@ -85,27 +86,10 @@ export async function promoteGate(
   };
 
 
-  const artifactDirectory = path.join(
-    rootDir,
-    "pbos/runtime"
-  );
-
-  await mkdir(
-    artifactDirectory,
-    { recursive: true }
-  );
-
-
-  await writeFile(
-    path.join(
-      artifactDirectory,
-      "promotion.json"
-    ),
-    JSON.stringify(
-      result,
-      null,
-      2
-    ) + "\n"
+  Runtime.save(
+    path.join(rootDir, Artifacts.promotion),
+    result,
+    "release-promotion"
   );
 
 

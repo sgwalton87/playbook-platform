@@ -9,7 +9,7 @@ import {
 export function runValidator() {
   const result = runRuntimeValidator();
 
-  Runtime.save(Artifacts.validation, result);
+  Runtime.save(Artifacts.validation, result, "runtime-validator");
 
   Logger.blank();
   Logger.section("PBOS Runtime Validator");

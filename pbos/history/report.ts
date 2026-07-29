@@ -1,18 +1,14 @@
-import fs from "fs";
-
 import { ExecutionHistory } from "./types";
+import { Artifacts, Runtime } from "../kernel";
 
 export function writeExecutionHistory(
   report: ExecutionHistory
 ) {
 
-  fs.mkdirSync("pbos/runtime", {
-    recursive: true,
-  });
-
-  fs.writeFileSync(
-    "pbos/runtime/execution-history.json",
-    JSON.stringify(report, null, 2)
+  Runtime.save(
+    Artifacts.executionHistory,
+    report,
+    "execution-history"
   );
 
 }

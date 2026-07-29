@@ -1,6 +1,6 @@
 {
   "status": "PASS",
-  "selectedGate": "PBOS-CONTEXT-001",
+  "selectedGate": null,
   "checks": [
     {
       "name": "Repository Artifact",
@@ -15,12 +15,12 @@
     {
       "name": "Selected Gate",
       "status": "PASS",
-      "message": "PBOS-CONTEXT-001"
+      "message": "Valid idle"
     },
     {
       "name": "Planning Eligible",
       "status": "PASS",
-      "message": "in_progress"
+      "message": "VALID_IDLE"
     }
   ]
 }

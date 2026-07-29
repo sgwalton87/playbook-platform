@@ -1,0 +1,63 @@
+{
+  "version": "1.0.0",
+  "owner": "repository-context",
+  "latest": {
+    "id": "200ac483e1f42bfb53db9c026b8055a0b57b306c4ba530597183ec6def5947c2",
+    "previousContextIdentity": "2735eaca421b2d9fdef34b03710a595e3d918401b8f3eb11e714acff258fce20",
+    "newContextIdentity": "3d4ae6364ba9e69e8c8c869754997ec3e047d24e4051a5db322eeb95c9e82cb0",
+    "reason": "PBOS-ARTIFACT-CONSISTENCY-001 final documentation synchronization",
+    "triggeringConditions": [
+      "Context validation failed: working tree state changed after capture."
+    ],
+    "timestamp": "2026-07-29T05:52:33.663Z",
+    "validator": {
+      "id": "PBOS-CONTEXT-VALIDATOR",
+      "version": "1.1.0"
+    },
+    "generationResult": "PASS"
+  },
+  "history": [
+    {
+      "id": "9dfb4fe48bd6d784de7c2a7f6e121d96baaefdd6a3d317974124c61128b1a94e",
+      "previousContextIdentity": "2c899391c128b7748ae37e8a6b9e5a1fac713cc8d57de112bc6392bd211faa39",
+      "newContextIdentity": "2735eaca421b2d9fdef34b03710a595e3d918401b8f3eb11e714acff258fce20",
+      "reason": "PBOS-ARTIFACT-CONSISTENCY-001 reconciliation completed",
+      "triggeringConditions": [
+        "Context validation failed: commit identity mismatches.",
+        "Context validation failed: working tree state changed after capture.",
+        "Context validation failed: PBOS runtime context changed after capture.",
+        "Context validation failed: artifact ownership is invalid: pbos/runtime/repository.json.",
+        "Context validation failed: artifact ownership is invalid: pbos/runtime/next-gate.json.",
+        "Context validation failed: artifact changed after capture: pbos/runtime/next-gate.json.",
+        "Context validation failed: artifact ownership is invalid: pbos/runtime/validation.json.",
+        "Context validation failed: artifact changed after capture: pbos/runtime/validation.json.",
+        "Context validation failed: artifact ownership is invalid: pbos/runtime/execution.json.",
+        "Context validation failed: artifact changed after capture: pbos/runtime/execution.json.",
+        "Context validation failed: artifact ownership is invalid: pbos/runtime/execution-contract.json.",
+        "Context validation failed: artifact ownership is invalid: pbos/runtime/work-package.json.",
+        "Context validation failed: artifact ownership is invalid: pbos/runtime/execution-authorization.json."
+      ],
+      "timestamp": "2026-07-29T05:50:25.497Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "200ac483e1f42bfb53db9c026b8055a0b57b306c4ba530597183ec6def5947c2",
+      "previousContextIdentity": "2735eaca421b2d9fdef34b03710a595e3d918401b8f3eb11e714acff258fce20",
+      "newContextIdentity": "3d4ae6364ba9e69e8c8c869754997ec3e047d24e4051a5db322eeb95c9e82cb0",
+      "reason": "PBOS-ARTIFACT-CONSISTENCY-001 final documentation synchronization",
+      "triggeringConditions": [
+        "Context validation failed: working tree state changed after capture."
+      ],
+      "timestamp": "2026-07-29T05:52:33.663Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    }
+  ]
+}

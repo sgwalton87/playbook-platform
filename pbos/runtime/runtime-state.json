@@ -1,10 +1,12 @@
 {
   "version": "1.0.0",
   "startedAt": "2026-07-25T08:05:10.000Z",
-  "updatedAt": "2026-07-27T02:06:11.366Z",
+  "updatedAt": "2026-07-29T05:28:07.189Z",
   "currentPhase": "learn",
   "warnings": [],
-  "blockers": [],
+  "blockers": [
+    "Context validation failed: commit identity mismatches. Context validation failed: working tree state changed after capture. Context validation failed: PBOS runtime context changed after capture. Context validation failed: artifact changed after capture: pbos/runtime/next-gate.json. Context validation failed: artifact pbos/runtime/validation.json references conflicting gate PBOS-CONTEXT-001. Context validation failed: artifact pbos/runtime/execution.json references conflicting gate PBOS-CONTEXT-001."
+  ],
   "completedPhases": [
     "observe",
     "understand",

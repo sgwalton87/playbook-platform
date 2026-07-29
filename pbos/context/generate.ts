@@ -1,29 +1,22 @@
 import path from "node:path";
-import {
-  Artifacts,
-  Runtime,
-  artifactDigest,
-} from "../kernel";
-import {
-  REPOSITORY_CONTEXT_VERSION,
-  type RepositoryContextArtifact,
-} from "./schema";
+import { Artifacts, Runtime } from "../kernel";
+import type { RepositoryContextArtifact } from "./schema";
+import { buildRepositoryContextArtifact } from "./generator";
 import { loadRepositoryContextSnapshot } from "./loader";
 
 export function generateRepositoryContextArtifact(
   rootDir = process.cwd()
 ): RepositoryContextArtifact {
   const snapshot = loadRepositoryContextSnapshot(rootDir);
-  const artifact: RepositoryContextArtifact = {
-    version: REPOSITORY_CONTEXT_VERSION,
-    capturedAt: new Date().toISOString(),
+  const artifact = buildRepositoryContextArtifact(
     snapshot,
-    identity: artifactDigest(snapshot),
-  };
+    new Date().toISOString()
+  );
 
   Runtime.save(
     path.join(rootDir, Artifacts.repositoryContext),
-    artifact
+    artifact,
+    "repository-context"
   );
 
   return artifact;

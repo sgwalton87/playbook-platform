@@ -28,6 +28,8 @@ export interface ArtifactContext {
   status: string | null;
   generatedAt: string | null;
   digest: string | null;
+  owner?: string | null;
+  consumers?: string[];
 }
 
 export interface RepositoryContextSnapshot {
@@ -50,4 +52,25 @@ export interface RepositoryContextArtifact {
 export interface ContextValidationResult {
   valid: boolean;
   errors: string[];
+}
+
+export interface ContextRefreshRecord {
+  id: string;
+  previousContextIdentity: string | null;
+  newContextIdentity: string;
+  reason: string;
+  triggeringConditions: string[];
+  timestamp: string;
+  validator: {
+    id: "PBOS-CONTEXT-VALIDATOR";
+    version: typeof REPOSITORY_CONTEXT_VERSION;
+  };
+  generationResult: "PASS";
+}
+
+export interface ContextRefreshArtifact {
+  version: "1.0.0";
+  owner: "repository-context";
+  latest: ContextRefreshRecord;
+  history: ContextRefreshRecord[];
 }

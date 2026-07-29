@@ -1,10 +1,9 @@
 import { readFileSync } from "node:fs";
-import { mkdir, writeFile } from "node:fs/promises";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 import { verifyStoredRepositoryContext } from "../context";
 import { loadConfig } from "../engine/config";
 import { loadState } from "../engine/state";
-import { Artifacts } from "../kernel";
+import { Artifacts, Runtime } from "../kernel";
 import { validateRequiredArtifact } from "./artifact-validation";
 import { buildDependencyGraph } from "./dependency-graph";
 import { evaluateGateEligibility } from "./eligibility";
@@ -117,24 +116,20 @@ export async function planConstitutionalGate(options: {
 
   if (options.persist !== false) {
     const outputPath = join(rootDir, Artifacts.constitutionalPlanning);
-    await mkdir(dirname(outputPath), { recursive: true });
-    await writeFile(outputPath, `${JSON.stringify(report, null, 2)}\n`);
-    await writeFile(
+    Runtime.save(outputPath, report, "constitutional-planner");
+    Runtime.save(
       join(rootDir, Artifacts.planning),
-      `${JSON.stringify(
-        {
-          selectedGate: report.selectedGate,
-          eligible: report.eligibleGates,
-          blocked: report.blockedGates.map(({ gateId }) => gateId),
-          completed: report.completedGates,
-          state: report.selectedGate
-            ? "ACTIVE_SPRINT"
-            : "VALID_IDLE",
-          authority: "constitutional-planner",
-        },
-        null,
-        2
-      )}\n`
+      {
+        selectedGate: report.selectedGate,
+        eligible: report.eligibleGates,
+        blocked: report.blockedGates.map(({ gateId }) => gateId),
+        completed: report.completedGates,
+        state: report.selectedGate
+          ? "ACTIVE_SPRINT"
+          : "VALID_IDLE",
+        authority: "constitutional-planner",
+      },
+      "constitutional-planner"
     );
   }
 

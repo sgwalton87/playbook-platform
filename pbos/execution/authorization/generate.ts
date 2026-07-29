@@ -1,4 +1,5 @@
 import { Runtime, Artifacts } from "../../kernel";
+import path from "node:path";
 import type { ExecutionContract } from "../contracts";
 import type { CodexWorkPackage } from "../work-package";
 import { buildExecutionAuthorization } from "./builder";
@@ -13,9 +14,14 @@ import { loadExecutionAuthorizationOrUndefined } from "./load";
  */
 export function generateExecutionAuthorization(
   contract: ExecutionContract,
-  workPackage: CodexWorkPackage
+  workPackage: CodexWorkPackage,
+  rootDir = process.cwd()
 ) {
-  const existing = loadExecutionAuthorizationOrUndefined();
+  const existing = loadExecutionAuthorizationOrUndefined(rootDir);
+  const artifactPath = path.join(
+    rootDir,
+    Artifacts.executionAuthorization
+  );
 
   if (existing) {
     const expected = buildExecutionAuthorization(contract, workPackage);
@@ -40,11 +46,12 @@ export function generateExecutionAuthorization(
     buildExecutionAuthorization(contract, workPackage);
 
   Runtime.save(
-    Artifacts.executionAuthorization,
-    authorization
+    artifactPath,
+    authorization,
+    "execution-authorization"
   );
 
-  if (!Runtime.exists(Artifacts.executionAuthorization)) {
+  if (!Runtime.exists(artifactPath)) {
     throw new Error(
       "Execution authorization artifact was not persisted."
     );

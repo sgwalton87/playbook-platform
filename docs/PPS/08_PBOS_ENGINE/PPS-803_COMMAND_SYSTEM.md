@@ -78,6 +78,7 @@ The Command System consists of:
 PBOS shall support commands including:
 
 - pbos plan
+- pbos context
 - pbos next
 - pbos execute
 - pbos validate
@@ -89,6 +90,22 @@ PBOS shall support commands including:
 - pbos bootstrap
 
 Additional commands may be introduced through constitutional amendment.
+
+## Repository Context Command
+
+`npm run pbos:context` is the sole public repository context refresh authority. It observes repository and runtime reality, builds a content-sensitive snapshot, validates the complete candidate, preserves prior refresh evidence, and publishes the new context only after validation passes.
+
+The command requires known repository identity, configured remote alignment, complete required runtime artifacts, canonical artifact ownership, consistent gate relationships, and a passing runtime validation artifact. It rejects partial refreshes and never repairs planning, validation, authorization, certification, or lifecycle state.
+
+`pbos:next` consumes the resulting context through the canonical constitutional planner. Missing, stale, or mismatched context prevents gate selection.
+
+## Artifact Reconciliation Command
+
+`npm run pbos:reconcile-artifacts` is the governed recovery path for inconsistent PBOS runtime artifacts. It classifies validation, execution, planning, repository context, and engine state as valid, stale, superseded, invalid, or recoverable.
+
+Before regeneration, the command archives each prior artifact body and digest in durable reconciliation history. It then delegates planning to `constitutional-planner`, validation to `runtime-validator`, and execution state to `execution-engine`. Repository context is regenerated separately through `pbos:context`; engine state is never synthesized by reconciliation.
+
+Unknown ownership, invalid engine-state authority, failed owner regeneration, or remaining cross-artifact conflicts deny reconciliation.
 
 ---
 
@@ -164,4 +181,3 @@ Future versions may introduce graphical command interfaces, conversational execu
 - PPS-800 PBOS Engine Architecture
 - PPS-801 Planning Engine
 - PPS-802 Execution Engine
-

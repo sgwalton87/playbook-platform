@@ -5,6 +5,14 @@ import { evaluatePlanningRules, loadGates } from "../engine/planner";
 import { loadState } from "../engine/state";
 import { planConstitutionalGate } from "../planner";
 import type { ExecutionMode } from "../engine/types";
+import {
+  loadRepositoryContextArtifact,
+  verifyStoredRepositoryContext,
+  type ContextRefreshArtifact,
+} from "../context";
+import { Artifacts, Runtime } from "../kernel";
+import path from "node:path";
+import { inspectArtifactConsistency } from "../reconciliation";
 
 export interface EngineHealthReport {
   engineVersion: string;
@@ -30,6 +38,12 @@ export interface EngineHealthReport {
   currentDependencyNode: string | null;
   planningHealth: "HEALTHY" | "BLOCKED";
   planningRecommendation: string;
+  contextHealth: "VALID" | "INVALID";
+  contextIdentity: string | null;
+  lastContextRefresh: string | null;
+  contextRefreshRequired: boolean;
+  artifactHealth: "VALID" | "INVALID";
+  artifactConflictCount: number;
 }
 
 export async function getEngineHealth(rootDir = process.cwd()): Promise<EngineHealthReport> {
@@ -49,6 +63,17 @@ export async function getEngineHealth(rootDir = process.cwd()): Promise<EngineHe
     plan: constitutionalPlan,
   });
   const failedRules = ruleResults.filter((rule) => !rule.passed);
+  const contextValidation = verifyStoredRepositoryContext(rootDir);
+  const contextArtifact = loadRepositoryContextArtifact(rootDir);
+  const refreshPath = path.join(rootDir, Artifacts.contextRefresh);
+  const refresh = Runtime.exists(refreshPath)
+    ? Runtime.load<ContextRefreshArtifact>(refreshPath)
+    : null;
+  const artifactConflicts = inspectArtifactConsistency(rootDir).filter(
+    ({ path: artifactPath, classification }) =>
+      artifactPath !== Artifacts.repositoryContext &&
+      classification !== "valid"
+  );
 
   return {
     engineVersion: config.version,
@@ -77,6 +102,13 @@ export async function getEngineHealth(rootDir = process.cwd()): Promise<EngineHe
     currentDependencyNode: constitutionalPlan.currentDependencyNode,
     planningHealth: constitutionalPlan.planningHealth,
     planningRecommendation: constitutionalPlan.reasonSelected,
+    contextHealth: contextValidation.valid ? "VALID" : "INVALID",
+    contextIdentity: contextArtifact?.identity ?? null,
+    lastContextRefresh: refresh?.latest.timestamp ?? null,
+    contextRefreshRequired: !contextValidation.valid,
+    artifactHealth:
+      artifactConflicts.length === 0 ? "VALID" : "INVALID",
+    artifactConflictCount: artifactConflicts.length,
   };
 }
 
@@ -89,6 +121,12 @@ export function formatEngineHealth(report: EngineHealthReport): string {
     `Current Dependency Node: ${report.currentDependencyNode ?? "none"}`,
     `Planning Health: ${report.planningHealth}`,
     `Planning Recommendation: ${report.planningRecommendation}`,
+    `Context Health: ${report.contextHealth}`,
+    `Context Identity: ${report.contextIdentity ?? "none"}`,
+    `Last Refresh: ${report.lastContextRefresh ?? "none"}`,
+    `Refresh Required: ${report.contextRefreshRequired ? "YES" : "NO"}`,
+    `Artifact Health: ${report.artifactHealth}`,
+    `Artifact Conflicts: ${report.artifactConflictCount}`,
     `Completed Gates: ${report.completedGates.join(", ") || "none"}`,
     `Blocked Gates: ${report.blockedGates.join(", ") || "none"}`,
     `Rule Count: ${report.ruleCount}`,

@@ -1,5 +1,17 @@
 [
   {
+    "name": "reconcile-artifacts",
+    "description": "Classify runtime conflicts and invoke canonical owners to regenerate stale artifacts.",
+    "mode": "doctor",
+    "status": "active"
+  },
+  {
+    "name": "context",
+    "description": "Observe, certify, and record an identity-bound repository context refresh.",
+    "mode": "planning",
+    "status": "active"
+  },
+  {
     "name": "next",
     "description": "Select exactly one eligible gate and generate planning evidence.",
     "mode": "planning",
@@ -50,6 +62,18 @@
   {
     "name": "promote",
     "description": "Promote a validated release contract into PBOS lifecycle state.",
+    "mode": "release",
+    "status": "active"
+  },
+  {
+    "name": "certify-volume",
+    "description": "Evaluate a constitutional volume and generate durable certification evidence.",
+    "mode": "audit",
+    "status": "active"
+  },
+  {
+    "name": "promote-volume",
+    "description": "Apply one evidence-bound constitutional volume lifecycle transition.",
     "mode": "release",
     "status": "active"
   }

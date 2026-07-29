@@ -45,7 +45,7 @@ const state = {
     transitionTimestamp: "2026-07-28T00:00:00.000Z",
     transitionReason: "test",
     environment: {
-      name: "test",
+      name: "sandbox",
       gitRemoteAvailable: true,
       gitCredentialsAvailable: true,
       repositoryWritable: true,
@@ -81,7 +81,7 @@ describe("legacy planner support", () => {
       selectedGate: gate,
       eligibleGates: [gate.id],
       blockedGates: [],
-    } as ConstitutionalPlanningReport;
+    } as unknown as ConstitutionalPlanningReport;
 
     const results = evaluatePlanningRules({
       gates: [gate],

@@ -20,11 +20,13 @@ import {
   type ExecutionDispatcher,
 } from "./dispatch";
 import type { ExecutionPlan } from "./types";
+import path from "node:path";
 
 export function runExecutionEngine(
-  dispatch: ExecutionDispatcher = dispatchExecutionAdapter
+  dispatch: ExecutionDispatcher = dispatchExecutionAdapter,
+  rootDir = process.cwd()
 ): ExecutionPlan {
-  const context = loadExecutionContext();
+  const context = loadExecutionContext(rootDir);
 
   const plan = createExecutionPlan(context);
 
@@ -34,15 +36,15 @@ export function runExecutionEngine(
     context.planning.selectedGate
   ) {
     const existingAuthorization =
-      loadExecutionAuthorizationOrUndefined();
+      loadExecutionAuthorizationOrUndefined(rootDir);
 
     let contract: ExecutionContract;
     let workPackage: CodexWorkPackage;
 
     if (existingAuthorization) {
       if (
-        !Runtime.exists(Artifacts.executionContract) ||
-        !Runtime.exists(Artifacts.workPackage)
+        !Runtime.exists(path.join(rootDir, Artifacts.executionContract)) ||
+        !Runtime.exists(path.join(rootDir, Artifacts.workPackage))
       ) {
         return {
           status: "BLOCKED",
@@ -52,14 +54,15 @@ export function runExecutionEngine(
       }
 
       contract = Runtime.load<ExecutionContract>(
-        Artifacts.executionContract
+        path.join(rootDir, Artifacts.executionContract)
       );
       workPackage = Runtime.load<CodexWorkPackage>(
-        Artifacts.workPackage
+        path.join(rootDir, Artifacts.workPackage)
       );
     } else {
       contract = generateExecutionContract(
-        context.planning.selectedGate
+        context.planning.selectedGate,
+        rootDir
       );
 
       const contractValidation = validateExecutionContract(
@@ -75,16 +78,18 @@ export function runExecutionEngine(
       }
 
       workPackage = generateCodexWorkPackage(
-        contract
+        contract,
+        rootDir
       );
 
       generateExecutionAuthorization(
         contract,
-        workPackage
+        workPackage,
+        rootDir
       );
     }
 
-    const authorization = loadExecutionAuthorizationOrUndefined();
+    const authorization = loadExecutionAuthorizationOrUndefined(rootDir);
 
     const authorizationValidation = validateExecutionAuthorization(
       authorization,

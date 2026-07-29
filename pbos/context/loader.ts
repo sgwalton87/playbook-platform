@@ -7,6 +7,7 @@ import path from "node:path";
 import {
   Artifacts,
   PBOSConfig,
+  RuntimeArtifactOwnership,
   artifactDigest,
 } from "../kernel";
 import type {
@@ -27,6 +28,12 @@ interface PlanningArtifact {
   selectedGate?: { id?: string } | null;
 }
 
+const CONTEXT_OUTPUTS = new Set([
+  Artifacts.repositoryContext,
+  Artifacts.contextRefresh,
+  "docs/release-evidence/pbos-context-refresh.md",
+]);
+
 function git(rootDir: string, args: string[]): string {
   return execFileSync("git", args, {
     cwd: rootDir,
@@ -44,7 +51,9 @@ function artifactGateId(value: unknown): string | null {
   const direct = record.gateId ?? record.gate;
 
   if (typeof direct === "string") {
-    return direct;
+    return direct === "NONE" || direct === "UNKNOWN"
+      ? null
+      : direct;
   }
 
   const selected = record.selectedGate;
@@ -88,6 +97,9 @@ function loadArtifact(
   const absolutePath = path.join(rootDir, relativePath);
 
   if (!existsSync(absolutePath)) {
+    const governance = Object.values(
+      RuntimeArtifactOwnership
+    ).find(({ path: artifactPath }) => artifactPath === relativePath);
     return {
       path: relativePath,
       exists: false,
@@ -96,12 +108,17 @@ function loadArtifact(
       status: null,
       generatedAt: null,
       digest: null,
+      owner: governance?.owner ?? null,
+      consumers: governance?.consumers ?? [],
     };
   }
 
   const value = JSON.parse(
     readFileSync(absolutePath, "utf8")
   ) as unknown;
+  const governance = Object.values(
+    RuntimeArtifactOwnership
+  ).find(({ path: artifactPath }) => artifactPath === relativePath);
 
   return {
     path: relativePath,
@@ -124,6 +141,8 @@ function loadArtifact(
         : null,
     generatedAt: artifactTimestamp(value),
     digest: artifactDigest(value),
+    owner: governance?.owner ?? null,
+    consumers: governance?.consumers ?? [],
   };
 }
 
@@ -206,7 +225,9 @@ export function loadRepositoryContextSnapshot(
     .filter(
       (line) =>
         line.length > 0 &&
-        !line.endsWith(Artifacts.repositoryContext)
+        ![...CONTEXT_OUTPUTS].some((output) =>
+          line.endsWith(output)
+        )
     )
     .join("\n");
   const trackedDiff = git(repositoryRoot, [
@@ -216,6 +237,8 @@ export function loadRepositoryContextSnapshot(
     "--",
     ".",
     `:(exclude)${Artifacts.repositoryContext}`,
+    `:(exclude)${Artifacts.contextRefresh}`,
+    ":(exclude)docs/release-evidence/pbos-context-refresh.md",
   ]);
   const untrackedFiles = git(repositoryRoot, [
     "ls-files",
@@ -226,7 +249,7 @@ export function loadRepositoryContextSnapshot(
     .filter(
       (relativePath) =>
         relativePath.length > 0 &&
-        relativePath !== Artifacts.repositoryContext
+        !CONTEXT_OUTPUTS.has(relativePath)
     )
     .sort()
     .map((relativePath) => ({

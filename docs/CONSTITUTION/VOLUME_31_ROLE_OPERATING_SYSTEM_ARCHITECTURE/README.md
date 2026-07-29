@@ -34,7 +34,7 @@ Role Operating Systems shall not become independent products or duplicate canoni
 
 Volume 31 inherits the platform principles in PPS-000 through PPS-015, the Operating System framework in PPS-004 and PPS-500, and the Product Architecture registries in Volume 30.
 
-Volume 30 defines the canonical product artifacts that an Operating System may compose. Volume 31 defines which roles consume those artifacts and under what responsibilities, permissions, relationships, and success measures. Future Volume 32 may define application architecture that realizes these contracts; it shall not redefine role authority established here.
+Volume 30 defines the canonical product artifacts that an Operating System may compose. Volume 31 defines which roles consume those artifacts and under what responsibilities, permissions, relationships, and success measures. Volume 32 defines the shared Platform Applications that realize these contracts; it does not redefine role authority established here.
 
 # Ecosystem Organization
 
@@ -104,4 +104,4 @@ PBOS shall verify file presence, identifier uniqueness, YAML metadata, parent in
 - PPS-500 Operating Systems Architecture
 - PPS-3000 Product Architecture Overview
 - PPS-3100 Role Operating System Constitutional Framework
-
+- PPS-3200 Platform Application Constitutional Framework

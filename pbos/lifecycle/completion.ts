@@ -1,10 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import { loadConfig } from "../engine/config";
-import {
-  loadState,
-  saveState,
-} from "../engine/state";
+import { loadState, saveState } from "../engine/state";
+import { Artifacts, Runtime } from "../kernel";
 import { refreshPlanningArtifact } from "../engine/planning-refresh";
 import type { GateTransition } from "./contracts";
 import { transitionGate } from "./transition";
@@ -95,9 +93,10 @@ export async function completePromotedGate(options: {
     ],
   });
 
-  fs.writeFileSync(
-    path.join(rootDir, "pbos/runtime/completion.json"),
-    `${JSON.stringify(result, null, 2)}\n`
+  Runtime.save(
+    path.join(rootDir, Artifacts.completion),
+    result,
+    "gate-lifecycle"
   );
 
   const config = await loadConfig(rootDir);

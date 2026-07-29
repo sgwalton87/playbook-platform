@@ -1,10 +1,13 @@
 import { existsSync, readFileSync } from "node:fs";
+import { Artifacts } from "../kernel";
 import { ValidationContext } from "./types";
 
-export function loadValidationContext(): ValidationContext {
+export function loadValidationContext(
+  rootDir = process.cwd()
+): ValidationContext {
 
-    const repoPath = "pbos/runtime/repository.json";
-    const planningPath = "pbos/runtime/next-gate.json";
+    const repoPath = `${rootDir}/${Artifacts.repository}`;
+    const planningPath = `${rootDir}/${Artifacts.planning}`;
 
     if (!existsSync(repoPath))
         throw new Error("Missing runtime artifact: repository.json");

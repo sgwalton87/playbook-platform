@@ -1,18 +1,16 @@
-import {
-  existsSync,
-  readFileSync,
-  rmSync,
-  writeFileSync,
-} from "fs";
-import path from "path";
+import { existsSync } from "node:fs";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { Runtime, Artifacts } from "../../kernel";
+import { Artifacts, Runtime } from "../../kernel";
 import {
-  loadExecutionAuthorizationOrUndefined,
-  setAuthorizationStatus,
+  loadExecutionAuthorizationOrUndefined as loadAuthorizationFromRuntime,
+  setAuthorizationStatus as transitionAuthorization,
 } from "../authorization";
 import type { ExecutionAuthorizationRecord } from "../authorization";
-import { runExecutionEngine } from "../index";
+import {
+  runExecutionEngine as runExecutionEngineAtRoot,
+} from "../index";
+import type { ExecutionDispatcher } from "../index";
+import { PbosRuntimeTestHarness } from "../../testing/runtime-harness";
 
 /**
  * Layer 7 Enforcement Tests
@@ -24,18 +22,25 @@ import { runExecutionEngine } from "../index";
  * - AUTHORIZED authorization → READY
  */
 
-const testAuthorizationPath = path.join(
-  process.cwd(),
-  Artifacts.executionAuthorization
-);
+let harness: PbosRuntimeTestHarness;
 
-const managedArtifactPaths = [
-  Artifacts.executionContract,
-  Artifacts.workPackage,
-  Artifacts.executionAuthorization,
-];
+function loadExecutionAuthorizationOrUndefined() {
+  return loadAuthorizationFromRuntime(harness.rootDir);
+}
 
-const originalArtifacts = new Map<string, string | undefined>();
+function setAuthorizationStatus(
+  status: "PENDING" | "AUTHORIZED" | "DENIED",
+  metadata: {
+    approvedBy?: string | null;
+    approvalReason?: string | null;
+  } = {}
+) {
+  return transitionAuthorization(status, metadata, harness.rootDir);
+}
+
+function runExecutionEngine(dispatch?: ExecutionDispatcher) {
+  return runExecutionEngineAtRoot(dispatch, harness.rootDir);
+}
 
 const createTestAuthorization = (
   status: "PENDING" | "AUTHORIZED" | "DENIED"
@@ -68,42 +73,58 @@ const createTestAuthorization = (
   authorizedAt: status !== "PENDING" ? "2026-07-27T00:00:01.000Z" : null,
 });
 
+function registerAuthorizationRequestContext(): void {
+  harness.save(Artifacts.repository, {
+    currentBranch: "test",
+  });
+  harness.save(Artifacts.planning, {
+    selectedGate: {
+      id: "TEST-LAYER-7",
+      title: "Test authorization lifecycle",
+      tasks: ["Verify governed adapter dispatch."],
+      validation: ["pbos:test"],
+    },
+    eligible: ["TEST-LAYER-7"],
+    blocked: [],
+    state: "ACTIVE_SPRINT",
+    authority: "constitutional-planner",
+  });
+  harness.save(Artifacts.validation, {
+    status: "PASS",
+    selectedGate: "TEST-LAYER-7",
+    checks: [],
+  });
+}
+
 describe("PBOS Layer 7: Execution Authorization Enforcement", () => {
   beforeEach(() => {
-    for (const artifact of managedArtifactPaths) {
-      originalArtifacts.set(
-        artifact,
-        existsSync(artifact)
-          ? readFileSync(artifact, "utf8")
-          : undefined
-      );
-      rmSync(artifact, { force: true });
-    }
+    harness = new PbosRuntimeTestHarness();
   });
 
   afterEach(() => {
-    for (const artifact of managedArtifactPaths) {
-      const original = originalArtifacts.get(artifact);
-
-      if (original === undefined) {
-        rmSync(artifact, { force: true });
-      } else {
-        writeFileSync(artifact, original, "utf8");
-      }
-    }
-
-    originalArtifacts.clear();
+    const isolatedRoot = harness.rootDir;
+    harness.cleanup();
+    expect(existsSync(isolatedRoot)).toBe(false);
   });
 
   describe("Load authorization from runtime", () => {
     it("returns undefined when authorization artifact does not exist", () => {
       const result = loadExecutionAuthorizationOrUndefined();
       expect(result).toBeUndefined();
+      expect(() =>
+        Runtime.save(
+          harness.resolve(Artifacts.executionAuthorization),
+          {},
+          "unregistered-owner"
+        )
+      ).toThrow(
+        "is owned by execution-authorization"
+      );
     });
 
     it("loads authorization when artifact exists", () => {
       const testAuth = createTestAuthorization("PENDING");
-      Runtime.save(testAuthorizationPath, testAuth);
+      harness.save(Artifacts.executionAuthorization, testAuth);
 
       const result = loadExecutionAuthorizationOrUndefined();
       expect(result).toBeDefined();
@@ -113,7 +134,7 @@ describe("PBOS Layer 7: Execution Authorization Enforcement", () => {
 
     it("loads authorization with AUTHORIZED status", () => {
       const testAuth = createTestAuthorization("AUTHORIZED");
-      Runtime.save(testAuthorizationPath, testAuth);
+      harness.save(Artifacts.executionAuthorization, testAuth);
 
       const result = loadExecutionAuthorizationOrUndefined();
       expect(result?.status).toBe("AUTHORIZED");
@@ -123,7 +144,7 @@ describe("PBOS Layer 7: Execution Authorization Enforcement", () => {
 
     it("loads authorization with DENIED status", () => {
       const testAuth = createTestAuthorization("DENIED");
-      Runtime.save(testAuthorizationPath, testAuth);
+      harness.save(Artifacts.executionAuthorization, testAuth);
 
       const result = loadExecutionAuthorizationOrUndefined();
       expect(result?.status).toBe("DENIED");
@@ -133,7 +154,7 @@ describe("PBOS Layer 7: Execution Authorization Enforcement", () => {
   describe("Set authorization status", () => {
     it("updates authorization to AUTHORIZED", () => {
       const testAuth = createTestAuthorization("PENDING");
-      Runtime.save(testAuthorizationPath, testAuth);
+      harness.save(Artifacts.executionAuthorization, testAuth);
 
       const updated = setAuthorizationStatus("AUTHORIZED", {
         approvedBy: "approver-123",
@@ -152,7 +173,7 @@ describe("PBOS Layer 7: Execution Authorization Enforcement", () => {
 
     it("updates authorization to DENIED", () => {
       const testAuth = createTestAuthorization("PENDING");
-      Runtime.save(testAuthorizationPath, testAuth);
+      harness.save(Artifacts.executionAuthorization, testAuth);
 
       const updated = setAuthorizationStatus("DENIED", {
         approvedBy: "reviewer-456",
@@ -165,7 +186,7 @@ describe("PBOS Layer 7: Execution Authorization Enforcement", () => {
 
     it("does not revert a terminal authorization to PENDING", () => {
       const testAuth = createTestAuthorization("AUTHORIZED");
-      Runtime.save(testAuthorizationPath, testAuth);
+      harness.save(Artifacts.executionAuthorization, testAuth);
 
       expect(() => setAuthorizationStatus("PENDING")).toThrow(
         "Authorization decision is immutable after status AUTHORIZED."
@@ -176,7 +197,7 @@ describe("PBOS Layer 7: Execution Authorization Enforcement", () => {
   describe("Execution enforcement scenarios", () => {
     it("scenario 1: PENDING authorization blocks execution", () => {
       const testAuth = createTestAuthorization("PENDING");
-      Runtime.save(testAuthorizationPath, testAuth);
+      harness.save(Artifacts.executionAuthorization, testAuth);
 
       const loaded = loadExecutionAuthorizationOrUndefined();
       expect(loaded?.status).toBe("PENDING");
@@ -186,7 +207,7 @@ describe("PBOS Layer 7: Execution Authorization Enforcement", () => {
 
     it("scenario 2: DENIED authorization blocks execution", () => {
       const testAuth = createTestAuthorization("DENIED");
-      Runtime.save(testAuthorizationPath, testAuth);
+      harness.save(Artifacts.executionAuthorization, testAuth);
 
       const loaded = loadExecutionAuthorizationOrUndefined();
       expect(loaded?.status).toBe("DENIED");
@@ -196,7 +217,7 @@ describe("PBOS Layer 7: Execution Authorization Enforcement", () => {
 
     it("scenario 3: AUTHORIZED authorization permits execution", () => {
       const testAuth = createTestAuthorization("AUTHORIZED");
-      Runtime.save(testAuthorizationPath, testAuth);
+      harness.save(Artifacts.executionAuthorization, testAuth);
 
       const loaded = loadExecutionAuthorizationOrUndefined();
       expect(loaded?.status).toBe("AUTHORIZED");
@@ -216,7 +237,7 @@ describe("PBOS Layer 7: Execution Authorization Enforcement", () => {
     it("scenario 5: External approval workflow", () => {
       // Create initial PENDING authorization
       const testAuth = createTestAuthorization("PENDING");
-      Runtime.save(testAuthorizationPath, testAuth);
+      harness.save(Artifacts.executionAuthorization, testAuth);
 
       let loaded = loadExecutionAuthorizationOrUndefined();
       expect(loaded?.status).toBe("PENDING");
@@ -250,7 +271,7 @@ describe("PBOS Layer 7: Execution Authorization Enforcement", () => {
 
     it("must have AUTHORIZED status, not just any status", () => {
       const testAuth = createTestAuthorization("PENDING");
-      Runtime.save(testAuthorizationPath, testAuth);
+      harness.save(Artifacts.executionAuthorization, testAuth);
 
       const loaded = loadExecutionAuthorizationOrUndefined();
       expect(loaded?.status).not.toBe("AUTHORIZED");
@@ -259,7 +280,7 @@ describe("PBOS Layer 7: Execution Authorization Enforcement", () => {
 
     it("approval must include metadata (approvedBy, reason, timestamp)", () => {
       const testAuth = createTestAuthorization("PENDING");
-      Runtime.save(testAuthorizationPath, testAuth);
+      harness.save(Artifacts.executionAuthorization, testAuth);
 
       const approved = setAuthorizationStatus("AUTHORIZED", {
         approvedBy: "reviewer",
@@ -274,7 +295,7 @@ describe("PBOS Layer 7: Execution Authorization Enforcement", () => {
 
     it("does not overwrite an existing approval", () => {
       const testAuth = createTestAuthorization("AUTHORIZED");
-      Runtime.save(testAuthorizationPath, testAuth);
+      harness.save(Artifacts.executionAuthorization, testAuth);
 
       const before = JSON.stringify(
         loadExecutionAuthorizationOrUndefined()
@@ -293,7 +314,7 @@ describe("PBOS Layer 7: Execution Authorization Enforcement", () => {
 
     it("does not overwrite a denied decision", () => {
       const testAuth = createTestAuthorization("DENIED");
-      Runtime.save(testAuthorizationPath, testAuth);
+      harness.save(Artifacts.executionAuthorization, testAuth);
 
       expect(() => setAuthorizationStatus("AUTHORIZED")).toThrow(
         "Authorization decision is immutable after status DENIED."
@@ -302,6 +323,10 @@ describe("PBOS Layer 7: Execution Authorization Enforcement", () => {
   });
 
   describe("Resumable execution lifecycle", () => {
+    beforeEach(() => {
+      registerAuthorizationRequestContext();
+    });
+
     it("pending authorization blocks execution and adapter dispatch", () => {
       const dispatch = vi.fn((plan) => plan);
 
@@ -320,9 +345,8 @@ describe("PBOS Layer 7: Execution Authorization Enforcement", () => {
         approvedBy: "governance-reviewer",
         approvalReason: "Immutable artifacts reviewed",
       });
-      const approved = readFileSync(
-        Artifacts.executionAuthorization,
-        "utf8"
+      const approved = harness.readText(
+        Artifacts.executionAuthorization
       );
       const dispatch = vi.fn((plan) => plan);
 
@@ -331,7 +355,7 @@ describe("PBOS Layer 7: Execution Authorization Enforcement", () => {
       expect(result.status).toBe("READY");
       expect(dispatch).toHaveBeenCalledOnce();
       expect(
-        readFileSync(Artifacts.executionAuthorization, "utf8")
+        harness.readText(Artifacts.executionAuthorization)
       ).toBe(approved);
     });
 
@@ -341,9 +365,8 @@ describe("PBOS Layer 7: Execution Authorization Enforcement", () => {
         approvedBy: "governance-reviewer",
         approvalReason: "Governance requirements not met",
       });
-      const denied = readFileSync(
-        Artifacts.executionAuthorization,
-        "utf8"
+      const denied = harness.readText(
+        Artifacts.executionAuthorization
       );
       const dispatch = vi.fn((plan) => plan);
 
@@ -352,7 +375,7 @@ describe("PBOS Layer 7: Execution Authorization Enforcement", () => {
       expect(result.status).toBe("BLOCKED");
       expect(dispatch).not.toHaveBeenCalled();
       expect(
-        readFileSync(Artifacts.executionAuthorization, "utf8")
+        harness.readText(Artifacts.executionAuthorization)
       ).toBe(denied);
     });
   });

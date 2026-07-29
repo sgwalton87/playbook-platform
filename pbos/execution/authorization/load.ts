@@ -11,9 +11,11 @@ import type { ExecutionAuthorizationRecord } from "./types";
  *
  * Throws error if artifact does not exist.
  */
-export function loadExecutionAuthorization(): ExecutionAuthorizationRecord {
+export function loadExecutionAuthorization(
+  rootDir = process.cwd()
+): ExecutionAuthorizationRecord {
   const artifactPath = path.join(
-    process.cwd(),
+    rootDir,
     Artifacts.executionAuthorization
   );
 
@@ -28,9 +30,11 @@ export function loadExecutionAuthorization(): ExecutionAuthorizationRecord {
  * Layer 7: Checks whether an authorization has been created.
  * Missing authorization blocks execution (fail closed).
  */
-export function loadExecutionAuthorizationOrUndefined(): ExecutionAuthorizationRecord | undefined {
+export function loadExecutionAuthorizationOrUndefined(
+  rootDir = process.cwd()
+): ExecutionAuthorizationRecord | undefined {
   const artifactPath = path.join(
-    process.cwd(),
+    rootDir,
     Artifacts.executionAuthorization
   );
 

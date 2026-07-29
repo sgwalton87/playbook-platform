@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   Artifacts,
   PBOSConfig,
+  RuntimeArtifactOwnership,
   artifactDigest,
 } from "../kernel";
 import type {
@@ -65,6 +66,13 @@ function snapshot(): RepositoryContextSnapshot {
         artifactPath === Artifacts.validation ? "PASS" : null,
       generatedAt: "2026-07-28T11:00:00.000Z",
       digest: artifactDigest(artifactPath),
+      owner: Object.values(RuntimeArtifactOwnership).find(
+        ({ path }) => path === artifactPath
+      )?.owner,
+      consumers:
+        Object.values(RuntimeArtifactOwnership).find(
+          ({ path }) => path === artifactPath
+        )?.consumers ?? [],
     })),
   };
 }

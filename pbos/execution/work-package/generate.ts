@@ -19,7 +19,8 @@ export const WorkPackageArtifact =
  * - contract has invalid field values
  */
 export function generateCodexWorkPackage(
-  contract: ExecutionContract | undefined
+  contract: ExecutionContract | undefined,
+  rootDir = process.cwd()
 ) {
   // Layer 5: Validate contract before generating work package
   const validation =
@@ -45,10 +46,11 @@ export function generateCodexWorkPackage(
 
   Runtime.save(
     path.join(
-      process.cwd(),
+      rootDir,
       WorkPackageArtifact
     ),
-    packageData
+    packageData,
+    "work-package"
   );
 
   return packageData;

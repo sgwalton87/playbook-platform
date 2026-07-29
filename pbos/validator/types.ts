@@ -13,6 +13,6 @@ export interface ValidationContext {
 
 export interface ValidationResult {
   status: "PASS" | "FAIL";
-  selectedGate: string;
+  selectedGate: string | null;
   checks: ValidationCheck[];
 }

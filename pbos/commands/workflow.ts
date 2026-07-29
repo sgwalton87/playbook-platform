@@ -36,7 +36,8 @@ export function runWorkflow() {
 
   Runtime.save(
     Artifacts.workflow,
-    workflow
+    workflow,
+    "workflow-engine"
   );
 
   Logger.blank();

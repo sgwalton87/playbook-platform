@@ -2,9 +2,11 @@ import { loadValidationContext } from "./load";
 import { runChecks } from "./checks";
 import { ValidationResult } from "./types";
 
-export function runRuntimeValidator(): ValidationResult {
+export function runRuntimeValidator(
+  rootDir = process.cwd()
+): ValidationResult {
 
-    const ctx = loadValidationContext();
+    const ctx = loadValidationContext(rootDir);
 
     const checks = runChecks(ctx);
 
@@ -14,7 +16,7 @@ export function runRuntimeValidator(): ValidationResult {
 
         status: passed ? "PASS" : "FAIL",
 
-        selectedGate: ctx.planning?.selectedGate?.id ?? "UNKNOWN",
+        selectedGate: ctx.planning?.selectedGate?.id ?? null,
         checks
 
     };

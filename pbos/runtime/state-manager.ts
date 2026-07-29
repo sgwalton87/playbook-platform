@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { Artifacts, Runtime } from "../kernel";
 
 import {
   RuntimeState,
@@ -14,8 +15,8 @@ const RUNTIME_DIRECTORY = path.join(
 );
 
 const STATE_FILE = path.join(
-  RUNTIME_DIRECTORY,
-  "runtime-state.json"
+  process.cwd(),
+  Artifacts.runtimeState
 );
 
 function ensureRuntimeDirectory() {
@@ -36,12 +37,7 @@ export function loadRuntimeState(): RuntimeState {
     return state;
   }
 
-  return JSON.parse(
-    fs.readFileSync(
-      STATE_FILE,
-      "utf8"
-    )
-  ) as RuntimeState;
+  return Runtime.load<RuntimeState>(STATE_FILE);
 
 }
 
@@ -53,13 +49,10 @@ export function saveRuntimeState(
 
   state.updatedAt = new Date().toISOString();
 
-  fs.writeFileSync(
+  Runtime.save(
     STATE_FILE,
-    JSON.stringify(
-      state,
-      null,
-      2
-    )
+    state,
+    "runtime-phase-manager"
   );
 
 }

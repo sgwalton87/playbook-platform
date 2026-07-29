@@ -1,0 +1,517 @@
+{
+  "schemaVersion": 1,
+  "runId": "8fd95727bedc85cf50529d2bd79d7952d5480bfde50653293b4a6fe4932f3007",
+  "evaluatedAt": "2026-07-29T05:50:10.209Z",
+  "owner": "artifact-reconciliation",
+  "engineStateOwner": "engine-state-manager",
+  "artifacts": [
+    {
+      "path": "pbos/runtime/validation.json",
+      "owner": "runtime-validator",
+      "producer": "pbos validator",
+      "classification": "valid",
+      "reasons": [
+        "Validation gate PBOS-CONTEXT-001 was superseded by planning gate none."
+      ],
+      "previousDigest": "7145aa52ea94dcbfe4beda9249c81589247951a06744ef9bc7ce71b359c2773a",
+      "currentDigest": "8107e0918e4301b93bc1d6793635ad232db98fe5cdad410f6bdfb3f81b6bb122",
+      "previousArtifact": {
+        "status": "PASS",
+        "selectedGate": "PBOS-CONTEXT-001",
+        "checks": [
+          {
+            "name": "Repository Artifact",
+            "status": "PASS",
+            "message": "repository.json loaded"
+          },
+          {
+            "name": "Planning Artifact",
+            "status": "PASS",
+            "message": "next-gate.json loaded"
+          },
+          {
+            "name": "Selected Gate",
+            "status": "PASS",
+            "message": "PBOS-CONTEXT-001"
+          },
+          {
+            "name": "Planning Eligible",
+            "status": "PASS",
+            "message": "in_progress"
+          }
+        ]
+      },
+      "regenerated": true
+    },
+    {
+      "path": "pbos/runtime/execution.json",
+      "owner": "execution-engine",
+      "producer": "pbos execute",
+      "classification": "valid",
+      "reasons": [
+        "Execution gate PBOS-CONTEXT-001 was superseded by planning gate none."
+      ],
+      "previousDigest": "a0c5cba56efcf0dcb383550affaff5867becf6b317f37bbc4efda59d06caf2e9",
+      "currentDigest": "2a4d8229227d171c17ef3792006de8b560cc37007143bd5d535ce859be98fff1",
+      "previousArtifact": {
+        "status": "BLOCKED",
+        "gate": "PBOS-CONTEXT-001",
+        "tasks": []
+      },
+      "regenerated": true
+    },
+    {
+      "path": "pbos/runtime/next-gate.json",
+      "owner": "constitutional-planner",
+      "producer": "planConstitutionalGate",
+      "classification": "valid",
+      "reasons": [],
+      "previousDigest": "33837e77f36daa1dbe72205caa6df08b68cc53087e9c9f073c95e850fd3e4f05",
+      "currentDigest": "33837e77f36daa1dbe72205caa6df08b68cc53087e9c9f073c95e850fd3e4f05",
+      "previousArtifact": {
+        "selectedGate": null,
+        "eligible": [],
+        "blocked": [
+          "PBOS-CONTEXT-001"
+        ],
+        "completed": [
+          "PBOS-AUDIT-001",
+          "PBOS-ENGINE-004",
+          "PBOS-ENGINE-005",
+          "PBOS-GATE-001",
+          "PBOS-QA-001",
+          "PBOS-RLS-001",
+          "PBOS-UI-001"
+        ],
+        "state": "VALID_IDLE",
+        "authority": "constitutional-planner"
+      },
+      "regenerated": true
+    },
+    {
+      "path": "pbos/runtime/repository-context.json",
+      "owner": "repository-context",
+      "producer": "generateRepositoryContextArtifact",
+      "classification": "recoverable",
+      "reasons": [
+        "Repository context must be regenerated after runtime reconciliation."
+      ],
+      "previousDigest": "2683e2b76928854cab0d3561b2cbb21ed54b38e3915d58f19f1d65bcb69799bc",
+      "currentDigest": "2683e2b76928854cab0d3561b2cbb21ed54b38e3915d58f19f1d65bcb69799bc",
+      "previousArtifact": {
+        "version": "1.1.0",
+        "capturedAt": "2026-07-28T21:37:31.675Z",
+        "snapshot": {
+          "repositoryRoot": "/Users/bulletproof/playbook-platform",
+          "remoteName": "origin",
+          "remoteUrl": "https://github.com/sgwalton87/playbook-platform.git",
+          "repositoryIdentity": "playbook-platform",
+          "git": {
+            "branch": "pbos/post-pps300-convergence",
+            "commitSha": "5fa6699b5b4034cb11b4b95bdb81a8dd3491f4b1",
+            "upstream": "origin/pbos/post-pps300-convergence",
+            "ahead": 1,
+            "behind": 0,
+            "workingTreeClean": false,
+            "workingTreeDigest": "7a670510901187748cda2e355f1aaeb97b2f4b9ed845848e2d291fd2fc4ed125",
+            "workingTreeContentDigest": "7428f85182b0e4f9d26c0fd870e0e13e1c0ffa8734e0ca89ceb6bae7201a7340"
+          },
+          "runtime": {
+            "engineVersion": "3.0.0",
+            "currentGate": "PBOS-CONTEXT-001",
+            "completedGates": [
+              "PBOS-AUDIT-001",
+              "PBOS-ENGINE-004",
+              "PBOS-ENGINE-005",
+              "PBOS-GATE-001",
+              "PBOS-QA-001",
+              "PBOS-RLS-001",
+              "PBOS-UI-001"
+            ],
+            "activeSprint": "PBOS-CONTEXT-001",
+            "executionMode": "planning"
+          },
+          "artifacts": [
+            {
+              "path": "pbos/runtime/repository.json",
+              "exists": true,
+              "gateId": null,
+              "branch": "pbos/post-pps300-convergence",
+              "status": null,
+              "generatedAt": "2026-07-28T21:37:08.908Z",
+              "digest": "170cee54aa4593eeea2f8d44c685d3bdae0c46b2d860e6ade171462efbe7d5ff"
+            },
+            {
+              "path": "pbos/runtime/next-gate.json",
+              "exists": true,
+              "gateId": "PBOS-CONTEXT-001",
+              "branch": null,
+              "status": null,
+              "generatedAt": null,
+              "digest": "99b5f215c302d05a24955852c904b3d56dfe154aca422d1732e3bba2ba68eb98"
+            },
+            {
+              "path": "pbos/runtime/validation.json",
+              "exists": true,
+              "gateId": "PBOS-CONTEXT-001",
+              "branch": null,
+              "status": "PASS",
+              "generatedAt": null,
+              "digest": "7145aa52ea94dcbfe4beda9249c81589247951a06744ef9bc7ce71b359c2773a"
+            },
+            {
+              "path": "pbos/runtime/execution.json",
+              "exists": true,
+              "gateId": "PBOS-CONTEXT-001",
+              "branch": null,
+              "status": "BLOCKED",
+              "generatedAt": null,
+              "digest": "a0c5cba56efcf0dcb383550affaff5867becf6b317f37bbc4efda59d06caf2e9"
+            },
+            {
+              "path": "pbos/runtime/execution-contract.json",
+              "exists": true,
+              "gateId": "PBOS-ENGINE-005",
+              "branch": null,
+              "status": null,
+              "generatedAt": "2026-07-28T18:15:32.116Z",
+              "digest": "da26cc7ab003476f0820a31ac95202c22372abd1a0b7d68a0a81ed702465ea5d"
+            },
+            {
+              "path": "pbos/runtime/work-package.json",
+              "exists": true,
+              "gateId": "PBOS-ENGINE-005",
+              "branch": null,
+              "status": null,
+              "generatedAt": "2026-07-28T18:15:32.121Z",
+              "digest": "a2e870a81380a262126f3c23eb50b10d934608ea05942a7678f9521b1b8a39b6"
+            },
+            {
+              "path": "pbos/runtime/execution-authorization.json",
+              "exists": true,
+              "gateId": "PBOS-ENGINE-005",
+              "branch": null,
+              "status": "PENDING",
+              "generatedAt": "2026-07-28T18:15:32.140Z",
+              "digest": "e9660ce2fa360155bc1e34780a3f99047a8bc618334cb0c2e1b4560a4c30843d"
+            }
+          ]
+        },
+        "identity": "2c899391c128b7748ae37e8a6b9e5a1fac713cc8d57de112bc6392bd211faa39"
+      },
+      "regenerated": false
+    },
+    {
+      "path": "pbos/state/engine-state.json",
+      "owner": "engine-state-manager",
+      "producer": "saveState",
+      "classification": "valid",
+      "reasons": [],
+      "previousDigest": "c5f90ac1bbcdfaaead591565307a9b7b8c3642ce4297975d0fec142dbcb44131",
+      "currentDigest": "c5f90ac1bbcdfaaead591565307a9b7b8c3642ce4297975d0fec142dbcb44131",
+      "previousArtifact": {
+        "currentGate": null,
+        "failedGates": [],
+        "blockedGates": [
+          "SingleSprintRule"
+        ],
+        "blockedBy": [
+          "SingleSprintRule"
+        ],
+        "lastRun": "2026-07-28T23:19:58.049Z",
+        "handbookVersion": "2026-07-24",
+        "validationHash": "ac1224c16df205813b8b2f2193de9535d343585dab9cdf7fd7079712a700258d",
+        "configurationHash": null,
+        "futureCompatibility": [
+          "execution",
+          "audit",
+          "doctor",
+          "release",
+          "ship"
+        ],
+        "engineVersion": "3.0.0",
+        "resumeToken": "02613d5b8b88585bb3ff4623",
+        "executionMode": "planning",
+        "release": {
+          "currentState": "PROMOTION_COMPLETE",
+          "previousState": "PROMOTION_PENDING",
+          "transitionTimestamp": "2026-07-25T09:55:41.131Z",
+          "transitionReason": "Repository promotion can complete in this environment.",
+          "environment": {
+            "name": "local",
+            "gitRemoteAvailable": true,
+            "gitCredentialsAvailable": true,
+            "repositoryWritable": true,
+            "pullRequestPossible": true,
+            "tagCreationPossible": true
+          },
+          "blockingConditions": []
+        }
+      },
+      "regenerated": false
+    }
+  ],
+  "unresolvedConflicts": [],
+  "artifactHealth": "VALID",
+  "refreshRequired": true,
+  "readyForContextRefresh": true,
+  "history": [
+    {
+      "runId": "8fd95727bedc85cf50529d2bd79d7952d5480bfde50653293b4a6fe4932f3007",
+      "evaluatedAt": "2026-07-29T05:50:10.209Z",
+      "owner": "artifact-reconciliation",
+      "engineStateOwner": "engine-state-manager",
+      "artifacts": [
+        {
+          "path": "pbos/runtime/validation.json",
+          "owner": "runtime-validator",
+          "producer": "pbos validator",
+          "classification": "valid",
+          "reasons": [
+            "Validation gate PBOS-CONTEXT-001 was superseded by planning gate none."
+          ],
+          "previousDigest": "7145aa52ea94dcbfe4beda9249c81589247951a06744ef9bc7ce71b359c2773a",
+          "currentDigest": "8107e0918e4301b93bc1d6793635ad232db98fe5cdad410f6bdfb3f81b6bb122",
+          "previousArtifact": {
+            "status": "PASS",
+            "selectedGate": "PBOS-CONTEXT-001",
+            "checks": [
+              {
+                "name": "Repository Artifact",
+                "status": "PASS",
+                "message": "repository.json loaded"
+              },
+              {
+                "name": "Planning Artifact",
+                "status": "PASS",
+                "message": "next-gate.json loaded"
+              },
+              {
+                "name": "Selected Gate",
+                "status": "PASS",
+                "message": "PBOS-CONTEXT-001"
+              },
+              {
+                "name": "Planning Eligible",
+                "status": "PASS",
+                "message": "in_progress"
+              }
+            ]
+          },
+          "regenerated": true
+        },
+        {
+          "path": "pbos/runtime/execution.json",
+          "owner": "execution-engine",
+          "producer": "pbos execute",
+          "classification": "valid",
+          "reasons": [
+            "Execution gate PBOS-CONTEXT-001 was superseded by planning gate none."
+          ],
+          "previousDigest": "a0c5cba56efcf0dcb383550affaff5867becf6b317f37bbc4efda59d06caf2e9",
+          "currentDigest": "2a4d8229227d171c17ef3792006de8b560cc37007143bd5d535ce859be98fff1",
+          "previousArtifact": {
+            "status": "BLOCKED",
+            "gate": "PBOS-CONTEXT-001",
+            "tasks": []
+          },
+          "regenerated": true
+        },
+        {
+          "path": "pbos/runtime/next-gate.json",
+          "owner": "constitutional-planner",
+          "producer": "planConstitutionalGate",
+          "classification": "valid",
+          "reasons": [],
+          "previousDigest": "33837e77f36daa1dbe72205caa6df08b68cc53087e9c9f073c95e850fd3e4f05",
+          "currentDigest": "33837e77f36daa1dbe72205caa6df08b68cc53087e9c9f073c95e850fd3e4f05",
+          "previousArtifact": {
+            "selectedGate": null,
+            "eligible": [],
+            "blocked": [
+              "PBOS-CONTEXT-001"
+            ],
+            "completed": [
+              "PBOS-AUDIT-001",
+              "PBOS-ENGINE-004",
+              "PBOS-ENGINE-005",
+              "PBOS-GATE-001",
+              "PBOS-QA-001",
+              "PBOS-RLS-001",
+              "PBOS-UI-001"
+            ],
+            "state": "VALID_IDLE",
+            "authority": "constitutional-planner"
+          },
+          "regenerated": true
+        },
+        {
+          "path": "pbos/runtime/repository-context.json",
+          "owner": "repository-context",
+          "producer": "generateRepositoryContextArtifact",
+          "classification": "recoverable",
+          "reasons": [
+            "Repository context must be regenerated after runtime reconciliation."
+          ],
+          "previousDigest": "2683e2b76928854cab0d3561b2cbb21ed54b38e3915d58f19f1d65bcb69799bc",
+          "currentDigest": "2683e2b76928854cab0d3561b2cbb21ed54b38e3915d58f19f1d65bcb69799bc",
+          "previousArtifact": {
+            "version": "1.1.0",
+            "capturedAt": "2026-07-28T21:37:31.675Z",
+            "snapshot": {
+              "repositoryRoot": "/Users/bulletproof/playbook-platform",
+              "remoteName": "origin",
+              "remoteUrl": "https://github.com/sgwalton87/playbook-platform.git",
+              "repositoryIdentity": "playbook-platform",
+              "git": {
+                "branch": "pbos/post-pps300-convergence",
+                "commitSha": "5fa6699b5b4034cb11b4b95bdb81a8dd3491f4b1",
+                "upstream": "origin/pbos/post-pps300-convergence",
+                "ahead": 1,
+                "behind": 0,
+                "workingTreeClean": false,
+                "workingTreeDigest": "7a670510901187748cda2e355f1aaeb97b2f4b9ed845848e2d291fd2fc4ed125",
+                "workingTreeContentDigest": "7428f85182b0e4f9d26c0fd870e0e13e1c0ffa8734e0ca89ceb6bae7201a7340"
+              },
+              "runtime": {
+                "engineVersion": "3.0.0",
+                "currentGate": "PBOS-CONTEXT-001",
+                "completedGates": [
+                  "PBOS-AUDIT-001",
+                  "PBOS-ENGINE-004",
+                  "PBOS-ENGINE-005",
+                  "PBOS-GATE-001",
+                  "PBOS-QA-001",
+                  "PBOS-RLS-001",
+                  "PBOS-UI-001"
+                ],
+                "activeSprint": "PBOS-CONTEXT-001",
+                "executionMode": "planning"
+              },
+              "artifacts": [
+                {
+                  "path": "pbos/runtime/repository.json",
+                  "exists": true,
+                  "gateId": null,
+                  "branch": "pbos/post-pps300-convergence",
+                  "status": null,
+                  "generatedAt": "2026-07-28T21:37:08.908Z",
+                  "digest": "170cee54aa4593eeea2f8d44c685d3bdae0c46b2d860e6ade171462efbe7d5ff"
+                },
+                {
+                  "path": "pbos/runtime/next-gate.json",
+                  "exists": true,
+                  "gateId": "PBOS-CONTEXT-001",
+                  "branch": null,
+                  "status": null,
+                  "generatedAt": null,
+                  "digest": "99b5f215c302d05a24955852c904b3d56dfe154aca422d1732e3bba2ba68eb98"
+                },
+                {
+                  "path": "pbos/runtime/validation.json",
+                  "exists": true,
+                  "gateId": "PBOS-CONTEXT-001",
+                  "branch": null,
+                  "status": "PASS",
+                  "generatedAt": null,
+                  "digest": "7145aa52ea94dcbfe4beda9249c81589247951a06744ef9bc7ce71b359c2773a"
+                },
+                {
+                  "path": "pbos/runtime/execution.json",
+                  "exists": true,
+                  "gateId": "PBOS-CONTEXT-001",
+                  "branch": null,
+                  "status": "BLOCKED",
+                  "generatedAt": null,
+                  "digest": "a0c5cba56efcf0dcb383550affaff5867becf6b317f37bbc4efda59d06caf2e9"
+                },
+                {
+                  "path": "pbos/runtime/execution-contract.json",
+                  "exists": true,
+                  "gateId": "PBOS-ENGINE-005",
+                  "branch": null,
+                  "status": null,
+                  "generatedAt": "2026-07-28T18:15:32.116Z",
+                  "digest": "da26cc7ab003476f0820a31ac95202c22372abd1a0b7d68a0a81ed702465ea5d"
+                },
+                {
+                  "path": "pbos/runtime/work-package.json",
+                  "exists": true,
+                  "gateId": "PBOS-ENGINE-005",
+                  "branch": null,
+                  "status": null,
+                  "generatedAt": "2026-07-28T18:15:32.121Z",
+                  "digest": "a2e870a81380a262126f3c23eb50b10d934608ea05942a7678f9521b1b8a39b6"
+                },
+                {
+                  "path": "pbos/runtime/execution-authorization.json",
+                  "exists": true,
+                  "gateId": "PBOS-ENGINE-005",
+                  "branch": null,
+                  "status": "PENDING",
+                  "generatedAt": "2026-07-28T18:15:32.140Z",
+                  "digest": "e9660ce2fa360155bc1e34780a3f99047a8bc618334cb0c2e1b4560a4c30843d"
+                }
+              ]
+            },
+            "identity": "2c899391c128b7748ae37e8a6b9e5a1fac713cc8d57de112bc6392bd211faa39"
+          },
+          "regenerated": false
+        },
+        {
+          "path": "pbos/state/engine-state.json",
+          "owner": "engine-state-manager",
+          "producer": "saveState",
+          "classification": "valid",
+          "reasons": [],
+          "previousDigest": "c5f90ac1bbcdfaaead591565307a9b7b8c3642ce4297975d0fec142dbcb44131",
+          "currentDigest": "c5f90ac1bbcdfaaead591565307a9b7b8c3642ce4297975d0fec142dbcb44131",
+          "previousArtifact": {
+            "currentGate": null,
+            "failedGates": [],
+            "blockedGates": [
+              "SingleSprintRule"
+            ],
+            "blockedBy": [
+              "SingleSprintRule"
+            ],
+            "lastRun": "2026-07-28T23:19:58.049Z",
+            "handbookVersion": "2026-07-24",
+            "validationHash": "ac1224c16df205813b8b2f2193de9535d343585dab9cdf7fd7079712a700258d",
+            "configurationHash": null,
+            "futureCompatibility": [
+              "execution",
+              "audit",
+              "doctor",
+              "release",
+              "ship"
+            ],
+            "engineVersion": "3.0.0",
+            "resumeToken": "02613d5b8b88585bb3ff4623",
+            "executionMode": "planning",
+            "release": {
+              "currentState": "PROMOTION_COMPLETE",
+              "previousState": "PROMOTION_PENDING",
+              "transitionTimestamp": "2026-07-25T09:55:41.131Z",
+              "transitionReason": "Repository promotion can complete in this environment.",
+              "environment": {
+                "name": "local",
+                "gitRemoteAvailable": true,
+                "gitCredentialsAvailable": true,
+                "repositoryWritable": true,
+                "pullRequestPossible": true,
+                "tagCreationPossible": true
+              },
+              "blockingConditions": []
+            }
+          },
+          "regenerated": false
+        }
+      ],
+      "unresolvedConflicts": [],
+      "artifactHealth": "VALID",
+      "refreshRequired": true,
+      "readyForContextRefresh": true
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 export * from "./runtime";
 export * from "./artifacts";
+export * from "./artifact-ownership";
 export * from "./logger";
 export * from "./config";
 export * from "./identity";

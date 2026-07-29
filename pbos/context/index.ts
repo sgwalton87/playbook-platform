@@ -2,6 +2,12 @@ export * from "./schema";
 export * from "./loader";
 export * from "./validator";
 export * from "./generate";
+export * from "./certification";
+export * from "./generator";
+export * from "./history";
+export * from "./lifecycle";
+export * from "./observer";
+export * from "./reports";
 
 import type { ContextValidationResult } from "./schema";
 import {

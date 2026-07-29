@@ -38,6 +38,8 @@
     "pbos:next": "tsx pbos/commands/next.ts",
     "pbos": "tsx pbos/main.ts",
     "pbos:status": "tsx pbos/commands/status.ts",
+    "pbos:context": "tsx pbos/commands/context.ts",
+    "pbos:reconcile-artifacts": "tsx pbos/commands/reconcile-artifacts.ts",
     "pbos:release": "tsx pbos/commands/release.ts",
     "pbos:promote": "tsx pbos/commands/promote.ts",
     "pbos:complete": "tsx pbos/commands/complete.ts",

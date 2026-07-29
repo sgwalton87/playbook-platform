@@ -2,6 +2,7 @@ import path from "node:path";
 import {
   Artifacts,
   PBOSConfig,
+  RuntimeArtifactOwnership,
   artifactDigest,
 } from "../kernel";
 import {
@@ -169,6 +170,19 @@ export function validateRepositoryContext(options: {
         `Context validation failed: required artifact missing: ${current.path}.`
       );
       continue;
+    }
+
+    const governance = Object.values(
+      RuntimeArtifactOwnership
+    ).find(({ path: artifactPath }) => artifactPath === current.path);
+    if (
+      !governance ||
+      current.owner !== governance.owner ||
+      captured.owner !== governance.owner
+    ) {
+      errors.push(
+        `Context validation failed: artifact ownership is invalid: ${current.path}.`
+      );
     }
 
     if (captured.digest !== current.digest) {

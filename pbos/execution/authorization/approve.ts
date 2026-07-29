@@ -14,10 +14,11 @@ import type { ExecutionAuthorizationRecord, AuthorizationStatus } from "./types"
  */
 export function approveExecutionAuthorization(
   approvedBy: string,
-  approvalReason: string
+  approvalReason: string,
+  rootDir = process.cwd()
 ): ExecutionAuthorizationRecord {
   const artifactPath = path.join(
-    process.cwd(),
+    rootDir,
     Artifacts.executionAuthorization
   );
 
@@ -39,7 +40,7 @@ export function approveExecutionAuthorization(
     authorizedAt: new Date().toISOString(),
   };
 
-  Runtime.save(artifactPath, approved);
+  Runtime.save(artifactPath, approved, "execution-authorization");
 
   return approved;
 }
@@ -52,10 +53,11 @@ export function approveExecutionAuthorization(
  */
 export function denyExecutionAuthorization(
   deniedBy: string,
-  denialReason: string
+  denialReason: string,
+  rootDir = process.cwd()
 ): ExecutionAuthorizationRecord {
   const artifactPath = path.join(
-    process.cwd(),
+    rootDir,
     Artifacts.executionAuthorization
   );
 
@@ -77,7 +79,7 @@ export function denyExecutionAuthorization(
     authorizedAt: new Date().toISOString(),
   };
 
-  Runtime.save(artifactPath, denied);
+  Runtime.save(artifactPath, denied, "execution-authorization");
 
   return denied;
 }
@@ -92,10 +94,11 @@ export function setAuthorizationStatus(
   metadata: {
     approvedBy?: string | null;
     approvalReason?: string | null;
-  } = {}
+  } = {},
+  rootDir = process.cwd()
 ): ExecutionAuthorizationRecord {
   const artifactPath = path.join(
-    process.cwd(),
+    rootDir,
     Artifacts.executionAuthorization
   );
 
@@ -117,7 +120,7 @@ export function setAuthorizationStatus(
     authorizedAt: status !== "PENDING" ? (new Date().toISOString()) : null,
   };
 
-  Runtime.save(artifactPath, updated);
+  Runtime.save(artifactPath, updated, "execution-authorization");
 
   return updated;
 }

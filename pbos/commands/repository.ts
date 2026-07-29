@@ -9,7 +9,11 @@ import {
 export function runRepositoryAnalysis() {
   const model = analyzeRepository();
 
-  Runtime.save(Artifacts.repository, model);
+  Runtime.save(
+    Artifacts.repository,
+    model,
+    "repository-intelligence"
+  );
 
   Logger.blank();
   Logger.section("PBOS Repository Intelligence");
