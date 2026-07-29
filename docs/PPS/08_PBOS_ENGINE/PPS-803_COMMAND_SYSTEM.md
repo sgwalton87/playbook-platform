@@ -107,6 +107,12 @@ Before regeneration, the command archives each prior artifact body and digest in
 
 Unknown ownership, invalid engine-state authority, failed owner regeneration, or remaining cross-artifact conflicts deny reconciliation.
 
+## Lifecycle Governance Command
+
+`npm run pbos:govern-lifecycle -- <gate-id>` is the public evidence-backed gate completion workflow. It validates a gate-specific completion evidence manifest, executes every declared validation requirement through a registered adapter, generates a release contract, delegates promotion and completion to their canonical authorities, reconciles runtime artifacts, refreshes repository context, and invokes the constitutional planner.
+
+The workflow rejects missing, stale, mismatched, incomplete, or undeclared evidence. It also rejects unsupported validation requirements, skipped transitions, duplicate completion, invalid history, promotion failure, and recovery failure. Every attempt is recorded in `pbos/runtime/lifecycle-governance.json`.
+
 ---
 
 # Command Lifecycle

@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { loadConfig } from "../engine/config";
 import { loadState, saveState } from "../engine/state";
-import { Artifacts, Runtime } from "../kernel";
+import { Artifacts, Runtime, artifactDigest } from "../kernel";
 import { refreshPlanningArtifact } from "../engine/planning-refresh";
 import type { GateTransition } from "./contracts";
 import { transitionGate } from "./transition";
@@ -10,6 +10,8 @@ import { transitionGate } from "./transition";
 interface PromotionArtifact {
   gateId: string;
   promoted: boolean;
+  gateDigest?: string;
+  contractDigest?: string;
 }
 
 interface ReleaseContractArtifact {
@@ -21,6 +23,7 @@ interface ReleaseContractArtifact {
 export async function completePromotedGate(options: {
   requestedGateId?: string;
   rootDir?: string;
+  additionalEvidence?: string[];
 } = {}): Promise<GateTransition> {
   const rootDir = options.rootDir ?? process.cwd();
   const promotionPath = path.join(
@@ -75,12 +78,51 @@ export async function completePromotedGate(options: {
       "Completion denied: release contract is not promotion ready."
     );
   }
-
   const gatePath = path.join(
     rootDir,
     "pbos/gates",
     `${gateId}.json`
   );
+  const gateBefore = JSON.parse(
+    fs.readFileSync(gatePath, "utf8")
+  ) as unknown;
+  if (
+    promotion.gateDigest &&
+    promotion.gateDigest !== artifactDigest(gateBefore)
+  ) {
+    throw new Error(
+      "Completion denied: promoted gate content identity does not match."
+    );
+  }
+  if (
+    promotion.contractDigest &&
+    promotion.contractDigest !== artifactDigest(contract)
+  ) {
+    throw new Error(
+      "Completion denied: promoted release contract identity does not match."
+    );
+  }
+
+  const completionPath = path.join(rootDir, Artifacts.completion);
+  const existing = Runtime.exists(completionPath)
+    ? Runtime.load<
+        GateTransition & {
+          schemaVersion?: 1;
+          owner?: "gate-lifecycle";
+          history?: GateTransition[];
+        }
+      >(completionPath)
+    : null;
+  if (
+    existing?.history &&
+    existing.history.length > 0 &&
+    existing.timestamp !==
+      existing.history[existing.history.length - 1].timestamp
+  ) {
+    throw new Error(
+      "Completion denied: existing completion history is invalid."
+    );
+  }
   const result = transitionGate({
     gatePath,
     gateId,
@@ -90,12 +132,33 @@ export async function completePromotedGate(options: {
     evidence: [
       "docs/release-evidence/release-contract.json",
       "pbos/runtime/promotion.json",
+      ...(options.additionalEvidence ?? []),
     ],
   });
 
   Runtime.save(
-    path.join(rootDir, Artifacts.completion),
-    result,
+    completionPath,
+    {
+      schemaVersion: 1,
+      owner: "gate-lifecycle",
+      ...result,
+      history: [
+        ...(existing
+          ? existing.history ?? [
+              {
+                gateId: existing.gateId,
+                from: existing.from,
+                to: existing.to,
+                reason: existing.reason,
+                evidence: existing.evidence,
+                timestamp: existing.timestamp,
+                contentIdentity: existing.contentIdentity,
+              },
+            ]
+          : []),
+        result,
+      ],
+    },
     "gate-lifecycle"
   );
 

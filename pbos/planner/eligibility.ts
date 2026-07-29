@@ -82,7 +82,10 @@ export function evaluateGateEligibility(
       code: "VALIDATION_FAILED",
       message: "Runtime validation has not passed.",
     });
-  } else if (environment.validationGate !== gate.id) {
+  } else if (
+    environment.validationGate !== null &&
+    environment.validationGate !== gate.id
+  ) {
     reasons.push({
       code: "VALIDATION_GATE_MISMATCH",
       message: `Validation belongs to ${environment.validationGate ?? "no gate"}, not ${gate.id}.`,

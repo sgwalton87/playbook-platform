@@ -1,5 +1,11 @@
 [
   {
+    "name": "govern-lifecycle",
+    "description": "Evaluate completion evidence and orchestrate validation, promotion, completion, recovery, and replanning.",
+    "mode": "release",
+    "status": "active"
+  },
+  {
     "name": "reconcile-artifacts",
     "description": "Classify runtime conflicts and invoke canonical owners to regenerate stale artifacts.",
     "mode": "doctor",

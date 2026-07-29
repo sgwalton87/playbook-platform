@@ -1,6 +1,6 @@
 {
   "version": "1.1.0",
-  "capturedAt": "2026-07-29T05:52:33.663Z",
+  "capturedAt": "2026-07-29T07:03:46.030Z",
   "snapshot": {
     "repositoryRoot": "/Users/bulletproof/playbook-platform",
     "remoteName": "origin",
@@ -8,19 +8,20 @@
     "repositoryIdentity": "playbook-platform",
     "git": {
       "branch": "pbos/post-pps300-convergence",
-      "commitSha": "7f103f8e32496205819ef3e258c2e6f2836bbdf5",
+      "commitSha": "924c67f6c7ced0385c422bdca91fe53d3641d28b",
       "upstream": "origin/pbos/post-pps300-convergence",
-      "ahead": 6,
+      "ahead": 0,
       "behind": 0,
       "workingTreeClean": false,
-      "workingTreeDigest": "9d5baee3cc26ff7bb31311380395eaccaee46fa61b76d84042e67d1298e9381c",
-      "workingTreeContentDigest": "4ff3242d5b3ccac6add3b56ebbc756d7f492d740ef9107dcde3740ce77d41b46"
+      "workingTreeDigest": "3a70f2e547701593e63e119fafd25f1ef5fca9bf7a3896953f55228bcea68e02",
+      "workingTreeContentDigest": "48466306a6a19081d17c5e825465af50f5f85d17451f16f1a96fc56bbef21218"
     },
     "runtime": {
       "engineVersion": "3.0.0",
       "currentGate": null,
       "completedGates": [
         "PBOS-AUDIT-001",
+        "PBOS-CONTEXT-001",
         "PBOS-ENGINE-004",
         "PBOS-ENGINE-005",
         "PBOS-GATE-001",
@@ -54,7 +55,7 @@
         "branch": null,
         "status": null,
         "generatedAt": null,
-        "digest": "33837e77f36daa1dbe72205caa6df08b68cc53087e9c9f073c95e850fd3e4f05",
+        "digest": "9546a1060aa0089ef70ced77aec845a3a31d525679411c5b2a1dde48e807ab52",
         "owner": "constitutional-planner",
         "consumers": [
           "validator",
@@ -137,5 +138,5 @@
       }
     ]
   },
-  "identity": "3d4ae6364ba9e69e8c8c869754997ec3e047d24e4051a5db322eeb95c9e82cb0"
+  "identity": "098215a26f1f172e3cfa48a7bd3bfcd7426464f3799e2254e06527b5c65e9583"
 }

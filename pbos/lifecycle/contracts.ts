@@ -9,6 +9,7 @@ export interface GateTransition {
   reason: string;
   evidence: string[];
   timestamp: string;
+  contentIdentity?: string;
 }
 
 export interface TransitionRequest {

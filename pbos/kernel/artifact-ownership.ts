@@ -101,6 +101,14 @@ export const RuntimeArtifactOwnership: Record<
     persistence: "durable",
     cleanup: "governed-transition",
   },
+  lifecycleGovernance: {
+    path: Artifacts.lifecycleGovernance,
+    owner: "lifecycle-governance",
+    producer: "pbos govern-lifecycle",
+    consumers: ["completion", "promotion", "planner", "status"],
+    persistence: "durable",
+    cleanup: "governed-transition",
+  },
   workflow: {
     path: Artifacts.workflow,
     owner: "workflow-engine",

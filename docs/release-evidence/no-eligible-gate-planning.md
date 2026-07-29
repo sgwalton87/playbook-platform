@@ -13,17 +13,17 @@
   "validationResults": [
     {
       "id": "NoSkippedDependencies",
-      "severity": "warning",
+      "severity": "info",
       "passed": true,
-      "message": "1 gate(s) are blocked by incomplete dependencies and will not be selected.",
+      "message": "No blocked dependency chains were selected.",
       "remediation": "Complete prerequisite gates before selecting dependent gates.",
       "handbookReference": "docs/auto_sprint.md#sprint-selection-algorithm"
     },
     {
       "id": "SingleSprintRule",
-      "severity": "error",
-      "passed": false,
-      "message": "PBOS detected an invalid sprint state.",
+      "severity": "info",
+      "passed": true,
+      "message": "PBOS is idle with all configured gates complete.",
       "remediation": "Ensure PBOS has either one active sprint or a fully completed idle state.",
       "handbookReference": "docs/auto_sprint.md#required-output-format"
     },
@@ -92,12 +92,10 @@
       "handbookReference": "pbos/README.md#architecture"
     }
   ],
-  "blockers": [
-    "SingleSprintRule: PBOS detected an invalid sprint state. Remediation: Ensure PBOS has either one active sprint or a fully completed idle state."
-  ],
-  "recommendation": "No gate is eligible. PBOS-AUDIT-001: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED, CONTEXT_INVALID, VALIDATION_GATE_MISMATCH; PBOS-CONTEXT-001: CONTEXT_INVALID; PBOS-ENGINE-004: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED, CONTEXT_INVALID, VALIDATION_GATE_MISMATCH; PBOS-ENGINE-005: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED, CONTEXT_INVALID, VALIDATION_GATE_MISMATCH; PBOS-GATE-001: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED, CONTEXT_INVALID, VALIDATION_GATE_MISMATCH; PBOS-QA-001: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED, CONTEXT_INVALID, VALIDATION_GATE_MISMATCH; PBOS-RLS-001: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED, CONTEXT_INVALID, VALIDATION_GATE_MISMATCH; PBOS-UI-001: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED, CONTEXT_INVALID, VALIDATION_GATE_MISMATCH.",
-  "duration": 403,
-  "timestamp": "2026-07-28T23:19:58.052Z",
+  "blockers": [],
+  "recommendation": "No gate is eligible. PBOS-AUDIT-001: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED; PBOS-CONTEXT-001: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED, ARTIFACTS_INVALID; PBOS-ENGINE-004: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED; PBOS-ENGINE-005: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED; PBOS-GATE-001: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED; PBOS-QA-001: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED; PBOS-RLS-001: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED; PBOS-UI-001: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED.",
+  "duration": 1209,
+  "timestamp": "2026-07-29T07:03:02.602Z",
   "release": {
     "currentState": "PROMOTION_COMPLETE",
     "previousState": "PROMOTION_PENDING",
@@ -120,10 +118,10 @@
 - No eligible gate was selected.
 
 ## Validation Results
-- PASS: NoSkippedDependencies [warning] — 1 gate(s) are blocked by incomplete dependencies and will not be selected.
+- PASS: NoSkippedDependencies [info] — No blocked dependency chains were selected.
   - Remediation: Complete prerequisite gates before selecting dependent gates.
   - Handbook: docs/auto_sprint.md#sprint-selection-algorithm
-- FAIL: SingleSprintRule [error] — PBOS detected an invalid sprint state.
+- PASS: SingleSprintRule [info] — PBOS is idle with all configured gates complete.
   - Remediation: Ensure PBOS has either one active sprint or a fully completed idle state.
   - Handbook: docs/auto_sprint.md#required-output-format
 - PASS: DocumentationRule [info] — Handbook authority paths are configured.
@@ -152,7 +150,7 @@
   - Handbook: pbos/README.md#architecture
 
 ## Blockers
-- SingleSprintRule: PBOS detected an invalid sprint state. Remediation: Ensure PBOS has either one active sprint or a fully completed idle state.
+- None from planning validation.
 
 ## Recommendation
-No gate is eligible. PBOS-AUDIT-001: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED, CONTEXT_INVALID, VALIDATION_GATE_MISMATCH; PBOS-CONTEXT-001: CONTEXT_INVALID; PBOS-ENGINE-004: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED, CONTEXT_INVALID, VALIDATION_GATE_MISMATCH; PBOS-ENGINE-005: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED, CONTEXT_INVALID, VALIDATION_GATE_MISMATCH; PBOS-GATE-001: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED, CONTEXT_INVALID, VALIDATION_GATE_MISMATCH; PBOS-QA-001: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED, CONTEXT_INVALID, VALIDATION_GATE_MISMATCH; PBOS-RLS-001: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED, CONTEXT_INVALID, VALIDATION_GATE_MISMATCH; PBOS-UI-001: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED, CONTEXT_INVALID, VALIDATION_GATE_MISMATCH.
+No gate is eligible. PBOS-AUDIT-001: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED; PBOS-CONTEXT-001: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED, ARTIFACTS_INVALID; PBOS-ENGINE-004: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED; PBOS-ENGINE-005: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED; PBOS-GATE-001: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED; PBOS-QA-001: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED; PBOS-RLS-001: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED; PBOS-UI-001: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED.

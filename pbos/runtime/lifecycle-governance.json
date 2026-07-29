@@ -1,0 +1,366 @@
+{
+  "schemaVersion": 1,
+  "runId": "a845d5ec68ac344b9fb066517efb902992c7588ecc75129f8ff1ffaaa5d12776",
+  "gateId": "PBOS-CONTEXT-001",
+  "previousStatus": "in_progress",
+  "evaluatedAt": "2026-07-29T06:59:30.664Z",
+  "authority": "lifecycle-governance",
+  "gateContentIdentity": "5cdf7a8c817fa2d369fb6781eac200c20277de0b59cdb34ab15896de5e0c9ebc",
+  "evidenceEvaluation": {
+    "passed": true,
+    "gateId": "PBOS-CONTEXT-001",
+    "gateDigest": "5cdf7a8c817fa2d369fb6781eac200c20277de0b59cdb34ab15896de5e0c9ebc",
+    "manifestPath": "docs/release-evidence/pbos-context-001-completion-evidence.json",
+    "evidence": [
+      {
+        "path": "docs/release-evidence/pbos-context-001-implementation.md",
+        "digest": "446e8ae339a2d274001c7b3d257bc1178f91785eb52585023c95a7463ade642e",
+        "capturedAt": "2026-07-29T06:25:55Z"
+      },
+      {
+        "path": "docs/release-evidence/pbos-context-lifecycle.md",
+        "digest": "4371fdb5d776a3cfaacb73baf7a4cca61577d6b1c458324940a9a1ab4dfcedfe",
+        "capturedAt": "2026-07-29T06:25:55Z"
+      },
+      {
+        "path": "docs/release-evidence/pbos-artifact-consistency-report.md",
+        "digest": "c87b11c63b7e6eb27d779b1e28a01bf874f0640a93f2f8f0d6079a84ca024868",
+        "capturedAt": "2026-07-29T06:25:55Z"
+      }
+    ],
+    "blockers": []
+  },
+  "newStatus": "complete",
+  "validationEvidence": [
+    {
+      "id": "pbos:test",
+      "name": "PBOS Declared Test Validation",
+      "status": "PASS",
+      "executedAt": "2026-07-29T06:59:31.218Z",
+      "durationMs": 145741,
+      "summary": "pbos:test passed.",
+      "evidence": [
+        "Exit Code: 0",
+        "> playbook-platform@0.1.0 test\n> vitest run --pool=threads\n\n\n RUN  v4.1.9 /Users/bulletproof/playbook-platform\n\n\n Test Files  111 passed (111)\n      Tests  422 passed (422)\n   Start at  23:59:33\n   Duration  143.37s (transform 8.07s, setup 0ms, import 25.06s, tests 3.58s, environment 339.04s)"
+      ]
+    },
+    {
+      "id": "pbos:lint",
+      "name": "PBOS Declared Lint Validation",
+      "status": "PASS",
+      "executedAt": "2026-07-29T07:01:56.959Z",
+      "durationMs": 35860,
+      "summary": "pbos:lint passed.",
+      "evidence": [
+        "Exit Code: 0",
+        "> playbook-platform@0.1.0 lint\n> eslint\n\n\n/Users/bulletproof/playbook-platform/pbos/constitution/promotion/validator.ts\n  12:3  warning  'ConstitutionalVolumeLifecycle' is defined but never used  @typescript-eslint/no-unused-vars\n\n/Users/bulletproof/playbook-platform/pbos/constitution/validator.ts\n  48:3  warning  'rootDir' is assigned a value but never used  @typescript-eslint/no-unused-vars\n\n✖ 2 problems (0 errors, 2 warnings)"
+      ]
+    }
+  ],
+  "promotionEligible": true,
+  "promoted": true,
+  "completed": true,
+  "transition": {
+    "gateId": "PBOS-CONTEXT-001",
+    "from": "in_progress",
+    "to": "complete",
+    "reason": "Gate completed after successful PBOS release validation and promotion.",
+    "evidence": [
+      "docs/release-evidence/release-contract.json",
+      "pbos/runtime/promotion.json",
+      "docs/release-evidence/pbos-context-001-completion-evidence.json",
+      "docs/release-evidence/pbos-context-001-implementation.md",
+      "docs/release-evidence/pbos-context-lifecycle.md",
+      "docs/release-evidence/pbos-artifact-consistency-report.md"
+    ],
+    "timestamp": "2026-07-29T07:02:33.375Z",
+    "contentIdentity": "4abb83f76230fed71d971ef2c207869dde035b3228dff06a10b770d49a3d92f7"
+  },
+  "recovery": {
+    "artifactsReconciled": true,
+    "contextRefreshed": true,
+    "planningRefreshed": true
+  },
+  "blockers": [],
+  "history": [
+    {
+      "runId": "a43ebd1610fd9b09fe42ac3e9acc01178f4e0c8d47523623864cdf722533c66d",
+      "gateId": "PBOS-CONTEXT-001",
+      "previousStatus": "in_progress",
+      "evaluatedAt": "2026-07-29T06:29:56.600Z",
+      "authority": "lifecycle-governance",
+      "gateContentIdentity": "5cdf7a8c817fa2d369fb6781eac200c20277de0b59cdb34ab15896de5e0c9ebc",
+      "evidenceEvaluation": {
+        "passed": false,
+        "gateId": "PBOS-CONTEXT-001",
+        "gateDigest": "5cdf7a8c817fa2d369fb6781eac200c20277de0b59cdb34ab15896de5e0c9ebc",
+        "manifestPath": "docs/release-evidence/pbos-context-001-completion-evidence.json",
+        "evidence": [
+          {
+            "path": "docs/release-evidence/pbos-context-001-implementation.md",
+            "digest": "446e8ae339a2d274001c7b3d257bc1178f91785eb52585023c95a7463ade642e",
+            "capturedAt": "2026-07-29T06:25:55Z"
+          },
+          {
+            "path": "docs/release-evidence/pbos-context-lifecycle.md",
+            "digest": "4371fdb5d776a3cfaacb73baf7a4cca61577d6b1c458324940a9a1ab4dfcedfe",
+            "capturedAt": "2026-07-29T06:25:55Z"
+          },
+          {
+            "path": "docs/release-evidence/pbos-context-refresh.md",
+            "digest": "90b42d9b72d7e5b497cfc3dd94837c4631b3c90c21a0afa92b5cab0a6231b0a3",
+            "capturedAt": "2026-07-29T06:25:55Z"
+          },
+          {
+            "path": "docs/release-evidence/pbos-artifact-consistency-report.md",
+            "digest": "c87b11c63b7e6eb27d779b1e28a01bf874f0640a93f2f8f0d6079a84ca024868",
+            "capturedAt": "2026-07-29T06:25:55Z"
+          }
+        ],
+        "blockers": [
+          "Completion evidence digest does not match: docs/release-evidence/pbos-context-refresh.md."
+        ]
+      },
+      "newStatus": "in_progress",
+      "validationEvidence": [],
+      "promotionEligible": false,
+      "promoted": false,
+      "completed": false,
+      "transition": null,
+      "recovery": {
+        "artifactsReconciled": false,
+        "contextRefreshed": false,
+        "planningRefreshed": false
+      },
+      "blockers": [
+        "Completion evidence digest does not match: docs/release-evidence/pbos-context-refresh.md."
+      ]
+    },
+    {
+      "runId": "18d9f2e1281e615f25bf2a3ae289ec96f1475707bff776e8577159ec39f455cc",
+      "gateId": "PBOS-CONTEXT-001",
+      "previousStatus": "in_progress",
+      "evaluatedAt": "2026-07-29T06:31:43.327Z",
+      "authority": "lifecycle-governance",
+      "gateContentIdentity": "5cdf7a8c817fa2d369fb6781eac200c20277de0b59cdb34ab15896de5e0c9ebc",
+      "evidenceEvaluation": {
+        "passed": true,
+        "gateId": "PBOS-CONTEXT-001",
+        "gateDigest": "5cdf7a8c817fa2d369fb6781eac200c20277de0b59cdb34ab15896de5e0c9ebc",
+        "manifestPath": "docs/release-evidence/pbos-context-001-completion-evidence.json",
+        "evidence": [
+          {
+            "path": "docs/release-evidence/pbos-context-001-implementation.md",
+            "digest": "446e8ae339a2d274001c7b3d257bc1178f91785eb52585023c95a7463ade642e",
+            "capturedAt": "2026-07-29T06:25:55Z"
+          },
+          {
+            "path": "docs/release-evidence/pbos-context-lifecycle.md",
+            "digest": "4371fdb5d776a3cfaacb73baf7a4cca61577d6b1c458324940a9a1ab4dfcedfe",
+            "capturedAt": "2026-07-29T06:25:55Z"
+          },
+          {
+            "path": "docs/release-evidence/pbos-artifact-consistency-report.md",
+            "digest": "c87b11c63b7e6eb27d779b1e28a01bf874f0640a93f2f8f0d6079a84ca024868",
+            "capturedAt": "2026-07-29T06:25:55Z"
+          }
+        ],
+        "blockers": []
+      },
+      "newStatus": "in_progress",
+      "validationEvidence": [
+        {
+          "id": "pbos:test",
+          "name": "PBOS Declared Test Validation",
+          "status": "FAIL",
+          "executedAt": "2026-07-29T06:31:43.902Z",
+          "durationMs": 300113,
+          "summary": "pbos:test failed.",
+          "evidence": [
+            "Exit Code: 143",
+            "> playbook-platform@0.1.0 test\n> vitest run\n\n\n RUN  v4.1.9 /Users/bulletproof/playbook-platform"
+          ]
+        },
+        {
+          "id": "pbos:lint",
+          "name": "PBOS Declared Lint Validation",
+          "status": "PASS",
+          "executedAt": "2026-07-29T06:36:44.017Z",
+          "durationMs": 166384,
+          "summary": "pbos:lint passed.",
+          "evidence": [
+            "Exit Code: 0",
+            "> playbook-platform@0.1.0 lint\n> eslint\n\n\n/Users/bulletproof/playbook-platform/pbos/constitution/promotion/validator.ts\n  12:3  warning  'ConstitutionalVolumeLifecycle' is defined but never used  @typescript-eslint/no-unused-vars\n\n/Users/bulletproof/playbook-platform/pbos/constitution/validator.ts\n  48:3  warning  'rootDir' is assigned a value but never used  @typescript-eslint/no-unused-vars\n\n✖ 2 problems (0 errors, 2 warnings)"
+          ]
+        }
+      ],
+      "promotionEligible": false,
+      "promoted": false,
+      "completed": false,
+      "transition": null,
+      "recovery": {
+        "artifactsReconciled": false,
+        "contextRefreshed": false,
+        "planningRefreshed": false
+      },
+      "blockers": [
+        "pbos:test: pbos:test failed."
+      ]
+    },
+    {
+      "runId": "36b492ed753a3c9ecca4663a4dd7d19990f53dbffea04b7994bd7aff2951860b",
+      "gateId": "PBOS-CONTEXT-001",
+      "previousStatus": "in_progress",
+      "evaluatedAt": "2026-07-29T06:35:45.783Z",
+      "authority": "lifecycle-governance",
+      "gateContentIdentity": "5cdf7a8c817fa2d369fb6781eac200c20277de0b59cdb34ab15896de5e0c9ebc",
+      "evidenceEvaluation": {
+        "passed": true,
+        "gateId": "PBOS-CONTEXT-001",
+        "gateDigest": "5cdf7a8c817fa2d369fb6781eac200c20277de0b59cdb34ab15896de5e0c9ebc",
+        "manifestPath": "docs/release-evidence/pbos-context-001-completion-evidence.json",
+        "evidence": [
+          {
+            "path": "docs/release-evidence/pbos-context-001-implementation.md",
+            "digest": "446e8ae339a2d274001c7b3d257bc1178f91785eb52585023c95a7463ade642e",
+            "capturedAt": "2026-07-29T06:25:55Z"
+          },
+          {
+            "path": "docs/release-evidence/pbos-context-lifecycle.md",
+            "digest": "4371fdb5d776a3cfaacb73baf7a4cca61577d6b1c458324940a9a1ab4dfcedfe",
+            "capturedAt": "2026-07-29T06:25:55Z"
+          },
+          {
+            "path": "docs/release-evidence/pbos-artifact-consistency-report.md",
+            "digest": "c87b11c63b7e6eb27d779b1e28a01bf874f0640a93f2f8f0d6079a84ca024868",
+            "capturedAt": "2026-07-29T06:25:55Z"
+          }
+        ],
+        "blockers": []
+      },
+      "newStatus": "in_progress",
+      "validationEvidence": [
+        {
+          "id": "pbos:test",
+          "name": "PBOS Declared Test Validation",
+          "status": "FAIL",
+          "executedAt": "2026-07-29T06:35:47.900Z",
+          "durationMs": 300089,
+          "summary": "pbos:test failed.",
+          "evidence": [
+            "Exit Code: 143",
+            "> playbook-platform@0.1.0 test\n> vitest run\n\n\n RUN  v4.1.9 /Users/bulletproof/playbook-platform"
+          ]
+        },
+        {
+          "id": "pbos:lint",
+          "name": "PBOS Declared Lint Validation",
+          "status": "PASS",
+          "executedAt": "2026-07-29T06:40:47.990Z",
+          "durationMs": 48242,
+          "summary": "pbos:lint passed.",
+          "evidence": [
+            "Exit Code: 0",
+            "> playbook-platform@0.1.0 lint\n> eslint\n\n\n/Users/bulletproof/playbook-platform/pbos/constitution/promotion/validator.ts\n  12:3  warning  'ConstitutionalVolumeLifecycle' is defined but never used  @typescript-eslint/no-unused-vars\n\n/Users/bulletproof/playbook-platform/pbos/constitution/validator.ts\n  48:3  warning  'rootDir' is assigned a value but never used  @typescript-eslint/no-unused-vars\n\n✖ 2 problems (0 errors, 2 warnings)"
+          ]
+        }
+      ],
+      "promotionEligible": false,
+      "promoted": false,
+      "completed": false,
+      "transition": null,
+      "recovery": {
+        "artifactsReconciled": false,
+        "contextRefreshed": false,
+        "planningRefreshed": false
+      },
+      "blockers": [
+        "pbos:test: pbos:test failed."
+      ]
+    },
+    {
+      "runId": "a845d5ec68ac344b9fb066517efb902992c7588ecc75129f8ff1ffaaa5d12776",
+      "gateId": "PBOS-CONTEXT-001",
+      "previousStatus": "in_progress",
+      "evaluatedAt": "2026-07-29T06:59:30.664Z",
+      "authority": "lifecycle-governance",
+      "gateContentIdentity": "5cdf7a8c817fa2d369fb6781eac200c20277de0b59cdb34ab15896de5e0c9ebc",
+      "evidenceEvaluation": {
+        "passed": true,
+        "gateId": "PBOS-CONTEXT-001",
+        "gateDigest": "5cdf7a8c817fa2d369fb6781eac200c20277de0b59cdb34ab15896de5e0c9ebc",
+        "manifestPath": "docs/release-evidence/pbos-context-001-completion-evidence.json",
+        "evidence": [
+          {
+            "path": "docs/release-evidence/pbos-context-001-implementation.md",
+            "digest": "446e8ae339a2d274001c7b3d257bc1178f91785eb52585023c95a7463ade642e",
+            "capturedAt": "2026-07-29T06:25:55Z"
+          },
+          {
+            "path": "docs/release-evidence/pbos-context-lifecycle.md",
+            "digest": "4371fdb5d776a3cfaacb73baf7a4cca61577d6b1c458324940a9a1ab4dfcedfe",
+            "capturedAt": "2026-07-29T06:25:55Z"
+          },
+          {
+            "path": "docs/release-evidence/pbos-artifact-consistency-report.md",
+            "digest": "c87b11c63b7e6eb27d779b1e28a01bf874f0640a93f2f8f0d6079a84ca024868",
+            "capturedAt": "2026-07-29T06:25:55Z"
+          }
+        ],
+        "blockers": []
+      },
+      "newStatus": "complete",
+      "validationEvidence": [
+        {
+          "id": "pbos:test",
+          "name": "PBOS Declared Test Validation",
+          "status": "PASS",
+          "executedAt": "2026-07-29T06:59:31.218Z",
+          "durationMs": 145741,
+          "summary": "pbos:test passed.",
+          "evidence": [
+            "Exit Code: 0",
+            "> playbook-platform@0.1.0 test\n> vitest run --pool=threads\n\n\n RUN  v4.1.9 /Users/bulletproof/playbook-platform\n\n\n Test Files  111 passed (111)\n      Tests  422 passed (422)\n   Start at  23:59:33\n   Duration  143.37s (transform 8.07s, setup 0ms, import 25.06s, tests 3.58s, environment 339.04s)"
+          ]
+        },
+        {
+          "id": "pbos:lint",
+          "name": "PBOS Declared Lint Validation",
+          "status": "PASS",
+          "executedAt": "2026-07-29T07:01:56.959Z",
+          "durationMs": 35860,
+          "summary": "pbos:lint passed.",
+          "evidence": [
+            "Exit Code: 0",
+            "> playbook-platform@0.1.0 lint\n> eslint\n\n\n/Users/bulletproof/playbook-platform/pbos/constitution/promotion/validator.ts\n  12:3  warning  'ConstitutionalVolumeLifecycle' is defined but never used  @typescript-eslint/no-unused-vars\n\n/Users/bulletproof/playbook-platform/pbos/constitution/validator.ts\n  48:3  warning  'rootDir' is assigned a value but never used  @typescript-eslint/no-unused-vars\n\n✖ 2 problems (0 errors, 2 warnings)"
+          ]
+        }
+      ],
+      "promotionEligible": true,
+      "promoted": true,
+      "completed": true,
+      "transition": {
+        "gateId": "PBOS-CONTEXT-001",
+        "from": "in_progress",
+        "to": "complete",
+        "reason": "Gate completed after successful PBOS release validation and promotion.",
+        "evidence": [
+          "docs/release-evidence/release-contract.json",
+          "pbos/runtime/promotion.json",
+          "docs/release-evidence/pbos-context-001-completion-evidence.json",
+          "docs/release-evidence/pbos-context-001-implementation.md",
+          "docs/release-evidence/pbos-context-lifecycle.md",
+          "docs/release-evidence/pbos-artifact-consistency-report.md"
+        ],
+        "timestamp": "2026-07-29T07:02:33.375Z",
+        "contentIdentity": "4abb83f76230fed71d971ef2c207869dde035b3228dff06a10b770d49a3d92f7"
+      },
+      "recovery": {
+        "artifactsReconciled": true,
+        "contextRefreshed": true,
+        "planningRefreshed": true
+      },
+      "blockers": []
+    }
+  ]
+}

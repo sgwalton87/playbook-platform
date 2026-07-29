@@ -131,6 +131,17 @@ describe("constitutional planning engine", () => {
     );
   });
 
+  it("permits selection from a validated constitutional idle state", () => {
+    const item = gate("PBOS-NEXT-001");
+    const result = evaluateGateEligibility(
+      item,
+      buildDependencyGraph([item]),
+      environment({ validationGate: null })
+    );
+
+    expect(result.eligible).toBe(true);
+  });
+
   it("reports missing dependencies and cycles deterministically", () => {
     const graph = buildDependencyGraph([
       gate("PBOS-A-001", { dependencies: ["PBOS-B-001"] }),

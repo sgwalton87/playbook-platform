@@ -1,24 +1,10 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-07-29T05:50:13.377Z",
+  "generatedAt": "2026-07-29T07:03:02.316Z",
   "engineVersion": "3.0.0",
   "repositoryContext": {
-    "valid": false,
-    "errors": [
-      "Context validation failed: commit identity mismatches.",
-      "Context validation failed: working tree state changed after capture.",
-      "Context validation failed: PBOS runtime context changed after capture.",
-      "Context validation failed: artifact ownership is invalid: pbos/runtime/repository.json.",
-      "Context validation failed: artifact ownership is invalid: pbos/runtime/next-gate.json.",
-      "Context validation failed: artifact changed after capture: pbos/runtime/next-gate.json.",
-      "Context validation failed: artifact ownership is invalid: pbos/runtime/validation.json.",
-      "Context validation failed: artifact ownership is invalid: pbos/runtime/execution.json.",
-      "Context validation failed: artifact ownership is invalid: pbos/runtime/execution-contract.json.",
-      "Context validation failed: artifact ownership is invalid: pbos/runtime/work-package.json.",
-      "Context validation failed: artifact ownership is invalid: pbos/runtime/execution-authorization.json.",
-      "Context validation failed: artifact pbos/runtime/validation.json references conflicting gate PBOS-CONTEXT-001.",
-      "Context validation failed: artifact pbos/runtime/execution.json references conflicting gate PBOS-CONTEXT-001."
-    ]
+    "valid": true,
+    "errors": []
   },
   "currentLifecycle": {
     "releaseState": "PROMOTION_COMPLETE",
@@ -27,6 +13,7 @@
   "currentDependencyNode": null,
   "completedGates": [
     "PBOS-AUDIT-001",
+    "PBOS-CONTEXT-001",
     "PBOS-ENGINE-004",
     "PBOS-ENGINE-005",
     "PBOS-GATE-001",
@@ -35,20 +22,7 @@
     "PBOS-UI-001"
   ],
   "eligibleGates": [],
-  "blockedGates": [
-    {
-      "gateId": "PBOS-CONTEXT-001",
-      "reasons": [
-        {
-          "code": "CONTEXT_INVALID",
-          "message": "Context validation failed: commit identity mismatches. Context validation failed: working tree state changed after capture. Context validation failed: PBOS runtime context changed after capture. Context validation failed: artifact ownership is invalid: pbos/runtime/repository.json. Context validation failed: artifact ownership is invalid: pbos/runtime/next-gate.json. Context validation failed: artifact changed after capture: pbos/runtime/next-gate.json. Context validation failed: artifact ownership is invalid: pbos/runtime/validation.json. Context validation failed: artifact ownership is invalid: pbos/runtime/execution.json. Context validation failed: artifact ownership is invalid: pbos/runtime/execution-contract.json. Context validation failed: artifact ownership is invalid: pbos/runtime/work-package.json. Context validation failed: artifact ownership is invalid: pbos/runtime/execution-authorization.json. Context validation failed: artifact pbos/runtime/validation.json references conflicting gate PBOS-CONTEXT-001. Context validation failed: artifact pbos/runtime/execution.json references conflicting gate PBOS-CONTEXT-001."
-        }
-      ],
-      "incompleteDependencies": [],
-      "missingArtifacts": [],
-      "invalidArtifacts": []
-    }
-  ],
+  "blockedGates": [],
   "dependencyGraphSummary": {
     "nodeCount": 8,
     "edgeCount": 10,
@@ -56,17 +30,15 @@
     "cycles": []
   },
   "selectedGate": null,
-  "reasonSelected": "No gate is eligible. PBOS-AUDIT-001: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED, CONTEXT_INVALID, VALIDATION_GATE_MISMATCH; PBOS-CONTEXT-001: CONTEXT_INVALID; PBOS-ENGINE-004: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED, CONTEXT_INVALID, VALIDATION_GATE_MISMATCH; PBOS-ENGINE-005: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED, CONTEXT_INVALID, VALIDATION_GATE_MISMATCH; PBOS-GATE-001: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED, CONTEXT_INVALID, VALIDATION_GATE_MISMATCH; PBOS-QA-001: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED, CONTEXT_INVALID, VALIDATION_GATE_MISMATCH; PBOS-RLS-001: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED, CONTEXT_INVALID, VALIDATION_GATE_MISMATCH; PBOS-UI-001: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED, CONTEXT_INVALID, VALIDATION_GATE_MISMATCH.",
+  "reasonSelected": "No gate is eligible. PBOS-AUDIT-001: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED; PBOS-CONTEXT-001: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED, ARTIFACTS_INVALID; PBOS-ENGINE-004: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED; PBOS-ENGINE-005: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED; PBOS-GATE-001: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED; PBOS-QA-001: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED; PBOS-RLS-001: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED; PBOS-UI-001: LIFECYCLE_NOT_EXECUTABLE, ALREADY_SATISFIED.",
   "requiredArtifacts": [],
   "validationResults": {
     "passed": true,
-    "gateId": "PBOS-CONTEXT-001"
+    "gateId": null
   },
   "recommendedNextGate": null,
   "expectedDeliverables": [],
   "estimatedImpact": "No implementation impact is authorized.",
-  "blockingConditions": [
-    "Context validation failed: commit identity mismatches. Context validation failed: working tree state changed after capture. Context validation failed: PBOS runtime context changed after capture. Context validation failed: artifact ownership is invalid: pbos/runtime/repository.json. Context validation failed: artifact ownership is invalid: pbos/runtime/next-gate.json. Context validation failed: artifact changed after capture: pbos/runtime/next-gate.json. Context validation failed: artifact ownership is invalid: pbos/runtime/validation.json. Context validation failed: artifact ownership is invalid: pbos/runtime/execution.json. Context validation failed: artifact ownership is invalid: pbos/runtime/execution-contract.json. Context validation failed: artifact ownership is invalid: pbos/runtime/work-package.json. Context validation failed: artifact ownership is invalid: pbos/runtime/execution-authorization.json. Context validation failed: artifact pbos/runtime/validation.json references conflicting gate PBOS-CONTEXT-001. Context validation failed: artifact pbos/runtime/execution.json references conflicting gate PBOS-CONTEXT-001."
-  ],
+  "blockingConditions": [],
   "planningHealth": "BLOCKED"
 }

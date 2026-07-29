@@ -4,6 +4,7 @@ import type {
   TransitionRequest,
   GateTransition,
 } from "./contracts";
+import { artifactDigest } from "../kernel";
 
 function allowedTransition(
   from: GateStatus,
@@ -33,6 +34,9 @@ export function transitionGate(
   const gate = JSON.parse(raw);
 
   const current = gate.status as GateStatus;
+  if (gate.id !== request.gateId) {
+    throw new Error("Gate transition identity does not match gate content.");
+  }
 
 
   if (!allowedTransition(current, request.nextStatus)) {
@@ -73,5 +77,6 @@ export function transitionGate(
     reason: request.reason,
     evidence: request.evidence,
     timestamp: new Date().toISOString(),
+    contentIdentity: artifactDigest(gate),
   };
 }

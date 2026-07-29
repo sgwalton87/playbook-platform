@@ -2,14 +2,14 @@
   "version": "1.0.0",
   "owner": "repository-context",
   "latest": {
-    "id": "200ac483e1f42bfb53db9c026b8055a0b57b306c4ba530597183ec6def5947c2",
-    "previousContextIdentity": "2735eaca421b2d9fdef34b03710a595e3d918401b8f3eb11e714acff258fce20",
-    "newContextIdentity": "3d4ae6364ba9e69e8c8c869754997ec3e047d24e4051a5db322eeb95c9e82cb0",
-    "reason": "PBOS-ARTIFACT-CONSISTENCY-001 final documentation synchronization",
+    "id": "93e6342c74502b24ba68c7ba244f35ba8a56deb8b86eb5448d81f55a9549215c",
+    "previousContextIdentity": "7c6847912c527beea6b6b55a1940711e741ae0b3da8d831644d81b9112be2b79",
+    "newContextIdentity": "098215a26f1f172e3cfa48a7bd3bfcd7426464f3799e2254e06527b5c65e9583",
+    "reason": "PBOS-LIFECYCLE-GOVERNANCE-001 post-planning synchronization",
     "triggeringConditions": [
       "Context validation failed: working tree state changed after capture."
     ],
-    "timestamp": "2026-07-29T05:52:33.663Z",
+    "timestamp": "2026-07-29T07:03:46.030Z",
     "validator": {
       "id": "PBOS-CONTEXT-VALIDATOR",
       "version": "1.1.0"
@@ -53,6 +53,175 @@
         "Context validation failed: working tree state changed after capture."
       ],
       "timestamp": "2026-07-29T05:52:33.663Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "ccd5cad40cf889862aebf315b9e7f1b3c0677cae33383f75f5c6acf1c9749432",
+      "previousContextIdentity": "3d4ae6364ba9e69e8c8c869754997ec3e047d24e4051a5db322eeb95c9e82cb0",
+      "newContextIdentity": "3a200ec138c35851f01e077c982ee979f905b6eff5c7ebfe55d62f75b11f8a75",
+      "reason": "Operator-requested repository context synchronization.",
+      "triggeringConditions": [
+        "Context validation failed: commit identity mismatches.",
+        "Context validation failed: working tree state changed after capture."
+      ],
+      "timestamp": "2026-07-29T06:10:19.698Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "b3336af7cf6ff35bd301e69e1080ef57912485881f9a519e7cb42f4c47644010",
+      "previousContextIdentity": "3a200ec138c35851f01e077c982ee979f905b6eff5c7ebfe55d62f75b11f8a75",
+      "newContextIdentity": "3136bd95de83ff34bf69f17ea51d066c7a4a22dbbc87b0496539cc526c88b0fe",
+      "reason": "Operator-requested repository context synchronization.",
+      "triggeringConditions": [
+        "Context validation failed: working tree state changed after capture."
+      ],
+      "timestamp": "2026-07-29T06:12:48.578Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "124ef846c0796aaef7e82c7e31b1096e7621eacec52ebc6e354cf819cd540bb8",
+      "previousContextIdentity": "3136bd95de83ff34bf69f17ea51d066c7a4a22dbbc87b0496539cc526c88b0fe",
+      "newContextIdentity": "74282a26006d8a10bba0b42c3b11c4ecb7a16d82e545b337cf01e8a31f44cfde",
+      "reason": "PBOS-LIFECYCLE-GOVERNANCE-001 pre-transition synchronization",
+      "triggeringConditions": [
+        "Context validation failed: working tree state changed after capture."
+      ],
+      "timestamp": "2026-07-29T06:27:59.976Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "fcfeb1c501d8d4e464774992991226006446e30921b7b28218afbdb4aabfecbd",
+      "previousContextIdentity": "74282a26006d8a10bba0b42c3b11c4ecb7a16d82e545b337cf01e8a31f44cfde",
+      "newContextIdentity": "7bfc2340e040d2928e1635a02337de35245920929e231941fe35fce31436cec6",
+      "reason": "PBOS-LIFECYCLE-GOVERNANCE-001 recapture concurrent documentation state",
+      "triggeringConditions": [
+        "Context validation failed: working tree state changed after capture."
+      ],
+      "timestamp": "2026-07-29T06:29:41.998Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "1e359a0b09756bff16f297c7e43226515a3fbc144fa1230e0a2902762c6984d5",
+      "previousContextIdentity": "7bfc2340e040d2928e1635a02337de35245920929e231941fe35fce31436cec6",
+      "newContextIdentity": "946cdc45d48c31a7109c16e91e655ee9c0530f6384d5dbf4a63d094c379f51a8",
+      "reason": "PBOS-LIFECYCLE-GOVERNANCE-001 immutable evidence correction",
+      "triggeringConditions": [
+        "Context validation failed: working tree state changed after capture."
+      ],
+      "timestamp": "2026-07-29T06:30:51.278Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "93cdbabbb8b9c81f46dbb1873211867f84ad84048d5c5663b0602fe75128ce51",
+      "previousContextIdentity": "946cdc45d48c31a7109c16e91e655ee9c0530f6384d5dbf4a63d094c379f51a8",
+      "newContextIdentity": "d6ec2b3451013c0f27234705e55f2843bbf29a19042955a945e0d3f44b0652b5",
+      "reason": "PBOS-LIFECYCLE-GOVERNANCE-001 include concurrent runtime documentation",
+      "triggeringConditions": [
+        "Context validation failed: working tree state changed after capture."
+      ],
+      "timestamp": "2026-07-29T06:31:30.992Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "f0914e667b46cff536704f79b1fe443130005c81f27132b29eda179579fb431f",
+      "previousContextIdentity": "d6ec2b3451013c0f27234705e55f2843bbf29a19042955a945e0d3f44b0652b5",
+      "newContextIdentity": "1df2eacc3a889a23c483a5bfdc78611dddbc789b04cbc18aa667f7fefd999846",
+      "reason": "PBOS-LIFECYCLE-GOVERNANCE-001 stable pre-transition context",
+      "triggeringConditions": [
+        "Context validation failed: working tree state changed after capture."
+      ],
+      "timestamp": "2026-07-29T06:35:19.297Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "6c4b6eeff8dc21d21d1e8912aeb173d7abbb2ff04f78c1e86cec30c3a5e53321",
+      "previousContextIdentity": "1df2eacc3a889a23c483a5bfdc78611dddbc789b04cbc18aa667f7fefd999846",
+      "newContextIdentity": "4071a5272a26d9aadaee3f7c0d575e79328bd367e43db432e0b97f4b117d9a3f",
+      "reason": "PBOS-LIFECYCLE-GOVERNANCE-001 deterministic validation runner",
+      "triggeringConditions": [
+        "Context validation failed: commit identity mismatches.",
+        "Context validation failed: working tree state changed after capture."
+      ],
+      "timestamp": "2026-07-29T06:53:42.898Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "adc66cf4704b53486debe17f7fad8f2e9528491c13b5b9c75fdd4ad2391f1c43",
+      "previousContextIdentity": "4071a5272a26d9aadaee3f7c0d575e79328bd367e43db432e0b97f4b117d9a3f",
+      "newContextIdentity": "3ac07e5db3f5fe3cbc68aa10946a911949f03da3ddf075f873871610289d7d4c",
+      "reason": "PBOS-LIFECYCLE-GOVERNANCE-001 pre-persistence validation boundary",
+      "triggeringConditions": [
+        "Context validation failed: working tree state changed after capture."
+      ],
+      "timestamp": "2026-07-29T06:59:18.933Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "f9559ba84b47c4c5e18d72cc39da654dca7a6294a69344eac468a729a1f1f1e9",
+      "previousContextIdentity": "3ac07e5db3f5fe3cbc68aa10946a911949f03da3ddf075f873871610289d7d4c",
+      "newContextIdentity": "7c6847912c527beea6b6b55a1940711e741ae0b3da8d831644d81b9112be2b79",
+      "reason": "Lifecycle completion recovery for PBOS-CONTEXT-001.",
+      "triggeringConditions": [
+        "Context validation failed: working tree state changed after capture.",
+        "Context validation failed: PBOS runtime context changed after capture.",
+        "Context validation failed: artifact changed after capture: pbos/runtime/next-gate.json."
+      ],
+      "timestamp": "2026-07-29T06:59:30.664Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "93e6342c74502b24ba68c7ba244f35ba8a56deb8b86eb5448d81f55a9549215c",
+      "previousContextIdentity": "7c6847912c527beea6b6b55a1940711e741ae0b3da8d831644d81b9112be2b79",
+      "newContextIdentity": "098215a26f1f172e3cfa48a7bd3bfcd7426464f3799e2254e06527b5c65e9583",
+      "reason": "PBOS-LIFECYCLE-GOVERNANCE-001 post-planning synchronization",
+      "triggeringConditions": [
+        "Context validation failed: working tree state changed after capture."
+      ],
+      "timestamp": "2026-07-29T07:03:46.030Z",
       "validator": {
         "id": "PBOS-CONTEXT-VALIDATOR",
         "version": "1.1.0"

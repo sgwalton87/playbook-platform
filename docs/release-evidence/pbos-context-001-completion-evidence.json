@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "gateId": "PBOS-CONTEXT-001",
+  "gateDigest": "5cdf7a8c817fa2d369fb6781eac200c20277de0b59cdb34ab15896de5e0c9ebc",
+  "capturedAt": "2026-07-29T06:25:55Z",
+  "validator": {
+    "id": "PBOS-LIFECYCLE-EVIDENCE",
+    "version": "1.0.0"
+  },
+  "evidence": [
+    {
+      "path": "docs/release-evidence/pbos-context-001-implementation.md",
+      "digest": "446e8ae339a2d274001c7b3d257bc1178f91785eb52585023c95a7463ade642e",
+      "capturedAt": "2026-07-29T06:25:55Z"
+    },
+    {
+      "path": "docs/release-evidence/pbos-context-lifecycle.md",
+      "digest": "4371fdb5d776a3cfaacb73baf7a4cca61577d6b1c458324940a9a1ab4dfcedfe",
+      "capturedAt": "2026-07-29T06:25:55Z"
+    },
+    {
+      "path": "docs/release-evidence/pbos-artifact-consistency-report.md",
+      "digest": "c87b11c63b7e6eb27d779b1e28a01bf874f0640a93f2f8f0d6079a84ca024868",
+      "capturedAt": "2026-07-29T06:25:55Z"
+    }
+  ],
+  "claims": [
+    {
+      "requirement": "Repository context is validated before execution.",
+      "evidence": [
+        "docs/release-evidence/pbos-context-001-implementation.md",
+        "docs/release-evidence/pbos-context-lifecycle.md"
+      ]
+    },
+    {
+      "requirement": "Branch and commit mismatches fail closed.",
+      "evidence": [
+        "docs/release-evidence/pbos-context-001-implementation.md",
+        "docs/release-evidence/pbos-context-lifecycle.md"
+      ]
+    },
+    {
+      "requirement": "Required artifacts are verified.",
+      "evidence": [
+        "docs/release-evidence/pbos-context-lifecycle.md",
+        "docs/release-evidence/pbos-artifact-consistency-report.md"
+      ]
+    },
+    {
+      "requirement": "Runtime state consistency is enforced.",
+      "evidence": [
+        "docs/release-evidence/pbos-artifact-consistency-report.md",
+        "docs/release-evidence/pbos-context-lifecycle.md"
+      ]
+    },
+    {
+      "requirement": "Context validation evidence is generated.",
+      "evidence": [
+        "docs/release-evidence/pbos-context-001-implementation.md",
+        "docs/release-evidence/pbos-context-lifecycle.md"
+      ]
+    }
+  ]
+}

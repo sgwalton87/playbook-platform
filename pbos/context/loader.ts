@@ -32,7 +32,15 @@ const CONTEXT_OUTPUTS = new Set([
   Artifacts.repositoryContext,
   Artifacts.contextRefresh,
   "docs/release-evidence/pbos-context-refresh.md",
+  "docs/release-evidence/pbos-lifecycle-governance-report.md",
 ]);
+
+function isGovernedRuntimeOutput(relativePath: string): boolean {
+  return (
+    relativePath.startsWith("pbos/runtime/") ||
+    CONTEXT_OUTPUTS.has(relativePath)
+  );
+}
 
 function git(rootDir: string, args: string[]): string {
   return execFileSync("git", args, {
@@ -225,9 +233,8 @@ export function loadRepositoryContextSnapshot(
     .filter(
       (line) =>
         line.length > 0 &&
-        ![...CONTEXT_OUTPUTS].some((output) =>
-          line.endsWith(output)
-        )
+        !line.includes("pbos/runtime/") &&
+        ![...CONTEXT_OUTPUTS].some((output) => line.endsWith(output))
     )
     .join("\n");
   const trackedDiff = git(repositoryRoot, [
@@ -236,9 +243,9 @@ export function loadRepositoryContextSnapshot(
     "HEAD",
     "--",
     ".",
-    `:(exclude)${Artifacts.repositoryContext}`,
-    `:(exclude)${Artifacts.contextRefresh}`,
+    ":(exclude)pbos/runtime/**",
     ":(exclude)docs/release-evidence/pbos-context-refresh.md",
+    ":(exclude)docs/release-evidence/pbos-lifecycle-governance-report.md",
   ]);
   const untrackedFiles = git(repositoryRoot, [
     "ls-files",
@@ -249,7 +256,7 @@ export function loadRepositoryContextSnapshot(
     .filter(
       (relativePath) =>
         relativePath.length > 0 &&
-        !CONTEXT_OUTPUTS.has(relativePath)
+        !isGovernedRuntimeOutput(relativePath)
     )
     .sort()
     .map((relativePath) => ({

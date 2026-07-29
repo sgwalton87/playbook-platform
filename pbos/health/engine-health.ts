@@ -13,6 +13,9 @@ import {
 import { Artifacts, Runtime } from "../kernel";
 import path from "node:path";
 import { inspectArtifactConsistency } from "../reconciliation";
+import {
+  type LifecycleGovernanceArtifact,
+} from "../lifecycle";
 
 export interface EngineHealthReport {
   engineVersion: string;
@@ -44,6 +47,8 @@ export interface EngineHealthReport {
   contextRefreshRequired: boolean;
   artifactHealth: "VALID" | "INVALID";
   artifactConflictCount: number;
+  lifecycleHealth: "VALID" | "INVALID";
+  lifecycleSynchronized: boolean;
 }
 
 export async function getEngineHealth(rootDir = process.cwd()): Promise<EngineHealthReport> {
@@ -73,6 +78,18 @@ export async function getEngineHealth(rootDir = process.cwd()): Promise<EngineHe
     ({ path: artifactPath, classification }) =>
       artifactPath !== Artifacts.repositoryContext &&
       classification !== "valid"
+  );
+  const lifecyclePath = path.join(
+    rootDir,
+    Artifacts.lifecycleGovernance
+  );
+  const lifecycle = Runtime.exists(lifecyclePath)
+    ? Runtime.load<LifecycleGovernanceArtifact>(lifecyclePath)
+    : null;
+  const lifecycleConsistent = gates.every((gate) =>
+    gate.status === "complete"
+      ? gate.completion_state === "satisfied"
+      : gate.completion_state === "pending"
   );
 
   return {
@@ -109,6 +126,10 @@ export async function getEngineHealth(rootDir = process.cwd()): Promise<EngineHe
     artifactHealth:
       artifactConflicts.length === 0 ? "VALID" : "INVALID",
     artifactConflictCount: artifactConflicts.length,
+    lifecycleHealth: lifecycleConsistent ? "VALID" : "INVALID",
+    lifecycleSynchronized:
+      lifecycleConsistent &&
+      (lifecycle?.completed !== false),
   };
 }
 
@@ -127,6 +148,8 @@ export function formatEngineHealth(report: EngineHealthReport): string {
     `Refresh Required: ${report.contextRefreshRequired ? "YES" : "NO"}`,
     `Artifact Health: ${report.artifactHealth}`,
     `Artifact Conflicts: ${report.artifactConflictCount}`,
+    `Lifecycle Health: ${report.lifecycleHealth}`,
+    `Lifecycle Synchronized: ${report.lifecycleSynchronized ? "YES" : "NO"}`,
     `Completed Gates: ${report.completedGates.join(", ") || "none"}`,
     `Blocked Gates: ${report.blockedGates.join(", ") || "none"}`,
     `Rule Count: ${report.ruleCount}`,

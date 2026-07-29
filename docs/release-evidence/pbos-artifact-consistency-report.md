@@ -15,15 +15,15 @@ last_updated: 2026-07-29
 - Artifact conflicts: 0
 - Refresh required: YES
 - Ready for context refresh: YES
-- Evaluated at: 2026-07-29T05:50:10.209Z
-- Run identity: `8fd95727bedc85cf50529d2bd79d7952d5480bfde50653293b4a6fe4932f3007`
+- Evaluated at: 2026-07-29T06:59:30.664Z
+- Run identity: `703b5f3646dd9505bde1d7618383028d8a3a993f9afe48246978738ec0b29f92`
 
 ## Canonical Ownership
 
 | Artifact | Canonical Owner | Classification | Regenerated | Evidence |
 | --- | --- | --- | --- | --- |
-| pbos/runtime/validation.json | runtime-validator | valid | YES | Validation gate PBOS-CONTEXT-001 was superseded by planning gate none. |
-| pbos/runtime/execution.json | execution-engine | valid | YES | Execution gate PBOS-CONTEXT-001 was superseded by planning gate none. |
+| pbos/runtime/validation.json | runtime-validator | valid | YES | None |
+| pbos/runtime/execution.json | execution-engine | valid | YES | None |
 | pbos/runtime/next-gate.json | constitutional-planner | valid | YES | None |
 | pbos/runtime/repository-context.json | repository-context | recoverable | NO | Repository context must be regenerated after runtime reconciliation. |
 | pbos/state/engine-state.json | engine-state-manager | valid | NO | None |
