@@ -2,15 +2,15 @@
   "version": "1.0.0",
   "owner": "repository-context",
   "latest": {
-    "id": "ee2888541723a507f7f3a625e6ad34b2ef6b127792b437815fd8d4979bdc649d",
-    "previousContextIdentity": "b867273e5fd22807c97a973564cfe65f18aeba0ddce1ca415ed774e9db54d052",
-    "newContextIdentity": "f8626f409c8ec3d57d466a6d7d3dd8bc257294bfc52577e670ce9fc3840a1a89",
+    "id": "8c593e5bb6417cf64ca26c5b2f26c7d7ef939f9b5ea470e56cd16e50caa4fd2f",
+    "previousContextIdentity": "3be183298b985ebac8060e8e90143ae4d1aadfa2f28bf3be2329daca4ecb49ca",
+    "newContextIdentity": "b28403a003b897586d71260646d2bb3f15df029fec8efbcfc5c382e6bd30601e",
     "reason": "Operator-requested repository context synchronization.",
     "triggeringConditions": [
       "Context validation failed: commit identity mismatches.",
       "Context validation failed: working tree state changed after capture."
     ],
-    "timestamp": "2026-07-29T08:48:22.074Z",
+    "timestamp": "2026-07-29T10:08:03.595Z",
     "validator": {
       "id": "PBOS-CONTEXT-VALIDATOR",
       "version": "1.1.0"
@@ -360,6 +360,37 @@
         "Context validation failed: working tree state changed after capture."
       ],
       "timestamp": "2026-07-29T08:48:22.074Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "5424dbd31498b019e252848c2b9246ea8cc8158d45ce247cfdb92dc26ac8b734",
+      "previousContextIdentity": "f8626f409c8ec3d57d466a6d7d3dd8bc257294bfc52577e670ce9fc3840a1a89",
+      "newContextIdentity": "3be183298b985ebac8060e8e90143ae4d1aadfa2f28bf3be2329daca4ecb49ca",
+      "reason": "Operator-requested repository context synchronization.",
+      "triggeringConditions": [
+        "Context validation failed: commit identity mismatches."
+      ],
+      "timestamp": "2026-07-29T09:24:36.550Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "8c593e5bb6417cf64ca26c5b2f26c7d7ef939f9b5ea470e56cd16e50caa4fd2f",
+      "previousContextIdentity": "3be183298b985ebac8060e8e90143ae4d1aadfa2f28bf3be2329daca4ecb49ca",
+      "newContextIdentity": "b28403a003b897586d71260646d2bb3f15df029fec8efbcfc5c382e6bd30601e",
+      "reason": "Operator-requested repository context synchronization.",
+      "triggeringConditions": [
+        "Context validation failed: commit identity mismatches.",
+        "Context validation failed: working tree state changed after capture."
+      ],
+      "timestamp": "2026-07-29T10:08:03.595Z",
       "validator": {
         "id": "PBOS-CONTEXT-VALIDATOR",
         "version": "1.1.0"

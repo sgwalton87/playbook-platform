@@ -13,7 +13,7 @@ PBOS Planning Handoff Architecture
 - Status: GOVERNED_IDLE
 - Selected objective: none
 - Reason: No constitutional objectives are registered. PBOS remains in governed idle state.
-- Generated: 2026-07-29T08:42:40.954Z
+- Generated: 2026-07-29T09:24:48.948Z
 
 ## Authority
 
@@ -26,8 +26,8 @@ PBOS Planning Handoff Architecture
 ## Lineage
 
 - Repository: playbook-platform
-- Commit: b7e13bc7d3569534c245aa1f51fddca106aa12e0
-- Context: b867273e5fd22807c97a973564cfe65f18aeba0ddce1ca415ed774e9db54d052
+- Commit: dd3d5a5f5211f43cffe8946221765911bce32a4a
+- Context: 3be183298b985ebac8060e8e90143ae4d1aadfa2f28bf3be2329daca4ecb49ca
 - Registry: aec61d2be59dcf3749208e63aa4a926f1ead726f20e55a89d7caa2b065954e6d
 - Objective: none
 - Dependency snapshot: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
