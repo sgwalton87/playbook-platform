@@ -116,7 +116,7 @@ function renderMarkdown(contract: ReleaseContract): string {
   return `${lines.join("\n")}\n`;
 }
 
-async function persistReleaseContract(
+export async function persistReleaseContract(
   contract: ReleaseContract,
   reportsDirectory: string
 ): Promise<void> {

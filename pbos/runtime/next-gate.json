@@ -1,11 +1,10 @@
 {
   "selectedGate": null,
   "eligible": [],
-  "blocked": [
-    "PBOS-CONTEXT-001"
-  ],
+  "blocked": [],
   "completed": [
     "PBOS-AUDIT-001",
+    "PBOS-CONTEXT-001",
     "PBOS-ENGINE-004",
     "PBOS-ENGINE-005",
     "PBOS-GATE-001",

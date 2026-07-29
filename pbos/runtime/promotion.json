@@ -1,6 +1,26 @@
 {
-  "gateId": "PBOS-ENGINE-005",
+  "schemaVersion": 1,
+  "owner": "release-promotion",
+  "gateId": "PBOS-CONTEXT-001",
   "promoted": true,
   "reason": "Release contract passed promotion requirements.",
-  "timestamp": "2026-07-28T18:37:14.573Z"
+  "timestamp": "2026-07-29T07:02:33.363Z",
+  "gateDigest": "5cdf7a8c817fa2d369fb6781eac200c20277de0b59cdb34ab15896de5e0c9ebc",
+  "contractDigest": "b005ac09a9f8d72503393312fd1060147b93d04b06fb39461746e269a3427953",
+  "history": [
+    {
+      "gateId": "PBOS-ENGINE-005",
+      "promoted": true,
+      "reason": "Release contract passed promotion requirements.",
+      "timestamp": "2026-07-28T18:37:14.573Z"
+    },
+    {
+      "gateId": "PBOS-CONTEXT-001",
+      "promoted": true,
+      "reason": "Release contract passed promotion requirements.",
+      "timestamp": "2026-07-29T07:02:33.363Z",
+      "gateDigest": "5cdf7a8c817fa2d369fb6781eac200c20277de0b59cdb34ab15896de5e0c9ebc",
+      "contractDigest": "b005ac09a9f8d72503393312fd1060147b93d04b06fb39461746e269a3427953"
+    }
+  ]
 }

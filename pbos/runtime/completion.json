@@ -1,11 +1,47 @@
 {
-  "gateId": "PBOS-ENGINE-005",
+  "schemaVersion": 1,
+  "owner": "gate-lifecycle",
+  "gateId": "PBOS-CONTEXT-001",
   "from": "in_progress",
   "to": "complete",
   "reason": "Gate completed after successful PBOS release validation and promotion.",
   "evidence": [
     "docs/release-evidence/release-contract.json",
-    "pbos/runtime/promotion.json"
+    "pbos/runtime/promotion.json",
+    "docs/release-evidence/pbos-context-001-completion-evidence.json",
+    "docs/release-evidence/pbos-context-001-implementation.md",
+    "docs/release-evidence/pbos-context-lifecycle.md",
+    "docs/release-evidence/pbos-artifact-consistency-report.md"
   ],
-  "timestamp": "2026-07-28T18:37:32.344Z"
+  "timestamp": "2026-07-29T07:02:33.375Z",
+  "contentIdentity": "4abb83f76230fed71d971ef2c207869dde035b3228dff06a10b770d49a3d92f7",
+  "history": [
+    {
+      "gateId": "PBOS-ENGINE-005",
+      "from": "in_progress",
+      "to": "complete",
+      "reason": "Gate completed after successful PBOS release validation and promotion.",
+      "evidence": [
+        "docs/release-evidence/release-contract.json",
+        "pbos/runtime/promotion.json"
+      ],
+      "timestamp": "2026-07-28T18:37:32.344Z"
+    },
+    {
+      "gateId": "PBOS-CONTEXT-001",
+      "from": "in_progress",
+      "to": "complete",
+      "reason": "Gate completed after successful PBOS release validation and promotion.",
+      "evidence": [
+        "docs/release-evidence/release-contract.json",
+        "pbos/runtime/promotion.json",
+        "docs/release-evidence/pbos-context-001-completion-evidence.json",
+        "docs/release-evidence/pbos-context-001-implementation.md",
+        "docs/release-evidence/pbos-context-lifecycle.md",
+        "docs/release-evidence/pbos-artifact-consistency-report.md"
+      ],
+      "timestamp": "2026-07-29T07:02:33.375Z",
+      "contentIdentity": "4abb83f76230fed71d971ef2c207869dde035b3228dff06a10b770d49a3d92f7"
+    }
+  ]
 }

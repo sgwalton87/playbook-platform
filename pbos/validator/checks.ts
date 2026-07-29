@@ -1,5 +1,6 @@
 import { ValidationCheck, ValidationContext } from "./types";
 import { isPlanningEligibleStatus } from "../lifecycle/status";
+import type { PlanningDecision } from "../planner/types";
 
 export function runChecks(ctx: ValidationContext): ValidationCheck[] {
   const checks: ValidationCheck[] = [];
