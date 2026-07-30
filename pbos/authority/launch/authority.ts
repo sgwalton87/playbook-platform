@@ -34,7 +34,8 @@ export function validateLaunchApproval(input: {
       approval.boundary_digest !== boundary.digest)
       ? ["Approval boundary identity does not match."]
       : []),
-    ...(Date.parse(approval.expiration) <= Date.parse(input.timestamp)
+    ...(!Number.isFinite(Date.parse(approval.expiration)) ||
+    Date.parse(approval.expiration) <= Date.parse(input.timestamp)
       ? ["Launch approval is expired."]
       : []),
     ...(approval.ledger_decision.subject_id !== approval.scope_identity ||

@@ -2,6 +2,9 @@ import type { FounderOperatingLoopResult } from "../../autonomous";
 
 export function formatItCommand(result: FounderOperatingLoopResult): string {
   const guidance = result.guidance;
+  const humanEvidenceComplete =
+    result.mission_control.change_boundary_status === "APPROVED" &&
+    result.mission_control.launch_approval_status === "APPROVED";
   return [
     "=====================================",
     "PLAYBOOK OS",
@@ -38,9 +41,18 @@ export function formatItCommand(result: FounderOperatingLoopResult): string {
     "",
     `Current execution: ${result.mission_control.current_execution}`,
     `Authority state: ${result.mission_control.authority_state}`,
+    `Human Evidence: ${humanEvidenceComplete ? "COMPLETE" : "MISSING"}`,
     `Change boundary: ${result.mission_control.change_boundary_status}`,
-    `Launch approval: ${result.mission_control.launch_approval_status}`,
-    `Context status: ${result.mission_control.context_status}`,
+    `Launch approval: ${
+      result.mission_control.launch_approval_status === "APPROVED"
+        ? "ACTIVE"
+        : result.mission_control.launch_approval_status
+    }`,
+    `Trusted context: ${
+      result.mission_control.context_status === "TRUSTED"
+        ? "ACTIVE"
+        : result.mission_control.context_status
+    }`,
     `Execution state: ${result.mission_control.execution_state}`,
     `Evidence state: ${result.mission_control.evidence_state}`,
     `Next action: ${result.mission_control.next_action}`,

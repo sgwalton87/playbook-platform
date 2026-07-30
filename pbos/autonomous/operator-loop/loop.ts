@@ -173,13 +173,24 @@ export class FounderOperatingLoop {
         : "MISSING" as const,
       execution_state: "NOT_STARTED" as const,
       evidence_state: "NOT_AVAILABLE" as const,
-      change_boundary_status: changeBoundary ? "APPROVED" as const : "MISSING" as const,
-      launch_approval_status: launchApproval
-        ? launchApproval.decision === "APPROVED"
+      change_boundary_status: changeBoundary
+        ? discovery.activation_snapshot.change_boundary_valid
           ? "APPROVED" as const
-          : "REJECTED" as const
+          : "INVALID" as const
         : "MISSING" as const,
-      context_status: trusted ? "TRUSTED" as const : "MISSING" as const,
+      launch_approval_status: launchApproval
+        ? discovery.activation_snapshot.launch_approval_valid &&
+          launchApproval.decision === "APPROVED"
+          ? "APPROVED" as const
+          : launchApproval.decision === "REJECTED"
+            ? "REJECTED" as const
+            : "INVALID" as const
+        : "MISSING" as const,
+      context_status: trusted
+        ? contextReadiness.current_capability_level === "GOVERNED_PLANNING"
+          ? "TRUSTED" as const
+          : "INVALID" as const
+        : "MISSING" as const,
     };
     const mission_control = {
       ...missionControlBody,

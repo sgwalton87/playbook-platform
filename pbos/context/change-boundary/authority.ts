@@ -51,7 +51,8 @@ export function validateChangeBoundary(
     ...(inventory.changes.some(({ owner }) => owner === "UNKNOWN")
       ? ["Unknown change ownership is prohibited."]
       : []),
-    ...(Date.parse(declaration.expiration_timestamp) <= Date.parse(timestamp)
+    ...(!Number.isFinite(Date.parse(declaration.expiration_timestamp)) ||
+    Date.parse(declaration.expiration_timestamp) <= Date.parse(timestamp)
       ? ["Change boundary is expired."]
       : []),
   ];

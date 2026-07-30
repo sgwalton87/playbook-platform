@@ -24,6 +24,11 @@ import {
   createLaunchApproval,
   persistLaunchApproval,
 } from "../authority/launch";
+import {
+  evidenceList,
+  evidenceString,
+  type FounderEvidenceInput,
+} from "./founder-evidence-input";
 
 export const KERNEL_COMMANDS = [
   "next",
@@ -70,7 +75,8 @@ export function isKernelCommand(value: string): value is KernelCommandName {
 export async function dispatchKernelCommand(
   command: KernelCommandName,
   rootDir = process.cwd(),
-  actorId = process.env.PBOS_ACTOR_ID ?? ""
+  actorId = process.env.PBOS_ACTOR_ID ?? "",
+  evidenceInput: FounderEvidenceInput = {}
 ): Promise<KernelCommandResult> {
   if (command === "change-inventory") {
     const inventory = createChangeInventory(rootDir);
@@ -82,16 +88,31 @@ export async function dispatchKernelCommand(
   }
 
   if (command === "change-boundary") {
-    const requesterIdentity = process.env.PBOS_BOUNDARY_REQUESTER_ID ?? "";
-    const approvedFiles = (process.env.PBOS_BOUNDARY_APPROVED_FILES ?? "")
-      .split(",").map((value) => value.trim()).filter(Boolean);
-    const excludedFiles = (process.env.PBOS_BOUNDARY_EXCLUDED_FILES ?? "")
-      .split(",").map((value) => value.trim()).filter(Boolean);
-    const purpose = process.env.PBOS_BOUNDARY_PURPOSE ?? "";
-    const businessPurpose = process.env.PBOS_BOUNDARY_BUSINESS_PURPOSE ?? "";
-    const technicalPurpose = process.env.PBOS_BOUNDARY_TECHNICAL_PURPOSE ?? "";
-    const riskAcknowledgment = process.env.PBOS_BOUNDARY_RISK_ACKNOWLEDGMENT ?? "";
-    const expirationTimestamp = process.env.PBOS_BOUNDARY_EXPIRATION ?? "";
+    const requesterIdentity = evidenceString(
+      evidenceInput, "requester-identity", process.env.PBOS_BOUNDARY_REQUESTER_ID
+    );
+    const approvedFiles = evidenceList(
+      evidenceInput, "approved-files", process.env.PBOS_BOUNDARY_APPROVED_FILES ?? ""
+    );
+    const excludedFiles = evidenceList(
+      evidenceInput, "excluded-files", process.env.PBOS_BOUNDARY_EXCLUDED_FILES ?? ""
+    );
+    const businessPurpose = evidenceString(
+      evidenceInput, "business-purpose", process.env.PBOS_BOUNDARY_BUSINESS_PURPOSE
+    );
+    const technicalPurpose = evidenceString(
+      evidenceInput, "technical-purpose", process.env.PBOS_BOUNDARY_TECHNICAL_PURPOSE
+    );
+    const purpose = evidenceString(
+      evidenceInput, "purpose", process.env.PBOS_BOUNDARY_PURPOSE ?? businessPurpose
+    );
+    const riskAcknowledgment = evidenceString(
+      evidenceInput, "risk-acknowledgment",
+      process.env.PBOS_BOUNDARY_RISK_ACKNOWLEDGMENT
+    );
+    const expirationTimestamp = evidenceString(
+      evidenceInput, "expiration", process.env.PBOS_BOUNDARY_EXPIRATION
+    );
     const previewInventory = createChangeInventory(rootDir);
     const previewAssessment = assessChangeBoundary(
       previewInventory,
@@ -159,12 +180,25 @@ export async function dispatchKernelCommand(
 
   if (command === "approve-boundary") {
     const boundary = loadChangeBoundary(rootDir)?.latest ?? null;
-    const requesterIdentity = process.env.PBOS_LAUNCH_REQUESTER_ID ?? "";
-    const reviewerIdentity = process.env.PBOS_LAUNCH_REVIEWER_ID ?? "";
-    const decision = process.env.PBOS_LAUNCH_DECISION;
-    const reason = process.env.PBOS_LAUNCH_REASON ?? "";
-    const riskAcknowledgment = process.env.PBOS_LAUNCH_RISK_ACKNOWLEDGMENT ?? "";
-    const expiration = process.env.PBOS_LAUNCH_EXPIRATION ?? "";
+    const requesterIdentity = evidenceString(
+      evidenceInput, "requester-identity", process.env.PBOS_LAUNCH_REQUESTER_ID
+    );
+    const reviewerIdentity = evidenceString(
+      evidenceInput, "reviewer-identity", process.env.PBOS_LAUNCH_REVIEWER_ID
+    );
+    const decision = evidenceString(
+      evidenceInput, "decision", process.env.PBOS_LAUNCH_DECISION
+    ).toUpperCase();
+    const reason = evidenceString(
+      evidenceInput, "reason", process.env.PBOS_LAUNCH_REASON
+    );
+    const riskAcknowledgment = evidenceString(
+      evidenceInput, "risk-acknowledgment",
+      process.env.PBOS_LAUNCH_RISK_ACKNOWLEDGMENT
+    );
+    const expiration = evidenceString(
+      evidenceInput, "expiration", process.env.PBOS_LAUNCH_EXPIRATION
+    );
     if (
       !boundary ||
       !requesterIdentity ||

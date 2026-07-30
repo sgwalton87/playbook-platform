@@ -62,6 +62,10 @@ describe("it command presentation", () => {
     });
     expect(output).toContain("System readiness: NOT_READY");
     expect(output).toContain("Launch status: HOLD");
+    expect(output).toContain("Human Evidence: MISSING");
+    expect(output).toContain("Change boundary: MISSING");
+    expect(output).toContain("Launch approval: MISSING");
+    expect(output).toContain("Trusted context: MISSING");
     expect(output).toContain("npm run pbos:context-reconcile");
     expect(output).toContain("No action was executed outside existing PBOS authority.");
   });
