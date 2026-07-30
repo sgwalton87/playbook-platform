@@ -17,6 +17,10 @@ import type {
   RuntimeContext,
 } from "./schema";
 import { loadConstitutionalGates } from "../planner/load";
+import {
+  GOVERNED_CONTEXT_OUTPUTS,
+  isGovernedRuntimeOutput,
+} from "./governed-outputs";
 
 interface EngineStateArtifact {
   engineVersion: string;
@@ -26,21 +30,6 @@ interface EngineStateArtifact {
 
 interface PlanningArtifact {
   selectedGate?: { id?: string } | null;
-}
-
-const CONTEXT_OUTPUTS = new Set([
-  Artifacts.repositoryContext,
-  Artifacts.contextRefresh,
-  "docs/release-evidence/pbos-context-refresh.md",
-  "docs/release-evidence/pbos-lifecycle-governance-report.md",
-  "docs/release-evidence/pbos-planning-handoff-report.md",
-]);
-
-function isGovernedRuntimeOutput(relativePath: string): boolean {
-  return (
-    relativePath.startsWith("pbos/runtime/") ||
-    CONTEXT_OUTPUTS.has(relativePath)
-  );
 }
 
 function git(rootDir: string, args: string[]): string {
@@ -235,7 +224,7 @@ export function loadRepositoryContextSnapshot(
       (line) =>
         line.length > 0 &&
         !line.includes("pbos/runtime/") &&
-        ![...CONTEXT_OUTPUTS].some((output) => line.endsWith(output))
+        ![...GOVERNED_CONTEXT_OUTPUTS].some((output) => line.endsWith(output))
     )
     .join("\n");
   const trackedDiff = git(repositoryRoot, [

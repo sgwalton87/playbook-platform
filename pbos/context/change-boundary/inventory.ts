@@ -2,6 +2,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { artifactDigest } from "../../kernel/identity";
+import { isGovernedRuntimeOutput } from "../governed-outputs";
 import type {
   ChangeApprovalStatus,
   ChangeInventory,
@@ -65,6 +66,7 @@ export function createChangeInventory(
       index += 1;
     }
     const normalized = file.replaceAll("\\", "/");
+    if (isGovernedRuntimeOutput(normalized)) continue;
     const classification = classify(normalized);
     const absolute = path.join(rootDir, normalized);
     changes.push({

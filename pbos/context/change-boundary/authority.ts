@@ -18,6 +18,7 @@ export function validateChangeBoundary(
   const excluded = [...declaration.excluded_files].sort();
   const classified = [...approved, ...excluded].sort();
   const isBaseline = declaration.boundary_type === "BASELINE_ACTIVATION";
+  const isChange = declaration.boundary_type === "CHANGE";
   const baselineFields = [
     declaration.context_digest,
     declaration.manifest_digest,
@@ -60,6 +61,9 @@ export function validateChangeBoundary(
     ...(isBaseline && inventory.changes.length > 0
       ? ["Baseline activation requires a clean repository."]
       : []),
+    ...(isChange && inventory.changes.length === 0
+      ? ["Change boundary requires at least one changed file."]
+      : []),
     ...(isBaseline &&
     (approved.length > 0 ||
       declaration.included_files.length > 0 ||
@@ -77,14 +81,15 @@ export function validateChangeBoundary(
       declaration.governance_digest !== expectedBaseline.governance_digest)
       ? ["Baseline activation digest does not match current context."]
       : []),
-    ...(new Set(classified).size !== classified.length
+    ...(isChange && new Set(classified).size !== classified.length
       ? ["Files cannot be both approved and excluded."]
       : []),
     ...(JSON.stringify([...declaration.approved_files].sort()) !==
     JSON.stringify([...declaration.included_files].sort())
       ? ["Approved and included file identities do not match."]
       : []),
-    ...(JSON.stringify(classified) !== JSON.stringify(inventoryFiles)
+    ...(isChange &&
+    JSON.stringify(classified) !== JSON.stringify(inventoryFiles)
       ? ["Every changed file must be classified exactly once."]
       : []),
     ...(inventory.changes.some(({ owner }) => owner === "UNKNOWN")

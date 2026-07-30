@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { artifactDigest } from "../../kernel/identity";
 import { createChangeBoundary, validateChangeBoundary } from "./authority";
 import type { BaselineActivationIdentity, ChangeInventory } from "./types";
+import { isGovernedRuntimeOutput } from "../governed-outputs";
 
 const timestamp = "2026-07-30T00:00:00.000Z";
 
@@ -110,6 +111,27 @@ describe("change boundary authority", () => {
     ).toContain("Change inventory identity does not match.");
   });
 
+  it("accepts a change boundary when every changed file is classified", () => {
+    const value = inventory();
+    const declaration = createChangeBoundary({
+      inventory: value,
+      boundaryType: "CHANGE",
+      requesterIdentity: "human-owner",
+      approvedFiles: ["docs/a.md"],
+      excludedFiles: ["pbos/a.ts"],
+      purpose: "Approve the complete change set.",
+      businessPurpose: "Release governed changes.",
+      technicalPurpose: "Bind every changed file.",
+      riskAcknowledgment: "YELLOW risk reviewed.",
+      creationTimestamp: timestamp,
+      expirationTimestamp: "2026-07-31T00:00:00.000Z",
+    });
+    expect(validateChangeBoundary(declaration, value, timestamp)).toEqual({
+      valid: true,
+      findings: [],
+    });
+  });
+
   it("accepts a clean repository baseline with complete identity evidence", () => {
     const value = cleanInventory();
     const declaration = createChangeBoundary({
@@ -149,6 +171,40 @@ describe("change boundary authority", () => {
     })).toThrow("Baseline activation requires a clean repository.");
   });
 
+  it("rejects baseline activation with included files", () => {
+    expect(() => createChangeBoundary({
+      inventory: cleanInventory(),
+      boundaryType: "BASELINE_ACTIVATION",
+      baselineIdentity,
+      requesterIdentity: "human-owner",
+      approvedFiles: ["docs/a.md"],
+      excludedFiles: [],
+      purpose: "Invalid baseline.",
+      businessPurpose: "Invalid baseline.",
+      technicalPurpose: "Invalid baseline.",
+      riskAcknowledgment: "Risk reviewed.",
+      creationTimestamp: timestamp,
+      expirationTimestamp: "2026-07-31T00:00:00.000Z",
+    })).toThrow("Baseline activation file classifications must be empty.");
+  });
+
+  it("rejects baseline activation with excluded files", () => {
+    expect(() => createChangeBoundary({
+      inventory: cleanInventory(),
+      boundaryType: "BASELINE_ACTIVATION",
+      baselineIdentity,
+      requesterIdentity: "human-owner",
+      approvedFiles: [],
+      excludedFiles: ["docs/a.md"],
+      purpose: "Invalid baseline.",
+      businessPurpose: "Invalid baseline.",
+      technicalPurpose: "Invalid baseline.",
+      riskAcknowledgment: "Risk reviewed.",
+      creationTimestamp: timestamp,
+      expirationTimestamp: "2026-07-31T00:00:00.000Z",
+    })).toThrow("Baseline activation file classifications must be empty.");
+  });
+
   it("rejects missing identity, expiration, and baseline digest drift", () => {
     const value = cleanInventory();
     const declaration = createChangeBoundary({
@@ -185,5 +241,24 @@ describe("change boundary authority", () => {
     }).findings).toContain(
       "Baseline activation digest does not match current context."
     );
+  });
+
+  it("rejects an empty CHANGE boundary and excludes governed runtime outputs", () => {
+    expect(() => createChangeBoundary({
+      inventory: cleanInventory(),
+      boundaryType: "CHANGE",
+      requesterIdentity: "human-owner",
+      approvedFiles: [],
+      excludedFiles: [],
+      purpose: "Invalid empty change.",
+      businessPurpose: "Invalid empty change.",
+      technicalPurpose: "Invalid empty change.",
+      riskAcknowledgment: "Risk reviewed.",
+      creationTimestamp: timestamp,
+      expirationTimestamp: "2026-07-31T00:00:00.000Z",
+    })).toThrow("Change boundary requires at least one changed file.");
+    expect(isGovernedRuntimeOutput("pbos/runtime/change-boundary.json")).toBe(true);
+    expect(isGovernedRuntimeOutput("pbos/runtime/launch-approval.json")).toBe(true);
+    expect(isGovernedRuntimeOutput("pbos/context/index.ts")).toBe(false);
   });
 });
