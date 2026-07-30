@@ -10,3 +10,4 @@ test-results/
 
 # TypeScript incremental cache
 tsconfig.tsbuildinfo
+pbos/runtime/*.json
