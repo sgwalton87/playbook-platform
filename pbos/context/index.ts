@@ -8,6 +8,8 @@ export * from "./history";
 export * from "./lifecycle";
 export * from "./observer";
 export * from "./reports";
+export * from "./reconciliation";
+export * from "./refresh";
 
 import type { ContextValidationResult } from "./schema";
 import {

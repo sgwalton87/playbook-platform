@@ -1,5 +1,41 @@
 [
   {
+    "name": "analyze",
+    "description": "Analyze repository, architecture, capability, engine, and governance state without selecting outside the constitutional planner.",
+    "mode": "planning",
+    "status": "active"
+  },
+  {
+    "name": "recommend",
+    "description": "Expose one evidence-bound governed recommendation from the constitutional planner without execution authority.",
+    "mode": "planning",
+    "status": "active"
+  },
+  {
+    "name": "refresh",
+    "description": "Inspect context refresh readiness without mutating trusted context.",
+    "mode": "planning",
+    "status": "active"
+  },
+  {
+    "name": "package",
+    "description": "Generate an immutable Codex execution package only from an eligible constitutional plan.",
+    "mode": "planning",
+    "status": "active"
+  },
+  {
+    "name": "authorize",
+    "description": "Inspect the human authorization gateway without creating a decision.",
+    "mode": "audit",
+    "status": "active"
+  },
+  {
+    "name": "improve",
+    "description": "Report evidence-bound improvement findings without mutating platform state.",
+    "mode": "planning",
+    "status": "active"
+  },
+  {
     "name": "govern-lifecycle",
     "description": "Evaluate completion evidence and orchestrate validation, promotion, completion, recovery, and replanning.",
     "mode": "release",

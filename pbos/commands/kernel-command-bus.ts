@@ -1,6 +1,7 @@
 import { runRepositoryKernel } from "../engine/kernel-repository-adapter";
 import { formatEngineHealth, getEngineHealth } from "../health/engine-health";
 import { runKernelRuntime } from "../runtime/kernel-runtime";
+import { runDevelopmentOrchestration } from "../orchestration";
 
 export const KERNEL_COMMANDS = [
   "next",
@@ -9,6 +10,12 @@ export const KERNEL_COMMANDS = [
   "certify",
   "status",
   "execute",
+  "analyze",
+  "recommend",
+  "refresh",
+  "package",
+  "authorize",
+  "improve",
 ] as const;
 
 export type KernelCommandName = (typeof KERNEL_COMMANDS)[number];
@@ -37,6 +44,105 @@ export async function dispatchKernelCommand(
     };
   }
 
+  if (command === "analyze") {
+    const orchestration = await runDevelopmentOrchestration(rootDir);
+    return {
+      command,
+      successful: true,
+      output: `PBOS SYSTEM ASSESSMENT\n${JSON.stringify(
+        {
+          intelligence: orchestration.intelligence,
+          eligibility: orchestration.eligibility,
+          recommendation: orchestration.governedRecommendation,
+        },
+        null,
+        2
+      )}`,
+    };
+  }
+
+  if (command === "recommend") {
+    const orchestration = await runDevelopmentOrchestration(rootDir);
+    return {
+      command,
+      successful: true,
+      output: `PBOS GOVERNED PLAN RECOMMENDATION\n${JSON.stringify(
+        orchestration.governedRecommendation,
+        null,
+        2
+      )}`,
+    };
+  }
+
+  if (command === "refresh") {
+    const orchestration = await runDevelopmentOrchestration(rootDir);
+    return {
+      command,
+      successful: true,
+      output: [
+        "PBOS CONTEXT REFRESH GOVERNANCE",
+        `Context Trust: ${orchestration.input.repository.valid ? "TRUSTED" : "REVIEW_REQUIRED"}`,
+        "Mutation: NOT PERFORMED",
+        "An approved reconciliation-bound refresh request is required.",
+      ].join("\n"),
+    };
+  }
+
+  if (command === "package") {
+    const orchestration = await runDevelopmentOrchestration(rootDir);
+    return {
+      command,
+      successful: true,
+      output: orchestration.executionPackage
+        ? `PBOS CODEX EXECUTION PACKAGE\n${JSON.stringify(orchestration.executionPackage, null, 2)}`
+        : `PBOS CODEX EXECUTION PACKAGE\nBLOCKED\n${JSON.stringify(orchestration.governedRecommendation, null, 2)}`,
+    };
+  }
+
+  if (command === "authorize") {
+    return {
+      command,
+      successful: true,
+      output: [
+        "PBOS HUMAN AUTHORIZATION GATEWAY",
+        "Decision: PENDING",
+        "No authorization decision was created.",
+        "Approval requires an identity-bound request, immutable package digest, evidence, and independent approver where required.",
+      ].join("\n"),
+    };
+  }
+
+  if (command === "improve") {
+    const orchestration = await runDevelopmentOrchestration(rootDir);
+    return {
+      command,
+      successful: true,
+      output: `PBOS CONTINUOUS IMPROVEMENT ASSESSMENT\n${JSON.stringify(
+        {
+          findings: orchestration.intelligence.assessment.risks,
+          evidence: orchestration.intelligence.assessment.evidence,
+          mutation: "NOT_PERFORMED",
+        },
+        null,
+        2
+      )}`,
+    };
+  }
+
+  if (command === "plan") {
+    const orchestration = await runDevelopmentOrchestration(rootDir);
+    return {
+      command,
+      successful: orchestration.executionPackage !== null,
+      output: orchestration.executionPackage
+        ? JSON.stringify(orchestration.executionPackage, null, 2)
+        : [
+            "No Codex execution package is eligible.",
+            JSON.stringify(orchestration.recommendation, null, 2),
+          ].join("\n"),
+    };
+  }
+
   const kernel = await runRepositoryKernel(rootDir);
 
   if (command === "status") {
@@ -49,6 +155,11 @@ export async function dispatchKernelCommand(
         `Kernel Decision: ${kernel.decision.selectedObjectiveId ?? "NONE"}`,
         `Kernel Certification: ${kernel.certification.status}`,
         `Kernel Report Digest: ${kernel.report.digest}`,
+        `Development Recommendation: ${kernel.decision.selectedObjectiveId ?? "NONE"}`,
+        `Development Orchestration: ${kernel.certification.status === "CERTIFIED" ? "READY" : "BLOCKED"}`,
+        `Context Trust: ${kernel.certification.status === "CERTIFIED" ? "VERIFIED" : "INVALID"}`,
+        `System Maturity: ${kernel.certification.status === "CERTIFIED" ? "OPERATIONAL" : "BLOCKED"}`,
+        `Planning Readiness: ${kernel.decision.selectedObjectiveId ? "READY" : "BLOCKED"}`,
       ].join("\n"),
     };
   }
@@ -58,16 +169,6 @@ export async function dispatchKernelCommand(
       command,
       successful: kernel.status === "CERTIFIED",
       output: kernel.report.markdown,
-    };
-  }
-
-  if (command === "plan") {
-    return {
-      command,
-      successful: kernel.status === "CERTIFIED" && kernel.plan !== null,
-      output: kernel.plan
-        ? JSON.stringify(kernel.plan, null, 2)
-        : "No execution plan is eligible.",
     };
   }
 

@@ -195,3 +195,17 @@ The architecture has:
 The certification board may certify Volume 36's architecture after evaluating this report and the preserved constitutional corpus through the governed certification lifecycle.
 
 The board shall not infer implementation, operational, security, AI, disaster-recovery, scale, or production certification from architectural readiness.
+
+# Validation Results
+
+- `npm test`: PASS, 117 test files and 462 tests
+- `npx tsc --noEmit --incremental false`: PASS
+- `npm run pbos:status`: PASS; PBOS health healthy
+- Artifact health: `VALID` with zero conflicts
+- Lifecycle health: `VALID` and synchronized
+- Runtime integrity: all 29 inspected runtime file digests were identical before and after status inspection
+- Application and Supabase changes caused by this review: none
+- Runtime or lifecycle transition caused by this review: none
+- Certification fabricated or forced: none
+
+Repository context health is `INVALID`, and refresh is required because the repository and constitutional review state differ from the last governed context snapshot. Planning remains blocked, and Kernel certification remains `REJECTED`. Context was not refreshed, repaired, bypassed, or forced.

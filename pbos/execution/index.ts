@@ -129,3 +129,4 @@ export function runExecutionEngine(
 }
 
 export type { ExecutionDispatcher } from "./dispatch";
+export * from "./capability-binding-adapter";
