@@ -38,6 +38,7 @@ describe("it command presentation", () => {
         execution_state: "NOT_STARTED",
         evidence_state: "NOT_AVAILABLE",
         change_boundary_status: "MISSING",
+        boundary_type: "NONE",
         launch_approval_status: "MISSING",
         context_status: "MISSING",
         digest: "mission-control",
@@ -62,6 +63,7 @@ describe("it command presentation", () => {
     });
     expect(output).toContain("System readiness: NOT_READY");
     expect(output).toContain("Launch status: HOLD");
+    expect(output).toContain("Boundary Type: NONE");
     expect(output).toContain("Human Evidence: MISSING");
     expect(output).toContain("Change boundary: MISSING");
     expect(output).toContain("Launch approval: MISSING");

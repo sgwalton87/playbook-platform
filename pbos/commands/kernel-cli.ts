@@ -4,6 +4,7 @@ import {
   isKernelCommand,
 } from "./kernel-command-bus";
 import { readFounderEvidenceInput } from "./founder-evidence-input";
+import { createChangeInventory } from "../context/change-boundary";
 
 const requested = process.argv[2] ?? "next";
 
@@ -15,6 +16,9 @@ if (!isKernelCommand(requested)) {
     command: requested,
     args: process.argv.slice(3),
     interactive: Boolean(process.stdin.isTTY && process.stdout.isTTY),
+    baselineAvailable:
+      requested === "change-boundary" &&
+      createChangeInventory(process.cwd()).changes.length === 0,
   })
     .then((input) =>
       dispatchKernelCommand(

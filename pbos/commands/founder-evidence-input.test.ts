@@ -41,4 +41,25 @@ describe("founder evidence input", () => {
       expiration: "2026-08-01T00:00:00.000Z",
     }, async () => "no")).rejects.toThrow("not confirmed");
   });
+
+  it("selects a clean baseline without requesting file classifications", async () => {
+    const answers = [
+      "2",
+      "founder",
+      "Activate governed planning.",
+      "Bind the clean commit.",
+      "Baseline risk accepted.",
+      "2026-08-01T00:00:00.000Z",
+      "yes",
+    ];
+    const result = await collectFounderEvidenceInput(
+      "change-boundary",
+      {},
+      async () => answers.shift() ?? "",
+      true
+    );
+    expect(result["boundary-type"]).toBe("BASELINE_ACTIVATION");
+    expect(result["approved-files"]).toBeUndefined();
+    expect(result["excluded-files"]).toBeUndefined();
+  });
 });

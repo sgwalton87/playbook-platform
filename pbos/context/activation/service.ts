@@ -42,6 +42,13 @@ export interface TrustedContextDiscovery {
   readonly assessment: RepositoryRealityAssessment;
   readonly reconciliation: ReturnType<RepositoryContextReconciliation["reconcile"]>;
   readonly activation_snapshot: ContextActivationSnapshot;
+  readonly baseline_identity: {
+    readonly context_digest: string;
+    readonly manifest_digest: string;
+    readonly architecture_digest: string;
+    readonly artifact_digest: string;
+    readonly governance_digest: string;
+  };
 }
 
 export function discoverTrustedContext(
@@ -67,10 +74,25 @@ export function discoverTrustedContext(
     current,
     timestamp,
   });
+  const governanceDigest = artifactDigest(
+    governanceFiles.map((file) => ({
+      file,
+      content: readFileSync(path.join(rootDir, file), "utf8"),
+    }))
+  );
+  const baselineIdentity = {
+    context_digest: artifactDigest(current),
+    manifest_digest: assessment.manifest_digest ?? "",
+    architecture_digest: assessment.architecture_digest,
+    artifact_digest: assessment.artifact_digest,
+    governance_digest: governanceDigest,
+  };
   const changeInventory = createChangeInventory(rootDir, timestamp);
   const changeBoundary = loadChangeBoundary(rootDir)?.latest ?? null;
   const changeBoundaryValidation = changeBoundary
-    ? validateChangeBoundary(changeBoundary, changeInventory, timestamp)
+    ? validateChangeBoundary(
+        changeBoundary, changeInventory, timestamp, baselineIdentity
+      )
     : { valid: false, findings: ["Approved change boundary is missing."] };
   const launchApproval = loadLaunchApproval(rootDir)?.latest ?? null;
   const launchApprovalValidation = launchApproval
@@ -96,12 +118,7 @@ export function discoverTrustedContext(
     manifest_digest: assessment.manifest_digest ?? "",
     artifact_digest: assessment.artifact_digest,
     architecture_digest: assessment.architecture_digest,
-    governance_digest: artifactDigest(
-      governanceFiles.map((file) => ({
-        file,
-        content: readFileSync(path.join(rootDir, file), "utf8"),
-      }))
-    ),
+    governance_digest: governanceDigest,
     governance_state_valid: assessment.governance_state === "VALID",
     change_boundary_identity: changeBoundary?.digest ?? "",
     change_boundary_valid: changeBoundaryValidation.valid,
@@ -114,7 +131,12 @@ export function discoverTrustedContext(
     ...snapshotBody,
     digest: artifactDigest(snapshotBody),
   };
-  return { assessment, reconciliation, activation_snapshot };
+  return {
+    assessment,
+    reconciliation,
+    activation_snapshot,
+    baseline_identity: baselineIdentity,
+  };
 }
 
 function isTrustedBuildContext(value: unknown): value is TrustedBuildContext {

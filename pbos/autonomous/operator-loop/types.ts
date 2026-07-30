@@ -33,6 +33,7 @@ export interface EnterpriseMissionControlSnapshot {
   readonly execution_state: "NOT_STARTED" | "ADMITTED" | "EXECUTING" | "COMPLETE" | "FAILED";
   readonly evidence_state: "NOT_AVAILABLE" | "PENDING" | "CAPTURED" | "INVALID";
   readonly change_boundary_status: "APPROVED" | "MISSING" | "INVALID";
+  readonly boundary_type: "CHANGE" | "BASELINE_ACTIVATION" | "NONE";
   readonly launch_approval_status: "APPROVED" | "REJECTED" | "MISSING" | "INVALID";
   readonly context_status: "TRUSTED" | "MISSING" | "INVALID";
   readonly digest: string;

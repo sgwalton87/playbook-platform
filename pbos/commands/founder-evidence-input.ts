@@ -61,11 +61,29 @@ const approvalPrompts = [
 export async function collectFounderEvidenceInput(
   command: EvidenceCommand,
   initial: FounderEvidenceInput,
-  prompt: Prompt
+  prompt: Prompt,
+  baselineAvailable = false
 ): Promise<FounderEvidenceInput> {
   if (command !== "change-boundary" && command !== "approve-boundary") return initial;
   const entries = new Map(Object.entries(initial));
-  const prompts = command === "change-boundary" ? boundaryPrompts : approvalPrompts;
+  if (command === "change-boundary" && baselineAvailable &&
+    !entries.get("boundary-type")) {
+    const selection = (await prompt(
+      "PBOS BASELINE ACTIVATION DETECTED\n\nChoose boundary type:\n1. CHANGE\n2. BASELINE_ACTIVATION\n> "
+    )).trim();
+    entries.set(
+      "boundary-type",
+      selection === "2" ? "BASELINE_ACTIVATION" : selection === "1" ? "CHANGE" : selection
+    );
+  }
+  const baselineSelected =
+    entries.get("boundary-type") === "BASELINE_ACTIVATION";
+  const prompts = command === "change-boundary"
+    ? boundaryPrompts.filter(([name]) =>
+        !baselineSelected ||
+        (name !== "approved-files" && name !== "excluded-files")
+      )
+    : approvalPrompts;
   for (const [name, label] of prompts) {
     const existing = entries.get(name);
     if (typeof existing === "string" ? existing : existing?.length) continue;
@@ -82,6 +100,7 @@ export async function readFounderEvidenceInput(input: {
   readonly command: EvidenceCommand;
   readonly args: readonly string[];
   readonly interactive: boolean;
+  readonly baselineAvailable?: boolean;
   readonly stdin?: Readable;
   readonly stdout?: Writable;
 }): Promise<FounderEvidenceInput> {
@@ -97,7 +116,10 @@ export async function readFounderEvidenceInput(input: {
   try {
     (input.stdout ?? process.stdout).write("\nPBOS HUMAN AUTHORIZATION REQUIRED\n\n");
     return await collectFounderEvidenceInput(
-      input.command, parsed, (label) => terminal.question(label)
+      input.command,
+      parsed,
+      (label) => terminal.question(label),
+      input.baselineAvailable
     );
   } finally {
     terminal.close();

@@ -1,5 +1,6 @@
 export type ChangeType = "ADDED" | "MODIFIED" | "DELETED" | "RENAMED";
 export type ChangeRisk = "GREEN" | "YELLOW" | "RED";
+export type ChangeBoundaryType = "CHANGE" | "BASELINE_ACTIVATION";
 export type ChangeApprovalStatus =
   | "APPROVED_CANDIDATE"
   | "REVIEW_REQUIRED"
@@ -29,6 +30,7 @@ export interface ChangeInventory {
 
 export interface ChangeBoundaryDeclaration {
   readonly boundary_id: string;
+  readonly boundary_type: ChangeBoundaryType;
   readonly repository_identity: string;
   readonly commit_identity: string;
   readonly branch_identity: string;
@@ -39,6 +41,11 @@ export interface ChangeBoundaryDeclaration {
   readonly included_files: readonly string[];
   readonly excluded_files: readonly string[];
   readonly scope_digest: string;
+  readonly context_digest: string;
+  readonly manifest_digest: string;
+  readonly architecture_digest: string;
+  readonly artifact_digest: string;
+  readonly governance_digest: string;
   readonly purpose: string;
   readonly business_purpose: string;
   readonly technical_purpose: string;
@@ -49,6 +56,14 @@ export interface ChangeBoundaryDeclaration {
   readonly expiration_timestamp: string;
   readonly expiration: string;
   readonly digest: string;
+}
+
+export interface BaselineActivationIdentity {
+  readonly context_digest: string;
+  readonly manifest_digest: string;
+  readonly architecture_digest: string;
+  readonly artifact_digest: string;
+  readonly governance_digest: string;
 }
 
 export interface ChangeBoundaryValidation {

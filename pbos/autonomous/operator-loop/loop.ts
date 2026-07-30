@@ -178,6 +178,7 @@ export class FounderOperatingLoop {
           ? "APPROVED" as const
           : "INVALID" as const
         : "MISSING" as const,
+      boundary_type: changeBoundary?.boundary_type ?? "NONE" as const,
       launch_approval_status: launchApproval
         ? discovery.activation_snapshot.launch_approval_valid &&
           launchApproval.decision === "APPROVED"

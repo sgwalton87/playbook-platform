@@ -6,12 +6,18 @@ function isDeclaration(value: unknown): value is ChangeBoundaryDeclaration {
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
   const record = value as Record<string, unknown>;
   return [
-    "boundary_id", "repository_identity", "commit_identity", "branch_identity",
+    "boundary_id", "boundary_type", "repository_identity", "commit_identity", "branch_identity",
     "requester_identity", "inventory_digest", "inventory_identity", "scope_digest", "purpose",
     "business_purpose", "technical_purpose", "owner_identity",
     "risk_acknowledgment", "creation_timestamp", "created_at",
     "expiration_timestamp", "expiration", "digest",
   ].every((key) => typeof record[key] === "string" && record[key] !== "") &&
+    ["context_digest", "manifest_digest", "architecture_digest",
+      "artifact_digest", "governance_digest"].every(
+      (key) => typeof record[key] === "string"
+    ) &&
+    (record.boundary_type === "CHANGE" ||
+      record.boundary_type === "BASELINE_ACTIVATION") &&
     Array.isArray(record.approved_files) &&
     Array.isArray(record.included_files) &&
     Array.isArray(record.excluded_files);

@@ -88,6 +88,7 @@ export async function dispatchKernelCommand(
   }
 
   if (command === "change-boundary") {
+    const timestamp = new Date().toISOString();
     const requesterIdentity = evidenceString(
       evidenceInput, "requester-identity", process.env.PBOS_BOUNDARY_REQUESTER_ID
     );
@@ -113,7 +114,12 @@ export async function dispatchKernelCommand(
     const expirationTimestamp = evidenceString(
       evidenceInput, "expiration", process.env.PBOS_BOUNDARY_EXPIRATION
     );
-    const previewInventory = createChangeInventory(rootDir);
+    const previewInventory = createChangeInventory(rootDir, timestamp);
+    const boundaryTypeInput = evidenceString(
+      evidenceInput, "boundary-type", process.env.PBOS_BOUNDARY_TYPE
+    ).toUpperCase();
+    const boundaryType = boundaryTypeInput ||
+      (previewInventory.changes.length > 0 ? "CHANGE" : "");
     const previewAssessment = assessChangeBoundary(
       previewInventory,
       loadChangeBoundary(rootDir)?.latest ?? null,
@@ -125,7 +131,8 @@ export async function dispatchKernelCommand(
       !businessPurpose ||
       !technicalPurpose ||
       !riskAcknowledgment ||
-      !expirationTimestamp
+      !expirationTimestamp ||
+      !["CHANGE", "BASELINE_ACTIVATION"].includes(boundaryType)
     ) {
       return {
         command,
@@ -137,17 +144,22 @@ export async function dispatchKernelCommand(
           `Current Commit: ${previewAssessment.commit_identity}`,
           `Changed Files: ${previewAssessment.change_summary.length}`,
           `Risk Level: ${previewAssessment.risk_level}`,
+          `Boundary Type: ${boundaryType || "REQUIRED"}`,
           `Recommended Scope: ${previewAssessment.classification_summary.REVIEW_REQUIRED} files require explicit review.`,
-          "Requester identity, business and technical purposes, complete approved/excluded file lists, risk acknowledgment, and expiration are required.",
+          "Boundary type, requester identity, business and technical purposes, complete file classification, risk acknowledgment, and expiration are required.",
           "No runtime artifact was created.",
         ].join("\n"),
       };
     }
-    const timestamp = new Date().toISOString();
     try {
       const inventory = createChangeInventory(rootDir, timestamp);
+      const baselineIdentity = boundaryType === "BASELINE_ACTIVATION"
+        ? discoverTrustedContext(rootDir, timestamp).baseline_identity
+        : undefined;
       const declaration = createChangeBoundary({
         inventory,
+        boundaryType: boundaryType as "CHANGE" | "BASELINE_ACTIVATION",
+        baselineIdentity,
         requesterIdentity,
         approvedFiles,
         excludedFiles,

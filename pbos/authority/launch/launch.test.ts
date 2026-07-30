@@ -8,6 +8,7 @@ const timestamp = "2026-07-30T00:00:00.000Z";
 function boundary(): ChangeBoundaryDeclaration {
   const body = {
     boundary_id: "BOUNDARY-001",
+    boundary_type: "CHANGE" as const,
     repository_identity: "playbook-platform",
     commit_identity: "c".repeat(40),
     branch_identity: "main",
@@ -21,6 +22,11 @@ function boundary(): ChangeBoundaryDeclaration {
       included: ["docs/a.md"],
       excluded: ["pbos/a.ts"],
     }),
+    context_digest: "",
+    manifest_digest: "",
+    architecture_digest: "",
+    artifact_digest: "",
+    governance_digest: "",
     purpose: "Approve a bounded release.",
     business_purpose: "Release governed work.",
     technical_purpose: "Commit an exact scope.",
