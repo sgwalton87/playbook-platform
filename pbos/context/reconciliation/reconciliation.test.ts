@@ -89,4 +89,21 @@ describe("repository context reconciliation", () => {
     expect(report.state).toBe("REJECTED");
     expect(report.differences[0]?.code).toBe("MISSING_CONTEXT");
   });
+
+  it("requires human review for expected continuation changes", () => {
+    const previous = snapshot();
+    const report = new RepositoryContextReconciliation().reconcile({
+      stored: stored(previous),
+      current: snapshot({
+        git: {
+          ...previous.git,
+          commitSha: "d".repeat(40),
+          workingTreeContentDigest: "e".repeat(64),
+        },
+      }),
+      timestamp,
+    });
+    expect(report.state).toBe("REVIEW_REQUIRED");
+    expect(report.recommendation).toBe("HUMAN_REVIEW_REQUIRED");
+  });
 });

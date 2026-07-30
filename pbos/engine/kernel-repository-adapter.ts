@@ -1,4 +1,6 @@
 import { loadRepositoryContextArtifact, verifyStoredRepositoryContext } from "../context";
+import { existsSync, readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { artifactDigest } from "../kernel";
 import {
   ConstitutionalExecutionKernel,
@@ -8,6 +10,7 @@ import {
 } from "../kernel/execution";
 import { planConstitutionalGate } from "../planner";
 import { loadConstitutionalGates } from "../planner/load";
+import { loadMasterBuildManifest, type BuildMilestone } from "../manifests";
 import { loadConfig } from "./config";
 import { loadState } from "./state";
 
@@ -17,6 +20,7 @@ export async function createRepositoryKernelInput(
   const config = await loadConfig(rootDir);
   const state = await loadState(config, config.defaultMode, rootDir);
   const gates = loadConstitutionalGates(rootDir, config.gatesDirectory);
+  const buildManifest = loadMasterBuildManifest(rootDir);
   const planning = await planConstitutionalGate({ rootDir, persist: false });
   const stored = loadRepositoryContextArtifact(rootDir);
   if (!stored) {
@@ -31,7 +35,7 @@ export async function createRepositoryKernelInput(
     if (parent) byParent.set(parent, [...(byParent.get(parent) ?? []), gate.id]);
   }
 
-  const objectives: KernelObjective[] = gates.map((gate) => ({
+  const gateObjectives: KernelObjective[] = gates.map((gate) => ({
     id: gate.id,
     description: gate.description,
     state: completed.has(gate.id)
@@ -76,11 +80,74 @@ export async function createRepositoryKernelInput(
     failureCriteria: [...gate.blocking_conditions],
     rollback: ["Preserve prior runtime artifacts and lifecycle history."],
   }));
+  const risk = { GREEN: 20, YELLOW: 60, RED: 100 } as const;
+  const milestoneState = (milestone: BuildMilestone): KernelObjective["state"] => {
+    if (milestone.status === "COMPLETE" || milestone.status === "ARCHIVED") return "COMPLETED";
+    if (milestone.status === "READY") return "READY";
+    if (milestone.status === "PLANNED") return "PLANNED";
+    if (milestone.status === "AUTHORIZED" || milestone.status === "IN_PROGRESS" || milestone.status === "VALIDATING") {
+      return "IN_PROGRESS";
+    }
+    return "BLOCKED";
+  };
+  const buildChildren = new Map<string, string[]>();
+  for (const milestone of buildManifest.manifest.milestones) {
+    const parent = [...milestone.dependencies, ...milestone.blocking_dependencies][0];
+    if (parent) {
+      buildChildren.set(parent, [...(buildChildren.get(parent) ?? []), milestone.id]);
+    }
+  }
+  const buildObjectives: KernelObjective[] = buildManifest.manifest.milestones.map((milestone, index) => ({
+    id: milestone.id,
+    description: milestone.description,
+    state: milestoneState(milestone),
+    parentId: [...milestone.dependencies, ...milestone.blocking_dependencies][0] ?? null,
+    dependencyIds: [...milestone.dependencies, ...milestone.blocking_dependencies],
+    childIds: [...(buildChildren.get(milestone.id) ?? [])].sort(),
+    constitutionalOrder: 10_000 + index,
+    priority: {
+      constitutional: milestone.priority,
+      strategic: milestone.priority,
+      engineering: milestone.priority,
+      business: milestone.priority,
+      operational: milestone.priority,
+    },
+    risk: risk[milestone.risk_level],
+    estimatedEffort: milestone.validation_requirements.length + milestone.outputs.length,
+    criticalPath: (buildChildren.get(milestone.id)?.length ?? 0) > 0,
+    authority: buildManifest.manifest.authority,
+    blockers:
+      milestone.status === "BLOCKED"
+        ? [`MANIFEST_STATE_${milestone.status}`]
+        : [],
+    requiredApprovals: [],
+    approvals: [],
+    validations: [...milestone.validation_requirements],
+    artifacts: milestone.required_artifacts.map((uri) => {
+      const path = resolve(rootDir, uri);
+      return {
+        id: `${milestone.id}:${uri}`,
+        uri,
+        digest: existsSync(path) ? artifactDigest(readFileSync(path, "utf8")) : "",
+      };
+    }),
+    outputs: [...milestone.outputs],
+    successCriteria: [...milestone.completion_definition],
+    failureCriteria: [...milestone.evidence_requirements.map((item) => `Missing evidence: ${item}`)],
+    rollback: ["Preserve prior manifest, execution, and evidence history."],
+  }));
+  const objectives = [...gateObjectives, ...buildObjectives];
   const snapshot = stored.snapshot;
-  const rootObjectiveIds = gates
-    .filter((gate) => gate.dependencies.length === 0)
-    .map((gate) => gate.id)
-    .sort();
+  const rootObjectiveIds = [
+    ...gates.filter((gate) => gate.dependencies.length === 0).map((gate) => gate.id),
+    ...buildManifest.manifest.milestones
+      .filter(
+        (milestone) =>
+          milestone.dependencies.length === 0 &&
+          milestone.blocking_dependencies.length === 0
+      )
+      .map((milestone) => milestone.id),
+  ].sort();
 
   return {
     observedAt: stored.capturedAt,
@@ -112,14 +179,14 @@ export async function createRepositoryKernelInput(
       ],
     },
     constitution: {
-      id: "PBOS-CONSTITUTIONAL-GATE-CORPUS",
-      uri: config.gatesDirectory,
-      digest: artifactDigest(gates),
+      id: "PBOS-CONSTITUTIONAL-BUILD-CORPUS",
+      uri: `${config.gatesDirectory};pbos/manifests/playbook-master-manifest.yaml`,
+      digest: artifactDigest({ gates, buildManifest: buildManifest.manifest }),
     },
     registry: {
-      id: "PBOS-CONSTITUTIONAL-PLANNER",
+      id: "PBOS-MASTER-BUILD-REGISTRY",
       digest: artifactDigest({
-        id: "PBOS-CONSTITUTIONAL-PLANNER",
+        id: "PBOS-MASTER-BUILD-REGISTRY",
         rootObjectiveIds,
         objectives,
       }),

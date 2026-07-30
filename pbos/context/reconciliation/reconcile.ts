@@ -121,7 +121,24 @@ export class RepositoryContextReconciliation {
     const resolutionActions = [
       ...new Set(differences.map(({ resolution }) => resolution)),
     ].sort();
-    const state = differences.length === 0 ? "VERIFIED" : "REJECTED";
+    const identityFailure = differences.some(({ code }) =>
+      ["MISSING_CONTEXT", "REPOSITORY_IDENTITY", "REPOSITORY_ROOT", "REMOTE_IDENTITY", "BRANCH_IDENTITY"].includes(code)
+    );
+    const corruptArtifact = differences.some(
+      ({ code, current }) =>
+        (code === "ARTIFACT_INVENTORY" || code === "ARTIFACT_IDENTITY") &&
+        current === null
+    );
+    const state = differences.length === 0
+      ? "VERIFIED"
+      : identityFailure || corruptArtifact
+        ? "REJECTED"
+        : "REVIEW_REQUIRED";
+    const recommendation = state === "VERIFIED"
+      ? "ACTIVATION_ELIGIBLE"
+      : state === "REVIEW_REQUIRED"
+        ? "HUMAN_REVIEW_REQUIRED"
+        : "REJECT";
     const body = {
       reconciliation_id: `CONTEXT-RECONCILIATION-${currentIdentity.slice(0, 16)}`,
       state,
@@ -131,7 +148,9 @@ export class RepositoryContextReconciliation {
       current_snapshot: input.current,
       differences,
       resolution_actions: resolutionActions,
-      confidence: state === "VERIFIED" ? 100 : 0,
+      confidence: state === "VERIFIED" ? 100 : state === "REVIEW_REQUIRED" ? 70 : 0,
+      risk_level: state === "VERIFIED" ? "LOW" : state === "REVIEW_REQUIRED" ? "HIGH" : "CRITICAL",
+      recommendation,
       timestamp: input.timestamp,
       digest: "",
     } satisfies ContextReconciliationReport;

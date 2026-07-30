@@ -1,113 +1,43 @@
 # PBOS Scholar OS Screen Specifications
 
-**Purpose:** Define implementation-ready contracts for the seven primary Scholar OS screens.  
-**Owner:** Playbook OS Engineering  
-**Last Updated:** July 30, 2026  
-**Related:** [Application Architecture](./PBOS_SCHOLAR_OS_APPLICATION_ARCHITECTURE.md), [User Flows](./PBOS_SCHOLAR_OS_USER_FLOW_ARCHITECTURE.md)
+**Purpose:** Define the initial governed screen inventory and complete states.  
+**Owner:** Playbook OS Product and Experience Architecture  
+**Last Updated:** July 30, 2026
 
-## Canonical States
+## Shared Contract
 
-Every screen implements:
+Every screen provides loading, empty, success, error, permission, privacy, stale-evidence, and recovery states. Every recommendation displays evidence, reasoning, confidence, confirmation, and feedback. No screen mutates canonical truth without Kernel-admitted capability and human confirmation.
 
-| State | Required Behavior |
-|---|---|
-| Loading | Preserve layout while governed data and decisions resolve |
-| Empty | State that no authorized records exist; never invent examples as facts |
-| First-time | Present consent-aware setup appropriate to the Scholar |
-| Success | Display authorized, provenance-preserving content |
-| Error | Explain failure and provide a reversible recovery action |
-| Locked | Explain the governed capability boundary without implying purchase grants authority |
-| Permission required | Identify required permission or consent and the authorized request path |
-| Unavailable | Do not expose unsupported actions or fabricated content |
+| Screen | Purpose | Primary action | Required data | Permission |
+|---|---|---|---|---|
+| Scholar Home | Orient the scholar around identity, mission, goals, progress, actions, opportunities, network, and achievements | Choose a next step | Scholar Record, Journey, opportunities, support consent | `VIEW_SCHOLAR_HOME` |
+| Journey | Connect current reality to desired future and progress | Confirm or revise a goal | Goals, milestones, actions, outcome evidence | `MANAGE_OWN_GOALS` |
+| Academic Path | Understand courses, credits, requirements, readiness, and applications | Review academic next action | Verified academic evidence | `VIEW_ACADEMIC_PATH` |
+| Athletic Path | Understand development, achievement, recruiting readiness, and pathways | Confirm athletic milestone | Scholar-confirmed and verified athletic evidence | `VIEW_ATHLETIC_PATH` |
+| Opportunities | Evaluate scholarships, internships, programs, mentorships, competitions, and careers | Save or pursue opportunity | Source, provenance, eligibility, expiry | `VIEW_OPPORTUNITIES` |
+| Human Network | Understand and control support relationships | Invite, scope, or revoke support | Consent, role, visibility, expiry | `MANAGE_SUPPORT_NETWORK` |
+| Growth | Review outcomes across paths | Reflect and confirm outcome | Milestone and outcome evidence | `VIEW_GROWTH` |
 
-## Scholar Home
+## Scholar Home Hierarchy
 
-- **Purpose:** Orient the Scholar around identity, progress, goals, actions, and opportunities.
-- **Audience:** Scholar.
-- **Primary action:** Review the next governed action.
-- **Secondary actions:** Review goals, progress, and opportunity details.
-- **Hierarchy:** Welcome, Scholar snapshot, goals, progress, next actions, opportunity highlights.
-- **Components:** Identity summary, goal summary, progress indicators, recommendation list, opportunity highlights.
-- **Data:** Scholar Record references, evidence-backed milestones, capability decisions.
-- **Ownership:** Scholar.
-- **Permissions:** Home and Scholar Record read.
-- **Capabilities:** Scholar Record; future Compass and Opportunity connections.
+1. Identity and mission.
+2. Current focus and next confirmed goal.
+3. Progress and milestones.
+4. Recommended actions with explanations.
+5. Time-sensitive opportunities.
+6. Support network and consent status.
+7. Achievements and recent evidence.
 
-## Scholar Profile
+## State Behavior
 
-- **Purpose:** Present and maintain the Scholar-owned identity and development story.
-- **Audience:** Scholar; separately authorized supporting roles.
-- **Primary action:** Review or propose a profile update.
-- **Secondary actions:** Attach evidence, inspect source, review revision history.
-- **Hierarchy:** Identity, education, athletics, interests, achievements, skills, activities.
-- **Components:** Profile sections, provenance detail, evidence attachment, revision history.
-- **Data:** Human-confirmed Scholar facts with owner, source, timestamp, evidence, and revision.
-- **Ownership:** Scholar.
-- **Permissions:** Profile read; governed write for changes; sensitive-read for protected fields.
-- **Capabilities:** Scholar Record read/write.
+- **Loading:** preserve layout, label loading regions, and avoid invented placeholder values.
+- **Empty:** distinguish no evidence from zero progress and provide a governed creation path.
+- **Error:** identify unavailable source, preserve last trusted state when allowed, and offer retry.
+- **Permission:** explain required authority without exposing protected data.
+- **Privacy:** show current visibility, consent owner, expiry, and revocation action.
+- **Stale evidence:** display observation time and block consequential recommendation.
+- **Success:** confirm the human action and resulting evidence reference.
 
-## Scholar Journey
+## Analytics And Audit
 
-- **Purpose:** Represent growth across academic, athletic, career, and personal development.
-- **Audience:** Scholar.
-- **Primary action:** Review progress over time.
-- **Secondary actions:** Inspect milestones, evidence, and growth areas.
-- **Hierarchy:** Journey selector, timeline, milestones, progress, growth areas.
-- **Components:** Timeline, milestone detail, evidence links, progress summary.
-- **Data:** Deterministically ordered evidence-backed journey events.
-- **Ownership:** Scholar.
-- **Permissions:** Journey and referenced evidence read.
-- **Capabilities:** Scholar Journey; future Career Journey engine.
-
-## Goals
-
-- **Purpose:** Govern Scholar-created academic, athletic, career, and personal goals.
-- **Audience:** Scholar.
-- **Primary action:** Create or update a goal through governed confirmation.
-- **Secondary actions:** Track progress, add milestone, complete goal.
-- **Hierarchy:** Active goals, progress, milestones, completed goals.
-- **Components:** Goal list, goal editor, progress history, milestone confirmation.
-- **Data:** Scholar-owned goals and evidence-backed progress.
-- **Ownership:** Scholar.
-- **Permissions:** Goal read/write.
-- **Capabilities:** Scholar Record goal management; future Compass assistance.
-
-## Opportunities
-
-- **Purpose:** Surface opportunities the Scholar is authorized to discover and evaluate.
-- **Audience:** Scholar.
-- **Primary action:** Review requirements and choose a human action.
-- **Secondary actions:** Save, dismiss, request guidance.
-- **Hierarchy:** Eligibility context, opportunity summary, requirements, evidence, actions.
-- **Components:** Opportunity list, filters, requirement detail, saved state.
-- **Data:** Governed opportunity sources and explainable eligibility context.
-- **Ownership:** Source organization owns opportunity; Scholar owns saved and action state.
-- **Permissions:** Opportunity read/save/action as separately authorized.
-- **Capabilities:** Opportunity discovery; future Opportunity Intelligence.
-
-## Connections
-
-- **Purpose:** Govern relationships with mentors, coaches, advisors, and institutions.
-- **Audience:** Scholar.
-- **Primary action:** Request a connection with explicit permission.
-- **Secondary actions:** Review relationship scope, consent, and status.
-- **Hierarchy:** Existing relationships, requests, available support, permission scope.
-- **Components:** Connection list, request flow, consent detail, status history.
-- **Data:** Permissioned relationship records.
-- **Ownership:** Each party owns identity; relationship state is jointly governed.
-- **Permissions:** Connection read/request and explicit consent.
-- **Capabilities:** Connection governance; future Mentorship Intelligence.
-
-## Growth
-
-- **Purpose:** Organize evidence-backed skills, achievements, and development areas.
-- **Audience:** Scholar.
-- **Primary action:** Review growth evidence.
-- **Secondary actions:** Confirm a development area, attach evidence, inspect history.
-- **Hierarchy:** Skills, achievements, development areas, evidence, history.
-- **Components:** Skill summary, achievement list, development areas, evidence detail.
-- **Data:** Scholar-owned or institution-verified facts with provenance.
-- **Ownership:** Scholar; institutional assertions retain source ownership.
-- **Permissions:** Growth and evidence read; governed confirmation for changes.
-- **Capabilities:** Scholar Record growth; future Resume and Career Intelligence.
-
+Analytics records screen and interaction taxonomy without sensitive content. Audit events record consent, recommendation disposition, evidence submission, goal confirmation, opportunity engagement, and permission changes with actor, time, and lineage.

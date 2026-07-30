@@ -2,6 +2,28 @@ import { runRepositoryKernel } from "../engine/kernel-repository-adapter";
 import { formatEngineHealth, getEngineHealth } from "../health/engine-health";
 import { runKernelRuntime } from "../runtime/kernel-runtime";
 import { runDevelopmentOrchestration } from "../orchestration";
+import { runAutonomousBuildCycle } from "../orchestration/autonomous";
+import { loadMasterBuildManifest } from "../manifests";
+import { loadKernelRuntimeHistory } from "../runtime/kernel-runtime";
+import { createDefaultAgentRegistry } from "../agents/registry";
+import {
+  assessAutonomousReadiness,
+  createActivationEvidence,
+  discoverTrustedContext,
+  loadTrustedBuildContext,
+  persistTrustedContext,
+} from "../context/activation";
+import {
+  createChangeBoundary,
+  createChangeInventory,
+  assessChangeBoundary,
+  loadChangeBoundary,
+  persistChangeBoundary,
+} from "../context/change-boundary";
+import {
+  createLaunchApproval,
+  persistLaunchApproval,
+} from "../authority/launch";
 
 export const KERNEL_COMMANDS = [
   "next",
@@ -16,6 +38,21 @@ export const KERNEL_COMMANDS = [
   "package",
   "authorize",
   "improve",
+  "manifest",
+  "cycle",
+  "approve",
+  "advance",
+  "history",
+  "agents",
+  "assign",
+  "first-build",
+  "execution-status",
+  "context-status",
+  "context-reconcile",
+  "context-activate",
+  "change-inventory",
+  "change-boundary",
+  "approve-boundary",
 ] as const;
 
 export type KernelCommandName = (typeof KERNEL_COMMANDS)[number];
@@ -35,12 +72,372 @@ export async function dispatchKernelCommand(
   rootDir = process.cwd(),
   actorId = process.env.PBOS_ACTOR_ID ?? ""
 ): Promise<KernelCommandResult> {
+  if (command === "change-inventory") {
+    const inventory = createChangeInventory(rootDir);
+    return {
+      command,
+      successful: inventory.changes.every(({ owner }) => owner !== "UNKNOWN"),
+      output: `PBOS CHANGE INVENTORY\n${JSON.stringify(inventory, null, 2)}`,
+    };
+  }
+
+  if (command === "change-boundary") {
+    const requesterIdentity = process.env.PBOS_BOUNDARY_REQUESTER_ID ?? "";
+    const approvedFiles = (process.env.PBOS_BOUNDARY_APPROVED_FILES ?? "")
+      .split(",").map((value) => value.trim()).filter(Boolean);
+    const excludedFiles = (process.env.PBOS_BOUNDARY_EXCLUDED_FILES ?? "")
+      .split(",").map((value) => value.trim()).filter(Boolean);
+    const purpose = process.env.PBOS_BOUNDARY_PURPOSE ?? "";
+    const businessPurpose = process.env.PBOS_BOUNDARY_BUSINESS_PURPOSE ?? "";
+    const technicalPurpose = process.env.PBOS_BOUNDARY_TECHNICAL_PURPOSE ?? "";
+    const riskAcknowledgment = process.env.PBOS_BOUNDARY_RISK_ACKNOWLEDGMENT ?? "";
+    const expirationTimestamp = process.env.PBOS_BOUNDARY_EXPIRATION ?? "";
+    const previewInventory = createChangeInventory(rootDir);
+    const previewAssessment = assessChangeBoundary(
+      previewInventory,
+      loadChangeBoundary(rootDir)?.latest ?? null,
+      new Date().toISOString()
+    );
+    if (
+      !requesterIdentity ||
+      !purpose ||
+      !businessPurpose ||
+      !technicalPurpose ||
+      !riskAcknowledgment ||
+      !expirationTimestamp
+    ) {
+      return {
+        command,
+        successful: false,
+        output: [
+          "PBOS CHANGE BOUNDARY",
+          "Decision: BLOCKED",
+          `Current Branch: ${previewAssessment.branch_identity}`,
+          `Current Commit: ${previewAssessment.commit_identity}`,
+          `Changed Files: ${previewAssessment.change_summary.length}`,
+          `Risk Level: ${previewAssessment.risk_level}`,
+          `Recommended Scope: ${previewAssessment.classification_summary.REVIEW_REQUIRED} files require explicit review.`,
+          "Requester identity, business and technical purposes, complete approved/excluded file lists, risk acknowledgment, and expiration are required.",
+          "No runtime artifact was created.",
+        ].join("\n"),
+      };
+    }
+    const timestamp = new Date().toISOString();
+    try {
+      const inventory = createChangeInventory(rootDir, timestamp);
+      const declaration = createChangeBoundary({
+        inventory,
+        requesterIdentity,
+        approvedFiles,
+        excludedFiles,
+        purpose,
+        businessPurpose,
+        technicalPurpose,
+        riskAcknowledgment,
+        creationTimestamp: timestamp,
+        expirationTimestamp,
+      });
+      const artifact = persistChangeBoundary(rootDir, declaration);
+      return {
+        command,
+        successful: true,
+        output: `PBOS CHANGE BOUNDARY\n${JSON.stringify({ declaration, artifact }, null, 2)}`,
+      };
+    } catch (error: unknown) {
+      return {
+        command,
+        successful: false,
+        output: [
+          "PBOS CHANGE BOUNDARY",
+          "Decision: BLOCKED",
+          error instanceof Error ? error.message : String(error),
+          "No runtime artifact was created.",
+        ].join("\n"),
+      };
+    }
+  }
+
+  if (command === "approve-boundary") {
+    const boundary = loadChangeBoundary(rootDir)?.latest ?? null;
+    const requesterIdentity = process.env.PBOS_LAUNCH_REQUESTER_ID ?? "";
+    const reviewerIdentity = process.env.PBOS_LAUNCH_REVIEWER_ID ?? "";
+    const decision = process.env.PBOS_LAUNCH_DECISION;
+    const reason = process.env.PBOS_LAUNCH_REASON ?? "";
+    const riskAcknowledgment = process.env.PBOS_LAUNCH_RISK_ACKNOWLEDGMENT ?? "";
+    const expiration = process.env.PBOS_LAUNCH_EXPIRATION ?? "";
+    if (
+      !boundary ||
+      !requesterIdentity ||
+      !reviewerIdentity ||
+      !["APPROVED", "REJECTED", "EXPIRED", "REVOKED"].includes(decision ?? "") ||
+      !reason ||
+      !riskAcknowledgment ||
+      !expiration
+    ) {
+      return {
+        command,
+        successful: false,
+        output: [
+          "PBOS HUMAN LAUNCH AUTHORITY",
+          "Decision: BLOCKED",
+          "A current change boundary, requester, independent reviewer, APPROVED/REJECTED/EXPIRED/REVOKED decision, reason, risk acknowledgment, and expiration are required.",
+          "No runtime artifact was created.",
+        ].join("\n"),
+      };
+    }
+    const timestamp = new Date().toISOString();
+    try {
+      const approval = createLaunchApproval({
+        boundary,
+        requesterIdentity,
+        reviewerIdentity,
+        decision: decision as "APPROVED" | "REJECTED" | "EXPIRED" | "REVOKED",
+        reason,
+        riskAcknowledgment,
+        timestamp,
+        expiration,
+      });
+      const artifact = persistLaunchApproval(rootDir, approval);
+      return {
+        command,
+        successful: true,
+        output: `PBOS HUMAN LAUNCH AUTHORITY\n${JSON.stringify({ approval, artifact }, null, 2)}`,
+      };
+    } catch (error: unknown) {
+      return {
+        command,
+        successful: false,
+        output: [
+          "PBOS HUMAN LAUNCH AUTHORITY",
+          "Decision: BLOCKED",
+          error instanceof Error ? error.message : String(error),
+          "No runtime artifact was created.",
+        ].join("\n"),
+      };
+    }
+  }
+
+  if (command === "context-reconcile") {
+    const discovery = discoverTrustedContext(rootDir);
+    return {
+      command,
+      successful: discovery.reconciliation.state === "VERIFIED",
+      output: `PBOS CONTEXT IDENTITY RECONCILIATION\n${JSON.stringify(discovery, null, 2)}`,
+    };
+  }
+
+  if (command === "context-status") {
+    const discovery = discoverTrustedContext(rootDir);
+    const history = loadTrustedBuildContext(rootDir);
+    const readiness = assessAutonomousReadiness({
+      context: history?.latest ?? null,
+      repository: discovery.assessment,
+      timestamp: new Date().toISOString(),
+    });
+    return {
+      command,
+      successful: readiness.current_capability_level === "GOVERNED_PLANNING",
+      output: [
+        "PBOS TRUSTED BUILD CONTEXT",
+        `Current Context: ${history?.latest.context_id ?? "NONE"}`,
+        `Trust Level: ${readiness.current_capability_level === "GOVERNED_PLANNING" ? "TRUSTED" : "BLOCKED"}`,
+        `Identity: ${history?.latest.repository_identity ?? discovery.assessment.repository_identity}`,
+        `Expiration: ${history?.latest.expiration_timestamp ?? "NONE"}`,
+        `Validation: ${readiness.current_capability_level === "GOVERNED_PLANNING" ? "PASS" : "FAIL"}`,
+        JSON.stringify(readiness, null, 2),
+      ].join("\n"),
+    };
+  }
+
+  if (command === "context-activate") {
+    const timestamp = new Date().toISOString();
+    const discovery = discoverTrustedContext(rootDir, timestamp);
+    const reviewerIdentity = process.env.PBOS_CONTEXT_REVIEWER_ID ?? "";
+    const requestedBy = process.env.PBOS_CONTEXT_REQUESTER_ID ?? actorId;
+    const decision = process.env.PBOS_CONTEXT_DECISION;
+    const reason = process.env.PBOS_CONTEXT_REASON ?? "";
+    const riskAcknowledgement =
+      process.env.PBOS_CONTEXT_RISK_ACKNOWLEDGEMENT ?? "";
+    const expirationTimestamp = process.env.PBOS_CONTEXT_EXPIRATION ?? "";
+    if (
+      !requestedBy ||
+      !reviewerIdentity ||
+      (decision !== "APPROVED" && decision !== "REJECTED") ||
+      !reason ||
+      !riskAcknowledgement ||
+      !expirationTimestamp
+    ) {
+      return {
+        command,
+        successful: false,
+        output: [
+          "PBOS TRUSTED BUILD CONTEXT ACTIVATION",
+          "Decision: BLOCKED",
+          "Explicit requester, reviewer, APPROVED/REJECTED decision, reason, risk acknowledgement, and expiration are required.",
+          "No runtime artifact was created.",
+        ].join("\n"),
+      };
+    }
+    const evidence = createActivationEvidence({
+      discovery,
+      requestedBy,
+      reviewerIdentity,
+      decision,
+      reason,
+      riskAcknowledgement,
+      timestamp,
+      expirationTimestamp,
+    });
+    if (!evidence.trusted_context) {
+      return {
+        command,
+        successful: false,
+        output: `PBOS TRUSTED BUILD CONTEXT ACTIVATION\n${JSON.stringify(evidence, null, 2)}\nNo runtime artifact was created.`,
+      };
+    }
+    const artifact = persistTrustedContext(rootDir, evidence);
+    return {
+      command,
+      successful: true,
+      output: `PBOS TRUSTED BUILD CONTEXT ACTIVATION\n${JSON.stringify({ evidence, artifact }, null, 2)}`,
+    };
+  }
   if (command === "execute") {
     const result = await runKernelRuntime({ rootDir, actorId });
     return {
       command,
       successful: result.successful,
       output: JSON.stringify(result.envelope, null, 2),
+    };
+  }
+
+  if (command === "manifest") {
+    const manifest = loadMasterBuildManifest(rootDir);
+    return {
+      command,
+      successful: true,
+      output: `PBOS PLAYBOOK MASTER MANIFEST\n${JSON.stringify(
+        { ...manifest.manifest, digest: manifest.digest },
+        null,
+        2
+      )}`,
+    };
+  }
+
+  if (command === "agents") {
+    const registry = createDefaultAgentRegistry("2026-07-30T00:00:00.000Z").snapshot();
+    return {
+      command,
+      successful: true,
+      output: `PBOS EXECUTION AGENT REGISTRY\n${JSON.stringify(registry, null, 2)}`,
+    };
+  }
+
+  if (command === "assign") {
+    const orchestration = await runDevelopmentOrchestration(rootDir);
+    const findings = [
+      ...(!orchestration.input.repository.valid ? ["Trusted context is unavailable."] : []),
+      ...(!orchestration.executionPackage ? ["Approved execution package is unavailable."] : []),
+      "Approved authority record is unavailable.",
+    ];
+    return {
+      command,
+      successful: false,
+      output: [
+        "PBOS EXECUTION TASK ASSIGNMENT",
+        "Decision: BLOCKED",
+        ...findings,
+        "No agent assignment was created.",
+      ].join("\n"),
+    };
+  }
+
+  if (command === "first-build") {
+    const cycle = await runAutonomousBuildCycle(rootDir);
+    return {
+      command,
+      successful: false,
+      output: [
+        "PBOS FIRST GOVERNED PRODUCT BUILD",
+        JSON.stringify(cycle, null, 2),
+        "No agent executed product work.",
+      ].join("\n"),
+    };
+  }
+
+  if (command === "cycle") {
+    const cycle = await runAutonomousBuildCycle(rootDir);
+    return {
+      command,
+      successful: false,
+      output: `PBOS AUTONOMOUS BUILD CYCLE\n${JSON.stringify(cycle, null, 2)}`,
+    };
+  }
+
+  if (command === "approve") {
+    const orchestration = await runDevelopmentOrchestration(rootDir);
+    const reasons = [
+      ...(!orchestration.input.repository.valid
+        ? ["Trusted build context is unavailable."]
+        : []),
+      ...(!orchestration.executionPackage
+        ? ["Certified execution package is unavailable."]
+        : []),
+      ...(!actorId ? ["Approver identity is required through PBOS_ACTOR_ID."] : []),
+    ];
+    return {
+      command,
+      successful: false,
+      output: [
+        "PBOS HUMAN APPROVAL",
+        "Decision: BLOCKED",
+        ...reasons,
+        "No authority record was created.",
+      ].join("\n"),
+    };
+  }
+
+  if (command === "advance") {
+    return {
+      command,
+      successful: false,
+      output: [
+        "PBOS MILESTONE ADVANCEMENT",
+        "Decision: BLOCKED",
+        "A matching trusted context, authorization, successful execution, passing validation, and completion evidence are required.",
+        "No manifest transition request was applied.",
+      ].join("\n"),
+    };
+  }
+
+  if (command === "history") {
+    const history = loadKernelRuntimeHistory(rootDir);
+    return {
+      command,
+      successful: true,
+      output: `PBOS LIFECYCLE HISTORY\n${JSON.stringify(
+        history ?? { owner: "kernel-runtime", latest: null, history: [] },
+        null,
+        2
+      )}`,
+    };
+  }
+
+  if (command === "execution-status") {
+    const orchestration = await runDevelopmentOrchestration(rootDir);
+    const history = loadKernelRuntimeHistory(rootDir);
+    return {
+      command,
+      successful: true,
+      output: [
+        "PBOS AGENT EXECUTION STATUS",
+        `Current Package: ${orchestration.executionPackage?.package_id ?? "NONE"}`,
+        "Assigned Agent: NONE",
+        `Execution State: ${history?.latest.outcome ?? "NOT_STARTED"}`,
+        `Validation State: ${history?.latest.validationResults.every(({ status }) => status === "PASS") ? "PASS" : "NOT_AVAILABLE"}`,
+        `Evidence State: ${history?.latest.certification ? "CAPTURED" : "NOT_AVAILABLE"}`,
+        `Context Trust: ${orchestration.input.repository.valid ? "TRUSTED" : "INVALID"}`,
+      ].join("\n"),
     };
   }
 
@@ -164,7 +561,35 @@ export async function dispatchKernelCommand(
     };
   }
 
-  if (command === "next" || command === "report") {
+  if (command === "next") {
+    const orchestration = await runDevelopmentOrchestration(rootDir);
+    return {
+      command,
+      successful:
+        orchestration.governedRecommendation.recommended_milestone !== null,
+      output: [
+        "PBOS NEXT ANALYSIS",
+        `Current Program: Playbook Platform`,
+        `Current Phase: Governed Product Construction`,
+        `Next Eligible Milestone: ${orchestration.governedRecommendation.recommended_milestone ?? "NONE"}`,
+        `Risk: ${orchestration.governedRecommendation.risk}`,
+        `Human Approval: REQUIRED`,
+        "",
+        JSON.stringify(
+          {
+            assessment: orchestration.intelligence.assessment,
+            recommendation: orchestration.governedRecommendation,
+            execution_package_available:
+              orchestration.executionPackage !== null,
+          },
+          null,
+          2
+        ),
+      ].join("\n"),
+    };
+  }
+
+  if (command === "report") {
     return {
       command,
       successful: kernel.status === "CERTIFIED",

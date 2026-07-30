@@ -10,6 +10,8 @@ export * from "./observer";
 export * from "./reports";
 export * from "./reconciliation";
 export * from "./refresh";
+export * from "./activation";
+export * from "./change-boundary";
 
 import type { ContextValidationResult } from "./schema";
 import {

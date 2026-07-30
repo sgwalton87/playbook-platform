@@ -4,3 +4,4 @@ export * from "./governance";
 export * from "./navigation";
 export * from "./models";
 export * as ScholarOSApplication from "./application";
+export * as ScholarOSProduct from "./product";

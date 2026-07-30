@@ -1,0 +1,186 @@
+{
+  "manifest_id": "PLAYBOOK-MASTER-MANIFEST",
+  "version": "1.0.0",
+  "authority": "PBOS-KERNEL",
+  "program": "Playbook Platform",
+  "domains": ["platform", "operating-systems", "applications", "engines", "features", "infrastructure", "integrations", "security", "launch"],
+  "milestones": [
+    {
+      "id": "PLAYBOOK-PROGRAM-001", "name": "Playbook Platform", "type": "PROGRAM",
+      "description": "Govern the complete Playbook platform construction program.", "domain": "platform",
+      "priority": 100, "status": "DEFINED", "dependencies": [], "blocking_dependencies": [],
+      "required_capabilities": ["constitutional-governance"], "required_artifacts": ["CODEX.md"],
+      "validation_requirements": ["program-governance-validation"], "risk_level": "RED",
+      "approval_level": "EXPLICIT_HUMAN", "completion_definition": ["All launch requirements are independently certified."],
+      "evidence_requirements": ["Program certification"], "owner": "Playbook Platform Governance", "version": "1.0.0", "outputs": []
+    },
+    {
+      "id": "PLAYBOOK-BRAND-SYSTEM-001", "name": "Playbook Brand System", "type": "COMPONENT",
+      "description": "Establish the governed Playbook brand foundation.", "domain": "platform",
+      "priority": 100, "status": "COMPLETE", "dependencies": [], "blocking_dependencies": [],
+      "required_capabilities": ["brand-governance"], "required_artifacts": ["docs/DESIGN/PLAYBOOK_BRAND_SYSTEM/PLAYBOOK_BRAND_CONSTITUTION.md"],
+      "validation_requirements": ["documentation-integrity"], "risk_level": "GREEN", "approval_level": "HUMAN",
+      "completion_definition": ["Canonical brand authority exists."], "evidence_requirements": ["Brand constitution digest"],
+      "owner": "Playbook Brand and Experience Architecture", "version": "1.0.0", "outputs": ["docs/DESIGN/PLAYBOOK_BRAND_SYSTEM"]
+    },
+    {
+      "id": "SCHOLAR-OS-SCREEN-COMPILER-001", "name": "Scholar OS Screen Compiler", "type": "COMPONENT",
+      "description": "Define governed Scholar OS screen specifications.", "domain": "operating-systems",
+      "priority": 100, "status": "COMPLETE", "dependencies": ["PLAYBOOK-BRAND-SYSTEM-001"], "blocking_dependencies": [],
+      "required_capabilities": ["screen-specification"], "required_artifacts": ["docs/EXPERIENCE/SCHOLAR_OS_SCREEN_COMPILER/SCREEN_SPECIFICATION_CONTRACT.md"],
+      "validation_requirements": ["screen-contract-validation"], "risk_level": "GREEN", "approval_level": "HUMAN",
+      "completion_definition": ["Initial screen inventory conforms to the canonical contract."], "evidence_requirements": ["Screen corpus digest"],
+      "owner": "Playbook Experience Architecture", "version": "1.0.0", "outputs": ["docs/EXPERIENCE/SCHOLAR_OS_SCREEN_COMPILER"]
+    },
+    {
+      "id": "PBOS-PRODUCT-FACTORY-FOUNDATION-001", "name": "Product Factory Foundation", "type": "ENGINE",
+      "description": "Compile governed specifications into deterministic build packages.", "domain": "engines",
+      "priority": 100, "status": "COMPLETE", "dependencies": ["SCHOLAR-OS-SCREEN-COMPILER-001"], "blocking_dependencies": [],
+      "required_capabilities": ["deterministic-package-generation"], "required_artifacts": ["pbos/product-factory/screen-compiler/compiler.ts"],
+      "validation_requirements": ["product-factory-compiler"], "risk_level": "YELLOW", "approval_level": "HUMAN",
+      "completion_definition": ["Build package generation is deterministic and fail closed."], "evidence_requirements": ["Compiler test evidence"],
+      "owner": "Playbook OS Engineering", "version": "1.0.0", "outputs": ["pbos/product-factory"]
+    },
+    {
+      "id": "PBOS-PRODUCT-FACTORY-BUILD-PACKAGE-VALIDATION-001", "name": "Product Factory Build Package Validation", "type": "MILESTONE",
+      "description": "Prove one governed screen package through authorization-ready engineering handoff.", "domain": "features",
+      "priority": 100, "status": "READY", "dependencies": ["PBOS-PRODUCT-FACTORY-FOUNDATION-001"], "blocking_dependencies": [],
+      "required_capabilities": ["product-build-package", "human-authorization"],
+      "required_artifacts": ["docs/EXPERIENCE/SCHOLAR_OS_SCREEN_COMPILER/SCHOLAR_HOME.md", "pbos/product-factory/screen-compiler/compiler.ts"],
+      "validation_requirements": ["package-identity", "dependency-validation", "permission-boundary"],
+      "risk_level": "YELLOW", "approval_level": "HUMAN",
+      "completion_definition": ["One screen package is generated deterministically.", "Implementation remains blocked pending human authorization."],
+      "evidence_requirements": ["Source digest", "Package digest", "Validation evidence", "Authorization decision"],
+      "owner": "Playbook OS Engineering", "version": "1.0.0", "outputs": ["docs/release-evidence/product-factory-build-package-validation-001.md"]
+    },
+    {
+      "id": "SCHOLAR-OS-001", "name": "Scholar OS", "type": "OPERATING_SYSTEM", "description": "Govern the Scholar operating experience.", "domain": "operating-systems",
+      "priority": 95, "status": "DEFINED", "dependencies": [], "blocking_dependencies": ["PBOS-PRODUCT-FACTORY-BUILD-PACKAGE-VALIDATION-001"],
+      "required_capabilities": ["scholar-experience"], "required_artifacts": ["docs/EXPERIENCE/PBOS_SCHOLAR_OS_ARCHITECTURE.md"], "validation_requirements": ["experience-certification"],
+      "risk_level": "YELLOW", "approval_level": "HUMAN", "completion_definition": ["Scholar OS is validated and certified."], "evidence_requirements": ["Experience evidence"],
+      "owner": "Scholar OS Governance", "version": "1.0.0", "outputs": []
+    },
+    {
+      "id": "SCHOLAR-ATHLETE-OS-001", "name": "Scholar-Athlete OS", "type": "OPERATING_SYSTEM", "description": "Govern scholar-athlete experiences.", "domain": "operating-systems",
+      "priority": 85, "status": "DISCOVERED", "dependencies": ["SCHOLAR-OS-001"], "blocking_dependencies": [], "required_capabilities": ["athletic-journey"],
+      "required_artifacts": [], "validation_requirements": ["architecture-definition"], "risk_level": "YELLOW", "approval_level": "HUMAN",
+      "completion_definition": ["Architecture and implementation are certified."], "evidence_requirements": ["Certification evidence"], "owner": "Experience Governance", "version": "1.0.0", "outputs": []
+    },
+    {
+      "id": "PARENT-OS-001", "name": "Parent OS", "type": "OPERATING_SYSTEM", "description": "Govern parent and family experiences.", "domain": "operating-systems",
+      "priority": 75, "status": "DISCOVERED", "dependencies": ["SCHOLAR-OS-001"], "blocking_dependencies": [], "required_capabilities": ["family-support"],
+      "required_artifacts": [], "validation_requirements": ["architecture-definition"], "risk_level": "YELLOW", "approval_level": "HUMAN",
+      "completion_definition": ["Architecture and implementation are certified."], "evidence_requirements": ["Certification evidence"], "owner": "Experience Governance", "version": "1.0.0", "outputs": []
+    },
+    {
+      "id": "COACH-OS-001", "name": "Coach OS", "type": "OPERATING_SYSTEM", "description": "Govern coaching experiences.", "domain": "operating-systems",
+      "priority": 70, "status": "DISCOVERED", "dependencies": ["SCHOLAR-ATHLETE-OS-001"], "blocking_dependencies": [], "required_capabilities": ["coaching"],
+      "required_artifacts": [], "validation_requirements": ["architecture-definition"], "risk_level": "YELLOW", "approval_level": "HUMAN",
+      "completion_definition": ["Architecture and implementation are certified."], "evidence_requirements": ["Certification evidence"], "owner": "Experience Governance", "version": "1.0.0", "outputs": []
+    },
+    {
+      "id": "COUNSELOR-OS-001", "name": "Counselor OS", "type": "OPERATING_SYSTEM", "description": "Govern counseling experiences.", "domain": "operating-systems",
+      "priority": 80, "status": "DISCOVERED", "dependencies": ["SCHOLAR-OS-001"], "blocking_dependencies": [], "required_capabilities": ["counseling"],
+      "required_artifacts": [], "validation_requirements": ["architecture-definition"], "risk_level": "YELLOW", "approval_level": "HUMAN",
+      "completion_definition": ["Architecture and implementation are certified."], "evidence_requirements": ["Certification evidence"], "owner": "Experience Governance", "version": "1.0.0", "outputs": []
+    },
+    {
+      "id": "MENTOR-OS-001", "name": "Mentor OS", "type": "OPERATING_SYSTEM", "description": "Govern mentorship experiences.", "domain": "operating-systems",
+      "priority": 80, "status": "DISCOVERED", "dependencies": ["SCHOLAR-OS-001"], "blocking_dependencies": [], "required_capabilities": ["mentorship"],
+      "required_artifacts": [], "validation_requirements": ["architecture-definition"], "risk_level": "YELLOW", "approval_level": "HUMAN",
+      "completion_definition": ["Architecture and implementation are certified."], "evidence_requirements": ["Certification evidence"], "owner": "Experience Governance", "version": "1.0.0", "outputs": []
+    },
+    {
+      "id": "INSTITUTION-OS-001", "name": "Institution OS", "type": "OPERATING_SYSTEM", "description": "Govern institutional operations.", "domain": "operating-systems",
+      "priority": 85, "status": "DISCOVERED", "dependencies": ["SCHOLAR-OS-001"], "blocking_dependencies": [], "required_capabilities": ["organization-governance"],
+      "required_artifacts": [], "validation_requirements": ["architecture-definition"], "risk_level": "RED", "approval_level": "EXPLICIT_HUMAN",
+      "completion_definition": ["Multi-organization controls are certified."], "evidence_requirements": ["Isolation evidence"], "owner": "Enterprise Governance", "version": "1.0.0", "outputs": []
+    },
+    {
+      "id": "OPPORTUNITY-ENGINE-001", "name": "Opportunity Engine", "type": "ENGINE", "description": "Govern opportunity discovery and matching.", "domain": "engines",
+      "priority": 90, "status": "DISCOVERED", "dependencies": ["SCHOLAR-OS-001"], "blocking_dependencies": [], "required_capabilities": ["opportunity-matching"],
+      "required_artifacts": [], "validation_requirements": ["engine-admission"], "risk_level": "YELLOW", "approval_level": "HUMAN",
+      "completion_definition": ["Engine is admitted and certified."], "evidence_requirements": ["Admission evidence"], "owner": "Product Intelligence", "version": "1.0.0", "outputs": []
+    },
+    {
+      "id": "COMPASS-ENGINE-001", "name": "Compass Engine", "type": "ENGINE", "description": "Govern navigation and decision support.", "domain": "engines",
+      "priority": 90, "status": "DISCOVERED", "dependencies": ["SCHOLAR-OS-001"], "blocking_dependencies": [], "required_capabilities": ["decision-support"],
+      "required_artifacts": [], "validation_requirements": ["engine-admission"], "risk_level": "YELLOW", "approval_level": "HUMAN",
+      "completion_definition": ["Engine is admitted and certified."], "evidence_requirements": ["Admission evidence"], "owner": "Product Intelligence", "version": "1.0.0", "outputs": []
+    },
+    {
+      "id": "SCHOLAR-RECORD-ENGINE-001", "name": "Scholar Record", "type": "ENGINE", "description": "Govern verified scholar records.", "domain": "engines",
+      "priority": 95, "status": "DEFINED", "dependencies": [], "blocking_dependencies": ["PBOS-PRODUCT-FACTORY-BUILD-PACKAGE-VALIDATION-001"],
+      "required_capabilities": ["scholar-record"], "required_artifacts": ["pbos/engines/scholar-record/engine.ts"], "validation_requirements": ["engine-admission"],
+      "risk_level": "RED", "approval_level": "EXPLICIT_HUMAN", "completion_definition": ["Production activation is certified."], "evidence_requirements": ["Production proof"],
+      "owner": "Scholar Record Governance", "version": "1.0.0", "outputs": []
+    },
+    {
+      "id": "CAREER-INTELLIGENCE-001", "name": "Career Intelligence", "type": "ENGINE", "description": "Govern career intelligence.", "domain": "engines",
+      "priority": 80, "status": "DISCOVERED", "dependencies": ["SCHOLAR-OS-001"], "blocking_dependencies": [], "required_capabilities": ["career-intelligence"], "required_artifacts": [],
+      "validation_requirements": ["engine-admission"], "risk_level": "YELLOW", "approval_level": "HUMAN", "completion_definition": ["Engine is certified."],
+      "evidence_requirements": ["Certification evidence"], "owner": "Product Intelligence", "version": "1.0.0", "outputs": []
+    },
+    {
+      "id": "FINANCIAL-LITERACY-001", "name": "Financial Literacy", "type": "APPLICATION", "description": "Govern financial literacy capabilities.", "domain": "applications",
+      "priority": 70, "status": "DISCOVERED", "dependencies": ["SCHOLAR-OS-001"], "blocking_dependencies": [], "required_capabilities": ["financial-literacy"], "required_artifacts": [],
+      "validation_requirements": ["application-certification"], "risk_level": "YELLOW", "approval_level": "HUMAN", "completion_definition": ["Application is certified."],
+      "evidence_requirements": ["Certification evidence"], "owner": "Product Governance", "version": "1.0.0", "outputs": []
+    },
+    {
+      "id": "MENTOR-INTELLIGENCE-001", "name": "Mentor Intelligence", "type": "ENGINE", "description": "Govern mentor matching intelligence.", "domain": "engines",
+      "priority": 75, "status": "DISCOVERED", "dependencies": ["MENTOR-OS-001"], "blocking_dependencies": [], "required_capabilities": ["mentor-intelligence"], "required_artifacts": [],
+      "validation_requirements": ["engine-admission"], "risk_level": "YELLOW", "approval_level": "HUMAN", "completion_definition": ["Engine is certified."],
+      "evidence_requirements": ["Certification evidence"], "owner": "Product Intelligence", "version": "1.0.0", "outputs": []
+    },
+    {
+      "id": "RECOMMENDATION-SYSTEMS-001", "name": "Recommendation Systems", "type": "ENGINE", "description": "Govern explainable recommendations.", "domain": "engines",
+      "priority": 85, "status": "DISCOVERED", "dependencies": ["SCHOLAR-OS-001"], "blocking_dependencies": [], "required_capabilities": ["recommendations"], "required_artifacts": [],
+      "validation_requirements": ["ai-governance"], "risk_level": "RED", "approval_level": "EXPLICIT_HUMAN", "completion_definition": ["Recommendations are explainable and certified."],
+      "evidence_requirements": ["AI governance evidence"], "owner": "AI Governance", "version": "1.0.0", "outputs": []
+    },
+    {
+      "id": "AUTHENTICATION-INFRASTRUCTURE-001", "name": "Authentication", "type": "SECURITY_CONTROL", "description": "Govern platform authentication.", "domain": "security",
+      "priority": 100, "status": "DEFINED", "dependencies": [], "blocking_dependencies": [], "required_capabilities": ["identity"], "required_artifacts": [],
+      "validation_requirements": ["security-certification"], "risk_level": "RED", "approval_level": "EXPLICIT_HUMAN", "completion_definition": ["Authentication controls are certified."],
+      "evidence_requirements": ["Security evidence"], "owner": "Security Governance", "version": "1.0.0", "outputs": []
+    },
+    {
+      "id": "DATABASE-INFRASTRUCTURE-001", "name": "Database", "type": "INFRASTRUCTURE", "description": "Govern persistent platform data.", "domain": "infrastructure",
+      "priority": 100, "status": "DEFINED", "dependencies": [], "blocking_dependencies": [], "required_capabilities": ["data-persistence"], "required_artifacts": [],
+      "validation_requirements": ["data-governance"], "risk_level": "RED", "approval_level": "EXPLICIT_HUMAN", "completion_definition": ["Data controls are certified."],
+      "evidence_requirements": ["Data governance evidence"], "owner": "Platform Engineering", "version": "1.0.0", "outputs": []
+    },
+    {
+      "id": "WEB-PLATFORM-001", "name": "Web Platform", "type": "INFRASTRUCTURE", "description": "Govern web delivery.", "domain": "infrastructure",
+      "priority": 90, "status": "DEFINED", "dependencies": [], "blocking_dependencies": [], "required_capabilities": ["web-runtime"], "required_artifacts": ["package.json"],
+      "validation_requirements": ["build-validation"], "risk_level": "YELLOW", "approval_level": "HUMAN", "completion_definition": ["Web platform passes release validation."],
+      "evidence_requirements": ["Build evidence"], "owner": "Platform Engineering", "version": "1.0.0", "outputs": []
+    },
+    {
+      "id": "MOBILE-PLATFORM-001", "name": "Mobile Platform", "type": "INFRASTRUCTURE", "description": "Govern future mobile delivery.", "domain": "infrastructure",
+      "priority": 65, "status": "DISCOVERED", "dependencies": ["WEB-PLATFORM-001"], "blocking_dependencies": [], "required_capabilities": ["mobile-runtime"], "required_artifacts": [],
+      "validation_requirements": ["architecture-definition"], "risk_level": "YELLOW", "approval_level": "HUMAN", "completion_definition": ["Mobile architecture is certified."],
+      "evidence_requirements": ["Certification evidence"], "owner": "Platform Engineering", "version": "1.0.0", "outputs": []
+    },
+    {
+      "id": "ANALYTICS-INFRASTRUCTURE-001", "name": "Analytics", "type": "INFRASTRUCTURE", "description": "Govern product analytics and observability.", "domain": "infrastructure",
+      "priority": 80, "status": "DISCOVERED", "dependencies": ["WEB-PLATFORM-001"], "blocking_dependencies": [], "required_capabilities": ["analytics"], "required_artifacts": [],
+      "validation_requirements": ["privacy-validation"], "risk_level": "RED", "approval_level": "EXPLICIT_HUMAN", "completion_definition": ["Analytics controls are certified."],
+      "evidence_requirements": ["Privacy evidence"], "owner": "Observability Governance", "version": "1.0.0", "outputs": []
+    },
+    {
+      "id": "INTEGRATION-PLATFORM-001", "name": "Integrations", "type": "INTEGRATION", "description": "Govern external system connectivity.", "domain": "integrations",
+      "priority": 75, "status": "DISCOVERED", "dependencies": ["AUTHENTICATION-INFRASTRUCTURE-001"], "blocking_dependencies": [], "required_capabilities": ["integration-orchestration"], "required_artifacts": [],
+      "validation_requirements": ["integration-certification"], "risk_level": "RED", "approval_level": "EXPLICIT_HUMAN", "completion_definition": ["Integration controls are certified."],
+      "evidence_requirements": ["Integration evidence"], "owner": "Integration Governance", "version": "1.0.0", "outputs": []
+    },
+    {
+      "id": "PLAYBOOK-LAUNCH-READINESS-001", "name": "Launch Readiness", "type": "MILESTONE", "description": "Independently certify Playbook launch readiness.", "domain": "launch",
+      "priority": 100, "status": "DISCOVERED", "dependencies": ["SCHOLAR-OS-001", "AUTHENTICATION-INFRASTRUCTURE-001", "DATABASE-INFRASTRUCTURE-001", "WEB-PLATFORM-001"],
+      "blocking_dependencies": [], "required_capabilities": ["release-certification"], "required_artifacts": [], "validation_requirements": ["release-validation"],
+      "risk_level": "RED", "approval_level": "EXPLICIT_HUMAN", "completion_definition": ["Independent launch certification passes."],
+      "evidence_requirements": ["Launch certification"], "owner": "Playbook Platform Governance", "version": "1.0.0", "outputs": []
+    }
+  ]
+}

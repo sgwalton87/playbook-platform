@@ -130,3 +130,8 @@ export function runExecutionEngine(
 
 export type { ExecutionDispatcher } from "./dispatch";
 export * from "./capability-binding-adapter";
+export * as Tasks from "./tasks";
+export * as Adapters from "./adapters";
+export * as Admission from "./admission";
+export * as Evidence from "./evidence";
+export * as Authority from "./authority";
