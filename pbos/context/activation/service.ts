@@ -25,6 +25,8 @@ import type {
   TrustedBuildContext,
   TrustedBuildContextHistory,
 } from "./types";
+import type { ChangeBoundaryDeclaration } from "../change-boundary";
+import type { LaunchApprovalRecord } from "../../authority/launch";
 
 function filesUnder(rootDir: string, relativeDir: string): string[] {
   const absolute = path.join(rootDir, relativeDir);
@@ -50,6 +52,12 @@ export interface TrustedContextDiscovery {
     readonly governance_digest: string;
   };
 }
+
+type ActivationDiscoveryEvidence = {
+  readonly assessment: Pick<RepositoryRealityAssessment, "digest">;
+  readonly reconciliation: { readonly digest: string };
+  readonly activation_snapshot: ContextActivationSnapshot;
+};
 
 export function discoverTrustedContext(
   rootDir = process.cwd(),
@@ -201,7 +209,7 @@ export function persistTrustedContext(
 }
 
 export function createActivationEvidence(input: {
-  readonly discovery: TrustedContextDiscovery;
+  readonly discovery: ActivationDiscoveryEvidence;
   readonly requestedBy: string;
   readonly reviewerIdentity: string;
   readonly decision: "APPROVED" | "REJECTED";
@@ -209,6 +217,7 @@ export function createActivationEvidence(input: {
   readonly riskAcknowledgement: string;
   readonly timestamp: string;
   readonly expirationTimestamp: string;
+  readonly authorityEvidenceReferences?: readonly string[];
 }): ContextActivationEvidence {
   const requestBody = {
     request_id: `CONTEXT-ACTIVATION-${input.discovery.activation_snapshot.digest.slice(0, 16)}`,
@@ -236,6 +245,7 @@ export function createActivationEvidence(input: {
       input.discovery.assessment.digest,
       input.discovery.reconciliation.digest,
       input.discovery.activation_snapshot.digest,
+      ...(input.authorityEvidenceReferences ?? []),
     ],
     risk_acknowledgement: input.riskAcknowledgement,
     timestamp: input.timestamp,
@@ -251,4 +261,88 @@ export function createActivationEvidence(input: {
     input.timestamp,
     input.expirationTimestamp
   );
+}
+
+export interface AuthorityLinkedActivationResolution {
+  readonly valid: boolean;
+  readonly findings: readonly string[];
+  readonly evidence: ContextActivationEvidence | null;
+}
+
+export function resolveAuthorityLinkedActivation(input: {
+  readonly discovery: ActivationDiscoveryEvidence;
+  readonly boundary: ChangeBoundaryDeclaration | null;
+  readonly approval: LaunchApprovalRecord | null;
+  readonly timestamp: string;
+}): AuthorityLinkedActivationResolution {
+  const { boundary, approval, discovery } = input;
+  const approvalValidation = approval
+    ? validateLaunchApproval({
+        approval,
+        boundary,
+        timestamp: input.timestamp,
+      })
+    : { valid: false, findings: ["Human launch approval is missing."] };
+  const findings = [
+    ...(!boundary ? ["Change boundary is missing."] : []),
+    ...(!discovery.activation_snapshot.change_boundary_valid
+      ? ["Change boundary is not valid for current repository context."]
+      : []),
+    ...approvalValidation.findings,
+    ...(approval && approval.decision !== "APPROVED"
+      ? ["Launch approval decision is not APPROVED."]
+      : []),
+    ...(boundary &&
+    discovery.activation_snapshot.change_boundary_identity !== boundary.digest
+      ? ["Activation boundary identity does not match."]
+      : []),
+    ...(approval &&
+    discovery.activation_snapshot.launch_approval_identity !== approval.digest
+      ? ["Activation approval identity does not match."]
+      : []),
+    ...(approval &&
+    discovery.activation_snapshot.launch_approval_reviewer_identity !==
+      approval.reviewer_identity
+      ? ["Activation reviewer identity does not match launch approval."]
+      : []),
+    ...(approval && (!approval.decision_reason || !approval.risk_acknowledgment)
+      ? ["Launch approval decision evidence is incomplete."]
+      : []),
+  ];
+  if (!boundary || !approval || findings.length > 0) {
+    return { valid: false, findings, evidence: null };
+  }
+  const expirationTimestamp = new Date(Math.min(
+    Date.parse(boundary.expiration_timestamp),
+    Date.parse(approval.expiration)
+  )).toISOString();
+  const evidence = createActivationEvidence({
+    discovery,
+    requestedBy: boundary.requester_identity,
+    reviewerIdentity: approval.reviewer_identity,
+    decision: "APPROVED",
+    reason: approval.decision_reason,
+    riskAcknowledgement: approval.risk_acknowledgment,
+    timestamp: input.timestamp,
+    expirationTimestamp,
+    authorityEvidenceReferences: [boundary.digest, approval.digest],
+  });
+  return {
+    valid: evidence.outcome.decision === "TRUSTED",
+    findings: evidence.outcome.findings,
+    evidence,
+  };
+}
+
+export function createAuthorityLinkedActivationEvidence(
+  rootDir = process.cwd(),
+  timestamp = new Date().toISOString()
+): AuthorityLinkedActivationResolution {
+  const discovery = discoverTrustedContext(rootDir, timestamp);
+  return resolveAuthorityLinkedActivation({
+    discovery,
+    boundary: loadChangeBoundary(rootDir)?.latest ?? null,
+    approval: loadLaunchApproval(rootDir)?.latest ?? null,
+    timestamp,
+  });
 }

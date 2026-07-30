@@ -8,7 +8,7 @@ import { loadKernelRuntimeHistory } from "../runtime/kernel-runtime";
 import { createDefaultAgentRegistry } from "../agents/registry";
 import {
   assessAutonomousReadiness,
-  createActivationEvidence,
+  createAuthorityLinkedActivationEvidence,
   discoverTrustedContext,
   loadTrustedBuildContext,
   persistTrustedContext,
@@ -297,50 +297,23 @@ export async function dispatchKernelCommand(
 
   if (command === "context-activate") {
     const timestamp = new Date().toISOString();
-    const discovery = discoverTrustedContext(rootDir, timestamp);
-    const reviewerIdentity = process.env.PBOS_CONTEXT_REVIEWER_ID ?? "";
-    const requestedBy = process.env.PBOS_CONTEXT_REQUESTER_ID ?? actorId;
-    const decision = process.env.PBOS_CONTEXT_DECISION;
-    const reason = process.env.PBOS_CONTEXT_REASON ?? "";
-    const riskAcknowledgement =
-      process.env.PBOS_CONTEXT_RISK_ACKNOWLEDGEMENT ?? "";
-    const expirationTimestamp = process.env.PBOS_CONTEXT_EXPIRATION ?? "";
-    if (
-      !requestedBy ||
-      !reviewerIdentity ||
-      (decision !== "APPROVED" && decision !== "REJECTED") ||
-      !reason ||
-      !riskAcknowledgement ||
-      !expirationTimestamp
-    ) {
+    const resolution = createAuthorityLinkedActivationEvidence(
+      rootDir,
+      timestamp
+    );
+    if (!resolution.evidence || !resolution.valid) {
       return {
         command,
         successful: false,
         output: [
           "PBOS TRUSTED BUILD CONTEXT ACTIVATION",
           "Decision: BLOCKED",
-          "Explicit requester, reviewer, APPROVED/REJECTED decision, reason, risk acknowledgement, and expiration are required.",
+          ...resolution.findings,
           "No runtime artifact was created.",
         ].join("\n"),
       };
     }
-    const evidence = createActivationEvidence({
-      discovery,
-      requestedBy,
-      reviewerIdentity,
-      decision,
-      reason,
-      riskAcknowledgement,
-      timestamp,
-      expirationTimestamp,
-    });
-    if (!evidence.trusted_context) {
-      return {
-        command,
-        successful: false,
-        output: `PBOS TRUSTED BUILD CONTEXT ACTIVATION\n${JSON.stringify(evidence, null, 2)}\nNo runtime artifact was created.`,
-      };
-    }
+    const evidence = resolution.evidence;
     const artifact = persistTrustedContext(rootDir, evidence);
     return {
       command,

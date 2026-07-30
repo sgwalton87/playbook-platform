@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { artifactDigest } from "../../kernel/identity";
 import { activateBuildContext } from "./authority";
+import {
+  resolveAuthorityLinkedActivation,
+} from "./service";
+import { createLaunchApproval } from "../../authority/launch";
+import type { ChangeBoundaryDeclaration } from "../change-boundary";
 import type {
   ContextActivationDecision,
   ContextActivationRequest,
@@ -63,6 +68,75 @@ function decision(
   return { ...body, digest: artifactDigest(body) };
 }
 
+function boundary(): ChangeBoundaryDeclaration {
+  const body = {
+    boundary_id: "BASELINE-001",
+    boundary_type: "BASELINE_ACTIVATION" as const,
+    repository_identity: "REPOSITORY-001",
+    commit_identity: "a".repeat(40),
+    branch_identity: "main",
+    requester_identity: "human-operator",
+    inventory_digest: "2".repeat(64),
+    inventory_identity: "3".repeat(64),
+    approved_files: [],
+    included_files: [],
+    excluded_files: [],
+    scope_digest: artifactDigest({ included: [], excluded: [] }),
+    context_digest: "4".repeat(64),
+    manifest_digest: "b".repeat(64),
+    architecture_digest: "d".repeat(64),
+    artifact_digest: "c".repeat(64),
+    governance_digest: "e".repeat(64),
+    purpose: "Activate baseline.",
+    business_purpose: "Enable governed planning.",
+    technical_purpose: "Bind the trusted repository state.",
+    owner_identity: "human-operator",
+    risk_acknowledgment: "Baseline risk reviewed.",
+    creation_timestamp: "2026-07-30T00:00:00.000Z",
+    created_at: "2026-07-30T00:00:00.000Z",
+    expiration_timestamp: expiresAt,
+    expiration: expiresAt,
+  };
+  return { ...body, digest: artifactDigest(body) };
+}
+
+function linkedEvidence(
+  approvalDecision: "APPROVED" | "REJECTED" = "APPROVED"
+) {
+  const scope = boundary();
+  const approval = createLaunchApproval({
+    boundary: scope,
+    requesterIdentity: scope.requester_identity,
+    reviewerIdentity: "human-reviewer",
+    decision: approvalDecision,
+    reason: "Reviewed repository comparison and accepted the stated risk.",
+    riskAcknowledgment: "Baseline risk reviewed.",
+    timestamp: "2026-07-30T00:00:00.000Z",
+    expiration: expiresAt,
+  });
+  const baseSnapshot = snapshot();
+  const snapshotBody = {
+    ...baseSnapshot,
+    change_boundary_identity: scope.digest,
+    launch_approval_identity: approval.digest,
+    launch_approval_valid: approvalDecision === "APPROVED",
+    digest: undefined,
+  };
+  const activationSnapshot = {
+    ...snapshotBody,
+    digest: artifactDigest(snapshotBody),
+  };
+  return {
+    scope,
+    approval,
+    discovery: {
+      assessment: { digest: "assessment" },
+      reconciliation: { digest: "reconciliation" },
+      activation_snapshot: activationSnapshot,
+    },
+  };
+}
+
 describe("context activation", () => {
   it("creates a temporally bounded trusted context from matching human evidence", () => {
     const value = snapshot();
@@ -102,5 +176,53 @@ describe("context activation", () => {
     );
     expect(result.outcome.findings).toContain("Human context approval is absent.");
     expect(result.trusted_context).toBeNull();
+  });
+
+  it("activates from a valid boundary and matching approval artifact", () => {
+    const value = linkedEvidence();
+    const result = resolveAuthorityLinkedActivation({
+      discovery: value.discovery,
+      boundary: value.scope,
+      approval: value.approval,
+      timestamp: activatedAt,
+    });
+    expect(result.valid).toBe(true);
+    expect(result.evidence?.trusted_context?.created_by).toBe("human-reviewer");
+    expect(result.evidence?.decision.evidence_references).toContain(
+      value.approval.digest
+    );
+  });
+
+  it("blocks missing and digest-mismatched approval artifacts", () => {
+    const value = linkedEvidence();
+    expect(resolveAuthorityLinkedActivation({
+      discovery: value.discovery,
+      boundary: value.scope,
+      approval: null,
+      timestamp: activatedAt,
+    }).findings).toContain("Human launch approval is missing.");
+    expect(resolveAuthorityLinkedActivation({
+      discovery: value.discovery,
+      boundary: value.scope,
+      approval: { ...value.approval, boundary_digest: "mismatch" },
+      timestamp: activatedAt,
+    }).valid).toBe(false);
+  });
+
+  it("blocks expired and rejected approval artifacts", () => {
+    const approved = linkedEvidence();
+    expect(resolveAuthorityLinkedActivation({
+      discovery: approved.discovery,
+      boundary: approved.scope,
+      approval: approved.approval,
+      timestamp: "2026-08-01T00:00:00.000Z",
+    }).findings).toContain("Launch approval is expired.");
+    const rejected = linkedEvidence("REJECTED");
+    expect(resolveAuthorityLinkedActivation({
+      discovery: rejected.discovery,
+      boundary: rejected.scope,
+      approval: rejected.approval,
+      timestamp: activatedAt,
+    }).findings).toContain("Launch approval decision is not APPROVED.");
   });
 });

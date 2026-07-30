@@ -20,6 +20,10 @@ export function validateLaunchApproval(input: {
     ...(approval.requester_identity === approval.reviewer_identity
       ? ["Launch approval requires separation of duties."]
       : []),
+    ...(boundary &&
+    approval.requester_identity !== boundary.requester_identity
+      ? ["Launch approval requester does not match change boundary."]
+      : []),
     ...(!["APPROVED", "REJECTED", "EXPIRED", "REVOKED"].includes(approval.decision)
       ? ["Launch approval decision is invalid."]
       : []),
