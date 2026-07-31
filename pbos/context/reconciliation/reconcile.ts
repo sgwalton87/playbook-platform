@@ -151,9 +151,17 @@ export class RepositoryContextReconciliation {
       confidence: state === "VERIFIED" ? 100 : state === "REVIEW_REQUIRED" ? 70 : 0,
       risk_level: state === "VERIFIED" ? "LOW" : state === "REVIEW_REQUIRED" ? "HIGH" : "CRITICAL",
       recommendation,
-      timestamp: input.timestamp,
       digest: "",
-    } satisfies ContextReconciliationReport;
-    return { ...body, digest: artifactDigest({ ...body, digest: undefined }) };
+    } satisfies Omit<ContextReconciliationReport, "digest" | "timestamp"> & {
+      digest: string;
+    };
+
+    const digest = artifactDigest(body);
+
+    return {
+      ...body,
+      timestamp: input.timestamp,
+      digest,
+    };
   }
 }
