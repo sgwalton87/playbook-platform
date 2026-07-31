@@ -36,6 +36,11 @@ import {
   evidenceString,
   type FounderEvidenceInput,
 } from "./founder-evidence-input";
+import {
+  buildPBOSRecoveryAssessment,
+  collectPBOSRecoveryEvidence,
+  formatPBOSRecoveryAssessment,
+} from "../recovery";
 
 export const KERNEL_COMMANDS = [
   "next",
@@ -66,6 +71,7 @@ export const KERNEL_COMMANDS = [
   "change-boundary",
   "approve-boundary",
   "approve-refresh",
+  "recover",
 ] as const;
 
 export type KernelCommandName = (typeof KERNEL_COMMANDS)[number];
@@ -86,6 +92,19 @@ export async function dispatchKernelCommand(
   actorId = process.env.PBOS_ACTOR_ID ?? "",
   evidenceInput: FounderEvidenceInput = {}
 ): Promise<KernelCommandResult> {
+  if (command === "recover") {
+    const timestamp = new Date().toISOString();
+    const assessment = buildPBOSRecoveryAssessment(
+      collectPBOSRecoveryEvidence(rootDir, timestamp),
+      timestamp
+    );
+    return {
+      command,
+      successful: true,
+      output: formatPBOSRecoveryAssessment(assessment),
+    };
+  }
+
   if (command === "change-inventory") {
     const inventory = createChangeInventory(rootDir);
     return {
