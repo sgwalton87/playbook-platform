@@ -104,6 +104,12 @@ export function persistMilestoneAdvancement(input: {
   };
   const record = { ...body, digest: artifactDigest(body) };
   const existing = loadMilestoneAdvancementHistory(input.rootDir);
+  if (
+    existing?.latest.package_digest === input.package.digest &&
+    existing.latest.evidence_digest === input.assessment.evidence_digest
+  ) {
+    return existing;
+  }
   const history = existing
     ? [...existing.history, existing.latest].filter(
         (item, index, items) =>

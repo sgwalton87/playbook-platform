@@ -37,6 +37,9 @@ function evidence(
     refreshApproval: "INVALID",
     refreshApprovalState: null,
     findings: ["Repository identity changed."],
+    sourceChangeCount: 1,
+    runtimeChangesOnly: false,
+    trustedCommitIdentity: "a".repeat(40),
     ...overrides,
   };
 }
@@ -66,6 +69,17 @@ describe("PBOS autonomous operator experience", () => {
       launchApproval: "VALID",
     }));
     expect(result.decision.transition).toBe("RECONCILE");
+    expect(result.human_action?.command).toBe("npm run pbos:approve-refresh");
+  });
+
+  it("selects committed reconciliation without requesting a change boundary", () => {
+    const result = plan(evidence({
+      sourceChangeCount: 0,
+      trustedCommitIdentity: "b".repeat(40),
+    }));
+    expect(result.decision.current_state).toBe(
+      "COMMITTED_CONTEXT_RECONCILIATION_REQUIRED"
+    );
     expect(result.human_action?.command).toBe("npm run pbos:approve-refresh");
   });
 

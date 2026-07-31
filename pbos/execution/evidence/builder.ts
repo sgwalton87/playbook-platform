@@ -7,6 +7,9 @@ export function buildExecutionEvidence(input: {
   readonly package_digest: string;
   readonly context_digest: string;
   readonly approval_id: string;
+  readonly authorization_id: string;
+  readonly provider_id: string;
+  readonly provider_contract_id: string;
   readonly required_validations: readonly string[];
   readonly required_evidence: readonly string[];
 }): ExecutionEvidenceBundle {
@@ -16,6 +19,9 @@ export function buildExecutionEvidence(input: {
     package_digest: input.package_digest,
     context_digest: input.context_digest,
     approval_id: input.approval_id,
+    authorization_id: input.authorization_id,
+    provider_id: input.provider_id,
+    provider_contract_id: input.provider_contract_id,
     agent_id: input.result.agent_id,
     status: input.result.status,
     artifacts: input.result.artifacts,

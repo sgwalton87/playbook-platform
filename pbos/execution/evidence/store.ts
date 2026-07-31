@@ -32,6 +32,9 @@ function isEvidenceBundle(value: unknown): value is ExecutionEvidenceBundle {
     typeof record.package_digest === "string" &&
     typeof record.context_digest === "string" &&
     typeof record.approval_id === "string" &&
+    typeof record.authorization_id === "string" &&
+    typeof record.provider_id === "string" &&
+    typeof record.provider_contract_id === "string" &&
     typeof record.agent_id === "string" &&
     (record.status === "SUCCEEDED" || record.status === "FAILED") &&
     Array.isArray(record.artifacts) &&

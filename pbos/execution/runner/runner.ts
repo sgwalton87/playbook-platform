@@ -44,6 +44,9 @@ export class ExecutionFabricRunner {
       package_digest: request.package.digest,
       context_digest: request.context.digest,
       approval_id: request.approval.approval_id,
+      authorization_id: request.authorization.authorization_id,
+      provider_id: provider.contract.provider_id,
+      provider_contract_id: provider.contract.provider_contract_id,
       required_validations: request.assignment.task.validation_requirements,
       required_evidence: request.assignment.task.evidence_requirements,
     });

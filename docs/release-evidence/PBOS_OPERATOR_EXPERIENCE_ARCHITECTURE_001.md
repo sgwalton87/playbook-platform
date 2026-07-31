@@ -53,6 +53,23 @@ choose boundary type, artifact producer, validator order, or recovery sequence.
 
 ## State Machine
 
+### Committed Repository Transitions
+
+PBOS distinguishes source changes from committed context drift. A dirty source inventory requires `CHANGE_BOUNDARY_REQUIRED`. When the source inventory is empty and current HEAD differs from the trusted context commit, PBOS selects `COMMITTED_CONTEXT_RECONCILIATION_REQUIRED`. Governed runtime outputs alone follow the reconciliation path and are never presented as source changes.
+
+The committed path uses the existing Context Refresh Authority. RUN IT prepares the reconciliation proposal and requests `pbos:approve-refresh`. After valid approval, RUN IT derives the baseline activation boundary and launch record through their canonical builders, applies the approved refresh, activates trusted context, and resumes planning. The operator does not classify files or choose lifecycle mechanics.
+
+```text
+COMMITTED_CONTEXT_RECONCILIATION_REQUIRED
+→ refresh approval
+→ canonical baseline authority derivation
+→ context refresh
+→ trusted context activation
+→ resumed RUN IT
+```
+
+Stale, rejected, expired, or identity-mismatched approval remains fail-closed.
+
 | Canonical recovery decision | Operator transition | Authority behavior |
 |---|---|---|
 | `CHANGE_BOUNDARY_REQUIRED` | `CHANGE` | Request boundary evidence |

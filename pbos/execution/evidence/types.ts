@@ -6,6 +6,9 @@ export interface ExecutionRecord {
   readonly package_digest: string;
   readonly context_digest: string;
   readonly approval_id: string;
+  readonly authorization_id: string;
+  readonly provider_id: string;
+  readonly provider_contract_id: string;
   readonly agent_id: string;
   readonly status: AgentExecutionResult["status"];
   readonly artifacts: readonly AgentExecutionArtifact[];

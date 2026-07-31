@@ -1,6 +1,7 @@
 export type PBOSRecoveryPhase =
   | "TRUSTED"
   | "CONTEXT_INVALID"
+  | "COMMITTED_CONTEXT_RECONCILIATION_REQUIRED"
   | "CHANGE_BOUNDARY_CREATED"
   | "BOUNDARY_APPROVED"
   | "REFRESH_APPROVED"
@@ -9,6 +10,7 @@ export type PBOSRecoveryPhase =
 export type PBOSRecoveryTransition =
   | "NONE"
   | "CHANGE_BOUNDARY_REQUIRED"
+  | "COMMITTED_CONTEXT_RECONCILIATION_REQUIRED"
   | "APPROVE_BOUNDARY_REQUIRED"
   | "APPROVE_REFRESH_REQUIRED"
   | "REFRESH_REQUIRED"
@@ -82,4 +84,7 @@ export interface PBOSRecoveryEvidence {
   readonly refreshApproval: "VALID" | "MISSING" | "INVALID";
   readonly refreshApprovalState: "APPROVED" | "REJECTED" | "APPLIED" | null;
   readonly findings: readonly string[];
+  readonly sourceChangeCount: number;
+  readonly runtimeChangesOnly: boolean;
+  readonly trustedCommitIdentity: string | null;
 }

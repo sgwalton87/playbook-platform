@@ -18,7 +18,7 @@ export function formatOperatorReport(
     `Intent: ${plan.intent}`,
     `Status: ${result.status}`,
     "",
-    "System Assessment:",
+    "CURRENT STATE:",
     `Context: ${assessment.trust_state.level}`,
     `Lifecycle: ${plan.decision.current_state}`,
     `Repository: ${assessment.repository_state.artifact_state}`,
@@ -26,12 +26,14 @@ export function formatOperatorReport(
     "Diagnosis:",
     ...assessment.diagnosis.map((finding) => `- ${finding}`),
     "",
-    `Selected Transition: ${plan.decision.transition}`,
     "",
-    "Automatic Actions:",
+    "AVAILABLE ACTION:",
+    `${plan.decision.transition}${plan.decision.command ? ` via ${plan.decision.command}` : ""}`,
+    "",
+    "AUTOMATIC ACTIONS:",
     ...plan.automatic_actions.map((item) => `- PASS: ${item}`),
     "",
-    "Human Action Required:",
+    "HUMAN ACTION REQUIRED:",
     ...(action
       ? [
           `Reason: ${action.reason}`,
@@ -41,6 +43,9 @@ export function formatOperatorReport(
           `Command: ${action.command}`,
         ]
       : ["NONE"]),
+    "",
+    "NEXT COMMAND:",
+    action?.command ?? plan.decision.command ?? "PBOS continues automatically",
     "",
     `Build Pipeline: ${operatorPipelineReady(capabilities) ? "READY" : "INCOMPLETE"}`,
     ...capabilities.map(({ capability, status, blocker }) =>

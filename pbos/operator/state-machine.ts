@@ -33,6 +33,11 @@ const TRANSITIONS: Readonly<Record<
     command: "npm run pbos:change-boundary",
     human_authority_required: true,
   },
+  COMMITTED_CONTEXT_RECONCILIATION_REQUIRED: {
+    transition: "RECONCILE",
+    command: "npm run pbos:approve-refresh",
+    human_authority_required: true,
+  },
   APPROVE_BOUNDARY_REQUIRED: {
     transition: "CHANGE",
     command: "npm run pbos:approve-boundary",
@@ -51,7 +56,7 @@ const TRANSITIONS: Readonly<Record<
   CONTEXT_ACTIVATION_REQUIRED: {
     transition: "ACTIVATE",
     command: "npm run pbos:context-activate",
-    human_authority_required: true,
+    human_authority_required: false,
   },
 };
 

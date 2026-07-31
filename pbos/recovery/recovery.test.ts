@@ -37,6 +37,9 @@ function evidence(
     refreshApproval: "INVALID",
     refreshApprovalState: "APPLIED",
     findings: ["Current boundary is stale."],
+    sourceChangeCount: 1,
+    runtimeChangesOnly: false,
+    trustedCommitIdentity: "a".repeat(40),
     ...overrides,
   };
 }
@@ -79,6 +82,52 @@ describe("PBOS recovery orchestrator", () => {
     expect(assessment.recovery_required).toBe(false);
     expect(assessment.recommended_transition).toBe("NONE");
     expect(assessment.required_sequence).toEqual([]);
+  });
+
+  it("selects committed reconciliation for clean source state and stale HEAD", () => {
+    const assessment = buildPBOSRecoveryAssessment(
+      evidence({
+        sourceChangeCount: 0,
+        runtimeChangesOnly: false,
+        trustedCommitIdentity: "b".repeat(40),
+      }),
+      now
+    );
+    expect(assessment.recommended_transition).toBe(
+      "COMMITTED_CONTEXT_RECONCILIATION_REQUIRED"
+    );
+    expect(assessment.required_sequence.map(({ command }) => command)).toEqual([
+      "npm run pbos:approve-refresh",
+      "npm run pbos:refresh",
+      "npm run pbos:context-activate",
+    ]);
+  });
+
+  it("bootstraps a fresh clean repository through governed reconciliation", () => {
+    const assessment = buildPBOSRecoveryAssessment(
+      evidence({
+        sourceChangeCount: 0,
+        trustedCommitIdentity: null,
+        trustedContextIdentity: null,
+      }),
+      now
+    );
+    expect(assessment.recommended_transition).toBe(
+      "COMMITTED_CONTEXT_RECONCILIATION_REQUIRED"
+    );
+  });
+
+  it("routes governed runtime-only drift through reconciliation", () => {
+    const assessment = buildPBOSRecoveryAssessment(
+      evidence({
+        sourceChangeCount: 0,
+        runtimeChangesOnly: true,
+      }),
+      now
+    );
+    expect(assessment.recommended_transition).toBe(
+      "COMMITTED_CONTEXT_RECONCILIATION_REQUIRED"
+    );
   });
 
   it("produces deterministic output for unchanged inputs", () => {

@@ -12,6 +12,7 @@ import {
 } from "../context/refresh";
 import { loadLaunchApproval } from "../authority/launch";
 import type { PBOSRecoveryEvidence } from "./types";
+import { createChangeInventory } from "../context/change-boundary";
 
 export function collectPBOSRecoveryEvidence(
   rootDir = process.cwd(),
@@ -23,6 +24,7 @@ export function collectPBOSRecoveryEvidence(
   const refreshApproval = loadContextRefreshApproval(rootDir)?.latest ?? null;
   const storedContext = loadRepositoryContextArtifact(rootDir);
   const trustedContext = loadTrustedBuildContext(rootDir)?.latest ?? null;
+  const inventory = createChangeInventory(rootDir, timestamp);
   const readiness = assessAutonomousReadiness({
     context: trustedContext,
     repository: discovery.assessment,
@@ -100,5 +102,10 @@ export function collectPBOSRecoveryEvidence(
     refreshApproval: refreshStatus,
     refreshApprovalState: refreshApproval?.state ?? null,
     findings: [...new Set(findings)],
+    sourceChangeCount: inventory.changes.length,
+    runtimeChangesOnly:
+      discovery.assessment.working_tree_state === "DIRTY" &&
+      inventory.changes.length === 0,
+    trustedCommitIdentity: trustedContext?.commit_identity ?? null,
   };
 }

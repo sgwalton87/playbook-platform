@@ -13,6 +13,10 @@ const STEPS: Readonly<Record<Exclude<PBOSRecoveryTransition, "NONE">, PBOSRecove
     command: "npm run pbos:change-boundary",
     purpose: "Create an identity-bound repository transition boundary.",
   },
+  COMMITTED_CONTEXT_RECONCILIATION_REQUIRED: {
+    command: "npm run pbos:approve-refresh",
+    purpose: "Authorize the committed repository reconciliation proposed by PBOS.",
+  },
   APPROVE_BOUNDARY_REQUIRED: {
     command: "npm run pbos:approve-boundary",
     purpose: "Authorize the current boundary through an independent human decision.",
@@ -46,6 +50,11 @@ const ARTIFACTS: Readonly<Record<
   CHANGE_BOUNDARY_REQUIRED: [{
     path: "pbos/runtime/change-boundary.json",
     owner: "change-boundary-authority",
+    classification: "RUNTIME",
+  }],
+  COMMITTED_CONTEXT_RECONCILIATION_REQUIRED: [{
+    path: "pbos/runtime/context-refresh-approval.json",
+    owner: "context-refresh-authority",
     classification: "RUNTIME",
   }],
   APPROVE_BOUNDARY_REQUIRED: [{
@@ -94,6 +103,29 @@ function deriveState(evidence: PBOSRecoveryEvidence): {
   if (evidence.trusted) {
     return { phase: "TRUSTED", transition: "NONE" };
   }
+  const committedContextTransition =
+    evidence.sourceChangeCount === 0 &&
+    (evidence.trustedCommitIdentity === null ||
+      evidence.repository.commit !== evidence.trustedCommitIdentity);
+  const runtimeOnlyTransition =
+    evidence.sourceChangeCount === 0 && evidence.runtimeChangesOnly;
+  if (
+    (committedContextTransition || runtimeOnlyTransition) &&
+    (evidence.refreshApproval !== "VALID" ||
+      evidence.refreshApprovalState !== "APPROVED")
+  ) {
+    return {
+      phase: "COMMITTED_CONTEXT_RECONCILIATION_REQUIRED",
+      transition: "COMMITTED_CONTEXT_RECONCILIATION_REQUIRED",
+    };
+  }
+  if (
+    (committedContextTransition || runtimeOnlyTransition) &&
+    evidence.refreshApproval === "VALID" &&
+    evidence.refreshApprovalState === "APPROVED"
+  ) {
+    return { phase: "REFRESH_APPROVED", transition: "REFRESH_REQUIRED" };
+  }
   if (evidence.boundary !== "VALID") {
     return {
       phase: "CONTEXT_INVALID",
@@ -129,9 +161,17 @@ export function buildPBOSRecoveryAssessment(
   timestamp: string
 ): PBOSRecoveryAssessment {
   const { phase, transition } = deriveState(evidence);
-  const sequence = transition === "NONE"
-    ? []
-    : ORDER.slice(ORDER.indexOf(transition)).map((item) => STEPS[item]);
+  const transitionSequence: readonly Exclude<PBOSRecoveryTransition, "NONE">[] =
+    transition === "COMMITTED_CONTEXT_RECONCILIATION_REQUIRED"
+      ? [
+          "COMMITTED_CONTEXT_RECONCILIATION_REQUIRED",
+          "REFRESH_REQUIRED",
+          "CONTEXT_ACTIVATION_REQUIRED",
+        ]
+      : transition === "NONE"
+        ? []
+        : ORDER.slice(ORDER.indexOf(transition));
+  const sequence = transitionSequence.map((item) => STEPS[item]);
   const artifactCandidates = transition === "NONE"
     ? []
     : sequence.flatMap(({ command }) => {
@@ -145,6 +185,7 @@ export function buildPBOSRecoveryAssessment(
   const approvalRequirements = sequence
     .filter(({ command }) =>
       command === "npm run pbos:change-boundary" ||
+      command === "npm run pbos:approve-refresh" ||
       command === "npm run pbos:approve-boundary" ||
       command === "npm run pbos:approve-refresh"
     )

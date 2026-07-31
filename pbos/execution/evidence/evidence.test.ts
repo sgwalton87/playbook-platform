@@ -21,6 +21,9 @@ describe("execution evidence", () => {
       package_digest: "b".repeat(64),
       context_digest: "c".repeat(64),
       approval_id: "APPROVAL-001",
+      authorization_id: "AUTHORIZATION-001",
+      provider_id: "PROVIDER-001",
+      provider_contract_id: "PROVIDER-CONTRACT-001",
       required_validations: ["npm test"],
       required_evidence: ["EVIDENCE-001"],
     });
@@ -65,6 +68,9 @@ describe("execution evidence", () => {
       package_digest: executionPackage.digest,
       context_digest: "c".repeat(64),
       approval_id: "APPROVAL-001",
+      authorization_id: "AUTHORIZATION-001",
+      provider_id: "PROVIDER-001",
+      provider_contract_id: "PROVIDER-CONTRACT-001",
       required_validations: ["npm test"],
       required_evidence: ["VALIDATION_RESULTS"],
     });

@@ -2,7 +2,6 @@ import { runRepositoryKernel } from "../engine/kernel-repository-adapter";
 import { formatEngineHealth, getEngineHealth } from "../health/engine-health";
 import { runKernelRuntime } from "../runtime/kernel-runtime";
 import { runDevelopmentOrchestration } from "../orchestration";
-import { runAutonomousBuildCycle } from "../orchestration/autonomous";
 import { loadMasterBuildManifest } from "../manifests";
 import { loadKernelRuntimeHistory } from "../runtime/kernel-runtime";
 import { createDefaultAgentRegistry } from "../agents/registry";
@@ -149,11 +148,121 @@ export async function dispatchKernelCommand(
 
   if (command === "run") {
     const timestamp = new Date().toISOString();
+    const recoveryEvidence = collectPBOSRecoveryEvidence(rootDir, timestamp);
     const recovery = buildPBOSRecoveryAssessment(
-      collectPBOSRecoveryEvidence(rootDir, timestamp),
+      recoveryEvidence,
       timestamp
     );
     const operatorOutput = runOperator(rootDir, "RUN_IT", timestamp);
+    if (recovery.recommended_transition === "REFRESH_REQUIRED") {
+      if (
+        recoveryEvidence.sourceChangeCount === 0 &&
+        recoveryEvidence.boundary !== "VALID"
+      ) {
+        const refreshApproval = loadContextRefreshApproval(rootDir)?.latest ?? null;
+        if (
+          !refreshApproval ||
+          refreshApproval.state !== "APPROVED" ||
+          refreshApproval.decision !== "APPROVED"
+        ) {
+          return { command, successful: true, output: operatorOutput };
+        }
+        const discovery = discoverTrustedContext(rootDir, timestamp);
+        const boundary = createChangeBoundary({
+          inventory: createChangeInventory(rootDir, timestamp),
+          boundaryType: "BASELINE_ACTIVATION",
+          baselineIdentity: discovery.baseline_identity,
+          requesterIdentity: refreshApproval.requester_identity,
+          approvedFiles: [],
+          excludedFiles: [],
+          purpose: refreshApproval.decision_reason,
+          businessPurpose: "Reconcile an approved committed repository transition.",
+          technicalPurpose: "Bind trusted context to the approved repository HEAD.",
+          riskAcknowledgment: refreshApproval.risk_acknowledgment,
+          creationTimestamp: timestamp,
+          expirationTimestamp: refreshApproval.expiration,
+        });
+        persistChangeBoundary(rootDir, boundary);
+        persistLaunchApproval(
+          rootDir,
+          createLaunchApproval({
+            boundary,
+            requesterIdentity: refreshApproval.requester_identity,
+            reviewerIdentity: refreshApproval.reviewer_identity,
+            decision: "APPROVED",
+            reason: refreshApproval.decision_reason,
+            riskAcknowledgment: refreshApproval.risk_acknowledgment,
+            timestamp,
+            expiration: refreshApproval.expiration,
+          })
+        );
+      }
+      const refreshResult = await dispatchKernelCommand(
+        "refresh",
+        rootDir,
+        actorId,
+        evidenceInput
+      );
+      if (!refreshResult.successful) {
+        return {
+          command,
+          successful: false,
+          output: [operatorOutput, "", refreshResult.output].join("\n"),
+        };
+      }
+      const activationResult = await dispatchKernelCommand(
+        "context-activate",
+        rootDir,
+        actorId,
+        evidenceInput
+      );
+      if (!activationResult.successful) {
+        return {
+          command,
+          successful: false,
+          output: [
+            operatorOutput,
+            "",
+            refreshResult.output,
+            "",
+            activationResult.output,
+          ].join("\n"),
+        };
+      }
+      const resumed = await dispatchKernelCommand(
+        "run",
+        rootDir,
+        actorId,
+        evidenceInput
+      );
+      return {
+        command,
+        successful: resumed.successful,
+        output: [
+          operatorOutput,
+          "",
+          "PBOS ACTION: Context refresh and activation completed.",
+          "",
+          resumed.output,
+        ].join("\n"),
+      };
+    }
+    if (recovery.recommended_transition === "CONTEXT_ACTIVATION_REQUIRED") {
+      const activationResult = await dispatchKernelCommand(
+        "context-activate",
+        rootDir,
+        actorId,
+        evidenceInput
+      );
+      if (!activationResult.successful) {
+        return {
+          command,
+          successful: false,
+          output: [operatorOutput, "", activationResult.output].join("\n"),
+        };
+      }
+      return dispatchKernelCommand("run", rootDir, actorId, evidenceInput);
+    }
     if (recovery.recommended_transition !== "NONE") {
       return {
         command,
@@ -209,7 +318,14 @@ export async function dispatchKernelCommand(
       assignmentArtifact.assignment.task.package_id !==
         orchestration.executionPackage.package_id ||
       assignmentArtifact.assignment.task.context_identity !==
-        authorization.context_digest
+        authorization.context_digest ||
+      assignmentArtifact.assignment.task.execution_authorization_id !==
+        authorization.authorization_id ||
+      assignmentArtifact.assignment.task.provider_id !==
+        authorization.provider_id ||
+      assignmentArtifact.assignment.task.provider_contract_id !==
+        authorization.provider_contract_id ||
+      assignmentArtifact.assignment.task.assigned_agent !== authorization.agent_id
     ) {
       const assignmentResult = await dispatchKernelCommand(
         "assign",
@@ -228,6 +344,42 @@ export async function dispatchKernelCommand(
     }
     if (!assignmentArtifact) {
       throw new Error("Execution assignment was not persisted.");
+    }
+    const existingEvidence = loadExecutionEvidence(rootDir)?.latest ?? null;
+    if (
+      existingEvidence &&
+      existingEvidence.record.package_digest === orchestration.executionPackage.digest &&
+      existingEvidence.record.approval_id === approval.approval_id
+    ) {
+      const advancement = assessMilestoneAdvancement({
+        package: orchestration.executionPackage,
+        evidence: existingEvidence,
+      });
+      const transition = advancement.eligible
+        ? persistMilestoneAdvancement({
+            rootDir,
+            package: orchestration.executionPackage,
+            assessment: advancement,
+            authorized_by: authorization.approved_by,
+            timestamp: existingEvidence.record.completed_at,
+          }).latest
+        : null;
+      return {
+        command,
+        successful: advancement.eligible,
+        output: [
+          "PBOS OPERATOR MODE",
+          "CURRENT STATE: EXECUTION EVIDENCE RECOVERED",
+          "AVAILABLE ACTION: Lifecycle advancement assessment",
+          "AUTOMATIC ACTIONS: Evidence loaded and validated",
+          "HUMAN ACTION REQUIRED: NONE",
+          "NEXT COMMAND: npm run it",
+          `Execution: ${existingEvidence.record.status}`,
+          `Validation: ${existingEvidence.completion.complete ? "PASS" : "FAIL"}`,
+          `Milestone Advancement: ${transition ? "COMPLETE" : "BLOCKED"}`,
+          ...advancement.findings.map((finding) => `- ${finding}`),
+        ].join("\n"),
+      };
     }
     if (process.env.PBOS_CODEX_EXECUTION_ENABLED !== "true") {
       return {
@@ -827,25 +979,23 @@ export async function dispatchKernelCommand(
   }
 
   if (command === "first-build") {
-    const cycle = await runAutonomousBuildCycle(rootDir);
-    return {
-      command,
-      successful: false,
-      output: [
-        "PBOS FIRST GOVERNED PRODUCT BUILD",
-        JSON.stringify(cycle, null, 2),
-        "No agent executed product work.",
-      ].join("\n"),
-    };
+    const result = await dispatchKernelCommand(
+      "run",
+      rootDir,
+      actorId,
+      evidenceInput
+    );
+    return { ...result, command };
   }
 
   if (command === "cycle") {
-    const cycle = await runAutonomousBuildCycle(rootDir);
-    return {
-      command,
-      successful: false,
-      output: `PBOS AUTONOMOUS BUILD CYCLE\n${JSON.stringify(cycle, null, 2)}`,
-    };
+    const result = await dispatchKernelCommand(
+      "run",
+      rootDir,
+      actorId,
+      evidenceInput
+    );
+    return { ...result, command };
   }
 
   if (command === "approve") {
@@ -1179,16 +1329,13 @@ export async function dispatchKernelCommand(
   }
 
   if (command === "authorize") {
-    return {
-      command,
-      successful: true,
-      output: [
-        "PBOS HUMAN AUTHORIZATION GATEWAY",
-        "Decision: PENDING",
-        "No authorization decision was created.",
-        "Approval requires an identity-bound request, immutable package digest, evidence, and independent approver where required.",
-      ].join("\n"),
-    };
+    const result = await dispatchKernelCommand(
+      "approve",
+      rootDir,
+      actorId,
+      evidenceInput
+    );
+    return { ...result, command };
   }
 
   if (command === "improve") {

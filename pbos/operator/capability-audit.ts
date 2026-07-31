@@ -59,7 +59,7 @@ export const OPERATOR_CAPABILITIES: readonly OperatorCapability[] = [
     capability: "Task assignment",
     status: "OPERATIONAL",
     owner: "Execution Admission",
-    evidence: "The assign command always returns BLOCKED and creates no assignment.",
+    evidence: "The assign command resolves certified provider identity and persists admitted assignments.",
     blocker: null,
   },
   {
