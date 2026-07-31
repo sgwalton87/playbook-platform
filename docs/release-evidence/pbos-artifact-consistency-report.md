@@ -4,7 +4,7 @@ title: PBOS Artifact Consistency Report
 status: VALID
 classification: Reconciliation Evidence
 owner: PBOS Artifact Reconciliation
-last_updated: 2026-07-29
+last_updated: 2026-07-31
 ---
 
 # PBOS Artifact Consistency Report
@@ -15,8 +15,8 @@ last_updated: 2026-07-29
 - Artifact conflicts: 0
 - Refresh required: YES
 - Ready for context refresh: YES
-- Evaluated at: 2026-07-29T06:59:30.664Z
-- Run identity: `703b5f3646dd9505bde1d7618383028d8a3a993f9afe48246978738ec0b29f92`
+- Evaluated at: 2026-07-31T01:13:28.189Z
+- Run identity: `37eab4f2e1d2f33e1aa8802c92c297d38367d0f778fb7234a5a9a27a3972c606`
 
 ## Canonical Ownership
 
