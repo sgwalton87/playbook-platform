@@ -101,6 +101,14 @@ export const RuntimeArtifactOwnership: Record<
     persistence: "durable",
     cleanup: "governed-transition",
   },
+  contextRefreshApproval: {
+    path: Artifacts.contextRefreshApproval,
+    owner: "context-refresh-authority",
+    producer: "pbos approve-refresh",
+    consumers: ["repository-context", "mission-control", "governance-audit"],
+    persistence: "durable",
+    cleanup: "governed-transition",
+  },
   trustedBuildContext: {
     path: Artifacts.trustedBuildContext,
     owner: "context-activation-authority",

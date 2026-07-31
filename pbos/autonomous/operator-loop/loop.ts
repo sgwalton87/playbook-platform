@@ -10,6 +10,12 @@ import { runDevelopmentOrchestration } from "../../orchestration";
 import { loadExecutionAuthority } from "../../execution/authority";
 import { loadChangeBoundary } from "../../context/change-boundary";
 import { loadLaunchApproval } from "../../authority/launch";
+import {
+  loadContextRefreshApproval,
+  validateAppliedContextRefreshApproval,
+  validateContextRefreshApproval,
+} from "../../context/refresh";
+import { loadRepositoryContextArtifact } from "../../context/loader";
 import { AutonomousRiskRouter } from "../risk-router";
 import { checkMissionAlignment } from "./mission";
 import type {
@@ -17,7 +23,33 @@ import type {
   PBOSReadinessGuidance,
 } from "./types";
 
-function contextGuidance(reason: string): PBOSReadinessGuidance {
+function contextGuidance(
+  reason: string,
+  refreshApprovalReady: boolean,
+  refreshApprovalApplied: boolean
+): PBOSReadinessGuidance {
+  if (refreshApprovalApplied) {
+    return {
+      current_blocker: "Trusted Build Context is not active.",
+      business_impact: "PBOS cannot select or execute product work until the refreshed context is explicitly activated.",
+      why: "The governed context refresh is complete; trusted context activation remains a separate authority transition.",
+      required_resolution: ["Activate Trusted Context."],
+      responsible_authority: "PBOS Context Activation Authority and human reviewer",
+      commands: ["npm run pbos:context-activate"],
+      expected_next_state: "Governed planning becomes available.",
+    };
+  }
+  if (refreshApprovalReady) {
+    return {
+      current_blocker: "Approved repository context refresh has not been applied.",
+      business_impact: "PBOS cannot activate trusted context until Repository Context Authority records the approved snapshot.",
+      why: "Context Refresh Authority validated the human decision; repository context generation remains pending.",
+      required_resolution: ["Apply the approved repository context refresh."],
+      responsible_authority: "PBOS Context Refresh Authority",
+      commands: ["npm run pbos:refresh"],
+      expected_next_state: "Trusted context activation becomes eligible.",
+    };
+  }
   return {
     current_blocker: "Trusted Build Context is not current.",
     business_impact: "PBOS cannot select or execute product work against untrusted repository reality.",
@@ -47,6 +79,26 @@ export class FounderOperatingLoop {
     const trusted = loadTrustedBuildContext(rootDir)?.latest ?? null;
     const changeBoundary = loadChangeBoundary(rootDir)?.latest ?? null;
     const launchApproval = loadLaunchApproval(rootDir)?.latest ?? null;
+    const refreshApproval = loadContextRefreshApproval(rootDir)?.latest ?? null;
+    const storedContext = loadRepositoryContextArtifact(rootDir);
+    const refreshApprovalValidation = refreshApproval
+      ? refreshApproval.state === "APPLIED"
+        ? validateAppliedContextRefreshApproval(
+            refreshApproval,
+            storedContext?.identity ?? null
+          )
+        : validateContextRefreshApproval({
+            approval: refreshApproval,
+            reconciliation: discovery.reconciliation,
+            timestamp,
+          })
+      : null;
+    const refreshApprovalApplied =
+      refreshApproval?.state === "APPLIED" &&
+      refreshApprovalValidation?.valid === true;
+    const refreshApprovalReady =
+      refreshApproval?.state === "APPROVED" &&
+      refreshApprovalValidation?.valid === true;
     const contextReadiness = assessAutonomousReadiness({
       context: trusted,
       repository: discovery.assessment,
@@ -95,7 +147,11 @@ export class FounderOperatingLoop {
           expected_next_state: "The blocking authority reports VERIFIED.",
         }
       : contextReadiness.current_capability_level !== "GOVERNED_PLANNING"
-        ? contextGuidance(discovery.assessment.findings.join(" "))
+        ? contextGuidance(
+            discovery.assessment.findings.join(" "),
+            refreshApprovalReady,
+            refreshApprovalApplied
+          )
         : !orchestration.executionPackage
           ? {
               current_blocker: "No certified execution package is available.",
@@ -186,6 +242,11 @@ export class FounderOperatingLoop {
           : launchApproval.decision === "REJECTED"
             ? "REJECTED" as const
             : "INVALID" as const
+        : "MISSING" as const,
+      context_refresh_approval_status: refreshApproval
+        ? refreshApprovalValidation?.valid
+          ? "VALID" as const
+          : "INVALID" as const
         : "MISSING" as const,
       context_status: trusted
         ? contextReadiness.current_capability_level === "GOVERNED_PLANNING"

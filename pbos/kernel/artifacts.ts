@@ -16,6 +16,7 @@ export const Artifacts = {
   executionAuthority: "pbos/runtime/execution-authority.json",
   repositoryContext: "pbos/runtime/repository-context.json",
   contextRefresh: "pbos/runtime/context-refresh.json",
+  contextRefreshApproval: "pbos/runtime/context-refresh-approval.json",
   trustedBuildContext: "pbos/runtime/trusted-build-context.json",
   changeBoundary: "pbos/runtime/change-boundary.json",
   launchApproval: "pbos/runtime/launch-approval.json",

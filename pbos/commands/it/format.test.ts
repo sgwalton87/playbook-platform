@@ -40,6 +40,7 @@ describe("it command presentation", () => {
         change_boundary_status: "MISSING",
         boundary_type: "NONE",
         launch_approval_status: "MISSING",
+        context_refresh_approval_status: "MISSING",
         context_status: "MISSING",
         digest: "mission-control",
       },
@@ -67,6 +68,7 @@ describe("it command presentation", () => {
     expect(output).toContain("Human Evidence: MISSING");
     expect(output).toContain("Change boundary: MISSING");
     expect(output).toContain("Launch approval: MISSING");
+    expect(output).toContain("Context Refresh Approval: MISSING");
     expect(output).toContain("Trusted context: MISSING");
     expect(output).toContain("npm run pbos:context-reconcile");
     expect(output).toContain("No action was executed outside existing PBOS authority.");

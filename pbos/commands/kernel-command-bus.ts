@@ -21,6 +21,13 @@ import {
   persistChangeBoundary,
 } from "../context/change-boundary";
 import {
+  ContextRefreshAuthority,
+  applyContextRefreshApproval,
+  createContextRefreshApproval,
+  loadContextRefreshApproval,
+  persistContextRefreshApproval,
+} from "../context/refresh";
+import {
   createLaunchApproval,
   persistLaunchApproval,
 } from "../authority/launch";
@@ -58,6 +65,7 @@ export const KERNEL_COMMANDS = [
   "change-inventory",
   "change-boundary",
   "approve-boundary",
+  "approve-refresh",
 ] as const;
 
 export type KernelCommandName = (typeof KERNEL_COMMANDS)[number];
@@ -255,6 +263,82 @@ export async function dispatchKernelCommand(
         successful: false,
         output: [
           "PBOS HUMAN LAUNCH AUTHORITY",
+          "Decision: BLOCKED",
+          error instanceof Error ? error.message : String(error),
+          "No runtime artifact was created.",
+        ].join("\n"),
+      };
+    }
+  }
+
+  if (command === "approve-refresh") {
+    const discovery = discoverTrustedContext(rootDir);
+    const requesterIdentity = evidenceString(
+      evidenceInput, "requester-identity", process.env.PBOS_REFRESH_REQUESTER_ID
+    );
+    const reviewerIdentity = evidenceString(
+      evidenceInput, "reviewer-identity", process.env.PBOS_REFRESH_REVIEWER_ID
+    );
+    const decision = evidenceString(
+      evidenceInput, "decision", process.env.PBOS_REFRESH_DECISION
+    ).toUpperCase();
+    const reason = evidenceString(
+      evidenceInput, "reason", process.env.PBOS_REFRESH_REASON
+    );
+    const riskAcknowledgment = evidenceString(
+      evidenceInput, "risk-acknowledgment",
+      process.env.PBOS_REFRESH_RISK_ACKNOWLEDGMENT
+    );
+    const expiration = evidenceString(
+      evidenceInput, "expiration", process.env.PBOS_REFRESH_EXPIRATION
+    );
+    if (
+      !requesterIdentity ||
+      !reviewerIdentity ||
+      !["APPROVED", "REJECTED"].includes(decision) ||
+      !reason ||
+      !riskAcknowledgment ||
+      !expiration
+    ) {
+      return {
+        command,
+        successful: false,
+        output: [
+          "PBOS CONTEXT REFRESH AUTHORITY",
+          "Decision: BLOCKED",
+          "Requester, independent reviewer, APPROVED/REJECTED decision, reason, risk acknowledgment, and expiration are required.",
+          "No runtime artifact was created.",
+        ].join("\n"),
+      };
+    }
+    const timestamp = new Date().toISOString();
+    try {
+      const approval = createContextRefreshApproval({
+        reconciliation: discovery.reconciliation,
+        requesterIdentity,
+        reviewerIdentity,
+        decision: decision as "APPROVED" | "REJECTED",
+        decisionReason: reason,
+        riskAcknowledgment,
+        timestamp,
+        expiration,
+      });
+      const artifact = persistContextRefreshApproval(rootDir, approval);
+      return {
+        command,
+        successful: true,
+        output: `PBOS CONTEXT REFRESH AUTHORITY\n${JSON.stringify(
+          { approval, artifact },
+          null,
+          2
+        )}`,
+      };
+    } catch (error: unknown) {
+      return {
+        command,
+        successful: false,
+        output: [
+          "PBOS CONTEXT REFRESH AUTHORITY",
           "Decision: BLOCKED",
           error instanceof Error ? error.message : String(error),
           "No runtime artifact was created.",
@@ -491,17 +575,55 @@ export async function dispatchKernelCommand(
   }
 
   if (command === "refresh") {
-    const orchestration = await runDevelopmentOrchestration(rootDir);
-    return {
-      command,
-      successful: true,
-      output: [
-        "PBOS CONTEXT REFRESH GOVERNANCE",
-        `Context Trust: ${orchestration.input.repository.valid ? "TRUSTED" : "REVIEW_REQUIRED"}`,
-        "Mutation: NOT PERFORMED",
-        "An approved reconciliation-bound refresh request is required.",
-      ].join("\n"),
-    };
+    const timestamp = new Date().toISOString();
+    const discovery = discoverTrustedContext(rootDir, timestamp);
+    const approval = loadContextRefreshApproval(rootDir)?.latest ?? null;
+    if (!approval) {
+      return {
+        command,
+        successful: false,
+        output: [
+          "PBOS CONTEXT REFRESH GOVERNANCE",
+          "Mutation: NOT PERFORMED",
+          "An approved reconciliation-bound refresh request is required.",
+        ].join("\n"),
+      };
+    }
+    try {
+      const result = new ContextRefreshAuthority().refreshApproved(rootDir, {
+        reconciliation: discovery.reconciliation,
+        approval,
+        timestamp,
+      });
+      const applied = applyContextRefreshApproval(
+        approval,
+        result.context.identity,
+        timestamp
+      );
+      persistContextRefreshApproval(rootDir, applied);
+      return {
+        command,
+        successful: true,
+        output: [
+          "PBOS CONTEXT REFRESH GOVERNANCE",
+          "Decision: APPLIED",
+          `Previous Context: ${approval.previous_context_identity ?? "NONE"}`,
+          `Current Context: ${result.context.identity}`,
+          "Trusted Context Activation: NOT PERFORMED",
+          "Next action: Activate Trusted Context",
+        ].join("\n"),
+      };
+    } catch (error: unknown) {
+      return {
+        command,
+        successful: false,
+        output: [
+          "PBOS CONTEXT REFRESH GOVERNANCE",
+          "Mutation: NOT PERFORMED",
+          error instanceof Error ? error.message : String(error),
+        ].join("\n"),
+      };
+    }
   }
 
   if (command === "package") {

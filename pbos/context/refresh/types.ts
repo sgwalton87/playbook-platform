@@ -72,3 +72,39 @@ export interface ContextRefreshEvidence {
   readonly findings: readonly string[];
   readonly digest: string;
 }
+
+export type ContextRefreshDecisionValue = "APPROVED" | "REJECTED";
+export type ContextRefreshApprovalState = "APPROVED" | "REJECTED" | "APPLIED";
+
+export interface ContextRefreshApprovalRecord {
+  readonly approval_id: string;
+  readonly requester_identity: string;
+  readonly reviewer_identity: string;
+  readonly decision: ContextRefreshDecisionValue;
+  readonly decision_reason: string;
+  readonly risk_acknowledgment: string;
+  readonly repository_identity: string;
+  readonly branch_identity: string;
+  readonly commit_identity: string;
+  readonly reconciliation_digest: string;
+  readonly previous_context_identity: string | null;
+  readonly proposed_context_identity: string;
+  readonly state: ContextRefreshApprovalState;
+  readonly timestamp: string;
+  readonly expiration: string;
+  readonly applied_at: string | null;
+  readonly resulting_context_identity: string | null;
+  readonly digest: string;
+}
+
+export interface ContextRefreshApprovalHistory {
+  readonly owner: "context-refresh-authority";
+  readonly latest: ContextRefreshApprovalRecord;
+  readonly history: readonly ContextRefreshApprovalRecord[];
+  readonly digest: string;
+}
+
+export interface ContextRefreshApprovalValidation {
+  readonly valid: boolean;
+  readonly findings: readonly string[];
+}

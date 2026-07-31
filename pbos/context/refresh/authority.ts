@@ -1,6 +1,8 @@
 import { artifactDigest } from "../../kernel/identity";
 import { refreshRepositoryContext } from "../lifecycle";
+import { validateContextRefreshApproval } from "./approval";
 import type {
+  ContextRefreshApprovalRecord,
   ContextRefreshApproval,
   ContextRefreshAuthorityInput,
   ContextRefreshState,
@@ -17,6 +19,11 @@ const TRANSITIONS: Readonly<Record<ContextRefreshState, readonly ContextRefreshS
 };
 
 export class ContextRefreshAuthority {
+  constructor(
+    private readonly contextRefresher: typeof refreshRepositoryContext =
+      refreshRepositoryContext
+  ) {}
+
   transition(
     current: ContextRefreshApproval,
     state: ContextRefreshState,
@@ -54,9 +61,33 @@ export class ContextRefreshAuthority {
     ) {
       throw new Error("Governed context refresh authorization is invalid.");
     }
-    return refreshRepositoryContext({
+    return this.contextRefresher({
       rootDir,
       reason: input.request.reason,
+    });
+  }
+
+  refreshApproved(
+    rootDir: string,
+    input: {
+      readonly reconciliation: ContextRefreshAuthorityInput["reconciliation"];
+      readonly approval: ContextRefreshApprovalRecord;
+      readonly timestamp?: string;
+    }
+  ): ReturnType<typeof refreshRepositoryContext> {
+    const validation = validateContextRefreshApproval({
+      approval: input.approval,
+      reconciliation: input.reconciliation,
+      timestamp: input.timestamp ?? new Date().toISOString(),
+    });
+    if (!validation.valid) {
+      throw new Error(
+        `Governed context refresh authorization is invalid:\n${validation.findings.join("\n")}`
+      );
+    }
+    return this.contextRefresher({
+      rootDir,
+      reason: input.approval.decision_reason,
     });
   }
 }

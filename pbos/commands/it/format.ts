@@ -64,6 +64,7 @@ export function formatItCommand(result: FounderOperatingLoopResult): string {
         ? "ACTIVE"
         : result.mission_control.launch_approval_status
     }`,
+    `Context Refresh Approval: ${result.mission_control.context_refresh_approval_status}`,
     `Trusted context: ${trustedContextDisplay}`,
     `Execution state: ${result.mission_control.execution_state}`,
     `Evidence state: ${result.mission_control.evidence_state}`,

@@ -2,7 +2,11 @@ import { createInterface } from "node:readline/promises";
 import type { Readable, Writable } from "node:stream";
 
 export type FounderEvidenceInput = Readonly<Record<string, string | readonly string[]>>;
-type EvidenceCommand = "change-boundary" | "approve-boundary" | string;
+type EvidenceCommand =
+  | "change-boundary"
+  | "approve-boundary"
+  | "approve-refresh"
+  | string;
 
 type Prompt = (label: string) => Promise<string>;
 const LIST_FIELDS = new Set(["approved-files", "excluded-files"]);
@@ -64,7 +68,11 @@ export async function collectFounderEvidenceInput(
   prompt: Prompt,
   baselineAvailable = false
 ): Promise<FounderEvidenceInput> {
-  if (command !== "change-boundary" && command !== "approve-boundary") return initial;
+  if (
+    command !== "change-boundary" &&
+    command !== "approve-boundary" &&
+    command !== "approve-refresh"
+  ) return initial;
   const entries = new Map(Object.entries(initial));
   if (command === "change-boundary" && baselineAvailable &&
     !entries.get("boundary-type")) {
@@ -106,7 +114,9 @@ export async function readFounderEvidenceInput(input: {
 }): Promise<FounderEvidenceInput> {
   const parsed = parseFounderEvidenceArguments(input.args);
   if (!input.interactive ||
-    (input.command !== "change-boundary" && input.command !== "approve-boundary")) {
+    (input.command !== "change-boundary" &&
+      input.command !== "approve-boundary" &&
+      input.command !== "approve-refresh")) {
     return parsed;
   }
   const terminal = createInterface({

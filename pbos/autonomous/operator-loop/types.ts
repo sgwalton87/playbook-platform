@@ -35,6 +35,7 @@ export interface EnterpriseMissionControlSnapshot {
   readonly change_boundary_status: "APPROVED" | "MISSING" | "INVALID";
   readonly boundary_type: "CHANGE" | "BASELINE_ACTIVATION" | "NONE";
   readonly launch_approval_status: "APPROVED" | "REJECTED" | "MISSING" | "INVALID";
+  readonly context_refresh_approval_status: "VALID" | "MISSING" | "INVALID";
   readonly context_status: "TRUSTED" | "MISSING" | "INVALID";
   readonly digest: string;
 }

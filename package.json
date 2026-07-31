@@ -59,6 +59,7 @@
     "pbos:change-inventory": "tsx pbos/commands/kernel-cli.ts change-inventory",
     "pbos:change-boundary": "tsx pbos/commands/kernel-cli.ts change-boundary",
     "pbos:approve-boundary": "tsx pbos/commands/kernel-cli.ts approve-boundary",
+    "pbos:approve-refresh": "tsx pbos/commands/kernel-cli.ts approve-refresh",
     "pbos:report": "tsx pbos/commands/kernel-cli.ts report",
     "pbos:certify": "tsx pbos/commands/kernel-cli.ts certify",
     "pbos": "tsx pbos/commands/kernel-cli.ts",
