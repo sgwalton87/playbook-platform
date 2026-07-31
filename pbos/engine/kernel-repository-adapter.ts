@@ -10,7 +10,11 @@ import {
 } from "../kernel/execution";
 import { planConstitutionalGate } from "../planner";
 import { loadConstitutionalGates } from "../planner/load";
-import { loadMasterBuildManifest, type BuildMilestone } from "../manifests";
+import {
+  loadMasterBuildManifest,
+  resolveBuildMilestoneLifecycle,
+  type BuildMilestone,
+} from "../manifests";
 import { completedMilestoneIds } from "../execution/evidence";
 import { loadConfig } from "./config";
 import { loadState } from "./state";
@@ -23,6 +27,12 @@ export async function createRepositoryKernelInput(
   const gates = loadConstitutionalGates(rootDir, config.gatesDirectory);
   const buildManifest = loadMasterBuildManifest(rootDir);
   const runtimeCompletedMilestones = completedMilestoneIds(rootDir);
+  const completedBuildMilestones = new Set([
+    ...runtimeCompletedMilestones,
+    ...buildManifest.manifest.milestones
+      .filter(({ status }) => status === "COMPLETE" || status === "ARCHIVED")
+      .map(({ id }) => id),
+  ]);
   const planning = await planConstitutionalGate({ rootDir, persist: false });
   const stored = loadRepositoryContextArtifact(rootDir);
   if (!stored) {
@@ -84,14 +94,10 @@ export async function createRepositoryKernelInput(
   }));
   const risk = { GREEN: 20, YELLOW: 60, RED: 100 } as const;
   const milestoneState = (milestone: BuildMilestone): KernelObjective["state"] => {
-    if (runtimeCompletedMilestones.has(milestone.id)) return "COMPLETED";
-    if (milestone.status === "COMPLETE" || milestone.status === "ARCHIVED") return "COMPLETED";
-    if (milestone.status === "READY") return "READY";
-    if (milestone.status === "PLANNED") return "PLANNED";
-    if (milestone.status === "AUTHORIZED" || milestone.status === "IN_PROGRESS" || milestone.status === "VALIDATING") {
-      return "IN_PROGRESS";
-    }
-    return "BLOCKED";
+    return resolveBuildMilestoneLifecycle(
+      milestone,
+      completedBuildMilestones
+    ).resolved_state;
   };
   const buildChildren = new Map<string, string[]>();
   for (const milestone of buildManifest.manifest.milestones) {
@@ -119,10 +125,20 @@ export async function createRepositoryKernelInput(
     estimatedEffort: milestone.validation_requirements.length + milestone.outputs.length,
     criticalPath: (buildChildren.get(milestone.id)?.length ?? 0) > 0,
     authority: buildManifest.manifest.authority,
-    blockers:
-      milestone.status === "BLOCKED"
-        ? [`MANIFEST_STATE_${milestone.status}`]
-        : [],
+    blockers: (() => {
+      const lifecycle = resolveBuildMilestoneLifecycle(
+        milestone,
+        completedBuildMilestones
+      );
+      return lifecycle.resolved_state === "BLOCKED"
+        ? [
+            `MANIFEST_STATE_${milestone.status}`,
+            ...lifecycle.incomplete_dependencies.map(
+              (dependency) => `DEPENDENCY_INCOMPLETE:${dependency}`
+            ),
+          ]
+        : [];
+    })(),
     requiredApprovals: [],
     approvals: [],
     validations: [...milestone.validation_requirements],

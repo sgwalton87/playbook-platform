@@ -1,5 +1,6 @@
 import { assessMissionOutput, selectedMilestone } from "./assessment";
 import { formatMissionHeader, formatMissionOutcome } from "./report";
+import { formatRoadmapContinuity, resolveRoadmapContinuity } from "./continuity";
 import {
   formatProductMission,
   generateProductMissionPackages,
@@ -35,6 +36,7 @@ export async function runMissionControl(
   }
 
   const selected = selectedMilestone(planning.output);
+  const continuity = resolveRoadmapContinuity(rootDir, selected);
   generateProductMissionPackages(rootDir, selected);
   const productMission = resolveProductMission(
     rootDir,
@@ -53,6 +55,8 @@ export async function runMissionControl(
         "",
         "PHASE 2 - MISSION PLANNING",
         planning.output,
+        "",
+        formatRoadmapContinuity(continuity),
         "",
         formatProductMission(productMission),
         "",
@@ -87,6 +91,8 @@ export async function runMissionControl(
       "",
       "PHASE 2 - MISSION PLANNING",
       planning.output,
+      "",
+      formatRoadmapContinuity(continuity),
       "",
       "PHASES 3-7 - AUTHORITY, EXECUTION, EVIDENCE, ADVANCEMENT",
       execution.output,

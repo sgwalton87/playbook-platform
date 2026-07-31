@@ -2,6 +2,7 @@ import { mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { resolveBuildMilestoneLifecycle } from "./lifecycle";
 import { loadMasterBuildManifest } from "./loader";
 
 function writeManifest(value: unknown): string {
@@ -89,14 +90,24 @@ describe("master build manifest", () => {
     );
   });
 
-  it("registers Scholar Experience product definition before Scholar OS", () => {
+  it("registers the Scholar Experience construction lifecycle", () => {
     const manifest = loadMasterBuildManifest(process.cwd()).manifest;
     const product = manifest.milestones.find(
       ({ id }) => id === "SCHOLAR-EXPERIENCE-V1-PRODUCT-DEFINITION-001"
     );
+    const implementation = manifest.milestones.find(
+      ({ id }) => id === "SCHOLAR-EXPERIENCE-V1-IMPLEMENTATION-001"
+    );
     const scholar = manifest.milestones.find(({ id }) => id === "SCHOLAR-OS-001");
     expect(product?.status).toBe("READY");
     expect(product?.dependencies).toEqual(["PBOS-PRODUCT-FACTORY-BUILD-PACKAGE-VALIDATION-001"]);
-    expect(scholar?.blocking_dependencies).toEqual([product?.id]);
+    expect(implementation?.dependencies).toEqual([product?.id]);
+    expect(scholar?.dependencies).toEqual([implementation?.id]);
+    expect(
+      resolveBuildMilestoneLifecycle(
+        implementation!,
+        new Set([product!.id])
+      ).resolved_state
+    ).toBe("READY");
   });
 });

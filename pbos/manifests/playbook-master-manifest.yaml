@@ -82,11 +82,24 @@
       }
     },
     {
-      "id": "SCHOLAR-OS-001", "name": "Scholar OS", "type": "OPERATING_SYSTEM", "description": "Govern the Scholar operating experience.", "domain": "operating-systems",
-      "priority": 95, "status": "DEFINED", "dependencies": [], "blocking_dependencies": ["SCHOLAR-EXPERIENCE-V1-PRODUCT-DEFINITION-001"],
-      "required_capabilities": ["scholar-experience"], "required_artifacts": ["docs/EXPERIENCE/PBOS_SCHOLAR_OS_ARCHITECTURE.md"], "validation_requirements": ["experience-certification"],
-      "risk_level": "YELLOW", "approval_level": "HUMAN", "completion_definition": ["Scholar OS is validated and certified."], "evidence_requirements": ["Experience evidence"],
-      "owner": "Scholar OS Governance", "version": "1.0.0", "outputs": []
+      "id": "SCHOLAR-EXPERIENCE-V1-IMPLEMENTATION-001", "name": "Scholar Experience V1 Implementation", "type": "MILESTONE",
+      "description": "Implement the approved Scholar Experience V1 engineering package through bounded application changes.", "domain": "features",
+      "priority": 98, "status": "DEFINED", "dependencies": ["SCHOLAR-EXPERIENCE-V1-PRODUCT-DEFINITION-001"], "blocking_dependencies": [],
+      "required_capabilities": ["scholar-experience", "web-runtime", "human-authorization"],
+      "required_artifacts": ["docs/release-evidence/SCHOLAR_EXPERIENCE_V1_PRODUCT_REQUIREMENTS_001.md", "docs/release-evidence/SCHOLAR_EXPERIENCE_V1_EXPERIENCE_PACKAGE_001.md", "docs/release-evidence/SCHOLAR_EXPERIENCE_V1_ENGINEERING_PACKAGE_001.md"],
+      "validation_requirements": ["package-identity", "permission-boundary", "npm run lint", "npm test", "npm run build"],
+      "risk_level": "YELLOW", "approval_level": "HUMAN",
+      "completion_definition": ["Scholar Experience V1 implements the approved package within declared scope.", "Lint, tests, build, accessibility states, and evidence validation pass."],
+      "evidence_requirements": ["Command inventory", "File change inventory", "Validation results", "Implementation evidence"],
+      "owner": "Scholar OS Engineering", "version": "1.0.0",
+      "outputs": ["app/home/page.tsx", "app/profile/page.tsx", "app/journey/page.tsx", "app/academic-readiness/page.tsx", "app/opportunities/page.tsx", "app/connections/page.tsx", "app/gamification/page.tsx", "app/notifications/page.tsx", "app/settings/page.tsx", "docs/release-evidence/SCHOLAR_EXPERIENCE_V1_IMPLEMENTATION_EVIDENCE_001.md"]
+    },
+    {
+      "id": "SCHOLAR-OS-001", "name": "Scholar OS Certification", "type": "OPERATING_SYSTEM", "description": "Certify the implemented Scholar operating experience without owning implementation.", "domain": "operating-systems",
+      "priority": 95, "status": "DEFINED", "dependencies": ["SCHOLAR-EXPERIENCE-V1-IMPLEMENTATION-001"], "blocking_dependencies": [],
+      "required_capabilities": ["scholar-experience", "experience-certification"], "required_artifacts": ["docs/EXPERIENCE/PBOS_SCHOLAR_OS_ARCHITECTURE.md", "docs/release-evidence/SCHOLAR_EXPERIENCE_V1_IMPLEMENTATION_EVIDENCE_001.md"], "validation_requirements": ["experience-certification"],
+      "risk_level": "YELLOW", "approval_level": "HUMAN", "completion_definition": ["Scholar OS implementation evidence is independently validated and certified."], "evidence_requirements": ["Experience evidence", "Accessibility evidence", "Performance evidence", "Certification decision"],
+      "owner": "Scholar OS Governance", "version": "1.0.0", "outputs": ["docs/release-evidence/SCHOLAR_OS_V1_CERTIFICATION_001.md"]
     },
     {
       "id": "SCHOLAR-ATHLETE-OS-001", "name": "Scholar-Athlete OS", "type": "OPERATING_SYSTEM", "description": "Govern scholar-athlete experiences.", "domain": "operating-systems",
