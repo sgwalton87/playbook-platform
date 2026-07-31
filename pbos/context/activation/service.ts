@@ -27,6 +27,11 @@ import type {
 } from "./types";
 import type { ChangeBoundaryDeclaration } from "../change-boundary";
 import type { LaunchApprovalRecord } from "../../authority/launch";
+import {
+  loadContextRefreshApproval,
+  validateAppliedContextRefreshApproval,
+  type ContextRefreshApprovalRecord,
+} from "../refresh";
 
 function filesUnder(rootDir: string, relativeDir: string): string[] {
   const absolute = path.join(rootDir, relativeDir);
@@ -110,6 +115,30 @@ export function discoverTrustedContext(
         timestamp,
       })
     : { valid: false, findings: ["Human launch approval is missing."] };
+  const storedContext = loadRepositoryContextArtifact(rootDir);
+  const refreshApproval = loadContextRefreshApproval(rootDir)?.latest ?? null;
+  const refreshApprovalValidation = refreshApproval
+    ? validateAppliedContextRefreshApproval(
+        refreshApproval,
+        storedContext?.identity ?? null
+      )
+    : { valid: false, findings: ["Applied context refresh approval is missing."] };
+  const refreshAuthorityValid =
+    refreshApprovalValidation.valid &&
+    Boolean(refreshApproval?.requester_identity) &&
+    Boolean(refreshApproval?.reviewer_identity) &&
+    refreshApproval?.requester_identity !== refreshApproval?.reviewer_identity &&
+    Boolean(refreshApproval?.decision_reason) &&
+    Boolean(refreshApproval?.risk_acknowledgment) &&
+    Date.parse(refreshApproval?.expiration ?? "") > Date.parse(timestamp) &&
+    refreshApproval?.repository_identity === assessment.repository_identity &&
+    refreshApproval.branch_identity === assessment.current_branch &&
+    refreshApproval.commit_identity === assessment.current_commit &&
+    refreshApproval.proposed_context_identity === baselineIdentity.context_digest;
+  const boundaryAuthorityValid =
+    changeBoundaryValidation.valid &&
+    launchApprovalValidation.valid &&
+    launchApproval?.decision === "APPROVED";
   const snapshotBody = {
     context_id: assessment.assessment_id,
     repository_identity: assessment.repository_identity,
@@ -134,6 +163,16 @@ export function discoverTrustedContext(
     launch_approval_reviewer_identity: launchApproval?.reviewer_identity ?? "",
     launch_approval_valid:
       launchApprovalValidation.valid && launchApproval?.decision === "APPROVED",
+    activation_authority_type: refreshAuthorityValid
+      ? "CONTEXT_REFRESH_APPROVAL" as const
+      : "BOUNDARY_LAUNCH_APPROVAL" as const,
+    activation_authority_identity: refreshAuthorityValid
+      ? refreshApproval?.digest ?? ""
+      : launchApproval?.digest ?? "",
+    activation_authority_reviewer_identity: refreshAuthorityValid
+      ? refreshApproval?.reviewer_identity ?? ""
+      : launchApproval?.reviewer_identity ?? "",
+    activation_authority_valid: refreshAuthorityValid || boundaryAuthorityValid,
   };
   const activation_snapshot = {
     ...snapshotBody,
@@ -273,9 +312,37 @@ export function resolveAuthorityLinkedActivation(input: {
   readonly discovery: ActivationDiscoveryEvidence;
   readonly boundary: ChangeBoundaryDeclaration | null;
   readonly approval: LaunchApprovalRecord | null;
+  readonly refreshApproval?: ContextRefreshApprovalRecord | null;
   readonly timestamp: string;
 }): AuthorityLinkedActivationResolution {
   const { boundary, approval, discovery } = input;
+  const refreshApproval = input.refreshApproval ?? null;
+  if (
+    discovery.activation_snapshot.activation_authority_type ===
+      "CONTEXT_REFRESH_APPROVAL" &&
+    discovery.activation_snapshot.activation_authority_valid &&
+    refreshApproval?.state === "APPLIED" &&
+    refreshApproval.decision === "APPROVED" &&
+    discovery.activation_snapshot.activation_authority_identity ===
+      refreshApproval.digest
+  ) {
+    const evidence = createActivationEvidence({
+      discovery,
+      requestedBy: refreshApproval.requester_identity,
+      reviewerIdentity: refreshApproval.reviewer_identity,
+      decision: "APPROVED",
+      reason: refreshApproval.decision_reason,
+      riskAcknowledgement: refreshApproval.risk_acknowledgment,
+      timestamp: input.timestamp,
+      expirationTimestamp: refreshApproval.expiration,
+      authorityEvidenceReferences: [refreshApproval.digest],
+    });
+    return {
+      valid: evidence.outcome.decision === "TRUSTED",
+      findings: evidence.outcome.findings,
+      evidence,
+    };
+  }
   const approvalValidation = approval
     ? validateLaunchApproval({
         approval,
@@ -343,6 +410,7 @@ export function createAuthorityLinkedActivationEvidence(
     discovery,
     boundary: loadChangeBoundary(rootDir)?.latest ?? null,
     approval: loadLaunchApproval(rootDir)?.latest ?? null,
+    refreshApproval: loadContextRefreshApproval(rootDir)?.latest ?? null,
     timestamp,
   });
 }

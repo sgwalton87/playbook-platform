@@ -14,6 +14,12 @@ export function activateBuildContext(
   timestamp: string,
   expirationTimestamp: string
 ): ContextActivationEvidence {
+  const activationAuthorityValid =
+    snapshot.activation_authority_valid ??
+    (snapshot.change_boundary_valid && snapshot.launch_approval_valid);
+  const activationReviewerIdentity =
+    snapshot.activation_authority_reviewer_identity ??
+    snapshot.launch_approval_reviewer_identity;
   const findings = [
     ...(artifactDigest({ ...snapshot, digest: undefined }) !== snapshot.digest
       ? ["Context snapshot digest is invalid."]
@@ -38,11 +44,12 @@ export function activateBuildContext(
     ...(!snapshot.artifact_digest ? ["Artifact digest is invalid."] : []),
     ...(!snapshot.architecture_digest ? ["Architecture digest is invalid."] : []),
     ...(!snapshot.governance_digest ? ["Governance digest is invalid."] : []),
-    ...(!snapshot.change_boundary_identity || !snapshot.change_boundary_valid
-      ? ["Approved change boundary is required."]
+    ...(!snapshot.activation_authority_identity &&
+    (!snapshot.change_boundary_identity || !snapshot.launch_approval_identity)
+      ? ["Context activation authority identity is required."]
       : []),
-    ...(!snapshot.launch_approval_identity || !snapshot.launch_approval_valid
-      ? ["Valid human launch approval is required."]
+    ...(!activationAuthorityValid
+      ? ["Valid context activation authority is required."]
       : []),
     ...(!snapshot.governance_state_valid ? ["Governance state is invalid."] : []),
     ...(request.snapshot_digest !== snapshot.digest ? ["Context snapshot identity changed."] : []),
@@ -52,7 +59,7 @@ export function activateBuildContext(
     ...(decision.context_id !== snapshot.context_id
       ? ["Human decision context identity mismatches."]
       : []),
-    ...(decision.reviewer_identity !== snapshot.launch_approval_reviewer_identity
+    ...(decision.reviewer_identity !== activationReviewerIdentity
       ? ["Context reviewer does not match launch approval reviewer."]
       : []),
     ...(decision.decision !== "APPROVED" ? ["Human context approval is absent."] : []),
@@ -87,6 +94,12 @@ export function activateBuildContext(
           governance_digest: snapshot.governance_digest,
           change_boundary_identity: snapshot.change_boundary_identity,
           launch_approval_identity: snapshot.launch_approval_identity,
+          activation_authority_type:
+            snapshot.activation_authority_type ??
+            "BOUNDARY_LAUNCH_APPROVAL",
+          activation_authority_identity:
+            snapshot.activation_authority_identity ??
+            snapshot.launch_approval_identity,
           activation_decision_id: decision.decision_id,
           created_timestamp: timestamp,
           expiration_timestamp: expirationTimestamp,

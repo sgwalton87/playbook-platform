@@ -193,6 +193,81 @@ describe("context activation", () => {
     );
   });
 
+  it("activates from a matching applied context refresh approval", () => {
+    const base = snapshot();
+    const refreshBody = {
+      approval_id: "REFRESH-APPROVAL-001",
+      requester_identity: "human-operator",
+      reviewer_identity: "human-reviewer",
+      decision: "APPROVED" as const,
+      decision_reason: "Approved the exact committed context transition.",
+      risk_acknowledgment: "Refresh risk reviewed.",
+      repository_identity: base.repository_identity,
+      branch_identity: base.branch_identity,
+      commit_identity: base.commit_identity,
+      reconciliation_digest: "reconciliation",
+      previous_context_identity: "old-context",
+      proposed_context_identity: "new-context",
+      state: "APPLIED" as const,
+      timestamp: "2026-07-30T00:00:00.000Z",
+      expiration: expiresAt,
+      applied_at: activatedAt,
+      resulting_context_identity: "new-context",
+    };
+    const refreshApproval = {
+      ...refreshBody,
+      digest: artifactDigest(refreshBody),
+    };
+    const snapshotBody = {
+      ...base,
+      change_boundary_valid: false,
+      launch_approval_valid: false,
+      activation_authority_type: "CONTEXT_REFRESH_APPROVAL" as const,
+      activation_authority_identity: refreshApproval.digest,
+      activation_authority_reviewer_identity:
+        refreshApproval.reviewer_identity,
+      activation_authority_valid: true,
+      digest: undefined,
+    };
+    const activationSnapshot = {
+      ...snapshotBody,
+      digest: artifactDigest(snapshotBody),
+    };
+    const result = resolveAuthorityLinkedActivation({
+      discovery: {
+        assessment: { digest: "assessment" },
+        reconciliation: { digest: "reconciliation" },
+        activation_snapshot: activationSnapshot,
+      },
+      boundary: null,
+      approval: null,
+      refreshApproval,
+      timestamp: activatedAt,
+    });
+    expect(result.valid).toBe(true);
+    expect(result.evidence?.decision.evidence_references).toContain(
+      refreshApproval.digest
+    );
+    expect(result.evidence?.trusted_context?.activation_authority_type).toBe(
+      "CONTEXT_REFRESH_APPROVAL"
+    );
+    const expired = resolveAuthorityLinkedActivation({
+      discovery: {
+        assessment: { digest: "assessment" },
+        reconciliation: { digest: "reconciliation" },
+        activation_snapshot: activationSnapshot,
+      },
+      boundary: null,
+      approval: null,
+      refreshApproval,
+      timestamp: "2026-08-01T00:00:00.000Z",
+    });
+    expect(expired.valid).toBe(false);
+    expect(expired.findings).toContain(
+      "Context expiration must follow activation."
+    );
+  });
+
   it("blocks missing and digest-mismatched approval artifacts", () => {
     const value = linkedEvidence();
     expect(resolveAuthorityLinkedActivation({

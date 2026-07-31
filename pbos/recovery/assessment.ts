@@ -103,6 +103,16 @@ function deriveState(evidence: PBOSRecoveryEvidence): {
   if (evidence.trusted) {
     return { phase: "TRUSTED", transition: "NONE" };
   }
+  if (
+    evidence.refreshApproval === "VALID" &&
+    evidence.refreshApprovalState === "APPLIED" &&
+    evidence.reconciliation.reconciliation_state === "VERIFIED"
+  ) {
+    return {
+      phase: "TRUST_ACTIVATION_READY",
+      transition: "CONTEXT_ACTIVATION_REQUIRED",
+    };
+  }
   const committedContextTransition =
     evidence.sourceChangeCount === 0 &&
     (evidence.trustedCommitIdentity === null ||

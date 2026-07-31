@@ -130,6 +130,28 @@ describe("PBOS recovery orchestrator", () => {
     );
   });
 
+  it("activates an already applied refresh instead of requesting approval again", () => {
+    const assessment = buildPBOSRecoveryAssessment(
+      evidence({
+        sourceChangeCount: 0,
+        trustedCommitIdentity: "b".repeat(40),
+        refreshApproval: "VALID",
+        refreshApprovalState: "APPLIED",
+        reconciliation: {
+          reconciliation_state: "VERIFIED",
+          previous_identity: "new-context",
+          proposed_identity: "new-context",
+          stored_identity: "new-context",
+          validation: "PASS",
+        },
+      }),
+      now
+    );
+    expect(assessment.recommended_transition).toBe(
+      "CONTEXT_ACTIVATION_REQUIRED"
+    );
+  });
+
   it("produces deterministic output for unchanged inputs", () => {
     const first = buildPBOSRecoveryAssessment(evidence(), now);
     const second = buildPBOSRecoveryAssessment(

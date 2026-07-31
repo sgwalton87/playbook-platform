@@ -16,6 +16,12 @@ export interface ContextActivationSnapshot {
   readonly launch_approval_identity: string;
   readonly launch_approval_reviewer_identity: string;
   readonly launch_approval_valid: boolean;
+  readonly activation_authority_type?:
+    | "BOUNDARY_LAUNCH_APPROVAL"
+    | "CONTEXT_REFRESH_APPROVAL";
+  readonly activation_authority_identity?: string;
+  readonly activation_authority_reviewer_identity?: string;
+  readonly activation_authority_valid?: boolean;
   readonly governance_state_valid: boolean;
   readonly digest: string;
 }
@@ -62,6 +68,10 @@ export interface TrustedBuildContext {
   readonly governance_digest: string;
   readonly change_boundary_identity: string;
   readonly launch_approval_identity: string;
+  readonly activation_authority_type?:
+    | "BOUNDARY_LAUNCH_APPROVAL"
+    | "CONTEXT_REFRESH_APPROVAL";
+  readonly activation_authority_identity?: string;
   readonly activation_decision_id: string;
   readonly created_timestamp: string;
   readonly expiration_timestamp: string;
