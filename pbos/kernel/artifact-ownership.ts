@@ -117,6 +117,14 @@ export const RuntimeArtifactOwnership: Record<
     persistence: "durable",
     cleanup: "governed-transition",
   },
+  executionTelemetry: {
+    path: Artifacts.executionTelemetry,
+    owner: "execution-provider-telemetry",
+    producer: "Codex execution provider adapter",
+    consumers: ["operator", "execution-fabric", "observability", "audit"],
+    persistence: "durable",
+    cleanup: "governed-transition",
+  },
   milestoneAdvancement: {
     path: Artifacts.milestoneAdvancement,
     owner: "milestone-lifecycle-governance",

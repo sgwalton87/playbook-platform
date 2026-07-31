@@ -18,6 +18,7 @@ export const Artifacts = {
   executionFabricAuthorization: "pbos/runtime/execution-fabric-authorization.json",
   executionAssignment: "pbos/runtime/execution-assignment.json",
   executionEvidence: "pbos/runtime/execution-evidence.json",
+  executionTelemetry: "pbos/runtime/execution-telemetry.json",
   milestoneAdvancement: "pbos/runtime/milestone-advancement.json",
   repositoryContext: "pbos/runtime/repository-context.json",
   contextRefresh: "pbos/runtime/context-refresh.json",
