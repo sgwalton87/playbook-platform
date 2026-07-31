@@ -1,13 +1,11 @@
-"use client";
-
-import OpportunityMarketplace from "@/components/opportunity-marketplace/OpportunityMarketplace";
-
-const demoCourses = [
-  { name: "Biology", subject: "science", credits: 10, completed: true },
-  { name: "Algebra II", subject: "math", credits: 10, completed: true },
-  { name: "English 9", subject: "english", credits: 10, completed: true },
-];
+import Link from "next/link";
 
 export default function OpportunitiesPage() {
-  return <OpportunityMarketplace courses={demoCourses} />;
+  return <main style={page}>
+    <header style={header}><p style={eyebrow}>Opportunity galaxy</p><h1 style={title}>Explore options without guessing.</h1><p style={lead}>Opportunity matches must identify their source, eligibility evidence, reasoning, confidence, and expiration before you choose to save or pursue them.</p></header>
+    <section style={panel} aria-labelledby="opportunity-state"><h2 id="opportunity-state">Your matches</h2><div role="status" style={empty}><strong>No evidence-backed matches are available.</strong><span>This is missing evidence, not zero potential. Add academic or achievement evidence to help Playbook evaluate governed sources.</span><div style={actions}><Link href="/academic-readiness" style={primary}>Review academic evidence</Link><Link href="/profile" style={secondary}>Review Scholar Record</Link></div></div></section>
+    <section style={panel} aria-labelledby="match-contract"><h2 id="match-contract">What every match will show</h2><ul style={list}><li>Source and last observed time</li><li>Eligibility evidence and unknowns</li><li>Match reasoning and confidence</li><li>Alternatives, deadline, and recovery path</li><li>Your confirmation before a consequential action</li></ul></section>
+    <aside style={boundary}><strong>Availability boundary:</strong> no opportunity is presented as eligible, saved, applied to, or completed without an authorized source and a confirmed human action.</aside>
+  </main>;
 }
+const page:React.CSSProperties={minHeight:"100vh",background:"#F8F7F4",padding:"clamp(22px,5vw,60px)",color:"#0F172A",fontFamily:"system-ui,sans-serif"}; const header:React.CSSProperties={maxWidth:960,margin:"0 auto 26px"}; const eyebrow:React.CSSProperties={color:"#C2410C",fontWeight:800,textTransform:"uppercase",letterSpacing:".15em",fontSize:11}; const title:React.CSSProperties={fontSize:"clamp(40px,6vw,68px)",lineHeight:1,margin:"12px 0"}; const lead:React.CSSProperties={color:"#475569",fontSize:17,lineHeight:1.65,maxWidth:760}; const panel:React.CSSProperties={maxWidth:960,margin:"18px auto",background:"#fff",border:"1px solid #E2E8F0",borderRadius:20,padding:24}; const empty:React.CSSProperties={display:"grid",gap:10,background:"#FFF7ED",border:"1px dashed #FDBA74",padding:22,borderRadius:14,color:"#475569"}; const actions:React.CSSProperties={display:"flex",gap:10,flexWrap:"wrap",marginTop:8}; const primary:React.CSSProperties={background:"#F97316",color:"#fff",textDecoration:"none",padding:"11px 14px",borderRadius:10,fontWeight:800}; const secondary:React.CSSProperties={border:"1px solid #CBD5E1",color:"#0F172A",textDecoration:"none",padding:"11px 14px",borderRadius:10,fontWeight:800}; const list:React.CSSProperties={lineHeight:1.9,color:"#475569"}; const boundary:React.CSSProperties={maxWidth:960,margin:"18px auto",padding:18,background:"#EFF6FF",borderLeft:"4px solid #2563EB",lineHeight:1.6};

@@ -38,6 +38,7 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState("");
   const [activeSection, setActiveSection] = useState("personal");
 
   const [firstName, setFirstName] = useState("");
@@ -138,8 +139,8 @@ export default function ProfilePage() {
 
   const save = async () => {
     if(!profile?.id)return;
-    setSaving(true);
-    await supabase.from("profiles").update({
+    setSaving(true);setSaveError("");
+    const {error}=await supabase.from("profiles").update({
       first_name:firstName,last_name:lastName,full_name:`${firstName} ${lastName}`.trim(),bio,gender,date_of_birth:dob||null,favorite_quote:favoriteQuote||null,
       school,grade,school_district:district,grad_year:gradYear,weighted_gpa:weightedGpa||null,unweighted_gpa:unweightedGpa||null,city,zip_code:zipCode,english_language_learner:ell,dream_school:dreamSchool||null,sat_score:satScore||null,act_score:actScore||null,intended_major:intendedMajor||null,
       college_list_2:collegeList[0]||null,college_list_3:collegeList[1]||null,college_list_4:collegeList[2]||null,college_list_5:collegeList[3]||null,college_list_6:collegeList[4]||null,college_list_7:collegeList[5]||null,college_list_8:collegeList[6]||null,college_list_9:collegeList[7]||null,college_list_10:collegeList[8]||null,
@@ -149,7 +150,9 @@ export default function ProfilePage() {
       instagram:instagram||null,tiktok:tiktok||null,twitter:twitter||null,hudl:hudl||null,youtube:youtube||null,
       pillars,race:race||null,household_income:householdIncome||null,first_generation:firstGen,free_reduced_lunch:freeLunch,migrant_student:migrant,foster_youth:fosterYouth,unhoused,has_iep:iep,
     }).eq("id",profile.id);
-    setSaving(false);setSaved(true);setTimeout(()=>setSaved(false),3000);
+    setSaving(false);
+    if(error){setSaveError("Your changes were not saved. Review your connection and try again.");return;}
+    setSaved(true);setTimeout(()=>setSaved(false),3000);
   };
 
   if(loading)return<><div style={{padding:40,fontFamily:"'Space Mono',monospace",fontSize:12,color:T.faint}}>Loading profile...</div></>;
@@ -189,6 +192,11 @@ export default function ProfilePage() {
             </button>
           </div>
         </div>
+
+        <div style={{background:T.orangeL,border:`1px solid ${T.amber}`,borderRadius:12,padding:"12px 14px",marginBottom:16,fontSize:13,lineHeight:1.5,color:T.ink}}>
+          <strong>You own this record.</strong> Profile fields are shared only through server-enforced permissions and explicit consent. Sensitive background details are not made public by this form.
+        </div>
+        {saveError&&<div role="alert" style={{background:"#FEF2F2",border:"1px solid #FCA5A5",color:"#991B1B",borderRadius:12,padding:"12px 14px",marginBottom:16}}>{saveError}</div>}
 
         {/* Section nav */}
         <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:20}}>

@@ -53,8 +53,10 @@ export default function ConnectionsPage() {
   const [authed, setAuthed] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [incoming, setIncoming] = useState<Scholar[]>([]);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const loadNetwork = useCallback(async () => {
+    setLoadError(null);
     const { data: authData } = await supabase.auth.getUser();
     const me = authData.user;
 
@@ -73,6 +75,8 @@ export default function ConnectionsPage() {
 
     if (connectionError) {
       console.error("Connections load error:", connectionError.message);
+      setLoadError("Your connection list is unavailable. Protected relationship data was not shown.");
+      return;
     }
 
     const connectedIds = (connectionRows || []).map(
@@ -119,6 +123,7 @@ export default function ConnectionsPage() {
 
     if (profileError) {
       console.error("Profile network load error:", profileError.message);
+      setLoadError("The support network source is unavailable. Try again without changing your consent state.");
       return;
     }
 
@@ -378,9 +383,20 @@ export default function ConnectionsPage() {
             Connections
           </h1>
           <p style={{ fontSize: 15, color: muted, maxWidth: "48ch", lineHeight: 1.6 }}>
-            Search real Playbook users, send connection requests, accept support, and build your network.
+            Search Playbook members and manage requests. A connection does not grant access to your private Scholar Record; support visibility requires separately scoped consent.
           </p>
         </div>
+
+        {loadError && (
+          <div role="alert" style={{ background: "#3b1717", border: "1px solid #7f1d1d", color: "#fecaca", borderRadius: 14, padding: 16, marginBottom: 20 }}>
+            <strong>Network unavailable.</strong> {loadError}{" "}
+            <button onClick={() => void loadNetwork()} style={{ background: "transparent", border: 0, color: "#fdba74", fontWeight: 800, textDecoration: "underline", cursor: "pointer" }}>Retry</button>
+          </div>
+        )}
+
+        <aside style={{ background: surface2, borderLeft: `4px solid ${accent}`, borderRadius: 10, padding: 14, marginBottom: 20, color: muted, lineHeight: 1.55 }}>
+          <strong style={{ color: ink }}>Consent boundary:</strong> accept only people you know. Record visibility, purpose, and expiration are managed separately; disconnecting does not rewrite historical evidence.
+        </aside>
 
         {/* Search + tabs */}
         <div style={{ display: "flex", gap: 12, marginBottom: 24, flexWrap: "wrap", alignItems: "center" }}>
