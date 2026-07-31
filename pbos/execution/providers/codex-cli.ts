@@ -4,7 +4,7 @@ import {
   spawn,
   type ChildProcess,
 } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { promisify } from "node:util";
 import { Artifacts } from "../../kernel/artifacts";
@@ -244,7 +244,12 @@ export function createCodexCliDelegate(input: {
     const produced = after.filter(
       (file) => !before.has(file) && file !== Artifacts.executionTelemetry
     );
-    const artifacts = produced.map((file) => {
+    const inspected = task.allowed_scope.filter((file) => {
+      const absolute = path.join(input.rootDir, file);
+      return existsSync(absolute) && statSync(absolute).isFile();
+    });
+    const artifactPaths = [...new Set([...produced, ...inspected])].sort();
+    const artifacts = artifactPaths.map((file) => {
       const absolute = path.join(input.rootDir, file);
       return {
         path: file,

@@ -1,6 +1,6 @@
 {
   "version": "1.1.0",
-  "capturedAt": "2026-07-31T19:06:48.862Z",
+  "capturedAt": "2026-07-31T20:13:51.129Z",
   "snapshot": {
     "repositoryRoot": "/Users/bulletproof/playbook-platform",
     "remoteName": "origin",
@@ -8,13 +8,13 @@
     "repositoryIdentity": "playbook-platform",
     "git": {
       "branch": "pbos/post-pps300-convergence",
-      "commitSha": "c90f3ab2306ac5fc7b20e99f0fea064a054919eb",
+      "commitSha": "df487ac157e10bf06e1ccadd31d4ee8b9c49e363",
       "upstream": "origin/pbos/post-pps300-convergence",
-      "ahead": 1,
+      "ahead": 0,
       "behind": 0,
-      "workingTreeClean": false,
-      "workingTreeDigest": "dcdd8fa74379ad3b5b642140ad9aeb04f5e1a77dcdd637c7e988f5020654bb87",
-      "workingTreeContentDigest": "607583db8deecf67c7a2896a5553b062c0b068e558f00848f6d1a05d75ea5c15"
+      "workingTreeClean": true,
+      "workingTreeDigest": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126",
+      "workingTreeContentDigest": "ed4ccabef8bb193ff5eee64176e5c966de34ac7bdf962c77bf0fb1a8fa9afac2"
     },
     "runtime": {
       "engineVersion": "3.0.0",
@@ -138,5 +138,5 @@
       }
     ]
   },
-  "identity": "428d633272b6891f3afaef4bb25a9611ccfdcafb026bc0e7c4f0fa74c4a6c753"
+  "identity": "6cafcef47028056da8ae6359fd946bfe808ecb91d058720d37cc92c73154cb96"
 }

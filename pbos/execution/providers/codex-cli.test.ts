@@ -1,6 +1,6 @@
 import { EventEmitter } from "node:events";
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, readFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { PassThrough } from "node:stream";
@@ -106,6 +106,24 @@ describe("Codex CLI execution telemetry", () => {
     expect(telemetry.completion_state).toBe("SUCCEEDED");
     expect(telemetry.status).toBe("COMPLETED");
     expect(telemetry.digest).toBeTruthy();
+  });
+
+  it("captures authorized existing files for read-only validation executions", async () => {
+    const rootDir = repository();
+    mkdirSync(path.join(rootDir, "docs"));
+    writeFileSync(path.join(rootDir, "docs", "package.md"), "governed package");
+    const base = task();
+    const result = await createCodexCliDelegate({
+      rootDir,
+      heartbeat_interval_ms: 1_000,
+      no_response_timeout_ms: 1_000,
+      event_sink: () => undefined,
+      launch: () => processDouble({}) as never,
+    })({ ...base, allowed_scope: ["docs/package.md"] });
+    expect(result.artifacts).toEqual([{
+      path: "docs/package.md",
+      digest: artifactDigest(Buffer.from("governed package")),
+    }]);
   });
 
   it("emits heartbeats and a waiting warning without stopping the provider", async () => {

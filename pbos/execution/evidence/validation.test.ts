@@ -19,6 +19,9 @@ function fixture() {
   mkdirSync(path.join(rootDir, "pbos/manifests"), { recursive: true });
   mkdirSync(path.join(rootDir, "docs"), { recursive: true });
   writeFileSync(path.join(rootDir, "docs/output.md"), "validated output");
+  writeFileSync(path.join(rootDir, "docs/strategy.md"), "product strategy");
+  writeFileSync(path.join(rootDir, "docs/experience.md"), "experience architecture");
+  writeFileSync(path.join(rootDir, "docs/technical.md"), "technical architecture");
   const domains = [
     "applications", "engines", "features", "infrastructure", "integrations",
     "launch", "operating-systems", "platform", "security",
@@ -49,6 +52,16 @@ function fixture() {
         validation_requirements: [
           "dependency-validation", "package-identity", "permission-boundary",
         ],
+        mission_control: {
+          objective: "Build Experience", phase: "Product Package Generation",
+          completed: [
+            { label: "Product Strategy Evidence", evidence: ["docs/strategy.md"] },
+            { label: "UX Architecture Evidence", evidence: ["docs/experience.md"] },
+            { label: "Technical Architecture Evidence", evidence: ["docs/technical.md"] },
+          ],
+          generating: [{ label: "Package", output: "docs/output.md" }],
+          next_human_decision: "Approve Build",
+        },
       },
     ],
   };
@@ -170,6 +183,35 @@ describe("post-execution constitutional validation", () => {
     });
     expect(results.find(({ validation_id }) => validation_id === "package-identity"))
       .toEqual(expect.objectContaining({ status: "FAIL" }));
+  });
+
+  it("validates declared product, experience, and technical architecture evidence", () => {
+    const value = fixture();
+    const task = {
+      ...value.task,
+      validation_requirements: [
+        "product-strategy-integrity",
+        "experience-architecture-integrity",
+        "technical-architecture-integrity",
+      ],
+    };
+    const results = evaluateExecutionValidations({
+      ...value,
+      task,
+      provider_validation_results: [],
+    });
+    expect(results.map(({ status }) => status)).toEqual(["PASS", "PASS", "PASS"]);
+  });
+
+  it("blocks architecture validation when declared evidence is empty", () => {
+    const value = fixture();
+    writeFileSync(path.join(value.rootDir, "docs/strategy.md"), "");
+    const result = evaluateExecutionValidations({
+      ...value,
+      task: { ...value.task, validation_requirements: ["product-strategy-integrity"] },
+      provider_validation_results: [],
+    });
+    expect(result[0]).toEqual(expect.objectContaining({ status: "FAIL" }));
   });
 
   it("safely revalidates a previously successful execution without redispatch", () => {

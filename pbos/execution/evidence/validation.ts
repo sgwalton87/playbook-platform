@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { artifactDigest } from "../../kernel";
 import { loadMasterBuildManifest } from "../../manifests";
+import { validateScholarExperiencePackageSet } from "../../product-factory";
 import type { CodexExecutionPackage } from "../../orchestration";
 import type { AgentExecutionArtifact } from "../adapters";
 import type { ExecutionAuthorization, ExecutionAuthorityRecord } from "../authority";
@@ -98,6 +99,9 @@ export function evaluateExecutionValidations(input: {
           ? ["Authorized package digest does not match."]
           : []),
         ...(input.artifacts.length === 0 ? ["Execution artifact inventory is empty."] : []),
+        ...(milestone?.id === "SCHOLAR-EXPERIENCE-V1-PRODUCT-DEFINITION-001"
+          ? validateScholarExperiencePackageSet(milestone, input.rootDir).findings
+          : []),
         ...artifactFindings,
       ];
       return result(requirement, findings, {
@@ -105,6 +109,44 @@ export function evaluateExecutionValidations(input: {
         package_digest: input.package.digest,
         milestone_id: input.package.milestone_id,
         artifacts: input.artifacts,
+      });
+    }
+    if (
+      requirement === "product-strategy-integrity" ||
+      requirement === "experience-architecture-integrity" ||
+      requirement === "technical-architecture-integrity"
+    ) {
+      const label = requirement === "product-strategy-integrity"
+        ? "Product Strategy Evidence"
+        : requirement === "experience-architecture-integrity"
+          ? "UX Architecture Evidence"
+          : "Technical Architecture Evidence";
+      const evidence = milestone?.mission_control?.completed.find(
+        (entry) => entry.label === label
+      )?.evidence ?? [];
+      const findings = [
+        ...(!milestone ? ["Manifest milestone is missing."] : []),
+        ...(evidence.length === 0 ? [`${label} is not declared by the milestone.`] : []),
+        ...evidence.flatMap((artifact) => {
+          const absolute = path.join(input.rootDir, artifact);
+          if (!existsSync(absolute)) return [`Architecture evidence is missing: ${artifact}.`];
+          return readFileSync(absolute, "utf8").trim()
+            ? []
+            : [`Architecture evidence is empty: ${artifact}.`];
+        }),
+        ...(milestone?.id === "SCHOLAR-EXPERIENCE-V1-PRODUCT-DEFINITION-001"
+          ? validateScholarExperiencePackageSet(milestone, input.rootDir).findings
+          : []),
+      ];
+      return result(requirement, findings, {
+        milestone: milestone?.id ?? null,
+        label,
+        evidence: evidence.map((artifact) => ({
+          artifact,
+          digest: existsSync(path.join(input.rootDir, artifact))
+            ? artifactDigest(readFileSync(path.join(input.rootDir, artifact)))
+            : null,
+        })),
       });
     }
     if (requirement === "permission-boundary") {
