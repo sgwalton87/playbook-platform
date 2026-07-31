@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Record bounded validation evidence for task `TASK-f704c37bad1e0a97` and
+Record bounded validation evidence for task `TASK-e686076a12a2908f` and
 milestone `PBOS-PRODUCT-FACTORY-BUILD-PACKAGE-VALIDATION-001` without changing
 PBOS authority, runtime truth, approvals, or lifecycle state.
 
@@ -23,7 +23,7 @@ July 31, 2026.
 
 ## Assignment Boundary
 
-- Task: `TASK-f704c37bad1e0a97`
+- Task: `TASK-e686076a12a2908f`
 - Milestone: `PBOS-PRODUCT-FACTORY-BUILD-PACKAGE-VALIDATION-001`
 - Allowed change: this evidence file only
 - Prohibited changes: `.env`, `.git`, `pbos/runtime`, and every path outside the
@@ -68,17 +68,10 @@ source digest, ordered contents, and package digest.
 | ID | Command | Purpose | Exit |
 | --- | --- | --- | --- |
 | C01 | `pwd`; Git repository identity, remote, branch, status, and latest-commit inspection | Confirm repository identity and preserve unrelated changes | `0` |
-| C02 | Read `CODEX.md`, scoped instructions if present, the manifest milestone, compiler, compiler test, types, canonical screen specification, and related evidence | Establish governing and implementation context | `0` |
+| C02 | Read `CODEX.md`, the manifest milestone, compiler, compiler test, types, identity helper, canonical screen specification, current evidence, and `package.json`; hash the source specification and compiler | Establish governing context and confirm the package identity inputs | `0` |
 | C03 | `npx vitest run pbos/product-factory/screen-compiler/compiler.test.ts --pool=threads` | Exercise deterministic generation, authorization binding, and fail-closed digest/permission validation | `0` |
 | C04 | Read-only Node manifest validation | Confirm milestone dependency status, required artifacts, and declared validation requirements | `0` |
-| C05 | `npx tsx -e <in-memory package validation>` followed by source hashing | Attempt public-API package derivation and hash required artifacts | `1` for `tsx`; hashes completed |
-| C06 | Read-only Node canonical package derivation | Independently reproduce compiler identity rules for the canonical screen transcription and verify repeatability and permission fields | `0` |
-| C07 | `git diff --check` for the authorized file, related-link existence checks, `git status --short`, and authorized-file inspection | Verify document integrity, boundary, and final worktree truth | `0` |
-
-Command C05 failed because the sandbox denied the `tsx -e` IPC pipe with
-`listen EPERM`. It made no repository change. The compiler public API remained
-covered by C03; C06 then reproduced the reviewed compiler transformation and
-canonical hashing algorithm in a plain Node process.
+| C05 | `git diff --check -- docs/release-evidence/product-factory-build-package-validation-001.md`; related-link and task-marker checks; `git diff --name-only`; `git status --short` | Verify document integrity, evidence completeness, and the assignment boundary | `0` |
 
 ## EXECUTION_TIMESTAMPS
 
@@ -86,17 +79,17 @@ All timestamps are UTC.
 
 | Command | Started | Completed | Result |
 | --- | --- | --- | --- |
-| C03 | `2026-07-31T17:03:07Z` | `2026-07-31T17:03:16Z` | Passed: 1 file, 2 tests |
-| C04 | `2026-07-31T17:03:25Z` | `2026-07-31T17:03:25Z` | Passed |
-| C05 | `2026-07-31T17:03:43Z` | `2026-07-31T17:03:45Z` | Package invocation blocked by sandbox; artifact hashes completed |
-| C06 | `2026-07-31T17:04:20Z` | `2026-07-31T17:04:21Z` | Passed |
-| C07 | `2026-07-31T17:05:07Z` | `2026-07-31T17:05:07Z` | Passed; only the authorized file was newly added by this assignment |
+| C01 | `2026-07-31T17:53:56Z` | `2026-07-31T17:53:57Z` | Passed; canonical remote confirmed and unrelated changes observed |
+| C02 | `2026-07-31T17:53:57Z` | `2026-07-31T17:53:57Z` | Passed; source and compiler hashes match the recorded identity inputs |
+| C03 | `2026-07-31T17:52:58Z` | `2026-07-31T17:53:05Z` | Passed: 1 file, 2 tests |
+| C04 | `2026-07-31T17:53:14Z` | `2026-07-31T17:53:14Z` | Passed |
+| C05 | `2026-07-31T17:54:09Z` | `2026-07-31T17:54:10Z` | Passed; only the authorized evidence file was changed by this assignment |
 
 ## FILE_CHANGE_INVENTORY
 
 | Path | Assignment change | Classification |
 | --- | --- | --- |
-| `docs/release-evidence/product-factory-build-package-validation-001.md` | Added bounded validation evidence | Authorized |
+| `docs/release-evidence/product-factory-build-package-validation-001.md` | Refreshed bounded validation evidence for task `TASK-e686076a12a2908f` | Authorized |
 
 No other file is part of this assignment's change inventory. No application,
 manifest, approval, authority, runtime, or lifecycle artifact was changed.

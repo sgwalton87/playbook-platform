@@ -2,26 +2,27 @@
 
 ## Identity
 
-- Context identity: `dce23559b9a4506ab61db24bb28f72b423fe12dc5a7fe9d18b0ffb00dd8c7d1c`
-- Previous identity: `363a8c3a7a6f1b18ecc282a699349c58601632809822fd826ad5f7fdc1f3a647`
+- Context identity: `428d633272b6891f3afaef4bb25a9611ccfdcafb026bc0e7c4f0fa74c4a6c753`
+- Previous identity: `67be55b87538b3024250465a7a0125aa92d55700784496889283a5b9305da30b`
 - Repository: playbook-platform
 - Root: `/Users/bulletproof/playbook-platform`
 - Remote: origin (https://github.com/sgwalton87/playbook-platform.git)
 - Branch: pbos/post-pps300-convergence
-- Commit: `c191c9debd3ff7df14706a722acfcbb54cfcab91`
-- Working tree digest: `ed4ccabef8bb193ff5eee64176e5c966de34ac7bdf962c77bf0fb1a8fa9afac2`
-- Captured at: 2026-07-31T16:55:20.101Z
+- Commit: `c90f3ab2306ac5fc7b20e99f0fea064a054919eb`
+- Working tree digest: `607583db8deecf67c7a2896a5553b062c0b068e558f00848f6d1a05d75ea5c15`
+- Captured at: 2026-07-31T19:06:48.862Z
 
 ## Refresh
 
-- Reason: Approve committed repository reconciliation after review of the Codex execution adapter hardening changes, provider streaming implementation, execution telemetry lifecycle, repository identity, commit identity, reconciliation evidence, and trusted context transition artifacts. This approval authorizes PBOS to refresh trusted context to the current committed repository state. This approval does not grant unrestricted execution authority, bypass provider validation, or permit lifecycle advancement without successful execution evidence and validation.
+- Reason: Approve committed repository reconciliation after installation of PBOS Mission Control orchestration. This authorization permits PBOS to reconcile trusted context with the current committed repository state while preserving context identity, execution governance, evidence integrity, human authorization requirements, and lifecycle controls.
 - Validator: PBOS-CONTEXT-VALIDATOR@1.1.0
 - Generation result: PASS
-- History entries: 36
+- History entries: 39
 
 ## Triggering Conditions
 
 - Context validation failed: commit identity mismatches.
+- Context validation failed: working tree state changed after capture.
 
 ## Runtime Artifact Inventory
 

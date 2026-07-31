@@ -2,15 +2,15 @@
   "version": "1.0.0",
   "owner": "repository-context",
   "latest": {
-    "id": "b017a1babc96f288f16ba0f5964f2deb89c6b0c7169f42b7a2668f06206d73bf",
-    "previousContextIdentity": "423a09b83f9751ae3bee142e8ad9e68db001db256a2337252a1e3c3c26fbec7e",
-    "newContextIdentity": "000e6cfab6c1a18f2e62a2de3ebc886269cf4e3949cf645f59af1e0d1cec0013",
-    "reason": "Canonical recapture after final concurrent repository advancement.",
+    "id": "046995ab5a0e26c7dff6a62078a5ce8eba5150158cc695d4e72fb8364d983551",
+    "previousContextIdentity": "67be55b87538b3024250465a7a0125aa92d55700784496889283a5b9305da30b",
+    "newContextIdentity": "428d633272b6891f3afaef4bb25a9611ccfdcafb026bc0e7c4f0fa74c4a6c753",
+    "reason": "Approve committed repository reconciliation after installation of PBOS Mission Control orchestration. This authorization permits PBOS to reconcile trusted context with the current committed repository state while preserving context identity, execution governance, evidence integrity, human authorization requirements, and lifecycle controls.",
     "triggeringConditions": [
       "Context validation failed: commit identity mismatches.",
       "Context validation failed: working tree state changed after capture."
     ],
-    "timestamp": "2026-07-29T18:54:26.537Z",
+    "timestamp": "2026-07-31T19:06:48.862Z",
     "validator": {
       "id": "PBOS-CONTEXT-VALIDATOR",
       "version": "1.1.0"
@@ -517,6 +517,116 @@
         "Context validation failed: working tree state changed after capture."
       ],
       "timestamp": "2026-07-29T18:54:26.537Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "78c88546824e2f8afdc02f935071561cbefa2cc311c6a410b12fa8508f24a4e7",
+      "previousContextIdentity": "000e6cfab6c1a18f2e62a2de3ebc886269cf4e3949cf645f59af1e0d1cec0013",
+      "newContextIdentity": "deaee2d74aa68f9007f8970fb9f533fe5e2536ffc47b20c70e4283925925fae0",
+      "reason": "Approve the PBOS trusted context refresh after successful reconciliation of the newly activated baseline boundary. This approval confirms that the repository identity, commit identity, runtime artifact ownership, context transition evidence, and refreshed context artifacts have been reviewed and may proceed through the controlled context refresh lifecycle. This authorization permits the trusted context update only and does not grant unrestricted execution authority, provider dispatch authority, or lifecycle advancement without separate governance validation.",
+      "triggeringConditions": [
+        "Context validation failed: context artifact is stale.",
+        "Context validation failed: commit identity mismatches.",
+        "Context validation failed: working tree state changed after capture.",
+        "Context validation failed: artifact changed after capture: pbos/runtime/repository.json."
+      ],
+      "timestamp": "2026-07-31T13:05:53.066Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "994eb87f95f27346adcb410117165acf2166c4888bd6713443237ccc4c6f2ffd",
+      "previousContextIdentity": "deaee2d74aa68f9007f8970fb9f533fe5e2536ffc47b20c70e4283925925fae0",
+      "newContextIdentity": "d72d97e81e025ed355e4a33e2f9aa6d90a22ac3efe8097610dff0f523a974276",
+      "reason": "Approve committed repository reconciliation after review of the updated PBOS execution architecture, repository identity, commit identity, context transition evidence, and lifecycle controls. This approval authorizes PBOS to refresh trusted context to the current committed repository state. This approval does not grant unrestricted execution authority, bypass provider validation, or remove future human authorization requirements.",
+      "triggeringConditions": [
+        "Context validation failed: commit identity mismatches."
+      ],
+      "timestamp": "2026-07-31T15:34:50.256Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "81da22a23ef35792b62982996ff3965606f8082be7a1e95b33666c0fc5326caf",
+      "previousContextIdentity": "d72d97e81e025ed355e4a33e2f9aa6d90a22ac3efe8097610dff0f523a974276",
+      "newContextIdentity": "363a8c3a7a6f1b18ecc282a699349c58601632809822fd826ad5f7fdc1f3a647",
+      "reason": "Approve committed repository reconciliation after review of the finalized PBOS trusted context activation lifecycle changes, repository identity, commit identity, reconciliation evidence, and context transition artifacts. This approval authorizes PBOS to refresh trusted context to the current committed repository state. This approval does not grant unrestricted execution authority, bypass provider validation, or remove required human authorization controls for future execution.",
+      "triggeringConditions": [
+        "Context validation failed: commit identity mismatches."
+      ],
+      "timestamp": "2026-07-31T16:05:45.544Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "c84d7c4e168e70bf6dae60e7457182578ec28737184fa96ce2cee841a3c216e2",
+      "previousContextIdentity": "363a8c3a7a6f1b18ecc282a699349c58601632809822fd826ad5f7fdc1f3a647",
+      "newContextIdentity": "dce23559b9a4506ab61db24bb28f72b423fe12dc5a7fe9d18b0ffb00dd8c7d1c",
+      "reason": "Approve committed repository reconciliation after review of the Codex execution adapter hardening changes, provider streaming implementation, execution telemetry lifecycle, repository identity, commit identity, reconciliation evidence, and trusted context transition artifacts. This approval authorizes PBOS to refresh trusted context to the current committed repository state. This approval does not grant unrestricted execution authority, bypass provider validation, or permit lifecycle advancement without successful execution evidence and validation.",
+      "triggeringConditions": [
+        "Context validation failed: commit identity mismatches."
+      ],
+      "timestamp": "2026-07-31T16:55:20.101Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "9edf787ec6e91e559b4fa6a1ba5f3c951a7a3b82bdde3300b241b9734c0edd86",
+      "previousContextIdentity": "dce23559b9a4506ab61db24bb28f72b423fe12dc5a7fe9d18b0ffb00dd8c7d1c",
+      "newContextIdentity": "be4e8387fc9d2feee35ebbd25358d2a484b94496482c7bbee9bed61060f014b1",
+      "reason": "Approve committed repository reconciliation after completion of PBOS execution lifecycle integration, including provider execution telemetry, constitutional evidence validation, milestone advancement controls, and governed execution authority reuse. This approval authorizes trusted context refresh for the exact committed repository state. This approval does not bypass execution governance, provider authorization, evidence validation, or lifecycle controls.",
+      "triggeringConditions": [
+        "Context validation failed: commit identity mismatches."
+      ],
+      "timestamp": "2026-07-31T17:48:55.221Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "77ffb2a15a4efe3991988216ba7eb9d9b2bc974191e09e46969f8f69ad8d2f1a",
+      "previousContextIdentity": "be4e8387fc9d2feee35ebbd25358d2a484b94496482c7bbee9bed61060f014b1",
+      "newContextIdentity": "67be55b87538b3024250465a7a0125aa92d55700784496889283a5b9305da30b",
+      "reason": "Approve committed repository reconciliation after completion of PBOS Mission Control orchestration, Apollo 11 governed execution certification, execution authority reuse, and final execution lifecycle improvements. This approval authorizes PBOS to reconcile trusted context with the current repository state while preserving execution governance, identity validation, evidence integrity, and human authorization requirements.",
+      "triggeringConditions": [
+        "Context validation failed: commit identity mismatches.",
+        "Context validation failed: working tree state changed after capture."
+      ],
+      "timestamp": "2026-07-31T18:58:59.474Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "046995ab5a0e26c7dff6a62078a5ce8eba5150158cc695d4e72fb8364d983551",
+      "previousContextIdentity": "67be55b87538b3024250465a7a0125aa92d55700784496889283a5b9305da30b",
+      "newContextIdentity": "428d633272b6891f3afaef4bb25a9611ccfdcafb026bc0e7c4f0fa74c4a6c753",
+      "reason": "Approve committed repository reconciliation after installation of PBOS Mission Control orchestration. This authorization permits PBOS to reconcile trusted context with the current committed repository state while preserving context identity, execution governance, evidence integrity, human authorization requirements, and lifecycle controls.",
+      "triggeringConditions": [
+        "Context validation failed: commit identity mismatches.",
+        "Context validation failed: working tree state changed after capture."
+      ],
+      "timestamp": "2026-07-31T19:06:48.862Z",
       "validator": {
         "id": "PBOS-CONTEXT-VALIDATOR",
         "version": "1.1.0"
