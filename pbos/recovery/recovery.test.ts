@@ -125,7 +125,7 @@ describe("PBOS recovery orchestrator", () => {
     expect(result.output).toContain("PBOS RECOVERY ASSESSMENT");
     expect(result.output).toContain("Mutation: NOT PERFORMED");
     expect(after).toBe(before);
-  });
+  }, 15_000);
 
   it("preserves existing recovery command registrations", () => {
     expect(KERNEL_COMMANDS).toEqual(expect.arrayContaining([

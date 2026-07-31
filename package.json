@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "it": "tsx pbos/commands/it/index.ts",
+    "it": "tsx pbos/commands/kernel-cli.ts run",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -61,6 +61,8 @@
     "pbos:approve-boundary": "tsx pbos/commands/kernel-cli.ts approve-boundary",
     "pbos:approve-refresh": "tsx pbos/commands/kernel-cli.ts approve-refresh",
     "pbos:recover": "tsx pbos/commands/kernel-cli.ts recover",
+    "pbos:run": "tsx pbos/commands/kernel-cli.ts run",
+    "pbos:fabric-status": "tsx pbos/commands/kernel-cli.ts fabric-status",
     "pbos:report": "tsx pbos/commands/kernel-cli.ts report",
     "pbos:certify": "tsx pbos/commands/kernel-cli.ts certify",
     "pbos": "tsx pbos/commands/kernel-cli.ts",

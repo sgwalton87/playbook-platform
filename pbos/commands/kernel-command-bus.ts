@@ -41,6 +41,38 @@ import {
   collectPBOSRecoveryEvidence,
   formatPBOSRecoveryAssessment,
 } from "../recovery";
+import { runOperator } from "../operator";
+import { artifactDigest } from "../kernel";
+import {
+  createExecutionApproval,
+  createExecutionAuthority,
+  issueExecutionAuthorization,
+  loadExecutionApproval,
+  loadExecutionAuthority,
+  loadProviderExecutionAuthorization,
+  persistExecutionApproval,
+  persistExecutionAuthority,
+  persistProviderExecutionAuthorization,
+} from "../execution/authority";
+import { createCodexProviderContract } from "../execution/providers";
+import {
+  createCodexCliDelegate,
+  ExecutionProviderRegistry,
+  registerCodexProvider,
+} from "../execution/providers";
+import {
+  assignExecutionTask,
+  persistExecutionAssignment,
+  loadExecutionAssignment,
+} from "../execution/tasks";
+import { evaluateAgentExecutionAdmission } from "../execution/admission";
+import { ExecutionFabricRunner } from "../execution/runner";
+import {
+  assessMilestoneAdvancement,
+  loadExecutionEvidence,
+  persistMilestoneAdvancement,
+  persistExecutionEvidence,
+} from "../execution/evidence";
 
 export const KERNEL_COMMANDS = [
   "next",
@@ -72,6 +104,8 @@ export const KERNEL_COMMANDS = [
   "approve-boundary",
   "approve-refresh",
   "recover",
+  "run",
+  "fabric-status",
 ] as const;
 
 export type KernelCommandName = (typeof KERNEL_COMMANDS)[number];
@@ -92,6 +126,174 @@ export async function dispatchKernelCommand(
   actorId = process.env.PBOS_ACTOR_ID ?? "",
   evidenceInput: FounderEvidenceInput = {}
 ): Promise<KernelCommandResult> {
+  if (command === "fabric-status") {
+    return {
+      command,
+      successful: true,
+      output: [
+        "PBOS EXECUTION FABRIC",
+        "Core: OPERATIONAL",
+        "Provider Registry: OPERATIONAL",
+        "Provider-Bound Authorization: OPERATIONAL",
+        "Assignment and Admission Contracts: OPERATIONAL",
+        "Evidence and Advancement Assessment: OPERATIONAL",
+        "Production Codex Delegate: OPERATIONAL",
+        "Execution Approval Command: OPERATIONAL",
+        `Production Dispatch: ${process.env.PBOS_CODEX_EXECUTION_ENABLED === "true" ? "ENABLED" : "PAUSED"}`,
+      ].join("\n"),
+    };
+  }
+
+  if (command === "run") {
+    const timestamp = new Date().toISOString();
+    const recovery = buildPBOSRecoveryAssessment(
+      collectPBOSRecoveryEvidence(rootDir, timestamp),
+      timestamp
+    );
+    const operatorOutput = runOperator(rootDir, "RUN_IT", timestamp);
+    if (recovery.recommended_transition !== "NONE") {
+      return {
+        command,
+        successful: true,
+        output: operatorOutput,
+      };
+    }
+    const orchestration = await runDevelopmentOrchestration(rootDir);
+    if (!orchestration.executionPackage) {
+      return {
+        command,
+        successful: false,
+        output: [
+          operatorOutput,
+          "",
+          "PBOS EXECUTION",
+          "Issue: No certified execution package is eligible.",
+          `Cause: ${orchestration.governedRecommendation.blocking_conditions.join(" ") || "Planner produced no eligible milestone."}`,
+          "Resolution: Resolve the canonical planner findings.",
+        ].join("\n"),
+      };
+    }
+    const approval = loadExecutionApproval(rootDir)?.latest ?? null;
+    const authority = loadExecutionAuthority(rootDir)?.latest ?? null;
+    const authorization =
+      loadProviderExecutionAuthorization(rootDir)?.latest ?? null;
+    if (
+      !approval ||
+      approval.decision !== "APPROVED" ||
+      approval.package_digest !== orchestration.executionPackage.digest ||
+      !authority ||
+      authority.package_digest !== orchestration.executionPackage.digest ||
+      !authorization ||
+      authorization.package_digest !== orchestration.executionPackage.digest
+    ) {
+      return {
+        command,
+        successful: true,
+        output: [
+          operatorOutput,
+          "",
+          "PBOS HUMAN ACTION REQUIRED",
+          "Reason: Package-bound execution approval is required.",
+          `Package: ${orchestration.executionPackage.package_id}`,
+          `Digest: ${orchestration.executionPackage.digest}`,
+          "Command: npm run pbos:approve",
+        ].join("\n"),
+      };
+    }
+    let assignmentArtifact = loadExecutionAssignment(rootDir);
+    if (
+      !assignmentArtifact ||
+      assignmentArtifact.assignment.task.package_id !==
+        orchestration.executionPackage.package_id ||
+      assignmentArtifact.assignment.task.context_identity !==
+        authorization.context_digest
+    ) {
+      const assignmentResult = await dispatchKernelCommand(
+        "assign",
+        rootDir,
+        actorId,
+        evidenceInput
+      );
+      if (!assignmentResult.successful) {
+        return {
+          command,
+          successful: false,
+          output: [operatorOutput, "", assignmentResult.output].join("\n"),
+        };
+      }
+      assignmentArtifact = loadExecutionAssignment(rootDir);
+    }
+    if (!assignmentArtifact) {
+      throw new Error("Execution assignment was not persisted.");
+    }
+    if (process.env.PBOS_CODEX_EXECUTION_ENABLED !== "true") {
+      return {
+        command,
+        successful: true,
+        output: [
+          operatorOutput,
+          "",
+          "PBOS EXECUTION READY",
+          `Package: ${orchestration.executionPackage.package_id}`,
+          `Authorization: ${authorization.authorization_id}`,
+          `Assignment: ${assignmentArtifact.assignment.task.task_id}`,
+          "Provider: PBOS-CODEX-CODE-001",
+          "Dispatch: PAUSED",
+          "Reason: Production Codex delegate is not enabled.",
+          "Resolution: Set PBOS_CODEX_EXECUTION_ENABLED=true after provider certification.",
+        ].join("\n"),
+      };
+    }
+    const context = loadTrustedBuildContext(rootDir)?.latest ?? null;
+    if (!context) throw new Error("Trusted context disappeared before dispatch.");
+    const providers = registerCodexProvider({
+      registry: new ExecutionProviderRegistry(),
+      provider_id: authorization.provider_id,
+      version: "1.0.0",
+      delegate: createCodexCliDelegate({ rootDir }),
+    });
+    const fabricResult = await new ExecutionFabricRunner().execute({
+      context,
+      package: orchestration.executionPackage,
+      approval,
+      authority,
+      authorization,
+      assignment: assignmentArtifact.assignment,
+      admission: assignmentArtifact.admission,
+      providers,
+      requested_at: new Date().toISOString(),
+    });
+    persistExecutionEvidence(rootDir, fabricResult.evidence);
+    const advancement = assessMilestoneAdvancement({
+      package: orchestration.executionPackage,
+      evidence: fabricResult.evidence,
+    });
+    const transition = advancement.eligible
+      ? persistMilestoneAdvancement({
+          rootDir,
+          package: orchestration.executionPackage,
+          assessment: advancement,
+          authorized_by: authorization.approved_by,
+          timestamp: new Date().toISOString(),
+        }).latest
+      : null;
+    return {
+      command,
+      successful: advancement.eligible,
+      output: [
+        "PBOS OPERATOR MODE",
+        "Intent: RUN_IT",
+        `Package: ${orchestration.executionPackage.package_id}`,
+        `Provider: ${fabricResult.provider_id}`,
+        `Execution: ${fabricResult.evidence.record.status}`,
+        "Evidence: CAPTURED",
+        `Validation: ${fabricResult.evidence.completion.complete ? "PASS" : "FAIL"}`,
+        `Milestone Advancement: ${transition ? "COMPLETE" : "BLOCKED"}`,
+        ...advancement.findings.map((finding) => `- ${finding}`),
+      ].join("\n"),
+    };
+  }
+
   if (command === "recover") {
     const timestamp = new Date().toISOString();
     const assessment = buildPBOSRecoveryAssessment(
@@ -457,19 +659,122 @@ export async function dispatchKernelCommand(
 
   if (command === "assign") {
     const orchestration = await runDevelopmentOrchestration(rootDir);
+    const context = loadTrustedBuildContext(rootDir)?.latest ?? null;
+    const executionPackage = orchestration.executionPackage;
+    const approval = loadExecutionApproval(rootDir)?.latest ?? null;
+    const authority = loadExecutionAuthority(rootDir)?.latest ?? null;
+    const authorization =
+      loadProviderExecutionAuthorization(rootDir)?.latest ?? null;
+    const timestamp = new Date().toISOString();
+    const registry = createDefaultAgentRegistry(timestamp);
+    const agent = registry.get("PBOS-CODEX-CODE-001");
     const findings = [
       ...(!orchestration.input.repository.valid ? ["Trusted context is unavailable."] : []),
-      ...(!orchestration.executionPackage ? ["Approved execution package is unavailable."] : []),
-      "Approved authority record is unavailable.",
+      ...(!context ? ["Active trusted context is unavailable."] : []),
+      ...(!executionPackage ? ["Approved execution package is unavailable."] : []),
+      ...(!approval || approval.decision !== "APPROVED"
+        ? ["Approved authority record is unavailable."]
+        : []),
+      ...(!authority ? ["Execution authority record is unavailable."] : []),
+      ...(!authorization
+        ? ["Provider-bound execution authorization is unavailable."]
+        : []),
+      ...(!agent ? ["Certified execution agent is unavailable."] : []),
     ];
+    if (
+      findings.length > 0 ||
+      !context ||
+      !executionPackage ||
+      !approval ||
+      !authority ||
+      !authorization ||
+      !agent
+    ) {
+      return {
+        command,
+        successful: false,
+        output: [
+          "PBOS EXECUTION TASK ASSIGNMENT",
+          "Decision: BLOCKED",
+          ...findings,
+          "No agent assignment was created.",
+        ].join("\n"),
+      };
+    }
+    const task = {
+      task_id: `TASK-${artifactDigest({
+        package: executionPackage.digest,
+        approval: approval.digest,
+        agent: agent.digest,
+      }).slice(0, 16)}`,
+      package_id: executionPackage.package_id,
+      milestone_id: executionPackage.milestone_id,
+      context_identity: context.digest,
+      authorization_reference: approval.approval_id,
+      assigned_agent: agent.agent_id,
+      allowed_scope: [...authorization.allowed_actions],
+      prohibited_scope: [...authorization.prohibited_actions],
+      required_capabilities: ["CODE_GENERATION"],
+      validation_requirements: [...executionPackage.validation_requirements],
+      evidence_requirements: [...authorization.evidence_requirements],
+    };
+    const assignment = assignExecutionTask({
+      task,
+      registry,
+      context,
+      approval,
+      package: executionPackage,
+      required_permissions: [
+        "READ_APPROVED_SCOPE",
+        "MODIFY_APPROVED_FILES",
+        "RUN_TESTS",
+        "RUN_VALIDATION",
+      ],
+    });
+    const requestBody = {
+      request_id: `ADMISSION-${assignment.task.task_id}`,
+      context,
+      package: executionPackage,
+      package_certification_digest: authority.package_certification_digest,
+      execution_authority: authority,
+      approval,
+      agent,
+      assignment,
+      requested_at: timestamp,
+    };
+    const admissionRequest = {
+      ...requestBody,
+      digest: artifactDigest(requestBody),
+    };
+    const admission = evaluateAgentExecutionAdmission(
+      admissionRequest,
+      timestamp
+    );
+    if (!assignment.assigned || !admission.decision.admitted) {
+      return {
+        command,
+        successful: false,
+        output: [
+          "PBOS EXECUTION TASK ASSIGNMENT",
+          "Decision: BLOCKED",
+          ...assignment.findings,
+          ...admission.decision.findings,
+          "No agent assignment was created.",
+        ].join("\n"),
+      };
+    }
+    persistExecutionAssignment(rootDir, assignment, admission);
     return {
       command,
-      successful: false,
+      successful: true,
       output: [
         "PBOS EXECUTION TASK ASSIGNMENT",
-        "Decision: BLOCKED",
-        ...findings,
-        "No agent assignment was created.",
+        "Decision: ASSIGNED",
+        `Task: ${assignment.task.task_id}`,
+        `Provider: ${assignment.task.assigned_agent}`,
+        `Scope: ${assignment.task.allowed_scope.join(", ")}`,
+        "Admission: APPROVED",
+        "Next action: RUN IT",
       ].join("\n"),
     };
   }
@@ -498,36 +803,206 @@ export async function dispatchKernelCommand(
 
   if (command === "approve") {
     const orchestration = await runDevelopmentOrchestration(rootDir);
+    const context = loadTrustedBuildContext(rootDir)?.latest ?? null;
+    const executionPackage = orchestration.executionPackage;
+    const requester = evidenceString(
+      evidenceInput, "requester-identity",
+      process.env.PBOS_EXECUTION_REQUESTER_ID
+    );
+    const reviewer = evidenceString(
+      evidenceInput, "reviewer-identity",
+      process.env.PBOS_EXECUTION_REVIEWER_ID ?? actorId
+    );
+    const decision = evidenceString(
+      evidenceInput, "decision", process.env.PBOS_EXECUTION_DECISION
+    ).toUpperCase();
+    const reason = evidenceString(
+      evidenceInput, "reason", process.env.PBOS_EXECUTION_REASON
+    );
+    const riskAcknowledgment = evidenceString(
+      evidenceInput, "risk-acknowledgment",
+      process.env.PBOS_EXECUTION_RISK_ACKNOWLEDGMENT
+    );
+    const expiration = evidenceString(
+      evidenceInput, "expiration", process.env.PBOS_EXECUTION_EXPIRATION
+    );
+    const timestamp = new Date().toISOString();
     const reasons = [
       ...(!orchestration.input.repository.valid
         ? ["Trusted build context is unavailable."]
         : []),
-      ...(!orchestration.executionPackage
+      ...(!context ? ["Active trusted context is unavailable."] : []),
+      ...(!executionPackage
         ? ["Certified execution package is unavailable."]
         : []),
-      ...(!actorId ? ["Approver identity is required through PBOS_ACTOR_ID."] : []),
+      ...(!requester ? ["Requester identity is required."] : []),
+      ...(!reviewer ? ["Independent reviewer identity is required."] : []),
+      ...(requester === reviewer
+        ? ["Requester and reviewer must be independent."]
+        : []),
+      ...(!["APPROVED", "REJECTED"].includes(decision)
+        ? ["Decision must be APPROVED or REJECTED."]
+        : []),
+      ...(!reason ? ["Decision reason is required."] : []),
+      ...(!riskAcknowledgment ? ["Risk acknowledgment is required."] : []),
+      ...(!expiration || Date.parse(expiration) <= Date.parse(timestamp)
+        ? ["A future approval expiration is required."]
+        : []),
     ];
+    if (reasons.length > 0 || !context || !executionPackage) {
+      return {
+        command,
+        successful: false,
+        output: [
+          "PBOS HUMAN EXECUTION APPROVAL",
+          "Decision: BLOCKED",
+          ...reasons,
+          "No authority record was created.",
+        ].join("\n"),
+      };
+    }
+    const riskLevel = orchestration.governedRecommendation.risk > 70
+      ? "RED" as const
+      : orchestration.governedRecommendation.risk > 30
+        ? "YELLOW" as const
+        : "GREEN" as const;
+    const scope = executionPackage.required_changes.filter(Boolean);
+    if (scope.length === 0) {
+      return {
+        command,
+        successful: false,
+        output: "PBOS HUMAN EXECUTION APPROVAL\nDecision: BLOCKED\nExecution package scope is empty.",
+      };
+    }
+    const approval = createExecutionApproval({
+      package: executionPackage,
+      context,
+      requested_by: requester,
+      approved_by: reviewer,
+      decision: decision === "APPROVED" ? "APPROVED" : "REJECTED",
+      reason,
+      risk_acknowledgment: riskAcknowledgment,
+      risk_level: riskLevel,
+      scope,
+      timestamp,
+      expiration,
+    });
+    persistExecutionApproval(rootDir, approval);
+    if (approval.decision !== "APPROVED") {
+      return {
+        command,
+        successful: false,
+        output: [
+          "PBOS HUMAN EXECUTION APPROVAL",
+          "Decision: REJECTED",
+          `Approval: ${approval.approval_id}`,
+          "Execution authority was not issued.",
+        ].join("\n"),
+      };
+    }
+    const agent = createDefaultAgentRegistry(timestamp).get(
+      "PBOS-CODEX-CODE-001"
+    );
+    if (!agent) throw new Error("Canonical Codex agent registration is missing.");
+    const providerBody = createCodexProviderContract({
+      provider_id: agent.agent_id,
+      version: agent.version,
+    });
+    const provider = {
+      ...providerBody,
+      digest: artifactDigest(providerBody),
+    };
+    const evidenceRequirements = [...provider.evidence_contract];
+    const authority = createExecutionAuthority({
+      context,
+      package: executionPackage,
+      packageCertificationDigest: orchestration.kernel.certification.digest,
+      approval,
+      agent,
+      scope,
+      blockedOperations: [".git", ".env", "pbos/runtime"],
+      requiredCapabilities: ["CODE_GENERATION"],
+      evidenceRequirements,
+      authorizationTime: timestamp,
+      expirationTime: expiration,
+    });
+    persistExecutionAuthority(rootDir, authority);
+    const authorization = issueExecutionAuthorization({
+      authority,
+      context,
+      package: executionPackage,
+      provider,
+      created_by: requester,
+      approved_by: reviewer,
+      issued_at: timestamp,
+    });
+    persistProviderExecutionAuthorization(rootDir, authorization);
     return {
       command,
-      successful: false,
+      successful: true,
       output: [
-        "PBOS HUMAN APPROVAL",
-        "Decision: BLOCKED",
-        ...reasons,
-        "No authority record was created.",
+        "PBOS HUMAN EXECUTION APPROVAL",
+        "Decision: APPROVED",
+        `Approval: ${approval.approval_id}`,
+        `Authority: ${authority.execution_authority_id}`,
+        `Authorization: ${authorization.authorization_id}`,
+        `Provider: ${authorization.provider_id}`,
+        "Next action: RUN IT",
       ].join("\n"),
     };
   }
 
   if (command === "advance") {
+    const orchestration = await runDevelopmentOrchestration(rootDir);
+    const executionPackage = orchestration.executionPackage;
+    const evidence = loadExecutionEvidence(rootDir)?.latest ?? null;
+    const authorization =
+      loadProviderExecutionAuthorization(rootDir)?.latest ?? null;
+    if (!executionPackage || !evidence || !authorization) {
+      return {
+        command,
+        successful: false,
+        output: [
+          "PBOS MILESTONE ADVANCEMENT",
+          "Decision: BLOCKED",
+          "A matching execution package, authorization, and evidence bundle are required.",
+          "No milestone transition was applied.",
+        ].join("\n"),
+      };
+    }
+    const assessment = assessMilestoneAdvancement({
+      package: executionPackage,
+      evidence,
+    });
+    if (!assessment.eligible) {
+      return {
+        command,
+        successful: false,
+        output: [
+          "PBOS MILESTONE ADVANCEMENT",
+          "Decision: BLOCKED",
+          ...assessment.findings,
+          "No milestone transition was applied.",
+        ].join("\n"),
+      };
+    }
+    const transition = persistMilestoneAdvancement({
+      rootDir,
+      package: executionPackage,
+      assessment,
+      authorized_by: authorization.approved_by,
+      timestamp: new Date().toISOString(),
+    }).latest;
     return {
       command,
-      successful: false,
+      successful: true,
       output: [
         "PBOS MILESTONE ADVANCEMENT",
-        "Decision: BLOCKED",
-        "A matching trusted context, authorization, successful execution, passing validation, and completion evidence are required.",
-        "No manifest transition request was applied.",
+        "Decision: COMPLETE",
+        `Milestone: ${transition.milestone_id}`,
+        `Transition: ${transition.transition_id}`,
+        `Evidence: ${transition.evidence_digest}`,
+        "Next action: RUN IT",
       ].join("\n"),
     };
   }

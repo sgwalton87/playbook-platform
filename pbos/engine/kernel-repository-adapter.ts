@@ -11,6 +11,7 @@ import {
 import { planConstitutionalGate } from "../planner";
 import { loadConstitutionalGates } from "../planner/load";
 import { loadMasterBuildManifest, type BuildMilestone } from "../manifests";
+import { completedMilestoneIds } from "../execution/evidence";
 import { loadConfig } from "./config";
 import { loadState } from "./state";
 
@@ -21,6 +22,7 @@ export async function createRepositoryKernelInput(
   const state = await loadState(config, config.defaultMode, rootDir);
   const gates = loadConstitutionalGates(rootDir, config.gatesDirectory);
   const buildManifest = loadMasterBuildManifest(rootDir);
+  const runtimeCompletedMilestones = completedMilestoneIds(rootDir);
   const planning = await planConstitutionalGate({ rootDir, persist: false });
   const stored = loadRepositoryContextArtifact(rootDir);
   if (!stored) {
@@ -82,6 +84,7 @@ export async function createRepositoryKernelInput(
   }));
   const risk = { GREEN: 20, YELLOW: 60, RED: 100 } as const;
   const milestoneState = (milestone: BuildMilestone): KernelObjective["state"] => {
+    if (runtimeCompletedMilestones.has(milestone.id)) return "COMPLETED";
     if (milestone.status === "COMPLETE" || milestone.status === "ARCHIVED") return "COMPLETED";
     if (milestone.status === "READY") return "READY";
     if (milestone.status === "PLANNED") return "PLANNED";

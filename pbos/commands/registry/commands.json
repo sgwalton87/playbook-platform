@@ -85,9 +85,21 @@
   },
   {
     "name": "recover",
-    "description": "Reserved future command for interrupted execution recovery.",
+    "description": "Inspect recovery state and produce the canonical governed recovery sequence.",
     "mode": "doctor",
-    "status": "reserved"
+    "status": "active"
+  },
+  {
+    "name": "run",
+    "description": "Express RUN_IT intent and receive one deterministic operator transition or human authority request.",
+    "mode": "doctor",
+    "status": "active"
+  },
+  {
+    "name": "fabric-status",
+    "description": "Report execution-fabric readiness and production activation blockers.",
+    "mode": "doctor",
+    "status": "active"
   },
   {
     "name": "release",
