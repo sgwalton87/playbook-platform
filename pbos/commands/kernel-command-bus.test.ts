@@ -55,6 +55,7 @@ describe("kernel command bus", () => {
 
   it("recognizes only governed kernel commands", () => {
     expect(isKernelCommand("execute")).toBe(true);
+    expect(isKernelCommand("mission")).toBe(true);
     expect(isKernelCommand("unknown")).toBe(false);
   });
 

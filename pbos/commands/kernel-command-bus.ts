@@ -79,6 +79,7 @@ import {
   persistExecutionEvidence,
   revalidateExecutionEvidence,
 } from "../execution/evidence";
+import { runMissionControl } from "../mission-control";
 
 export const KERNEL_COMMANDS = [
   "next",
@@ -111,6 +112,7 @@ export const KERNEL_COMMANDS = [
   "approve-refresh",
   "recover",
   "run",
+  "mission",
   "fabric-status",
 ] as const;
 
@@ -132,6 +134,13 @@ export async function dispatchKernelCommand(
   actorId = process.env.PBOS_ACTOR_ID ?? "",
   evidenceInput: FounderEvidenceInput = {}
 ): Promise<KernelCommandResult> {
+  if (command === "mission") {
+    const result = await runMissionControl((missionCommand) =>
+      dispatchKernelCommand(missionCommand, rootDir, actorId, evidenceInput)
+    );
+    return { command, successful: result.successful, output: result.output };
+  }
+
   if (command === "fabric-status") {
     return {
       command,

@@ -62,6 +62,7 @@
     "pbos:approve-refresh": "tsx pbos/commands/kernel-cli.ts approve-refresh",
     "pbos:recover": "tsx pbos/commands/kernel-cli.ts recover",
     "pbos:run": "tsx pbos/commands/kernel-cli.ts run",
+    "pbos:mission": "tsx pbos/commands/kernel-cli.ts mission",
     "pbos:fabric-status": "tsx pbos/commands/kernel-cli.ts fabric-status",
     "pbos:report": "tsx pbos/commands/kernel-cli.ts report",
     "pbos:certify": "tsx pbos/commands/kernel-cli.ts certify",

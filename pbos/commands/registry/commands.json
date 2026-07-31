@@ -96,6 +96,12 @@
     "status": "active"
   },
   {
+    "name": "mission",
+    "description": "Coordinate assessment, canonical planning, governed authority, execution, evidence validation, advancement, and continuation through existing PBOS owners.",
+    "mode": "doctor",
+    "status": "active"
+  },
+  {
     "name": "fabric-status",
     "description": "Report execution-fabric readiness and production activation blockers.",
     "mode": "doctor",
