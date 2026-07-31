@@ -4,6 +4,7 @@ import type { TrustedBuildContext } from "../../context/activation";
 import type { CodexExecutionPackage } from "../../orchestration/execution-packages";
 import type { TaskAssignment } from "../tasks";
 import type { ExecutionAuthorityRecord } from "../authority";
+import type { ExecutionIdentityResolution } from "../providers";
 
 export interface ExecutionAdmissionRequest {
   readonly request_id: string;
@@ -13,6 +14,7 @@ export interface ExecutionAdmissionRequest {
   readonly execution_authority: ExecutionAuthorityRecord | null;
   readonly approval: ApprovalRecord | null;
   readonly agent: AgentRecord | null;
+  readonly identity_resolution: ExecutionIdentityResolution | null;
   readonly assignment: TaskAssignment | null;
   readonly requested_at: string;
   readonly digest: string;
@@ -33,6 +35,7 @@ export interface ExecutionAdmissionEvidence {
   readonly package_digest: string | null;
   readonly approval_digest: string | null;
   readonly agent_digest: string | null;
+  readonly identity_resolution_digest: string | null;
   readonly assignment_digest: string | null;
   readonly certification_digest: string | null;
   readonly execution_authority_digest: string | null;

@@ -4,6 +4,10 @@ import { artifactDigest } from "../../kernel/identity";
 import { evaluateAgentExecutionAdmission } from "./gate";
 import type { ExecutionAdmissionRequest } from "./types";
 import { createExecutionAuthority } from "../authority";
+import {
+  createCodexProviderContract,
+  resolveExecutionIdentity,
+} from "../providers";
 
 function request(): ExecutionAdmissionRequest {
   const agent = createDefaultAgentRegistry("2026-07-30T00:00:00.000Z").get("PBOS-CODEX-CODE-001");
@@ -65,6 +69,9 @@ function request(): ExecutionAdmissionRequest {
     milestone_id: executionPackage.milestone_id,
     context_identity: context.digest,
     authorization_reference: approval.approval_id,
+    execution_authorization_id: "EXECUTION-AUTHORIZATION-001",
+    provider_id: agent.agent_id,
+    provider_contract_id: `PROVIDER-CONTRACT-${agent.agent_id}-${agent.version}`,
     assigned_agent: agent.agent_id,
     allowed_scope: ["docs"],
     prohibited_scope: ["app"],
@@ -93,6 +100,16 @@ function request(): ExecutionAdmissionRequest {
     authorizationTime: "2026-07-30T00:00:00.000Z",
     expirationTime: "2026-07-30T01:00:00.000Z",
   });
+  const providerBody = createCodexProviderContract({
+    provider_id: agent.agent_id,
+    version: agent.version,
+  });
+  const provider = { ...providerBody, digest: artifactDigest(providerBody) };
+  const identityResolution = resolveExecutionIdentity({
+    provider,
+    agents: createDefaultAgentRegistry("2026-07-30T00:00:00.000Z"),
+    created_at: "2026-07-30T00:00:00.000Z",
+  });
   const body = {
     request_id: "ADMISSION-001",
     context,
@@ -101,6 +118,7 @@ function request(): ExecutionAdmissionRequest {
     execution_authority: executionAuthority,
     approval,
     agent,
+    identity_resolution: identityResolution,
     assignment,
     requested_at: "2026-07-30T00:30:00.000Z",
   };
