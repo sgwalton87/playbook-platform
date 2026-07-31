@@ -8,6 +8,9 @@ const task = {
   milestone_id: "MILESTONE-001",
   context_identity: "CONTEXT-DIGEST",
   authorization_reference: "APPROVAL-001",
+  execution_authorization_id: "EXECUTION-AUTHORIZATION-001",
+  provider_id: "PBOS-CODEX-CODE-001",
+  provider_contract_id: "PROVIDER-CONTRACT-PBOS-CODEX-CODE-001-1.0.0",
   assigned_agent: "PBOS-CODEX-CODE-001",
   allowed_scope: ["docs/release-evidence"],
   prohibited_scope: ["app", "supabase", "pbos/runtime"],
@@ -24,6 +27,10 @@ describe("execution task assignment", () => {
       context: null,
       approval: null,
       package: null,
+      execution_authorization_id: task.execution_authorization_id,
+      provider_id: task.provider_id,
+      provider_contract_id: task.provider_contract_id,
+      resolved_agent_id: task.assigned_agent,
       required_permissions: ["MODIFY_APPROVED_FILES"],
     });
     expect(result.assigned).toBe(false);
@@ -37,6 +44,10 @@ describe("execution task assignment", () => {
       context: null,
       approval: null,
       package: null,
+      execution_authorization_id: task.execution_authorization_id,
+      provider_id: task.provider_id,
+      provider_contract_id: task.provider_contract_id,
+      resolved_agent_id: task.assigned_agent,
       required_permissions: ["MODIFY_APPROVED_FILES"],
     });
     expect(result.findings).toContain("Approved scope intersects prohibited scope: app.");

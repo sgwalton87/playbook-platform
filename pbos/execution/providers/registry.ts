@@ -14,6 +14,8 @@ export class ExecutionProviderRegistry {
   ): this {
     if (
       !contract.provider_id ||
+      !contract.provider_contract_id ||
+      !contract.executable_agent_id ||
       !PROVIDER_TYPES.includes(contract.provider_type) ||
       !contract.version ||
       contract.trust_level !== "CERTIFIED" ||

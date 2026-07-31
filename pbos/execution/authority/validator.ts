@@ -51,8 +51,7 @@ export function validateExecutionAuthority(input: {
       approval.context_digest !== record.context_digest)
       ? ["Approval identity does not match execution authority."]
       : []),
-    ...(agent &&
-    (record.agent_id !== agent.agent_id || record.agent_digest !== agent.digest)
+    ...(agent && record.agent_id !== agent.agent_id
       ? ["Agent identity does not match execution authority."]
       : []),
     ...(agent

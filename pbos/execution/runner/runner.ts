@@ -6,7 +6,7 @@ import type { ExecutionFabricRequest, ExecutionFabricResult } from "./types";
 
 export class ExecutionFabricRunner {
   async execute(request: ExecutionFabricRequest): Promise<ExecutionFabricResult> {
-    const providerId = request.assignment.task.assigned_agent;
+    const providerId = request.assignment.task.provider_id;
     const provider = request.providers.get(providerId);
     const authorizationFindings = provider
       ? validateExecutionAuthorization({
@@ -21,7 +21,12 @@ export class ExecutionFabricRunner {
       !request.admission.decision.admitted ||
       !provider ||
       authorizationFindings.length > 0 ||
-      provider.contract.provider_id !== request.authority.agent_id ||
+      request.assignment.task.execution_authorization_id !==
+        request.authorization.authorization_id ||
+      request.assignment.task.provider_contract_id !==
+        request.authorization.provider_contract_id ||
+      request.assignment.task.assigned_agent !== request.authorization.agent_id ||
+      provider.contract.executable_agent_id !== request.authority.agent_id ||
       !request.authority.required_capabilities.every((capability) =>
         provider.contract.capabilities.includes(capability)
       ) ||

@@ -39,10 +39,29 @@ export function assignExecutionTask(input: {
   readonly context: TrustedBuildContext | null;
   readonly approval: ApprovalRecord | null;
   readonly package: CodexExecutionPackage | null;
+  readonly execution_authorization_id: string;
+  readonly provider_id: string;
+  readonly provider_contract_id: string;
+  readonly resolved_agent_id: string;
   readonly required_permissions: readonly string[];
 }): TaskAssignment {
   const agent = input.registry.get(input.task.assigned_agent);
   const findings = [
+    ...(!input.execution_authorization_id ||
+    input.task.execution_authorization_id !== input.execution_authorization_id
+      ? ["Task execution authorization identity does not match."]
+      : []),
+    ...(!input.provider_id || input.task.provider_id !== input.provider_id
+      ? ["Task provider identity does not match."]
+      : []),
+    ...(!input.provider_contract_id ||
+    input.task.provider_contract_id !== input.provider_contract_id
+      ? ["Task provider contract identity does not match."]
+      : []),
+    ...(!input.resolved_agent_id ||
+    input.task.assigned_agent !== input.resolved_agent_id
+      ? ["Task resolved agent identity does not match."]
+      : []),
     ...(!input.context ? ["Trusted context is required."] : []),
     ...(!input.approval || input.approval.decision !== "APPROVED"
       ? ["Approved authority record is required."]

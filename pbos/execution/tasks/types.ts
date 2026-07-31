@@ -4,6 +4,9 @@ export interface ExecutionTask {
   readonly milestone_id: string;
   readonly context_identity: string;
   readonly authorization_reference: string;
+  readonly execution_authorization_id: string;
+  readonly provider_id: string;
+  readonly provider_contract_id: string;
   readonly assigned_agent: string;
   readonly allowed_scope: readonly string[];
   readonly prohibited_scope: readonly string[];

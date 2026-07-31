@@ -23,7 +23,9 @@ describe("execution provider registry", () => {
     const registry = new ExecutionProviderRegistry();
     const adapter = { execute: vi.fn() };
     registry.register({
+      provider_contract_id: "PROVIDER-CONTRACT-001",
       provider_id: "PROVIDER-001",
+      executable_agent_id: "PBOS-CODEX-TEST-001",
       provider_type: "TEST_AGENT",
       capabilities: ["TEST_EXECUTION"],
       version: "1.0.0",
@@ -32,7 +34,9 @@ describe("execution provider registry", () => {
       evidence_contract: ["VALIDATION_RESULTS"],
     }, adapter);
     expect(() => registry.register({
+      provider_contract_id: "PROVIDER-CONTRACT-001",
       provider_id: "PROVIDER-001",
+      executable_agent_id: "PBOS-CODEX-TEST-001",
       provider_type: "TEST_AGENT",
       capabilities: ["TEST_EXECUTION"],
       version: "1.0.0",

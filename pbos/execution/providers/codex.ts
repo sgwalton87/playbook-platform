@@ -7,9 +7,11 @@ export function createCodexProviderContract(input: {
   readonly version: string;
 }): Omit<ProviderContract, "digest"> {
   return {
+    provider_contract_id: `PROVIDER-CONTRACT-${input.provider_id}-${input.version}`,
     provider_id: input.provider_id,
+    executable_agent_id: input.provider_id,
     provider_type: "CODE_AGENT",
-    capabilities: ["CODE_GENERATION", "TEST_EXECUTION", "DOCUMENTATION"],
+    capabilities: ["CODE_GENERATION"],
     version: input.version,
     trust_level: "CERTIFIED",
     execution_method: "CONTROLLED_DELEGATE",

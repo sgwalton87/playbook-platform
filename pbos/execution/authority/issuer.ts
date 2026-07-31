@@ -26,7 +26,7 @@ export function issueExecutionAuthorization(input: {
     authority.package_digest !== executionPackage.digest ||
     authority.context_id !== context.context_id ||
     authority.context_digest !== context.digest ||
-    authority.agent_id !== provider.provider_id ||
+    authority.agent_id !== provider.executable_agent_id ||
     Date.parse(authority.expiration_time) <= Date.parse(input.issued_at) ||
     !authority.required_capabilities.every((capability) =>
       provider.capabilities.includes(capability)
@@ -49,6 +49,8 @@ export function issueExecutionAuthorization(input: {
     commit_identity: context.commit_identity,
     context_digest: context.digest,
     provider_id: provider.provider_id,
+    provider_contract_id: provider.provider_contract_id,
+    agent_id: provider.executable_agent_id,
     provider_contract_digest: provider.digest,
     allowed_actions: [...authority.scope].sort(),
     prohibited_actions: [...authority.blocked_operations].sort(),
@@ -87,6 +89,8 @@ export function validateExecutionAuthorization(input: {
       ? ["Execution authorization repository context does not match."]
       : []),
     ...(authorization.provider_id !== provider.provider_id ||
+    authorization.provider_contract_id !== provider.provider_contract_id ||
+    authorization.agent_id !== provider.executable_agent_id ||
     authorization.provider_contract_digest !== provider.digest
       ? ["Execution authorization provider identity does not match."]
       : []),

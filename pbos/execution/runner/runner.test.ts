@@ -60,30 +60,6 @@ function request(): ExecutionFabricRequest {
     expiration: "2026-08-01T00:00:00.000Z",
   };
   const approval = { ...approvalBody, digest: artifactDigest(approvalBody) };
-  const taskBody = {
-    task_id: "TASK-001",
-    package_id: executionPackage.package_id,
-    milestone_id: executionPackage.milestone_id,
-    context_identity: context.digest,
-    authorization_reference: approval.approval_id,
-    assigned_agent: "PBOS-CODEX-CODE-001",
-    allowed_scope: ["docs"],
-    prohibited_scope: ["app", "supabase", "pbos/runtime"],
-    required_capabilities: ["CODE_GENERATION"],
-    validation_requirements: ["npm test"],
-    evidence_requirements: ["VALIDATION_RESULTS"],
-  };
-  const task = { ...taskBody, digest: artifactDigest(taskBody) };
-  const assignmentBody = {
-    task,
-    assigned: true,
-    authority: "PBOS-TASK-ASSIGNMENT" as const,
-    findings: [],
-  };
-  const assignment = {
-    ...assignmentBody,
-    digest: artifactDigest(assignmentBody),
-  };
   const authorityBody = {
     execution_authority_id: "AUTHORITY-001",
     package_id: executionPackage.package_id,
@@ -105,37 +81,11 @@ function request(): ExecutionFabricRequest {
     authority_status: "AUTHORIZED" as const,
   };
   const authority = { ...authorityBody, digest: artifactDigest(authorityBody) };
-  const admissionDecisionBody = {
-    request_id: "ADMISSION-001",
-    admitted: true,
-    authority: "PBOS-AGENT-EXECUTION-ADMISSION" as const,
-    findings: [],
-    decided_at: "2026-07-31T00:00:00.000Z",
-  };
-  const decision = {
-    ...admissionDecisionBody,
-    digest: artifactDigest(admissionDecisionBody),
-  };
-  const admissionBody = {
-    request_digest: "5".repeat(64),
-    context_digest: context.digest,
-    package_digest: executionPackage.digest,
-    approval_digest: approval.digest,
-    agent_digest: authority.agent_digest,
-    assignment_digest: assignment.digest,
-    certification_digest: authority.package_certification_digest,
-    execution_authority_digest: authority.digest,
-    decision,
-  };
-  const admission = {
-    ...admissionBody,
-    digest: artifactDigest(admissionBody),
-  };
   const providers = registerCodexProvider({
     registry: new ExecutionProviderRegistry(),
     provider_id: "PBOS-CODEX-CODE-001",
     version: "1.0.0",
-    delegate: async () => ({
+    delegate: async (task) => ({
       execution_id: "EXECUTION-001",
       task_id: task.task_id,
       agent_id: task.assigned_agent,
@@ -158,6 +108,60 @@ function request(): ExecutionFabricRequest {
     approved_by: "reviewer",
     issued_at: "2026-07-31T00:00:00.000Z",
   });
+  const taskBody = {
+    task_id: "TASK-001",
+    package_id: executionPackage.package_id,
+    milestone_id: executionPackage.milestone_id,
+    context_identity: context.digest,
+    authorization_reference: approval.approval_id,
+    execution_authorization_id: authorization.authorization_id,
+    provider_id: provider.contract.provider_id,
+    provider_contract_id: provider.contract.provider_contract_id,
+    assigned_agent: "PBOS-CODEX-CODE-001",
+    allowed_scope: ["docs"],
+    prohibited_scope: ["app", "supabase", "pbos/runtime"],
+    required_capabilities: ["CODE_GENERATION"],
+    validation_requirements: ["npm test"],
+    evidence_requirements: ["VALIDATION_RESULTS"],
+  };
+  const task = { ...taskBody, digest: artifactDigest(taskBody) };
+  const assignmentBody = {
+    task,
+    assigned: true,
+    authority: "PBOS-TASK-ASSIGNMENT" as const,
+    findings: [],
+  };
+  const assignment = {
+    ...assignmentBody,
+    digest: artifactDigest(assignmentBody),
+  };
+  const admissionDecisionBody = {
+    request_id: "ADMISSION-001",
+    admitted: true,
+    authority: "PBOS-AGENT-EXECUTION-ADMISSION" as const,
+    findings: [],
+    decided_at: "2026-07-31T00:00:00.000Z",
+  };
+  const decision = {
+    ...admissionDecisionBody,
+    digest: artifactDigest(admissionDecisionBody),
+  };
+  const admissionBody = {
+    request_digest: "5".repeat(64),
+    context_digest: context.digest,
+    package_digest: executionPackage.digest,
+    approval_digest: approval.digest,
+    agent_digest: authority.agent_digest,
+    identity_resolution_digest: "7".repeat(64),
+    assignment_digest: assignment.digest,
+    certification_digest: authority.package_certification_digest,
+    execution_authority_digest: authority.digest,
+    decision,
+  };
+  const admission = {
+    ...admissionBody,
+    digest: artifactDigest(admissionBody),
+  };
   return {
     context,
     package: executionPackage,
@@ -187,5 +191,18 @@ describe("execution fabric runner", () => {
         decision: { ...value.admission.decision, admitted: false },
       },
     })).rejects.toThrow("admission rejected");
+  });
+
+  it("rejects authorization bound to another agent", async () => {
+    const value = request();
+    await expect(
+      new ExecutionFabricRunner().execute({
+        ...value,
+        authorization: {
+          ...value.authorization,
+          agent_id: "PBOS-CODEX-TEST-001",
+        },
+      })
+    ).rejects.toThrow("admission rejected");
   });
 });

@@ -54,7 +54,10 @@ import {
   persistExecutionAuthority,
   persistProviderExecutionAuthorization,
 } from "../execution/authority";
-import { createCodexProviderContract } from "../execution/providers";
+import {
+  createCodexProviderContract,
+  resolveExecutionIdentity,
+} from "../execution/providers";
 import {
   createCodexCliDelegate,
   ExecutionProviderRegistry,
@@ -668,6 +671,27 @@ export async function dispatchKernelCommand(
     const timestamp = new Date().toISOString();
     const registry = createDefaultAgentRegistry(timestamp);
     const agent = registry.get("PBOS-CODEX-CODE-001");
+    const providerBody = agent
+      ? createCodexProviderContract({
+          provider_id: authorization?.provider_id ?? agent.agent_id,
+          version: agent.version,
+        })
+      : null;
+    const provider = providerBody
+      ? { ...providerBody, digest: artifactDigest(providerBody) }
+      : null;
+    let identityResolution = null;
+    if (provider) {
+      try {
+        identityResolution = resolveExecutionIdentity({
+          provider,
+          agents: registry,
+          created_at: timestamp,
+        });
+      } catch (error) {
+        identityResolution = null;
+      }
+    }
     const findings = [
       ...(!orchestration.input.repository.valid ? ["Trusted context is unavailable."] : []),
       ...(!context ? ["Active trusted context is unavailable."] : []),
@@ -680,6 +704,16 @@ export async function dispatchKernelCommand(
         ? ["Provider-bound execution authorization is unavailable."]
         : []),
       ...(!agent ? ["Certified execution agent is unavailable."] : []),
+      ...(!provider || !identityResolution
+        ? ["Certified provider identity could not be resolved."]
+        : []),
+      ...(authorization && provider &&
+      (authorization.provider_id !== provider.provider_id ||
+        authorization.provider_contract_id !== provider.provider_contract_id ||
+        authorization.agent_id !== provider.executable_agent_id ||
+        authorization.provider_contract_digest !== provider.digest)
+        ? ["Execution authorization provider identity does not match."]
+        : []),
     ];
     if (
       findings.length > 0 ||
@@ -688,7 +722,9 @@ export async function dispatchKernelCommand(
       !approval ||
       !authority ||
       !authorization ||
-      !agent
+      !agent ||
+      !provider ||
+      !identityResolution
     ) {
       return {
         command,
@@ -711,7 +747,10 @@ export async function dispatchKernelCommand(
       milestone_id: executionPackage.milestone_id,
       context_identity: context.digest,
       authorization_reference: approval.approval_id,
-      assigned_agent: agent.agent_id,
+      execution_authorization_id: authorization.authorization_id,
+      provider_id: identityResolution.provider_id,
+      provider_contract_id: identityResolution.provider_contract_id,
+      assigned_agent: identityResolution.agent_id,
       allowed_scope: [...authorization.allowed_actions],
       prohibited_scope: [...authorization.prohibited_actions],
       required_capabilities: ["CODE_GENERATION"],
@@ -724,6 +763,10 @@ export async function dispatchKernelCommand(
       context,
       approval,
       package: executionPackage,
+      execution_authorization_id: authorization.authorization_id,
+      provider_id: identityResolution.provider_id,
+      provider_contract_id: identityResolution.provider_contract_id,
+      resolved_agent_id: identityResolution.agent_id,
       required_permissions: [
         "READ_APPROVED_SCOPE",
         "MODIFY_APPROVED_FILES",
@@ -739,6 +782,7 @@ export async function dispatchKernelCommand(
       execution_authority: authority,
       approval,
       agent,
+      identity_resolution: identityResolution,
       assignment,
       requested_at: timestamp,
     };
@@ -771,7 +815,10 @@ export async function dispatchKernelCommand(
         "PBOS EXECUTION TASK ASSIGNMENT",
         "Decision: ASSIGNED",
         `Task: ${assignment.task.task_id}`,
-        `Provider: ${assignment.task.assigned_agent}`,
+        `Provider: ${assignment.task.provider_id}`,
+        `Provider Contract: ${assignment.task.provider_contract_id}`,
+        `Agent: ${assignment.task.assigned_agent}`,
+        `Identity Resolution: ${identityResolution.resolution_id}`,
         `Scope: ${assignment.task.allowed_scope.join(", ")}`,
         "Admission: APPROVED",
         "Next action: RUN IT",

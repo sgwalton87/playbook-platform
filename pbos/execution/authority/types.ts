@@ -43,6 +43,8 @@ export interface ExecutionAuthorization {
   readonly commit_identity: string;
   readonly context_digest: string;
   readonly provider_id: string;
+  readonly provider_contract_id: string;
+  readonly agent_id: string;
   readonly provider_contract_digest: string;
   readonly allowed_actions: readonly string[];
   readonly prohibited_actions: readonly string[];
