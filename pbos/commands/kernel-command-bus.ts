@@ -135,8 +135,10 @@ export async function dispatchKernelCommand(
   evidenceInput: FounderEvidenceInput = {}
 ): Promise<KernelCommandResult> {
   if (command === "mission") {
-    const result = await runMissionControl((missionCommand) =>
-      dispatchKernelCommand(missionCommand, rootDir, actorId, evidenceInput)
+    const result = await runMissionControl(
+      (missionCommand) =>
+        dispatchKernelCommand(missionCommand, rootDir, actorId, evidenceInput),
+      rootDir
     );
     return { command, successful: result.successful, output: result.output };
   }

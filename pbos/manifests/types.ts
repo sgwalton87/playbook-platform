@@ -25,6 +25,20 @@ export type BuildObjectType =
   | "INTEGRATION"
   | "SECURITY_CONTROL";
 
+export interface MissionControlDefinition {
+  readonly objective: string;
+  readonly phase: string;
+  readonly completed: readonly {
+    readonly label: string;
+    readonly evidence: readonly string[];
+  }[];
+  readonly generating: readonly {
+    readonly label: string;
+    readonly output: string;
+  }[];
+  readonly next_human_decision: string;
+}
+
 export interface BuildMilestone {
   readonly id: string;
   readonly name: string;
@@ -45,6 +59,7 @@ export interface BuildMilestone {
   readonly owner: string;
   readonly version: string;
   readonly outputs: readonly string[];
+  readonly mission_control?: MissionControlDefinition;
 }
 
 export interface PlaybookMasterBuildManifest {

@@ -72,4 +72,31 @@ describe("master build manifest", () => {
       "identity and ownership"
     );
   });
+
+  it("fails closed when Mission Control outputs are not declared", () => {
+    const value = validManifest();
+    Object.assign(value.milestones[0], {
+      mission_control: {
+        objective: "Build Experience V1",
+        phase: "Product Definition",
+        completed: [{ label: "Strategy", evidence: ["docs/strategy.md"] }],
+        generating: [{ label: "Product Package", output: "docs/product.md" }],
+        next_human_decision: "Approve Build",
+      },
+    });
+    expect(() => loadMasterBuildManifest(writeManifest(value))).toThrow(
+      "Mission Control output is undeclared"
+    );
+  });
+
+  it("registers Scholar Experience product definition before Scholar OS", () => {
+    const manifest = loadMasterBuildManifest(process.cwd()).manifest;
+    const product = manifest.milestones.find(
+      ({ id }) => id === "SCHOLAR-EXPERIENCE-V1-PRODUCT-DEFINITION-001"
+    );
+    const scholar = manifest.milestones.find(({ id }) => id === "SCHOLAR-OS-001");
+    expect(product?.status).toBe("READY");
+    expect(product?.dependencies).toEqual(["PBOS-PRODUCT-FACTORY-BUILD-PACKAGE-VALIDATION-001"]);
+    expect(scholar?.blocking_dependencies).toEqual([product?.id]);
+  });
 });

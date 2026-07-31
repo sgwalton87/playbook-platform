@@ -29,6 +29,8 @@ System status
 
 Mission Control invokes `run` exactly once. The existing RUN_IT command remains the canonical lifecycle coordinator for recovery, execution package creation, authority resolution, assignment, admission, provider dispatch, evidence, and advancement. Mission Control invokes `next` again only after advancement is complete.
 
+For a selected milestone with a governed product mission definition, Mission Control delegates deterministic package compilation to Product Factory and pauses before provider execution. It reports review readiness only after the generated package identities match their current architecture sources and every output is declared by the milestone. Human approval remains required before build execution.
+
 ## Governance Boundaries
 
 - The constitutional planner alone selects milestones.

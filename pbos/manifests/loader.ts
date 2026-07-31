@@ -50,6 +50,42 @@ function assertMilestone(value: unknown, ids: Set<string>): asserts value is Bui
     throw new Error(`Build milestone ${String(item.id)} has invalid governance metadata.`);
   }
   if (ids.has(String(item.id))) throw new Error(`Duplicate build milestone ${String(item.id)}.`);
+  if (item.mission_control !== undefined) {
+    const mission = item.mission_control as Record<string, unknown>;
+    const completed = mission.completed;
+    const generating = mission.generating;
+    if (
+      !mission ||
+      typeof mission !== "object" ||
+      typeof mission.objective !== "string" ||
+      !mission.objective ||
+      typeof mission.phase !== "string" ||
+      !mission.phase ||
+      typeof mission.next_human_decision !== "string" ||
+      !mission.next_human_decision ||
+      !Array.isArray(completed) ||
+      completed.length === 0 ||
+      !completed.every((entry) => {
+        const record = entry as Record<string, unknown>;
+        return typeof record.label === "string" && record.label.length > 0 && strings(record.evidence);
+      }) ||
+      !Array.isArray(generating) ||
+      generating.length === 0 ||
+      !generating.every((entry) => {
+        const record = entry as Record<string, unknown>;
+        return typeof record.label === "string" && record.label.length > 0 &&
+          typeof record.output === "string" && record.output.length > 0;
+      })
+    ) {
+      throw new Error(`Build milestone ${String(item.id)} has invalid Mission Control metadata.`);
+    }
+    const outputs = item.outputs as readonly string[];
+    for (const entry of generating as Array<Record<string, unknown>>) {
+      if (!outputs.includes(String(entry.output))) {
+        throw new Error(`Build milestone ${String(item.id)} Mission Control output is undeclared.`);
+      }
+    }
+  }
   ids.add(String(item.id));
 }
 

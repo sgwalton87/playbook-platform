@@ -54,8 +54,36 @@
       "owner": "Playbook OS Engineering", "version": "1.0.0", "outputs": ["docs/release-evidence/product-factory-build-package-validation-001.md"]
     },
     {
+      "id": "SCHOLAR-EXPERIENCE-V1-PRODUCT-DEFINITION-001", "name": "Playbook Scholar Experience V1 Product Definition", "type": "MILESTONE",
+      "description": "Compile the canonical Scholar product, experience, and technical architecture into approval-ready implementation packages.", "domain": "operating-systems",
+      "priority": 99, "status": "READY", "dependencies": ["PBOS-PRODUCT-FACTORY-BUILD-PACKAGE-VALIDATION-001"], "blocking_dependencies": [],
+      "required_capabilities": ["product-build-package", "screen-specification", "deterministic-package-generation"],
+      "required_artifacts": ["docs/EXPERIENCE/PBOS_SCHOLAR_OS_PRODUCT_ARCHITECTURE.md", "docs/EXPERIENCE/PBOS_SCHOLAR_OS_SCREEN_SPECIFICATIONS.md", "docs/EXPERIENCE/PBOS_SCHOLAR_OS_APPLICATION_ARCHITECTURE.md"],
+      "validation_requirements": ["product-strategy-integrity", "experience-architecture-integrity", "technical-architecture-integrity", "package-identity"],
+      "risk_level": "YELLOW", "approval_level": "HUMAN",
+      "completion_definition": ["Product, experience, and engineering packages are generated deterministically.", "The Scholar Experience V1 build remains blocked pending package-bound human approval."],
+      "evidence_requirements": ["Product architecture digest", "Experience architecture digest", "Technical architecture digest", "Package set digest", "Human authorization decision"],
+      "owner": "Scholar OS Governance", "version": "1.0.0",
+      "outputs": ["docs/release-evidence/SCHOLAR_EXPERIENCE_V1_PRODUCT_REQUIREMENTS_001.md", "docs/release-evidence/SCHOLAR_EXPERIENCE_V1_EXPERIENCE_PACKAGE_001.md", "docs/release-evidence/SCHOLAR_EXPERIENCE_V1_ENGINEERING_PACKAGE_001.md"],
+      "mission_control": {
+        "objective": "Build Playbook Scholar Experience V1",
+        "phase": "Product Package Generation",
+        "completed": [
+          {"label": "Product Strategy Evidence", "evidence": ["docs/EXPERIENCE/PBOS_SCHOLAR_OS_PRODUCT_ARCHITECTURE.md"]},
+          {"label": "UX Architecture Evidence", "evidence": ["docs/EXPERIENCE/PBOS_SCHOLAR_OS_SCREEN_SPECIFICATIONS.md", "docs/EXPERIENCE/PBOS_SCHOLAR_OS_USER_JOURNEY_ARCHITECTURE.md"]},
+          {"label": "Technical Architecture Evidence", "evidence": ["docs/EXPERIENCE/PBOS_SCHOLAR_OS_APPLICATION_ARCHITECTURE.md", "docs/EXPERIENCE/PBOS_SCHOLAR_OS_APPLICATION_COMPOSITION_ARCHITECTURE.md"]}
+        ],
+        "generating": [
+          {"label": "Product Requirement Package", "output": "docs/release-evidence/SCHOLAR_EXPERIENCE_V1_PRODUCT_REQUIREMENTS_001.md"},
+          {"label": "Experience Package", "output": "docs/release-evidence/SCHOLAR_EXPERIENCE_V1_EXPERIENCE_PACKAGE_001.md"},
+          {"label": "Engineering Package", "output": "docs/release-evidence/SCHOLAR_EXPERIENCE_V1_ENGINEERING_PACKAGE_001.md"}
+        ],
+        "next_human_decision": "Approve Scholar Experience Build"
+      }
+    },
+    {
       "id": "SCHOLAR-OS-001", "name": "Scholar OS", "type": "OPERATING_SYSTEM", "description": "Govern the Scholar operating experience.", "domain": "operating-systems",
-      "priority": 95, "status": "DEFINED", "dependencies": [], "blocking_dependencies": ["PBOS-PRODUCT-FACTORY-BUILD-PACKAGE-VALIDATION-001"],
+      "priority": 95, "status": "DEFINED", "dependencies": [], "blocking_dependencies": ["SCHOLAR-EXPERIENCE-V1-PRODUCT-DEFINITION-001"],
       "required_capabilities": ["scholar-experience"], "required_artifacts": ["docs/EXPERIENCE/PBOS_SCHOLAR_OS_ARCHITECTURE.md"], "validation_requirements": ["experience-certification"],
       "risk_level": "YELLOW", "approval_level": "HUMAN", "completion_definition": ["Scholar OS is validated and certified."], "evidence_requirements": ["Experience evidence"],
       "owner": "Scholar OS Governance", "version": "1.0.0", "outputs": []
