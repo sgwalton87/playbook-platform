@@ -93,6 +93,32 @@ function request(): ExecutionFabricRequest {
       artifacts: [{ path: "docs/output.md", digest: "6".repeat(64) }],
       validation_results: ["npm test"],
       evidence_references: ["VALIDATION_RESULTS"],
+      provider_telemetry: (() => {
+        const body = {
+          version: "1.0.0" as const,
+          owner: "execution-provider-telemetry" as const,
+          execution_id: "EXECUTION-001",
+          provider: "PBOS-CODEX-CODE-001",
+          task: task.task_id,
+          milestone: task.milestone_id,
+          phase: "PROVIDER_EXECUTION" as const,
+          status: "COMPLETED" as const,
+          started_at: "2026-07-31T00:00:00.000Z",
+          updated_at: "2026-07-31T00:01:00.000Z",
+          completed_at: "2026-07-31T00:01:00.000Z",
+          last_provider_event: "PROVIDER_COMPLETED" as const,
+          events: [{
+            sequence: 1,
+            type: "PROVIDER_COMPLETED" as const,
+            timestamp: "2026-07-31T00:01:00.000Z",
+            elapsed_ms: 60_000,
+            detail: "Completed.",
+          }],
+          completion_state: "SUCCEEDED" as const,
+        };
+        return { ...body, digest: artifactDigest(body) };
+      })(),
+      provider_exit_status: 0,
       started_at: "2026-07-31T00:00:00.000Z",
       completed_at: "2026-07-31T00:01:00.000Z",
     }),
@@ -163,6 +189,7 @@ function request(): ExecutionFabricRequest {
     digest: artifactDigest(admissionBody),
   };
   return {
+    rootDir: process.cwd(),
     context,
     package: executionPackage,
     approval,

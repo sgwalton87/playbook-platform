@@ -52,6 +52,9 @@ import {
   persistExecutionApproval,
   persistExecutionAuthority,
   persistProviderExecutionAuthorization,
+  persistExecutionAuthorityLedgerEntry,
+  resolveReusableExecutionAuthority,
+  formatReusableExecutionAuthority,
 } from "../execution/authority";
 import {
   createCodexProviderContract,
@@ -74,6 +77,7 @@ import {
   loadExecutionEvidence,
   persistMilestoneAdvancement,
   persistExecutionEvidence,
+  revalidateExecutionEvidence,
 } from "../execution/evidence";
 
 export const KERNEL_COMMANDS = [
@@ -285,19 +289,26 @@ export async function dispatchKernelCommand(
         ].join("\n"),
       };
     }
-    const approval = loadExecutionApproval(rootDir)?.latest ?? null;
-    const authority = loadExecutionAuthority(rootDir)?.latest ?? null;
-    const authorization =
-      loadProviderExecutionAuthorization(rootDir)?.latest ?? null;
-    if (
-      !approval ||
-      approval.decision !== "APPROVED" ||
-      approval.package_digest !== orchestration.executionPackage.digest ||
-      !authority ||
-      authority.package_digest !== orchestration.executionPackage.digest ||
-      !authorization ||
-      authorization.package_digest !== orchestration.executionPackage.digest
-    ) {
+    const context = loadTrustedBuildContext(rootDir)?.latest ?? null;
+    const agent = createDefaultAgentRegistry(timestamp).get("PBOS-CODEX-CODE-001");
+    const providerBody = agent
+      ? createCodexProviderContract({ provider_id: agent.agent_id, version: agent.version })
+      : null;
+    const provider = providerBody
+      ? { ...providerBody, digest: artifactDigest(providerBody) }
+      : null;
+    const reuse = context && agent && provider
+      ? resolveReusableExecutionAuthority({
+          rootDir,
+          context,
+          package: orchestration.executionPackage,
+          provider,
+          agent,
+          expected_scope: orchestration.executionPackage.required_changes,
+          timestamp,
+        })
+      : { valid: false, authority: null, findings: ["Current execution identity is unavailable."] };
+    if (!reuse.valid || !reuse.authority) {
       return {
         command,
         successful: true,
@@ -308,10 +319,16 @@ export async function dispatchKernelCommand(
           "Reason: Package-bound execution approval is required.",
           `Package: ${orchestration.executionPackage.package_id}`,
           `Digest: ${orchestration.executionPackage.digest}`,
+          ...reuse.findings.map((finding) => `Reason: ${finding}`),
           "Command: npm run pbos:approve",
         ].join("\n"),
       };
     }
+    if (!context) {
+      throw new Error("Trusted context disappeared during authority reuse.");
+    }
+    const { approval, authority, authorization } = reuse.authority;
+    const authorityReuseOutput = formatReusableExecutionAuthority(reuse.authority);
     let assignmentArtifact = loadExecutionAssignment(rootDir);
     if (
       !assignmentArtifact ||
@@ -351,9 +368,37 @@ export async function dispatchKernelCommand(
       existingEvidence.record.package_digest === orchestration.executionPackage.digest &&
       existingEvidence.record.approval_id === approval.approval_id
     ) {
+      let validatedEvidence;
+      try {
+        validatedEvidence = revalidateExecutionEvidence({
+          rootDir,
+          evidence: existingEvidence,
+          context,
+          package: orchestration.executionPackage,
+          approval,
+          authority,
+          authorization,
+          assignment: assignmentArtifact.assignment,
+        });
+      } catch (error) {
+        return {
+          command,
+          successful: false,
+          output: [
+            "PBOS EXECUTION EVIDENCE RECOVERY",
+            "Decision: BLOCKED",
+            error instanceof Error ? error.message : String(error),
+            "No milestone transition was applied.",
+          ].join("\n"),
+        };
+      }
+      const recoveredEvidence = persistExecutionEvidence(
+        rootDir,
+        validatedEvidence
+      ).latest;
       const advancement = assessMilestoneAdvancement({
         package: orchestration.executionPackage,
-        evidence: existingEvidence,
+        evidence: recoveredEvidence,
       });
       const transition = advancement.eligible
         ? persistMilestoneAdvancement({
@@ -361,7 +406,7 @@ export async function dispatchKernelCommand(
             package: orchestration.executionPackage,
             assessment: advancement,
             authorized_by: authorization.approved_by,
-            timestamp: existingEvidence.record.completed_at,
+            timestamp: recoveredEvidence.record.completed_at,
           }).latest
         : null;
       return {
@@ -369,13 +414,15 @@ export async function dispatchKernelCommand(
         successful: advancement.eligible,
         output: [
           "PBOS OPERATOR MODE",
+          authorityReuseOutput,
           "CURRENT STATE: EXECUTION EVIDENCE RECOVERED",
           "AVAILABLE ACTION: Lifecycle advancement assessment",
           "AUTOMATIC ACTIONS: Evidence loaded and validated",
           "HUMAN ACTION REQUIRED: NONE",
           "NEXT COMMAND: npm run it",
-          `Execution: ${existingEvidence.record.status}`,
-          `Validation: ${existingEvidence.completion.complete ? "PASS" : "FAIL"}`,
+          `Execution: ${recoveredEvidence.record.status}`,
+          `Evidence: ${recoveredEvidence.completion.evidence_status}`,
+          `Validation: ${recoveredEvidence.completion.complete ? "PASS" : "FAIL"}`,
           `Milestone Advancement: ${transition ? "COMPLETE" : "BLOCKED"}`,
           ...advancement.findings.map((finding) => `- ${finding}`),
         ].join("\n"),
@@ -388,6 +435,8 @@ export async function dispatchKernelCommand(
         output: [
           operatorOutput,
           "",
+          authorityReuseOutput,
+          "",
           "PBOS EXECUTION READY",
           `Package: ${orchestration.executionPackage.package_id}`,
           `Authorization: ${authorization.authorization_id}`,
@@ -399,8 +448,6 @@ export async function dispatchKernelCommand(
         ].join("\n"),
       };
     }
-    const context = loadTrustedBuildContext(rootDir)?.latest ?? null;
-    if (!context) throw new Error("Trusted context disappeared before dispatch.");
     const providers = registerCodexProvider({
       registry: new ExecutionProviderRegistry(),
       provider_id: authorization.provider_id,
@@ -408,6 +455,7 @@ export async function dispatchKernelCommand(
       delegate: createCodexCliDelegate({ rootDir }),
     });
     const fabricResult = await new ExecutionFabricRunner().execute({
+      rootDir,
       context,
       package: orchestration.executionPackage,
       approval,
@@ -437,6 +485,7 @@ export async function dispatchKernelCommand(
       successful: advancement.eligible,
       output: [
         "PBOS OPERATOR MODE",
+        authorityReuseOutput,
         "Intent: RUN_IT",
         `Package: ${orchestration.executionPackage.package_id}`,
         `Provider: ${fabricResult.provider_id}`,
@@ -1134,6 +1183,12 @@ export async function dispatchKernelCommand(
       issued_at: timestamp,
     });
     persistProviderExecutionAuthorization(rootDir, authorization);
+    persistExecutionAuthorityLedgerEntry({
+      rootDir,
+      approval,
+      authority,
+      authorization,
+    });
     return {
       command,
       successful: true,

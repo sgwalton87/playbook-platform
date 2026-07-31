@@ -85,6 +85,14 @@ export const RuntimeArtifactOwnership: Record<
     persistence: "durable",
     cleanup: "governed-transition",
   },
+  executionAuthorityLedger: {
+    path: Artifacts.executionAuthorityLedger,
+    owner: "execution-authority-ledger",
+    producer: "execution authority correlation",
+    consumers: ["operator", "execution-admission", "audit"],
+    persistence: "durable",
+    cleanup: "governed-transition",
+  },
   executionApproval: {
     path: Artifacts.executionApproval,
     owner: "execution-approval-authority",

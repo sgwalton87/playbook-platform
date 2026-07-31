@@ -6,3 +6,5 @@ export * from "./issuer";
 export * from "./approval";
 export * from "./approval-store";
 export * from "./authorization-store";
+export * from "./ledger-store";
+export * from "./reuse";

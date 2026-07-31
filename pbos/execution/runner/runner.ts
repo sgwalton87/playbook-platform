@@ -1,6 +1,6 @@
 import { artifactDigest } from "../../kernel/identity";
 import { ExecutionLifecycleAdapter } from "../adapters";
-import { buildExecutionEvidence } from "../evidence";
+import { buildExecutionEvidence, evaluateExecutionValidations } from "../evidence";
 import { validateExecutionAuthorization } from "../authority";
 import type { ExecutionFabricRequest, ExecutionFabricResult } from "./types";
 
@@ -39,16 +39,30 @@ export class ExecutionFabricRunner {
     const result = await new ExecutionLifecycleAdapter(
       new Map([[providerId, provider.adapter]])
     ).execute(request.admission, request.assignment);
+    const validationEvidence = evaluateExecutionValidations({
+      rootDir: request.rootDir,
+      task: request.assignment.task,
+      package: request.package,
+      authority: request.authority,
+      authorization: request.authorization,
+      artifacts: result.artifacts,
+      provider_validation_results: result.validation_results,
+    });
     const evidence = buildExecutionEvidence({
       result,
+      package_id: request.package.package_id,
+      milestone_id: request.package.milestone_id,
       package_digest: request.package.digest,
       context_digest: request.context.digest,
       approval_id: request.approval.approval_id,
       authorization_id: request.authorization.authorization_id,
+      authority_digest: request.authority.digest,
       provider_id: provider.contract.provider_id,
       provider_contract_id: provider.contract.provider_contract_id,
+      assigned_agent_id: request.assignment.task.assigned_agent,
       required_validations: request.assignment.task.validation_requirements,
       required_evidence: request.assignment.task.evidence_requirements,
+      validation_evidence: validationEvidence,
     });
     const body = {
       provider_id: providerId,

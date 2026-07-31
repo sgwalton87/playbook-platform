@@ -11,6 +11,7 @@ import type { ExecutionProviderRegistry } from "../providers";
 import type { TaskAssignment } from "../tasks";
 
 export interface ExecutionFabricRequest {
+  readonly rootDir: string;
   readonly context: TrustedBuildContext;
   readonly package: CodexExecutionPackage;
   readonly approval: ApprovalRecord;

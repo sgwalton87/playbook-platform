@@ -13,6 +13,7 @@ import type { ExecutionTask } from "../tasks";
 import type { CodexTaskDelegate } from "../adapters";
 import {
   ExecutionTelemetryRecorder,
+  loadExecutionTelemetry,
   type ProviderEventSink,
   type ProviderExecutionEventType,
 } from "./telemetry";
@@ -282,6 +283,7 @@ export function createCodexCliDelegate(input: {
       `VALIDATION_RESULTS:${artifactDigest(validationResults)}`
     );
     const completedAt = now().toISOString();
+    const telemetry = loadExecutionTelemetry(input.rootDir);
     return {
       execution_id: executionId,
       task_id: task.task_id,
@@ -290,6 +292,8 @@ export function createCodexCliDelegate(input: {
       artifacts,
       validation_results: validationResults,
       evidence_references: evidenceReferences,
+      provider_telemetry: telemetry,
+      provider_exit_status: 0,
       started_at: startedAt,
       completed_at: completedAt,
     };

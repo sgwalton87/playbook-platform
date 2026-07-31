@@ -10,10 +10,16 @@ export interface ExecutionEvidenceHistory {
 }
 
 function validBundle(bundle: ExecutionEvidenceBundle): boolean {
-  return bundle.digest === artifactDigest({
-    record: bundle.record,
-    completion: bundle.completion,
-  });
+  const { digest: recordDigest, ...recordBody } = bundle.record;
+  const { digest: completionDigest, ...completionBody } = bundle.completion;
+  return (
+    recordDigest === artifactDigest(recordBody) &&
+    completionDigest === artifactDigest(completionBody) &&
+    bundle.digest === artifactDigest({
+      record: bundle.record,
+      completion: bundle.completion,
+    })
+  );
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

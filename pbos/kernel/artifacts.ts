@@ -14,6 +14,7 @@ export const Artifacts = {
   workPackage: "pbos/runtime/work-package.json",
   executionAuthorization: "pbos/runtime/execution-authorization.json",
   executionAuthority: "pbos/runtime/execution-authority.json",
+  executionAuthorityLedger: "pbos/runtime/execution-authority-ledger.json",
   executionApproval: "pbos/runtime/execution-approval.json",
   executionFabricAuthorization: "pbos/runtime/execution-fabric-authorization.json",
   executionAssignment: "pbos/runtime/execution-assignment.json",

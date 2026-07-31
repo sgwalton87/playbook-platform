@@ -85,3 +85,10 @@ export function persistExecutionApproval(
   );
   return artifact;
 }
+
+export function executionApprovalRecords(
+  rootDir = process.cwd()
+): readonly ApprovalRecord[] {
+  const value = loadExecutionApproval(rootDir);
+  return value ? [...value.history, value.latest] : [];
+}

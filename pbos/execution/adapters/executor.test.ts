@@ -38,6 +38,8 @@ describe("agent executor", () => {
           artifacts: [{ path: "app/page.tsx", digest: "c".repeat(64) }],
           validation_results: ["PASS"],
           evidence_references: ["EVIDENCE-001"],
+          provider_telemetry: null,
+          provider_exit_status: 0,
           started_at: "2026-07-30T00:00:00.000Z",
           completed_at: "2026-07-30T00:00:01.000Z",
         }),

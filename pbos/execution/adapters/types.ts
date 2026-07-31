@@ -1,4 +1,5 @@
 import type { ExecutionTask } from "../tasks";
+import type { ExecutionTelemetry } from "../providers/telemetry";
 
 export interface AgentExecutionArtifact {
   readonly path: string;
@@ -13,6 +14,8 @@ export interface AgentExecutionResult {
   readonly artifacts: readonly AgentExecutionArtifact[];
   readonly validation_results: readonly string[];
   readonly evidence_references: readonly string[];
+  readonly provider_telemetry: ExecutionTelemetry | null;
+  readonly provider_exit_status: number | null;
   readonly started_at: string;
   readonly completed_at: string;
   readonly digest: string;

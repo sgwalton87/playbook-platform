@@ -63,3 +63,10 @@ export function persistExecutionAuthority(
   );
   return artifact;
 }
+
+export function executionAuthorityRecords(
+  rootDir = process.cwd()
+): readonly ExecutionAuthorityRecord[] {
+  const value = loadExecutionAuthority(rootDir);
+  return value ? [...value.history, value.latest] : [];
+}

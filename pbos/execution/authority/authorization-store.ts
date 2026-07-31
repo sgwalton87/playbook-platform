@@ -121,3 +121,15 @@ export function persistProviderExecutionAuthorization(
   );
   return artifact;
 }
+
+export function providerExecutionAuthorizationRecords(
+  rootDir = process.cwd()
+): readonly ExecutionAuthorization[] {
+  const value = loadAuthorizationEnvelope(rootDir);
+  if (!value) return [];
+  const records: ExecutionAuthorization[] = [];
+  for (const candidate of [...value.history, value.latest]) {
+    if (isAuthorization(candidate)) records.push(candidate);
+  }
+  return records;
+}

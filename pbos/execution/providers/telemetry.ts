@@ -146,3 +146,35 @@ export class ExecutionTelemetryRecorder {
     return { ...body, digest: artifactDigest(body) };
   }
 }
+
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+export function loadExecutionTelemetry(
+  rootDir = process.cwd()
+): ExecutionTelemetry | null {
+  const artifactPath = path.join(rootDir, Artifacts.executionTelemetry);
+  if (!Runtime.exists(artifactPath)) return null;
+  const value = Runtime.load(artifactPath);
+  if (
+    !isObject(value) ||
+    value.version !== "1.0.0" ||
+    value.owner !== "execution-provider-telemetry" ||
+    typeof value.execution_id !== "string" ||
+    typeof value.provider !== "string" ||
+    typeof value.task !== "string" ||
+    typeof value.milestone !== "string" ||
+    value.phase !== "PROVIDER_EXECUTION" ||
+    !["STARTING", "RUNNING", "WAITING", "COMPLETED", "FAILED"].includes(String(value.status)) ||
+    !Array.isArray(value.events) ||
+    typeof value.digest !== "string"
+  ) {
+    throw new Error("Execution telemetry artifact is invalid.");
+  }
+  const { digest, ...body } = value;
+  if (digest !== artifactDigest(body)) {
+    throw new Error("Execution telemetry digest is invalid.");
+  }
+  return value as unknown as ExecutionTelemetry;
+}
