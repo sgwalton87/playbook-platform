@@ -1,6 +1,6 @@
 ---
 title: PBOS Autonomous Engineering Lifecycle
-version: 1.0.0
+version: 2.0.0
 status: Canonical
 owners:
   - PBOS
@@ -22,6 +22,14 @@ The specification establishes how PBOS performs software engineering, validates 
 The following document is the implementation authority for this engineering initiative:
 
 PBOS-ENGINE-LIFECYCLE-001_AUTONOMOUS_ENGINEERING_LIFECYCLE.md
+
+Its Version 2 architecture supersedes Version 1 and is the sole constitutional implementation authority.
+
+The Candidate Workspace subsystem is governed by:
+
+`PBOS-ENGINE-LIFECYCLE-002_CANDIDATE_WORKSPACE_ARCHITECTURE.md`
+
+This subordinate authority defines how PBOS constructs mutable engineering candidates without transferring Runtime, Validation, Certification, Repository Context, or Repository Evolution ownership.
 
 If implementation behavior conflicts with this README, the engineering specification takes precedence.
 
@@ -107,31 +115,25 @@ Repository evolution shall occur only after constitutional certification.
 
 Implementation proceeds in the following order.
 
-1. Repository Discovery
+1. Contract and Artifact Inventory
 
-2. Architecture Impact Assessment
+2. Engineering Lifecycle Coordination
 
-3. Migration Planning
+3. Candidate Workspace Isolation
 
-4. Lifecycle Foundation
+4. Storage Separation
 
-5. Runtime Separation
+5. Validation Aggregation
 
-6. Validation Separation
+6. Engineering Certification Coordination
 
-7. Certification Engine
+7. Repository Evolution and Baselines
 
-8. Repository Evolution Engine
+8. Mission Queue and Concurrency
 
-9. Baseline Engine
+9. Legacy Retirement
 
-10. Runtime Artifact Governance
-
-11. Migration
-
-12. Repository Certification
-
-13. Engineering Certification
+10. Enterprise Certification
 
 Every phase concludes with constitutional validation before the next phase begins.
 
@@ -202,4 +204,3 @@ Implementation is complete only when:
 • Repository history represents certified engineering milestones rather than runtime execution.
 
 • PBOS produces a successful Engineering Certification Report confirming compliance with PBOS-ENGINE-LIFECYCLE-001.
-

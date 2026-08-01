@@ -1,4 +1,5 @@
 import type { SupportRole } from "@/lib/collaboration";
+import { getPermissionsForRelationship } from "@/lib/permissions/rolePermissions";
 
 export function getRoleNotifications() {
   return [
@@ -55,5 +56,10 @@ export function getRoleNotifications() {
 }
 
 export function getNotificationForRole(role: SupportRole) {
-  return getRoleNotifications().find(item => item.role === role);
+  return getRoleNotifications().find((item) => item.role === role);
+}
+
+export function getPermissionAwareActionRoute(role: SupportRole, permission: string) {
+  const permissions = getPermissionsForRelationship(role === "university" ? "university_partner" : role === "district" ? "district_admin" : role === "employer" ? "employer_partner" : role === "family" ? "parent_guardian" : role === "educator" ? "educator" : role === "mentor" ? "mentor" : "scholar");
+  return permissions.includes(permission as never) ? getNotificationForRole(role)?.route : "/notifications";
 }

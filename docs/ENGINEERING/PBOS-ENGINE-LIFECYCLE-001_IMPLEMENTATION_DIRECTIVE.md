@@ -1,7 +1,7 @@
 ---
 id: PBOS-ENGINE-LIFECYCLE-001-IMPLEMENTATION-DIRECTIVE
 title: Implementation Directive for Autonomous Engineering Lifecycle
-version: 1.0.0
+version: 2.0.0
 status: Canonical
 classification: Engineering Directive
 owners:
@@ -21,6 +21,8 @@ The objective is not merely to write code.
 The objective is to produce a production-grade architectural implementation that preserves constitutional integrity while advancing PBOS toward autonomous engineering.
 
 This directive is mandatory.
+
+Version 2 of `PBOS-ENGINE-LIFECYCLE-001_AUTONOMOUS_ENGINEERING_LIFECYCLE.md` is the sole implementation authority. Implementation shall begin with its Phase 0 contracts and inventory. The prior Version 1 directory prescription is superseded; implementations shall use architectural ports and adapt existing constitutional owners rather than create parallel subsystems.
 
 ---
 
@@ -343,4 +345,3 @@ Codex is NOT authorized to weaken constitutional guarantees.
 Codex is NOT authorized to reduce architectural quality.
 
 Codex shall continue implementation until the lifecycle defined by PBOS-ENGINE-LIFECYCLE-001 has been fully realized and constitutionally certified.
-

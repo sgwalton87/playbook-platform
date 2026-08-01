@@ -9,8 +9,8 @@ export const PLAYBOOK_ROLES = {
   "college-coach": { label: "College Coach / Recruiter", osLabel: "Recruiting OS", osRoute: "/university-os", onboarding: true },
   "college-admissions": { label: "College Admissions", osLabel: "Admissions OS", osRoute: "/university-os", onboarding: true },
   "brand-partner": { label: "Brand Partner", osLabel: "Brand Partner OS", osRoute: "/brand-partner-os", onboarding: true },
-  employer: { label: "Employer / Workforce Partner", osLabel: "Employer OS", osRoute: "/employer-os", onboarding: false },
-  district: { label: "District / School Administrator", osLabel: "District OS", osRoute: "/district-os", onboarding: false },
+  employer: { label: "Employer / Workforce Partner", osLabel: "Employer OS", osRoute: "/employer-os", onboarding: true },
+  district: { label: "District / School Administrator", osLabel: "District OS", osRoute: "/district-os", onboarding: true },
   other: { label: "Community Partner", osLabel: "Playbook", osRoute: "/pending", onboarding: true },
 } as const;
 

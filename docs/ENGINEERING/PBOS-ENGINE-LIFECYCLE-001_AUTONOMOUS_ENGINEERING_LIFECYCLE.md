@@ -1,11 +1,11 @@
 ---
 id: PBOS-ENGINE-LIFECYCLE-001
 title: Autonomous Engineering Lifecycle
-version: 1.0.0
-status: Draft
-classification: Canonical Engineering Specification
+version: 2.0.0
+status: Canonical
+classification: Constitutional Engineering Specification
 owners:
-  - PBOS
+  - PBOS Engineering Governance
 layer: Engineering
 parent: PBOS Engineering
 depends_on:
@@ -21,2204 +21,625 @@ related:
   - PBOS Kernel
   - PBOS Compiler
   - Mission Control
-  - Repository Context
+  - Repository Context Authority
+  - PBOS-ENGINE-LIFECYCLE-001_IMPLEMENTATION_DIRECTIVE.md
+supersedes:
+  - PBOS-ENGINE-LIFECYCLE-001@1.0.0
 last_updated: 2026-08-01
 ---
 
-# Executive Summary
+# Executive Architecture Decision
+
+PBOS shall separate autonomous engineering execution from certified repository evolution through an isolated Candidate Workspace and an immutable Candidate Change Set.
+
+Runtime executes missions in Candidate Workspaces. Validation establishes engineering confidence in Candidate Change Sets. Existing domain certifiers establish domain trust. The Engineering Certification Coordinator aggregates, but never replaces, those trust decisions. Repository Evolution alone converts a certified Candidate Change Set into durable repository history through a recoverable constitutional transaction.
+
+The certified repository checkout is read-only to Runtime, Validation, and Mission Control. Candidate Workspaces may contain governed engineering mutations. This distinction resolves the Version 1 contradiction between building software and requiring the certified checkout to remain clean.
+
+This Version 2 specification is the sole constitutional implementation authority for the PBOS Autonomous Engineering Lifecycle. Version 1 is superseded.
+
+# 1. Purpose and Scope
+
+This specification governs how PBOS queues, executes, validates, certifies, records, recovers, and evolves software engineering work. It applies to all PBOS engineering missions, providers, repositories, organizations, and future implementation technologies.
+
+It governs architectural ownership and contracts. It does not transfer authority held by the Kernel, Constitutional Planner, Repository Context Authority, domain certifiers, Execution Fabric, or existing authorization systems.
+
+# 2. Constitutional Principles
+
+1. **Certified history is immutable.** Runtime cannot rewrite accepted repository history or certified evidence.
+2. **Candidate mutation is explicit.** Engineering changes occur only inside an admitted Candidate Workspace.
+3. **Validation creates confidence, not trust.** Validation cannot certify or evolve a repository.
+4. **Certification is federated.** Domain certifiers retain authority; engineering certification aggregates their decisions.
+5. **Repository Evolution is singular.** Only Repository Evolution may commit, tag, push, or advance a baseline.
+6. **Identity precedes mutation.** Every mission, workspace, change set, validation, certification, and evolution has an immutable identity.
+7. **Transitions are evidence-bound.** No lifecycle state changes without authority and evidence.
+8. **Retries are idempotent.** Repeated delivery cannot duplicate a transition or repository effect.
+9. **Failure preserves trust.** Ambiguity, corruption, conflict, or missing evidence fails closed.
+10. **Infrastructure is replaceable.** Constitutional domains depend on ports, not filesystem layouts or Git commands.
+11. **Human authority is preserved.** Automation may prepare and recommend; governed approvals remain mandatory where policy requires them.
+12. **History represents accepted evolution.** Transient execution and telemetry are not repository history.
+
+# 3. Constitutional Domain Model
+
+```text
+Strategic Intent
+  -> Mission Queue
+  -> Engineering Lifecycle Coordinator
+  -> Runtime + Candidate Workspace
+  -> Candidate Change Set
+  -> Validation Aggregate
+  -> Domain Certifications
+  -> Engineering Certification Coordinator
+  -> Certified Evolution Bundle
+  -> Repository Evolution Transaction
+  -> Repository Commit + Baseline + Historical Record
+```
+
+## 3.1 Domain Responsibilities
+
+| Domain | Owns | Must not own |
+|---|---|---|
+| Mission Queue | Admission order, leases, retry, scheduling history | Mission execution or approval |
+| Engineering Lifecycle Coordinator | Engineering state transitions and transition history | Work execution, validation, certification, Git |
+| Runtime | Mission execution sessions | Certified history, certification, repository evolution |
+| Candidate Workspace Authority | Isolated mutable workspace lifecycle | Planning, validation decisions, certification |
+| Validation | Deterministic correctness findings and confidence | Trust issuance or repository mutation |
+| Domain Certifiers | Trust within their constitutional domains | Global engineering certification |
+| Engineering Certification Coordinator | Aggregate engineering trust decision | Replacing domain certifiers or executing work |
+| Repository Evolution | Certified history mutation transaction | Runtime execution or validation |
+| Baseline Authority | Certified checkpoint identity and succession | Git side effects or candidate mutation |
+| Repository Context Authority | Repository reality identity and trust | Engineering certification decision |
+| History Authority | Append-only lifecycle and audit records | Operational decision making |
+| Observability | Telemetry projections and alerts | Lifecycle authority |
+
+## 3.2 Permitted Dependency Direction
+
+```text
+CLI / Mission Control
+  -> Lifecycle and Queue Ports
+  -> Domain Contracts
+  -> Infrastructure Ports
+  -> Filesystem / Git / Remote / Metrics Adapters
+```
+
+Infrastructure adapters may return results but may not initiate constitutional transitions. Reverse mutation, skipped domains, and direct Runtime-to-Git access are prohibited.
+
+# 4. Engineering Lifecycle Authority
+
+The Engineering Lifecycle Coordinator is the singular authority for engineering lifecycle transitions. It is distinct from gate lifecycle, execution lifecycle, provider lifecycle, certification state, and release lifecycle.
+
+## 4.1 State Machine
+
+```text
+QUEUED
+  -> ADMITTED
+  -> EXECUTING
+  -> CANDIDATE_READY
+  -> VALIDATING
+  -> VALIDATED
+  -> CERTIFICATION_PENDING
+  -> CERTIFIED
+  -> EVOLUTION_PENDING
+  -> EVOLVING
+  -> EVOLVED
+```
 
-This specification defines the constitutional evolution of the PBOS engineering lifecycle.
+Exceptional states:
+
+```text
+BLOCKED | FAILED | CANCELLED | REJECTED | SUPERSEDED | RECOVERY_REQUIRED
+```
 
-Its purpose is to separate autonomous engineering execution from repository certification so that PBOS may execute multiple validated engineering missions without continuously mutating repository state.
+## 4.2 Transition Contract
 
-Repository history shall represent certified engineering evolution rather than transient runtime execution.
+Every transition requires:
 
-The engineering lifecycle defined herein supersedes previous assumptions that successful runtime execution should immediately modify repository artifacts, regenerate repository context, or require Git operations.
+- transition identity and idempotency key;
+- mission, organization, repository, and subject identities;
+- expected prior state and prior-state digest;
+- requested next state;
+- actor and authority identities;
+- evidence references and evidence digests;
+- policy and schema versions;
+- timestamp from an injected trusted clock;
+- transition result and transition digest.
 
-Instead, PBOS shall execute continuously, validate continuously, certify intentionally, and evolve the repository only when constitutional certification requirements have been satisfied.
+The store shall use optimistic concurrency. A transition whose expected state or digest no longer matches fails with `CONCURRENT_TRANSITION`. No implicit retry may change the requested outcome.
 
-This document serves as the implementation authority for the Autonomous Engineering Lifecycle.
+## 4.3 State Entry Requirements
 
+| State | Entry requirement |
+|---|---|
+| QUEUED | Valid mission identity, objective, dependencies, authority scope |
+| ADMITTED | Dependencies satisfied, lease acquired, workspace capacity available |
+| EXECUTING | Candidate Workspace admitted and provider authorized |
+| CANDIDATE_READY | Execution ended and immutable Candidate Change Set sealed |
+| VALIDATING | Validation plan bound to change-set identity |
+| VALIDATED | Required validations complete and confidence policy satisfied |
+| CERTIFICATION_PENDING | Required domain certification set resolved |
+| CERTIFIED | Engineering certification issued for exact candidate digest |
+| EVOLUTION_PENDING | Repository Evolution approval and target resolved |
+| EVOLVING | Exclusive repository evolution lease acquired |
+| EVOLVED | Commit, verification, required publication, baseline, and audit finalized |
 
-# Purpose
+# 5. Candidate Workspace Architecture
 
-PBOS has evolved beyond a collection of engineering tools.
+## 5.1 Purpose
 
-PBOS is becoming an autonomous engineering operating system responsible for planning, implementing, validating, certifying, releasing, and continuously improving the Playbook Platform.
+A Candidate Workspace is an isolated mutable engineering environment derived from one certified repository baseline. It exists because Runtime must create real software changes while the certified checkout and accepted history remain immutable.
 
-The existing engineering lifecycle was designed around individual execution cycles.
+Candidate Workspace cannot be replaced by Runtime. Runtime owns execution sessions; Workspace Authority owns filesystem isolation, base ancestry, mutation boundaries, sealing, retention, and cleanup. Combining them would let an executor redefine its own trust boundary.
 
-As PBOS has matured, this lifecycle has become a limiting architectural constraint.
+## 5.2 Ownership and Authority
 
-Runtime execution currently produces repository mutations during ordinary engineering activity.
+Candidate Workspace Authority is the sole owner of workspace creation, admission, sealing, quarantine, cleanup, and recovery. Runtime receives a capability-scoped workspace handle. It never receives Repository Evolution credentials or unrestricted access to the certified checkout.
 
-This unnecessarily couples execution with repository evolution.
+## 5.3 Workspace Identity
 
-The purpose of this specification is to permanently separate:
+Every workspace declares:
+
+- workspace identity and version;
+- mission and organization identities;
+- repository and certified baseline identities;
+- parent commit and context identities;
+- provider and execution authority identities;
+- allowed and prohibited paths;
+- creation, lease, expiration, and retention timestamps;
+- isolation policy and adapter identity;
+- status and digest.
 
-• Runtime Execution
+## 5.4 Workspace Lifecycle
 
-• Engineering Validation
+```text
+REQUESTED -> PROVISIONED -> ADMITTED -> ACTIVE -> SEALED
+          -> VALIDATING -> RETAINED -> DISPOSED
+```
 
-• Repository Certification
+Exceptional states are `BLOCKED`, `QUARANTINED`, `EXPIRED`, `ORPHANED`, and `RECOVERY_REQUIRED`.
 
-• Repository Evolution
+## 5.5 Isolation and Mutation
+
+- The certified base is mounted or represented read-only.
+- Candidate mutations are permitted only within declared paths.
+- Symlink, path traversal, submodule, generated-file, credential, and network boundaries are validated.
+- Runtime state, telemetry, caches, and secrets are stored outside candidate source paths.
+- One workspace cannot read or mutate another organization or mission workspace unless an explicit read-only dependency contract permits it.
+- Workspace sealing prevents further mutation and produces a Candidate Change Set.
+
+## 5.6 Repository and Git Relationship
 
-• Git Operations
+A Git worktree may implement a Candidate Workspace, but Git is not its constitutional identity. Implementations may use copy-on-write snapshots, containers, virtual filesystems, or future technologies if they satisfy the port contract.
 
-Each becomes an independent constitutional lifecycle domain governed by explicit architectural boundaries.
+Runtime may use read-only Git inspection through a repository port. Runtime may not commit, tag, push, alter remotes, or update the certified branch. Repository Evolution alone performs those actions.
 
-PBOS shall execute continuously.
+## 5.7 Cleanup, Retention, and Recovery
 
-Repository evolution shall occur intentionally.
+- Failed and rejected workspaces are quarantined until evidence retention requirements are met.
+- Validated candidates are retained until certification disposition.
+- Certified candidates are retained until evolution finalization and audit verification.
+- Cleanup requires a terminal lifecycle state, retention eligibility, no active lease, and a recorded cleanup decision.
+- Orphan detection uses lease expiry plus owner liveness; expiry alone never deletes evidence.
+- Recovery reconstructs workspace state from the certified base, immutable change set, and history rather than trusting mutable workspace contents.
 
-Repository history shall represent engineering trust rather than engineering activity.
+## 5.8 Interactions
 
----
+| System | Interaction |
+|---|---|
+| Runtime | Receives scoped handle and writes candidate content |
+| Validation | Reads sealed workspace or reconstructed change set |
+| Certification | Consumes immutable candidate and validation identities |
+| Repository Evolution | Applies certified change set to target repository transaction |
+| Repository Context | Certifies base context and later observes evolved repository |
+| Mission Control | Displays workspace state but cannot mutate it |
+| Git | Optional adapter beneath workspace and repository ports |
 
-# North Star
+# 6. Candidate Change Set
 
-PBOS shall become capable of autonomous engineering across multiple validated missions while maintaining a clean repository until constitutional certification occurs.
+The Candidate Change Set is the immutable output of a sealed workspace. It is the unit of validation, certification, supersession, and repository evolution.
 
-The desired lifecycle is:
+## 6.1 Required Identity
 
-Mission Queue
+- change-set identity and schema version;
+- mission, workspace, repository, organization, and parent baseline identities;
+- parent commit and ancestry proof;
+- canonical file inventory with modes and content digests;
+- deterministic patch identity and full resulting-tree hash;
+- execution evidence identity;
+- validation aggregate identity, when available;
+- domain and engineering certification identities, when available;
+- creation authority, timestamp, and digest.
 
-↓
+Identity is computed from canonical content and parent identity, excluding mutable projections and display timestamps. Two logically identical candidates against the same parent have the same content identity.
 
-Mission 1
+## 6.2 Rules
 
-↓
+- A sealed change set is immutable.
+- Validation results bind to the exact change-set digest.
+- Certification cannot be transferred to a rebased or amended change set.
+- Promotion requires valid ancestry, complete evidence, passing validation, required domain certifications, and engineering certification.
+- Rejection records reasons and evidence; it never deletes the candidate.
+- Supersession links predecessor and successor identities without rewriting either.
+- Conflicting candidates require deterministic rebase or merge into a new candidate identity.
+- Rollback before evolution means rejection or supersession. After published evolution, recovery uses a new compensating candidate; history is not rewritten.
 
-Mission 2
+# 7. Storage Class Architecture
 
-↓
+No constitutional component shall infer governance from a pathname. Every artifact declares a storage class, owner, schema, subject identity, retention policy, and integrity metadata.
 
-Mission 3
+| Storage class | Purpose | Durability / retention | Owner and mutation authority | Validation / certification | Repository visibility | Backup / recovery |
+|---|---|---|---|---|---|---|
+| Ephemeral Runtime State | Active sessions, queues, temporary planning | Restart-recoverable or disposable by contract; bounded TTL | Runtime owner only | Schema, owner, session binding; never certified | Ignored and outside certified tree | Recreate from history or fail mission |
+| Candidate Engineering State | Mutable workspaces and sealed candidates | Until terminal disposition plus retention | Workspace Authority; sealed content immutable | Scope and content validation; certification required for evolution | Outside certified checkout | Reconstruct from base plus change set |
+| Validation State | Findings, logs, confidence aggregates | Through certification and audit period | Validation owner; aggregates immutable | Input, toolchain, policy, environment binding | Not repository history before certification | Content-addressed backup |
+| Certified Engineering Evidence | Trust decisions and required evidence | Durable, append-only, legal-hold capable | Certifier or Certification Coordinator | Signature, authority, lineage, revocation status | Referenced by repository history; stored in governed evidence store | Replicated and periodically verified |
+| Repository History | Commits, tags, releases, certified manifests | Permanent according to repository policy | Repository Evolution only | Certified bundle and post-write verification | Canonical | Remote replication and disaster recovery |
+| Operational Telemetry | Events, logs, traces, heartbeats | Bounded hot retention; archived as policy requires | Observability pipeline | Schema, sequence, redaction | Never canonical source truth | Replicated telemetry store |
+| Metrics | Aggregated operational measurements | Time-series retention policy | Metrics pipeline | Cardinality, provenance, clock checks | Not repository history | Provider retention and export |
+| Caches | Derived acceleration data | Disposable | Cache owner | Key binds all material inputs | Hidden from repository | Recompute |
+| Temporary Sessions | Credentials, leases, process handles | Short TTL; secrets destroyed on close | Session Authority | Principal, scope, expiry | Never visible | Not backed up; revoke and recreate |
+| Historical Records | Lifecycle and audit event ledger | Append-only, long-term | History Authority | Sequence, digest chain, authority | Referenced by certified history | Replicated, verified, restore-tested |
 
-↓
+Unknown storage classes, missing retention, or owner mismatch fail closed. Secrets may never enter candidate source, evidence, telemetry, or repository history.
 
-Mission N
+# 8. Storage Ports
 
-↓
+Constitutional domains depend on typed ports rather than paths or commands.
 
-Continuous Validation
+Required ports:
 
-↓
+- `RuntimeStatePort`: session-scoped ephemeral state.
+- `CandidateWorkspacePort`: provision, lease, seal, quarantine, dispose.
+- `CandidateChangeSetPort`: immutable candidate storage and retrieval.
+- `RepositoryPort`: read repository identity, ancestry, tree, and target policy.
+- `RepositoryEvolutionPort`: authorized prepare/apply/verify/finalize operations.
+- `TelemetryPort`: structured events and traces.
+- `MetricsPort`: bounded measurements.
+- `EvidencePort`: content-addressed immutable evidence.
+- `HistoryPort`: append-only ordered lifecycle records.
+- `ValidationPort`: submit and retrieve validation aggregates.
+- `BaselinePort`: read and create certified successor baselines.
+- `RepositoryContextPort`: request and retrieve context authority decisions.
+- `ClockPort`: trusted time for expiry and audit.
+- `LeasePort`: atomic acquire, renew, release, and fence tokens.
 
-Certification Decision
+Each port defines typed failures, idempotency, concurrency semantics, atomicity boundary, consistency guarantee, timeout, and observability contract. Filesystem, Git, database, object store, remote API, and in-memory implementations are adapters only.
 
-↓
+# 9. Validation Architecture
 
-Single Repository Certification
+Validation remains federated by concern. A Validation Aggregate references required lint, type, test, security, dependency, governance, authorization, artifact, performance, accessibility, and repository-health results.
 
-↓
+Every result binds to:
 
-Single Git Commit
+- Candidate Change Set identity;
+- validator identity and version;
+- toolchain and environment identity;
+- policy version;
+- input and output digests;
+- start and completion timestamps;
+- status, findings, and evidence.
 
-↓
+Parallel validation is permitted for independent checks. Aggregate completion waits for every required result. Missing, stale, cancelled, unknown, or mismatched results fail closed. Cached results are reusable only when all material identities match.
 
-Single Git Push
+# 10. Engineering Certification Coordinator
 
-↓
+## 10.1 Decision
 
-Baseline Evolution
+PBOS shall implement an Engineering Certification Coordinator, not a universal Certification Engine.
 
-↓
+## 10.2 Authority and Limits
 
-Continue Autonomous Engineering
+The coordinator owns the aggregate engineering certification decision for one Candidate Change Set. It may request, verify, and correlate domain certifications. It may not issue domain certification, execute validations, modify candidates, generate repository context independently, or evolve a repository.
 
-Normal runtime execution shall never dirty the Git working tree.
+## 10.3 Inputs
 
-Repository evolution becomes a constitutional event rather than an execution side effect.
+- Candidate Change Set and parent baseline identities;
+- immutable Validation Aggregate;
+- required domain certifications and revocation state;
+- Repository Context Authority decision;
+- repository health and target policy;
+- requester, reviewer, and approval evidence;
+- certification policy version.
 
----
+## 10.4 Outputs
 
-# Constitutional Authority
+```text
+CERTIFIED | REJECTED | BLOCKED | EXPIRED | REVOKED | SUPERSEDED
+```
 
-This document establishes the governing lifecycle architecture for PBOS engineering.
+The output includes certification identity, exact subject digest, participating domain decisions, policy, authority, conditions, expiration, revocation propagation rules, evidence, and digest.
 
-If implementation behavior conflicts with this specification:
+## 10.5 Relationships
 
-This specification takes precedence.
+- Runtime cannot call certification until lifecycle state permits it.
+- Validation supplies confidence evidence but cannot approve trust.
+- Domain certifiers retain final authority in their scopes.
+- Repository Context Authority supplies context trust; the coordinator cannot replace it.
+- Repository Evolution admits only current, unrevoked engineering certification.
+- Baseline Authority consumes finalized evolution evidence, not certification alone.
 
-Future Runtime, Kernel, Compiler, Planning, Mission Control, Repository, and Git implementations shall conform to this lifecycle.
+Conflicting domain decisions block certification. Revocation or expiration before finalization blocks evolution. Revocation after evolution creates an incident and remediation candidate; it never silently rewrites history.
 
-All future engineering subsystems shall respect the separation between:
+# 11. Mission Queue and Scheduler
 
-Runtime
+## 11.1 Mission Contract
 
-Validation
+Every mission declares identity, objective, organization, repository, requester, authority, dependencies, priority, risk, required capabilities, input contracts, expected outputs, evidence requirements, retry policy, timeout, cancellation policy, and idempotency key.
 
-Certification
+## 11.2 Queue Ownership
 
-Repository Evolution
+Mission Queue owns persistence, ordering, dependency readiness, leases, retries, cancellation requests, and history. Scheduler selects admitted work subject to policy and capacity. Neither may approve, execute, validate, or certify missions.
 
-Git
+## 11.3 Scheduling Rules
 
-Baselines
+- Dependency satisfaction precedes admission.
+- Priority is deterministic within a policy version.
+- Fairness prevents one organization or class from starvation.
+- Capacity and rate limits provide backpressure.
+- A mission has at most one active fenced lease.
+- Lease renewal requires the current fence token.
+- Duplicate delivery reuses the mission idempotency key.
+- Retry creates an attempt identity under the same mission identity.
+- Cancellation is cooperative until policy authorizes forced termination.
+- Timeouts move work to `RECOVERY_REQUIRED`; they do not imply failure or completion.
+- Restart reconstructs queue projections from durable mission history.
 
-Lifecycle boundaries established herein are mandatory.
+## 11.4 Mission History
 
-Cross-boundary mutation is prohibited unless explicitly authorized by this specification.
+Admission, lease, attempt, dependency, cancellation, timeout, retry, completion, and recovery events are append-only. Mutable queue projections are disposable and reconstructable.
 
----
+# 12. Concurrency and Consistency Model
 
-# Engineering Vision
+## 12.1 Execution and Workspace Concurrency
 
-PBOS shall ultimately own the complete software engineering lifecycle.
+Multiple missions may execute concurrently only in isolated workspaces. Shared writable workspaces are prohibited. Read-only dependencies are content-addressed and version-bound.
 
-The developer provides strategic direction.
+## 12.2 Validation Concurrency
 
-PBOS performs execution.
+Independent validators may run concurrently. Validators may not mutate the sealed candidate. Result aggregation is deterministic by rule identity, not completion time.
 
-Validation establishes engineering confidence.
+## 12.3 Certification Ordering
 
-Certification establishes engineering trust.
+Certification decisions for the same Candidate Change Set are serialized by subject revision. Domain certifications may complete in parallel. A newer candidate supersedes, but does not mutate, an older certification request.
 
-Repository evolution records certified engineering history.
+## 12.4 Repository Evolution Ordering
 
-Git becomes a downstream implementation detail rather than the center of the engineering workflow.
+One fenced evolution lease exists per repository target. Evolution is serialized at the target branch. Before commit, ancestry and target head are revalidated. Head drift creates `CONFLICT`; it never triggers an implicit merge.
 
+## 12.5 Conflict Resolution
 
-# Root Cause Analysis
+Conflicting candidates are resolved by producing a new change set through an authorized rebase, merge, or regeneration mission. PBOS records both predecessors. It never transfers validation or certification to the new digest.
 
-## Existing Lifecycle
+## 12.6 Locking
 
-The current PBOS engineering lifecycle evolved during the early phases of repository governance.
+- Optimistic concurrency governs lifecycle state and immutable artifact creation.
+- Pessimistic fenced leases govern workspace mutation and repository evolution.
+- Locks have bounded leases and monotonic fence tokens.
+- Lock acquisition order is repository -> target -> candidate to prevent deadlock.
+- A process losing its lease must stop mutation immediately.
 
-During that phase the primary engineering objective was ensuring repository integrity, deterministic execution, constitutional validation, and reproducible engineering evidence.
+## 12.7 ACID Interpretation
 
-As the platform matured, repository context generation, runtime evidence generation, and engineering certification gradually became coupled to ordinary runtime execution.
+- **Atomicity:** Each lifecycle transition and artifact seal is all-or-nothing. Repository Evolution uses a journaled multi-step transaction.
+- **Consistency:** Invariants are validated before and after every transition.
+- **Isolation:** Workspaces isolate candidate writes; evolution serializes target writes.
+- **Durability:** Certified evidence, history, and finalized evolution survive acknowledged completion.
 
-This coupling was acceptable while PBOS primarily served as an orchestration layer.
+# 13. Repository Evolution Transaction
 
-It is no longer acceptable for an autonomous engineering operating system.
+Repository Evolution is the only authority permitted to modify certified repository history.
 
----
+```text
+PREPARE -> VALIDATE -> FREEZE -> COMMIT -> VERIFY_COMMIT
+        -> TAG -> PUSH -> VERIFY_REMOTE -> BASELINE
+        -> FINALIZE
+```
 
-## Observed Behavior
+## 13.1 Transaction Steps
 
-During ordinary Mission Control execution PBOS currently regenerates artifacts such as:
+| Step | Required behavior | Failure response |
+|---|---|---|
+| Prepare | Load certified bundle, target, authority, policy, idempotency key | Block without mutation |
+| Validate | Revalidate certification, ancestry, head, signatures, repository health | Block without mutation |
+| Freeze | Acquire fenced evolution lease and freeze target expectation | Release lease; record rejection |
+| Commit | Apply exact change set and create deterministic signed commit metadata | Restore pre-commit local target if unpublished |
+| Verify Commit | Compare resulting tree and commit to certified identities | Quarantine and compensate before publication |
+| Tag | Create required signed tag bound to transaction | Remove unpublished tag or retry idempotently |
+| Push | Publish exact commit/tag using evolution credentials | Enter recovery; never assume publication state |
+| Verify Remote | Read remote identity and ancestry independently | Retry verification or suspend evolution |
+| Baseline | Create successor baseline from verified remote and certification evidence | Forward recovery; published commit remains historical truth |
+| Finalize | Append audit record, release lease, update projections | Retry idempotently from journal |
 
-• Repository Context
+## 13.2 Recovery and Compensation
 
-• Runtime Context
+Every step writes an append-only transaction journal before and after side effects. On restart, Repository Evolution inspects local and remote reality and resumes idempotently.
 
-• Context Refresh
+- Before publication, rollback may restore the prior local target and remove unpublished transaction artifacts.
+- After publication, history is never rewritten automatically. Recovery completes missing tag, baseline, and audit steps or creates an authorized compensating evolution.
+- Force push, destructive reset, and deletion of published evidence are constitutionally prohibited.
+- Partial remote ambiguity suspends all evolution for the target until independently reconciled.
 
-• Repository Identities
+# 14. Baseline Architecture
 
-• Context Identities
+A baseline is a certified checkpoint, not a runtime snapshot. It contains baseline identity, predecessor, repository and commit identities, tree digest, lifecycle and component versions, mission set, candidate identities, validation aggregate, engineering and domain certifications, evolution transaction, context identity, provenance, timestamp, and digest.
 
-• Runtime Evidence
+Baseline Authority creates exactly one successor for a finalized evolution transaction. Forks require explicit branch lineage. Baseline advancement cannot occur directly from Runtime, Validation, Certification, or Git adapters.
 
-• Repository Evidence
+# 15. Recovery Architecture
 
-These updates frequently produce tracked repository modifications despite no architectural changes having occurred.
+Recovery is a governed lifecycle, not exception handling.
 
-The result is:
+| Stage | Recovery authority | Recovery source | Required behavior |
+|---|---|---|---|
+| Mission Queue | Queue Authority | Mission event history and lease state | Requeue only retry-eligible attempts; fence stale workers |
+| Runtime | Runtime Recovery | Session checkpoint and execution evidence | Resume or fail attempt without inventing output |
+| Workspace | Workspace Authority | Base baseline, change set, lease journal | Reconstruct, quarantine, or dispose according to evidence |
+| Validation | Validation Authority | Immutable inputs and result ledger | Rerun missing checks; never infer PASS |
+| Certification | Certification Coordinator | Candidate, validations, domain decisions | Re-evaluate current trust and revocations |
+| Repository Evolution | Evolution Authority | Transaction journal plus local/remote reality | Roll back unpublished work or forward-recover published work |
+| Repository Context | Repository Context Authority | Current repository reality and prior context history | Reconcile through existing approval lifecycle |
+| Baseline | Baseline Authority | Verified evolution and predecessor chain | Complete missing successor or suspend lineage |
 
-• Dirty working tree
+Recovery requires incident identity, affected subjects, authority, plan, evidence, validation, outcome, and audit record. A recovery action cannot grant broader authority than the failed action. Unknown or contradictory reality suspends mutation.
 
-• Excessive Git commits
+# 16. Security Architecture
 
-• Excessive Git pushes
+- Runtime and providers receive least-privilege candidate capabilities.
+- Repository Evolution credentials are isolated from Runtime, Validation, and candidate processes.
+- Human and service identities are verified principals with organization and delegation scope.
+- Secrets are injected through session ports and excluded from artifacts, patches, telemetry, and history.
+- Candidate inputs and outputs undergo path, dependency, malware, secret, license, and policy scanning.
+- Evidence and certification use integrity protection and support signing and key rotation.
+- Tenant isolation applies to workspaces, queues, evidence, metrics, history, and recovery.
+- Compromised credentials, revoked authority, policy changes, or certifier revocation block new transitions and trigger impact assessment.
 
-• Repository noise
+# 17. Observability and Metrics
 
-• Reduced engineering signal
+One correlation chain connects mission, attempt, workspace, execution, change set, validation, domain certification, engineering certification, evolution, commit, baseline, and release.
 
-• Human intervention after successful execution
+Every transition emits a structured event containing trace identity, monotonic sequence, subject, prior and next state, authority, evidence, policy, outcome, and duration. Telemetry is not lifecycle truth.
 
-• Baseline instability
+Required operational measurements include queue lag, lease loss, workspace age, validation latency, certification backlog, evolution duration and failure, recovery time, provider saturation, candidate conflict rate, storage growth, and stale evidence. Cardinality and retention are governed.
 
-• Artificial repository evolution
+# 18. Determinism and Reproducibility
 
-This behavior prevents PBOS from operating autonomously across multiple engineering missions.
+- Canonical serialization defines every digest.
+- Set-like collections are sorted before identity calculation.
+- Clocks, random identities, environment, toolchains, models, and policies are explicit inputs.
+- Scheduling order uses declared deterministic tie-breakers.
+- Provider nondeterminism is captured in evidence and cannot alter constitutional selection rules.
+- Replay validates prior decisions against recorded inputs; it does not silently substitute current policy.
 
----
+# 19. Failure Rules
 
-## Architectural Defect
+PBOS fails closed when:
 
-The root architectural defect is not Git.
+- an owner or storage class is unknown;
+- a candidate base or ancestry is invalid;
+- a workspace escapes its scope;
+- a lease or fence token is stale;
+- lifecycle state or digest conflicts;
+- validation is missing, stale, or mismatched;
+- a required domain certification is absent, expired, revoked, or conflicting;
+- engineering certification does not bind the exact candidate;
+- repository target reality changes after freeze;
+- remote publication cannot be proven;
+- baseline lineage is ambiguous;
+- recovery cannot establish authoritative reality.
 
-The defect is that runtime execution currently owns responsibilities that belong to repository certification.
+Failure records evidence and a deterministic recovery state. It never fabricates completion, deletes history, or broadens authority.
 
-Execution and certification have become coupled.
+# 20. Implementation Architecture and Migration
 
-Responsibilities currently overlap between:
+Implementation shall adapt existing PBOS owners rather than create parallel systems.
 
-Runtime
+## Phase 0: Contract and Inventory
 
-Validation
+Classify every artifact and mutation point. Implement no behavioral change. Acceptance requires complete ownership, storage, and compatibility mapping.
 
-Repository Context
+## Phase 1: Lifecycle Coordination
 
-Repository Evidence
+Introduce the engineering state reducer, transition validator, and history port in shadow mode. Existing commands remain authoritative until evidence supports cutover.
 
-Baseline Evolution
+## Phase 2: Candidate Workspace
 
-Repository History
+Introduce opt-in isolated workspaces and immutable change sets. Execution Fabric integrates through a scoped handle. Existing direct execution remains compatibility-only and cannot claim Version 2 certification.
 
-Git Operations
+## Phase 3: Storage Separation
 
-This violates separation of concerns.
+Introduce typed ports and atomic adapters. Use dual-read/single-write migration. Move ephemeral state outside tracked repository paths without rewriting history.
 
-It also prevents deterministic autonomous engineering.
+## Phase 4: Validation Aggregate
 
----
+Compose existing validators into candidate-bound immutable aggregates. Do not replace domain validators.
 
-## Required Architectural Correction
+## Phase 5: Engineering Certification
 
-PBOS shall permanently separate engineering responsibilities into distinct lifecycle domains.
+Introduce coordinator in advisory mode, then make certified decisions mandatory for evolution admission.
 
-Runtime shall execute.
+## Phase 6: Repository Evolution and Baselines
 
-Validation shall verify.
+Implement dry-run, local-only, and finally governed remote adapters. Activate each level only after recovery tests pass.
 
-Certification shall establish engineering trust.
+## Phase 7: Mission Queue and Concurrency
 
-Repository Evolution shall record certified engineering history.
+Begin with one worker and durable leases. Increase concurrency only after isolation, conflict, fairness, and recovery evidence exists.
 
-Git shall persist certified engineering history.
+## Phase 8: Legacy Retirement
 
-Each domain shall own only its constitutional responsibility.
+Stop legacy writers, verify all consumers, preserve historical artifacts, and remove compatibility projections through governed deprecation.
 
-No lifecycle domain may mutate another domain without explicit authorization.
+## Phase 9: Enterprise Certification
 
----
+Demonstrate multiple missions, repository cleanliness, restart recovery, certification aggregation, one verified evolution, successor baseline, security boundaries, scale, and audit reconstruction.
 
-# Engineering Principles
+Every phase requires unit, contract, integration, lifecycle, migration, recovery, concurrency, security, and regression tests appropriate to its risk. Each phase has a documented rollback to the prior adapter configuration. No phase may introduce two authoritative writers.
 
-The following principles govern every future implementation of PBOS.
+# 21. Acceptance Criteria
 
-## Principle 1
+Version 2 is implemented only when objective evidence proves:
 
-Execution is Ephemeral.
+1. The certified checkout remains unchanged during multiple engineering missions.
+2. All engineering mutations occur in isolated Candidate Workspaces.
+3. Every sealed candidate has immutable content and ancestry identity.
+4. Runtime and Validation cannot access Repository Evolution credentials.
+5. Validation produces candidate-bound aggregates without issuing trust.
+6. Domain certifiers retain authority.
+7. Engineering Certification aggregates current, unrevoked trust.
+8. Repository Evolution is the only Git mutation path.
+9. Evolution recovers deterministically from every injected failure boundary.
+10. Baselines advance only after verified evolution.
+11. Mission delivery is durable, leased, idempotent, fair, and restart-safe.
+12. Concurrent candidates remain isolated and conflicts create new identities.
+13. Storage classes, retention, backup, and recovery are enforced.
+14. Complete lineage can be reconstructed from intent through baseline.
+15. Existing PBOS fail-closed guarantees and authorized commands remain compatible or are governably deprecated.
 
-Normal engineering execution shall never create durable engineering history.
+# 22. Architectural Glossary
 
----
+**Baseline:** Certified repository checkpoint created after finalized evolution.
 
-## Principle 2
+**Candidate Change Set:** Immutable, content-addressed engineering result sealed from a Candidate Workspace.
 
-Validation Creates Confidence.
+**Candidate Workspace:** Isolated mutable environment derived from one certified baseline.
 
-Validation establishes engineering confidence.
+**Certified Checkout:** Read-only repository projection representing accepted history.
 
-Validation does not establish engineering trust.
+**Domain Certification:** Trust decision owned by a specialized constitutional authority.
 
----
+**Engineering Certification:** Aggregate trust decision for one candidate; it does not replace domain certification.
 
-## Principle 3
+**Engineering Confidence:** Validation-based assessment of correctness, not authorization or trust.
 
-Certification Creates Trust.
+**Engineering Lifecycle:** State progression from queued mission through evolved repository history.
 
-Certification is the constitutional act that converts validated engineering work into durable repository history.
+**Evolution Bundle:** Candidate, validation, certification, authority, and target evidence admitted to Repository Evolution.
 
----
+**Fence Token:** Monotonic lease value preventing stale workers from mutating state.
 
-## Principle 4
+**History Record:** Append-only constitutional event used to reconstruct decisions.
 
-Repository History is Sacred.
+**Idempotency Key:** Stable identity ensuring repeated delivery produces one logical effect.
 
-Repository history represents certified engineering evolution.
+**Mission Attempt:** One execution attempt under an immutable mission identity.
 
-Repository history shall never represent ordinary runtime execution.
+**Mission Queue:** Durable owner of admitted mission ordering, leases, and retry history.
 
----
+**Operational Telemetry:** Observable events and metrics that describe operation but do not define lifecycle truth.
 
-## Principle 5
+**Repository Evolution:** Singular authority and transaction that records certified engineering history.
 
-Git is Downstream.
+**Repository Context:** Repository reality and trust decision owned by Repository Context Authority.
 
-Git is not the engineering lifecycle.
+**Runtime State:** Ephemeral execution information with no authority to establish durable trust.
 
-Git is an implementation detail of Repository Evolution.
+**Storage Class:** Constitutional durability, ownership, retention, visibility, backup, and recovery category.
 
-Git shall never become the controlling authority of PBOS.
+**Validation Aggregate:** Immutable set of candidate-bound validation results and confidence decision.
 
----
+# 23. Final Constitutional Directive
 
-## Principle 6
+PBOS shall execute continuously in governed Candidate Workspaces, validate immutable Candidate Change Sets, aggregate trust through existing certification authorities, and evolve repository history only through a verified Repository Evolution transaction.
 
-Baselines Represent Milestones.
+The clean certified checkout is a consequence of isolation, not the absence of engineering mutation. Git is an adapter, not an authority. Mission Control is an operator surface, not a lifecycle owner. Runtime performs work, Validation establishes confidence, domain certifiers establish scoped trust, Engineering Certification coordinates trust, Repository Evolution records accepted history, and Baseline Authority records certified succession.
 
-Baselines represent certified engineering milestones.
-
-Baselines shall not evolve because runtime executed.
-
-Baselines evolve because engineering has been constitutionally certified.
-
----
-
-## Principle 7
-
-Autonomous Execution is Continuous.
-
-PBOS shall execute continuously.
-
-Repository evolution shall occur intentionally.
-
----
-
-# Implementation Directive
-
-Implementation SHALL:
-
-• Remove repository mutation responsibilities from ordinary runtime execution.
-
-• Separate Runtime from Certification.
-
-• Separate Validation from Repository Evolution.
-
-• Ensure runtime execution alone cannot dirty the Git working tree.
-
-• Preserve all existing constitutional fail-closed guarantees.
-
-• Preserve backward compatibility wherever practical.
-
-No implementation phase may violate these principles.
-
-
-# Constitutional Lifecycle Domain Architecture
-
-## Overview
-
-PBOS shall evolve into a constitutional lifecycle operating system.
-
-The software engineering lifecycle shall be divided into independent constitutional domains.
-
-Each domain owns one and only one engineering responsibility.
-
-Each domain communicates through governed contracts.
-
-Direct cross-domain mutation is prohibited.
-
-The purpose of this separation is to preserve deterministic engineering behavior, eliminate repository instability, and enable long-running autonomous engineering.
-
----
-
-# Constitutional Lifecycle Domains
-
-PBOS shall consist of the following constitutional lifecycle domains.
-
-1. Runtime Domain
-
-2. Validation Domain
-
-3. Certification Domain
-
-4. Repository Evolution Domain
-
-Each domain is independently governed.
-
-Each domain owns its own state.
-
-Each domain exposes only contractual interfaces.
-
----
-
-# Runtime Domain
-
-## Purpose
-
-The Runtime Domain is responsible for autonomous engineering execution.
-
-It performs engineering work.
-
-It never establishes engineering trust.
-
-It never evolves repository history.
-
----
-
-## Responsibilities
-
-The Runtime Domain owns:
-
-• Mission execution
-
-• Planning execution
-
-• Scheduler execution
-
-• Runtime context
-
-• Temporary identities
-
-• Temporary hashes
-
-• Runtime queues
-
-• Runtime sessions
-
-• Runtime caches
-
-• Temporary execution evidence
-
-• Active engineering state
-
----
-
-## Runtime Domain Guarantees
-
-The Runtime Domain SHALL:
-
-Execute continuously.
-
-Recover safely.
-
-Remain deterministic.
-
-Remain reproducible.
-
-Remain fail closed.
-
-Never mutate certified repository history.
-
-Never invoke Git.
-
-Never regenerate certification artifacts.
-
-Never regenerate repository baselines.
-
-Never regenerate release evidence.
-
----
-
-## Runtime Outputs
-
-Runtime may produce:
-
-Temporary context
-
-Temporary execution reports
-
-Temporary planner state
-
-Temporary runtime identities
-
-Temporary execution evidence
-
-Temporary validation requests
-
-These outputs remain ephemeral.
-
-They do not become repository history.
-
----
-
-# Validation Domain
-
-## Purpose
-
-The Validation Domain determines engineering correctness.
-
-Validation establishes engineering confidence.
-
-Validation does not establish repository trust.
-
----
-
-## Responsibilities
-
-Validation owns:
-
-Lint
-
-Formatting
-
-Static Analysis
-
-Unit Tests
-
-Integration Tests
-
-Runtime Validation
-
-Contract Validation
-
-Dependency Validation
-
-Governance Validation
-
-Authorization Validation
-
-Security Validation
-
-Repository Health Validation
-
-Engineering Quality Reports
-
-Validation Reports
-
-Engineering Confidence Score
-
----
-
-## Validation Guarantees
-
-Validation SHALL:
-
-Execute after every mission.
-
-Produce deterministic results.
-
-Fail closed.
-
-Never modify repository history.
-
-Never invoke Git.
-
-Never regenerate baselines.
-
-Never regenerate repository context.
-
-Never regenerate release evidence.
-
----
-
-## Validation Outputs
-
-Validation may produce:
-
-Validation Report
-
-Engineering Confidence Score
-
-Validation Artifacts
-
-Mission Status
-
-Certification Recommendation
-
-Validation outputs remain temporary until Certification accepts them.
-
----
-
-# Certification Domain
-
-## Purpose
-
-Certification establishes engineering trust.
-
-Certification converts validated engineering work into constitutional repository history.
-
-Certification is the only domain authorized to create durable engineering evidence.
-
----
-
-## Responsibilities
-
-Certification owns:
-
-Repository Context
-
-Repository Identity
-
-Context Identity
-
-Release Evidence
-
-Baseline Generation
-
-Repository Certification
-
-Engineering Certification
-
-Certification Reports
-
-Repository Provenance
-
-Engineering Trust
-
----
-
-## Certification Guarantees
-
-Certification SHALL:
-
-Execute intentionally.
-
-Remain deterministic.
-
-Remain reproducible.
-
-Fail closed.
-
-Never execute without successful Validation.
-
-Never execute without Repository Health approval.
-
-Never execute partially.
-
----
-
-## Certification Outputs
-
-Certification produces:
-
-Certified Repository Context
-
-Certified Context Identity
-
-Certified Baseline
-
-Certified Release Evidence
-
-Repository Certification Report
-
-Repository Provenance
-
-Engineering Trust Record
-
-These artifacts become durable repository history.
-
----
-
-# Repository Evolution Domain
-
-## Purpose
-
-Repository Evolution is responsible for durable repository mutation.
-
-No other lifecycle domain may perform these operations.
-
----
-
-## Responsibilities
-
-Repository Evolution owns:
-
-Git Commit
-
-Git Push
-
-Git Tag
-
-Baseline Advancement
-
-Repository Version
-
-Release Creation
-
-Repository History
-
-Engineering History
-
-Repository Evolution Metrics
-
----
-
-## Repository Evolution Guarantees
-
-Repository Evolution SHALL:
-
-Execute only after Certification.
-
-Remain deterministic.
-
-Fail closed.
-
-Never execute directly from Runtime.
-
-Never execute directly from Validation.
-
-Never execute without Certification approval.
-
----
-
-## Repository Outputs
-
-Repository Evolution produces:
-
-Repository Commit
-
-Repository Tag
-
-Repository Push
-
-Engineering Release
-
-Baseline Advancement
-
-Repository History
-
-Engineering Milestone
-
-These represent certified engineering evolution.
-
----
-
-# Lifecycle Ownership Matrix
-
-Runtime owns execution.
-
-Validation owns confidence.
-
-Certification owns trust.
-
-Repository Evolution owns history.
-
-Ownership may not overlap.
-
-If multiple domains require the same responsibility, ownership belongs to the highest constitutional authority.
-
-Duplicate ownership is prohibited.
-
----
-
-# Cross-Domain Communication
-
-Domains communicate exclusively through governed contracts.
-
-Permitted communication:
-
-Runtime
-
-↓
-
-Validation
-
-↓
-
-Certification
-
-↓
-
-Repository Evolution
-
-Reverse mutation is prohibited.
-
-Skipping lifecycle domains is prohibited.
-
-Direct Runtime → Repository Evolution mutation is prohibited.
-
-Direct Runtime → Git mutation is prohibited.
-
-Direct Validation → Git mutation is prohibited.
-
-Direct Validation → Baseline mutation is prohibited.
-
-Direct Runtime → Certification artifact mutation is prohibited.
-
----
-
-# Fail-Closed Domain Rules
-
-PBOS SHALL immediately fail closed whenever:
-
-Runtime attempts Repository Evolution.
-
-Validation attempts Git.
-
-Certification executes without Validation.
-
-Repository Evolution executes without Certification.
-
-Cross-domain ownership violations occur.
-
-Lifecycle state becomes inconsistent.
-
-Repository trust cannot be established.
-
-Engineering provenance becomes unverifiable.
-
----
-
-# Implementation Directive
-
-Implement four independent lifecycle engines.
-
-Implement contractual interfaces between domains.
-
-Implement ownership validators.
-
-Implement cross-domain mutation guards.
-
-Implement lifecycle state validation.
-
-Implement fail-closed enforcement.
-
-Implement comprehensive lifecycle tests.
-
-Normal runtime execution SHALL NOT produce repository mutations.
-
-Repository mutation SHALL occur only through Repository Evolution after constitutional Certification approval.
-
-
-# Implementation Architecture
-
-## Objective
-
-Implement the Autonomous Engineering Lifecycle without disrupting existing PBOS capabilities.
-
-The implementation shall be evolutionary rather than revolutionary.
-
-Existing functionality shall continue operating throughout migration.
-
-Backward compatibility shall be maintained wherever practical.
-
-No implementation phase may reduce constitutional guarantees.
-
----
-
-# Required Repository Architecture
-
-Implement the following constitutional directory structure.
-
-pbos/
-
-    lifecycle/
-
-        state/
-
-        runtime/
-
-        validation/
-
-        certification/
-
-        repository/
-
-        baseline/
-
-        release/
-
-        git/
-
-        metrics/
-
-        scheduler/
-
-        history/
-
-        migration/
-
-        registry/
-
-        contracts/
-
-        validators/
-
-        reports/
-
-Each directory shall expose a single constitutional responsibility.
-
-No directory shall contain mixed lifecycle concerns.
-
----
-
-# Lifecycle Engine
-
-Create a Lifecycle Engine responsible for governing all engineering state transitions.
-
-The Lifecycle Engine becomes the constitutional authority for engineering progression.
-
-Responsibilities include:
-
-• lifecycle orchestration
-
-• state transitions
-
-• transition validation
-
-• lifecycle authorization
-
-• lifecycle history
-
-• lifecycle metrics
-
-• lifecycle recovery
-
-• lifecycle durability
-
-The Lifecycle Engine shall not execute engineering work.
-
-It governs engineering work.
-
----
-
-# Runtime Engine Evolution
-
-Refactor the Runtime Engine.
-
-The Runtime Engine shall own only execution.
-
-Runtime responsibilities include:
-
-Mission execution
-
-Planning execution
-
-Runtime scheduling
-
-Execution queues
-
-Temporary runtime context
-
-Execution sessions
-
-Temporary identities
-
-Temporary hashes
-
-Temporary runtime evidence
-
-Execution metrics
-
-The Runtime Engine shall never mutate repository history.
-
-The Runtime Engine shall never invoke Git.
-
-The Runtime Engine shall never regenerate certification artifacts.
-
----
-
-# Validation Engine Evolution
-
-Validation becomes an independent engine.
-
-Validation executes after every completed mission.
-
-Validation owns:
-
-Lint
-
-Formatting
-
-Static Analysis
-
-Unit Tests
-
-Integration Tests
-
-Runtime Validation
-
-Contract Validation
-
-Dependency Validation
-
-Governance Validation
-
-Authorization Validation
-
-Security Validation
-
-Repository Health Validation
-
-Validation Reports
-
-Engineering Confidence
-
-Validation shall expose deterministic pass/fail contracts.
-
-Validation shall never modify repository state.
-
----
-
-# Certification Engine
-
-Implement a Certification Engine.
-
-Certification owns engineering trust.
-
-Certification determines whether validated engineering work is eligible for repository evolution.
-
-Certification responsibilities include:
-
-Repository Context Generation
-
-Context Identity Generation
-
-Repository Identity Generation
-
-Baseline Generation
-
-Certification Reports
-
-Engineering Provenance
-
-Repository Provenance
-
-Release Evidence
-
-Engineering Trust
-
-Certification becomes the only subsystem authorized to create durable engineering evidence.
-
----
-
-# Repository Evolution Engine
-
-Implement a Repository Evolution Engine.
-
-Repository Evolution owns:
-
-Git Commit
-
-Git Push
-
-Git Tag
-
-Release Creation
-
-Repository Version
-
-Repository History
-
-Baseline Advancement
-
-Engineering History
-
-Repository Evolution Reports
-
-Repository Metrics
-
-Repository Evolution may only execute after Certification approval.
-
----
-
-# Baseline Engine
-
-Implement an independent Baseline Engine.
-
-The Baseline Engine owns constitutional engineering milestones.
-
-Every baseline shall contain:
-
-Baseline Identifier
-
-Repository SHA
-
-Runtime Version
-
-Kernel Version
-
-Compiler Version
-
-Planner Version
-
-Lifecycle Version
-
-Repository Identity
-
-Context Identity
-
-Mission Set
-
-Validation Report
-
-Engineering Confidence
-
-Certification Timestamp
-
-Repository Provenance
-
-Engineering Notes
-
-Baseline Hash
-
-Successor Baseline
-
-Baselines become constitutional engineering checkpoints.
-
----
-
-# Runtime State
-
-Implement Runtime State.
-
-Runtime State contains only temporary engineering information.
-
-Examples:
-
-Current Mission
-
-Current Queue
-
-Planner State
-
-Scheduler State
-
-Runtime Context
-
-Temporary Hashes
-
-Temporary Identities
-
-Execution Sessions
-
-Temporary Metrics
-
-Temporary Reports
-
-Temporary Validation Requests
-
-Runtime State SHALL NOT become repository history.
-
----
-
-# Candidate State
-
-Implement Candidate State.
-
-Candidate State contains validated engineering awaiting certification.
-
-Examples:
-
-Validated Missions
-
-Validation Reports
-
-Engineering Confidence
-
-Pending Certification
-
-Repository Health
-
-Candidate Summary
-
-Candidate State shall remain outside durable repository history until Certification succeeds.
-
----
-
-# Certified State
-
-Implement Certified State.
-
-Certified State contains engineering approved for repository evolution.
-
-Examples:
-
-Certified Baseline
-
-Certified Repository Context
-
-Certified Release Evidence
-
-Certified Engineering Reports
-
-Certified Repository Identity
-
-Certified Provenance
-
-Certified State becomes durable repository history.
-
----
-
-# Repository State
-
-Repository State contains durable engineering history.
-
-Examples:
-
-Git History
-
-Tags
-
-Releases
-
-Baselines
-
-Repository Provenance
-
-Engineering History
-
-Repository State may only be modified by the Repository Evolution Engine.
-
----
-
-# Engineering Contracts
-
-Create explicit contracts between every lifecycle domain.
-
-Required contracts include:
-
-Runtime Contract
-
-Validation Contract
-
-Certification Contract
-
-Repository Evolution Contract
-
-Baseline Contract
-
-Lifecycle Contract
-
-Scheduler Contract
-
-Mission Contract
-
-Repository Contract
-
-History Contract
-
-Every contract shall:
-
-Validate inputs.
-
-Validate outputs.
-
-Validate ownership.
-
-Validate lifecycle state.
-
-Fail closed upon violation.
-
----
-
-# Implementation Constraints
-
-Implementation SHALL NOT:
-
-Break Runtime.
-
-Break Kernel.
-
-Break Compiler.
-
-Break Planner.
-
-Break Mission Control.
-
-Break existing PBOS commands.
-
-Break existing constitutional guarantees.
-
-Remove fail-closed behavior.
-
-Reduce repository integrity.
-
-Implementation SHALL:
-
-Preserve deterministic execution.
-
-Preserve reproducibility.
-
-Preserve repository trust.
-
-Preserve engineering provenance.
-
-Increase engineering autonomy.
-
-
-# Implementation Phases
-
-Implementation shall proceed sequentially.
-
-No phase may begin until the previous phase has successfully completed.
-
-Every phase concludes with constitutional validation.
-
-Every phase shall preserve backward compatibility unless this specification explicitly authorizes otherwise.
-
-Every phase shall fail closed.
-
----
-
-## Phase 0 — Repository Discovery
-
-Objective
-
-Develop a complete understanding of the existing engineering lifecycle.
-
-Required Activities
-
-• Analyze Runtime architecture
-
-• Analyze Mission Control
-
-• Analyze Planner
-
-• Analyze Scheduler
-
-• Analyze Repository Context
-
-• Analyze Context Refresh
-
-• Analyze Release Evidence
-
-• Analyze Git lifecycle
-
-• Analyze Runtime artifacts
-
-• Analyze Baseline generation
-
-• Produce dependency graph
-
-• Produce migration report
-
-Deliverables
-
-Repository Analysis Report
-
-Lifecycle Dependency Graph
-
-Migration Strategy
-
-Backward Compatibility Report
-
-Acceptance Criteria
-
-No implementation begins until the engineering lifecycle has been completely mapped.
-
----
-
-## Phase 1 — Lifecycle Foundation
-
-Objective
-
-Introduce the constitutional Lifecycle Engine.
-
-Required Activities
-
-Implement lifecycle module.
-
-Implement lifecycle registry.
-
-Implement lifecycle state model.
-
-Implement lifecycle ownership model.
-
-Implement lifecycle contracts.
-
-Implement lifecycle validators.
-
-Acceptance Criteria
-
-Lifecycle Engine exists.
-
-Existing PBOS continues operating.
-
-No regression introduced.
-
----
-
-## Phase 2 — Runtime Separation
-
-Objective
-
-Remove repository mutation responsibilities from Runtime.
-
-Required Activities
-
-Move runtime state into dedicated Runtime State.
-
-Separate runtime identities.
-
-Separate runtime hashes.
-
-Separate runtime timestamps.
-
-Separate runtime sessions.
-
-Separate runtime queues.
-
-Separate runtime execution evidence.
-
-Acceptance Criteria
-
-Runtime execution no longer mutates repository history.
-
----
-
-## Phase 3 — Validation Separation
-
-Objective
-
-Make Validation independent.
-
-Required Activities
-
-Separate validation from Runtime.
-
-Implement Validation Engine.
-
-Implement engineering confidence.
-
-Implement validation contracts.
-
-Implement validation reports.
-
-Acceptance Criteria
-
-Validation executes after every mission.
-
-Validation never mutates repository history.
-
----
-
-## Phase 4 — Certification Engine
-
-Objective
-
-Create Certification as an independent constitutional subsystem.
-
-Required Activities
-
-Implement Certification Engine.
-
-Implement certification registry.
-
-Implement engineering trust.
-
-Implement certification reports.
-
-Implement repository identity generation.
-
-Implement context identity generation.
-
-Acceptance Criteria
-
-Certification may execute independently from Runtime.
-
----
-
-## Phase 5 — Repository Evolution
-
-Objective
-
-Move Git responsibilities into Repository Evolution.
-
-Required Activities
-
-Implement Repository Evolution Engine.
-
-Move Git Commit.
-
-Move Git Push.
-
-Move Git Tag.
-
-Move Release Creation.
-
-Move Baseline Advancement.
-
-Acceptance Criteria
-
-Runtime no longer invokes Git.
-
-Validation no longer invokes Git.
-
-Only Repository Evolution invokes Git.
-
----
-
-## Phase 6 — Baseline Engine
-
-Objective
-
-Create constitutional engineering baselines.
-
-Required Activities
-
-Implement Baseline Engine.
-
-Implement baseline manifests.
-
-Implement baseline registry.
-
-Implement engineering milestone registry.
-
-Acceptance Criteria
-
-Repository history now records certified engineering milestones.
-
----
-
-## Phase 7 — Runtime Artifact Governance
-
-Objective
-
-Separate ephemeral runtime from durable engineering evidence.
-
-Required Activities
-
-Categorize every runtime artifact.
-
-Assign ownership.
-
-Assign lifecycle.
-
-Assign durability.
-
-Acceptance Criteria
-
-No runtime artifact becomes durable engineering history without Certification approval.
-
----
-
-## Phase 8 — Migration
-
-Objective
-
-Safely migrate existing PBOS implementations.
-
-Required Activities
-
-Migrate Runtime.
-
-Migrate Planner.
-
-Migrate Mission Control.
-
-Migrate Git.
-
-Migrate Repository Context.
-
-Migrate Baselines.
-
-Acceptance Criteria
-
-No existing PBOS capability regresses.
-
----
-
-## Phase 9 — Repository Certification
-
-Objective
-
-Activate the complete constitutional lifecycle.
-
-Acceptance Criteria
-
-PBOS now executes multiple validated engineering missions before Repository Evolution.
-
-Repository remains clean until Certification.
-
-
-# Acceptance Criteria
-
-Implementation is complete only when every constitutional requirement has been satisfied.
-
----
-
-## Runtime
-
-✓ Runtime executes continuously.
-
-✓ Runtime maintains only ephemeral engineering state.
-
-✓ Runtime no longer mutates repository history.
-
-✓ Runtime never invokes Git.
-
-✓ Runtime never regenerates certification artifacts.
-
----
-
-## Validation
-
-✓ Validation executes after every completed mission.
-
-✓ Validation establishes engineering confidence.
-
-✓ Validation never mutates repository history.
-
-✓ Validation never invokes Git.
-
-✓ Validation fails closed.
-
----
-
-## Certification
-
-✓ Certification establishes engineering trust.
-
-✓ Certification regenerates repository context.
-
-✓ Certification regenerates release evidence.
-
-✓ Certification regenerates repository identities.
-
-✓ Certification regenerates baseline identities.
-
-✓ Certification remains deterministic.
-
----
-
-## Repository Evolution
-
-✓ Repository Evolution owns all Git operations.
-
-✓ Repository Evolution executes only after Certification.
-
-✓ Repository Evolution records engineering milestones.
-
-✓ Repository Evolution preserves repository provenance.
-
----
-
-## Baselines
-
-✓ Baselines represent constitutional engineering milestones.
-
-✓ Baselines never evolve during runtime execution.
-
-✓ Baselines evolve only through Certification.
-
----
-
-## Autonomous Engineering
-
-PBOS shall successfully execute the following lifecycle:
-
-Mission
-
-↓
-
-Validated
-
-↓
-
-Mission
-
-↓
-
-Validated
-
-↓
-
-Mission
-
-↓
-
-Validated
-
-↓
-
-Mission
-
-↓
-
-Validated
-
-↓
-
-Mission
-
-↓
-
-Validated
-
-↓
-
-Certification
-
-↓
-
-Single Git Commit
-
-↓
-
-Single Git Push
-
-↓
-
-Baseline Evolution
-
-↓
-
-Continue Autonomous Engineering
-
-The repository working tree shall remain clean throughout every mission prior to Certification.
-
----
-
-## Fail-Closed Guarantees
-
-PBOS shall fail closed whenever:
-
-Runtime mutates repository history.
-
-Validation invokes Git.
-
-Certification executes without Validation.
-
-Repository Evolution executes without Certification.
-
-Cross-domain ownership is violated.
-
-Repository provenance cannot be verified.
-
-Engineering trust cannot be established.
-
-Repository integrity becomes uncertain.
-
----
-
-## Definition of Success
-
-PBOS is considered to have successfully implemented this constitutional evolution only when:
-
-• Runtime executes independently.
-
-• Validation executes independently.
-
-• Certification executes independently.
-
-• Repository Evolution executes independently.
-
-• Git becomes a downstream consequence of Certification.
-
-• Repository history records engineering trust rather than engineering activity.
-
-• Multiple autonomous engineering missions execute without dirtying the Git working tree.
-
-• Engineering milestones replace execution frequency as the basis of repository evolution.
-
-• Human intervention is no longer required between successful validated missions.
-
-This marks the transition of PBOS from an AI-assisted engineering workflow into a constitutional autonomous engineering operating system.
-
-
-# Implementation Guardrails
-
-The Autonomous Engineering Lifecycle shall be implemented as an evolutionary migration.
-
-The objective is to improve PBOS without destabilizing the existing engineering platform.
-
-Implementation shall prioritize engineering safety over implementation speed.
-
-No implementation phase may compromise repository integrity, constitutional governance, deterministic execution, or existing production capabilities.
-
----
-
-## Mandatory Discovery
-
-Before implementing any architectural change PBOS shall perform a complete engineering discovery.
-
-Discovery shall identify:
-
-• Current Runtime responsibilities
-
-• Current Validation responsibilities
-
-• Current Mission Control responsibilities
-
-• Current Planner responsibilities
-
-• Current Repository Context responsibilities
-
-• Current Baseline responsibilities
-
-• Current Git responsibilities
-
-• Current Runtime Artifacts
-
-• Current Certification behavior
-
-• Existing lifecycle coupling
-
-Discovery shall produce an Engineering Impact Report before implementation begins.
-
-No implementation shall proceed until Discovery has completed successfully.
-
----
-
-## Incremental Migration
-
-Implementation shall occur incrementally.
-
-Large-scale rewrites are prohibited unless explicitly required.
-
-Prefer:
-
-Adapters
-
-Migration layers
-
-Compatibility layers
-
-Dependency inversion
-
-Progressive replacement
-
-Controlled deprecation
-
-Over:
-
-Repository-wide rewrites
-
-Breaking architectural replacements
-
-Massive subsystem replacement
-
-Engineering continuity shall be preserved throughout implementation.
-
----
-
-## Backward Compatibility
-
-Existing PBOS capabilities shall continue functioning during migration.
-
-Existing commands shall continue operating.
-
-Existing Runtime shall continue operating.
-
-Existing Kernel shall continue operating.
-
-Existing Compiler shall continue operating.
-
-Existing Mission Control shall continue operating.
-
-Existing Planning shall continue operating.
-
-Breaking changes require explicit constitutional justification.
-
----
-
-## Repository Safety
-
-Implementation shall never place repository integrity at risk.
-
-Repository history shall remain trustworthy.
-
-Repository provenance shall remain verifiable.
-
-Repository certification shall remain deterministic.
-
-Repository recovery shall remain possible.
-
-Repository rollback shall remain possible.
-
----
-
-## Engineering Documentation
-
-Documentation shall evolve simultaneously with implementation.
-
-Every implemented subsystem shall update:
-
-Architecture documentation
-
-Contracts
-
-Validators
-
-Engineering diagrams
-
-Repository diagrams
-
-Lifecycle diagrams
-
-Migration documentation
-
-Developer documentation
-
-Implementation documentation shall never lag behind implementation.
-
----
-
-## Testing Requirements
-
-Every implementation phase shall include:
-
-Unit Tests
-
-Integration Tests
-
-Lifecycle Tests
-
-Migration Tests
-
-Repository Tests
-
-Regression Tests
-
-Governance Tests
-
-Fail-Closed Tests
-
-Engineering Certification Tests
-
-No implementation phase is complete until all required tests pass.
-
----
-
-## Engineering Reports
-
-Every completed implementation phase shall produce:
-
-Implementation Report
-
-Validation Report
-
-Migration Report
-
-Risk Report
-
-Repository Impact Report
-
-Outstanding Work Report
-
-Engineering Recommendation Report
-
-Next Phase Recommendation
-
-Reports become engineering evidence supporting Certification.
-
----
-
-## Engineering Quality Standard
-
-Implementation quality shall meet production-grade enterprise engineering standards.
-
-Solutions shall prioritize:
-
-Maintainability
-
-Determinism
-
-Observability
-
-Recoverability
-
-Testability
-
-Security
-
-Governance
-
-Engineering simplicity
-
-Constitutional compliance
-
-Implementation shortcuts are prohibited.
-
-
-# Final Engineering Directive
-
-This specification constitutes the constitutional authority governing the evolution of the PBOS engineering lifecycle.
-
-Its purpose is not merely to improve Runtime.
-
-Its purpose is to redefine how PBOS performs software engineering.
-
-PBOS shall evolve from:
-
-An AI-assisted engineering workflow
-
-into
-
-A constitutional autonomous engineering operating system.
-
-The completed architecture shall exhibit the following characteristics.
-
-Runtime executes continuously.
-
-Mission Control orchestrates continuously.
-
-Planning executes continuously.
-
-Validation executes continuously.
-
-Engineering confidence is continuously measured.
-
-Certification intentionally establishes engineering trust.
-
-Repository Evolution intentionally records engineering milestones.
-
-Baselines become constitutional engineering checkpoints.
-
-Git becomes a downstream implementation detail.
-
-Repository history reflects engineering trust rather than engineering activity.
-
-The Git working tree remains clean throughout autonomous engineering execution.
-
-Repository mutations occur only after constitutional Certification.
-
-Human intervention between successful engineering missions is no longer required.
-
-The software lifecycle becomes owned by PBOS rather than by manual engineering processes.
-
----
-
-## Constitutional Success Definition
-
-This specification shall be considered successfully implemented only when PBOS demonstrates the following operational behavior.
-
-Mission Queue
-
-↓
-
-Mission 1
-
-↓
-
-Mission 2
-
-↓
-
-Mission 3
-
-↓
-
-Mission 4
-
-↓
-
-Mission N
-
-↓
-
-Continuous Validation
-
-↓
-
-Engineering Confidence
-
-↓
-
-Certification Decision
-
-↓
-
-Repository Certification
-
-↓
-
-Single Git Commit
-
-↓
-
-Single Git Push
-
-↓
-
-Baseline Evolution
-
-↓
-
-Continue Autonomous Engineering
-
-Throughout all mission execution:
-
-The repository working tree remains clean.
-
-Repository history remains unchanged.
-
-Runtime remains ephemeral.
-
-Repository Evolution occurs only after Certification.
-
-Engineering history records only constitutionally certified engineering milestones.
-
----
-
-## Engineering Certification Statement
-
-Upon completion of implementation PBOS shall produce a final Engineering Certification Report containing:
-
-Executive Summary
-
-Architecture Summary
-
-Migration Summary
-
-Lifecycle Summary
-
-Repository Summary
-
-Backward Compatibility Results
-
-Validation Results
-
-Test Results
-
-Performance Results
-
-Security Results
-
-Governance Results
-
-Engineering Risks
-
-Remaining Recommendations
-
-Engineering Readiness
-
-Repository Readiness
-
-Autonomous Readiness
-
-Certification Decision
-
-The report shall explicitly certify whether PBOS has achieved the North Star established by this specification.
-
-If any constitutional requirement remains unsatisfied the implementation shall be considered incomplete and shall fail closed.
-
-
-# Implementation Authorization
-
-This specification is hereby designated as the constitutional implementation authority for the Autonomous Engineering Lifecycle.
-
-Implementation SHALL proceed directly from this specification.
-
-Implementation SHALL NOT produce placeholder code.
-
-Implementation SHALL NOT stop after documentation.
-
-Implementation SHALL produce complete working software.
-
-Implementation SHALL include:
-
-• Repository discovery
-
-• Architecture impact assessment
-
-• Migration plan
-
-• Incremental implementation
-
-• Runtime migration
-
-• Validation migration
-
-• Certification migration
-
-• Repository Evolution migration
-
-• Baseline migration
-
-• Lifecycle integration
-
-• Backward compatibility
-
-• Documentation updates
-
-• Comprehensive testing
-
-• Engineering certification
-
-Implementation shall proceed phase-by-phase.
-
-After each completed phase PBOS shall automatically:
-
-• Validate implementation
-
-• Produce engineering evidence
-
-• Produce migration evidence
-
-• Produce implementation report
-
-• Recommend the next implementation phase
-
-Implementation continues until every acceptance criterion defined by this specification has been satisfied.
-
-PBOS shall fail closed whenever constitutional requirements cannot be met.
-
-Completion requires delivery of both:
-
-1. Fully implemented Autonomous Engineering Lifecycle
-
-2. Final Engineering Certification Report
-
-This specification authorizes implementation.
-
+Any implementation that bypasses these boundaries, writes directly to certified history, creates competing owners, transfers certification across changed content, or cannot recover authoritative reality is non-conforming and must fail closed.

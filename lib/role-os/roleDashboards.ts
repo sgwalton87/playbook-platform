@@ -14,6 +14,10 @@ export function getRoleDashboard(role: PlaybookRoleOS) {
       ],
       actions: ["Finish English Reflection", "Save top scholarship", "Ask Oracle about UC eligibility", "Add one evidence item"],
       insight: "Your Biology work strengthened your STEM and health science pathways.",
+      evidencePreview: [
+        { label: "Academic readiness", status: "ready" },
+        { label: "Scholarship evidence", status: "pending" },
+      ],
     },
     family: {
       title: "Family OS",
@@ -27,6 +31,10 @@ export function getRoleDashboard(role: PlaybookRoleOS) {
       ],
       actions: ["Review FAFSA checklist", "RSVP to college night", "Congratulate Maya on Biology", "Help upload tax documents"],
       insight: "Family support this week can improve scholarship readiness.",
+      evidencePreview: [
+        { label: "Deadline reminder", status: "ready" },
+        { label: "Family note", status: "pending" },
+      ],
     },
     educator: {
       title: "Educator OS",
@@ -40,6 +48,10 @@ export function getRoleDashboard(role: PlaybookRoleOS) {
       ],
       actions: ["Review A-G alerts", "Verify student evidence", "Recommend intervention", "Message high-priority scholars"],
       insight: "Early signals show which students need academic or opportunity support.",
+      evidencePreview: [
+        { label: "Student evidence", status: "ready" },
+        { label: "Intervention request", status: "pending" },
+      ],
     },
     district: {
       title: "District OS",
@@ -53,6 +65,10 @@ export function getRoleDashboard(role: PlaybookRoleOS) {
       ],
       actions: ["Review school readiness map", "Identify opportunity gaps", "Prioritize FAFSA support", "Export board briefing"],
       insight: "Opportunity gaps are highest in STEM internships and FAFSA completion.",
+      evidencePreview: [
+        { label: "District readiness", status: "ready" },
+        { label: "Intervention report", status: "pending" },
+      ],
     },
     university: {
       title: "University OS",
@@ -66,6 +82,10 @@ export function getRoleDashboard(role: PlaybookRoleOS) {
       ],
       actions: ["Review verified scholars", "Filter by pathway", "Invite students to program", "Create outreach list"],
       insight: "Scholar Records show readiness beyond GPA alone.",
+      evidencePreview: [
+        { label: "Verified record", status: "ready" },
+        { label: "Pathway fit", status: "pending" },
+      ],
     },
     employer: {
       title: "Employer OS",
@@ -79,6 +99,10 @@ export function getRoleDashboard(role: PlaybookRoleOS) {
       ],
       actions: ["Review talent pipeline", "Create internship opportunity", "Filter by verified skills", "Invite candidates"],
       insight: "Trust signals help employers match opportunity to verified growth.",
+      evidencePreview: [
+        { label: "Verified skills", status: "ready" },
+        { label: "Workforce note", status: "pending" },
+      ],
     },
     mentor: {
       title: "Mentor OS",
@@ -92,6 +116,10 @@ export function getRoleDashboard(role: PlaybookRoleOS) {
       ],
       actions: ["Schedule weekly check-in", "Review Maya's next step", "Practice mock interview", "Celebrate recent evidence"],
       insight: "Mentors help translate guidance into confidence, action, and follow-through.",
+      evidencePreview: [
+        { label: "Check-in evidence", status: "ready" },
+        { label: "Goal update", status: "pending" },
+      ],
     },
   };
 
