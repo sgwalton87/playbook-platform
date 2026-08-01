@@ -17,6 +17,10 @@ const ROLE_DESCRIPTIONS: Partial<Record<keyof typeof PLAYBOOK_ROLES, string>> = 
   "college-coach": "Discover and support verified scholar-athlete talent.",
   "college-admissions": "Connect verified scholars with institutional pathways.",
   "brand-partner": "Create responsible campaigns, rewards, internships, and sponsorships.",
+  employer:
+  "Connect employers with verified talent pathways, internships, and workforce opportunities.",
+district:
+  "Support school systems with governed insights, student pathways, and institutional tools.",
 };
 
 export const roleOptions = PUBLIC_ONBOARDING_ROLES.map((role) => ({
