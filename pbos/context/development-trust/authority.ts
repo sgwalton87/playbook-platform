@@ -206,11 +206,16 @@ export function ensureDevelopmentTrust(
       findings: ["Development trust lease is expired."], context_identity: context.context_id,
     };
   }
-  const currentApproval = loadLaunchApproval(rootDir)?.latest ?? null;
+  const approvalHistory = loadLaunchApproval(rootDir);
+  const boundApproval = [
+    ...(approvalHistory?.latest ? [approvalHistory.latest] : []),
+    ...(approvalHistory?.history ?? []),
+  ].find(({ digest }) => digest === lease.authority_identity) ?? null;
   const identityFindings = [
     ...(lease.status !== "ACTIVE" ? ["Development trust lease is revoked."] : []),
-    ...(!currentApproval || currentApproval.digest !== lease.authority_identity ||
-      currentApproval.decision !== "APPROVED"
+    ...(!boundApproval || boundApproval.decision !== "APPROVED" ||
+      boundApproval.requester_identity !== lease.requester_identity ||
+      boundApproval.reviewer_identity !== lease.reviewer_identity
       ? ["Development trust authority no longer matches its approval evidence."] : []),
     ...(snapshot.repositoryIdentity !== lease.repository_identity
       ? ["Repository identity changed."] : []),

@@ -160,6 +160,34 @@ describe("PBOS transition repository reality synchronization", () => {
     expect(context.output).toContain("Trust Level: ACTIVE");
     expect(context.output).toContain("Validation: PASS");
 
+    const approvalPath = path.join(rootDir, Artifacts.launchApproval);
+    const approvalArtifact = JSON.parse(readFileSync(approvalPath, "utf8")) as {
+      owner: "authority-ledger";
+      latest: Record<string, unknown> & { digest: string };
+      history: Array<Record<string, unknown> & { digest: string }>;
+      digest: string;
+    };
+    const priorApproval = approvalArtifact.latest;
+    const newerApprovalBody = {
+      ...priorApproval,
+      approval_id: "LAUNCH-APPROVAL-NEWER-EVIDENCE",
+      digest: undefined,
+    };
+    const newerApproval = {
+      ...newerApprovalBody,
+      digest: artifactDigest(newerApprovalBody),
+    };
+    const approvalBody = {
+      owner: approvalArtifact.owner,
+      latest: newerApproval,
+      history: [...approvalArtifact.history, priorApproval],
+    };
+    writeFileSync(
+      approvalPath,
+      JSON.stringify({ ...approvalBody, digest: artifactDigest(approvalBody) }, null, 2),
+      "utf8"
+    );
+
     git(rootDir, "config", "user.email", "pbos-test@example.com");
     git(rootDir, "config", "user.name", "PBOS Test");
     mkdirSync(path.join(rootDir, "app", "trust-lease-test"), { recursive: true });
