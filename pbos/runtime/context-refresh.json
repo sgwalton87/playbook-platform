@@ -2,17 +2,16 @@
   "version": "1.0.0",
   "owner": "repository-context",
   "latest": {
-    "id": "3166ca79c41cc4960707d77a48d3fe704ed2c3fbae9690e616d190d71212c365",
-    "previousContextIdentity": "6e8f12a01e7779571dc7105e378084c5f96b5db3bc2f6236e125b1981d6f4fd6",
-    "newContextIdentity": "7daddd17eff35cf90a581974b53d5ee57689f451c0b3527edee58a6f1c6b12a1",
-    "reason": "Approve activation of the current PBOS trusted repository baseline after validating repository identity, artifact integrity, transition scope, human authorization requirements, and lifecycle governance controls.",
+    "id": "e6e1126dca6c310a57ca2cfa13cc22893a5550f9950b6bb5db7ffa97df7993fa",
+    "previousContextIdentity": "7daddd17eff35cf90a581974b53d5ee57689f451c0b3527edee58a6f1c6b12a1",
+    "newContextIdentity": "91e15a868b47bf429981f5a1b3148c8674a4fdc1d466c96f947c4eca5faa81f9",
+    "reason": "> Approve activation of the PBOS baseline because repository identity, branch lineage, artifact integrity, lifecycle governance controls, and human authorization requirements have been reviewed. The baseline represents the current canonical engineering state following documentation canonicalization and repository recovery operations.",
     "triggeringConditions": [
-      "Context validation failed: context artifact is stale.",
+      "Context validation failed: repository root does not match expected context.",
       "Context validation failed: commit identity mismatches.",
-      "Context validation failed: working tree state changed after capture.",
       "Context validation failed: artifact changed after capture: pbos/runtime/repository.json."
     ],
-    "timestamp": "2026-08-02T04:37:32.294Z",
+    "timestamp": "2026-08-02T09:10:48.764Z",
     "validator": {
       "id": "PBOS-CONTEXT-VALIDATOR",
       "version": "1.1.0"
@@ -723,6 +722,23 @@
         "Context validation failed: artifact changed after capture: pbos/runtime/repository.json."
       ],
       "timestamp": "2026-08-02T04:37:32.294Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "e6e1126dca6c310a57ca2cfa13cc22893a5550f9950b6bb5db7ffa97df7993fa",
+      "previousContextIdentity": "7daddd17eff35cf90a581974b53d5ee57689f451c0b3527edee58a6f1c6b12a1",
+      "newContextIdentity": "91e15a868b47bf429981f5a1b3148c8674a4fdc1d466c96f947c4eca5faa81f9",
+      "reason": "> Approve activation of the PBOS baseline because repository identity, branch lineage, artifact integrity, lifecycle governance controls, and human authorization requirements have been reviewed. The baseline represents the current canonical engineering state following documentation canonicalization and repository recovery operations.",
+      "triggeringConditions": [
+        "Context validation failed: repository root does not match expected context.",
+        "Context validation failed: commit identity mismatches.",
+        "Context validation failed: artifact changed after capture: pbos/runtime/repository.json."
+      ],
+      "timestamp": "2026-08-02T09:10:48.764Z",
       "validator": {
         "id": "PBOS-CONTEXT-VALIDATOR",
         "version": "1.1.0"

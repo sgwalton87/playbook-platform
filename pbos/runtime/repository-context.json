@@ -1,16 +1,16 @@
 {
   "version": "1.1.0",
-  "capturedAt": "2026-08-02T04:37:32.294Z",
+  "capturedAt": "2026-08-02T09:10:48.764Z",
   "snapshot": {
-    "repositoryRoot": "/Users/bulletproof/playbook-platform",
+    "repositoryRoot": "/Volumes/PBOSCanonicalization/playbook-platform",
     "remoteName": "origin",
     "remoteUrl": "https://github.com/sgwalton87/playbook-platform.git",
     "repositoryIdentity": "playbook-platform",
     "git": {
       "branch": "pbos/post-pps300-convergence",
-      "commitSha": "1a5ea2b1b7f23f260d18171f3b43dc142534aba2",
+      "commitSha": "ddf5a3058982fb2954aa5edcb659f00af2e9bcd9",
       "upstream": "origin/pbos/post-pps300-convergence",
-      "ahead": 0,
+      "ahead": 1,
       "behind": 0,
       "workingTreeClean": true,
       "workingTreeDigest": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126",
@@ -39,8 +39,8 @@
         "gateId": null,
         "branch": "pbos/post-pps300-convergence",
         "status": null,
-        "generatedAt": "2026-08-02T04:37:31.642Z",
-        "digest": "5d3432da22b393f612b5143bd382c7f00eb5f4e8d5f99ac6f8aa26d8e8be43e9",
+        "generatedAt": "2026-08-02T07:58:15.727Z",
+        "digest": "bc10e201574a83dfb9bd961c0d55acfae083e9ca9bfcd3cf233dcc0e2c1d1718",
         "owner": "repository-intelligence",
         "consumers": [
           "context",
@@ -138,5 +138,5 @@
       }
     ]
   },
-  "identity": "7daddd17eff35cf90a581974b53d5ee57689f451c0b3527edee58a6f1c6b12a1"
+  "identity": "91e15a868b47bf429981f5a1b3148c8674a4fdc1d466c96f947c4eca5faa81f9"
 }
