@@ -107,6 +107,20 @@ describe("context refresh approval authority", () => {
     ).toBe(false);
   });
 
+  it("keeps authority valid when reconciliation output is regenerated", () => {
+    const value = approval();
+    const regenerated = {
+      ...reconciliation(),
+      current_identity: "regenerated-context-output",
+      digest: artifactDigest({ regenerated: true }),
+    };
+    expect(validateContextRefreshApproval({
+      approval: value,
+      reconciliation: regenerated,
+      timestamp: now,
+    })).toEqual({ valid: true, findings: [] });
+  });
+
   it("blocks an expired approval", () => {
     expect(
       validateContextRefreshApproval({

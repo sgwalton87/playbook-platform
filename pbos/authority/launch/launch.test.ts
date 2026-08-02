@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { artifactDigest } from "../../kernel/identity";
 import type { ChangeBoundaryDeclaration } from "../../context/change-boundary";
 import { createLaunchApproval, validateLaunchApproval } from "./authority";
+import { changeBoundaryTransitionIdentity } from "../../context/change-boundary";
 
 const timestamp = "2026-07-30T00:00:00.000Z";
 
@@ -53,7 +54,7 @@ describe("human launch authority", () => {
       timestamp,
       expiration: "2026-07-31T00:00:00.000Z",
     });
-    expect(approval.scope_identity).toBe(scope.digest);
+    expect(approval.scope_identity).toBe(changeBoundaryTransitionIdentity(scope));
     expect(approval.ledger_decision.actor_id).toBe("reviewer");
   });
 
@@ -84,7 +85,7 @@ describe("human launch authority", () => {
     });
     expect(
       validateLaunchApproval(
-        { approval, boundary: { ...scope, digest: "changed" }, timestamp }
+        { approval, boundary: { ...scope, approved_files: ["app/changed.tsx"] }, timestamp }
       ).findings
     ).toContain("Approval scope identity does not match change boundary.");
   });

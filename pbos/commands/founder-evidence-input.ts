@@ -72,6 +72,7 @@ export async function collectFounderEvidenceInput(
     command !== "change-boundary" &&
     command !== "approve-boundary" &&
     command !== "approve-refresh" &&
+    command !== "transition" &&
     command !== "approve"
   ) return initial;
   const entries = new Map(Object.entries(initial));
@@ -118,6 +119,7 @@ export async function readFounderEvidenceInput(input: {
     (input.command !== "change-boundary" &&
       input.command !== "approve-boundary" &&
       input.command !== "approve-refresh" &&
+      input.command !== "transition" &&
       input.command !== "approve")) {
     return parsed;
   }

@@ -1,4 +1,5 @@
 import type { ChangeBoundaryDeclaration } from "../../context/change-boundary";
+import { changeBoundaryTransitionIdentity } from "../../context/change-boundary";
 import { artifactDigest } from "../../kernel/identity";
 import { AuthorityLedger } from "../ledger";
 import type { LaunchApprovalRecord, LaunchApprovalValidation } from "./types";
@@ -30,12 +31,12 @@ export function validateLaunchApproval(input: {
     ...(!approval.decision_reason || !approval.risk_acknowledgment
       ? ["Approval reason and risk acknowledgment are required."]
       : []),
-    ...(boundary && approval.scope_identity !== boundary.digest
+    ...(boundary && approval.scope_identity !== changeBoundaryTransitionIdentity(boundary)
       ? ["Approval scope identity does not match change boundary."]
       : []),
     ...(boundary &&
     (approval.boundary_id !== boundary.boundary_id ||
-      approval.boundary_digest !== boundary.digest)
+      approval.boundary_digest !== changeBoundaryTransitionIdentity(boundary))
       ? ["Approval boundary identity does not match."]
       : []),
     ...(!Number.isFinite(Date.parse(approval.expiration)) ||
@@ -61,17 +62,17 @@ export function createLaunchApproval(input: {
   readonly timestamp: string;
   readonly expiration: string;
 }): LaunchApprovalRecord {
+  const transitionIdentity = changeBoundaryTransitionIdentity(input.boundary);
   const approvalId = `LAUNCH-APPROVAL-${artifactDigest({
-    boundary: input.boundary.digest,
+    boundary: transitionIdentity,
     reviewer: input.reviewerIdentity,
-    timestamp: input.timestamp,
   }).slice(0, 16)}`;
   const ledger = new AuthorityLedger().appendDecision({
     decision_id: `${approvalId}-DECISION`,
-    subject_id: input.boundary.digest,
+    subject_id: transitionIdentity,
     actor_id: input.reviewerIdentity,
     decision: input.decision,
-    evidence_ids: [input.boundary.digest],
+    evidence_ids: [transitionIdentity],
     timestamp: input.timestamp,
   });
   const ledgerDecision = ledger.snapshot().decisions[0];
@@ -81,11 +82,11 @@ export function createLaunchApproval(input: {
     requester_identity: input.requesterIdentity,
     reviewer_identity: input.reviewerIdentity,
     boundary_id: input.boundary.boundary_id,
-    boundary_digest: input.boundary.digest,
+    boundary_digest: transitionIdentity,
     decision: input.decision,
     decision_reason: input.reason,
     risk_acknowledgment: input.riskAcknowledgment,
-    scope_identity: input.boundary.digest,
+    scope_identity: transitionIdentity,
     timestamp: input.timestamp,
     approval_timestamp: input.timestamp,
     expiration: input.expiration,

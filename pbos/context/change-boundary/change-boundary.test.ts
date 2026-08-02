@@ -205,7 +205,7 @@ describe("change boundary authority", () => {
     })).toThrow("Baseline activation file classifications must be empty.");
   });
 
-  it("rejects missing identity, expiration, and baseline digest drift", () => {
+  it("rejects missing identity and expiration without binding generated digest drift", () => {
     const value = cleanInventory();
     const declaration = createChangeBoundary({
       inventory: value,
@@ -238,9 +238,7 @@ describe("change boundary authority", () => {
     expect(validateChangeBoundary(declaration, value, timestamp, {
       ...baselineIdentity,
       governance_digest: "changed",
-    }).findings).toContain(
-      "Baseline activation digest does not match current context."
-    );
+    })).toEqual({ valid: true, findings: [] });
   });
 
   it("rejects an empty CHANGE boundary and excludes governed runtime outputs", () => {
@@ -259,6 +257,7 @@ describe("change boundary authority", () => {
     })).toThrow("Change boundary requires at least one changed file.");
     expect(isGovernedRuntimeOutput("pbos/runtime/change-boundary.json")).toBe(true);
     expect(isGovernedRuntimeOutput("pbos/runtime/launch-approval.json")).toBe(true);
+    expect(isGovernedRuntimeOutput("docs/release-evidence/new-evidence.md")).toBe(true);
     expect(isGovernedRuntimeOutput("pbos/context/index.ts")).toBe(false);
   });
 });

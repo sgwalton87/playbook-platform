@@ -17,7 +17,7 @@ if (!isKernelCommand(requested)) {
     args: process.argv.slice(3),
     interactive: Boolean(process.stdin.isTTY && process.stdout.isTTY),
     baselineAvailable:
-      requested === "change-boundary" &&
+      (requested === "change-boundary" || requested === "transition") &&
       createChangeInventory(process.cwd()).changes.length === 0,
   })
     .then((input) =>

@@ -58,6 +58,7 @@
     "pbos:context-activate": "tsx pbos/commands/kernel-cli.ts context-activate",
     "pbos:change-inventory": "tsx pbos/commands/kernel-cli.ts change-inventory",
     "pbos:change-boundary": "tsx pbos/commands/kernel-cli.ts change-boundary",
+    "pbos:transition": "tsx pbos/commands/kernel-cli.ts transition",
     "pbos:approve-boundary": "tsx pbos/commands/kernel-cli.ts approve-boundary",
     "pbos:approve-refresh": "tsx pbos/commands/kernel-cli.ts approve-refresh",
     "pbos:recover": "tsx pbos/commands/kernel-cli.ts recover",

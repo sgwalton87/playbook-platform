@@ -133,8 +133,7 @@ export function discoverTrustedContext(
     Date.parse(refreshApproval?.expiration ?? "") > Date.parse(timestamp) &&
     refreshApproval?.repository_identity === assessment.repository_identity &&
     refreshApproval.branch_identity === assessment.current_branch &&
-    refreshApproval.commit_identity === assessment.current_commit &&
-    refreshApproval.proposed_context_identity === baselineIdentity.context_digest;
+    refreshApproval.commit_identity === assessment.current_commit;
   const boundaryAuthorityValid =
     changeBoundaryValidation.valid &&
     launchApprovalValidation.valid &&

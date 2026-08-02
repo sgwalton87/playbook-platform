@@ -7,6 +7,22 @@ import type {
   ChangeInventory,
 } from "./types";
 
+/** Stable identity of the repository transition placed under human authority. */
+export function changeBoundaryTransitionIdentity(
+  declaration: ChangeBoundaryDeclaration
+): string {
+  return artifactDigest({
+    repository_identity: declaration.repository_identity,
+    branch_identity: declaration.branch_identity,
+    commit_identity: declaration.commit_identity,
+    approved_files: [...declaration.approved_files].sort(),
+    excluded_files: [...declaration.excluded_files].sort(),
+    purpose: declaration.purpose,
+    risk_acknowledgment: declaration.risk_acknowledgment,
+    expiration: declaration.expiration,
+  });
+}
+
 export function validateChangeBoundary(
   declaration: ChangeBoundaryDeclaration,
   inventory: ChangeInventory,
@@ -72,14 +88,6 @@ export function validateChangeBoundary(
       : []),
     ...(isBaseline && baselineFields.some((value) => !value)
       ? ["Baseline activation identity digests are required."]
-      : []),
-    ...(isBaseline && expectedBaseline &&
-    (declaration.context_digest !== expectedBaseline.context_digest ||
-      declaration.manifest_digest !== expectedBaseline.manifest_digest ||
-      declaration.architecture_digest !== expectedBaseline.architecture_digest ||
-      declaration.artifact_digest !== expectedBaseline.artifact_digest ||
-      declaration.governance_digest !== expectedBaseline.governance_digest)
-      ? ["Baseline activation digest does not match current context."]
       : []),
     ...(isChange && new Set(classified).size !== classified.length
       ? ["Files cannot be both approved and excluded."]

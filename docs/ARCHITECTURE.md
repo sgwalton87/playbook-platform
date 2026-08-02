@@ -7,7 +7,7 @@ This document explains the Playbook OS platform architecture for engineers, revi
 Owned by Playbook OS Engineering. Security-sensitive architecture changes require review from the platform owner and must be recorded in [DECISIONS.md](./DECISIONS.md).
 
 ## Last Updated
-July 28, 2026
+August 2, 2026
 
 ## Related Documents
 - Constitution: [../CODEX.md](../CODEX.md)
@@ -85,6 +85,20 @@ Runtime handoff artifacts live under `pbos/runtime/`. Domain implementation rema
 Before the PBOS runtime enters its execution phase, it validates `pbos/runtime/repository-context.json`. The captured context binds the canonical repository identity, remote, branch, commit, working-tree state, PBOS runtime state, and required runtime artifacts through deterministic SHA-256 identities.
 
 Context validation is fail-closed and precedes execution authorization. Missing, stale, changed, or conflicting context prevents execution engines from running and records a runtime blocker. PBOS never refreshes context implicitly during execution; an intentional repository or runtime transition requires an explicit new capture.
+
+### Governed Transition Authority
+
+Human authority binds the stable repository transition: repository, branch, commit,
+approved and excluded files, purpose, acknowledged risk, and expiration. PBOS runtime
+files under `pbos/runtime/` and generated release evidence under
+`docs/release-evidence/` are system-managed observations. They may be regenerated
+after authorization without changing that authority. Source or scope drift remains
+fail-closed, as do missing reviewers, self-approval, invalid record digests, and
+expired decisions.
+
+`npm run pbos:transition` is the canonical baseline operator flow. It inventories
+and reconciles the repository, records one human authorization, refreshes when
+needed, activates the trusted context, and validates the resulting lifecycle.
 
 PBOS runtime artifact ownership and test isolation are governed by
 [`docs/ENGINEERING/PBOS_RUNTIME_ISOLATION.md`](./ENGINEERING/PBOS_RUNTIME_ISOLATION.md).

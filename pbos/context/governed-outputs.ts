@@ -12,6 +12,7 @@ export function isGovernedRuntimeOutput(relativePath: string): boolean {
   const normalized = relativePath.replaceAll("\\", "/");
   return (
     normalized.startsWith("pbos/runtime/") ||
+    normalized.startsWith("docs/release-evidence/") ||
     GOVERNED_CONTEXT_OUTPUTS.has(normalized)
   );
 }

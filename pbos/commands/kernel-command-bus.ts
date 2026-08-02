@@ -108,6 +108,7 @@ export const KERNEL_COMMANDS = [
   "context-activate",
   "change-inventory",
   "change-boundary",
+  "transition",
   "approve-boundary",
   "approve-refresh",
   "recover",
@@ -531,6 +532,114 @@ export async function dispatchKernelCommand(
     };
   }
 
+  if (command === "transition") {
+    const timestamp = new Date().toISOString();
+    const requesterIdentity = evidenceString(evidenceInput, "requester-identity");
+    const reviewerIdentity = evidenceString(evidenceInput, "reviewer-identity");
+    const decision = evidenceString(evidenceInput, "decision").toUpperCase();
+    const reason = evidenceString(evidenceInput, "reason");
+    const riskAcknowledgment = evidenceString(evidenceInput, "risk-acknowledgment");
+    const expiration = evidenceString(evidenceInput, "expiration");
+    if (!requesterIdentity || !reviewerIdentity || decision !== "APPROVED" ||
+      !reason || !riskAcknowledgment || !expiration) {
+      return {
+        command,
+        successful: false,
+        output: [
+          "PBOS GOVERNED TRANSITION",
+          "Decision: BLOCKED",
+          "Requester, independent reviewer, APPROVED decision, reason, risk acknowledgment, and expiration are required.",
+          "No transition was performed.",
+        ].join("\n"),
+      };
+    }
+    try {
+      const inventory = createChangeInventory(rootDir, timestamp);
+      if (inventory.changes.length > 0) {
+        throw new Error("Baseline activation requires committed application source; approve and commit the inventoried transition first.");
+      }
+      const before = discoverTrustedContext(rootDir, timestamp);
+      const boundary = createChangeBoundary({
+        inventory,
+        boundaryType: "BASELINE_ACTIVATION",
+        baselineIdentity: before.baseline_identity,
+        requesterIdentity,
+        approvedFiles: [],
+        excludedFiles: [],
+        purpose: reason,
+        businessPurpose: reason,
+        technicalPurpose: "Reconcile and activate the approved repository transition.",
+        riskAcknowledgment,
+        creationTimestamp: timestamp,
+        expirationTimestamp: expiration,
+      });
+      persistChangeBoundary(rootDir, boundary);
+      const approval = createLaunchApproval({
+        boundary,
+        requesterIdentity,
+        reviewerIdentity,
+        decision: "APPROVED",
+        reason,
+        riskAcknowledgment,
+        timestamp,
+        expiration,
+      });
+      persistLaunchApproval(rootDir, approval);
+      let refresh = "NOT_REQUIRED";
+      if (before.reconciliation.state === "REVIEW_REQUIRED") {
+        const refreshApproval = createContextRefreshApproval({
+          reconciliation: before.reconciliation,
+          requesterIdentity,
+          reviewerIdentity,
+          decision: "APPROVED",
+          decisionReason: reason,
+          riskAcknowledgment,
+          timestamp,
+          expiration,
+        });
+        persistContextRefreshApproval(rootDir, refreshApproval);
+        const refreshed = new ContextRefreshAuthority().refreshApproved(rootDir, {
+          reconciliation: before.reconciliation,
+          approval: refreshApproval,
+          timestamp,
+        });
+        persistContextRefreshApproval(rootDir, applyContextRefreshApproval(
+          refreshApproval, refreshed.context.identity, timestamp
+        ));
+        refresh = "APPLIED";
+      } else if (before.reconciliation.state !== "VERIFIED") {
+        throw new Error(`Repository reconciliation is ${before.reconciliation.state}.`);
+      }
+      const resolution = createAuthorityLinkedActivationEvidence(rootDir, timestamp);
+      if (!resolution.valid || !resolution.evidence) {
+        throw new Error(resolution.findings.join("\n"));
+      }
+      persistTrustedContext(rootDir, resolution.evidence);
+      const after = discoverTrustedContext(rootDir, timestamp);
+      const valid = after.reconciliation.state === "VERIFIED";
+      return {
+        command,
+        successful: valid,
+        output: [
+          "PBOS GOVERNED TRANSITION",
+          `Inventory: ${inventory.changes.length} source changes`,
+          `Reconciliation: ${after.reconciliation.state}`,
+          `Refresh: ${refresh}`,
+          "Human Authorization: RECORDED ONCE",
+          `Trust Level: ${valid ? "ACTIVE" : "BLOCKED"}`,
+          `Validation: ${valid ? "PASS" : "FAIL"}`,
+        ].join("\n"),
+      };
+    } catch (error: unknown) {
+      return {
+        command,
+        successful: false,
+        output: ["PBOS GOVERNED TRANSITION", "Decision: BLOCKED",
+          error instanceof Error ? error.message : String(error)].join("\n"),
+      };
+    }
+  }
+
   if (command === "change-boundary") {
     const timestamp = new Date().toISOString();
     const requesterIdentity = evidenceString(
@@ -806,7 +915,7 @@ export async function dispatchKernelCommand(
       output: [
         "PBOS TRUSTED BUILD CONTEXT",
         `Current Context: ${history?.latest.context_id ?? "NONE"}`,
-        `Trust Level: ${readiness.current_capability_level === "GOVERNED_PLANNING" ? "TRUSTED" : "BLOCKED"}`,
+        `Trust Level: ${readiness.current_capability_level === "GOVERNED_PLANNING" ? "ACTIVE" : "BLOCKED"}`,
         `Identity: ${history?.latest.repository_identity ?? discovery.assessment.repository_identity}`,
         `Expiration: ${history?.latest.expiration_timestamp ?? "NONE"}`,
         `Validation: ${readiness.current_capability_level === "GOVERNED_PLANNING" ? "PASS" : "FAIL"}`,
