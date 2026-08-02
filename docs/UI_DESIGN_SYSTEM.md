@@ -176,3 +176,7 @@ Before adding UI, search existing `components/`, `app/`, and `lib/design-system/
 - Forms must explain why sensitive data is requested.
 - Empty states should educate and offer a next step.
 - Error states should be recoverable when possible.
+
+## Launch Surface State Contract (August 1, 2026)
+
+Launch-facing workflows use `PlaybookSurfaceState` for explicit loading, empty, error, and permission-restricted states. Error states use alert semantics; loading states expose `aria-busy`; restricted states explain the authorization recovery action without implying missing data. Accessible reference implementations for buttons, cards, badges, metrics, forms, and workflow states live at `/design-system/examples`.

@@ -8,17 +8,23 @@ import {
 
 import type { RelationshipKind } from "@/lib/permissions";
 import { buildSupportInvitationEmail, sendPlaybookEmail } from "@/lib/email";
-import { createClient } from "@supabase/supabase-js";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { captureOperationalError, incrementMetric } from "@/lib/observability";
 
-function getSupabaseAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+const RELATIONSHIPS: RelationshipKind[] = ["parent_guardian", "educator", "mentor", "district_admin", "university_partner", "employer_partner"];
+
+export async function GET() {
+  const supabase = await createServerSupabaseClient();
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) return NextResponse.json({ error: "Sign in required." }, { status: 401 });
+  const { data, error } = await supabase.from("support_invitations")
+    .select("id,scholar_id,scholar_name,invitee_name,invitee_email,relationship,status,permissions,destination,created_at,responded_at")
+    .order("created_at", { ascending: false });
+  return error ? NextResponse.json({ error: error.message }, { status: 400 }) : NextResponse.json({ invitations: data || [] });
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = getSupabaseAdmin();
+  const supabase = await createServerSupabaseClient();
 
   try {
     const body = await req.json();
@@ -35,12 +41,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const relationship = body.relationship as RelationshipKind;
+    if (!RELATIONSHIPS.includes(relationship) || !String(body.inviteeEmail || "").includes("@")) {
+      return NextResponse.json({ error: "A valid supporter relationship and email are required." }, { status: 422 });
+    }
+
+    const { data: profile } = await supabase.from("profiles").select("full_name,username").eq("id", user.id).maybeSingle();
     const record = buildInvitationRecord({
       scholarId: user.id,
-      scholarName: body.scholarName || "Scholar",
+      scholarName: profile?.full_name || profile?.username || "Scholar",
       inviteeName: body.inviteeName,
       inviteeEmail: body.inviteeEmail,
-      relationship: body.relationship as RelationshipKind,
+      relationship,
     });
 
     const { error } = await supabase
@@ -88,13 +100,16 @@ export async function POST(req: NextRequest) {
       fromType: "onboarding",
     });
 
+    incrementMetric("invitation_total");
+
     return NextResponse.json({
       ok: true,
       invitation: record,
       email,
       deliveryStatus: "sent",
     });
-  } catch {
+  } catch (error: unknown) {
+    await captureOperationalError(error, { service: "playbook-communications", component: "invitations", operation: "send_invitation" });
     return NextResponse.json(
       { error: "Unable to create invitation." },
       { status: 500 }

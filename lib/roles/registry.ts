@@ -60,4 +60,4 @@ export function getOnboardingDestination(role?: string | null) {
 }
 
 export const PUBLIC_ONBOARDING_ROLES = (Object.keys(PLAYBOOK_ROLES) as PlaybookRole[])
-  .filter((role) => PLAYBOOK_ROLES[role].onboarding && role !== "other");
+  .filter((role) => PLAYBOOK_ROLES[role].onboarding);

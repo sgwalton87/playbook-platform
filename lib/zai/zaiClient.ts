@@ -7,6 +7,7 @@ export async function callZaiChat(input: {
   messages: ZaiMessage[];
   model?: string;
   temperature?: number;
+  timeoutMs?: number;
 }) {
   const apiKey = process.env.ZAI_API_KEY;
 
@@ -25,6 +26,7 @@ export async function callZaiChat(input: {
       messages: input.messages,
       temperature: input.temperature ?? 0.4,
     }),
+    signal: AbortSignal.timeout(input.timeoutMs ?? 12_000),
   });
 
   const json = await res.json();
@@ -35,6 +37,5 @@ export async function callZaiChat(input: {
 
   return {
     text: json?.choices?.[0]?.message?.content || "",
-    raw: json,
   };
 }

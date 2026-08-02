@@ -173,16 +173,24 @@ function StartContent() {
       ? form.invite_supporters.filter(Boolean)
       : [];
 
+    const relationshipMap: Record<string, "parent_guardian" | "educator" | "mentor"> = {
+      "Parent / Guardian": "parent_guardian",
+      Educator: "educator",
+      Mentor: "mentor",
+    };
+    const relationship = relationshipMap[String(form.invite_supporter_relationship || "")];
+    if (!relationship) return;
+
     await Promise.all(
       emails.map((email: string) =>
         fetch("/api/invitations/send", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            email,
-            role: "supporter",
-            scholarId: user?.id,
-            message: "I’m building my Playbook and would like you to support my journey.",
+            inviteeEmail: email,
+            inviteeName: email.split("@")[0],
+            scholarName: form.full_name || "Scholar",
+            relationship,
           }),
         }).catch(() => null)
       )
@@ -209,11 +217,29 @@ function StartContent() {
 
     if (isLast) {
       setCreating(true);
-      await persist(true);
+      const completionPayload = mapOnboardingToProfilePayload({
+        userId: user.id,
+        role,
+        data: form,
+        stepIndex,
+        complete: false,
+      });
+      const response = await fetch("/api/onboarding/complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(completionPayload),
+      });
+      const result = await response.json();
+      if (!response.ok || !result.ok) {
+        setCreating(false);
+        setSaving(false);
+        alert(result.message || "Onboarding could not be completed. Your progress is still saved.");
+        return;
+      }
       setCreating(false);
       setCreated(true);
       setTimeout(() => {
-        window.location.href = getOnboardingCompletionDestination(role);
+        window.location.href = result.destination || getOnboardingCompletionDestination(role);
       }, 15000);
       return;
     }

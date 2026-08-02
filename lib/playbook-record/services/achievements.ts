@@ -77,6 +77,13 @@ export async function createAchievementWithEvidence({
       title: evidenceTitle || title,
       evidence_type: evidenceUrl ? "link" : "other",
       url: evidenceUrl || null,
+      owner_id: profileId,
+      source: evidenceUrl ? "Scholar-provided link" : "Scholar-provided evidence",
+      source_type: "self_reported",
+      verification_state: "unverified",
+      last_observed_at: new Date().toISOString(),
+      visibility: "private",
+      consent_scope: "owner_only",
       created_by: profileId,
       updated_by: profileId,
     });

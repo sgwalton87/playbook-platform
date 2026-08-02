@@ -6,6 +6,10 @@
     "it": "tsx pbos/commands/kernel-cli.ts run",
     "dev": "next dev",
     "build": "next build",
+    "env:check": "tsx scripts/validate-environment.ts",
+    "db:validate:rls": "tsx scripts/validate-rls-contract.ts",
+    "platform:validate": "tsx scripts/validate-platform-registry.ts",
+    "observability:validate": "tsx scripts/validate-observability.ts",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run --pool=threads",
@@ -69,6 +73,7 @@
     "pbos:certify": "tsx pbos/commands/kernel-cli.ts certify",
     "pbos": "tsx pbos/commands/kernel-cli.ts",
     "pbos:status": "tsx pbos/commands/kernel-cli.ts status",
+    "pbos:platform-status": "tsx scripts/validate-platform-registry.ts",
     "pbos:context": "tsx pbos/commands/context.ts",
     "pbos:reconcile-artifacts": "tsx pbos/commands/reconcile-artifacts.ts",
     "pbos:govern-lifecycle": "tsx pbos/commands/govern-lifecycle.ts",
@@ -80,7 +85,9 @@
     "pbos:execute": "tsx pbos/commands/kernel-cli.ts execute",
     "pbos:certify-volume": "tsx pbos/commands/certify-volume.ts",
     "pbos:promote-volume": "tsx pbos/commands/promote-volume.ts",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:synthetic": "playwright test tests/e2e/observability-synthetic.spec.ts --project=chromium",
+    "test:integration:supabase": "vitest run tests/integration/supabase-authorization.integration.test.ts --pool=threads"
   },
   "dependencies": {
     "@hcaptcha/react-hcaptcha": "^2.0.2",
@@ -99,6 +106,7 @@
     "stripe": "^22.2.3"
   },
   "devDependencies": {
+    "@next/env": "16.2.9",
     "@playwright/test": "^1.51.1",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",

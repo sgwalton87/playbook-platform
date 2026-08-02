@@ -10,7 +10,7 @@ import {
 } from "@/components/ui";
 
 export default function ModerationPage() {
-  const [reports, setReports] = useState<LegacyValue[]>([]);
+  const [reports, setReports] = useState<Array<{ id: string; target_type: string; category: string; detail: string | null; severity: string; status: string; created_at: string }>>([]);
   const [loading, setLoading] = useState(true);
 
   async function load() {
@@ -34,8 +34,10 @@ export default function ModerationPage() {
 
   async function update(
     reportId: string,
-    status: "reviewing" | "resolved" | "dismissed"
+    status: "triaged" | "resolved" | "dismissed"
   ) {
+    const reason = window.prompt("Document the reason for this moderation decision.");
+    if (!reason?.trim()) return;
     await fetch("/api/admin/moderation", {
       method: "PATCH",
       headers: {
@@ -43,7 +45,7 @@ export default function ModerationPage() {
       },
       body: JSON.stringify({
         reportId,
-        status,
+        status, reason: reason.trim(),
       }),
     });
 
@@ -72,7 +74,7 @@ export default function ModerationPage() {
             <PlaybookCard
               key={report.id}
               eyebrow={report.target_type}
-              title={report.reason}
+              title={report.category.replaceAll("_", " ")}
             >
               <p style={body}>
                 {report.detail || "No additional detail provided."}
@@ -87,7 +89,7 @@ export default function ModerationPage() {
                 }}
               >
                 <PlaybookPill>
-                  {report.status}
+                  {report.severity} · {report.status}
                 </PlaybookPill>
 
                 <PlaybookPill>
@@ -103,7 +105,7 @@ export default function ModerationPage() {
                 }}
               >
                 <button
-                  onClick={() => update(report.id, "reviewing")}
+                  onClick={() => update(report.id, "triaged")}
                   style={button}
                 >
                   Review

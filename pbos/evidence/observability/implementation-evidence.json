@@ -1,0 +1,27 @@
+{
+  "mission": "PBOS-CODEX-MISSION-001",
+  "status": "PARTIAL",
+  "implemented": [
+    "structured-json-event-contract",
+    "sensitive-metadata-redaction",
+    "edge-request-correlation",
+    "server-request-error-capture",
+    "client-error-capture",
+    "operation-duration-and-dependency-tracing",
+    "platform-metric-contract",
+    "liveness-readiness-and-protected-metrics",
+    "alert-contracts",
+    "public-and-scholar-synthetic-contract",
+    "operational-ownership-contract"
+  ],
+  "certification_blockers": [
+    "deployed-collector-and-retention-evidence",
+    "durable-cross-instance-metrics-and-trace-backend",
+    "hosted-dashboard-and-alert-binding",
+    "test-alert-receipts",
+    "authenticated-scholar-synthetic-result",
+    "named-on-call-acknowledgment",
+    "security-and-privacy-approval"
+  ],
+  "production_certified": false
+}

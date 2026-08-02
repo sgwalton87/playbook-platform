@@ -48,7 +48,15 @@ export function convertEventToNotification(input: {
     userId: input.recipientUserId,
     scholarId: input.event.scholar_id,
     type:
-      input.event.type === "action.assigned" || input.event.type === "action.completed"
+      input.event.type.startsWith("verification.")
+        ? "verification"
+        : input.event.type.startsWith("intervention.")
+          ? "intervention"
+          : input.event.type.startsWith("opportunity.")
+            ? "opportunity"
+            : input.event.type.startsWith("milestone.")
+              ? "milestone"
+              : input.event.type === "action.assigned" || input.event.type === "action.completed"
         ? "shared_action"
         : input.event.type === "mail.reply_received"
           ? "mail_reply"

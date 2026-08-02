@@ -1,0 +1,8 @@
+{
+  "mission": "PBOS-CODEX-MISSION-001",
+  "synthetic": "tests/e2e/observability-synthetic.spec.ts",
+  "public_journey": { "status": "NOT_EXECUTED_PLAYWRIGHT_PACKAGE_UNAVAILABLE", "evidence": "npm ci returned HTTP 403 for playwright-core in this environment" },
+  "authenticated_scholar_journey": { "status": "NOT_EXECUTED_MISSING_SEEDED_CREDENTIALS", "evidence": null },
+  "deployed_monitoring": false,
+  "production_certified": false
+}

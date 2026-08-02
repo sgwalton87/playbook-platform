@@ -187,11 +187,18 @@ export function loadRepositoryContextSnapshot(
     "--show-current",
   ]);
   const commitSha = git(repositoryRoot, ["rev-parse", "HEAD"]);
-  const remoteUrl = git(repositoryRoot, [
-    "remote",
-    "get-url",
-    PBOSConfig.repository.remote,
-  ]);
+  let remoteUrl = "";
+  try {
+    remoteUrl = git(repositoryRoot, [
+      "remote",
+      "get-url",
+      PBOSConfig.repository.remote,
+    ]);
+  } catch {
+    // A local or isolated certification workspace may intentionally have no
+    // remote. Preserve deterministic discovery without inventing provenance.
+    remoteUrl = "";
+  }
   let upstream: string | null = null;
   let ahead = 0;
   let behind = 0;

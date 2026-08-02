@@ -7,7 +7,7 @@ export function buildPortfolioShare(input: {
   packet: LegacyValue;
   expiresAt?: string;
 }) {
-  const id = `portfolio-${input.scholarId}`;
+  const id = crypto.randomUUID();
 
   return {
     id,

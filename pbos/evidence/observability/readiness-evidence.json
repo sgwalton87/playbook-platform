@@ -1,0 +1,13 @@
+{
+  "registry": "PLAYBOOK-PLATFORM-REGISTRY-001",
+  "calculated_from": "pbos/platform-registry/readiness.ts",
+  "inventory": { "pages": 100, "apis": 53 },
+  "status_counts": { "implemented": 0, "partial": 172, "missing": 1, "blocked": 5, "demo_only": 21 },
+  "maturity_percent": 45,
+  "infrastructure_readiness_percent": 44,
+  "production_readiness_percent": 44,
+  "feature_completion_percent": 25,
+  "observability_status": "PARTIAL",
+  "recommended_next_mission": "CONTROL:RECOVERY",
+  "certification_note": "Diagnostic readiness only. Certified production readiness remains zero until all release gates have deployed evidence."
+}

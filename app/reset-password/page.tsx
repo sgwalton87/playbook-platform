@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { reportClientFailure } from "@/lib/observability/client";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -21,6 +22,7 @@ export default function ResetPasswordPage() {
     setLoading(false);
 
     if (error) {
+      reportClientFailure("client_error", "RecoveryFailure");
       setError(error.message);
       return;
     }

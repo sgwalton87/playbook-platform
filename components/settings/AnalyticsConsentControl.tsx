@@ -1,0 +1,8 @@
+"use client";
+import { useState } from "react";
+import { PlaybookButton } from "@/components/ui/PlaybookButton";
+export function AnalyticsConsentControl({ initialStatus }: { initialStatus: "granted" | "denied" | "withdrawn" }) {
+  const [status, setStatus] = useState(initialStatus); const [saving, setSaving] = useState(false); const [message, setMessage] = useState("");
+  async function update(next: "granted" | "withdrawn") { setSaving(true); setMessage(""); const response = await fetch("/api/settings/analytics-consent", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: next }) }); setSaving(false); if (!response.ok) { setMessage("Consent could not be updated."); return; } setStatus(next); setMessage(next === "granted" ? "Outcome analytics enabled." : "Outcome analytics withdrawn."); }
+  return <section aria-labelledby="analytics-consent-title" style={{ maxWidth: 960, margin: "18px auto", background: "#fff", border: "1px solid #E2E8F0", borderRadius: 20, padding: 24 }}><h2 id="analytics-consent-title">Outcome analytics consent</h2><p>Help Playbook measure onboarding, evidence, portfolio, opportunity, and support outcomes. Events are allowlisted, pseudonymous, retained for 13 months, and never include free-form profile content.</p><p role="status" aria-live="polite"><strong>Current choice:</strong> {status}. {message}</p><div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}><PlaybookButton onClick={() => update("granted")} >Allow outcome analytics</PlaybookButton><PlaybookButton variant="secondary" onClick={() => update("withdrawn")}>Withdraw consent</PlaybookButton></div>{saving && <p aria-live="polite">Saving your choice…</p>}</section>;
+}

@@ -1,119 +1,20 @@
-"use client";
-
-import { useEffect, useState } from "react";
+import { redirect } from "next/navigation";
 import AGTracker from "@/components/ag/AGTracker";
-import {
-  PlaybookButton,
-  PlaybookCard,
-  PlaybookHero,
-  PlaybookMetric,
-  PlaybookMetrics,
-  PlaybookPage,
-} from "@/components/ui";
-import { buildScholarRecord } from "@/lib/scholar";
-import type { ScholarRecord } from "@/lib/scholar";
-import { supabase } from "@/lib/supabaseClient";
+import LiveNextSteps from "@/components/dashboard/LiveNextSteps";
+import TrustSummaryCard from "@/components/trust/TrustSummaryCard";
+import { PlaybookButton, PlaybookCard, PlaybookHero, PlaybookMetric, PlaybookMetrics, PlaybookPage } from "@/components/ui";
+import { loadLaunchDashboardSummary } from "@/lib/launch-readiness/server";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
-export default function DashboardPage() {
-  const [record, setRecord] = useState<ScholarRecord | null>(null);
-
-  useEffect(() => {
-    let active = true;
-    async function loadScholarRecord() {
-      const { data: u } = await supabase.auth.getUser();
-      if (!u.user) return;
-      const [{ data: profile }, { data: agProgress }] = await Promise.all([
-        supabase.from("profiles").select("*").eq("id", u.user.id).single(),
-        supabase.from("ag_progress").select("*").eq("user_id", u.user.id).order("updated_at", { ascending: false }),
-      ]);
-      if (active) setRecord(buildScholarRecord({ profile, agProgress: agProgress || [] }));
-    }
-    loadScholarRecord();
-    return () => { active = false; };
-  }, []);
-
-  const academics = record?.academics;
-
-  return (
-    <PlaybookPage>
-      <PlaybookHero
-        eyebrow="Scholar Dashboard"
-        title="Your transcript is the starting point."
-        subtitle="Upload your transcript, see A–G readiness, close gaps with Compass, and activate your support network."
-      >
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 18 }}>
-          <PlaybookButton href="/transcript">Upload Transcript</PlaybookButton>
-          <PlaybookButton href="/compass" variant="secondary">Open Compass Plan</PlaybookButton>
-        </div>
-      </PlaybookHero>
-
-      <PlaybookMetrics>
-        <PlaybookMetric label="Academic Core" value={academics?.weightedGpa || academics?.gpa || "Active"} />
-        <PlaybookMetric label="A-G Tracker" value={academics ? `${academics.agSummary.percent}%` : "Live"} />
-        <PlaybookMetric label="Credits Earned" value={academics ? String(academics.creditsEarned) : "—"} />
-        <PlaybookMetric label="Grad Year" value={academics?.graduationYear || "—"} />
-      </PlaybookMetrics>
-
-      <div style={mainGrid}>
-        <section>
-          <AGTracker />
-        </section>
-
-        <section style={sideStack}>
-          <PlaybookCard eyebrow="Start Here" title="Upload your transcript">
-            <p style={body}>
-              This powers A–G readiness, graduation planning, scholar-athlete
-              eligibility, opportunity matching, applications, and support actions.
-            </p>
-            <PlaybookButton href="/transcript">Go to Transcript</PlaybookButton>
-          </PlaybookCard>
-
-          <PlaybookCard eyebrow="Academic Summary" title="Canonical Scholar Record">
-            <p style={body}>
-              {academics
-                ? `Class of ${academics.graduationYear || "—"} · ${academics.agSummary.subjectsMet}/7 A–G areas met · ${academics.currentCourses.length} current courses.`
-                : "Loading ScholarRecord academic summary..."}
-            </p>
-            <PlaybookButton href="/profile">Update Academics</PlaybookButton>
-          </PlaybookCard>
-
-          <PlaybookCard eyebrow="Compass" title="Turn gaps into action">
-            <p style={body}>
-              After A–G results are visible, Compass will prioritize what needs
-              to happen next and who can help.
-            </p>
-            <PlaybookButton href="/compass">Open Compass</PlaybookButton>
-          </PlaybookCard>
-
-          <PlaybookCard eyebrow="Support Network" title="Do not do this alone">
-            <p style={body}>
-              Invite family, educators, mentors, coaches, and advocates to help
-              close academic and opportunity gaps.
-            </p>
-            <PlaybookButton href="/support-network">Activate Support</PlaybookButton>
-          </PlaybookCard>
-
-          <PlaybookCard eyebrow="Community" title="Share your journey">
-            <p style={body}>
-              Post updates, photos, accomplishments, questions, club moments,
-              sports highlights, and milestones with the Playbook community.
-            </p>
-            <PlaybookButton href="/feed">Open Community Feed</PlaybookButton>
-          </PlaybookCard>
-        </section>
-      </div>
-    </PlaybookPage>
-  );
+export default async function DashboardPage() {
+  const supabase = await createServerSupabaseClient();
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) redirect("/login");
+  const result = await loadLaunchDashboardSummary(supabase, auth.user.id);
+  if (!result.ok) return <main role="alert" style={{ padding: 40 }}><h1>Dashboard unavailable</h1><p>{result.error}</p></main>;
+  const { summary } = result;
+  return <PlaybookPage><PlaybookHero eyebrow="Scholar Dashboard" title={`Welcome, ${summary.scholarName}.`} subtitle="Live guidance comes from your authorized Scholar Record, evidence, verification, actions, and opportunities."><div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 18 }}><PlaybookButton href="/record">Open Scholar Record</PlaybookButton><PlaybookButton href="/evidence" variant="secondary">Review Evidence</PlaybookButton></div></PlaybookHero>
+    <PlaybookMetrics><PlaybookMetric label="Trust readiness" value={`${summary.trust.score}%`} /><PlaybookMetric label="Verified evidence" value={String(summary.trust.verifiedCount)} /><PlaybookMetric label="Opportunity matches" value={String(summary.opportunityCount)} /><PlaybookMetric label="Open support actions" value={String(summary.openActionCount)} /></PlaybookMetrics>
+    <div style={{ maxWidth: 1180, margin: "0 auto", display: "grid", gridTemplateColumns: "minmax(0,1.3fr) minmax(300px,.7fr)", gap: 18 }}><section><AGTracker /></section><section style={{ display: "grid", gap: 14 }}><LiveNextSteps trust={summary.trust} /><TrustSummaryCard summary={summary.trust} /><PlaybookCard eyebrow="Attention" title={`${summary.unreadNotificationCount} unread updates`}><p>Verification, intervention, opportunity, and milestone changes remain linked to their governed source.</p><PlaybookButton href="/notifications">Open notifications</PlaybookButton></PlaybookCard></section></div>
+  </PlaybookPage>;
 }
-
-const mainGrid: React.CSSProperties = {
-  maxWidth: 1180,
-  margin: "0 auto",
-  display: "grid",
-  gridTemplateColumns: "minmax(0, 1.4fr) minmax(280px, .6fr)",
-  gap: 18,
-  alignItems: "start",
-};
-
-const sideStack: React.CSSProperties = { display: "grid", gap: 14 };
-const body: React.CSSProperties = { color: "#64748B", lineHeight: 1.6 };
