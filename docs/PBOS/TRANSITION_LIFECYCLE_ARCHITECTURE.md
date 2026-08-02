@@ -126,3 +126,8 @@ Every command loads the durable proposal before acting. Repeating a command is s
 - `COMPLETE` reports the existing successful result without creating new authority.
 
 PBOS never silently skips a state. A failure records the last completed state, reports the cause, and permits deterministic resumption after the cause is resolved.
+
+After `COMPLETE`, the resulting requester and reviewer authority issues a durable
+development trust lease. Ordinary descendant commits advance context automatically;
+only protected boundary changes require exception approval. See
+[Development Trust Lease Architecture](./DEVELOPMENT_TRUST_LEASE_ARCHITECTURE.md).

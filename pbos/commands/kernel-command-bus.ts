@@ -91,6 +91,10 @@ import {
 } from "../execution/evidence";
 import { runMissionControl } from "../mission-control";
 import { runRepositoryAnalysis } from "./repository";
+import {
+  ensureDevelopmentTrust,
+  type DevelopmentTrustAssessment,
+} from "../context/development-trust";
 
 export const KERNEL_COMMANDS = [
   "next",
@@ -179,6 +183,21 @@ function formatTransitionProposal(proposal: TransitionProposal): string {
   ].join("\n");
 }
 
+function developmentTrustLines(
+  assessment: DevelopmentTrustAssessment | null
+): string[] {
+  if (!assessment) return ["Development Trust Lease: NOT_AVAILABLE"];
+  return [
+    `Development Trust Lease: ${assessment.lease?.status ?? "NOT_AVAILABLE"}`,
+    `Trust Advancement: ${assessment.state}`,
+    `Lease Baseline: ${assessment.lease?.baseline_commit_identity ?? "NONE"}`,
+    `Lease Current Commit: ${assessment.lease?.current_commit_identity ?? "NONE"}`,
+    `Exception Approval: ${assessment.state === "EXCEPTION_APPROVAL_REQUIRED" || assessment.state === "EXPIRED" ? "REQUIRED" : "NOT_REQUIRED"}`,
+    ...assessment.protected_changes.map((file) => `Protected Change: ${file}`),
+    ...assessment.findings.map((finding) => `Trust Finding: ${finding}`),
+  ];
+}
+
 function rejectedBaselineRefreshIsEligible(
   discovery: ReturnType<typeof discoverTrustedContext>
 ): boolean {
@@ -206,6 +225,26 @@ export async function dispatchKernelCommand(
   actorId = process.env.PBOS_ACTOR_ID ?? "",
   evidenceInput: FounderEvidenceInput = {}
 ): Promise<KernelCommandResult> {
+  const trustAwareCommands: readonly KernelCommandName[] = [
+    "status", "context-status", "next", "plan", "report", "analyze",
+    "recommend", "package", "run", "mission", "recover", "cycle",
+    "first-build", "execution-status", "approve", "assign",
+  ];
+  let developmentTrust: DevelopmentTrustAssessment | null = null;
+  if (trustAwareCommands.includes(command)) {
+    try {
+      developmentTrust = ensureDevelopmentTrust(rootDir);
+    } catch (error: unknown) {
+      developmentTrust = {
+        state: "EXCEPTION_APPROVAL_REQUIRED",
+        lease: null,
+        changed_files: [],
+        protected_changes: [],
+        findings: [error instanceof Error ? error.message : String(error)],
+        context_identity: null,
+      };
+    }
+  }
   if (command === "mission") {
     const result = await runMissionControl(
       (missionCommand) =>
@@ -1144,6 +1183,7 @@ export async function dispatchKernelCommand(
         `Identity: ${history?.latest.repository_identity ?? discovery.assessment.repository_identity}`,
         `Expiration: ${history?.latest.expiration_timestamp ?? "NONE"}`,
         `Validation: ${readiness.current_capability_level === "GOVERNED_PLANNING" ? "PASS" : "FAIL"}`,
+        ...developmentTrustLines(developmentTrust),
         JSON.stringify(readiness, null, 2),
       ].join("\n"),
     };
@@ -1875,6 +1915,7 @@ export async function dispatchKernelCommand(
       output: [
         formatEngineHealth(health),
         ...transitionStatusLines(transitionLifecycle),
+        ...developmentTrustLines(developmentTrust),
         `Kernel Decision: ${kernel.decision.selectedObjectiveId ?? "NONE"}`,
         `Kernel Certification: ${transitionPending ? "PENDING_TRANSITION" : kernel.certification.status}`,
         `Kernel Report Digest: ${kernel.report.digest}`,

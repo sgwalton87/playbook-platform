@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -15,6 +15,10 @@ import {
 import { runRepositoryAnalysis } from "./repository";
 import { dispatchKernelCommand } from "./kernel-command-bus";
 import { loadTransitionLifecycle } from "../transition";
+import {
+  ensureDevelopmentTrust,
+  loadDevelopmentTrustLease,
+} from "../context/development-trust";
 
 const roots: string[] = [];
 
@@ -155,6 +159,44 @@ describe("PBOS transition repository reality synchronization", () => {
     expect(context.successful).toBe(true);
     expect(context.output).toContain("Trust Level: ACTIVE");
     expect(context.output).toContain("Validation: PASS");
+
+    git(rootDir, "config", "user.email", "pbos-test@example.com");
+    git(rootDir, "config", "user.name", "PBOS Test");
+    mkdirSync(path.join(rootDir, "app", "trust-lease-test"), { recursive: true });
+    writeFileSync(
+      path.join(rootDir, "app", "trust-lease-test", "page.tsx"),
+      "export default function Page() { return null; }\n",
+      "utf8"
+    );
+    git(rootDir, "add", "app/trust-lease-test/page.tsx");
+    git(rootDir, "commit", "-m", "feat: add ordinary descendant change");
+    const descendantCommit = git(rootDir, "rev-parse", "HEAD");
+
+    const advancedStatus = await dispatchKernelCommand("status", rootDir);
+    expect(advancedStatus.successful).toBe(true);
+    expect(advancedStatus.output).toContain("Development Trust Lease: ACTIVE");
+    expect(advancedStatus.output).toContain("Trust Advancement: ADVANCED");
+    expect(advancedStatus.output).toContain("Exception Approval: NOT_REQUIRED");
+    expect(loadDevelopmentTrustLease(rootDir)?.current_commit_identity).toBe(
+      descendantCommit
+    );
+    const advancedContext = await dispatchKernelCommand("context-status", rootDir);
+    expect(advancedContext.successful).toBe(true);
+    expect(advancedContext.output).toContain("Trust Level: ACTIVE");
+
+    mkdirSync(path.join(rootDir, "supabase", "migrations"), { recursive: true });
+    writeFileSync(
+      path.join(rootDir, "supabase", "migrations", "20990101000000_test.sql"),
+      "select 1;\n",
+      "utf8"
+    );
+    git(rootDir, "add", "supabase/migrations/20990101000000_test.sql");
+    git(rootDir, "commit", "-m", "test: exercise protected migration boundary");
+    const exception = ensureDevelopmentTrust(rootDir);
+    expect(exception.state).toBe("EXCEPTION_APPROVAL_REQUIRED");
+    expect(exception.protected_changes).toEqual([
+      "supabase/migrations/20990101000000_test.sql",
+    ]);
   }, 60_000);
 
   it("refreshes repository reality before transition context discovery", () => {

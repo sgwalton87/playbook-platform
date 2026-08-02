@@ -225,6 +225,13 @@ export function persistTrustedContext(
   if (!evidence.trusted_context || evidence.outcome.decision !== "TRUSTED") {
     throw new Error("Blocked context activation cannot be persisted.");
   }
+  return persistTrustedContextRecord(rootDir, evidence.trusted_context);
+}
+
+export function persistTrustedContextRecord(
+  rootDir: string,
+  context: TrustedBuildContext
+): TrustedBuildContextHistory {
   const existing = loadTrustedBuildContext(rootDir);
   const history = [
     ...(existing?.history ?? []),
@@ -234,7 +241,7 @@ export function persistTrustedContext(
   );
   const body = {
     owner: "context-activation-authority" as const,
-    latest: evidence.trusted_context,
+    latest: context,
     history,
   };
   const artifact = { ...body, digest: artifactDigest(body) };

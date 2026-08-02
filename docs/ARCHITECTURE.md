@@ -105,6 +105,14 @@ part of the normal operator workflow. The durable proposal and explicit state
 machine are defined in
 [`docs/PBOS/TRANSITION_LIFECYCLE_ARCHITECTURE.md`](./PBOS/TRANSITION_LIFECYCLE_ARCHITECTURE.md).
 
+Successful activation establishes a durable development trust lease. Normal
+descendant commits on the governed branch automatically refresh repository context
+and advance trusted-context evidence without repeating requester or reviewer
+ceremonies. Repository or remote changes, non-descendant history, protected PBOS or
+constitutional scope, migrations, dependency manifests, expiration, revocation, and
+production promotion remain explicit approval boundaries. See
+[`docs/PBOS/DEVELOPMENT_TRUST_LEASE_ARCHITECTURE.md`](./PBOS/DEVELOPMENT_TRUST_LEASE_ARCHITECTURE.md).
+
 PBOS runtime artifact ownership and test isolation are governed by
 [`docs/ENGINEERING/PBOS_RUNTIME_ISOLATION.md`](./ENGINEERING/PBOS_RUNTIME_ISOLATION.md).
 Runtime tests use explicit temporary roots and may not consume repository

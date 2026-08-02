@@ -197,6 +197,14 @@ export const RuntimeArtifactOwnership: Record<
     persistence: "durable",
     cleanup: "governed-transition",
   },
+  developmentTrustLease: {
+    path: Artifacts.developmentTrustLease,
+    owner: "development-trust-authority",
+    producer: "PBOS automatic trust advancement",
+    consumers: ["context", "planner", "status", "execution-admission", "governance-audit"],
+    persistence: "durable",
+    cleanup: "governed-transition",
+  },
   approvalPackage: {
     path: Artifacts.approvalPackage,
     owner: "approval-package-authority",

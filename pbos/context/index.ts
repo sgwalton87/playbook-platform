@@ -12,6 +12,7 @@ export * from "./reconciliation";
 export * from "./refresh";
 export * from "./activation";
 export * from "./change-boundary";
+export * from "./development-trust";
 
 import type { ContextValidationResult } from "./schema";
 import {

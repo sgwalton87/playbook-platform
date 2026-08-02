@@ -28,6 +28,7 @@ export const Artifacts = {
   changeBoundary: "pbos/runtime/change-boundary.json",
   launchApproval: "pbos/runtime/launch-approval.json",
   transitionLifecycle: "pbos/runtime/transition-lifecycle.json",
+  developmentTrustLease: "pbos/runtime/development-trust-lease.json",
   approvalPackage: "pbos/runtime/approval-package.json",
   artifactReconciliation: "pbos/runtime/artifact-reconciliation.json",
   lifecycleGovernance: "pbos/runtime/lifecycle-governance.json",
