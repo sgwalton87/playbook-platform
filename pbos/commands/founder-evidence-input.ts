@@ -90,7 +90,8 @@ export async function collectFounderEvidenceInput(
     command !== "approve-boundary" &&
     command !== "approve-refresh" &&
     command !== "transition" &&
-    command !== "approve"
+    command !== "approve" &&
+    command !== "approve-campaign"
   ) return initial;
   const entries = new Map(Object.entries(initial));
   if (command === "change-boundary" && baselineAvailable &&
@@ -142,7 +143,8 @@ export async function readFounderEvidenceInput(input: {
       input.command !== "approve-boundary" &&
       input.command !== "approve-refresh" &&
       input.command !== "transition" &&
-      input.command !== "approve")) {
+      input.command !== "approve" &&
+      input.command !== "approve-campaign")) {
     return parsed;
   }
   const terminal = createInterface({

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-02T19:27:59.602Z",
+  "generatedAt": "2026-08-02T19:42:24.735Z",
   "productionBranch": "main",
   "currentBranch": "pbos/post-pps300-convergence",
   "branches": [
@@ -2226,10 +2226,10 @@
     {
       "name": "pbos/post-pps300-convergence",
       "current": true,
-      "ahead": 170,
+      "ahead": 171,
       "behind": 0,
-      "latestCommit": "chore(pbos): record final trust lease activation evidence",
-      "latestCommitSha": "4eaa2841d5d44f473b2a576e2f1823f22afd28d7",
+      "latestCommit": "fix(pbos): continue missions through existing authority",
+      "latestCommitSha": "4ad21f829acf3a0463effe1000392f8a8f29c6a9",
       "changedFiles": [
         ".codex/context.md",
         ".env.example",

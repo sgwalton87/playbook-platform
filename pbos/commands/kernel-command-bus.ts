@@ -96,6 +96,15 @@ import {
   ensureDevelopmentTrust,
   type DevelopmentTrustAssessment,
 } from "../context/development-trust";
+import {
+  approveExecutionCampaign,
+  createExecutionCampaign,
+  loadCampaignApproval,
+  loadCampaignProgress,
+  loadExecutionCampaign,
+  resolveCampaignAuthorization,
+  updateCampaignProgress,
+} from "../execution/campaign";
 
 export const KERNEL_COMMANDS = [
   "next",
@@ -113,6 +122,9 @@ export const KERNEL_COMMANDS = [
   "manifest",
   "cycle",
   "approve",
+  "campaign",
+  "approve-campaign",
+  "campaign-status",
   "advance",
   "history",
   "agents",
@@ -230,6 +242,7 @@ export async function dispatchKernelCommand(
     "status", "context-status", "next", "plan", "report", "analyze",
     "recommend", "package", "run", "mission", "recover", "cycle",
     "first-build", "execution-status", "approve", "assign",
+    "campaign", "approve-campaign", "campaign-status",
   ];
   let developmentTrust: DevelopmentTrustAssessment | null = null;
   if (trustAwareCommands.includes(command)) {
@@ -245,6 +258,87 @@ export async function dispatchKernelCommand(
         context_identity: null,
       };
     }
+  }
+  if (command === "campaign") {
+    const requestedLimit = Number(evidenceString(evidenceInput, "limit", "10"));
+    try {
+      const orchestration = await runDevelopmentOrchestration(rootDir);
+      const campaign = createExecutionCampaign({
+        rootDir,
+        limit: requestedLimit,
+        timestamp: new Date().toISOString(),
+        startMilestoneId: orchestration.governedRecommendation.recommended_milestone,
+      });
+      return {
+        command, successful: true,
+        output: [
+          "PBOS EXECUTION CAMPAIGN PROPOSED",
+          `Campaign: ${campaign.campaign_id}`,
+          `Digest: ${campaign.digest}`,
+          `Packages: ${campaign.packages.length}`,
+          ...campaign.packages.map((item) =>
+            `${item.position}. ${item.milestone_id} [${item.risk_level}] ${item.package_digest}`
+          ),
+          "Migrations: EXCLUDED",
+          "Protected PBOS Governance: EXCLUDED",
+          "Production Promotion: EXCLUDED",
+          "Next action: npm run pbos:approve-campaign",
+        ].join("\n"),
+      };
+    } catch (error: unknown) {
+      return { command, successful: false, output: `PBOS EXECUTION CAMPAIGN\nDecision: BLOCKED\n${error instanceof Error ? error.message : String(error)}` };
+    }
+  }
+  if (command === "approve-campaign") {
+    const timestamp = new Date().toISOString();
+    try {
+      const decision = evidenceString(evidenceInput, "decision").toUpperCase();
+      if (decision !== "APPROVED" && decision !== "REJECTED") {
+        throw new Error("Decision must be APPROVED or REJECTED.");
+      }
+      const approval = approveExecutionCampaign({
+        rootDir,
+        requester: evidenceString(evidenceInput, "requester-identity"),
+        reviewer: evidenceString(evidenceInput, "reviewer-identity"),
+        decision,
+        reason: evidenceString(evidenceInput, "reason"),
+        riskAcknowledgment: evidenceString(evidenceInput, "risk-acknowledgment"),
+        timestamp,
+        expiration: evidenceString(evidenceInput, "expiration"),
+      });
+      return {
+        command, successful: approval.decision === "APPROVED",
+        output: [
+          "PBOS EXECUTION CAMPAIGN APPROVAL",
+          `Decision: ${approval.decision}`,
+          `Campaign: ${approval.campaign_id}`,
+          `Approval: ${approval.approval_id}`,
+          approval.decision === "APPROVED"
+            ? "Next action: npm run pbos:mission"
+            : "Campaign execution remains blocked.",
+        ].join("\n"),
+      };
+    } catch (error: unknown) {
+      return { command, successful: false, output: `PBOS EXECUTION CAMPAIGN APPROVAL\nDecision: BLOCKED\n${error instanceof Error ? error.message : String(error)}` };
+    }
+  }
+  if (command === "campaign-status") {
+    const campaign = loadExecutionCampaign(rootDir);
+    const approval = loadCampaignApproval(rootDir);
+    const progress = loadCampaignProgress(rootDir);
+    return {
+      command, successful: Boolean(campaign),
+      output: campaign ? [
+        "PBOS EXECUTION CAMPAIGN STATUS",
+        `Campaign: ${campaign.campaign_id}`,
+        `State: ${campaign.status}`,
+        `Approval: ${approval?.decision ?? "NOT_APPROVED"}`,
+        `Packages: ${campaign.packages.length}`,
+        ...(progress?.entries.map((entry, index) =>
+          `${index + 1}. ${entry.milestone_id}: ${entry.status}`
+        ) ?? []),
+      ].join("\n") : "PBOS EXECUTION CAMPAIGN STATUS\nState: NOT_STARTED",
+    };
   }
   if (command === "mission") {
     const result = await runMissionControl(
@@ -420,7 +514,7 @@ export async function dispatchKernelCommand(
     const provider = providerBody
       ? { ...providerBody, digest: artifactDigest(providerBody) }
       : null;
-    const reuse = context && agent && provider
+    let reuse = context && agent && provider
       ? resolveReusableExecutionAuthority({
           rootDir,
           context,
@@ -431,6 +525,78 @@ export async function dispatchKernelCommand(
           timestamp,
         })
       : { valid: false, authority: null, findings: ["Current execution identity is unavailable."] };
+    if ((!reuse.valid || !reuse.authority) && context && agent && provider) {
+      const campaignAssessment = resolveCampaignAuthorization({
+        rootDir,
+        package: orchestration.executionPackage,
+        timestamp,
+      });
+      if (campaignAssessment.valid && campaignAssessment.approval &&
+          campaignAssessment.package && campaignAssessment.campaign) {
+        const campaignApproval = campaignAssessment.approval;
+        const campaignPackage = campaignAssessment.package;
+        const derivedApproval = createExecutionApproval({
+          package: orchestration.executionPackage,
+          context,
+          requested_by: campaignApproval.requester_identity,
+          approved_by: campaignApproval.reviewer_identity,
+          decision: "APPROVED",
+          reason: `Derived from approved campaign ${campaignAssessment.campaign.campaign_id}.`,
+          risk_acknowledgment: campaignApproval.risk_acknowledgment,
+          risk_level: campaignPackage.risk_level,
+          scope: campaignPackage.allowed_paths,
+          timestamp,
+          expiration: campaignApproval.expiration,
+        });
+        persistExecutionApproval(rootDir, derivedApproval);
+        const derivedAuthority = createExecutionAuthority({
+          context,
+          package: orchestration.executionPackage,
+          packageCertificationDigest: orchestration.kernel.certification.digest,
+          approval: derivedApproval,
+          agent,
+          scope: campaignPackage.allowed_paths,
+          blockedOperations: [...campaignAssessment.campaign.prohibited_actions],
+          requiredCapabilities: ["CODE_GENERATION"],
+          evidenceRequirements: [...provider.evidence_contract],
+          authorizationTime: timestamp,
+          expirationTime: campaignApproval.expiration,
+        });
+        persistExecutionAuthority(rootDir, derivedAuthority);
+        const derivedAuthorization = issueExecutionAuthorization({
+          authority: derivedAuthority,
+          context,
+          package: orchestration.executionPackage,
+          provider,
+          created_by: campaignApproval.requester_identity,
+          approved_by: campaignApproval.reviewer_identity,
+          issued_at: timestamp,
+        });
+        persistProviderExecutionAuthorization(rootDir, derivedAuthorization);
+        persistExecutionAuthorityLedgerEntry({
+          rootDir,
+          approval: derivedApproval,
+          authority: derivedAuthority,
+          authorization: derivedAuthorization,
+        });
+        updateCampaignProgress({
+          rootDir,
+          milestoneId: campaignPackage.milestone_id,
+          status: "AUTHORIZED",
+          authorizationId: derivedAuthorization.authorization_id,
+          timestamp,
+        });
+        reuse = resolveReusableExecutionAuthority({
+          rootDir,
+          context,
+          package: orchestration.executionPackage,
+          provider,
+          agent,
+          expected_scope: orchestration.executionPackage.required_changes,
+          timestamp,
+        });
+      }
+    }
     if (!reuse.valid || !reuse.authority) {
       return {
         command,
@@ -532,6 +698,20 @@ export async function dispatchKernelCommand(
             timestamp: recoveredEvidence.record.completed_at,
           }).latest
         : null;
+      if (transition) {
+        const campaignAssessment = resolveCampaignAuthorization({
+          rootDir, package: orchestration.executionPackage, timestamp,
+        });
+        if (campaignAssessment.package) {
+          updateCampaignProgress({
+            rootDir,
+            milestoneId: campaignAssessment.package.milestone_id,
+            status: "COMPLETE",
+            authorizationId: authorization.authorization_id,
+            timestamp: recoveredEvidence.record.completed_at,
+          });
+        }
+      }
       return {
         command,
         successful: advancement.eligible,
@@ -603,6 +783,20 @@ export async function dispatchKernelCommand(
           timestamp: new Date().toISOString(),
         }).latest
       : null;
+    if (transition) {
+      const campaign = loadExecutionCampaign(rootDir);
+      if (campaign?.packages.some(({ milestone_id }) =>
+        milestone_id === orchestration.executionPackage!.milestone_id
+      )) {
+        updateCampaignProgress({
+          rootDir,
+          milestoneId: orchestration.executionPackage.milestone_id,
+          status: "COMPLETE",
+          authorizationId: authorization.authorization_id,
+          timestamp: new Date().toISOString(),
+        });
+      }
+    }
     return {
       command,
       successful: advancement.eligible,
@@ -1916,6 +2110,9 @@ export async function dispatchKernelCommand(
     const transitionPending = Boolean(
       transitionLifecycle && transitionLifecycle.state !== "COMPLETE"
     );
+    const campaign = loadExecutionCampaign(rootDir);
+    const campaignApproval = loadCampaignApproval(rootDir);
+    const campaignProgress = loadCampaignProgress(rootDir);
     return {
       command,
       successful: true,
@@ -1923,6 +2120,10 @@ export async function dispatchKernelCommand(
         formatEngineHealth(health),
         ...transitionStatusLines(transitionLifecycle),
         ...developmentTrustLines(developmentTrust),
+        `Execution Campaign: ${campaign?.status ?? "NOT_STARTED"}`,
+        `Campaign Approval: ${campaignApproval?.decision ?? "NOT_APPROVED"}`,
+        `Campaign Packages: ${campaign?.packages.length ?? 0}`,
+        `Campaign Completed: ${campaignProgress?.entries.filter(({ status }) => status === "COMPLETE").length ?? 0}`,
         `Kernel Decision: ${kernel.decision.selectedObjectiveId ?? "NONE"}`,
         `Kernel Certification: ${transitionPending ? "PENDING_TRANSITION" : kernel.certification.status}`,
         `Kernel Report Digest: ${kernel.report.digest}`,
