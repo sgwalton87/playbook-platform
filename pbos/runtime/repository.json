@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-02T22:13:29.677Z",
+  "generatedAt": "2026-08-02T22:28:04.022Z",
   "productionBranch": "main",
   "currentBranch": "pbos/post-pps300-convergence",
   "branches": [
@@ -2226,10 +2226,10 @@
     {
       "name": "pbos/post-pps300-convergence",
       "current": true,
-      "ahead": 179,
+      "ahead": 180,
       "behind": 0,
-      "latestCommit": "fix(pbos): constrain planning to active campaign order",
-      "latestCommitSha": "6193102f3e49f169fae220ada327c36bb9aa790b",
+      "latestCommit": "chore(pbos): synchronize trusted repository context after campaign advancement",
+      "latestCommitSha": "34cb97f320bfd9a23ea19d3c629a2588f423ba05",
       "changedFiles": [
         ".codex/context.md",
         ".env.example",

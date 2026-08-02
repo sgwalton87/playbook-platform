@@ -2,15 +2,15 @@
   "version": "1.0.0",
   "owner": "repository-context",
   "latest": {
-    "id": "0944c72f0bb055ade315a1180cfaadbcb2ed6f1dafb00f1225068e08c03d59db",
-    "previousContextIdentity": "f86df3ac30371f1afc3f18330e04dabbccb040650b297d39f120e923d390707b",
-    "newContextIdentity": "898218e5247224859a6782615b4fc0ece4f82f09450796a91fc2987121e4487c",
+    "id": "e139391ce6654f285b644677844cd13c2e47200caa2202bb09da8c0ad5275e2e",
+    "previousContextIdentity": "898218e5247224859a6782615b4fc0ece4f82f09450796a91fc2987121e4487c",
+    "newContextIdentity": "a56730d47997be61e8571273c79878e6ba96d267d1a81dfc0677626f67d77c77",
     "reason": "Automatic descendant-commit advancement under DEVELOPMENT-TRUST-d6697919266b92ee.",
     "triggeringConditions": [
       "Context validation failed: commit identity mismatches.",
       "Context validation failed: artifact changed after capture: pbos/runtime/repository.json."
     ],
-    "timestamp": "2026-08-02T22:13:29.682Z",
+    "timestamp": "2026-08-02T22:28:04.028Z",
     "validator": {
       "id": "PBOS-CONTEXT-VALIDATOR",
       "version": "1.1.0"
@@ -930,6 +930,22 @@
         "Context validation failed: artifact changed after capture: pbos/runtime/repository.json."
       ],
       "timestamp": "2026-08-02T22:13:29.682Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "e139391ce6654f285b644677844cd13c2e47200caa2202bb09da8c0ad5275e2e",
+      "previousContextIdentity": "898218e5247224859a6782615b4fc0ece4f82f09450796a91fc2987121e4487c",
+      "newContextIdentity": "a56730d47997be61e8571273c79878e6ba96d267d1a81dfc0677626f67d77c77",
+      "reason": "Automatic descendant-commit advancement under DEVELOPMENT-TRUST-d6697919266b92ee.",
+      "triggeringConditions": [
+        "Context validation failed: commit identity mismatches.",
+        "Context validation failed: artifact changed after capture: pbos/runtime/repository.json."
+      ],
+      "timestamp": "2026-08-02T22:28:04.028Z",
       "validator": {
         "id": "PBOS-CONTEXT-VALIDATOR",
         "version": "1.1.0"
