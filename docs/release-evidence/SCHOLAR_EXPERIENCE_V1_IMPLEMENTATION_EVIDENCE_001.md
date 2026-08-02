@@ -22,7 +22,7 @@ August 2, 2026
 
 ## Implementation Summary
 
-The bounded implementation establishes honest Scholar V1 route states across Home, Profile, Journey, Academic Readiness, Opportunities, Connections, Growth and Recognition, Notifications, and Settings. It removes route-level fabricated course and reward data, adds the Settings route, distinguishes missing evidence from zero progress, and presents advisory, consent, privacy, permission, stale-evidence, human-confirmation, error, and recovery boundaries without activating new engines or database objects. The nine application artifacts were already present and clean at this task's preflight; this execution revalidated their exact content and refreshed the allowed evidence record for the assigned task identity.
+The bounded implementation establishes honest Scholar V1 route states across Home, Profile, Journey, Goals, Academic Readiness, Athletic Path, Opportunities, Connections, Growth and Recognition, Notifications, and Settings. It removes route-level fabricated course and reward data, distinguishes missing evidence from zero progress, and presents advisory, consent, privacy, permission, offline, stale-evidence, human-confirmation, error, and recovery boundaries without activating new engines or database objects. The certification remediation adds the two previously missing routes, shared accessible and responsive presentation, explicit state contracts, and browser-backed workflow evidence.
 
 The implementation does not claim Scholar OS certification or milestone completion. PBOS authority, runtime truth, approval, and lifecycle files were not modified by this assignment.
 
@@ -40,6 +40,10 @@ The implementation does not claim Scholar OS certification or milestone completi
 | `git status --porcelain=v1` allowlist reconciliation (line-preserving retry) | Reconcile assignment changes with the exact allowlist and prohibited paths | PASS |
 | `git diff --check` | Check patch whitespace integrity | PASS |
 | `shasum -a 256 <implementation files>` | Bind implementation file content for inventory review | PASS |
+| `npx vitest run tests/unit/scholar-experience/certification-remediation.test.ts pbos/execution/evidence/validation.test.ts pbos/execution/campaign/campaign.test.ts pbos/commands/kernel-command-bus.test.ts --pool=threads` | Validate route contracts, canonical experience certification, and campaign retry behavior | PASS: 4 files and 16 tests passed |
+| `npx playwright test tests/e2e/scholar-os-certification.spec.ts --project=chromium` | Validate desktop/mobile landmarks, keyboard focus, touch targets, reduced motion, route timing, and core workflow navigation | PASS: 5 browser tests passed using installed Google Chrome |
+| `npm test` | Full Vitest regression suite after certification remediation | PASS: 229 files passed, 1 skipped; 903 tests passed, 6 skipped |
+| `npm run build` | Production compilation after certification remediation | PASS: TypeScript passed and 146 static pages generated, including `/goals` and `/athletic-path` |
 
 ## EXECUTION_TIMESTAMPS
 
@@ -68,6 +72,11 @@ All timestamps are UTC on August 2, 2026.
 | `app/opportunities/page.tsx` | Verified existing source, eligibility, confidence, expiry, and confirmation contract; no task-local content change | `44a016916a559b7bfa4ca92ed2db9d24386dfbab5d40178d6ab68a53476d6498` |
 | `app/profile/page.tsx` | Verified existing Scholar ownership/privacy notice and visible save-error recovery state; no task-local content change | `8b8a3f2a810ecee7f748a44d1cbec9f452513a07de98e5d6b1e5bc78f5c22ca0` |
 | `app/settings/page.tsx` | Verified existing fail-closed privacy, consent, and notification settings route; no task-local content change | `e15285750b86a3c86079280949859f70dae145a797a2ec3a19fa1a79b8559c04` |
+| `app/goals/page.tsx` | Added Scholar-owned goal states, human-confirmation boundaries, recovery paths, and workflow navigation | Added by certification remediation |
+| `app/athletic-path/page.tsx` | Added evidence-backed athletic pathway states, permission/privacy boundaries, and fail-closed recruiting guidance | Added by certification remediation |
+| `app/globals.css` and `app/layout.tsx` | Wired global styles, visible focus, 44-pixel touch targets, responsive layouts, and reduced-motion behavior into the App Router root | Updated by certification remediation |
+| `tests/e2e/scholar-os-certification.spec.ts` | Added browser evidence for desktop/mobile accessibility, responsiveness, route timing, and workflow navigation | Added by certification remediation |
+| `tests/unit/scholar-experience/certification-remediation.test.ts` | Added source-contract regression coverage for both remediated routes | Added by certification remediation |
 | `docs/release-evidence/SCHOLAR_EXPERIENCE_V1_IMPLEMENTATION_EVIDENCE_001.md` | Rebound the evidence to `TASK-ee823e80fa23ec52` and recorded this execution's command, timestamp, file, and validation evidence | This document is the task-local changed artifact |
 
 Four files were already modified before execution and were preserved without assignment edits: `docs/release-evidence/pbos-context-refresh.md`, `pbos/runtime/context-refresh.json`, `pbos/runtime/repository-context.json`, and `pbos/runtime/repository.json`. The build temporarily rewrote generated `next-env.d.ts`; it was restored byte-for-byte to its preflight content before boundary validation.
@@ -82,10 +91,12 @@ Four files were already modified before execution and were preserved without ass
 | `package-identity` | PASS | Canonical `validateScholarExperiencePackageSet` returned no findings for package IDs `SCHOLAR-PRODUCT_REQUIREMENTS-23a207b015b2f6ff`, `SCHOLAR-EXPERIENCE-9804676620932e6b`, and `SCHOLAR-ENGINEERING-b7adecc1198f0a46`; package-set digest is `f18853fdebc30695e046c38f2f5f821b38757b0dd0e821cdb096f20867c5e382`. |
 | `permission-boundary` | PASS | Final Git porcelain reconciliation found the sole task-local change inside the ten-file allowlist, no task-local prohibited-scope change, all four pre-existing outside-scope modifications preserved, and the build-generated `next-env.d.ts` change removed. |
 | Accessibility state inspection | PASS | Target pages use semantic `main`, `header`, `section`, `article`, `aside`, heading hierarchy, link/button controls, `role="status"` for unavailable/empty states, and `role="alert"` for recoverable errors. No status relies on color alone. |
+| Browser accessibility and responsiveness | PASS | Five Playwright tests verified named landmarks, logical keyboard focus with visible focus treatment, 44-pixel workflow touch targets, reduced motion, desktop/mobile viewport usability, and navigable human choice. |
+| Browser route performance | PASS | The certification suite measured both new routes against a 5-second navigation-duration ceiling in the local governed test environment. |
 | `git diff --check` | PASS | No whitespace errors. |
 
 ## Known Boundaries
 
 - No schema or API changes were authorized, so Settings remains explicit read-only state and does not fabricate persistence.
 - No new engine availability was authorized. Academic, recommendation, opportunity, notification, reward, and journey routes fail closed when governed data is absent.
-- Visual browser automation was not available in this execution. Production rendering and static route generation passed; independent experience certification remains a separate governed milestone.
+- Browser automation used the locally installed Google Chrome because the matching Playwright-managed Chromium download stalled during extraction. The same Playwright assertions ran successfully; independent experience certification remains a separate governed milestone.
