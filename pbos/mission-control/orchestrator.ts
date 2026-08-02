@@ -42,10 +42,10 @@ export async function runMissionControl(
     rootDir,
     selected
   );
-  if (productMission) {
+  if (productMission && !productMission.ready) {
     const outcome = assessMissionOutput(planning.output, productMission.ready);
     return {
-      successful: productMission.ready,
+      successful: false,
       outcome: { ...outcome, milestone: selected },
       output: [
         formatMissionHeader(),
@@ -60,9 +60,8 @@ export async function runMissionControl(
         "",
         formatProductMission(productMission),
         "",
-        "AUTOMATIC ACTIONS: Architecture validated and governed packages generated.",
-        "HUMAN ACTION REQUIRED: Review and approve the Scholar Experience build package.",
-        "NEXT STEP: npm run pbos:approve",
+        "PBOS MISSION BLOCKED",
+        "Reason: The Scholar Experience build package is not ready for governed execution.",
       ].join("\n"),
     };
   }
@@ -93,6 +92,7 @@ export async function runMissionControl(
       planning.output,
       "",
       formatRoadmapContinuity(continuity),
+      ...(productMission ? ["", formatProductMission(productMission)] : []),
       "",
       "PHASES 3-7 - AUTHORITY, EXECUTION, EVIDENCE, ADVANCEMENT",
       execution.output,

@@ -42,7 +42,7 @@ describe("product mission presentation", () => {
     expect(view?.findings).toContain("Product Strategy evidence is missing: docs/strategy.md");
   });
 
-  it("generates selected Scholar packages and pauses before execution", async () => {
+  it("generates selected Scholar packages and continues into authority reuse", async () => {
     const root = mkdtempSync(join(tmpdir(), "pbos-product-mission-"));
     mkdirSync(join(root, "pbos", "manifests"), { recursive: true });
     mkdirSync(join(root, "docs", "EXPERIENCE"), { recursive: true });
@@ -70,10 +70,16 @@ describe("product mission presentation", () => {
               successful: true,
               output: "Next Eligible Milestone: SCHOLAR-EXPERIENCE-V1-PRODUCT-DEFINITION-001",
             }
-          : { command, successful: true, output: "execution must not run" };
+          : {
+              command,
+              successful: true,
+              output: "PBOS EXISTING AUTHORITY FOUND\nPBOS EXECUTION READY\nPackage: PACKAGE-001",
+            };
     }, root);
-    expect(dispatched).toEqual(["status", "next"]);
+    expect(dispatched).toEqual(["status", "next", "run"]);
     expect(mission.output).toContain("Current Phase:\nProduct Package Generation");
     expect(mission.output).toContain("Status:\nREADY FOR BUILD PACKAGE REVIEW");
+    expect(mission.output).toContain("PBOS EXISTING AUTHORITY FOUND");
+    expect(mission.outcome.authority_reused).toBe(true);
   });
 });

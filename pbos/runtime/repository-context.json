@@ -1,6 +1,6 @@
 {
   "version": "1.1.0",
-  "capturedAt": "2026-08-02T10:52:06.905Z",
+  "capturedAt": "2026-08-02T19:27:59.608Z",
   "snapshot": {
     "repositoryRoot": "/Volumes/PBOSCanonicalization/playbook-platform",
     "remoteName": "origin",
@@ -8,9 +8,9 @@
     "repositoryIdentity": "playbook-platform",
     "git": {
       "branch": "pbos/post-pps300-convergence",
-      "commitSha": "284b8aa330c3a5276b33c24cf2a6ab6635c45b63",
+      "commitSha": "4eaa2841d5d44f473b2a576e2f1823f22afd28d7",
       "upstream": "origin/pbos/post-pps300-convergence",
-      "ahead": 4,
+      "ahead": 5,
       "behind": 0,
       "workingTreeClean": true,
       "workingTreeDigest": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126",
@@ -39,8 +39,8 @@
         "gateId": null,
         "branch": "pbos/post-pps300-convergence",
         "status": null,
-        "generatedAt": "2026-08-02T10:50:48.066Z",
-        "digest": "263b0891de7e155f7806691f0083dba24e0976f590a79a7d07554b42b196cd14",
+        "generatedAt": "2026-08-02T19:27:59.602Z",
+        "digest": "9cdb78e7613dd175af0fabce4b31edc4932198414fc90456e544515c29881b21",
         "owner": "repository-intelligence",
         "consumers": [
           "context",
@@ -138,5 +138,5 @@
       }
     ]
   },
-  "identity": "46958b6d45fd0bd75bf46b4816dd6721653e188fb2b8f131d0399b92e2173bfa"
+  "identity": "1cc58e1681717de8b5c5b7750107e1168763cc13bcb85bf94319a4b00966252e"
 }

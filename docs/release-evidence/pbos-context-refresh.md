@@ -2,22 +2,22 @@
 
 ## Identity
 
-- Context identity: `46958b6d45fd0bd75bf46b4816dd6721653e188fb2b8f131d0399b92e2173bfa`
-- Previous identity: `bcceeb67384dbed342029804387a4afe09939f9081dcbdd6e788034a107739cd`
+- Context identity: `1cc58e1681717de8b5c5b7750107e1168763cc13bcb85bf94319a4b00966252e`
+- Previous identity: `46958b6d45fd0bd75bf46b4816dd6721653e188fb2b8f131d0399b92e2173bfa`
 - Repository: playbook-platform
 - Root: `/Volumes/PBOSCanonicalization/playbook-platform`
 - Remote: origin (https://github.com/sgwalton87/playbook-platform.git)
 - Branch: pbos/post-pps300-convergence
-- Commit: `284b8aa330c3a5276b33c24cf2a6ab6635c45b63`
+- Commit: `4eaa2841d5d44f473b2a576e2f1823f22afd28d7`
 - Working tree digest: `ed4ccabef8bb193ff5eee64176e5c966de34ac7bdf962c77bf0fb1a8fa9afac2`
-- Captured at: 2026-08-02T10:52:06.905Z
+- Captured at: 2026-08-02T19:27:59.608Z
 
 ## Refresh
 
-- Reason: Independently reviewed the PBOS lease-rebasing correction. Tests confirm that transition completion binds the active lease to the approved commit and approval evidence while preserving protected-scope enforcement.
+- Reason: Automatic descendant-commit advancement under DEVELOPMENT-TRUST-daeae3d468ee74bd.
 - Validator: PBOS-CONTEXT-VALIDATOR@1.1.0
 - Generation result: PASS
-- History entries: 49
+- History entries: 50
 
 ## Triggering Conditions
 
@@ -28,7 +28,7 @@
 
 | Artifact | Owner | Exists | Digest | Gate |
 | --- | --- | --- | --- | --- |
-| pbos/runtime/repository.json | repository-intelligence | YES | 263b0891de7e155f7806691f0083dba24e0976f590a79a7d07554b42b196cd14 | none |
+| pbos/runtime/repository.json | repository-intelligence | YES | 9cdb78e7613dd175af0fabce4b31edc4932198414fc90456e544515c29881b21 | none |
 | pbos/runtime/next-gate.json | constitutional-planner | YES | 9546a1060aa0089ef70ced77aec845a3a31d525679411c5b2a1dde48e807ab52 | none |
 | pbos/runtime/validation.json | runtime-validator | YES | 8107e0918e4301b93bc1d6793635ad232db98fe5cdad410f6bdfb3f81b6bb122 | none |
 | pbos/runtime/execution.json | execution-engine | YES | 2a4d8229227d171c17ef3792006de8b560cc37007143bd5d535ce859be98fff1 | none |
