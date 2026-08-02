@@ -80,6 +80,7 @@ import {
   revalidateExecutionEvidence,
 } from "../execution/evidence";
 import { runMissionControl } from "../mission-control";
+import { runRepositoryAnalysis } from "./repository";
 
 export const KERNEL_COMMANDS = [
   "next",
@@ -558,6 +559,10 @@ export async function dispatchKernelCommand(
       if (inventory.changes.length > 0) {
         throw new Error("Baseline activation requires committed application source; approve and commit the inventoried transition first.");
       }
+      // repository.json is a replaceable observation, not human authority.
+      // Refresh it before context discovery so validation evaluates the current
+      // repository branch and HEAD while all identity checks remain fail-closed.
+      runRepositoryAnalysis(rootDir);
       const before = discoverTrustedContext(rootDir, timestamp);
       const boundary = createChangeBoundary({
         inventory,

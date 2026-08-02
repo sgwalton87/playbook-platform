@@ -1,14 +1,23 @@
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import { BranchInfo, RepositoryModel } from "./types";
 
-function run(cmd: string): string {
-  return execSync(cmd, { encoding: "utf8" }).trim();
+function git(rootDir: string, args: readonly string[]): string {
+  return execFileSync("git", args, {
+    cwd: rootDir,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  }).trim();
 }
 
-export function analyzeRepository(): RepositoryModel {
-  const currentBranch = run("git branch --show-current");
+export function analyzeRepository(rootDir = process.cwd()): RepositoryModel {
+  const repositoryRoot = git(rootDir, ["rev-parse", "--show-toplevel"]);
+  const currentBranch = git(repositoryRoot, ["branch", "--show-current"]);
 
-  const branches = run("git for-each-ref --format='%(refname:short)' refs/heads")
+  const branches = git(repositoryRoot, [
+    "for-each-ref",
+    "--format=%(refname:short)",
+    "refs/heads",
+  ])
     .split("\n")
     .filter(Boolean);
 
@@ -16,24 +25,23 @@ export function analyzeRepository(): RepositoryModel {
 
     // git rev-list --left-right --count main...branch returns:
     // <commits only in main> <commits only in branch>
-    const [commitsOnlyInMain, commitsOnlyInBranch] = run(
-      `git rev-list --left-right --count main...${name}`
-    )
+    const [commitsOnlyInMain, commitsOnlyInBranch] = git(repositoryRoot, [
+      "rev-list",
+      "--left-right",
+      "--count",
+      `main...${name}`,
+    ])
       .split(/\s+/)
       .map(Number);
 
     const behind = commitsOnlyInMain;
     const ahead = commitsOnlyInBranch;
 
-    const latestCommitSha = run(`git rev-parse ${name}`);
+    const latestCommitSha = git(repositoryRoot, ["rev-parse", name]);
 
-    const latestCommit = run(
-      `git log -1 --pretty=%s ${name}`
-    );
+    const latestCommit = git(repositoryRoot, ["log", "-1", "--pretty=%s", name]);
 
-    const changedFiles = run(
-      `git diff --name-only main..${name}`
-    )
+    const changedFiles = git(repositoryRoot, ["diff", "--name-only", `main..${name}`])
       .split("\n")
       .filter(Boolean);
 

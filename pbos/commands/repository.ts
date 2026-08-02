@@ -1,3 +1,4 @@
+import path from "node:path";
 import { analyzeRepository, recommend } from "../repository";
 import {
   Artifacts,
@@ -6,11 +7,11 @@ import {
   Runtime,
 } from "../kernel";
 
-export function runRepositoryAnalysis() {
-  const model = analyzeRepository();
+export function runRepositoryAnalysis(rootDir = process.cwd()) {
+  const model = analyzeRepository(rootDir);
 
   Runtime.save(
-    Artifacts.repository,
+    path.join(rootDir, Artifacts.repository),
     model,
     "repository-intelligence"
   );
@@ -38,7 +39,7 @@ export function runRepositoryAnalysis() {
 
   Logger.blank();
   Logger.info("Repository model written to:");
-  Logger.info(Artifacts.repository);
+  Logger.info(path.join(rootDir, Artifacts.repository));
 
   return Results.success(
     "repository",
