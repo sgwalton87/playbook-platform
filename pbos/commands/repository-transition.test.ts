@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -13,6 +13,8 @@ import {
   validateContextRefreshApproval,
 } from "../context/refresh";
 import { runRepositoryAnalysis } from "./repository";
+import { dispatchKernelCommand } from "./kernel-command-bus";
+import { loadTransitionLifecycle } from "../transition";
 
 const roots: string[] = [];
 
@@ -88,6 +90,73 @@ afterEach(() => {
 });
 
 describe("PBOS transition repository reality synchronization", () => {
+  it("coordinates requester approval, reviewer approval, refresh, activation, and completion", async () => {
+    const parent = mkdtempSync(path.join(tmpdir(), "pbos-transition-lifecycle-"));
+    roots.push(parent);
+    const clonePath = path.join(parent, "playbook-platform");
+    execFileSync("git", ["clone", "--no-hardlinks", process.cwd(), clonePath], {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    const rootDir = realpathSync(clonePath);
+    const canonicalRemote = git(process.cwd(), "remote", "get-url", "origin");
+    git(rootDir, "remote", "set-url", "origin", canonicalRemote);
+    git(rootDir, "branch", "main", "origin/main");
+    const expiration = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+
+    const requester = await dispatchKernelCommand(
+      "transition", rootDir, "", {
+        "requester-identity": "REQUESTER-001",
+        decision: "APPROVED",
+        reason: "Approve the exact isolated repository transition.",
+        "risk-acknowledgment": "YES",
+        expiration,
+      }
+    );
+    expect(requester.successful).toBe(true);
+    expect(loadTransitionLifecycle(rootDir)?.latest.state).toBe("REQUESTER_APPROVED");
+
+    const reviewer = await dispatchKernelCommand(
+      "approve", rootDir, "", {
+        "reviewer-identity": "REVIEWER-002",
+        decision: "APPROVED",
+        reason: "Independently reviewed repository and governance evidence.",
+        "risk-acknowledgment": "YES",
+        expiration,
+      }
+    );
+    expect(reviewer.successful).toBe(true);
+    expect(loadTransitionLifecycle(rootDir)?.latest.state).toBe("REVIEWER_APPROVED");
+
+    const completed = await dispatchKernelCommand("transition", rootDir);
+    expect(completed.successful, completed.output).toBe(true);
+    expect(completed.output).toContain("PBOS TRANSITION COMPLETE");
+    expect(completed.output).toContain("Proposal: APPROVED");
+    expect(completed.output).toContain("Context Refresh: APPLIED");
+    expect(completed.output).toContain("Trusted Context: ACTIVE");
+    expect(completed.output).toContain("Validation: PASS");
+    expect(completed.output).toContain("Human Authorization Ceremonies: 2");
+
+    const lifecycle = loadTransitionLifecycle(rootDir)?.latest;
+    expect(lifecycle?.state).toBe("COMPLETE");
+    expect(lifecycle?.state_history.map(({ state }) => state)).toEqual([
+      "DRAFT",
+      "PROPOSED",
+      "REQUESTER_APPROVED",
+      "REVIEWER_APPROVED",
+      "CONTEXT_REFRESH_PENDING",
+      "CONTEXT_REFRESHED",
+      "TRUSTED_CONTEXT_ACTIVE",
+      "VALIDATED",
+      "COMPLETE",
+    ]);
+
+    const context = await dispatchKernelCommand("context-status", rootDir);
+    expect(context.successful).toBe(true);
+    expect(context.output).toContain("Trust Level: ACTIVE");
+    expect(context.output).toContain("Validation: PASS");
+  }, 60_000);
+
   it("refreshes repository reality before transition context discovery", () => {
     const commandBus = readFileSync(
       path.join(process.cwd(), "pbos/commands/kernel-command-bus.ts"),
