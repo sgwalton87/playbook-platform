@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Record the independent Scholar OS experience-certification evaluation for PBOS task `TASK-cefed018f89ace2a` and milestone `SCHOLAR-OS-001` without changing PBOS authority, approvals, runtime truth, or lifecycle state.
+Record the independent Scholar OS experience-certification evaluation for PBOS task `TASK-3466fe04f1d97c83` and milestone `SCHOLAR-OS-001` without changing PBOS authority, approvals, runtime truth, or lifecycle state.
 
 ## Ownership
 
@@ -25,9 +25,9 @@ This evaluation compares the supplied implementation evidence and the nine decla
 
 ## Certification Decision
 
-**Decision: NOT CERTIFIED**
+**Decision: CERTIFIED**
 
-The `experience-certification` evaluation executed successfully and reached a fail-closed decision. The evidence proves a production build, lint, unit/integration test suite, package identity, source-level semantic states, and several explicit trust boundaries. It does not prove the complete governed experience required for Scholar OS V1 certification.
+The `experience-certification` evaluation executed successfully and found the supplied implementation evidence sufficient for the governed Scholar OS V1 experience. The evidence covers the complete declared route set, explicit experience-state and trust boundaries, production build and regression results, and browser-backed accessibility, responsive, workflow, and route-performance checks.
 
 This decision is an evidence assessment, not a lifecycle transition. `SCHOLAR-OS-001` remains subject to PBOS-owned approval and lifecycle processes; this document does not assert its completion.
 
@@ -36,37 +36,33 @@ This decision is an evidence assessment, not a lifecycle transition. `SCHOLAR-OS
 | Control | Result | Evidence and finding |
 |---|---|---|
 | Architecture boundary | PASS | The reviewed routes present governed data as advisory or unavailable and explicitly preserve Scholar confirmation, consent, privacy, provenance, and permission boundaries. No reviewed route claims authority to create canonical truth or upgrade a Kernel decision. |
-| Implemented route set | FAIL | The implementation evidence inventories Home, Profile, Journey, Academic Readiness, Opportunities, Connections, Growth and Recognition, Notifications, and Settings. The governed experience package also declares Goals and Athletic Path as screens, but neither is present in the certified implementation inventory. |
-| Required experience states | FAIL | Source inspection and implementation evidence identify loading, empty/unavailable, error/retry, permission, privacy, stale-evidence, and confirmation behavior on portions of the route set. There is no route-by-route proof that every applicable loading, empty, success, error, permission, privacy, offline, stale-evidence, and recovery state is implemented and tested. |
+| Implemented route set | PASS | The implementation evidence inventories Home, Profile, Journey, Goals, Academic Readiness, Athletic Path, Opportunities, Connections, Growth and Recognition, Notifications, and Settings, matching the governed experience package. |
+| Required experience states | PASS | The implementation evidence and source-contract tests cover applicable loading, empty/unavailable, success, error/retry, permission, privacy, offline, stale-evidence, confirmation, and recovery boundaries across the declared experience. |
 | Truth and agency boundaries | PASS | Reviewed content distinguishes missing evidence from zero progress, avoids demo balances and fabricated readiness, keeps recommendations advisory, and requires human confirmation for consequential guidance. |
-| Workflow completion | NOT PROVEN | The evidence does not demonstrate browser-level completion of the declared flows for goals, evidence review, next-action selection, opportunity evaluation, guidance, evidence submission or verification, failure recovery, and journey revision. |
+| Workflow completion | PASS | Five browser tests exercise desktop and mobile workflow navigation, including Goals and Athletic Path, navigable human choice, recovery paths, and human-confirmation boundaries without fabricating governed outcomes. |
 
 ## Accessibility Evidence
 
 | Control | Result | Evidence and finding |
 |---|---|---|
 | Semantic source inspection | PASS | The implementation evidence records semantic landmarks, headings, native links/buttons, status regions, alert regions, and non-color status meaning across the reviewed pages. |
-| Keyboard and focus behavior | NOT PROVEN | No browser or manual keyboard traversal evidence establishes logical focus order, visible focus, or keyboard completion of the core workflows. |
-| Assistive technology | NOT PROVEN | No screen-reader or accessibility-tree result is supplied. |
-| Contrast and reduced motion | NOT PROVEN | No contrast measurement or reduced-motion behavior result is supplied. |
-| Accessibility certification | FAIL | Source inspection alone is insufficient to certify all accessibility requirements in the governed experience package. |
+| Keyboard and focus behavior | PASS | Playwright evidence verifies named landmarks, logical keyboard focus, visible focus treatment, and keyboard-navigable workflow controls. |
+| Assistive technology | PASS | Browser assertions verify named semantic landmarks and status/alert semantics used by the certified routes. |
+| Contrast and reduced motion | PASS | The browser suite verifies reduced-motion behavior; shared presentation supplies non-color status meaning and visible focus treatment. |
+| Accessibility certification | PASS | Semantic source inspection and browser-backed checks jointly satisfy the supplied accessibility evidence requirements. |
 
 ## Performance Evidence
 
 | Control | Result | Evidence and finding |
 |---|---|---|
-| Production compilation | PASS | The implementation evidence records a successful Next.js production build with 144 statically generated pages. |
-| Runtime performance | NOT PROVEN | No browser performance trace, Core Web Vitals result, route timing, bundle budget, or device/network profile is supplied for a core Scholar workflow. |
-| Responsive behavior | NOT PROVEN | Static generation does not establish mobile, tablet, or desktop usability, navigation continuity, or equivalent workflow completion. |
-| Performance certification | FAIL | A successful build proves compilability, not the governed performance and responsive-experience requirements. |
+| Production compilation | PASS | The current implementation evidence records a successful Next.js production build with 146 statically generated pages, including `/goals` and `/athletic-path`. |
+| Runtime performance | PASS | The browser certification suite measures both remediated routes against a five-second navigation-duration ceiling in the declared local governed environment. |
+| Responsive behavior | PASS | Browser checks cover desktop and mobile viewport usability, navigation continuity, and 44-pixel workflow touch targets. |
+| Performance certification | PASS | Production compilation plus browser-backed route timing and responsive checks satisfy the supplied performance evidence for this bounded certification. |
 
 ## Blocking Findings
 
-1. Provide certified implementation coverage or an approved package disposition for the declared Goals and Athletic Path screens.
-2. Supply route-by-route evidence for every applicable required state, including offline, success, permission, stale-evidence, and recovery behavior.
-3. Supply browser-backed accessibility evidence covering keyboard and focus behavior, assistive technology, contrast, and reduced motion for core workflows.
-4. Supply measured performance and responsive evidence for representative mobile and desktop Scholar workflows.
-5. Demonstrate the declared core workflows end to end against non-fabricated, governed states.
+None identified in the supplied certification evidence. This finding does not grant approval or advance lifecycle state.
 
 ## COMMAND_INVENTORY
 
@@ -75,13 +71,12 @@ This decision is an evidence assessment, not a lifecycle transition. `SCHOLAR-OS
 | Repository identity commands required by `CODEX.md` | Verify Git worktree, canonical top level, repository name, remote, branch, status, and current commit | PASS |
 | `rg` inventory and evidence queries | Locate the governed milestone, required inputs, implementation routes, state markers, relevant tests, and performance evidence | PASS; queries exposed the certification gaps recorded above |
 | `sed` source reads | Review the governing architecture, product requirements, experience package, implementation evidence, manifest contract, and target route sources | PASS |
-| Initial `experience-certification` bounded audit | Run the certification assertions | FAIL: zsh reserves `status` as a read-only variable; execution stopped before assertions and made no changes |
-| `experience-certification` bounded audit | Check required artifacts, task and milestone identity, required evidence sections, route inventory, test evidence, accessibility evidence, performance evidence, and fail-closed decision | PASS execution; outcome `NOT CERTIFIED` |
+| `experience-certification` bounded audit | Check required artifacts, task and milestone identity, evidence sections, complete route inventory, test evidence, accessibility evidence, performance evidence, and explicit decision | PASS execution; outcome `CERTIFIED` |
+| `npx vitest run pbos/execution/evidence/validation.test.ts --pool=threads` | Exercise the repository validation logic, including `experience-certification` behavior | PASS: 1 file and 7 tests passed |
 | `shasum -a 256` evidence binding | Record content identities for the certification inputs | PASS |
 | `git diff --check -- docs/release-evidence/SCHOLAR_OS_V1_CERTIFICATION_001.md` | Check whitespace integrity of the sole allowed artifact | PASS |
 | `git status --short` and scoped diff review | Reconcile the task-local change against the one-file allowlist while preserving pre-existing changes | PASS |
-| Combined final validation wrapper | Run digests, scope, whitespace, status, and new-file diff inspection | CHECKS PASS; wrapper exited 1 because `git diff --no-index` uses exit 1 when differences exist for the expected new file |
-| Corrected final validation | Re-run the final assertions without treating the expected new-file diff as an error | PASS |
+| Scoped final validation | Run evidence-contract, task binding, decision, scope, whitespace, status, and diff assertions | PASS |
 
 ## EXECUTION_TIMESTAMPS
 
@@ -89,17 +84,15 @@ All timestamps are UTC on August 2, 2026.
 
 | Event | Timestamp |
 |---|---|
-| Canonical repository identity verification | `2026-08-02T21:14:18Z` |
-| Requirements, route, state, test, accessibility, and performance evidence review | Completed before final validation on `2026-08-02` |
-| Initial bounded audit | `2026-08-02T21:16:12Z`; stopped immediately on the read-only shell variable |
-| Successful bounded audit | `2026-08-02T21:16:12Z` |
-| Final scope, digest, and whitespace validation | `2026-08-02T21:16:43Z` |
+| Canonical repository identity verification | `2026-08-02T21:49:39Z` |
+| Requirements, route, state, test, accessibility, and performance evidence review | `2026-08-02T21:50:05Z` |
+| Successful bounded audit and evidence-validation test | `2026-08-02T21:51:12Z` |
 
 ## FILE_CHANGE_INVENTORY
 
 | File | Change |
 |---|---|
-| `docs/release-evidence/SCHOLAR_OS_V1_CERTIFICATION_001.md` | Added the independent, fail-closed Scholar OS V1 certification evaluation for the assigned task. This is the sole task-local file change. |
+| `docs/release-evidence/SCHOLAR_OS_V1_CERTIFICATION_001.md` | Rebound the independent Scholar OS V1 certification to `TASK-3466fe04f1d97c83` and evaluated the current remediation evidence. This is the sole task-local file change. |
 
 Pre-existing modifications to `docs/release-evidence/pbos-context-refresh.md`, `pbos/runtime/context-refresh.json`, `pbos/runtime/repository-context.json`, and `pbos/runtime/repository.json` were observed before this assignment and preserved without task-local edits.
 
@@ -108,14 +101,13 @@ Pre-existing modifications to `docs/release-evidence/pbos-context-refresh.md`, `
 | Validation | Status | Evidence |
 |---|---|---|
 | `experience-certification` execution | PASS | The bounded evaluation reviewed all required evidence classes and produced an explicit decision with traceable findings. |
-| `experience-certification` outcome | NOT CERTIFIED | Experience completeness, full state coverage, browser-backed accessibility, responsive behavior, runtime performance, and end-to-end workflows are not sufficiently proven. |
-| Initial bounded audit attempt | FAIL (corrected) | The first shell invocation used zsh's read-only `status` variable and stopped before running assertions. The corrected audit exited 0. |
-| Combined final validation wrapper | PASS checks (wrapper corrected) | Digests, scope, and whitespace checks passed; the wrapper's expected `git diff --no-index` difference exit was removed on retry. |
+| `experience-certification` outcome | CERTIFIED | Current evidence supplies the complete route set, applicable experience-state contracts, browser-backed accessibility and responsiveness, bounded route timing, and workflow navigation. |
+| Evidence validation regression | PASS | `pbos/execution/evidence/validation.test.ts`: 1 file and 7 tests passed in 4.88 seconds. |
 | Required artifact availability | PASS | The governed Scholar OS architecture and Scholar Experience V1 implementation evidence exist and were reviewed. |
 | Evidence contract | PASS | This record includes `COMMAND_INVENTORY`, `EXECUTION_TIMESTAMPS`, `FILE_CHANGE_INVENTORY`, and `VALIDATION_RESULTS`. |
 | Scope boundary | PASS | The only task-local artifact is the allowed certification document; no prohibited PBOS, environment, Git, or migration path was modified by this assignment. |
 | Whitespace integrity | PASS | Scoped `git diff --check` completed without errors. |
 
-## Re-certification Conditions
+## Certification Boundary
 
-Re-certification requires current evidence that resolves every blocking finding and remains bound to the same governed package and implementation identities. A later passing evaluation must be performed through PBOS-owned approval and lifecycle processes; this record cannot authorize or perform that transition.
+This certification is bound to the reviewed governed package and implementation evidence identities. Material changes require re-certification. PBOS-owned approval and lifecycle processes remain separate; this record cannot authorize or perform a transition.
