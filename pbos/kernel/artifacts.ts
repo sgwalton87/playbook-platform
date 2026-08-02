@@ -27,6 +27,7 @@ export const Artifacts = {
   trustedBuildContext: "pbos/runtime/trusted-build-context.json",
   changeBoundary: "pbos/runtime/change-boundary.json",
   launchApproval: "pbos/runtime/launch-approval.json",
+  approvalPackage: "pbos/runtime/approval-package.json",
   artifactReconciliation: "pbos/runtime/artifact-reconciliation.json",
   lifecycleGovernance: "pbos/runtime/lifecycle-governance.json",
   planningHandoff: "pbos/runtime/planning-handoff.json",
