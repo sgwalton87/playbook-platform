@@ -1,56 +1,11 @@
-"use client";
+import { notFound } from "next/navigation";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { canViewPortfolioShare } from "@/lib/portfolio-sharing";
 
-import {
-  PlaybookCard,
-  PlaybookGrid,
-  PlaybookHero,
-  PlaybookPage,
-  PlaybookPill,
-} from "@/components/ui";
-import {
-  buildPortfolioShare,
-  canViewPortfolioShare,
-} from "@/lib/portfolio-sharing";
-
-export default function SharedPortfolioPage() {
-  const share = buildPortfolioShare({
-    scholarId: "scholar-maya",
-    scholarName: "Maya Johnson",
-    targetUse: "internship",
-    packet: {
-      resume: true,
-      bragSheet: true,
-      recommendationLetter: true,
-    },
-  });
-
-  const allowed = canViewPortfolioShare(share);
-
-  return (
-    <PlaybookPage>
-      <PlaybookHero
-        eyebrow="Shared Portfolio"
-        title={allowed ? `${share.scholarName} Portfolio Packet` : "Portfolio unavailable"}
-        subtitle="A shareable portfolio page for applications, scholarships, recruiting, internships, jobs, and NIL opportunities."
-      />
-
-      <PlaybookGrid>
-        <PlaybookCard eyebrow="Share Status" title={share.status}>
-          <p style={body}>Target use: {share.targetUse}</p>
-          <PlaybookPill>{allowed ? "viewable" : "restricted"}</PlaybookPill>
-        </PlaybookCard>
-
-        <PlaybookCard eyebrow="Included Materials" title="Packet contents">
-          <p style={body}>Resume: {String(share.packet.resume)}</p>
-          <p style={body}>Brag Sheet: {String(share.packet.bragSheet)}</p>
-          <p style={body}>Recommendation Letter: {String(share.packet.recommendationLetter)}</p>
-        </PlaybookCard>
-      </PlaybookGrid>
-    </PlaybookPage>
-  );
+export default async function SharedPortfolioPage({ params }: { params: Promise<{ shareId: string }> }) {
+  const { shareId } = await params;
+  const supabase = createAdminSupabaseClient();
+  const { data: share } = await supabase.from("portfolio_shares").select("share_id,scholar_name,target_use,packet,status,expires_at").eq("share_id", shareId).maybeSingle();
+  if (!share || !canViewPortfolioShare({ status: share.status, expiresAt: share.expires_at })) notFound();
+  return <main style={{ maxWidth: 900, margin: "0 auto", padding: 36 }}><p>Controlled Scholar Portfolio</p><h1>{share.scholar_name}</h1><p>Prepared for: {share.target_use}</p><section><h2>Readiness packet</h2><pre style={{ whiteSpace: "pre-wrap" }}>{JSON.stringify(share.packet, null, 2)}</pre></section><aside>This link provides read-only access and may expire or be revoked by the Scholar.</aside></main>;
 }
-
-const body: React.CSSProperties = {
-  color: "#64748B",
-  lineHeight: 1.6,
-};

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 const AG_SUBJECTS = [
   { key: "A", name: "History / Social Science", required: 2 },
@@ -14,7 +14,6 @@ const AG_SUBJECTS = [
 type TranscriptParseBody = {
   base64?: string;
   mediaType?: string;
-  userId?: string;
 };
 
 type AgSubjectResult = {
@@ -62,11 +61,17 @@ Return ONLY valid JSON like this:
 
 export async function POST(req: NextRequest) {
   try {
-    const { base64, mediaType, userId } = (await req.json()) as TranscriptParseBody;
+    const supabase = await createServerSupabaseClient();
+    const { data: auth } = await supabase.auth.getUser();
+    if (!auth.user) return NextResponse.json({ error: "Sign in required." }, { status: 401 });
+    const { base64, mediaType } = (await req.json()) as TranscriptParseBody;
 
-    if (!base64 || !mediaType || !userId) {
+    const allowedMedia = ["application/pdf", "image/jpeg", "image/png", "image/webp"];
+    if (!base64 || !mediaType || !allowedMedia.includes(mediaType)) {
       return NextResponse.json({ error: "Missing transcript data." }, { status: 400 });
     }
+    if (base64.length > 14_000_000) return NextResponse.json({ error: "Transcript exceeds the 10 MB upload limit." }, { status: 413 });
+    if (!process.env.ANTHROPIC_API_KEY) return NextResponse.json({ error: "Transcript reader is not configured." }, { status: 503 });
 
     const sourceBlock = {
       type: "base64",
@@ -122,19 +127,6 @@ export async function POST(req: NextRequest) {
 
     const parsed = JSON.parse(rawJson) as AgParseResult;
 
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY ||
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
-
-    if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      return NextResponse.json(
-        { error: "Missing SUPABASE_SERVICE_ROLE_KEY. Transcript parsing cannot save A-G rows." },
-        { status: 500 }
-      );
-    }
-
     let agUpdates = 0;
     const saved: unknown[] = [];
 
@@ -142,11 +134,11 @@ export async function POST(req: NextRequest) {
       const val = parsed[subject.key] || {};
 
       const payload = {
-        user_id: userId,
+        user_id: auth.user.id,
         subject: subject.key,
         subject_name: subject.name,
-        years_required: Number(val.years_required || subject.required),
-        years_completed: Number(val.years_completed || 0),
+        years_required: Math.max(0, Math.min(8, Number(val.years_required || subject.required))),
+        years_completed: Math.max(0, Math.min(8, Number(val.years_completed || 0))),
         in_progress: Boolean(val.in_progress),
         courses_taken: Array.isArray(val.courses_taken) ? val.courses_taken : [],
         current_course: val.current_course || null,

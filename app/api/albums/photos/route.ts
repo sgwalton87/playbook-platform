@@ -1,28 +1,3 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-function admin() {
-  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
-}
-
-export async function POST(req: NextRequest) {
-  const body = await req.json();
-  const supabase = admin();
-
-  const { data, error } = await supabase.from("profile_album_photos").insert({
-    album_id: body.albumId,
-    user_id: body.userId,
-    image_url: body.imageUrl,
-    caption: body.caption || null,
-    sort_order: body.sortOrder || 0,
-  }).select().single();
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
-
-  await supabase.from("profile_albums").update({
-    cover_url: body.makeCover ? body.imageUrl : undefined,
-    updated_at: new Date().toISOString(),
-  }).eq("id", body.albumId);
-
-  return NextResponse.json({ ok: true, photo: data });
-}
+import { createServerSupabaseClient } from "@/lib/supabase/server";
+export async function POST(req:NextRequest){const supabase=await createServerSupabaseClient();const {data:auth}=await supabase.auth.getUser();if(!auth.user)return NextResponse.json({error:"Sign in required."},{status:401});const body=await req.json();if(!body.albumId||!body.imageUrl)return NextResponse.json({error:"Album and image are required."},{status:422});const {data:album}=await supabase.from("profile_albums").select("id").eq("id",body.albumId).eq("user_id",auth.user.id).maybeSingle();if(!album)return NextResponse.json({error:"Album ownership required."},{status:403});const {data,error}=await supabase.from("profile_album_photos").insert({album_id:body.albumId,user_id:auth.user.id,image_url:body.imageUrl,caption:body.caption||null,sort_order:body.sortOrder||0}).select().single();if(error)return NextResponse.json({error:error.message},{status:400});if(body.makeCover)await supabase.from("profile_albums").update({cover_url:body.imageUrl,updated_at:new Date().toISOString()}).eq("id",body.albumId).eq("user_id",auth.user.id);return NextResponse.json({ok:true,photo:data},{status:201});}

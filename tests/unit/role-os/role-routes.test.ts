@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getRoleDestination, roleOptions } from "@/lib/role-os/roleRoutes";
+import { PUBLIC_ONBOARDING_ROLES } from "@/lib/roles/registry";
 
 describe("Role OS routing", () => {
   it("routes family users to Family OS", () => {
@@ -7,8 +8,9 @@ describe("Role OS routing", () => {
   });
 
   it("exposes every completed public onboarding pathway", () => {
-    expect(roleOptions.length).toBe(10);
-    expect(roleOptions.map((option) => option.role)).toContain("scholar-athlete");
-    expect(roleOptions.map((option) => option.role)).toContain("college-admissions");
+    const optionRoles = roleOptions.map((option) => option.role);
+
+    expect(optionRoles).toEqual(PUBLIC_ONBOARDING_ROLES);
+    expect(new Set(optionRoles).size).toBe(optionRoles.length);
   });
 });

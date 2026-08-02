@@ -9,6 +9,7 @@ import { getRoleNavigation, type NavItem } from "@/lib/navigation";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import ProfileAvatar from "@/components/ProfileAvatar";
 import { supabase } from "@/lib/supabaseClient";
+import ScholarContextSelector from "./ScholarContextSelector";
 
 const AUTH_FULLSCREEN_ROUTES = [
   "/",
@@ -135,6 +136,8 @@ export default function UnifiedAppShell({ children }: { children: React.ReactNod
           <button onClick={() => router.back()} className="playbook-topbar__back">← Back</button>
           <Link href={roleNav.home} className="playbook-topbar__mode">{roleNav.label}</Link>
         </header>
+
+        <div style={{ padding: "8px 20px" }}><ScholarContextSelector /></div>
 
         {children}
 

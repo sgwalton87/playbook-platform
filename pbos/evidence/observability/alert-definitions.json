@@ -1,0 +1,19 @@
+{
+  "source": "lib/observability/alerts.ts",
+  "status": "DEFINED_NOT_DEPLOYED",
+  "alerts": [
+    { "id": "ALERT-APP-UNAVAILABLE", "severity": "critical", "signal": "synthetic.availability", "owner": "Platform Reliability" },
+    { "id": "ALERT-DATABASE-UNAVAILABLE", "severity": "critical", "signal": "database_query_failure_total", "owner": "Database Operations" },
+    { "id": "ALERT-AUTH-OUTAGE", "severity": "critical", "signal": "auth_failure_total", "owner": "Identity and Access" },
+    { "id": "ALERT-SECURITY-FAILURE", "severity": "critical", "signal": "database_authorization_failure_total", "owner": "Security Incident Response" },
+    { "id": "ALERT-ERROR-SURGE", "severity": "critical", "signal": "api_error_total", "owner": "Platform Reliability" },
+    { "id": "ALERT-API-DEGRADATION", "severity": "high", "signal": "api_latency_ms", "owner": "Platform Reliability" },
+    { "id": "ALERT-EMAIL-DELIVERY", "severity": "high", "signal": "delivery_failure_total", "owner": "Communications Operations" },
+    { "id": "ALERT-NOTIFICATION-FAILURE", "severity": "high", "signal": "notification_total", "owner": "Communications Operations" },
+    { "id": "ALERT-ONBOARDING-SPIKE", "severity": "high", "signal": "onboarding_completion_total", "owner": "Scholar OS Operations" },
+    { "id": "ALERT-ABNORMAL-USAGE", "severity": "medium", "signal": "api_rate_limit_total", "owner": "Security Operations" },
+    { "id": "ALERT-WORKFLOW-FAILURE", "severity": "medium", "signal": "workflow.failure", "owner": "Domain Operations" },
+    { "id": "ALERT-PERFORMANCE-DEGRADATION", "severity": "medium", "signal": "web_vitals", "owner": "Experience Reliability" }
+  ],
+  "test_alert_executed": false
+}

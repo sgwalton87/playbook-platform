@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { getPathway, normalizeRole } from "@/lib/onboarding/pathwayMap";
 import { getCanonicalOnboardingRoute } from "@/lib/onboarding";
+import { reportClientFailure } from "@/lib/observability/client";
 
 export default function AuthCallbackPage() {
   return (
@@ -29,7 +30,7 @@ function AuthCallbackContent() {
         });
 
         if (error) {
-          console.error("Auth token verification failed:", error.message);
+          reportClientFailure("client_error", "AuthTokenVerificationFailed");
           window.location.href = `/login?error=${encodeURIComponent(error.message)}`;
           return;
         }
@@ -39,7 +40,7 @@ function AuthCallbackContent() {
         if (code) {
           const { error } = await supabase.auth.exchangeCodeForSession(code);
           if (error) {
-            console.error("Auth callback exchange failed:", error.message);
+            reportClientFailure("client_error", "AuthCodeExchangeFailed");
             window.location.href = `/login?error=${encodeURIComponent(error.message)}`;
             return;
           }
@@ -49,6 +50,7 @@ function AuthCallbackContent() {
       const { data, error } = await supabase.auth.getUser();
 
       if (error || !data.user) {
+        reportClientFailure("client_error", "AuthSessionResolutionFailed");
         window.location.href = "/login";
         return;
       }

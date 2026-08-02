@@ -1,4 +1,4 @@
-import { normalizePlaybookRole } from "@/lib/roles/registry";
+import { PLAYBOOK_ROLES, normalizePlaybookRole, type PlaybookRole } from "@/lib/roles/registry";
 
 export type NavItem = {
   label: string;
@@ -36,7 +36,10 @@ const SHARED_OPPORTUNITIES: NavItem = {
   icon: "🚀",
 };
 
-export const ROLE_NAVIGATION: Record<string, RoleNavigation> = {
+const SHARED_EVIDENCE: NavItem = { label: "Evidence Center", href: "/evidence", icon: "🗂️" };
+const SHARED_PORTFOLIO: NavItem = { label: "Portfolio", href: "/portfolio", icon: "📁" };
+
+export const ROLE_NAVIGATION: Record<PlaybookRole, RoleNavigation> = {
   scholar: {
     home: "/dashboard",
     label: "Scholar OS",
@@ -50,6 +53,8 @@ export const ROLE_NAVIGATION: Record<string, RoleNavigation> = {
         icon: "📚",
       },
       { label: "Compass", href: "/compass", icon: "🧭" },
+      SHARED_EVIDENCE,
+      SHARED_PORTFOLIO,
       SHARED_OPPORTUNITIES,
       SHARED_COURSES,
       SHARED_MESSAGES,
@@ -74,6 +79,8 @@ export const ROLE_NAVIGATION: Record<string, RoleNavigation> = {
         icon: "📚",
       },
       { label: "Compass", href: "/compass", icon: "🧭" },
+      SHARED_EVIDENCE,
+      SHARED_PORTFOLIO,
       SHARED_OPPORTUNITIES,
       SHARED_COURSES,
       SHARED_MESSAGES,
@@ -107,6 +114,7 @@ export const ROLE_NAVIGATION: Record<string, RoleNavigation> = {
         icon: "🏠",
       },
       SHARED_OPPORTUNITIES,
+      SHARED_EVIDENCE,
       SHARED_COURSES,
       SHARED_MESSAGES,
       SHARED_PROFILE,
@@ -123,6 +131,7 @@ export const ROLE_NAVIGATION: Record<string, RoleNavigation> = {
         icon: "🧭",
       },
       SHARED_OPPORTUNITIES,
+      SHARED_EVIDENCE,
       SHARED_COURSES,
       SHARED_MESSAGES,
       SHARED_PROFILE,
@@ -144,6 +153,7 @@ export const ROLE_NAVIGATION: Record<string, RoleNavigation> = {
         icon: "📚",
       },
       SHARED_OPPORTUNITIES,
+      SHARED_EVIDENCE,
       SHARED_COURSES,
       SHARED_MESSAGES,
       SHARED_PROFILE,
@@ -151,12 +161,12 @@ export const ROLE_NAVIGATION: Record<string, RoleNavigation> = {
   },
 
   coach: {
-    home: "/mentor-os",
+    home: "/educator-os",
     label: "Coach OS",
     items: [
       {
         label: "Coach Dashboard",
-        href: "/mentor-os",
+        href: "/educator-os",
         icon: "📋",
       },
       {
@@ -165,6 +175,7 @@ export const ROLE_NAVIGATION: Record<string, RoleNavigation> = {
         icon: "📚",
       },
       SHARED_OPPORTUNITIES,
+      SHARED_EVIDENCE,
       SHARED_COURSES,
       SHARED_MESSAGES,
       SHARED_PROFILE,
@@ -208,6 +219,8 @@ export const ROLE_NAVIGATION: Record<string, RoleNavigation> = {
       { label: "Dashboard", href: "/dashboard", icon: "🏠" },
       { label: "Start Here", href: "/start", icon: "▶️" },
       { label: "Compass", href: "/compass", icon: "🧭" },
+      SHARED_EVIDENCE,
+      SHARED_PORTFOLIO,
       SHARED_OPPORTUNITIES,
       SHARED_COURSES,
       SHARED_MESSAGES,
@@ -230,8 +243,21 @@ export const ROLE_NAVIGATION: Record<string, RoleNavigation> = {
     ],
   },
 
+  district: {
+    home: "/district-os",
+    label: "District OS",
+    items: [
+      { label: "District Dashboard", href: "/district-os", icon: "🏫" },
+      { label: "Academic Readiness", href: "/academic-readiness", icon: "📚" },
+      SHARED_EVIDENCE,
+      SHARED_OPPORTUNITIES,
+      SHARED_MESSAGES,
+      SHARED_PROFILE,
+    ],
+  },
+
   other: {
-    home: "/dashboard",
+    home: "/pending",
     label: "Playbook",
     items: [
       { label: "Dashboard", href: "/dashboard", icon: "🏠" },
@@ -256,8 +282,11 @@ export function getRoleNavigation(
 ): RoleNavigation {
   const normalized = normalizeNavigationRole(profileMode, role);
 
-  return (
-    ROLE_NAVIGATION[normalized] ||
-    ROLE_NAVIGATION.other
-  );
+  return ROLE_NAVIGATION[normalized];
+}
+
+export const NAVIGATION_ROLES = Object.keys(ROLE_NAVIGATION) as PlaybookRole[];
+
+export function hasCanonicalRoleNavigation(role: PlaybookRole): boolean {
+  return ROLE_NAVIGATION[role].home === PLAYBOOK_ROLES[role].osRoute;
 }

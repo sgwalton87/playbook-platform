@@ -1,131 +1,87 @@
 "use client";
 
-import Link from "next/link";
-import { getRoleNotifications } from "@/lib/action-routing";
+import { useEffect, useState } from "react";
+import { PlaybookButton } from "@/components/ui/PlaybookButton";
+import { PlaybookCard, PlaybookGrid, PlaybookHero, PlaybookPage, PlaybookPill, PlaybookSurfaceState } from "@/components/ui";
+
+type HandoffStatus = "assigned" | "accepted" | "in_progress" | "completed" | "declined" | "cancelled";
+type Handoff = {
+  id: string;
+  action_type: string;
+  title: string;
+  detail: string | null;
+  source_type: string;
+  required_permission: string;
+  status: HandoffStatus;
+  assigned_to: string;
+  created_by: string;
+  due_at: string | null;
+  created_at: string;
+};
+
+const transitions: Partial<Record<HandoffStatus, Array<"accepted" | "in_progress" | "completed" | "declined">>> = {
+  assigned: ["accepted", "declined"],
+  accepted: ["in_progress", "declined"],
+  in_progress: ["completed"],
+};
 
 export default function ActionRoutingCenter() {
-  const notifications = getRoleNotifications();
+  const [handoffs, setHandoffs] = useState<Handoff[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [updating, setUpdating] = useState<string | null>(null);
 
-  return (
-    <main style={page}>
-      <section style={hero}>
-        <p style={eyebrow}>Role OS Action Routing</p>
-        <h1 style={title}>One signal. Seven role-specific actions.</h1>
-        <p style={sub}>
-          Playbook routes the right action to every person around the scholar so support becomes coordinated, not fragmented.
-        </p>
-      </section>
+  async function load() {
+    const response = await fetch("/api/action-routing", { cache: "no-store" });
+    const body = await response.json();
+    setLoading(false);
+    if (!response.ok) {
+      setError(body.error || "Action handoffs are unavailable.");
+      return;
+    }
+    setHandoffs(body.handoffs || []);
+  }
 
-      <section style={grid}>
-        {notifications.map(item => (
-          <article key={item.role} style={card}>
-            <div style={top}>
-              <p style={eyebrow}>{item.role}</p>
-              <span style={priority(item.priority)}>{item.priority}</span>
-            </div>
-            <h2 style={cardTitle}>{item.message}</h2>
-            <Link href={item.route} style={button}>{item.actionLabel} →</Link>
-          </article>
-        ))}
-      </section>
-    </main>
-  );
+  useEffect(() => {
+    void fetch("/api/action-routing", { cache: "no-store" })
+      .then(async (response) => ({ response, body: await response.json() }))
+      .then(({ response, body }) => {
+        setLoading(false);
+        if (!response.ok) {
+          setError(body.error || "Action handoffs are unavailable.");
+          return;
+        }
+        setHandoffs(body.handoffs || []);
+      });
+  }, []);
+
+  async function transition(handoffId: string, status: "accepted" | "in_progress" | "completed" | "declined") {
+    setUpdating(handoffId);
+    setError("");
+    const response = await fetch("/api/action-routing", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ handoffId, status }),
+    });
+    const body = await response.json();
+    setUpdating(null);
+    if (!response.ok) {
+      setError(body.error || "The handoff could not be updated.");
+      return;
+    }
+    await load();
+  }
+
+  return <PlaybookPage>
+    <PlaybookHero eyebrow="Role OS Action Routing" title="Governed support handoffs" subtitle="Interventions, recommendations, evidence reviews, and opportunity support move through persisted role assignments with explicit permission and lifecycle state." />
+    {error && <PlaybookSurfaceState state="error" title="Action routing needs attention" description={error} action={<PlaybookButton onClick={load}>Try again</PlaybookButton>} />}
+    {loading ? <PlaybookSurfaceState state="loading" description="Loading authorized handoffs." /> : handoffs.length === 0 ? <PlaybookSurfaceState state="empty" title="No open handoffs" description="No governed action has been assigned to or created by this account." action={{ href: "/support-network", label: "Review support relationships" }} /> :
+      <PlaybookGrid min={300}>{handoffs.map((handoff) => <PlaybookCard key={handoff.id} eyebrow={handoff.action_type} title={handoff.title}>
+        <p>{handoff.detail || "No additional detail supplied."}</p>
+        <p><strong>Source:</strong> {handoff.source_type} · <strong>Permission:</strong> {handoff.required_permission.replaceAll("_", " ")}</p>
+        {handoff.due_at && <p><strong>Due:</strong> {new Date(handoff.due_at).toLocaleDateString()}</p>}
+        <PlaybookPill>{handoff.status.replaceAll("_", " ")}</PlaybookPill>
+        {(transitions[handoff.status] || []).length > 0 && <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 16 }}>{transitions[handoff.status]?.map((status) => <PlaybookButton key={status} variant={status === "declined" ? "secondary" : "primary"} onClick={() => transition(handoff.id, status)}>{updating === handoff.id ? "Saving…" : status.replaceAll("_", " ")}</PlaybookButton>)}</div>}
+      </PlaybookCard>)}</PlaybookGrid>}
+  </PlaybookPage>;
 }
-
-function priority(level: string): React.CSSProperties {
-  const colors: Record<string, string> = {
-    high: "#DC2626",
-    medium: "#F97316",
-    low: "#2563EB",
-  };
-
-  return {
-    background: colors[level] || "#64748B",
-    color: "#fff",
-    borderRadius: 999,
-    padding: "6px 9px",
-    fontSize: 11,
-    fontWeight: 950,
-    textTransform: "uppercase",
-  };
-}
-
-const page: React.CSSProperties = {
-  minHeight: "100vh",
-  background: "#F8F7F4",
-  padding: 32,
-  fontFamily: "system-ui, sans-serif",
-};
-
-const hero: React.CSSProperties = {
-  maxWidth: 1120,
-  margin: "0 auto 18px",
-  background: "linear-gradient(135deg,#0F172A,#1E293B)",
-  color: "#fff",
-  borderRadius: 30,
-  padding: 34,
-  boxShadow: "0 24px 70px rgba(15,23,42,.22)",
-};
-
-const eyebrow: React.CSSProperties = {
-  fontSize: 11,
-  letterSpacing: ".14em",
-  textTransform: "uppercase",
-  fontWeight: 950,
-  color: "#F97316",
-  margin: 0,
-};
-
-const title: React.CSSProperties = {
-  fontSize: 54,
-  lineHeight: 1,
-  margin: "12px 0",
-};
-
-const sub: React.CSSProperties = {
-  color: "#CBD5E1",
-  fontSize: 17,
-  lineHeight: 1.6,
-  maxWidth: 800,
-};
-
-const grid: React.CSSProperties = {
-  maxWidth: 1120,
-  margin: "0 auto",
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))",
-  gap: 16,
-};
-
-const card: React.CSSProperties = {
-  background: "#fff",
-  border: "1px solid #E2E8F0",
-  borderRadius: 22,
-  padding: 22,
-  boxShadow: "0 16px 40px rgba(15,23,42,.06)",
-};
-
-const top: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "space-between",
-  gap: 12,
-  alignItems: "center",
-};
-
-const cardTitle: React.CSSProperties = {
-  color: "#0F172A",
-  fontSize: 22,
-  lineHeight: 1.2,
-  margin: "16px 0",
-};
-
-const button: React.CSSProperties = {
-  display: "inline-flex",
-  background: "#F97316",
-  color: "#fff",
-  borderRadius: 999,
-  padding: "10px 13px",
-  textDecoration: "none",
-  fontWeight: 900,
-  fontSize: 13,
-};

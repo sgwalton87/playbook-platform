@@ -1,5 +1,6 @@
 import {
   buildNotification,
+  notificationHrefForType,
   type PlaybookNotification,
 } from "@/lib/notifications-v2";
 
@@ -11,7 +12,17 @@ export type IntelligenceEventType =
   | "action.completed"
   | "network.blocker_detected"
   | "compass.recommendation_ready"
-  | "mail.reply_received";
+  | "mail.reply_received"
+  | "verification.requested"
+  | "verification.verified"
+  | "verification.rejected"
+  | "intervention.assigned"
+  | "intervention.completed"
+  | "opportunity.match_ready"
+  | "opportunity.recommended"
+  | "opportunity.deadline"
+  | "milestone.confirmed"
+  | "milestone.portfolio_ready";
 
 export type IntelligenceEvent = {
   type: IntelligenceEventType;
@@ -27,6 +38,20 @@ export function automateNotificationFromEvent(
   event: IntelligenceEvent
 ): PlaybookNotification | null {
   switch (event.type) {
+    case "verification.requested":
+    case "verification.verified":
+    case "verification.rejected":
+      return buildNotification({ userId: event.userId, scholarId: event.scholarId, type: "verification", title: event.title || "Verification update", body: event.detail || "Review the evidence verification state.", href: notificationHrefForType("verification"), priority: "high", sourceId: event.sourceId });
+    case "intervention.assigned":
+    case "intervention.completed":
+      return buildNotification({ userId: event.userId, scholarId: event.scholarId, type: "intervention", title: event.title || "Intervention update", body: event.detail || "Review the Scholar support action.", href: notificationHrefForType("intervention"), priority: "high", sourceId: event.sourceId });
+    case "opportunity.match_ready":
+    case "opportunity.recommended":
+    case "opportunity.deadline":
+      return buildNotification({ userId: event.userId, scholarId: event.scholarId, type: "opportunity", title: event.title || "Opportunity update", body: event.detail || "Review the governed opportunity context.", href: notificationHrefForType("opportunity"), priority: "medium", sourceId: event.sourceId });
+    case "milestone.confirmed":
+    case "milestone.portfolio_ready":
+      return buildNotification({ userId: event.userId, scholarId: event.scholarId, type: "milestone", title: event.title || "Milestone update", body: event.detail || "Review the confirmed Scholar milestone.", href: notificationHrefForType("milestone"), priority: "medium", sourceId: event.sourceId });
     case "message.received":
       return buildNotification({
         userId: event.userId,

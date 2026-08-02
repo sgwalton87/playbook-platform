@@ -5,6 +5,7 @@ import { Suspense, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import { supabase } from "@/lib/supabaseClient";
+import { reportClientFailure } from "@/lib/observability/client";
 import { USER_PATHWAYS } from "@/lib/auth";
 import { normalizeRole } from "@/lib/onboarding/pathwayMap";
 import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
@@ -93,6 +94,7 @@ function LoginContent() {
         });
 
         if (error) {
+          reportClientFailure("client_error", "RegistrationFailure");
           setStatus(error.message);
           return;
         }
@@ -112,6 +114,7 @@ function LoginContent() {
       });
 
       if (error) {
+        reportClientFailure("client_error", "LoginFailure");
         setStatus(error.message);
         return;
       }

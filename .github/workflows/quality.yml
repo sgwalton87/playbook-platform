@@ -1,0 +1,115 @@
+name: Quality and release gates
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI: "true"
+  PLAYBOOK_DEPLOYMENT_ENV: test
+  PLAYBOOK_APP_URL: https://ci.playbook.invalid
+  NEXT_PUBLIC_SUPABASE_URL: https://ci-project.supabase.co
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-anon-key-not-a-secret
+
+jobs:
+  application:
+    name: Lint, test, and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci --include=dev
+      - name: Validate environment contract
+        run: npm run env:check
+      - name: Validate RLS structural contract
+        run: npm run db:validate:rls
+      - name: Validate canonical platform registry
+        run: npm run platform:validate
+      - name: Validate observability contracts and evidence inventory
+        run: npm run observability:validate
+      - name: Lint
+        run: npm run lint
+      - name: Run unit and contract tests
+        run: npm test -- --reporter=default --reporter=junit --outputFile.junit=unit-results.xml
+      - name: Build production application
+        run: npm run build
+      - name: Archive test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-and-build-evidence
+          path: |
+            unit-results.xml
+            .next/build-manifest.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  browser-smoke:
+    name: Public browser smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci --include=dev
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run public browser and synthetic checks
+        run: npx playwright test tests/e2e/launch-smoke.spec.ts tests/e2e/observability-synthetic.spec.ts --project=chromium
+      - name: Archive browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-smoke-evidence
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: warn
+          retention-days: 30
+
+  migration-reset:
+    name: Supabase migration reset
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Start local Supabase and apply migrations
+        run: supabase start
+      - name: Reapply migrations from a clean database
+        run: supabase db reset --local
+      - name: Record migration status
+        run: supabase migration list --local | tee migration-status.txt
+      - name: Archive migration evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: migration-reset-evidence
+          path: migration-status.txt
+          if-no-files-found: warn
+          retention-days: 30

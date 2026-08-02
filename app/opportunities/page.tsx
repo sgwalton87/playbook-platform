@@ -1,11 +1,25 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import ForbiddenState from "@/components/auth/ForbiddenState";
+import TrustSummaryCard from "@/components/trust/TrustSummaryCard";
+import { resolveServerAuthorization } from "@/lib/authorization/server";
+import { loadLaunchDashboardSummary } from "@/lib/launch-readiness/server";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
-export default function OpportunitiesPage() {
-  return <main style={page}>
-    <header style={header}><p style={eyebrow}>Opportunity galaxy</p><h1 style={title}>Explore options without guessing.</h1><p style={lead}>Opportunity matches must identify their source, eligibility evidence, reasoning, confidence, and expiration before you choose to save or pursue them.</p></header>
-    <section style={panel} aria-labelledby="opportunity-state"><h2 id="opportunity-state">Your matches</h2><div role="status" style={empty}><strong>No evidence-backed matches are available.</strong><span>This is missing evidence, not zero potential. Add academic or achievement evidence to help Playbook evaluate governed sources.</span><div style={actions}><Link href="/academic-readiness" style={primary}>Review academic evidence</Link><Link href="/profile" style={secondary}>Review Scholar Record</Link></div></div></section>
-    <section style={panel} aria-labelledby="match-contract"><h2 id="match-contract">What every match will show</h2><ul style={list}><li>Source and last observed time</li><li>Eligibility evidence and unknowns</li><li>Match reasoning and confidence</li><li>Alternatives, deadline, and recovery path</li><li>Your confirmation before a consequential action</li></ul></section>
-    <aside style={boundary}><strong>Availability boundary:</strong> no opportunity is presented as eligible, saved, applied to, or completed without an authorized source and a confirmed human action.</aside>
+export default async function OpportunitiesPage() {
+  let authorization = await resolveServerAuthorization({ permission: "view_progress" });
+  if (!authorization.authorized && authorization.reason === "unauthenticated") redirect("/login");
+  if (!authorization.authorized) authorization = await resolveServerAuthorization({ permission: "view_verified_record" });
+  if (!authorization.authorized) return <ForbiddenState reason="Select an active Scholar relationship with opportunity or verified-record access." />;
+  const supabase = await createServerSupabaseClient();
+  const [{ data, error }, launch] = await Promise.all([
+    supabase.from("opportunity_matches").select("id,title,description,opportunity_type,readiness_score,reasons,next_steps,source_name,source_url,source_last_observed_at,expires_at,required_evidence,unknowns,confidence,role_context,status").eq("scholar_id", authorization.scholarId).eq("status", "recommended").or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`).order("readiness_score", { ascending: false }),
+    loadLaunchDashboardSummary(supabase, authorization.scholarId),
+  ]);
+  if (error) throw new Error("Authorized opportunity recommendations are unavailable.");
+  const matches = (data || []).filter((match) => match.source_name && match.source_last_observed_at);
+  return <main style={{ maxWidth: 1000, margin: "0 auto", padding: 36 }}><header><p>Opportunity recommendations</p><h1>Evidence-backed options, not guesses.</h1><p>Every recommendation exposes its source, observation time, evidence requirements, unknowns, confidence, and expiration.</p></header>
+    {launch.ok && <TrustSummaryCard summary={launch.summary.trust} title="Opportunity readiness trust" />}
+    {matches.length === 0 ? <section role="status"><h2>No governed matches are available</h2><p>This is missing or insufficiently sourced data, not zero potential.</p><Link href="/evidence">Strengthen evidence</Link></section> : <section aria-label="Opportunity matches" style={{ display: "grid", gap: 16, marginTop: 20 }}>{matches.map((match) => <article key={match.id} style={{ border: "1px solid #CBD5E1", borderRadius: 16, padding: 22 }}><p>{match.opportunity_type} · readiness {match.readiness_score}% · confidence {match.confidence ?? "not scored"}</p><h2>{match.title}</h2><p>{match.description}</p><dl><dt>Source</dt><dd>{match.source_name} · observed {new Date(match.source_last_observed_at).toLocaleDateString()}</dd><dt>Required evidence</dt><dd>{(match.required_evidence || []).join(", ") || "No requirements supplied"}</dd><dt>Unknowns</dt><dd>{(match.unknowns || []).join(", ") || "None recorded"}</dd><dt>Reasoning</dt><dd>{(match.reasons || []).join(" · ")}</dd></dl>{match.source_url && <a href={match.source_url} rel="noreferrer">Open authoritative source</a>}</article>)}</section>}
   </main>;
 }
-const page:React.CSSProperties={minHeight:"100vh",background:"#F8F7F4",padding:"clamp(22px,5vw,60px)",color:"#0F172A",fontFamily:"system-ui,sans-serif"}; const header:React.CSSProperties={maxWidth:960,margin:"0 auto 26px"}; const eyebrow:React.CSSProperties={color:"#C2410C",fontWeight:800,textTransform:"uppercase",letterSpacing:".15em",fontSize:11}; const title:React.CSSProperties={fontSize:"clamp(40px,6vw,68px)",lineHeight:1,margin:"12px 0"}; const lead:React.CSSProperties={color:"#475569",fontSize:17,lineHeight:1.65,maxWidth:760}; const panel:React.CSSProperties={maxWidth:960,margin:"18px auto",background:"#fff",border:"1px solid #E2E8F0",borderRadius:20,padding:24}; const empty:React.CSSProperties={display:"grid",gap:10,background:"#FFF7ED",border:"1px dashed #FDBA74",padding:22,borderRadius:14,color:"#475569"}; const actions:React.CSSProperties={display:"flex",gap:10,flexWrap:"wrap",marginTop:8}; const primary:React.CSSProperties={background:"#F97316",color:"#fff",textDecoration:"none",padding:"11px 14px",borderRadius:10,fontWeight:800}; const secondary:React.CSSProperties={border:"1px solid #CBD5E1",color:"#0F172A",textDecoration:"none",padding:"11px 14px",borderRadius:10,fontWeight:800}; const list:React.CSSProperties={lineHeight:1.9,color:"#475569"}; const boundary:React.CSSProperties={maxWidth:960,margin:"18px auto",padding:18,background:"#EFF6FF",borderLeft:"4px solid #2563EB",lineHeight:1.6};

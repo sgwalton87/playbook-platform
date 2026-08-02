@@ -324,3 +324,13 @@ Repository-grounded audit of role operating systems as of 2026-07-21.
 
 ### NOT VERIFIED (insufficient evidence)
 - Production deployment policies, complete RLS state, and real data lifecycle tests.
+
+## Remediation Update — August 1, 2026
+
+Canonical Role OS routes now wrap their page content in server authorization. The policy resolves the authenticated user and profile, normalizes the canonical role, and rejects direct URL access for mismatched roles independently of navigation visibility. Scholar-targeted evidence access additionally requires an active support relationship and the relevant `view_evidence` or `verify_evidence` permission. Authenticated denial renders a deliberate restricted state and API denial returns HTTP 403.
+
+The shared Evidence Center reads only RLS-authorized persisted evidence, exposes provenance and consent metadata, and deliberately models loading, empty, error, populated, and restricted states. Educator, mentor, and district-admin verification authority is an explicit relationship permission; decisions update verification state and append an audit record. These controls remediate the route-guard and evidence-review findings for the implemented routes, while deployment validation of the new migration remains part of release certification.
+
+## Trust Hardening Follow-up — August 1, 2026
+
+Supporter routes now use an explicit active-Scholar selection stored against an active relationship instead of choosing the first relationship returned by the database. Evidence review is backed by a persisted pending queue and a required-reason transactional decision. Scholar Record readiness uses the same server service as Portfolio and exposes read-only readiness to authorized supporters. Portfolio packets are generated server-side from an allowlist, and the four priority notification categories are materialized from persisted events. These capabilities remain in Testing until authenticated direct-route and RLS suites pass against the deployed migrations.

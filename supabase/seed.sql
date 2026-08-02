@@ -1,0 +1,3 @@
+-- Intentionally empty baseline seed.
+-- Deterministic authenticated role fixtures are created by isolated integration
+-- and browser-test setup rather than inserted into every local database reset.

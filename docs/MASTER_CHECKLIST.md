@@ -12,7 +12,7 @@ Owned by Playbook OS Engineering with Product, Design, Data, Security, and Opera
 
 # Last Updated
 
-July 23, 2026
+August 1, 2026
 
 # Related Documents
 
@@ -25,6 +25,7 @@ July 23, 2026
 - Architecture decisions: [DECISIONS.md](./DECISIONS.md)
 - Release process: [RELEASE_PROCESS.md](./RELEASE_PROCESS.md)
 - Auto sprint system: [auto_sprint.md](./auto_sprint.md)
+- Ordered platform build backlog: [PLATFORM_BUILD_BACKLOG.md](./PLATFORM_BUILD_BACKLOG.md)
 
 # North Star
 
@@ -109,23 +110,23 @@ Work is complete only when:
 - 🟨 Shared component inventory
 - 🟨 Button, card, form, badge, and navigation reuse review
 - 🟨 Responsive behavior review
-- ⬜ Accessibility acceptance examples
-- ⬜ Story-level component documentation
+- 🟦 Accessibility acceptance examples
+- 🟦 Story-level component documentation
 
 Notes: The Design System sprint exists to reduce duplicate UI, make Playbook OS feel unmistakably cohesive, and ensure every role surface follows [UI_DESIGN_SYSTEM.md](./UI_DESIGN_SYSTEM.md). Completion remains In Progress until shared components are reused across the highest-traffic Scholar, role, and admin surfaces.
 
 # Sprint 1.2 — Production RLS Validation
 
 **Status:** 🟥 needs fix
-**Completion:** 13%
+**Completion:** 38%
 
-- 🟨 RLS policy inventory
-- 🟨 Role relationship matrix review
-- ⬜ Scholar-owned data policy validation
-- ⬜ Support-role access validation
+- 🟦 RLS policy inventory
+- 🟦 Role relationship matrix review
+- 🟦 Scholar-owned data policy validation
+- 🟦 Support-role access validation
 - ⬜ Institution-scoped access validation
 - ⬜ Admin moderation access validation
-- ⬜ Negative permission tests
+- 🟦 Negative permission tests
 
 Notes: Production launch depends on proving that Supabase policies and application permission checks agree. This sprint remains Needs Fix until RLS validation evidence is attached to the relevant data domains in [DATABASE.md](./DATABASE.md).
 
@@ -153,12 +154,12 @@ Notes: Platform QA tracks role-by-role workflow readiness and must remain aligne
 **Completion:** 23%
 
 - 🟨 Production build validation
-- ⬜ Monitoring and error logging
-- ⬜ Analytics taxonomy
+- 🟦 Monitoring and error logging
+- 🟦 Analytics taxonomy
 - ⬜ Compliance review
 - ⬜ Soft launch checklist
 - ⬜ Beta feedback loop
-- ⬜ Rollback readiness
+- 🟦 Rollback readiness
 - ⬜ Final release notes
 
 Notes: Public Launch Readiness connects the live checklist to [RELEASE_PROCESS.md](./RELEASE_PROCESS.md). The platform should not launch publicly until monitoring, analytics, compliance, RLS, browser E2E, and soft-launch readiness are resolved.
@@ -210,7 +211,7 @@ Notes: Auth interfaces and Supabase flows are present, including login/signup, O
 - 🟨 Public Profile Generation
 - 🟥 Onboarding OS Redirects
 
-Notes: Onboarding is role-aware for the currently coded role set, but the checklist roles are broader than the implemented pathway map. Needs Fix: Onboarding OS Redirects should be reconciled against the onboarding audit scope before launch because not every registry role has a completed onboarding path.
+Notes: The canonical role registry, onboarding configurations, completion redirects, role selection, and shell navigation are reconciled by contract tests. Individual onboarding experiences remain below Complete until their persistence, permissions, build, and end-to-end release evidence is recorded.
 
 # Phase 3 — Public Profile
 
@@ -234,8 +235,10 @@ Notes: Onboarding is role-aware for the currently coded role set, but the checkl
 - 🟨 Public Timeline
 - 🟨 Privacy Settings
 - 🟨 Private Profile Editing
+- 🟦 Evidence Center and Provenance
+- 🟦 Portfolio Readiness, Controlled Sharing, and Export
 
-Notes: Profile surfaces and fields are present, but all items remain Partial because public/private profile permissions, persistence coverage, and end-to-end validation are not yet release-gate evidence.
+Notes: Evidence Center provenance, the persisted verification queue, shared Scholar Record/Portfolio readiness, and server-generated controlled packets are in Testing. They remain below Complete pending deployed migrations, authenticated RLS/direct-route evidence, and public-share security validation.
 
 # Phase 4 — Operating Systems
 
@@ -256,9 +259,9 @@ Notes: Profile surfaces and fields are present, but all items remain Partial bec
 - 🟨 Founder OS
 - 🟦 Athletes Abroad Hub
 - 🟦 Role-Aware Sidebar Navigation
-- 🟥 Role Permissions
+- 🟦 Role Permissions
 
-Notes: Role OS pages, a role selection surface, and role-aware navigation exist for many audiences. Needs Fix: Role Permissions must be reconciled with the role registry and Role OS audit before any OS item can move to Complete under the Definition of Done.
+Notes: Canonical Role OS routes enforce server-side role authorization. Scholar-targeted workflows require an explicit active-Scholar context backed by an active relationship and matching permission. Role Permissions remain in Testing pending deployed-migration, authenticated direct-access E2E, and real Supabase RLS evidence.
 
 # Phase 5 — Network
 
@@ -492,6 +495,8 @@ Notes: Unit and release-audit tests exist for selected platform areas, and produ
 
 # Final Release Checklist
 
+The canonical pre-beta dependency and evidence assessment is the [Public Beta Dependency Audit](./GOVERNANCE/AUDITS/PUBLIC_BETA_DEPENDENCY_AUDIT.md). Its PB-01 through PB-10 gates block even a private invited beta; PB-11 through PB-20 additionally block public beta certification.
+
 - ⬜ Desktop validation
 - ⬜ Tablet validation
 - ⬜ Mobile validation
@@ -501,13 +506,138 @@ Notes: Unit and release-audit tests exist for selected platform areas, and produ
 - ⬜ Production database validation
 - ⬜ Storage and backup validation
 - ⬜ Email and notification validation
-- ⬜ Monitoring and error logging
+- 🟦 Monitoring and error logging
 - ⬜ Soft launch
 - ⬜ Beta feedback resolved
 - 🟦 Final production build
 - ⬜ Public launch 🚀
 
+## Public Beta Readiness Gate — August 1, 2026
+
+**Status:** 🟥 blocked
+
+- ⬜ Enforceable protected-branch CI and archived gate evidence
+- ⬜ Production-like migration execution and complete RLS negative matrix
+- ⬜ Supported-role authentication, onboarding, and critical-journey browser matrix
+- ⬜ Server-enforced beta scope, cohort entitlement, and kill switch
+- ⬜ Deployed observability, alerting, support, incident, backup, restore, and rollback evidence
+- ⬜ Privacy, youth consent, retention, accessibility, performance, security, and public-beta approval
+
+Notes: Repository foundations and local tests do not constitute public-beta certification. The [Public Beta Dependency Audit](./GOVERNANCE/AUDITS/PUBLIC_BETA_DEPENDENCY_AUDIT.md) records the missing connections, owners, exit evidence, recommended beta boundary, and ordered next 20 missions.
+
+## Public Beta Foundation Increment — August 1, 2026
+
+**Status:** 🟦 testing
+
+- 🟦 Pull-request CI for clean install, environment/RLS contracts, lint, unit tests, build, browser smoke, migration reset, and evidence artifacts
+- 🟦 Checked-in non-secret environment schema with fail-closed beta deployment validation
+- 🟦 Explicit RLS policy disposition for every migration-created public table
+- 🟦 Opt-in server beta allowlist with persisted expiring cohort grants and denied-route UX
+- 🟦 CSP, transport, browser isolation, dependency-audit, signature, and dependency-update foundations
+
+Notes: Local lint, unit, structural RLS, type, and build evidence passes. This increment remains Testing until hosted CI executes, branch protection requires it, the Supabase reset and authenticated negative matrix pass, security headers are inspected on the deployed beta origin, and the cohort grant lifecycle is operated.
+
+
+# Launch Readiness Tranche — August 1, 2026
+
+**Status:** 🟦 testing
+
+- 🟦 Live Scholar next steps and role dashboard signals
+- 🟦 Explainable Trust Summary on dashboard, Scholar Record, and opportunities
+- 🟦 Consented institutional relationships and permission-safe support messages
+- 🟦 Governed role-action handoffs and evidence-backed opportunity presentation
+- 🟦 Safety moderation and immutable administrative role-change audit
+
+Notes: Application, domain, API, migration, RLS contract, and unit-test foundations are present. These capabilities remain in Testing—not Complete—until migration execution and authenticated RLS/direct-route scenarios pass against the designated Supabase test environment.
+
+## Launch Controls Increment — August 1, 2026
+
+**Status:** 🟦 testing
+
+- 🟦 Shared explicit workflow states and accessible component reference page
+- 🟦 Governed launch analytics taxonomy
+- 🟦 Fail-closed ten-gate release readiness evaluator
+- 🟦 Deployment readiness endpoint with non-secret configuration reporting
+- 🟦 Monitoring, privacy-review, and rollback evidence contracts
+
+Notes: These are implementation foundations, not release certification. Browser accessibility evidence, external monitoring integration, privacy approval, and rehearsed rollback evidence remain required before completion. Governed analytics now has an explicit grant/withdrawal surface, allowlisted event boundary, consent-enforcing persistence, and a 13-month retention contract; production data-governance approval and retention-job operation remain outstanding.
+
+## Consequence API Hardening Increment — August 1, 2026
+
+**Status:** 🟦 testing
+
+- 🟦 Twenty service-role/client-identity bypasses replaced with authenticated RLS boundaries
+- 🟦 Active relationships require both canonical role capability and persisted Scholar permission grants
+- 🟦 Reward emission restricted to administrators and persisted atomically
+- 🟦 Store redemption uses server pricing, serialized balance evaluation, and atomic debit
+
+Notes: Contract and unit evidence is present. The sprint remains Testing until migration execution and authenticated negative tests pass against the designated Supabase environment. Institution and moderation integration evidence remains outstanding.
+
+## Dynamic Ecosystem Wiring Increment — August 1, 2026
+
+**Status:** 🟦 testing
+
+- 🟦 Action Routing loads persisted handoffs and applies assignee-authorized transitions
+- 🟦 Application Workspaces load active-Scholar data and support Scholar-owned creation
+- 🟦 Transcript parsing binds writes to authenticated ownership and bounded input
+- 🟦 Inbound support mail is fail-closed, deduplicated, relationship-bound, and atomic
+
+Notes: Unit and contract evidence passes. These workflows remain Testing until the new migrations, authenticated browser journeys, webhook replay, and RLS negatives execute in the designated integration environment.
+
+## Athlete Network and NIL Foundation Increment — August 1, 2026
+
+**Status:** 🟦 testing
+
+- 🟦 Live Scholar-Athlete OS with profile readiness, recruiting, NIL identity, opportunity, and compliance-submission workflows
+- 🟦 Athlete identity expansion across level, sports, teams, leagues, seasons, history, awards, leadership, measurements, visibility, provenance, and verification state
+- 🟦 Atomic idempotent recruiting/NIL commands, activity history, events, guarded lifecycle transitions, and immutable compliance audit
+- 🟦 Explicit NIL marketplace consent, restricted brand projection, and guardian-consent safeguard for minor discovery
+- 🟦 Administrator NIL compliance review queue with required reason and immutable audit
+- 🟨 Brand discovery/proposal UI, deliverable/payment evidence, coach/institution relationships, and full Athlete Network graph
+
+Notes: Domain, application, API, migration, RLS, responsive UI, and unit evidence is present. The increment remains Testing until migration 009 runs against the designated Supabase environment and cross-role RLS, authenticated browser, accessibility, privacy, guardian-consent, compliance-review, monitoring, and rollback evidence passes.
+
+## Governed API and Communication Increment — August 1, 2026
+
+**Status:** 🟦 testing
+
+- 🟦 Shared authenticated mutation boundary with origin, byte-size, JSON, quota, idempotency, and safe-error controls
+- 🟦 Persistent serialized API quota contract with deny-direct RLS
+- 🟦 Authenticated and bounded AI guidance with fixed model parameters, timeout, and human authority
+- 🟦 Explicit, versioned, withdrawable AI-processing consent independent of core workflow access
+- 🟦 Privacy-minimized AI provider/model/policy provenance using content hashes rather than prompt text
+- 🟦 Server-derived administrative verification delivery without client-forged identity or development recipients
+- 🟦 Active-relationship guardian email delivery with replay-safe privacy-minimized audit
+- 🟨 Provider webhook, bounce/complaint, retry/dead-letter worker, template governance, and deployed deliverability monitoring
+
+Notes: Local contract evidence does not certify communications operations. Migration 010, provider-domain verification, webhook replay, dead-letter recovery, cross-user relationship negatives, and production alerting remain required.
 
 # Progress Tracking
+
+## Structural Infrastructure Registry Increment — August 1, 2026
+
+**Status:** 🟦 testing
+
+- 🟦 Canonical repository-derived platform registry with milestone-authority binding
+- 🟦 Inventory contracts for 100 routes, repository-discovered APIs, core data entities, ten roles, ten Role Operating Systems, seven engines, and production controls
+- 🟦 Explicit view/edit/approve/verify/administer data access contracts
+- 🟦 Deterministic maturity, blocker, and recommended-next-mission assessment
+- 🟦 CI registry validation and canonical data, authorization, Role OS, and recovery architecture
+- 🟥 Production observability operation, recovery rehearsal, administrator provisioning, counselor and financial-advisor role separation, and governed Scholar loop certification
+
+Notes: The registry validator and unit contracts pass locally. This increment remains Testing because no resources claim independent implementation certification and the generated assessment correctly reports production blockers. Hosted CI, live database, recovery, monitoring, and cross-role evidence remain required.
+
+## Observability Implementation Increment — August 1, 2026
+
+**Status:** 🟦 testing
+
+- 🟦 Privacy-safe structured JSON logging and deterministic redaction contract
+- 🟦 Edge-to-application request and correlation identifiers
+- 🟦 Server render/route errors, client exceptions, API authentication/quota, selected RPC, AI, communication, and onboarding telemetry
+- 🟦 Liveness, readiness, protected per-instance metric snapshot, alert definitions, and synthetic journey contract
+- 🟦 Operational ownership, validation command, and retained local evidence package
+- 🟥 Deployed collector and durable metric/trace backend, hosted dashboards, bound alert rules, test-alert receipts, authenticated synthetic execution, named on-call acknowledgment, and privacy/security approval
+
+Notes: `CONTROL:OBSERVABILITY` advances from Blocked to Partial. Local contracts and a public synthetic definition do not certify deployed monitoring or production response. The public browser execution was blocked by unavailable Playwright installation in this environment, and the authenticated journey additionally requires seeded credentials. Those and the external operational artifacts remain mandatory before completion.
 
 Progress is updated when implementation evidence changes, not merely when a feature exists visually. Completion percentages, status indicators, engineering notes, role-by-role QA, and launch checklist items must remain synchronized with code, migrations, tests, and release evidence.

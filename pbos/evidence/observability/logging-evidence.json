@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "1.0",
+  "timestamp": "2026-08-01T00:00:00.000Z",
+  "environment": "test",
+  "applicationVersion": "evidence-fixture",
+  "severity": "error",
+  "service": "playbook-api",
+  "component": "onboarding",
+  "route": "/api/onboarding/complete",
+  "feature": "onboarding",
+  "operation": "complete_onboarding",
+  "requestId": "request-evidence-001",
+  "correlationId": "correlation-evidence-001",
+  "actorType": "scholar",
+  "authenticated": true,
+  "outcome": "failure",
+  "durationMs": 125.4,
+  "errorClassification": "OnboardingPersistenceFailed",
+  "dependency": "supabase-rpc",
+  "retryCount": 0,
+  "metadata": { "code": "transaction_rejected", "privateMessage": "[REDACTED]" },
+  "evidence_note": "Representative schema fixture validated by tests; not a production event."
+}

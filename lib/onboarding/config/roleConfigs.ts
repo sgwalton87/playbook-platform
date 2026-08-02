@@ -174,6 +174,34 @@ const EDUCATOR_CONTEXT: OnboardingStep = {
   ],
 };
 
+const EMPLOYER_CONTEXT: OnboardingStep = {
+  id: "employer-context",
+  phase: "Employer Phase 1 · Opportunity Profile",
+  title: "Set up your workforce partner profile.",
+  body: "Describe the organization and the evidence-backed opportunities you can offer scholars.",
+  fields: [
+    { key: "organization_name", label: "Organization name", placeholder: "Company or workforce organization" },
+    { key: "title", label: "Your role/title", placeholder: "Hiring manager, program lead, recruiter..." },
+    { key: "opportunity_types", label: "Opportunity types", type: "multi-select", options: ["Internships", "Jobs", "Job shadowing", "Apprenticeships", "Career talks", "Work-based learning"] },
+    { key: "age_groups_supported", label: "Scholar groups served", type: "multi-select", options: ["High school", "College", "Transition-age youth", "Young adults"] },
+    { key: "verification_contact", label: "Organization verification contact", placeholder: "Name and work email" },
+  ],
+};
+
+const DISTRICT_CONTEXT: OnboardingStep = {
+  id: "district-context",
+  phase: "District Phase 1 · Institution Profile",
+  title: "Set up your institutional access.",
+  body: "Identify your institution and support scope before requesting access to Scholar information.",
+  fields: [
+    { key: "organization_name", label: "School or district name", placeholder: "Institution name" },
+    { key: "school_district", label: "District", type: "district", placeholder: "Start typing district..." },
+    { key: "title", label: "Your role/title", placeholder: "Principal, counselor, district administrator..." },
+    { key: "official_edu_email", label: "Official institution email", placeholder: "name@school.edu or district email" },
+    { key: "support_scope", label: "Support scope", type: "multi-select", options: ["Academic readiness", "Interventions", "College access", "Career pathways", "Evidence verification", "Program reporting"] },
+  ],
+};
+
 
 const HIGH_SCHOOL_COACH_CONTEXT: OnboardingStep = {
   id: "high-school-coach-context",
@@ -555,6 +583,7 @@ const NETWORK: OnboardingStep = {
   title: "Invite your support team.",
   body: "Invite family, mentors, coaches, counselors, partners, or trusted adults.",
   fields: [
+    { key: "invite_supporter_relationship", label: "Supporter relationship", type: "select", options: ["Parent / Guardian", "Educator", "Mentor"] },
     { key: "invite_supporters", label: "Supporter emails", type: "invite-list", placeholder: "supporter@example.com" },
   ],
 };
@@ -655,6 +684,8 @@ export const ROLE_ONBOARDING: Record<string, OnboardingStep[]> = {
     NETWORK,
     USER_AGREEMENT,
   ],
+  employer: [IDENTITY("Employer / Workforce Partner"), EMPLOYER_CONTEXT, NETWORK, USER_AGREEMENT],
+  district: [IDENTITY("District / School Administrator"), DISTRICT_CONTEXT, NETWORK, USER_AGREEMENT],
   other: [IDENTITY("Community Partner"), NETWORK, USER_AGREEMENT],
 };
 

@@ -7,7 +7,7 @@ This document explains the Playbook OS platform architecture for engineers, revi
 Owned by Playbook OS Engineering. Security-sensitive architecture changes require review from the platform owner and must be recorded in [DECISIONS.md](./DECISIONS.md).
 
 ## Last Updated
-July 28, 2026
+August 1, 2026
 
 ## Related Documents
 - Constitution: [../CODEX.md](../CODEX.md)
@@ -278,3 +278,67 @@ Deployments should follow [RELEASE_PROCESS.md](./RELEASE_PROCESS.md). Production
 
 ## Architecture Change Control
 Material architecture decisions must be recorded in [DECISIONS.md](./DECISIONS.md). Examples include changing auth providers, introducing new global state, adding third-party data processors, changing role boundaries, or adopting a new deployment architecture.
+
+## Canonical Route and Relationship Authorization
+
+Role OS and Scholar-owned server surfaces use `lib/authorization/routeAuthorization.ts` as the reusable policy decision point and `lib/authorization/server.ts` as the authenticated Supabase resolver. A decision resolves the authenticated identity, normalizes the profile through the canonical role registry, and—when another Scholar is targeted—requires an active `support_relationships` row with the requested permission. Direct URL access is therefore evaluated independently of shell navigation. Unauthenticated page requests redirect to login; authenticated but unauthorized requests render a deliberate restricted state; APIs return HTTP 403.
+
+The authorized evidence workflow uses the same `view_evidence` and `verify_evidence` permission vocabulary in application decisions and RLS. Scholars retain ownership; supporters receive only relationship- and consent-scoped access. Verification decisions are consequential writes and create immutable audit rows.
+
+Onboarding completion is a server-owned lifecycle. The `complete_onboarding` database function idempotently resolves the role profile and Playbook Record, activates accepted invitation relationships, and only then marks the profile complete. The route returns a discriminated success/error response and records failed attempts without converting partial work into a completed profile.
+
+## Explicit Scholar Context and Trusted Workflow Handoffs
+
+Supporters never inherit an arbitrary Scholar context. `active_scholar_contexts` stores an explicit selection backed by an active `support_relationships` row; the shell exposes the selector and server authorization resolves only that persisted context or an explicitly requested, authorized Scholar identifier. Removed relationships fail closed even when a stale context row remains.
+
+Invitation acceptance is a single database operation: it locks the invitation, validates authenticated email ownership and lifecycle state, upserts the permission snapshot into the relationship, updates invitation status, and emits the lifecycle event in one transaction. Evidence verification follows the same approach: Scholars create an atomic queue request that establishes relationship-scoped consent, reviewers act on a pending request with a required reason, and the function updates evidence, request state, audit history, and the event stream together.
+
+Portfolio packets are assembled only on the server from the canonical allowlist (`identity`, `readiness`, and `verified_evidence`). Verified evidence must also be public before it can enter an external packet. Client requests select allowlisted sections and target purpose; they cannot supply packet contents. The same readiness service composes both the Scholar Record and Portfolio surfaces.
+
+`playbook_events` is the notification source of truth for verification, intervention, opportunity, and milestone categories. A database trigger resolves permission-appropriate recipients and inserts deduplicated actionable notifications with governed internal destinations.
+
+
+## Launch Readiness Workflow Boundaries (August 1, 2026)
+
+Launch-facing dashboard data is assembled at the server boundary from authenticated Scholar context. Trust summaries are deterministic explanations of persisted evidence, verification, and activity signals; they are not predictive rankings. Institutional consent, support messages, role-action handoffs, moderation decisions, and role changes cross purpose-built database functions rather than accepting privileged client writes. Opportunity recommendations must expose provenance, observation time, expiration, evidence requirements, unknowns, and role context before presentation.
+
+## Analytics Consent Boundary (August 1, 2026)
+
+Launch analytics use a registry-first contract: the application validates the event name, retains only declared scalar dimensions, and submits the result to a consent-enforcing database function. Free-form profile, message, evidence, and portfolio content is not accepted as analytics metadata. The Settings surface is the explicit grant/withdrawal interface; product workflows remain available when consent is denied or withdrawn.
+
+
+## Consequence-Bearing API Boundary Audit (August 1, 2026)
+
+Twenty high-risk handler methods no longer instantiate service-role clients. Reads and writes now execute with the authenticated server session so RLS remains authoritative; client-supplied user identifiers cannot establish ownership. Cross-Scholar routes resolve active context and persisted grants. Administrative reward emission and balance-sensitive redemption use atomic database functions. Service-role clients remain limited to explicitly documented internal boundaries and must never authenticate a browser request.
+
+
+## Dynamic Ecosystem Wiring — Action, Application, Transcript, and Mail (August 1, 2026)
+
+Action Routing reads persisted `role_action_handoffs` and exposes only assignee-authorized lifecycle transitions. Application Workspaces resolve the active Scholar on the server, permit Scholar-owned creation, and deliberately expose loading, empty, restricted, error, and success states. Transcript parsing binds A–G writes to the authenticated Scholar, constrains media and payload size, and treats model output as untrusted bounded input. Inbound mail rejects missing webhook configuration and delegates replay-safe relationship-bound persistence to one atomic service-role-only function.
+### Public Beta Exposure Boundary
+
+Beta exposure is an opt-in server boundary, not a navigation convention. `proxy.ts` consults the canonical route allowlist in `lib/beta/exposure.ts`; routes outside the beta contract return a non-disclosing API 404 or the accessible unavailable experience. Governed routes can require a live, unexpired `beta_access_grants` row. This boundary limits surface exposure but never replaces route authorization or RLS.
+
+`PLAYBOOK_BETA_EXPOSURE_MODE=allowlist` and `PLAYBOOK_BETA_REQUIRE_ACCESS_GRANT=true` are mandatory in a validated beta environment. Public authentication, invitation, onboarding, controlled portfolio-share, and readiness entry points remain reachable while their own server boundaries continue to enforce identity and data access.
+
+### Environment Contract
+
+`.env.example` is the non-secret deployment inventory. `lib/config/environment.ts` owns typed validation and `npm run env:check` fails closed when Supabase or beta-boundary variables are missing, malformed, insecure, or placeholders. Server secrets must remain unprefixed; `NEXT_PUBLIC_*` values are treated as build-time public configuration.
+
+## Athlete Network and NIL Application Boundary (August 1, 2026)
+
+Scholar-Athlete OS is a first-class, server-rendered operating surface rather than a Scholar dashboard fixture. `lib/scholar-athlete/server.ts` maps owner-authorized profile, recruiting, NIL identity, NIL opportunity, and activity records into an explicit projection. Client commands cross bounded APIs that independently require the canonical Scholar-Athlete role; durable ownership remains enforced by RLS.
+
+Athletic self-report never changes verification state. Recruiting target creation atomically records relationship-direction activity and an event without implying coach interest, admission, an offer, or commitment. NIL lead creation and lifecycle commands are idempotent and audited. Direct changes to stage, agreement, disclosure, compliance, payment, and review state are trigger-blocked; signed and active stages require a signed agreement reference, submitted disclosure, and an authorized human compliance approval.
+
+Brand discovery does not expose athlete tables. Registered active brand partners call an allowlisted security-definer projection containing only athlete-approved identity and brand fields. Marketplace visibility requires explicit athlete consent; youth, middle-school, high-school, and international athlete discovery additionally remains excluded until verified guardian consent exists. Audience demographics and private commercial records are never returned by discovery.
+
+## Shared High-Risk API Boundary (August 1, 2026)
+
+Authenticated mutations that invoke external providers use `lib/api-security/server.ts` for same-origin enforcement, byte-accurate JSON limits, authenticated identity, persistent quotas, idempotency, and sanitized errors. AI guidance additionally requires the current explicit processing consent, fixes the model configuration server-side, applies a provider timeout, returns no raw provider payload, and preserves human review. Privacy-minimized provenance stores prompt and output hashes rather than their content. Consent can be withdrawn without disabling core workflows. Administrative and guardian email identities and recipients come from server configuration or active authorized relationships; delivery begins and finishes through an idempotent database audit rather than reporting synthetic success.
+
+## Operational Telemetry Boundary (August 1, 2026)
+
+`lib/observability` is the canonical application telemetry boundary. The edge proxy issues privacy-neutral request and correlation identifiers, Next.js instrumentation captures server and client runtime failures, and shared API/provider boundaries emit redacted structured JSON with release, environment, operation, outcome, dependency, and duration fields. Liveness, readiness, and protected per-instance metric snapshots support deployment probes; the governed alert and synthetic contracts bind signals to owners and runbooks.
+
+Repository telemetry remains a foundation rather than deployed certification. Production requires a durable collector and metric/trace backend, approved retention and access controls, hosted dashboards, bound alert queries, test-alert receipts, authenticated synthetic traces, and acknowledged on-call ownership. See [the canonical observability architecture](./OPERATIONS/PBOS_OBSERVABILITY_ARCHITECTURE_001.md).

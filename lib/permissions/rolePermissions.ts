@@ -1,6 +1,7 @@
 export type Permission =
   | "view_progress"
   | "view_verified_record"
+  | "view_evidence"
   | "view_deadlines"
   | "support_tasks"
   | "verify_evidence"
@@ -21,11 +22,11 @@ export type RelationshipKind =
 
 export function getPermissionsForRelationship(kind: RelationshipKind): Permission[] {
   const map: Record<RelationshipKind, Permission[]> = {
-    scholar: ["view_progress", "view_verified_record", "view_deadlines", "support_tasks"],
-    parent_guardian: ["view_progress", "view_deadlines", "support_tasks"],
-    educator: ["view_progress", "verify_evidence", "recommend_actions", "view_cohort"],
-    mentor: ["view_progress", "recommend_actions", "support_tasks"],
-    district_admin: ["view_cohort", "view_equity_metrics"],
+    scholar: ["view_progress", "view_verified_record", "view_evidence", "view_deadlines", "support_tasks"],
+    parent_guardian: ["view_progress", "view_evidence", "view_deadlines", "support_tasks"],
+    educator: ["view_progress", "view_evidence", "verify_evidence", "recommend_actions", "view_cohort"],
+    mentor: ["view_progress", "view_evidence", "verify_evidence", "recommend_actions", "support_tasks"],
+    district_admin: ["view_evidence", "verify_evidence", "view_cohort", "view_equity_metrics"],
     university_partner: ["view_verified_record", "recommend_actions"],
     employer_partner: ["view_verified_record", "create_opportunities", "review_candidates"],
   };

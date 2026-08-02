@@ -7,6 +7,8 @@ import {
   StyleSheet,
   renderToBuffer,
 } from "@react-pdf/renderer";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { buildServerPortfolioPacket, normalizePacketSections } from "@/lib/portfolio/server";
 
 const styles = StyleSheet.create({
   page: {
@@ -39,25 +41,18 @@ const styles = StyleSheet.create({
 });
 
 type PortfolioPdfRequestBody = {
-  scholarName?: string;
   targetUse?: string;
-  resume?: unknown;
-  bragSheet?: unknown;
-  recommendationLetter?: string;
+  sections?: unknown;
 };
 
 function PortfolioDocument({
   scholarName,
   targetUse,
-  resume,
-  bragSheet,
-  recommendationLetter,
+  packet,
 }: {
   scholarName: string;
   targetUse: string;
-  resume: unknown;
-  bragSheet: unknown;
-  recommendationLetter?: string;
+  packet: Record<string, unknown>;
 }) {
   return (
     <Document>
@@ -66,38 +61,30 @@ function PortfolioDocument({
         <Text style={styles.subtitle}>Target use: {targetUse}</Text>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Resume</Text>
-          <Text style={styles.body}>{JSON.stringify(resume, null, 2)}</Text>
+          <Text style={styles.sectionTitle}>Allowlisted Portfolio Data</Text>
+          <Text style={styles.body}>{JSON.stringify(packet, null, 2)}</Text>
         </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Brag Sheet</Text>
-          <Text style={styles.body}>{JSON.stringify(bragSheet, null, 2)}</Text>
-        </View>
-
-        {recommendationLetter && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Recommendation Letter</Text>
-            <Text style={styles.body}>{recommendationLetter}</Text>
-          </View>
-        )}
       </Page>
     </Document>
   );
 }
 
 export async function POST(req: NextRequest) {
+  const supabase = await createServerSupabaseClient();
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) return Response.json({ error: "Sign in required." }, { status: 401 });
   const body = (await req.json()) as PortfolioPdfRequestBody;
-
-  const scholarName = body.scholarName || "Scholar";
+  const sections = normalizePacketSections(body.sections);
+  if (sections.length === 0) return Response.json({ error: "At least one allowlisted section is required." }, { status: 422 });
+  const built = await buildServerPortfolioPacket({ supabase, scholarId: auth.user.id, targetUse: body.targetUse || "application", sections });
+  if (!built.ok) return Response.json({ error: built.error }, { status: 409 });
+  const scholarName = built.scholarName;
 
   const buffer = await renderToBuffer(
     <PortfolioDocument
       scholarName={scholarName}
       targetUse={body.targetUse || "application"}
-      resume={body.resume || {}}
-      bragSheet={body.bragSheet || {}}
-      recommendationLetter={body.recommendationLetter}
+      packet={built.packet}
     />
   );
 

@@ -5,7 +5,11 @@ export type NotificationType =
   | "compass_alert"
   | "mail_reply"
   | "network_blocker"
-  | "recommendation";
+  | "recommendation"
+  | "verification"
+  | "intervention"
+  | "opportunity"
+  | "milestone";
 
 export type NotificationPriority = "low" | "medium" | "high" | "urgent";
 
@@ -22,6 +26,16 @@ export type PlaybookNotification = {
   createdAt: string;
   sourceId?: string | null;
 };
+
+export function notificationHrefForType(type: NotificationType): string {
+  const governedHrefs: Partial<Record<NotificationType, string>> = {
+    verification: "/evidence",
+    intervention: "/action-routing",
+    opportunity: "/opportunities",
+    milestone: "/portfolio",
+  };
+  return governedHrefs[type] || "/notifications";
+}
 
 export function buildNotification(input: {
   id?: string;

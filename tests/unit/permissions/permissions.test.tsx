@@ -14,6 +14,8 @@ describe("Role OS Permissions", () => {
   it("checks permission access", () => {
     expect(canRelationship("parent_guardian", "verify_evidence")).toBe(false);
     expect(canRelationship("mentor", "support_tasks")).toBe(true);
+    expect(canRelationship("mentor", "verify_evidence")).toBe(true);
+    expect(canRelationship("district_admin", "verify_evidence")).toBe(true);
   });
 
   it("returns relationship graph", () => {

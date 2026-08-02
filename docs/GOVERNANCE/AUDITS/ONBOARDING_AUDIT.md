@@ -336,3 +336,13 @@ Repository-grounded audit of onboarding by role as of 2026-07-21.
 
 ### NOT VERIFIED (insufficient evidence)
 - Complete Supabase trigger/function behavior, if any exists outside migrations inspected.
+
+## Remediation Update — August 1, 2026
+
+The previously identified unified completion gap is remediated by the authenticated `/api/onboarding/complete` boundary and transactional `complete_onboarding` database function. Completion now resolves a canonical role profile, creates or reuses the Playbook Record, activates relationships from accepted invitations, and marks the profile complete only after those writes succeed. The operation is idempotent through unique profile/role, active-record, and invitation constraints. A predictable discriminated response separates authentication, validation, and persistence failures, and failed persistence attempts are recorded without setting completion state.
+
+Role-specific downstream products beyond the generic canonical `role_profiles` record remain future domain expansions; this remediation does not claim that every institution-specific workflow or external verification integration is production-certified.
+
+## Trust Hardening Follow-up — August 1, 2026
+
+Invitation acceptance now executes through the transactional `accept_support_invitation` database function. Invitation locking, authenticated email matching, relationship upsert with the invitation permission snapshot, invitation state transition, and lifecycle event creation succeed or roll back together. Repeat acceptance is idempotent, while attempts to reverse an already resolved invitation fail closed. Production completion remains contingent on applying the migration and passing the authenticated Supabase integration gate.
