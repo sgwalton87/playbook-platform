@@ -711,6 +711,19 @@ export async function dispatchKernelCommand(
             timestamp: recoveredEvidence.record.completed_at,
           });
         }
+      } else {
+        const campaign = loadExecutionCampaign(rootDir);
+        if (campaign?.packages.some(({ milestone_id }) =>
+          milestone_id === orchestration.executionPackage!.milestone_id
+        )) {
+          updateCampaignProgress({
+            rootDir,
+            milestoneId: orchestration.executionPackage.milestone_id,
+            status: "FAILED",
+            authorizationId: authorization.authorization_id,
+            timestamp: recoveredEvidence.record.completed_at,
+          });
+        }
       }
       return {
         command,
@@ -792,6 +805,19 @@ export async function dispatchKernelCommand(
           rootDir,
           milestoneId: orchestration.executionPackage.milestone_id,
           status: "COMPLETE",
+          authorizationId: authorization.authorization_id,
+          timestamp: new Date().toISOString(),
+        });
+      }
+    } else {
+      const campaign = loadExecutionCampaign(rootDir);
+      if (campaign?.packages.some(({ milestone_id }) =>
+        milestone_id === orchestration.executionPackage!.milestone_id
+      )) {
+        updateCampaignProgress({
+          rootDir,
+          milestoneId: orchestration.executionPackage.milestone_id,
+          status: "FAILED",
           authorizationId: authorization.authorization_id,
           timestamp: new Date().toISOString(),
         });
@@ -1475,7 +1501,7 @@ export async function dispatchKernelCommand(
           agents: registry,
           created_at: timestamp,
         });
-      } catch (error) {
+      } catch {
         identityResolution = null;
       }
     }

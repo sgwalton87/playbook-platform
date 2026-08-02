@@ -186,9 +186,7 @@ export function updateCampaignProgress(input: {
   if (campaign) {
     const status = updated.entries.every((entry) => entry.status === "COMPLETE")
       ? "COMPLETE" as const
-      : input.status === "FAILED"
-        ? "PAUSED" as const
-        : campaign.status;
+      : campaign.status;
     if (status !== campaign.status) {
       persistExecutionCampaign(input.rootDir, { ...campaign, status, digest: "" });
     }

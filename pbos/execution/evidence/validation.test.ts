@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
@@ -212,6 +212,49 @@ describe("post-execution constitutional validation", () => {
       provider_validation_results: [],
     });
     expect(result[0]).toEqual(expect.objectContaining({ status: "FAIL" }));
+  });
+
+  it("validates an explicit experience certification decision and fails closed otherwise", () => {
+    const value = fixture();
+    const manifestPath = path.join(value.rootDir, "pbos/manifests/playbook-master-manifest.yaml");
+    const manifest = JSON.parse(readFileSync(manifestPath, "utf8")) as {
+      milestones: Array<Record<string, unknown>>;
+    };
+    const milestone = manifest.milestones.find(({ id }) => id === "MILESTONE-001")!;
+    milestone.validation_requirements = ["experience-certification"];
+    milestone.outputs = ["docs/certification.md"];
+    milestone.mission_control = undefined;
+    milestone.required_artifacts = ["docs/strategy.md", "docs/experience.md"];
+    writeFileSync(manifestPath, JSON.stringify(manifest));
+    writeFileSync(
+      path.join(value.rootDir, "docs/certification.md"),
+      "## Certification Decision\n\n**Decision: CERTIFIED**\n"
+    );
+    const artifact = {
+      path: "docs/certification.md",
+      digest: artifactDigest(Buffer.from("## Certification Decision\n\n**Decision: CERTIFIED**\n")),
+    };
+    const passing = evaluateExecutionValidations({
+      ...value,
+      task: { ...value.task, validation_requirements: ["experience-certification"] },
+      artifacts: [artifact],
+      provider_validation_results: [],
+    });
+    expect(passing[0]).toEqual(expect.objectContaining({ status: "PASS" }));
+
+    writeFileSync(
+      path.join(value.rootDir, "docs/certification.md"),
+      "## Certification Decision\n\n**Decision: NOT CERTIFIED**\n"
+    );
+    const failing = evaluateExecutionValidations({
+      ...value,
+      task: { ...value.task, validation_requirements: ["experience-certification"] },
+      artifacts: [artifact],
+      provider_validation_results: [],
+    });
+    expect(failing[0]?.findings).toContain(
+      "Experience certification decision is not CERTIFIED: docs/certification.md."
+    );
   });
 
   it("safely revalidates a previously successful execution without redispatch", () => {

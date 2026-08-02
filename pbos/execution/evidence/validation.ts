@@ -180,6 +180,45 @@ export function evaluateExecutionValidations(input: {
         artifacts: input.artifacts,
       });
     }
+    if (requirement === "experience-certification") {
+      const declaredOutputs = milestone?.outputs ?? [];
+      const certificationArtifacts = input.artifacts.filter(({ path: artifact }) =>
+        declaredOutputs.includes(artifact)
+      );
+      const certificationDecisions = certificationArtifacts.map(({ path: artifact }) => {
+        const absolute = path.join(input.rootDir, artifact);
+        const content = existsSync(absolute) ? readFileSync(absolute, "utf8") : "";
+        return {
+          artifact,
+          exists: Boolean(content.trim()),
+          certified: /(?:\*\*Decision:\s*CERTIFIED\*\*|Certification Decision:\s*CERTIFIED)/i.test(content) &&
+            !/(?:NOT CERTIFIED|Certification Decision:\s*(?:FAIL|BLOCKED))/i.test(content),
+          digest: content ? artifactDigest(Buffer.from(content)) : null,
+        };
+      });
+      const requiredArtifacts = milestone?.required_artifacts ?? [];
+      const findings = [
+        ...(!milestone ? ["Manifest milestone is missing."] : []),
+        ...(certificationArtifacts.length === 0
+          ? ["No declared certification artifact was produced."] : []),
+        ...certificationDecisions.flatMap((decision) => [
+          ...(!decision.exists ? [`Certification artifact is missing or empty: ${decision.artifact}.`] : []),
+          ...(decision.exists && !decision.certified
+            ? [`Experience certification decision is not CERTIFIED: ${decision.artifact}.`] : []),
+        ]),
+        ...requiredArtifacts.flatMap((artifact) => {
+          const absolute = path.join(input.rootDir, artifact);
+          return !existsSync(absolute) || !readFileSync(absolute, "utf8").trim()
+            ? [`Required certification evidence is missing or empty: ${artifact}.`]
+            : [];
+        }),
+      ];
+      return result(requirement, findings, {
+        milestone: milestone?.id ?? null,
+        required_artifacts: requiredArtifacts,
+        decisions: certificationDecisions,
+      });
+    }
     return result(
       requirement,
       [`No canonical execution validator is registered for ${requirement}.`],

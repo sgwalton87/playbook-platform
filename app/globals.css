@@ -37,3 +37,54 @@ input { border: 1px solid #ddd; border-radius: 6px; }
 a { color: inherit; }
 button, input, textarea, select { font: inherit; }
 img, svg, video { max-width: 100%; }
+.scholar-remediation-page {
+  min-height: 100vh;
+  padding: clamp(1.25rem, 5vw, 3.75rem);
+  color: #0f172a;
+  background: #f8f7f4;
+}
+
+:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 3px;
+}
+
+.scholar-remediation-hero,
+.scholar-remediation-panel,
+.scholar-remediation-boundary {
+  width: min(100%, 61.25rem);
+  margin-inline: auto;
+}
+
+.scholar-remediation-hero {
+  padding: clamp(1.5rem, 5vw, 3.5rem);
+  border-radius: 1.5rem;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+}
+
+.scholar-remediation-hero--dark { color: #fff; background: #0f172a; }
+.scholar-remediation-eyebrow { color: #c2410c; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+.scholar-remediation-hero h1 { max-width: 48rem; font-size: clamp(2.25rem, 6vw, 4rem); line-height: 1.05; }
+.scholar-remediation-hero p { max-width: 48rem; line-height: 1.7; }
+.scholar-remediation-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.5rem; }
+.scholar-remediation-actions a { display: inline-flex; min-height: 44px; padding: .75rem 1rem; align-items: center; border-radius: .65rem; color: inherit; border: 1px solid currentColor; font-weight: 750; }
+.scholar-remediation-panel { margin-top: 1rem; padding: clamp(1.25rem, 3vw, 2rem); border: 1px solid #e2e8f0; border-radius: 1.25rem; background: #fff; }
+.scholar-remediation-status { display: grid; gap: .5rem; padding: 1rem; border-radius: .75rem; color: #334155; background: #fff7ed; }
+.scholar-remediation-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: .75rem; }
+.scholar-remediation-grid article { padding: 1rem; border: 1px solid #cbd5e1; border-radius: .75rem; }
+.scholar-remediation-grid p, .scholar-remediation-panel li { line-height: 1.6; color: #475569; }
+.scholar-remediation-boundary { box-sizing: border-box; margin-top: 1rem; padding: 1rem; border-left: 4px solid #2563eb; background: #eff6ff; line-height: 1.6; }
+
+@media (max-width: 40rem) {
+  .scholar-remediation-actions { flex-direction: column; }
+  .scholar-remediation-actions a { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scholar-remediation-page *, .scholar-remediation-page *::before, .scholar-remediation-page *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}

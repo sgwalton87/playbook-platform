@@ -1,5 +1,6 @@
 import { ThemeProvider } from "@/components/ThemeProvider";
 import UnifiedAppShell from "@/components/shell/UnifiedAppShell";
+import "./globals.css";
 
 export const metadata = {
   title: "The Playbook",
