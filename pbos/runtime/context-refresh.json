@@ -2,16 +2,15 @@
   "version": "1.0.0",
   "owner": "repository-context",
   "latest": {
-    "id": "e6e1126dca6c310a57ca2cfa13cc22893a5550f9950b6bb5db7ffa97df7993fa",
-    "previousContextIdentity": "7daddd17eff35cf90a581974b53d5ee57689f451c0b3527edee58a6f1c6b12a1",
-    "newContextIdentity": "91e15a868b47bf429981f5a1b3148c8674a4fdc1d466c96f947c4eca5faa81f9",
-    "reason": "> Approve activation of the PBOS baseline because repository identity, branch lineage, artifact integrity, lifecycle governance controls, and human authorization requirements have been reviewed. The baseline represents the current canonical engineering state following documentation canonicalization and repository recovery operations.",
+    "id": "724d8badf735961be12b309535270218e8a5d37e29643a68076d9942b062abbd",
+    "previousContextIdentity": "91e15a868b47bf429981f5a1b3148c8674a4fdc1d466c96f947c4eca5faa81f9",
+    "newContextIdentity": "b7bd554d318915cdd7c6e2e8cea4297a6791b52205e8d6f021c44258cac900fd",
+    "reason": "Independently reviewed the tested development trust lease and protected infrastructure changes.",
     "triggeringConditions": [
-      "Context validation failed: repository root does not match expected context.",
       "Context validation failed: commit identity mismatches.",
       "Context validation failed: artifact changed after capture: pbos/runtime/repository.json."
     ],
-    "timestamp": "2026-08-02T09:10:48.764Z",
+    "timestamp": "2026-08-02T10:17:52.397Z",
     "validator": {
       "id": "PBOS-CONTEXT-VALIDATOR",
       "version": "1.1.0"
@@ -739,6 +738,22 @@
         "Context validation failed: artifact changed after capture: pbos/runtime/repository.json."
       ],
       "timestamp": "2026-08-02T09:10:48.764Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "724d8badf735961be12b309535270218e8a5d37e29643a68076d9942b062abbd",
+      "previousContextIdentity": "91e15a868b47bf429981f5a1b3148c8674a4fdc1d466c96f947c4eca5faa81f9",
+      "newContextIdentity": "b7bd554d318915cdd7c6e2e8cea4297a6791b52205e8d6f021c44258cac900fd",
+      "reason": "Independently reviewed the tested development trust lease and protected infrastructure changes.",
+      "triggeringConditions": [
+        "Context validation failed: commit identity mismatches.",
+        "Context validation failed: artifact changed after capture: pbos/runtime/repository.json."
+      ],
+      "timestamp": "2026-08-02T10:17:52.397Z",
       "validator": {
         "id": "PBOS-CONTEXT-VALIDATOR",
         "version": "1.1.0"

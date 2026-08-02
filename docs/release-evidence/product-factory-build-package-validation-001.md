@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Record bounded validation evidence for task `TASK-e686076a12a2908f` and
+Record bounded validation evidence for task `TASK-965131cf486705f1` and
 milestone `PBOS-PRODUCT-FACTORY-BUILD-PACKAGE-VALIDATION-001` without changing
 PBOS authority, runtime truth, approvals, or lifecycle state.
 
@@ -12,7 +12,7 @@ Playbook OS Engineering.
 
 ## Last Updated
 
-July 31, 2026.
+August 2, 2026.
 
 ## Related Documents
 
@@ -23,7 +23,7 @@ July 31, 2026.
 
 ## Assignment Boundary
 
-- Task: `TASK-e686076a12a2908f`
+- Task: `TASK-965131cf486705f1`
 - Milestone: `PBOS-PRODUCT-FACTORY-BUILD-PACKAGE-VALIDATION-001`
 - Allowed change: this evidence file only
 - Prohibited changes: `.env`, `.git`, `pbos/runtime`, and every path outside the
@@ -68,7 +68,7 @@ source digest, ordered contents, and package digest.
 | ID | Command | Purpose | Exit |
 | --- | --- | --- | --- |
 | C01 | `pwd`; Git repository identity, remote, branch, status, and latest-commit inspection | Confirm repository identity and preserve unrelated changes | `0` |
-| C02 | Read `CODEX.md`, the manifest milestone, compiler, compiler test, types, identity helper, canonical screen specification, current evidence, and `package.json`; hash the source specification and compiler | Establish governing context and confirm the package identity inputs | `0` |
+| C02 | Read `CODEX.md`, the manifest milestone, compiler, compiler test, types, canonical screen specification, current evidence, and `package.json`; hash the source specification and compiler | Establish governing context and confirm the package identity inputs | `0` |
 | C03 | `npx vitest run pbos/product-factory/screen-compiler/compiler.test.ts --pool=threads` | Exercise deterministic generation, authorization binding, and fail-closed digest/permission validation | `0` |
 | C04 | Read-only Node manifest validation | Confirm milestone dependency status, required artifacts, and declared validation requirements | `0` |
 | C05 | `git diff --check -- docs/release-evidence/product-factory-build-package-validation-001.md`; related-link and task-marker checks; `git diff --name-only`; `git status --short` | Verify document integrity, evidence completeness, and the assignment boundary | `0` |
@@ -79,17 +79,17 @@ All timestamps are UTC.
 
 | Command | Started | Completed | Result |
 | --- | --- | --- | --- |
-| C01 | `2026-07-31T17:53:56Z` | `2026-07-31T17:53:57Z` | Passed; canonical remote confirmed and unrelated changes observed |
-| C02 | `2026-07-31T17:53:57Z` | `2026-07-31T17:53:57Z` | Passed; source and compiler hashes match the recorded identity inputs |
-| C03 | `2026-07-31T17:52:58Z` | `2026-07-31T17:53:05Z` | Passed: 1 file, 2 tests |
-| C04 | `2026-07-31T17:53:14Z` | `2026-07-31T17:53:14Z` | Passed |
-| C05 | `2026-07-31T17:54:09Z` | `2026-07-31T17:54:10Z` | Passed; only the authorized evidence file was changed by this assignment |
+| C01 | `2026-08-02T10:24:32Z` | `2026-08-02T10:24:32Z` | Passed; canonical remote confirmed and unrelated changes observed |
+| C02 | `2026-08-02T10:23:46Z` | `2026-08-02T10:23:47Z` | Passed; source and compiler hashes match the recorded identity inputs |
+| C03 | `2026-08-02T10:23:54Z` | `2026-08-02T10:24:03Z` | Passed: 1 file, 2 tests |
+| C04 | `2026-08-02T10:24:26Z` | `2026-08-02T10:24:26Z` | Passed |
+| C05 | `2026-08-02T10:25:00Z` | `2026-08-02T10:25:01Z` | Passed; only the authorized evidence file was changed by this assignment |
 
 ## FILE_CHANGE_INVENTORY
 
 | Path | Assignment change | Classification |
 | --- | --- | --- |
-| `docs/release-evidence/product-factory-build-package-validation-001.md` | Refreshed bounded validation evidence for task `TASK-e686076a12a2908f` | Authorized |
+| `docs/release-evidence/product-factory-build-package-validation-001.md` | Refreshed bounded validation evidence for task `TASK-965131cf486705f1` | Authorized |
 
 No other file is part of this assignment's change inventory. No application,
 manifest, approval, authority, runtime, or lifecycle artifact was changed.
