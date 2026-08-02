@@ -81,7 +81,10 @@ function protectedChanges(files: readonly string[]): string[] {
   ));
 }
 
-function bootstrapLease(rootDir: string, timestamp: string): DevelopmentTrustLease | null {
+export function activateDevelopmentTrustLease(
+  rootDir: string,
+  timestamp: string
+): DevelopmentTrustLease | null {
   const context = loadTrustedBuildContext(rootDir)?.latest ?? null;
   const repositoryContext = loadRepositoryContextArtifact(rootDir);
   const approval = loadLaunchApproval(rootDir)?.latest ?? null;
@@ -111,6 +114,10 @@ function bootstrapLease(rootDir: string, timestamp: string): DevelopmentTrustLea
     ...body,
     digest: artifactDigest(body),
   });
+}
+
+function bootstrapLease(rootDir: string, timestamp: string): DevelopmentTrustLease | null {
+  return activateDevelopmentTrustLease(rootDir, timestamp);
 }
 
 function advanceTrustedContext(

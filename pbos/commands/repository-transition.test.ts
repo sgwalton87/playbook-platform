@@ -154,6 +154,12 @@ describe("PBOS transition repository reality synchronization", () => {
       "VALIDATED",
       "COMPLETE",
     ]);
+    const activatedLease = loadDevelopmentTrustLease(rootDir);
+    expect(activatedLease?.baseline_commit_identity).toBe(git(rootDir, "rev-parse", "HEAD"));
+    expect(activatedLease?.current_commit_identity).toBe(git(rootDir, "rev-parse", "HEAD"));
+    expect(activatedLease?.authority_identity).toBe(
+      loadTransitionLifecycle(rootDir)?.latest.launch_approval_identity
+    );
 
     const context = await dispatchKernelCommand("context-status", rootDir);
     expect(context.successful).toBe(true);

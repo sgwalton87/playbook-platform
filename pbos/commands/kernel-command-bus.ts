@@ -92,6 +92,7 @@ import {
 import { runMissionControl } from "../mission-control";
 import { runRepositoryAnalysis } from "./repository";
 import {
+  activateDevelopmentTrustLease,
   ensureDevelopmentTrust,
   type DevelopmentTrustAssessment,
 } from "../context/development-trust";
@@ -873,6 +874,12 @@ export async function dispatchKernelCommand(
         persistTransitionLifecycle(rootDir, proposal);
       }
       if (proposal.state === "VALIDATED") {
+        const lease = activateDevelopmentTrustLease(rootDir, timestamp);
+        if (!lease || lease.current_commit_identity !== proposal.commit_identity) {
+          throw new Error(
+            "Development trust lease was not activated for the approved transition commit."
+          );
+        }
         proposal = advanceTransition(
           proposal, "COMPLETE", timestamp, proposal.digest
         );
