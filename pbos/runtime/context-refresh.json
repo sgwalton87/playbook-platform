@@ -2,14 +2,17 @@
   "version": "1.0.0",
   "owner": "repository-context",
   "latest": {
-    "id": "396b7f9e57dc65be328d9cfb38a18cb036f264bb67081c8160aba964a87d714d",
-    "previousContextIdentity": "1148e47908c59bb111f044fbedbb46579b0a11699626743623eb6d14caa986b4",
-    "newContextIdentity": "6e8f12a01e7779571dc7105e378084c5f96b5db3bc2f6236e125b1981d6f4fd6",
-    "reason": "Approve governed repository context refresh after review of the PBOS Mission Control lifecycle resolver, continuous product construction architecture, Scholar Experience implementation progression, and current repository state changes.",
+    "id": "3166ca79c41cc4960707d77a48d3fe704ed2c3fbae9690e616d190d71212c365",
+    "previousContextIdentity": "6e8f12a01e7779571dc7105e378084c5f96b5db3bc2f6236e125b1981d6f4fd6",
+    "newContextIdentity": "7daddd17eff35cf90a581974b53d5ee57689f451c0b3527edee58a6f1c6b12a1",
+    "reason": "Approve activation of the current PBOS trusted repository baseline after validating repository identity, artifact integrity, transition scope, human authorization requirements, and lifecycle governance controls.",
     "triggeringConditions": [
-      "Context validation failed: working tree state changed after capture."
+      "Context validation failed: context artifact is stale.",
+      "Context validation failed: commit identity mismatches.",
+      "Context validation failed: working tree state changed after capture.",
+      "Context validation failed: artifact changed after capture: pbos/runtime/repository.json."
     ],
-    "timestamp": "2026-08-01T00:11:35.348Z",
+    "timestamp": "2026-08-02T04:37:32.294Z",
     "validator": {
       "id": "PBOS-CONTEXT-VALIDATOR",
       "version": "1.1.0"
@@ -702,6 +705,24 @@
         "Context validation failed: working tree state changed after capture."
       ],
       "timestamp": "2026-08-01T00:11:35.348Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "3166ca79c41cc4960707d77a48d3fe704ed2c3fbae9690e616d190d71212c365",
+      "previousContextIdentity": "6e8f12a01e7779571dc7105e378084c5f96b5db3bc2f6236e125b1981d6f4fd6",
+      "newContextIdentity": "7daddd17eff35cf90a581974b53d5ee57689f451c0b3527edee58a6f1c6b12a1",
+      "reason": "Approve activation of the current PBOS trusted repository baseline after validating repository identity, artifact integrity, transition scope, human authorization requirements, and lifecycle governance controls.",
+      "triggeringConditions": [
+        "Context validation failed: context artifact is stale.",
+        "Context validation failed: commit identity mismatches.",
+        "Context validation failed: working tree state changed after capture.",
+        "Context validation failed: artifact changed after capture: pbos/runtime/repository.json."
+      ],
+      "timestamp": "2026-08-02T04:37:32.294Z",
       "validator": {
         "id": "PBOS-CONTEXT-VALIDATOR",
         "version": "1.1.0"
