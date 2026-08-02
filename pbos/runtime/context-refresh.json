@@ -2,15 +2,15 @@
   "version": "1.0.0",
   "owner": "repository-context",
   "latest": {
-    "id": "829a79ec81bc65e92a99c77ebedf1c85bf1026ec3e85ad135040b662922c9589",
-    "previousContextIdentity": "37dbaf85010be4ed5a086cbe17403af0c229c26e33028c18e73f60c50a525b24",
-    "newContextIdentity": "3750813a5009211a52454d7f68a6ee3c0bce665717ec2b1b1a615cce0de8f21e",
+    "id": "0944c72f0bb055ade315a1180cfaadbcb2ed6f1dafb00f1225068e08c03d59db",
+    "previousContextIdentity": "f86df3ac30371f1afc3f18330e04dabbccb040650b297d39f120e923d390707b",
+    "newContextIdentity": "898218e5247224859a6782615b4fc0ece4f82f09450796a91fc2987121e4487c",
     "reason": "Automatic descendant-commit advancement under DEVELOPMENT-TRUST-d6697919266b92ee.",
     "triggeringConditions": [
       "Context validation failed: commit identity mismatches.",
       "Context validation failed: artifact changed after capture: pbos/runtime/repository.json."
     ],
-    "timestamp": "2026-08-02T21:12:31.221Z",
+    "timestamp": "2026-08-02T22:13:29.682Z",
     "validator": {
       "id": "PBOS-CONTEXT-VALIDATOR",
       "version": "1.1.0"
@@ -866,6 +866,70 @@
         "Context validation failed: artifact changed after capture: pbos/runtime/repository.json."
       ],
       "timestamp": "2026-08-02T21:12:31.221Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "97756456175987e5dda695c8cdcf2abb4ede350433e3aa43c43f4e2ae48d90eb",
+      "previousContextIdentity": "3750813a5009211a52454d7f68a6ee3c0bce665717ec2b1b1a615cce0de8f21e",
+      "newContextIdentity": "1b8582f2305601b925b8cb907a122cab76833b72e098b69a1eab458df38b57c9",
+      "reason": "Automatic descendant-commit advancement under DEVELOPMENT-TRUST-d6697919266b92ee.",
+      "triggeringConditions": [
+        "Context validation failed: commit identity mismatches.",
+        "Context validation failed: artifact changed after capture: pbos/runtime/repository.json."
+      ],
+      "timestamp": "2026-08-02T21:45:39.477Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "17903f31a72a48f75eb2dc14374ebffdc5def3c2ab460c6d4bf62c47eae875e2",
+      "previousContextIdentity": "1b8582f2305601b925b8cb907a122cab76833b72e098b69a1eab458df38b57c9",
+      "newContextIdentity": "ddc5432ac92c402e1168dc85cdd01b03431e3950e09da010a73fe44afeb29c9b",
+      "reason": "Automatic descendant-commit advancement under DEVELOPMENT-TRUST-d6697919266b92ee.",
+      "triggeringConditions": [
+        "Context validation failed: commit identity mismatches.",
+        "Context validation failed: artifact changed after capture: pbos/runtime/repository.json."
+      ],
+      "timestamp": "2026-08-02T21:49:12.177Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "1fb78359dbc8b4bdafd83382fe77eb69032d528a4f9ea87f8fd351ecc8a12175",
+      "previousContextIdentity": "ddc5432ac92c402e1168dc85cdd01b03431e3950e09da010a73fe44afeb29c9b",
+      "newContextIdentity": "f86df3ac30371f1afc3f18330e04dabbccb040650b297d39f120e923d390707b",
+      "reason": "Automatic descendant-commit advancement under DEVELOPMENT-TRUST-d6697919266b92ee.",
+      "triggeringConditions": [
+        "Context validation failed: commit identity mismatches.",
+        "Context validation failed: artifact changed after capture: pbos/runtime/repository.json."
+      ],
+      "timestamp": "2026-08-02T21:52:35.088Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "0944c72f0bb055ade315a1180cfaadbcb2ed6f1dafb00f1225068e08c03d59db",
+      "previousContextIdentity": "f86df3ac30371f1afc3f18330e04dabbccb040650b297d39f120e923d390707b",
+      "newContextIdentity": "898218e5247224859a6782615b4fc0ece4f82f09450796a91fc2987121e4487c",
+      "reason": "Automatic descendant-commit advancement under DEVELOPMENT-TRUST-d6697919266b92ee.",
+      "triggeringConditions": [
+        "Context validation failed: commit identity mismatches.",
+        "Context validation failed: artifact changed after capture: pbos/runtime/repository.json."
+      ],
+      "timestamp": "2026-08-02T22:13:29.682Z",
       "validator": {
         "id": "PBOS-CONTEXT-VALIDATOR",
         "version": "1.1.0"
