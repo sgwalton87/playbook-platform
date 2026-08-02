@@ -2128,9 +2128,9 @@ export async function dispatchKernelCommand(
     };
   }
 
-  const kernel = await runRepositoryKernel(rootDir);
-
   if (command === "status") {
+    const orchestration = await runDevelopmentOrchestration(rootDir);
+    const kernel = orchestration.kernel;
     const health = await getEngineHealth(rootDir);
     const transitionLifecycle = loadTransitionLifecycle(rootDir)?.latest ?? null;
     const transitionPending = Boolean(
@@ -2150,21 +2150,29 @@ export async function dispatchKernelCommand(
         `Campaign Approval: ${campaignApproval?.decision ?? "NOT_APPROVED"}`,
         `Campaign Packages: ${campaign?.packages.length ?? 0}`,
         `Campaign Completed: ${campaignProgress?.entries.filter(({ status }) => status === "COMPLETE").length ?? 0}`,
+        `Campaign Next Package: ${orchestration.campaignSelection.milestone_id ?? "NONE"}`,
+        ...orchestration.governedRecommendation.blocking_conditions
+          .filter((finding) => orchestration.campaignSelection.constrained &&
+            (finding.includes(orchestration.campaignSelection.milestone_id ?? "") ||
+              orchestration.campaignSelection.findings.includes(finding)))
+          .map((finding) => `Campaign Selection Blocker: ${finding}`),
         `Kernel Decision: ${kernel.decision.selectedObjectiveId ?? "NONE"}`,
         `Kernel Certification: ${transitionPending ? "PENDING_TRANSITION" : kernel.certification.status}`,
         `Kernel Report Digest: ${kernel.report.digest}`,
-        `Development Recommendation: ${kernel.decision.selectedObjectiveId ?? "NONE"}`,
-        `Development Orchestration: ${kernel.certification.status === "CERTIFIED" ? "READY" : "BLOCKED"}`,
+        `Development Recommendation: ${orchestration.governedRecommendation.recommended_milestone ?? "NONE"}`,
+        `Development Orchestration: ${orchestration.executionPackage ? "READY" : "BLOCKED"}`,
         `Context Trust: ${transitionLifecycle?.state === "COMPLETE"
           ? "ACTIVE"
           : transitionPending
             ? "TRANSITION_PENDING"
             : kernel.certification.status === "CERTIFIED" ? "VERIFIED" : "INVALID"}`,
         `System Maturity: ${kernel.certification.status === "CERTIFIED" ? "OPERATIONAL" : "BLOCKED"}`,
-        `Planning Readiness: ${kernel.decision.selectedObjectiveId ? "READY" : "BLOCKED"}`,
+        `Planning Readiness: ${orchestration.executionPackage ? "READY" : "BLOCKED"}`,
       ].join("\n"),
     };
   }
+
+  const kernel = await runRepositoryKernel(rootDir);
 
   if (command === "next") {
     const orchestration = await runDevelopmentOrchestration(rootDir);

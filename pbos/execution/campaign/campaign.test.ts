@@ -14,6 +14,7 @@ import {
   approveExecutionCampaign, createExecutionCampaign, resolveCampaignAuthorization,
   updateCampaignProgress,
 } from "./campaign";
+import { resolveCampaignMilestoneSelection } from "./selection";
 
 const roots: string[] = [];
 const now = "2026-08-02T20:00:00.000Z";
@@ -128,5 +129,37 @@ describe("PBOS execution campaigns", () => {
     expect(resolveCampaignAuthorization({
       rootDir, package: executionPackage(rootDir, second.milestone_id), timestamp: now,
     }).valid).toBe(true);
+  });
+
+  it("selects package four after three completions and reuses campaign approval for retries", () => {
+    const rootDir = fixture();
+    const campaign = createExecutionCampaign({
+      rootDir,
+      limit: 10,
+      timestamp: now,
+      startMilestoneId: "SCHOLAR-EXPERIENCE-V1-PRODUCT-DEFINITION-001",
+    });
+    const approval = approveExecutionCampaign({
+      rootDir, requester: "REQUESTER", reviewer: "REVIEWER", decision: "APPROVED",
+      reason: "Approve.", riskAcknowledgment: "Accepted.", timestamp: now,
+      expiration: "2027-08-02T23:59:59.000Z",
+    });
+    campaign.packages.slice(0, 3).forEach(({ milestone_id }) =>
+      updateCampaignProgress({ rootDir, milestoneId: milestone_id, status: "COMPLETE", timestamp: now })
+    );
+    const fourth = campaign.packages[3]!;
+    expect(fourth.milestone_id).toBe("PLAYBOOK-ROLE-ACTIVATION-FOUNDATION-001");
+    expect(resolveCampaignMilestoneSelection({ rootDir, timestamp: now }).milestone_id)
+      .toBe(fourth.milestone_id);
+    expect(resolveCampaignAuthorization({
+      rootDir, package: executionPackage(rootDir, fourth.milestone_id), timestamp: now,
+    })).toMatchObject({ valid: true, approval: { approval_id: approval.approval_id } });
+
+    updateCampaignProgress({ rootDir, milestoneId: fourth.milestone_id, status: "FAILED", timestamp: now });
+    expect(resolveCampaignMilestoneSelection({ rootDir, timestamp: now }).milestone_id)
+      .toBe(fourth.milestone_id);
+    expect(resolveCampaignAuthorization({
+      rootDir, package: executionPackage(rootDir, fourth.milestone_id), timestamp: now,
+    })).toMatchObject({ valid: true, approval: { approval_id: approval.approval_id } });
   });
 });
