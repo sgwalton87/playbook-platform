@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-02T19:42:24.735Z",
+  "generatedAt": "2026-08-02T20:21:18.182Z",
   "productionBranch": "main",
   "currentBranch": "pbos/post-pps300-convergence",
   "branches": [
@@ -2226,10 +2226,10 @@
     {
       "name": "pbos/post-pps300-convergence",
       "current": true,
-      "ahead": 171,
+      "ahead": 172,
       "behind": 0,
-      "latestCommit": "fix(pbos): continue missions through existing authority",
-      "latestCommitSha": "4ad21f829acf3a0463effe1000392f8a8f29c6a9",
+      "latestCommit": "feat(pbos): add multi-package execution campaigns",
+      "latestCommitSha": "b15937651f851dc0718b6036c5364064e2454e89",
       "changedFiles": [
         ".codex/context.md",
         ".env.example",
@@ -3087,6 +3087,7 @@
         "docs/OPERATIONS/PBOS_OPERATIONAL_OWNERSHIP_001.md",
         "docs/OPERATIONS/RECOVERY_RUNBOOK.md",
         "docs/PBOS/DEVELOPMENT_TRUST_LEASE_ARCHITECTURE.md",
+        "docs/PBOS/EXECUTION_CAMPAIGN_AUTHORIZATION.md",
         "docs/PBOS/TRANSITION_LIFECYCLE_ARCHITECTURE.md",
         "docs/PLATFORM_BUILD_BACKLOG.md",
         "docs/PPS/00_CONSTITUTION/PPS-000_PLATFORM_OVERVIEW.md",
@@ -3931,6 +3932,11 @@
         "pbos/execution/authorization/types.ts",
         "pbos/execution/authorization/validator.test.ts",
         "pbos/execution/authorization/validator.ts",
+        "pbos/execution/campaign/campaign.test.ts",
+        "pbos/execution/campaign/campaign.ts",
+        "pbos/execution/campaign/index.ts",
+        "pbos/execution/campaign/store.ts",
+        "pbos/execution/campaign/types.ts",
         "pbos/execution/capability-binding-adapter.ts",
         "pbos/execution/contracts/builder.ts",
         "pbos/execution/contracts/generate.ts",
