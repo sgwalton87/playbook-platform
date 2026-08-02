@@ -189,6 +189,14 @@ export const RuntimeArtifactOwnership: Record<
     persistence: "durable",
     cleanup: "governed-transition",
   },
+  transitionLifecycle: {
+    path: Artifacts.transitionLifecycle,
+    owner: "transition-orchestrator",
+    producer: "pbos transition",
+    consumers: ["pbos approve", "context-activation", "status", "governance-audit"],
+    persistence: "durable",
+    cleanup: "governed-transition",
+  },
   approvalPackage: {
     path: Artifacts.approvalPackage,
     owner: "approval-package-authority",

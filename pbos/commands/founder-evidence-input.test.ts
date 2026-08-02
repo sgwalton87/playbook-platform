@@ -62,4 +62,28 @@ describe("founder evidence input", () => {
     expect(result["approved-files"]).toBeUndefined();
     expect(result["excluded-files"]).toBeUndefined();
   });
+
+  it("collects requester transition evidence without reviewer duplication", async () => {
+    const answers = [
+      "requester", "APPROVED", "Approve baseline.", "YES",
+      "2027-08-02T00:00:00.000Z", "yes",
+    ];
+    const result = await collectFounderEvidenceInput(
+      "transition", {}, async () => answers.shift() ?? ""
+    );
+    expect(result["requester-identity"]).toBe("requester");
+    expect(result["reviewer-identity"]).toBeUndefined();
+  });
+
+  it("collects pending transition reviewer evidence without requester duplication", async () => {
+    const answers = [
+      "reviewer", "APPROVED", "Independently reviewed.", "YES",
+      "2027-08-02T00:00:00.000Z", "yes",
+    ];
+    const result = await collectFounderEvidenceInput(
+      "approve", {}, async () => answers.shift() ?? "", false, true
+    );
+    expect(result["reviewer-identity"]).toBe("reviewer");
+    expect(result["requester-identity"]).toBeUndefined();
+  });
 });

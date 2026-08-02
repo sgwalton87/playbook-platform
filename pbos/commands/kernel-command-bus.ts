@@ -28,8 +28,18 @@ import {
 } from "../context/refresh";
 import {
   createLaunchApproval,
+  loadLaunchApproval,
   persistLaunchApproval,
 } from "../authority/launch";
+import {
+  advanceTransition,
+  createTransitionProposal,
+  loadTransitionLifecycle,
+  persistTransitionLifecycle,
+  transitionAuthorizationStatus,
+  validateTransitionScope,
+  type TransitionProposal,
+} from "../transition";
 import {
   evidenceList,
   evidenceString,
@@ -124,6 +134,66 @@ export interface KernelCommandResult {
   readonly command: KernelCommandName;
   readonly output: string;
   readonly successful: boolean;
+}
+
+function transitionStatusLines(proposal: TransitionProposal | null): string[] {
+  if (!proposal) {
+    return [
+      "Transition State: NOT_STARTED",
+      "Authorization Status: NOT_STARTED",
+      "Context Status: NOT_STARTED",
+      "Execution Status: NOT_STARTED",
+    ];
+  }
+  const contextStatus = proposal.state === "COMPLETE" ||
+    ["TRUSTED_CONTEXT_ACTIVE", "VALIDATED"].includes(proposal.state)
+    ? "ACTIVE"
+    : proposal.state === "CONTEXT_REFRESHED"
+      ? "REFRESHED"
+      : ["REVIEWER_APPROVED", "CONTEXT_REFRESH_PENDING"].includes(proposal.state)
+        ? "REFRESH_PENDING"
+        : "NOT_STARTED";
+  return [
+    `Transition State: ${proposal.state}`,
+    `Authorization Status: ${transitionAuthorizationStatus(proposal.state)}`,
+    `Context Status: ${contextStatus}`,
+    "Execution Status: NOT_STARTED",
+  ];
+}
+
+function formatTransitionProposal(proposal: TransitionProposal): string {
+  return [
+    "PBOS TRANSITION PROPOSAL",
+    "",
+    `Repository: ${proposal.repository_identity}`,
+    `Branch: ${proposal.branch_identity}`,
+    `Commit: ${proposal.commit_identity}`,
+    `Change Type: ${proposal.change_type}`,
+    `Risk Level: ${proposal.risk_level}`,
+    `Purpose: ${proposal.purpose}`,
+    `Proposal Identity: ${proposal.proposal_scope_identity}`,
+    "Required Human Actions:",
+    "- Requester approval",
+    "- Independent reviewer approval",
+    "Transition State: PROPOSED",
+  ].join("\n");
+}
+
+function rejectedBaselineRefreshIsEligible(
+  discovery: ReturnType<typeof discoverTrustedContext>
+): boolean {
+  const allowed = new Set([
+    "MISSING_CONTEXT",
+    "REPOSITORY_ROOT",
+    "COMMIT_IDENTITY",
+    "ARTIFACT_IDENTITY",
+    "ARTIFACT_INVENTORY",
+  ]);
+  return discovery.assessment.working_tree_state === "CLEAN" &&
+    discovery.assessment.artifact_state === "VALID" &&
+    discovery.assessment.manifest_state === "VALID" &&
+    discovery.assessment.governance_state === "VALID" &&
+    discovery.reconciliation.differences.every(({ code }) => allowed.has(code));
 }
 
 export function isKernelCommand(value: string): value is KernelCommandName {
@@ -535,112 +605,262 @@ export async function dispatchKernelCommand(
 
   if (command === "transition") {
     const timestamp = new Date().toISOString();
-    const requesterIdentity = evidenceString(evidenceInput, "requester-identity");
-    const reviewerIdentity = evidenceString(evidenceInput, "reviewer-identity");
-    const decision = evidenceString(evidenceInput, "decision").toUpperCase();
-    const reason = evidenceString(evidenceInput, "reason");
-    const riskAcknowledgment = evidenceString(evidenceInput, "risk-acknowledgment");
-    const expiration = evidenceString(evidenceInput, "expiration");
-    if (!requesterIdentity || !reviewerIdentity || decision !== "APPROVED" ||
-      !reason || !riskAcknowledgment || !expiration) {
-      return {
-        command,
-        successful: false,
-        output: [
-          "PBOS GOVERNED TRANSITION",
-          "Decision: BLOCKED",
-          "Requester, independent reviewer, APPROVED decision, reason, risk acknowledgment, and expiration are required.",
-          "No transition was performed.",
-        ].join("\n"),
-      };
-    }
-    try {
-      const inventory = createChangeInventory(rootDir, timestamp);
+    const inventory = createChangeInventory(rootDir, timestamp);
+    let proposal = loadTransitionLifecycle(rootDir)?.latest ?? null;
+
+    if (!proposal || validateTransitionScope(proposal, inventory, timestamp)
+      .some((finding) => finding.includes("scope changed"))) {
       if (inventory.changes.length > 0) {
-        throw new Error("Baseline activation requires committed application source; approve and commit the inventoried transition first.");
+        return {
+          command,
+          successful: false,
+          output: [
+            "PBOS TRANSITION",
+            "Decision: BLOCKED",
+            "Baseline activation requires committed source and a clean repository.",
+            "No transition proposal was created.",
+          ].join("\n"),
+        };
       }
-      // repository.json is a replaceable observation, not human authority.
-      // Refresh it before context discovery so validation evaluates the current
-      // repository branch and HEAD while all identity checks remain fail-closed.
       runRepositoryAnalysis(rootDir);
-      const before = discoverTrustedContext(rootDir, timestamp);
+      const discovery = discoverTrustedContext(rootDir, timestamp);
+      proposal = createTransitionProposal({
+        inventory: createChangeInventory(rootDir, timestamp),
+        riskLevel: discovery.assessment.risk_level,
+        purpose: "Activate trusted repository baseline for continued governed development.",
+        timestamp,
+      });
+      persistTransitionLifecycle(rootDir, proposal);
+    }
+
+    if (proposal.state === "PROPOSED") {
+      const requesterIdentity = evidenceString(evidenceInput, "requester-identity");
+      const decision = evidenceString(evidenceInput, "decision").toUpperCase();
+      const reason = evidenceString(evidenceInput, "reason");
+      const riskAcknowledgment = evidenceString(evidenceInput, "risk-acknowledgment");
+      const expiration = evidenceString(evidenceInput, "expiration");
+      if (!requesterIdentity && !decision && !reason && !riskAcknowledgment && !expiration) {
+        return { command, successful: true, output: formatTransitionProposal(proposal) };
+      }
+      const findings = [
+        ...(!requesterIdentity ? ["Requester identity is required."] : []),
+        ...(decision !== "APPROVED" ? ["Requester decision must be APPROVED."] : []),
+        ...(!reason ? ["Requester approval reason is required."] : []),
+        ...(!riskAcknowledgment ? ["Requester risk acknowledgment is required."] : []),
+        ...(!expiration || Date.parse(expiration) <= Date.parse(timestamp)
+          ? ["A future requester approval expiration is required."] : []),
+      ];
+      if (findings.length > 0) {
+        return {
+          command,
+          successful: false,
+          output: ["PBOS REQUESTER AUTHORIZATION", "Decision: BLOCKED", ...findings].join("\n"),
+        };
+      }
+      const discovery = discoverTrustedContext(rootDir, timestamp);
       const boundary = createChangeBoundary({
         inventory,
         boundaryType: "BASELINE_ACTIVATION",
-        baselineIdentity: before.baseline_identity,
+        baselineIdentity: discovery.baseline_identity,
         requesterIdentity,
         approvedFiles: [],
         excludedFiles: [],
-        purpose: reason,
-        businessPurpose: reason,
+        purpose: proposal.purpose,
+        businessPurpose: proposal.purpose,
         technicalPurpose: "Reconcile and activate the approved repository transition.",
         riskAcknowledgment,
         creationTimestamp: timestamp,
         expirationTimestamp: expiration,
       });
       persistChangeBoundary(rootDir, boundary);
-      const approval = createLaunchApproval({
-        boundary,
-        requesterIdentity,
-        reviewerIdentity,
-        decision: "APPROVED",
-        reason,
-        riskAcknowledgment,
+      proposal = advanceTransition(
+        proposal,
+        "REQUESTER_APPROVED",
         timestamp,
-        expiration,
-      });
-      persistLaunchApproval(rootDir, approval);
-      let refresh = "NOT_REQUIRED";
-      if (before.reconciliation.state === "REVIEW_REQUIRED") {
-        const refreshApproval = createContextRefreshApproval({
-          reconciliation: before.reconciliation,
-          requesterIdentity,
-          reviewerIdentity,
-          decision: "APPROVED",
-          decisionReason: reason,
-          riskAcknowledgment,
-          timestamp,
+        boundary.digest,
+        {
+          requester_identity: requesterIdentity,
+          requester_decision: "APPROVED",
+          requester_reason: reason,
+          requester_risk_acknowledgment: riskAcknowledgment,
           expiration,
-        });
-        persistContextRefreshApproval(rootDir, refreshApproval);
-        const refreshed = new ContextRefreshAuthority().refreshApproved(rootDir, {
-          reconciliation: before.reconciliation,
-          approval: refreshApproval,
-          timestamp,
-        });
-        persistContextRefreshApproval(rootDir, applyContextRefreshApproval(
-          refreshApproval, refreshed.context.identity, timestamp
-        ));
-        refresh = "APPLIED";
-      } else if (before.reconciliation.state !== "VERIFIED") {
-        throw new Error(`Repository reconciliation is ${before.reconciliation.state}.`);
-      }
-      const resolution = createAuthorityLinkedActivationEvidence(rootDir, timestamp);
-      if (!resolution.valid || !resolution.evidence) {
-        throw new Error(resolution.findings.join("\n"));
-      }
-      persistTrustedContext(rootDir, resolution.evidence);
-      const after = discoverTrustedContext(rootDir, timestamp);
-      const valid = after.reconciliation.state === "VERIFIED";
+          boundary_identity: boundary.digest,
+        }
+      );
+      persistTransitionLifecycle(rootDir, proposal);
       return {
         command,
-        successful: valid,
+        successful: true,
         output: [
-          "PBOS GOVERNED TRANSITION",
-          `Inventory: ${inventory.changes.length} source changes`,
-          `Reconciliation: ${after.reconciliation.state}`,
-          `Refresh: ${refresh}`,
-          "Human Authorization: RECORDED ONCE",
-          `Trust Level: ${valid ? "ACTIVE" : "BLOCKED"}`,
-          `Validation: ${valid ? "PASS" : "FAIL"}`,
+          "PBOS REQUESTER AUTHORIZATION RECORDED",
+          `Proposal: ${proposal.proposal_id}`,
+          "Authorization Status: REQUESTER_APPROVED",
+          "Transition State: AWAITING_REVIEWER_APPROVAL",
+          "Next action: npm run pbos:approve",
+        ].join("\n"),
+      };
+    }
+
+    if (proposal.state === "REQUESTER_APPROVED") {
+      return {
+        command,
+        successful: true,
+        output: [
+          "PBOS TRANSITION PAUSED",
+          `Proposal: ${proposal.proposal_id}`,
+          "Authorization Status: REQUESTER_APPROVED",
+          "Transition State: AWAITING_REVIEWER_APPROVAL",
+          "Next action: npm run pbos:approve",
+        ].join("\n"),
+      };
+    }
+
+    if (proposal.state === "COMPLETE") {
+      return {
+        command,
+        successful: true,
+        output: [
+          "PBOS TRANSITION COMPLETE",
+          "Proposal: APPROVED",
+          `Context Refresh: ${proposal.context_refresh}`,
+          "Trusted Context: ACTIVE",
+          "Validation: PASS",
+          "Human Authorization Ceremonies: 2",
+        ].join("\n"),
+      };
+    }
+
+    const scopeFindings = validateTransitionScope(proposal, inventory, timestamp);
+    if (scopeFindings.length > 0) {
+      return {
+        command,
+        successful: false,
+        output: [
+          "PBOS TRANSITION",
+          "Decision: BLOCKED",
+          ...scopeFindings,
+          "Create a new proposal for the current repository scope.",
+        ].join("\n"),
+      };
+    }
+    const boundary = loadChangeBoundary(rootDir)?.latest ?? null;
+    const launchApproval = loadLaunchApproval(rootDir)?.latest ?? null;
+    if (!boundary || !launchApproval || launchApproval.decision !== "APPROVED") {
+      return {
+        command,
+        successful: false,
+        output: "PBOS TRANSITION\nDecision: BLOCKED\nThe proposal-bound reviewer approval is unavailable.",
+      };
+    }
+
+    try {
+      if (proposal.state === "REVIEWER_APPROVED") {
+        proposal = advanceTransition(
+          proposal, "CONTEXT_REFRESH_PENDING", timestamp, launchApproval.digest,
+          { context_refresh: "PENDING" }
+        );
+        persistTransitionLifecycle(rootDir, proposal);
+      }
+
+      if (proposal.state === "CONTEXT_REFRESH_PENDING") {
+        const discovery = discoverTrustedContext(rootDir, timestamp);
+        if (discovery.reconciliation.state === "VERIFIED") {
+          proposal = advanceTransition(
+            proposal, "CONTEXT_REFRESHED", timestamp, discovery.reconciliation.digest,
+            { context_refresh: "NOT_REQUIRED" }
+          );
+        } else {
+          const allowRejectedBaseline = discovery.reconciliation.state === "REJECTED" &&
+            rejectedBaselineRefreshIsEligible(discovery);
+          if (discovery.reconciliation.state !== "REVIEW_REQUIRED" && !allowRejectedBaseline) {
+            throw new Error(
+              `Repository reconciliation is ${discovery.reconciliation.state} and is not eligible for autonomous baseline refresh.`
+            );
+          }
+          const refreshApproval = createContextRefreshApproval({
+            reconciliation: discovery.reconciliation,
+            requesterIdentity: proposal.requester_identity ?? "",
+            reviewerIdentity: launchApproval.reviewer_identity,
+            decision: "APPROVED",
+            decisionReason: launchApproval.decision_reason,
+            riskAcknowledgment: launchApproval.risk_acknowledgment,
+            timestamp,
+            expiration: launchApproval.expiration,
+            allowRejectedBaseline,
+          });
+          persistContextRefreshApproval(rootDir, refreshApproval);
+          const refreshed = new ContextRefreshAuthority().refreshApproved(rootDir, {
+            reconciliation: discovery.reconciliation,
+            approval: refreshApproval,
+            timestamp,
+            allowRejectedBaseline,
+          });
+          persistContextRefreshApproval(rootDir, applyContextRefreshApproval(
+            refreshApproval, refreshed.context.identity, timestamp
+          ));
+          proposal = advanceTransition(
+            proposal, "CONTEXT_REFRESHED", timestamp, refreshed.context.identity,
+            { context_refresh: "APPLIED" }
+          );
+        }
+        persistTransitionLifecycle(rootDir, proposal);
+      }
+
+      if (proposal.state === "CONTEXT_REFRESHED") {
+        const resolution = createAuthorityLinkedActivationEvidence(rootDir, timestamp);
+        if (!resolution.valid || !resolution.evidence) {
+          throw new Error(resolution.findings.join("\n"));
+        }
+        persistTrustedContext(rootDir, resolution.evidence);
+        proposal = advanceTransition(
+          proposal,
+          "TRUSTED_CONTEXT_ACTIVE",
+          timestamp,
+          resolution.evidence.digest,
+          { trusted_context_identity: resolution.evidence.trusted_context?.context_id ?? null }
+        );
+        persistTransitionLifecycle(rootDir, proposal);
+      }
+
+      if (proposal.state === "TRUSTED_CONTEXT_ACTIVE") {
+        const after = discoverTrustedContext(rootDir, timestamp);
+        if (after.reconciliation.state !== "VERIFIED") {
+          throw new Error(`Post-activation reconciliation is ${after.reconciliation.state}.`);
+        }
+        proposal = advanceTransition(
+          proposal, "VALIDATED", timestamp, after.reconciliation.digest,
+          { validation: "PASS" }
+        );
+        persistTransitionLifecycle(rootDir, proposal);
+      }
+      if (proposal.state === "VALIDATED") {
+        proposal = advanceTransition(
+          proposal, "COMPLETE", timestamp, proposal.digest
+        );
+        persistTransitionLifecycle(rootDir, proposal);
+      }
+      return {
+        command,
+        successful: true,
+        output: [
+          "PBOS TRANSITION COMPLETE",
+          "Proposal: APPROVED",
+          `Context Refresh: ${proposal.context_refresh}`,
+          "Trusted Context: ACTIVE",
+          "Validation: PASS",
+          "Human Authorization Ceremonies: 2",
         ].join("\n"),
       };
     } catch (error: unknown) {
       return {
         command,
         successful: false,
-        output: ["PBOS GOVERNED TRANSITION", "Decision: BLOCKED",
-          error instanceof Error ? error.message : String(error)].join("\n"),
+        output: [
+          "PBOS TRANSITION",
+          "Decision: BLOCKED",
+          error instanceof Error ? error.message : String(error),
+          `Transition State: ${proposal.state}`,
+        ].join("\n"),
       };
     }
   }
@@ -1173,6 +1393,98 @@ export async function dispatchKernelCommand(
   }
 
   if (command === "approve") {
+    const pendingTransition = loadTransitionLifecycle(rootDir)?.latest ?? null;
+    if (pendingTransition?.state === "REQUESTER_APPROVED") {
+      const boundary = loadChangeBoundary(rootDir)?.latest ?? null;
+      const reviewerIdentity = evidenceString(
+        evidenceInput, "reviewer-identity", process.env.PBOS_TRANSITION_REVIEWER_ID
+      );
+      const decision = evidenceString(
+        evidenceInput, "decision", process.env.PBOS_TRANSITION_REVIEWER_DECISION
+      ).toUpperCase();
+      const reason = evidenceString(
+        evidenceInput, "reason", process.env.PBOS_TRANSITION_REVIEWER_REASON
+      );
+      const riskAcknowledgment = evidenceString(
+        evidenceInput, "risk-acknowledgment",
+        process.env.PBOS_TRANSITION_REVIEWER_RISK_ACKNOWLEDGMENT
+      );
+      const expiration = evidenceString(
+        evidenceInput, "expiration", process.env.PBOS_TRANSITION_REVIEWER_EXPIRATION
+      );
+      const timestamp = new Date().toISOString();
+      const findings = [
+        ...(!boundary ? ["Proposal-bound change boundary is unavailable."] : []),
+        ...(!reviewerIdentity ? ["Independent reviewer identity is required."] : []),
+        ...(reviewerIdentity === pendingTransition.requester_identity
+          ? ["Requester and reviewer must be independent."] : []),
+        ...(!["APPROVED", "REJECTED"].includes(decision)
+          ? ["Reviewer decision must be APPROVED or REJECTED."] : []),
+        ...(!reason ? ["Review reason is required."] : []),
+        ...(!riskAcknowledgment ? ["Reviewer risk acknowledgment is required."] : []),
+        ...(!expiration || Date.parse(expiration) <= Date.parse(timestamp)
+          ? ["A future reviewer approval expiration is required."] : []),
+        ...(pendingTransition.expiration && expiration &&
+          Date.parse(expiration) > Date.parse(pendingTransition.expiration)
+          ? ["Reviewer approval cannot outlive requester authorization."] : []),
+      ];
+      if (findings.length > 0 || !boundary || !pendingTransition.requester_identity) {
+        return {
+          command,
+          successful: false,
+          output: ["PBOS TRANSITION REVIEW", "Decision: BLOCKED", ...findings].join("\n"),
+        };
+      }
+      const approval = createLaunchApproval({
+        boundary,
+        requesterIdentity: pendingTransition.requester_identity,
+        reviewerIdentity,
+        decision: decision as "APPROVED" | "REJECTED",
+        reason,
+        riskAcknowledgment,
+        timestamp,
+        expiration,
+      });
+      persistLaunchApproval(rootDir, approval);
+      if (decision !== "APPROVED") {
+        return {
+          command,
+          successful: false,
+          output: [
+            "PBOS TRANSITION REVIEW",
+            "Decision: REJECTED",
+            `Proposal: ${pendingTransition.proposal_id}`,
+            "Transition completion remains blocked.",
+          ].join("\n"),
+        };
+      }
+      const approved = advanceTransition(
+        pendingTransition,
+        "REVIEWER_APPROVED",
+        timestamp,
+        approval.digest,
+        {
+          reviewer_identity: reviewerIdentity,
+          reviewer_decision: "APPROVED",
+          reviewer_reason: reason,
+          launch_approval_identity: approval.digest,
+          expiration,
+        }
+      );
+      persistTransitionLifecycle(rootDir, approved);
+      return {
+        command,
+        successful: true,
+        output: [
+          "PBOS TRANSITION REVIEW RECORDED",
+          `Proposal: ${approved.proposal_id}`,
+          "Authorization Status: REVIEWER_APPROVED",
+          "Transition State: REVIEWER_APPROVED",
+          "Automatic continuation: AVAILABLE",
+          "Next action: npm run pbos:transition",
+        ].join("\n"),
+      };
+    }
     const orchestration = await runDevelopmentOrchestration(rootDir);
     const context = loadTrustedBuildContext(rootDir)?.latest ?? null;
     const executionPackage = orchestration.executionPackage;
@@ -1553,17 +1865,26 @@ export async function dispatchKernelCommand(
 
   if (command === "status") {
     const health = await getEngineHealth(rootDir);
+    const transitionLifecycle = loadTransitionLifecycle(rootDir)?.latest ?? null;
+    const transitionPending = Boolean(
+      transitionLifecycle && transitionLifecycle.state !== "COMPLETE"
+    );
     return {
       command,
       successful: true,
       output: [
         formatEngineHealth(health),
+        ...transitionStatusLines(transitionLifecycle),
         `Kernel Decision: ${kernel.decision.selectedObjectiveId ?? "NONE"}`,
-        `Kernel Certification: ${kernel.certification.status}`,
+        `Kernel Certification: ${transitionPending ? "PENDING_TRANSITION" : kernel.certification.status}`,
         `Kernel Report Digest: ${kernel.report.digest}`,
         `Development Recommendation: ${kernel.decision.selectedObjectiveId ?? "NONE"}`,
         `Development Orchestration: ${kernel.certification.status === "CERTIFIED" ? "READY" : "BLOCKED"}`,
-        `Context Trust: ${kernel.certification.status === "CERTIFIED" ? "VERIFIED" : "INVALID"}`,
+        `Context Trust: ${transitionLifecycle?.state === "COMPLETE"
+          ? "ACTIVE"
+          : transitionPending
+            ? "TRANSITION_PENDING"
+            : kernel.certification.status === "CERTIFIED" ? "VERIFIED" : "INVALID"}`,
         `System Maturity: ${kernel.certification.status === "CERTIFIED" ? "OPERATIONAL" : "BLOCKED"}`,
         `Planning Readiness: ${kernel.decision.selectedObjectiveId ? "READY" : "BLOCKED"}`,
       ].join("\n"),

@@ -73,12 +73,14 @@ export class ContextRefreshAuthority {
       readonly reconciliation: ContextRefreshAuthorityInput["reconciliation"];
       readonly approval: ContextRefreshApprovalRecord;
       readonly timestamp?: string;
+      readonly allowRejectedBaseline?: boolean;
     }
   ): ReturnType<typeof refreshRepositoryContext> {
     const validation = validateContextRefreshApproval({
       approval: input.approval,
       reconciliation: input.reconciliation,
       timestamp: input.timestamp ?? new Date().toISOString(),
+      allowRejectedBaseline: input.allowRejectedBaseline,
     });
     if (!validation.valid) {
       throw new Error(

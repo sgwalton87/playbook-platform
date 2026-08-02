@@ -62,11 +62,28 @@ const approvalPrompts = [
   ["expiration", "Expiration (ISO 8601)"],
 ] as const;
 
+const transitionRequesterPrompts = [
+  ["requester-identity", "Requester"],
+  ["decision", "Decision (APPROVED or REJECTED)"],
+  ["reason", "Approval Reason"],
+  ["risk-acknowledgment", "Risk Accepted"],
+  ["expiration", "Expiration (ISO 8601)"],
+] as const;
+
+const transitionReviewerPrompts = [
+  ["reviewer-identity", "Reviewer"],
+  ["decision", "Decision (APPROVED or REJECTED)"],
+  ["reason", "Review Reason"],
+  ["risk-acknowledgment", "Risk Accepted"],
+  ["expiration", "Expiration (ISO 8601)"],
+] as const;
+
 export async function collectFounderEvidenceInput(
   command: EvidenceCommand,
   initial: FounderEvidenceInput,
   prompt: Prompt,
-  baselineAvailable = false
+  baselineAvailable = false,
+  transitionApprovalPending = false
 ): Promise<FounderEvidenceInput> {
   if (
     command !== "change-boundary" &&
@@ -93,7 +110,11 @@ export async function collectFounderEvidenceInput(
         !baselineSelected ||
         (name !== "approved-files" && name !== "excluded-files")
       )
-    : approvalPrompts;
+    : command === "transition"
+      ? transitionRequesterPrompts
+      : command === "approve" && transitionApprovalPending
+        ? transitionReviewerPrompts
+        : approvalPrompts;
   for (const [name, label] of prompts) {
     const existing = entries.get(name);
     if (typeof existing === "string" ? existing : existing?.length) continue;
@@ -111,6 +132,7 @@ export async function readFounderEvidenceInput(input: {
   readonly args: readonly string[];
   readonly interactive: boolean;
   readonly baselineAvailable?: boolean;
+  readonly transitionApprovalPending?: boolean;
   readonly stdin?: Readable;
   readonly stdout?: Writable;
 }): Promise<FounderEvidenceInput> {
@@ -133,7 +155,8 @@ export async function readFounderEvidenceInput(input: {
       input.command,
       parsed,
       (label) => terminal.question(label),
-      input.baselineAvailable
+      input.baselineAvailable,
+      input.transitionApprovalPending
     );
   } finally {
     terminal.close();

@@ -97,8 +97,13 @@ fail-closed, as do missing reviewers, self-approval, invalid record digests, and
 expired decisions.
 
 `npm run pbos:transition` is the canonical baseline operator flow. It inventories
-and reconciles the repository, records one human authorization, refreshes when
-needed, activates the trusted context, and validates the resulting lifecycle.
+and reconciles the repository, records requester authorization once, pauses for
+one independent reviewer decision through `npm run pbos:approve`, then resumes
+automatic refresh, trusted-context activation, and validation. The lower-level
+boundary, refresh, and activation commands remain recovery interfaces and are not
+part of the normal operator workflow. The durable proposal and explicit state
+machine are defined in
+[`docs/PBOS/TRANSITION_LIFECYCLE_ARCHITECTURE.md`](./PBOS/TRANSITION_LIFECYCLE_ARCHITECTURE.md).
 
 PBOS runtime artifact ownership and test isolation are governed by
 [`docs/ENGINEERING/PBOS_RUNTIME_ISOLATION.md`](./ENGINEERING/PBOS_RUNTIME_ISOLATION.md).

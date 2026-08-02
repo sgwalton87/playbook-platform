@@ -21,6 +21,7 @@ export function createContextRefreshApproval(input: {
   readonly riskAcknowledgment: string;
   readonly timestamp: string;
   readonly expiration: string;
+  readonly allowRejectedBaseline?: boolean;
 }): ContextRefreshApprovalRecord {
   const body: Omit<ContextRefreshApprovalRecord, "digest"> = {
     approval_id: `CONTEXT-REFRESH-APPROVAL-${artifactDigest({
@@ -54,6 +55,7 @@ export function createContextRefreshApproval(input: {
     reconciliation: input.reconciliation,
     timestamp: input.timestamp,
     requireApproved: false,
+    allowRejectedBaseline: input.allowRejectedBaseline,
   });
   if (!validation.valid) {
     throw new Error(
@@ -68,6 +70,7 @@ export function validateContextRefreshApproval(input: {
   readonly reconciliation: ContextReconciliationReport;
   readonly timestamp: string;
   readonly requireApproved?: boolean;
+  readonly allowRejectedBaseline?: boolean;
 }): ContextRefreshApprovalValidation {
   const { approval, reconciliation } = input;
   const findings: string[] = [];
@@ -104,7 +107,10 @@ export function validateContextRefreshApproval(input: {
   if (approval.commit_identity !== reconciliation.current_snapshot.git.commitSha) {
     findings.push("Refresh approval commit identity does not match.");
   }
-  if (reconciliation.state !== "REVIEW_REQUIRED") {
+  if (
+    reconciliation.state !== "REVIEW_REQUIRED" &&
+    !(input.allowRejectedBaseline && reconciliation.state === "REJECTED")
+  ) {
     findings.push("Repository reconciliation does not require approved refresh.");
   }
   return { valid: findings.length === 0, findings };
