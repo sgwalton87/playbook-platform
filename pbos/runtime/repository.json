@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-02T10:43:16.689Z",
+  "generatedAt": "2026-08-02T10:50:48.066Z",
   "productionBranch": "main",
   "currentBranch": "pbos/post-pps300-convergence",
   "branches": [
@@ -2226,10 +2226,10 @@
     {
       "name": "pbos/post-pps300-convergence",
       "current": true,
-      "ahead": 167,
+      "ahead": 169,
       "behind": 0,
-      "latestCommit": "fix(pbos): preserve trust lease across newer approvals",
-      "latestCommitSha": "d1109fb9bb06784070a87bd360dda534a186dcac",
+      "latestCommit": "fix(pbos): rebase trust lease after approved transition",
+      "latestCommitSha": "284b8aa330c3a5276b33c24cf2a6ab6635c45b63",
       "changedFiles": [
         ".codex/context.md",
         ".env.example",
