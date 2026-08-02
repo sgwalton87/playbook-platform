@@ -2,15 +2,15 @@
   "version": "1.0.0",
   "owner": "repository-context",
   "latest": {
-    "id": "724d8badf735961be12b309535270218e8a5d37e29643a68076d9942b062abbd",
-    "previousContextIdentity": "91e15a868b47bf429981f5a1b3148c8674a4fdc1d466c96f947c4eca5faa81f9",
-    "newContextIdentity": "b7bd554d318915cdd7c6e2e8cea4297a6791b52205e8d6f021c44258cac900fd",
-    "reason": "Independently reviewed the tested development trust lease and protected infrastructure changes.",
+    "id": "5dc002823feaba7e6f0317f84c4c1a9c2c2c3b7317c6a99285afa2a602a988f5",
+    "previousContextIdentity": "b7bd554d318915cdd7c6e2e8cea4297a6791b52205e8d6f021c44258cac900fd",
+    "newContextIdentity": "bcceeb67384dbed342029804387a4afe09939f9081dcbdd6e788034a107739cd",
+    "reason": "Independently reviewed and approved the PBOS trust-lease correction. Tests confirm that valid bound approval evidence remains authoritative when newer approvals are recorded, while missing, altered, rejected, or unrelated authority continues to fail closed.",
     "triggeringConditions": [
       "Context validation failed: commit identity mismatches.",
       "Context validation failed: artifact changed after capture: pbos/runtime/repository.json."
     ],
-    "timestamp": "2026-08-02T10:17:52.397Z",
+    "timestamp": "2026-08-02T10:45:05.194Z",
     "validator": {
       "id": "PBOS-CONTEXT-VALIDATOR",
       "version": "1.1.0"
@@ -754,6 +754,22 @@
         "Context validation failed: artifact changed after capture: pbos/runtime/repository.json."
       ],
       "timestamp": "2026-08-02T10:17:52.397Z",
+      "validator": {
+        "id": "PBOS-CONTEXT-VALIDATOR",
+        "version": "1.1.0"
+      },
+      "generationResult": "PASS"
+    },
+    {
+      "id": "5dc002823feaba7e6f0317f84c4c1a9c2c2c3b7317c6a99285afa2a602a988f5",
+      "previousContextIdentity": "b7bd554d318915cdd7c6e2e8cea4297a6791b52205e8d6f021c44258cac900fd",
+      "newContextIdentity": "bcceeb67384dbed342029804387a4afe09939f9081dcbdd6e788034a107739cd",
+      "reason": "Independently reviewed and approved the PBOS trust-lease correction. Tests confirm that valid bound approval evidence remains authoritative when newer approvals are recorded, while missing, altered, rejected, or unrelated authority continues to fail closed.",
+      "triggeringConditions": [
+        "Context validation failed: commit identity mismatches.",
+        "Context validation failed: artifact changed after capture: pbos/runtime/repository.json."
+      ],
+      "timestamp": "2026-08-02T10:45:05.194Z",
       "validator": {
         "id": "PBOS-CONTEXT-VALIDATOR",
         "version": "1.1.0"

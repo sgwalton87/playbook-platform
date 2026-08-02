@@ -2,22 +2,22 @@
 
 ## Identity
 
-- Context identity: `b7bd554d318915cdd7c6e2e8cea4297a6791b52205e8d6f021c44258cac900fd`
-- Previous identity: `91e15a868b47bf429981f5a1b3148c8674a4fdc1d466c96f947c4eca5faa81f9`
+- Context identity: `bcceeb67384dbed342029804387a4afe09939f9081dcbdd6e788034a107739cd`
+- Previous identity: `b7bd554d318915cdd7c6e2e8cea4297a6791b52205e8d6f021c44258cac900fd`
 - Repository: playbook-platform
 - Root: `/Volumes/PBOSCanonicalization/playbook-platform`
 - Remote: origin (https://github.com/sgwalton87/playbook-platform.git)
 - Branch: pbos/post-pps300-convergence
-- Commit: `a024ae07e8b4d5c1c6a25c9f3d5cd4953da916e9`
+- Commit: `d1109fb9bb06784070a87bd360dda534a186dcac`
 - Working tree digest: `ed4ccabef8bb193ff5eee64176e5c966de34ac7bdf962c77bf0fb1a8fa9afac2`
-- Captured at: 2026-08-02T10:17:52.397Z
+- Captured at: 2026-08-02T10:45:05.194Z
 
 ## Refresh
 
-- Reason: Independently reviewed the tested development trust lease and protected infrastructure changes.
+- Reason: Independently reviewed and approved the PBOS trust-lease correction. Tests confirm that valid bound approval evidence remains authoritative when newer approvals are recorded, while missing, altered, rejected, or unrelated authority continues to fail closed.
 - Validator: PBOS-CONTEXT-VALIDATOR@1.1.0
 - Generation result: PASS
-- History entries: 47
+- History entries: 48
 
 ## Triggering Conditions
 
@@ -28,7 +28,7 @@
 
 | Artifact | Owner | Exists | Digest | Gate |
 | --- | --- | --- | --- | --- |
-| pbos/runtime/repository.json | repository-intelligence | YES | 9e969e0c0d49dce643ceb4f1a07b5ddb3aadd2e665bfbdc776edc6c9fb9468ba | none |
+| pbos/runtime/repository.json | repository-intelligence | YES | 23848efbd18863e6587af94e9cc4966be00d4e965853cb05e785d9cc816394b1 | none |
 | pbos/runtime/next-gate.json | constitutional-planner | YES | 9546a1060aa0089ef70ced77aec845a3a31d525679411c5b2a1dde48e807ab52 | none |
 | pbos/runtime/validation.json | runtime-validator | YES | 8107e0918e4301b93bc1d6793635ad232db98fe5cdad410f6bdfb3f81b6bb122 | none |
 | pbos/runtime/execution.json | execution-engine | YES | 2a4d8229227d171c17ef3792006de8b560cc37007143bd5d535ce859be98fff1 | none |
