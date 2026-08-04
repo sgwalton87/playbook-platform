@@ -32,6 +32,8 @@ PBOS reads authority in this order:
 ## Runtime Architecture
 PBOS coordinates a reusable execution pipeline: Planner → Validator → Execution Adapter → Verifier → Documentation Adapter → History Adapter → Ledger Adapter → Release Evidence Adapter → Reporting Adapter → Recommendation Engine → STOP.
 
+The local engineering runtime remains Playbook-owned. Its PBOS v1 integration is defined separately under `connector/`: `PLAYBOOK-SYSTEM-001` registers with `PLAYBOOK-OS-001` through the versioned PBOS API, while application workflows and data remain in this repository.
+
 PBOS separates orchestration responsibilities into focused modules:
 
 - `engine/planner.ts` loads structured gates and selects the highest-priority eligible gate without skipping dependencies.
@@ -93,6 +95,10 @@ PBOS prompts live under `pbos/prompts/` with `manifest.json`. PBOS verifies the 
 
 ## PBOS-ENGINE-004
 The proposed next PBOS self-improvement gate should add controlled implementation adapters, richer validation adapters, release-evidence append policies, checklist update APIs, state hashing, and mode-specific integration tests without changing application features.
+
+## PBOS v1 Connector
+
+The CIP-021 connector begins with system registration, domain activation, Supabase identity mapping, and runtime health. Intelligence and data exchange are explicitly disabled until identity, authority, provenance, and connector certification pass the PBOS lifecycle gate. See [the CIP-021 connector record](../docs/PBOS_CIP_021_PLAYBOOK_CONNECTOR.md).
 
 
 ## Release Candidate Baseline
