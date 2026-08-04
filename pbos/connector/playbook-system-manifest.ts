@@ -18,18 +18,30 @@ export const playbookSystemManifest = {
     name: "Playbook Platform",
     version: "1.0.0",
     domainIds: PLAYBOOK_DOMAINS,
-    capabilities: [{
-        capabilityId: "PLAYBOOK-RUNTIME-HEALTH",
-        name: "PBOS Runtime Health",
-        type: "SERVICE",
-        version: "1.0.0",
-        requiredPermissions: ["READ_RUNTIME_HEALTH"],
-        inputSchemaId: "pbos.health.request.v1",
-        outputSchemaId: "pbos.health.response.v1",
-        active: true
-    }],
-    permissions: ["READ_RUNTIME_HEALTH"],
-    communicationRules: ["HEALTH_CHECK"]
+    capabilities: [
+        {
+            capabilityId: "PLAYBOOK-RUNTIME-HEALTH",
+            name: "PBOS Runtime Health",
+            type: "SERVICE",
+            version: "1.0.0",
+            requiredPermissions: ["READ_RUNTIME_HEALTH"],
+            inputSchemaId: "pbos.health.request.v1",
+            outputSchemaId: "pbos.health.response.v1",
+            active: true
+        },
+        {
+            capabilityId: "PLAYBOOK-SCHOLAR-JOURNEY",
+            name: "Scholar Journey",
+            type: "WORKFLOW",
+            version: "1.0.0",
+            requiredPermissions: ["PUBLISH_LIFECYCLE_EVENT", "EXCHANGE_APPROVED_DATA"],
+            inputSchemaId: "playbook.scholar.onboarding.v1",
+            outputSchemaId: "playbook.scholar.dashboard.v1",
+            active: true
+        }
+    ],
+    permissions: ["READ_RUNTIME_HEALTH", "PUBLISH_LIFECYCLE_EVENT", "EXCHANGE_APPROVED_DATA"],
+    communicationRules: ["HEALTH_CHECK", "LIFECYCLE_EVENT", "DATA_EXCHANGE", "PROVENANCE_REQUIRED"]
 } as const;
 
 export const playbookDomainManifests = PLAYBOOK_DOMAINS.map((domainId) => ({
@@ -38,7 +50,9 @@ export const playbookDomainManifests = PLAYBOOK_DOMAINS.map((domainId) => ({
     externalSystemId: PLAYBOOK_SYSTEM_ID,
     pbosSystemId: PLAYBOOK_OS_ID,
     domainId,
-    capabilityIds: ["PLAYBOOK-RUNTIME-HEALTH"],
+    capabilityIds: domainId === "PLAYBOOK-DOMAIN-SCHOLAR"
+        ? ["PLAYBOOK-RUNTIME-HEALTH", "PLAYBOOK-SCHOLAR-JOURNEY"]
+        : ["PLAYBOOK-RUNTIME-HEALTH"],
     workflowIds: domainId === "PLAYBOOK-DOMAIN-SCHOLAR" ? ["PLAYBOOK-SCHOLAR-ONBOARDING"] : [],
     requiredServiceIds: ["PBOS-RUNTIME-HEALTH"],
     governanceRequirementIds: ["PBOS-AUTHORITY-BOUNDARY", "PLAYBOOK-DATA-OWNERSHIP"]
