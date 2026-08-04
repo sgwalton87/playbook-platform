@@ -3,9 +3,9 @@ import { PbosOperation, PbosResponse, PbosTransport } from "./contracts";
 export class PlaybookPbosRuntimeClient {
     constructor(private readonly transport: PbosTransport) {}
 
-    send<T>(operation: PbosOperation, payload: unknown, correlationId: string): Promise<PbosResponse<T>> {
+    send<T>(operation: PbosOperation, payload: unknown, correlationId: string, idempotencyKey?: string): Promise<PbosResponse<T>> {
         if (!correlationId) throw new Error("Playbook PBOS requests require a correlation ID.");
-        return this.transport.send<T>({ apiVersion: "v1", operation, payload, correlationId });
+        return this.transport.send<T>({ apiVersion: "v1", operation, payload, correlationId, idempotencyKey });
     }
 }
 

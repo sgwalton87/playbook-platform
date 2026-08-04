@@ -4,6 +4,8 @@
 
 CERTIFIED
 
+CIP-045 production activation is in progress and is not yet certified.
+
 ## Purpose
 
 Document Playbook Platform activation as the independently owned application `PLAYBOOK-SYSTEM-001` operating on `PLAYBOOK-OS-001` and PBOS v1.
@@ -30,7 +32,7 @@ PLAYBOOK-CONNECTOR-001
 PLAYBOOK-SYSTEM-001
 ```
 
-The first certified communication is runtime health. Scholar data exchange and intelligence remain disabled until identity, authority, provenance, and connector certification are validated.
+The first certified communication is runtime health. CIP-045 adds capability discovery, a governed Scholar onboarding lifecycle event, and an approved private dashboard projection. PBOS remains the authority and certification boundary; Playbook cannot self-authorize these operations.
 
 ## Registered Domains
 
@@ -46,6 +48,14 @@ The first certified communication is runtime health. Scholar data exchange and i
 - Playbook Platform validation gate: PASS
 - Human operator certification approval completed August 3, 2026
 - PBOS Core compatibility gate: PASS — 51 test files, 173 tests
+
+## CIP-045 Pending Evidence
+
+- Publish and install the exact `@pbos/connector-sdk` version.
+- Validate capability discovery and the onboarding-to-dashboard transaction against a deployed PBOS v1 service.
+- Prove denial, revocation, restart recovery, degraded mode, and provenance in the application repository.
+- Collect current lint, test, build, runtime, approval, and CI evidence.
+- Obtain human connector certification before merge or deployment.
 
 ## Related Links
 

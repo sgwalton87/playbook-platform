@@ -1,4 +1,9 @@
-import { PbosResponse, PlaybookIdentityMapping } from "./contracts";
+import {
+    PbosResponse,
+    PlaybookIdentityMapping,
+    ScholarDashboardProjection,
+    ScholarOnboardingEvent
+} from "./contracts";
 import { PlaybookIdentityMapper } from "./identity-mapper";
 import {
     PLAYBOOK_CONNECTOR_ID,
@@ -53,6 +58,51 @@ export class PlaybookConnector {
             purpose,
             correlationId: `playbook-health-${identity.externalIdentity.externalIdentityId}`
         }, `playbook-health-${identity.externalIdentity.externalIdentityId}`);
+    }
+
+    discoverCapabilities(grantedPermissions: readonly string[], correlationId: string): Promise<PbosResponse> {
+        return this.client.send("DISCOVER_CAPABILITIES", {
+            connectorId: PLAYBOOK_CONNECTOR_ID,
+            grantedPermissions
+        }, correlationId);
+    }
+
+    publishScholarOnboarding(
+        identity: PlaybookIdentityMapping,
+        event: ScholarOnboardingEvent,
+        correlationId: string
+    ): Promise<PbosResponse> {
+        return this.client.send("PUBLISH_LIFECYCLE_EVENT", {
+            ...this.scholarRuntimeBoundary(identity, correlationId),
+            purpose: "Publish an approved Scholar onboarding milestone.",
+            payload: event
+        }, correlationId, correlationId);
+    }
+
+    projectScholarDashboard(
+        identity: PlaybookIdentityMapping,
+        projection: ScholarDashboardProjection,
+        exchangeApprovalId: string,
+        correlationId: string
+    ): Promise<PbosResponse> {
+        if (!exchangeApprovalId) throw new Error("PBOS approval is required for Scholar dashboard exchange.");
+        return this.client.send("EXCHANGE_APPROVED_DATA", {
+            ...this.scholarRuntimeBoundary(identity, correlationId),
+            purpose: "Project approved Scholar onboarding state to the dashboard.",
+            payload: projection,
+            dataClassification: "PRIVATE",
+            exchangeApprovalId
+        }, correlationId, correlationId);
+    }
+
+    private scholarRuntimeBoundary(identity: PlaybookIdentityMapping, correlationId: string) {
+        if (!correlationId) throw new Error("Scholar runtime operations require a correlation ID.");
+        return {
+            connectorId: PLAYBOOK_CONNECTOR_ID,
+            domainRegistrationId: "PLAYBOOK-DOMAIN-SCHOLAR-REGISTRATION-001",
+            identityMappingId: identity.mappingId,
+            correlationId
+        } as const;
     }
 
     private async requireSuccess(response: Promise<PbosResponse>): Promise<PbosResponse> {

@@ -6,13 +6,17 @@ export type PbosOperation =
     | "REGISTER_DOMAIN"
     | "ACTIVATE_DOMAIN"
     | "REGISTER_IDENTITY"
-    | "HEALTH_CHECK";
+    | "HEALTH_CHECK"
+    | "DISCOVER_CAPABILITIES"
+    | "PUBLISH_LIFECYCLE_EVENT"
+    | "EXCHANGE_APPROVED_DATA";
 
 export interface PbosRequest<T = unknown> {
     readonly apiVersion: typeof PBOS_API_VERSION;
     readonly operation: PbosOperation;
     readonly correlationId: string;
     readonly payload: T;
+    readonly idempotencyKey?: string;
 }
 
 export type PbosResponse<T = unknown> =
@@ -40,6 +44,18 @@ export interface PlaybookIdentityMapping {
 }
 
 export type PlaybookRole = "SCHOLAR" | "SCHOLAR_ATHLETE" | "FAMILY" | "MENTOR" | "COACH" | "EDUCATOR";
+
+export interface ScholarOnboardingEvent {
+    readonly eventType: "SCHOLAR_ONBOARDING_COMPLETED";
+    readonly schemaVersion: "1.0.0";
+    readonly scholarRecordId: string;
+}
+
+export interface ScholarDashboardProjection {
+    readonly schemaVersion: "1.0.0";
+    readonly scholarRecordId: string;
+    readonly sectionIds: readonly string[];
+}
 
 export interface PbosTransport {
     send<T>(request: PbosRequest): Promise<PbosResponse<T>>;

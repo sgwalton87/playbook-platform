@@ -54,4 +54,45 @@ describe("PLAYBOOK-SYSTEM-001 connector", () => {
         const connector = new PlaybookConnector(new PlaybookPbosRuntimeClient(new RecordingTransport("CERTIFY_SYSTEM")));
         await expect(connector.activate(approvals)).rejects.toThrow("AUTHORITY_DENIED");
     });
+
+    it("discovers capabilities and sends the governed Scholar onboarding-to-dashboard transaction", async () => {
+        const transport = new RecordingTransport();
+        const connector = new PlaybookConnector(new PlaybookPbosRuntimeClient(transport));
+        const identity = await connector.registerIdentity("supabase-user-001", "SCHOLAR");
+
+        await connector.discoverCapabilities([
+            "READ_RUNTIME_HEALTH", "PUBLISH_LIFECYCLE_EVENT", "EXCHANGE_APPROVED_DATA"
+        ], "playbook-capabilities-001");
+        await connector.publishScholarOnboarding(identity, {
+            eventType: "SCHOLAR_ONBOARDING_COMPLETED",
+            schemaVersion: "1.0.0",
+            scholarRecordId: "scholar-record-001"
+        }, "playbook-onboarding-001");
+        await connector.projectScholarDashboard(identity, {
+            schemaVersion: "1.0.0",
+            scholarRecordId: "scholar-record-001",
+            sectionIds: ["identity", "goals"]
+        }, "PLAYBOOK-DASHBOARD-APPROVAL-001", "playbook-dashboard-001");
+
+        expect(transport.requests.slice(-3).map(request => request.operation)).toEqual([
+            "DISCOVER_CAPABILITIES", "PUBLISH_LIFECYCLE_EVENT", "EXCHANGE_APPROVED_DATA"
+        ]);
+        expect(transport.requests.at(-1)?.idempotencyKey).toBe("playbook-dashboard-001");
+        expect(transport.requests.at(-1)?.payload).toMatchObject({
+            dataClassification: "PRIVATE",
+            exchangeApprovalId: "PLAYBOOK-DASHBOARD-APPROVAL-001"
+        });
+    });
+
+    it("refuses dashboard projection without PBOS exchange approval", async () => {
+        const transport = new RecordingTransport();
+        const connector = new PlaybookConnector(new PlaybookPbosRuntimeClient(transport));
+        const identity = await connector.registerIdentity("supabase-user-001", "SCHOLAR");
+        await expect(connector.projectScholarDashboard(identity, {
+            schemaVersion: "1.0.0",
+            scholarRecordId: "scholar-record-001",
+            sectionIds: ["identity"]
+        }, "", "playbook-dashboard-denied-001")).rejects.toThrow("PBOS approval");
+        expect(transport.requests.some(request => request.operation === "EXCHANGE_APPROVED_DATA")).toBe(false);
+    });
 });
