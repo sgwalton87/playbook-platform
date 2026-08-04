@@ -1,5 +1,9 @@
 # PBOS CIP-021 Playbook Connector
 
+## Status
+
+CERTIFIED
+
 ## Purpose
 
 Document Playbook Platform activation as the independently owned application `PLAYBOOK-SYSTEM-001` operating on `PLAYBOOK-OS-001` and PBOS v1.
@@ -37,13 +41,11 @@ The first certified communication is runtime health. Scholar data exchange and i
 - Coach
 - Education
 
-## Validation Commands Ready
+## Validation Evidence
 
-```bash
-npm run lint
-npm test
-npm run build
-```
+- Playbook Platform validation gate: PASS
+- Human operator certification approval completed August 3, 2026
+- PBOS Core compatibility gate: PASS — 51 test files, 173 tests
 
 ## Related Links
 
