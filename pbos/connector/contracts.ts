@@ -33,7 +33,7 @@ export interface PlaybookIdentityMapping {
         readonly systemId: "PLAYBOOK-OS-001";
         readonly role: PlaybookRole;
         readonly authorityContext: readonly string[];
-        readonly provenance: readonly string[];
+        readonly provenance: string;
         readonly active: boolean;
     };
     readonly mappedAt: Date;
