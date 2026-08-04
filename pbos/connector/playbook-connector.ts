@@ -79,14 +79,14 @@ export class PlaybookConnector {
         }, correlationId, correlationId);
     }
 
-    projectScholarDashboard(
+    async projectScholarDashboard(
         identity: PlaybookIdentityMapping,
         projection: ScholarDashboardProjection,
         exchangeApprovalId: string,
         correlationId: string
     ): Promise<PbosResponse> {
         if (!exchangeApprovalId) throw new Error("PBOS approval is required for Scholar dashboard exchange.");
-        return this.client.send("EXCHANGE_APPROVED_DATA", {
+        return await this.client.send("EXCHANGE_APPROVED_DATA", {
             ...this.scholarRuntimeBoundary(identity, correlationId),
             purpose: "Project approved Scholar onboarding state to the dashboard.",
             payload: projection,
