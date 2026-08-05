@@ -30,6 +30,7 @@ function StartContent() {
   const [saving, setSaving] = useState(false);
   const [creating, setCreating] = useState(false);
   const [created, setCreated] = useState(false);
+  const [journeyError, setJourneyError] = useState<string | null>(null);
 
   const role = normalizeRole(
     params.get("first") === "1"
@@ -209,12 +210,24 @@ function StartContent() {
 
     if (isLast) {
       setCreating(true);
-      await persist(true);
-      setCreating(false);
-      setCreated(true);
-      setTimeout(() => {
-        window.location.href = getOnboardingCompletionDestination(role);
-      }, 15000);
+      setJourneyError(null);
+      try {
+        await persist(true);
+        const response = await fetch("/api/pbos/scholar/onboarding", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ displayName: String(form.full_name || "Scholar"), goalTitle: String(form.dream_school || form.ideal_profession || "Complete my scholar journey") }),
+        });
+        const result = await response.json() as { error?: string };
+        if (!response.ok) throw new Error(result.error || "PBOS Scholar journey could not be completed.");
+        setCreating(false);
+        setCreated(true);
+        setTimeout(() => { window.location.href = getOnboardingCompletionDestination(role); }, 15000);
+      } catch (error) {
+        setCreating(false);
+        setSaving(false);
+        setJourneyError(error instanceof Error ? error.message : "PBOS Scholar journey could not be completed.");
+      }
       return;
     }
 
@@ -226,6 +239,7 @@ function StartContent() {
 
   return (
     <main style={page}>
+      {journeyError && <div role="alert" aria-live="assertive" style={{ margin: 16, padding: 16, border: "1px solid #B91C1C", borderRadius: 12, color: "#B91C1C" }}>{journeyError}</div>}
       {creating && (
         <div style={overlay}>
           <div style={confetti}>✨ 🧭 📚</div>
