@@ -1,0 +1,6 @@
+#!/bin/sh
+set -eu
+[ "${PBOS_ARCHIVIST_DISABLED:-0}" = "1" ] && exit 0
+message="$(git log -1 --pretty=%B)"
+printf '%s' "$message" | grep -Eiq '^Milestone(\([^)]*\))?:[[:space:]]+.+' || exit 0
+node scripts/pbos-archive-milestone.mjs "$message"

@@ -1,0 +1,22 @@
+{
+  "missionId": "048-foundation",
+  "systemId": "PLAYBOOK-SYSTEM-001",
+  "repository": "sgwalton87/playbook-platform",
+  "governedRevision": "5dda9e7b32791402f6f6730995c120d89d5e4458",
+  "productionRunId": "08c241ee-9584-447b-9850-eb071d548375",
+  "state": "IMPLEMENTED_PENDING_VALIDATION",
+  "implementation": "lib/pbos/foundation.ts",
+  "test": "tests/unit/pbos/playbook-foundation.test.ts",
+  "evidence": [
+    "pbos/connector/identity-mapper.ts",
+    "pbos/generated/security/authority.ts",
+    "pbos/generated/design/tokens.ts",
+    "supabase/migrations/202608050002_pbos_scholar_foundation.sql"
+  ],
+  "acceptanceCriteria": [
+    "Supabase identity maps to PBOS",
+    "Owner authority fails closed",
+    "Scholar data remains RLS-scoped",
+    "The Playbook design tokens are canonical"
+  ]
+}
