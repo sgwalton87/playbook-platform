@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "capability": "PBOS_ENGINEERING_MEMORY",
+  "systemId": "PLAYBOOK-SYSTEM-001",
+  "systemName": "The Playbook",
+  "repository": "sgwalton87/playbook-platform",
+  "progressFile": "docs/project-management/project-progress.json",
+  "validationCommands": [
+    [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    [
+      "npm",
+      "test"
+    ],
+    [
+      "npm",
+      "run",
+      "build"
+    ]
+  ],
+  "persistence": "LOCAL_RECORDS_AND_CI_ARTIFACT"
+}
