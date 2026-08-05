@@ -1,0 +1,21 @@
+{
+  "sourceBlueprintId": "ff6831f4-7d23-4322-b424-8dd143b9651a",
+  "systemId": "PLAYBOOK-SYSTEM-001",
+  "tagline": "Connect. Empower. Achieve.",
+  "typography": {
+    "heading": "Montserrat, Inter, system-ui, sans-serif",
+    "body": "Inter, system-ui, sans-serif"
+  },
+  "usageGuidance": "Use The Playbook identity only inside The Playbook application. PBOS Genesis remains the factory brand.",
+  "assets": [
+    {
+      "assetId": "THE-PLAYBOOK-MASTER-BOARD-002",
+      "kind": "LOGO_CARD",
+      "location": "assets/brand/playbook-platform/the-playbook-master-brand-board-v2.png",
+      "mediaType": "image/png",
+      "sha256": "f0903d2ad8a74f7551048734b14216947686896c2b8568383711e753c9af746b",
+      "rightsConfirmed": true
+    }
+  ],
+  "policy": "References are build inputs. Verify integrity, rights, and production-ready variants before copying or publishing assets."
+}
