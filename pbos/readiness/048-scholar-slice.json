@@ -1,0 +1,25 @@
+{
+  "missionId": "048-scholar-slice",
+  "systemId": "PLAYBOOK-SYSTEM-001",
+  "repository": "sgwalton87/playbook-platform",
+  "governedRevision": "72c68aa14470b6db3f0155778354057b923eebc8",
+  "productionRunId": "f6b713f1-0671-4fef-8ff4-429303c6f711",
+  "state": "IMPLEMENTED_PENDING_VALIDATION",
+  "surfaces": [
+    "WEB"
+  ],
+  "journey": "IDENTITY_ONBOARDING_TO_DASHBOARD",
+  "implementation": [
+    "app/start/page.tsx",
+    "app/api/pbos/scholar/onboarding/route.ts",
+    "lib/pbos/scholar-onboarding-service.ts"
+  ],
+  "durableData": "supabase/migrations/202608050003_pbos_scholar_dashboard.sql",
+  "acceptanceCriteria": [
+    "Authenticated Scholar identity is owner-scoped",
+    "PBOS connector requests are server-signed",
+    "Onboarding, goal, milestone, and dashboard projection are idempotently durable",
+    "PBOS denial fails closed",
+    "The existing responsive UI reports journey failure accessibly"
+  ]
+}
