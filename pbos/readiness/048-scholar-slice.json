@@ -2,8 +2,8 @@
   "missionId": "048-scholar-slice",
   "systemId": "PLAYBOOK-SYSTEM-001",
   "repository": "sgwalton87/playbook-platform",
-  "governedRevision": "72c68aa14470b6db3f0155778354057b923eebc8",
-  "productionRunId": "f6b713f1-0671-4fef-8ff4-429303c6f711",
+  "governedRevision": "836e6aea7d79a2b1cc8977971d03b24d9650c710",
+  "productionRunId": "1997df6f-7d7b-45b7-9229-334f1080fa9d",
   "state": "IMPLEMENTED_PENDING_VALIDATION",
   "surfaces": [
     "WEB"
