@@ -1,0 +1,3 @@
+import { describe, expect, it } from "vitest";
+import { ScholarJourney } from "./scholar-journey";
+describe("The Playbook Scholar onboarding-to-dashboard slice", () => { it("requires governed identity and exchange approval", () => { const service = new ScholarJourney(); const scholar = service.begin("scholar@example.com"); expect(() => service.captureGoal(scholar, "Graduate")).toThrow("Verified identity"); const verified = service.verifyIdentity(scholar, "IDENTITY-APPROVAL-001"); const goal = service.captureGoal(verified, "Graduate"); expect(() => service.projectDashboard(verified, [goal])).toThrow("exchange approval"); expect(service.projectDashboard(verified, [goal], "EXCHANGE-APPROVAL-001").goalIds).toEqual([goal.id]); }); });
