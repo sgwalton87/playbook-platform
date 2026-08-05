@@ -1,0 +1,5 @@
+systemId: PLAYBOOK-SYSTEM-001
+operatingSystemId: PLAYBOOK-OS-001
+pbosVersion: 1.0.0
+domainPack: @pbos/domain-education
+blueprintId: ff6831f4-7d23-4322-b424-8dd143b9651a
