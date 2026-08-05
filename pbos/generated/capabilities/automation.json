@@ -1,0 +1,8 @@
+{
+  "systemId": "PLAYBOOK-SYSTEM-001",
+  "capability": "AUTOMATION",
+  "blueprintId": "a34583d9-bbf1-4c9e-b82c-a31cd4d2ddc8",
+  "state": "IMPLEMENTED_PENDING_CERTIFICATION",
+  "implementation": "pbos/generated/capabilities/automation.ts",
+  "validation": "pbos/generated/capabilities/automation.test.ts"
+}
