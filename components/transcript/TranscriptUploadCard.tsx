@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
 
 export default function TranscriptUploadCard({ onParsed }: { onParsed?: () => void }) {
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -19,24 +18,17 @@ export default function TranscriptUploadCard({ onParsed }: { onParsed?: () => vo
   async function handleFile(file?: File) {
     if (!file) return;
 
+    if (file.size > 12 * 1024 * 1024) { setStatus("Transcript must be 12 MB or smaller."); return; }
+
     setBusy(true);
     setStatus("Reading transcript...");
-
-    const { data } = await supabase.auth.getUser();
-    const userId = data.user?.id;
-
-    if (!userId) {
-      setStatus("Please sign in first.");
-      setBusy(false);
-      return;
-    }
 
     const base64 = await fileToBase64(file);
 
     const res = await fetch("/api/parse-transcript", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ base64, mediaType: file.type || "application/pdf", userId }),
+      body: JSON.stringify({ base64, mediaType: file.type || "application/pdf" }),
     });
 
     const json = await res.json();
@@ -74,7 +66,7 @@ export default function TranscriptUploadCard({ onParsed }: { onParsed?: () => vo
         {busy ? "Reading..." : "Upload Transcript"}
       </button>
 
-      <p style={statusStyle}>{status}</p>
+      <p role="status" aria-live="polite" style={statusStyle}>{status}</p>
     </section>
   );
 }

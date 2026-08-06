@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { AG_SUBJECT_NAMES, AG_REQUIREMENTS } from "@/lib/agCourses";
@@ -22,31 +22,34 @@ export default function TranscriptPage() {
   const [certificates, setCertificates] = useState<LegacyValue[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    (async () => {
-      const { data: u } = await supabase.auth.getUser();
-      if (!u.user) { router.replace("/login"); return; }
-      const [{ data: p }, { data: ag }, { data: certs }, { data: acts }] = await Promise.all([
-        supabase.from("profiles").select("*").eq("id", u.user.id).single(),
-        supabase.from("ag_progress").select("*").eq("user_id", u.user.id).order("updated_at", { ascending: false }),
-        supabase.from("certificates").select("*").eq("user_id", u.user.id),
-        supabase.from("student_activities").select("*").eq("student_id", u.user.id),
-      ]);
-      setProfile(p);
-      const record = buildScholarRecord({ profile: p, agProgress: ag || [], certificates: certs || [], activities: acts || [] });
-      setScholarRecord(record);
-      setAgProgress(record.academics.agProgress.map((a)=>({
-        subject: a.subject,
-        years_completed: a.yearsCompleted,
-        years_required: a.yearsRequired,
-        in_progress: a.inProgress,
-        courses_taken: a.coursesTaken,
-        current_course: a.currentCourse,
-      })));
-      setCertificates(certs||[]);
-      setLoading(false);
-    })();
+  const loadTranscript = useCallback(async () => {
+    const { data: u } = await supabase.auth.getUser();
+    if (!u.user) { router.replace("/login"); return; }
+    const [{ data: p }, { data: ag }, { data: certs }, { data: acts }] = await Promise.all([
+      supabase.from("profiles").select("*").eq("id", u.user.id).single(),
+      supabase.from("ag_progress").select("*").eq("user_id", u.user.id).order("updated_at", { ascending: false }),
+      supabase.from("certificates").select("*").eq("user_id", u.user.id),
+      supabase.from("student_activities").select("*").eq("student_id", u.user.id),
+    ]);
+    setProfile(p);
+    const record = buildScholarRecord({ profile: p, agProgress: ag || [], certificates: certs || [], activities: acts || [] });
+    setScholarRecord(record);
+    setAgProgress(record.academics.agProgress.map((a)=>({
+      subject: a.subject,
+      years_completed: a.yearsCompleted,
+      years_required: a.yearsRequired,
+      in_progress: a.inProgress,
+      courses_taken: a.coursesTaken,
+      current_course: a.currentCourse,
+    })));
+    setCertificates(certs||[]);
+    setLoading(false);
   }, [router]);
+
+  useEffect(() => {
+    const hydration = window.setTimeout(() => { void loadTranscript(); }, 0);
+    return () => window.clearTimeout(hydration);
+  }, [loadTranscript]);
 
   if (loading) return <><div style={{padding:"28px 32px",fontFamily:T.mono,fontSize:12,color:T.faint}}>Loading transcript...</div></>;
 
@@ -57,7 +60,7 @@ export default function TranscriptPage() {
   return (
     <>
 <>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');*,*::before,*::after{box-sizing:border-box;}@media print{.no-print{display:none!important;}}`}</style>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');*,*::before,*::after{box-sizing:border-box;}@media print{.no-print{display:none!important;}}@media(max-width:900px){.transcript-layout{flex-direction:column!important;}.transcript-sidebar{position:static!important;width:100%!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;}.transcript-main{width:100%!important;}.transcript-title-row,.transcript-record-heading,.transcript-footer{align-items:flex-start!important;flex-direction:column!important;gap:12px!important;}.transcript-record-heading>div:last-child{text-align:left!important;}.transcript-meta-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;}.transcript-table-scroll{max-width:100%;overflow-x:auto!important;-webkit-overflow-scrolling:touch;}.transcript-table{min-width:720px;}}@media(max-width:520px){.transcript-sidebar,.transcript-meta-grid{grid-template-columns:1fr!important;}.transcript-title-row h1{margin-bottom:0!important;}.transcript-table{min-width:660px;}}`}</style>
       <div style={{marginBottom:24}}>
         <PlaybookStoryBanner
           eyebrow="The Playbook Transcript"
@@ -68,9 +71,9 @@ export default function TranscriptPage() {
         />
       </div>
 
-      <div style={{display:"flex",gap:24,alignItems:"flex-start",width:"100%"}}>
+      <div className="transcript-layout" style={{display:"flex",gap:24,alignItems:"flex-start",width:"100%"}}>
 
-        <div className="no-print" style={{width:260,flexShrink:0,display:"flex",flexDirection:"column",gap:14,position:"sticky",top:28}}>
+        <div className="no-print transcript-sidebar" style={{width:260,flexShrink:0,display:"flex",flexDirection:"column",gap:14,position:"sticky",top:28}}>
           {academic?.dreamSchool&&(
             <div style={{background:T.navy,borderRadius:14,padding:"16px"}}>
               <div style={{fontFamily:T.mono,fontSize:9,letterSpacing:"0.14em",textTransform:"uppercase",color:"rgba(248,247,244,.4)",marginBottom:8}}>Dream school</div>
@@ -79,7 +82,7 @@ export default function TranscriptPage() {
             </div>
           )}
           <div style={{background:T.navy,borderRadius:16,padding:"18px 16px",color:"#F8F7F4"}}>
-            <div style={{fontFamily:T.mono,fontSize:9,letterSpacing:"0.14em",textTransform:"uppercase",color:"rgba(248,247,244,.4)",marginBottom:10}}>College readiness</div>
+            <div style={{fontFamily:T.mono,fontSize:9,letterSpacing:"0.14em",textTransform:"uppercase",color:"rgba(248,247,244,.72)",marginBottom:10}}>College readiness</div>
             <div style={{fontFamily:T.anton,fontSize:52,color:agDone===7?T.green:T.orange,lineHeight:1,marginBottom:4}}>{Math.round((agDone/7)*100)}%</div>
             <div style={{fontSize:12,color:"rgba(248,247,244,.5)",marginBottom:12}}>{agDone}/7 A-G subjects met</div>
             <div style={{background:"rgba(255,255,255,.1)",borderRadius:999,height:6,overflow:"hidden"}}>
@@ -115,7 +118,7 @@ export default function TranscriptPage() {
             })}
           </div>
           <div style={{background:T.orangeL,border:`0.5px solid #FED7AA`,borderRadius:14,padding:"16px"}}>
-            <div style={{fontFamily:T.mono,fontSize:9,letterSpacing:"0.14em",textTransform:"uppercase",color:T.orange,marginBottom:10}}>💡 Tips for success</div>
+            <div style={{fontFamily:T.mono,fontSize:9,letterSpacing:"0.14em",textTransform:"uppercase",color:"#9A3412",marginBottom:10}}>💡 Tips for success</div>
             {[agDone<7?"Complete all A-G requirements to qualify for UC and CSU.":null,!academic?.weightedGpa&&!academic?.gpa?"Add your GPA to strengthen your application.":null,"Request transcripts early — colleges need official copies.","A-G courses must be completed with a C or better to count."].filter(Boolean).slice(0,4).map((tip,i)=>(
               <div key={i} style={{display:"flex",gap:8,fontSize:11,color:"#7C2D12",lineHeight:1.5,marginBottom:6}}>
                 <span style={{flexShrink:0}}>→</span><span>{tip}</span>
@@ -124,14 +127,14 @@ export default function TranscriptPage() {
           </div>
         </div>
 
-        <div style={{flex:1,minWidth:0}}>
-          <TranscriptUploadCard onParsed={() => window.location.reload()} />
-          <div className="no-print" style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:24}}>
+        <div className="transcript-main" style={{flex:1,minWidth:0}}>
+          <TranscriptUploadCard onParsed={() => void loadTranscript()} />
+          <div className="no-print transcript-title-row" style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:24}}>
             <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink}}>Academic Transcript</h1>
             <button onClick={()=>window.print()} style={{fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:T.navy,color:"#fff",border:"none",borderRadius:12,padding:"10px 20px",cursor:"pointer"}}>🖨 Print / Save PDF</button>
           </div>
           <div style={{background:T.navy,borderRadius:16,padding:"24px 28px",marginBottom:20,color:"#F8F7F4"}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+            <div className="transcript-record-heading" style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
               <div>
                 <div style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.18em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>Official Academic Record</div>
                 <h2 style={{fontFamily:T.anton,fontWeight:400,fontSize:32,textTransform:"uppercase",lineHeight:.95,marginBottom:4}}>{profile?.full_name||`${profile?.first_name||""} ${profile?.last_name||""}`.trim()||"Student"}</h2>
@@ -140,13 +143,13 @@ export default function TranscriptPage() {
               <div style={{textAlign:"right"}}>
                 <div style={{fontSize:12,color:"rgba(248,247,244,.5)",marginBottom:4}}>Cumulative GPA</div>
                 <div style={{fontFamily:T.anton,fontSize:36,color:T.orange,lineHeight:1}}>{academic?.weightedGpa||academic?.gpa||"—"}</div>
-                <div style={{fontSize:11,color:"rgba(248,247,244,.4)"}}>Weighted</div>
+                <div style={{fontSize:11,color:"rgba(248,247,244,.72)"}}>Weighted</div>
               </div>
             </div>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:10,marginTop:16}}>
+            <div className="transcript-meta-grid" style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:10,marginTop:16}}>
               {[{label:"Student ID",val:profile?.id?.slice(0,8).toUpperCase()||"—"},{label:"Date of Birth",val:profile?.date_of_birth?new Date(profile.date_of_birth).toLocaleDateString("en",{month:"short",day:"numeric",year:"numeric"}):"—"},{label:"District",val:profile?.school_district||"—"},{label:"A-G Status",val:`${agDone}/7 complete`}].map(({label,val})=>(
                 <div key={label} style={{background:"rgba(255,255,255,.07)",borderRadius:8,padding:"8px 10px"}}>
-                  <div style={{fontFamily:T.mono,fontSize:9,color:"rgba(248,247,244,.4)",textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:2}}>{label}</div>
+                  <div style={{fontFamily:T.mono,fontSize:9,color:"rgba(248,247,244,.72)",textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:2}}>{label}</div>
                   <div style={{fontSize:12,fontWeight:600}}>{val}</div>
                 </div>
               ))}
@@ -158,8 +161,8 @@ export default function TranscriptPage() {
               <span style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:T.muted,padding:"0 12px"}}>A-G Education Requirements</span>
               <div style={{flex:1,height:1,background:T.line}}/>
             </div>
-            <div style={{border:`0.5px solid ${T.line}`,borderRadius:12,overflow:"hidden"}}>
-              <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+            <div className="transcript-table-scroll" role="region" aria-label="A-G education requirements" tabIndex={0} style={{border:`0.5px solid ${T.line}`,borderRadius:12,overflow:"hidden"}}>
+              <table className="transcript-table" style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
                 <thead>
                   <tr style={{background:T.navy,color:"#F8F7F4"}}>
                     <th style={{padding:"10px 14px",textAlign:"left",fontFamily:T.mono,fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:700,width:30}}>Cat.</th>
@@ -190,13 +193,13 @@ export default function TranscriptPage() {
                               {currentCourse&&<span style={{background:T.orangeL,color:T.orange,borderRadius:999,padding:"2px 8px",fontSize:11,fontWeight:500}}>{currentCourse} (in progress)</span>}
                             </div>
                           ):(
-                            <span style={{color:T.faint,fontStyle:"italic"}}>{inProg&&currentCourse?currentCourse+" (in progress)":"No courses logged yet"}</span>
+                            <span style={{color:"#475569",fontStyle:"italic"}}>{inProg&&currentCourse?currentCourse+" (in progress)":"No courses logged yet"}</span>
                           )}
                         </td>
                         <td style={{padding:"12px 14px",textAlign:"center",fontFamily:T.mono,fontWeight:700,fontSize:14,color:done?T.green:inProg?T.amber:T.ink}}>{completed}</td>
                         <td style={{padding:"12px 14px",textAlign:"center",fontFamily:T.mono,fontSize:13,color:T.muted}}>{required}</td>
                         <td style={{padding:"12px 14px",textAlign:"center"}}>
-                          {done?<span style={{background:T.greenL,color:T.green,borderRadius:999,padding:"3px 10px",fontSize:11,fontWeight:700,fontFamily:T.mono}}>✓ Met</span>:inProg?<span style={{background:T.orangeL,color:T.amber,borderRadius:999,padding:"3px 10px",fontSize:11,fontWeight:700,fontFamily:T.mono}}>In progress</span>:<span style={{background:T.surface2,color:T.faint,borderRadius:999,padding:"3px 10px",fontSize:11,fontWeight:700,fontFamily:T.mono}}>Needed</span>}
+                          {done?<span style={{background:T.greenL,color:"#047857",borderRadius:999,padding:"3px 10px",fontSize:11,fontWeight:700,fontFamily:T.mono}}>✓ Met</span>:inProg?<span style={{background:T.orangeL,color:"#92400E",borderRadius:999,padding:"3px 10px",fontSize:11,fontWeight:700,fontFamily:T.mono}}>In progress</span>:<span style={{background:T.surface2,color:"#475569",borderRadius:999,padding:"3px 10px",fontSize:11,fontWeight:700,fontFamily:T.mono}}>Needed</span>}
                         </td>
                       </tr>
                     );
@@ -206,8 +209,8 @@ export default function TranscriptPage() {
                   <tr style={{background:T.surface2,borderTop:`1px solid ${T.line}`}}>
                     <td colSpan={3} style={{padding:"10px 14px",fontFamily:T.mono,fontSize:11,fontWeight:700,color:T.ink}}>TOTAL A-G COMPLETION</td>
                     <td style={{padding:"10px 14px",textAlign:"center",fontFamily:T.mono,fontWeight:700,color:T.orange}}>{agProgress.reduce((sum,a)=>sum+Number(a.years_completed),0)}</td>
-                    <td style={{padding:"10px 14px",textAlign:"center",fontFamily:T.mono,color:T.muted}}>15</td>
-                    <td style={{padding:"10px 14px",textAlign:"center"}}><span style={{fontFamily:T.mono,fontSize:11,fontWeight:700,color:agDone===7?T.green:T.amber}}>{agDone}/7 met</span></td>
+                    <td style={{padding:"10px 14px",textAlign:"center",fontFamily:T.mono,color:"#475569"}}>15</td>
+                    <td style={{padding:"10px 14px",textAlign:"center"}}><span style={{fontFamily:T.mono,fontSize:11,fontWeight:700,color:agDone===7?"#047857":"#92400E"}}>{agDone}/7 met</span></td>
                   </tr>
                 </tfoot>
               </table>
@@ -243,9 +246,9 @@ export default function TranscriptPage() {
               </div>
             </div>
           )}
-          <div style={{borderTop:`0.5px solid ${T.line}`,paddingTop:16,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-            <div style={{fontFamily:T.mono,fontSize:10,color:T.faint}}>Generated by Playbook Series Inc. · playbookseriesinc.org</div>
-            <div style={{fontFamily:T.mono,fontSize:10,color:T.faint}}>{new Date().toLocaleDateString("en",{month:"long",day:"numeric",year:"numeric"})}</div>
+          <div className="transcript-footer" style={{borderTop:`0.5px solid ${T.line}`,paddingTop:16,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+            <div style={{fontFamily:T.mono,fontSize:10,color:"#475569"}}>Generated by Playbook Series Inc. · playbookseriesinc.org</div>
+            <div style={{fontFamily:T.mono,fontSize:10,color:"#475569"}}>{new Date().toLocaleDateString("en",{month:"long",day:"numeric",year:"numeric"})}</div>
           </div>
         </div>
       </div>
