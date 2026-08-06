@@ -1,0 +1,71 @@
+.playbook-login-card {
+  width: min(1240px, 100%);
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(380px, 1.15fr);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 34px;
+  overflow: hidden;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.14);
+}
+
+.playbook-login-brand {
+  position: relative;
+  min-width: 0;
+  min-height: 640px;
+  background: #0f172a;
+  color: #f8f7f4;
+  overflow: hidden;
+}
+
+.playbook-login-brand-content {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  min-height: 640px;
+  padding: clamp(34px, 5vw, 68px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.playbook-login-title {
+  max-width: 100%;
+  margin: 12px 0 18px;
+  font-family: "Anton", sans-serif;
+  font-size: clamp(44px, 5vw, 68px);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 900px) {
+  .playbook-login-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .playbook-login-brand,
+  .playbook-login-brand-content {
+    min-height: 420px;
+  }
+
+  .playbook-login-brand-content {
+    padding: clamp(30px, 8vw, 52px);
+  }
+
+  .playbook-login-title {
+    max-width: 12ch;
+    font-size: clamp(44px, 10vw, 64px);
+  }
+}
+
+@media (max-width: 520px) {
+  .playbook-login-card {
+    border-radius: 24px;
+  }
+
+  .playbook-login-brand,
+  .playbook-login-brand-content {
+    min-height: 360px;
+  }
+}

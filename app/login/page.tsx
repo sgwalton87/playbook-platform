@@ -9,6 +9,7 @@ import { USER_PATHWAYS } from "@/lib/auth";
 import { normalizeRole } from "@/lib/onboarding/pathwayMap";
 import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
+import "./login.css";
 
 export default function LoginPage() {
   return (
@@ -124,18 +125,18 @@ function LoginContent() {
 
   return (
     <main style={page}>
-      <section style={card}>
-        <div style={brand}>
+      <section className="playbook-login-card">
+        <div className="playbook-login-brand">
           <Image unoptimized width={1200} height={800}
             src={isSignup ? PLAYBOOK_HERO_VISUALS.signup.image : PLAYBOOK_HERO_VISUALS.login.image}
             alt={isSignup ? PLAYBOOK_HERO_VISUALS.signup.alt : PLAYBOOK_HERO_VISUALS.login.alt}
             style={brandImage}
           />
           <div style={brandOverlay} />
-          <div style={brandContent}>
+          <div className="playbook-login-brand-content">
             <PlaybookLogo size={138} priority />
             <p style={eyebrow}>The Playbook</p>
-            <h1 style={title}>{copy.title}</h1>
+            <h1 className="playbook-login-title">{copy.title}</h1>
             <p style={body}>{copy.body}</p>
           </div>
         </div>
@@ -259,25 +260,6 @@ const page: React.CSSProperties = {
   color: "#0F172A",
 };
 
-const card: React.CSSProperties = {
-  width: "min(1240px, 100%)",
-  display: "grid",
-  gridTemplateColumns: "minmax(300px,.85fr) minmax(380px,1.15fr)",
-  background: "#FFFFFF",
-  border: "1px solid #E2E8F0",
-  borderRadius: 34,
-  overflow: "hidden",
-  boxShadow: "0 24px 70px rgba(15,23,42,.14)",
-};
-
-const brand: React.CSSProperties = {
-  position: "relative",
-  minHeight: 640,
-  background: "#0F172A",
-  color: "#F8F7F4",
-  overflow: "hidden",
-};
-
 const brandImage: React.CSSProperties = {
   position: "absolute",
   inset: 0,
@@ -292,16 +274,6 @@ const brandOverlay: React.CSSProperties = {
   background: "linear-gradient(180deg,rgba(15,23,42,.74),rgba(15,23,42,.94))",
 };
 
-const brandContent: React.CSSProperties = {
-  position: "relative",
-  zIndex: 1,
-  minHeight: 640,
-  padding: "clamp(34px,5vw,68px)",
-  display: "flex",
-  flexDirection: "column",
-  justifyContent: "center",
-};
-
 const eyebrow: React.CSSProperties = {
   marginTop: 24,
   fontFamily: "'Space Mono', monospace",
@@ -310,14 +282,6 @@ const eyebrow: React.CSSProperties = {
   letterSpacing: ".18em",
   textTransform: "uppercase",
   color: "#F97316",
-};
-
-const title: React.CSSProperties = {
-  fontFamily: "'Anton', sans-serif",
-  fontSize: "clamp(48px,7vw,82px)",
-  lineHeight: .9,
-  textTransform: "uppercase",
-  margin: "12px 0 18px",
 };
 
 const body: React.CSSProperties = {
