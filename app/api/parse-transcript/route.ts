@@ -6,6 +6,7 @@ import { buildAcademicIntelligenceReport } from "@/lib/academic-intelligence";
 import { PlaybookConnector } from "@/pbos/connector/playbook-connector";
 import { PlaybookPbosRuntimeClient } from "@/pbos/connector/pbos-runtime-client";
 import { SignedPlaybookPbosTransport } from "@/pbos/connector/signed-server-transport";
+import { AgParseResult, parseTextPdfTranscript } from "@/lib/academic-transcript-fallback";
 
 const AG_SUBJECTS = [
   { key: "A", name: "History / Social Science", required: 2 }, { key: "B", name: "English", required: 4 },
@@ -13,8 +14,6 @@ const AG_SUBJECTS = [
   { key: "E", name: "Language Other Than English", required: 2 }, { key: "F", name: "Visual & Performing Arts", required: 1 },
   { key: "G", name: "College-Preparatory Elective", required: 1 }
 ] as const;
-type AgSubjectResult = { years_required?: number | string; years_completed?: number | string; in_progress?: boolean; courses_taken?: unknown[]; current_course?: string | null };
-type AgParseResult = Record<string, AgSubjectResult | undefined>;
 type AnthropicResponse = { content?: { text?: string }[]; error?: unknown };
 
 const PROMPT = `Analyze this student transcript and return only JSON containing California A-G categories A through G. For each category include years_completed, years_required, in_progress, courses_taken, and current_course. Count only visible passing coursework when grades are available.`;
@@ -28,19 +27,39 @@ export async function POST(request: NextRequest) {
     const base64 = String(body.base64 ?? ""); const mediaType = String(body.mediaType ?? "");
     validateTranscriptInput(base64, mediaType);
     const requestId = String(body.requestId ?? "transcript-" + user.id + "-" + createHash("sha256").update(base64).digest("hex").slice(0, 16));
-    const aiResponse = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: {
-      "content-type": "application/json", "x-api-key": required("ANTHROPIC_API_KEY"), "anthropic-version": "2023-06-01"
-    }, body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 2000, messages: [{ role: "user", content: [
-      { type: mediaType.startsWith("image/") ? "image" : "document", source: { type: "base64", media_type: mediaType, data: base64 } },
-      { type: "text", text: PROMPT }
-    ] }] }) });
-    if (!aiResponse.ok) return NextResponse.json({ error: "Transcript intelligence is temporarily unavailable." }, { status: 502 });
-    const ai = await aiResponse.json() as AnthropicResponse;
-    if (ai.error) return NextResponse.json({ error: "Transcript intelligence could not read this file." }, { status: 422 });
-    const text = ai.content?.[0]?.text ?? "";
-    const raw = text.match(/```json([\s\S]*?)```/)?.[1]?.trim() ?? text.match(/\{[\s\S]*\}/)?.[0];
-    if (!raw) return NextResponse.json({ error: "Transcript evidence could not be extracted." }, { status: 422 });
-    const parsed = JSON.parse(raw) as AgParseResult;
+    const anthropicKey = process.env.ANTHROPIC_API_KEY ?? "";
+    const providerConfigured = anthropicKey.startsWith("sk-ant-") && anthropicKey.length > 32
+      && !/[\s/]/.test(anthropicKey);
+    let aiResponse: Response | null = null;
+    if (providerConfigured) {
+      try {
+        aiResponse = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: {
+          "content-type": "application/json", "x-api-key": anthropicKey, "anthropic-version": "2023-06-01"
+        }, body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 2000, messages: [{ role: "user", content: [
+          { type: mediaType.startsWith("image/") ? "image" : "document", source: { type: "base64", media_type: mediaType, data: base64 } },
+          { type: "text", text: PROMPT }
+        ] }] }) });
+      } catch {
+        aiResponse = null;
+      }
+    }
+    let parsed: AgParseResult | null = null;
+    let parsingMode: "ANTHROPIC" | "LOCAL_TEXT_PDF" = "ANTHROPIC";
+    if (aiResponse?.ok) {
+      const ai = await aiResponse.json() as AnthropicResponse;
+      const text = ai.error ? "" : ai.content?.[0]?.text ?? "";
+      const raw = text.match(/```json([\s\S]*?)```/)?.[1]?.trim() ?? text.match(/\{[\s\S]*\}/)?.[0];
+      if (raw) {
+        try { parsed = JSON.parse(raw) as AgParseResult; } catch { parsed = null; }
+      }
+    }
+    if (!parsed) {
+      parsed = parseTextPdfTranscript(base64, mediaType);
+      parsingMode = "LOCAL_TEXT_PDF";
+    }
+    if (!parsed) return NextResponse.json({ error: aiResponse?.ok
+      ? "Transcript evidence could not be extracted."
+      : "Transcript intelligence is temporarily unavailable and this file requires approved OCR." }, { status: aiResponse?.ok ? 422 : 502 });
     let agUpdates = 0;
     for (const subject of AG_SUBJECTS) {
       const value = parsed[subject.key] ?? {};
@@ -87,7 +106,7 @@ export async function POST(request: NextRequest) {
     });
     const evidence = await journey.complete({ actorId: user.id, ownerId: user.id,
       approvalId: required("PBOS_ACADEMIC_JOURNEY_APPROVAL_ID"), readinessScore: readiness.score, agUpdates, idempotencyKey: requestId });
-    return NextResponse.json({ ok: true, agUpdates, readiness, evidence });
+    return NextResponse.json({ ok: true, agUpdates, readiness, evidence, parsingMode });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Transcript journey failed." }, { status: 500 });
   }
