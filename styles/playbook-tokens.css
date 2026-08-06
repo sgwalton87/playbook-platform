@@ -1,8 +1,10 @@
 :root {
   --pb-navy: #10233f;
   --pb-navy-dark: #071427;
-  --pb-orange: #f97316;
-  --pb-orange-hover: #ea580c;
+  --pb-orange: #c2410c;
+  --pb-orange-bright: #f97316;
+  --pb-orange-on-dark: #fdba74;
+  --pb-orange-hover: #9a3412;
   --pb-cream: #fff7ed;
   --pb-warm-white: #fffaf4;
   --pb-white: #ffffff;
@@ -101,7 +103,7 @@
 .playbook-brand strong { letter-spacing: -.03em; }
 .playbook-brand small, .playbook-section-label {
   display: block;
-  color: var(--pb-orange);
+  color: var(--pb-orange-on-dark);
   font-size: 10px;
   font-weight: 950;
   text-transform: uppercase;

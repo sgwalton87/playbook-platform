@@ -10,7 +10,8 @@ import {
 
 describe("Playbook Unified Experience", () => {
   it("has design tokens", () => {
-    expect(playbookTheme.colors.orange).toBe("#F97316");
+    expect(playbookTheme.colors.orange).toBe("#C2410C");
+    expect(playbookTheme.colors.orangeOnDark).toBe("#FDBA74");
   });
 
   it("has shared primitives", () => {

@@ -35,7 +35,7 @@ export function PlaybookHero({
 }) {
   return (
     <section style={hero}>
-      <p style={eyebrowStyle}>{eyebrow}</p>
+      <p style={heroEyebrowStyle}>{eyebrow}</p>
       <h1 style={titleStyle}>{title}</h1>
       {subtitle && <p style={subtitleStyle}>{subtitle}</p>}
       {children}
@@ -99,6 +99,11 @@ const eyebrowStyle: React.CSSProperties = {
   fontSize: 11,
   letterSpacing: ".14em",
   textTransform: "uppercase",
+};
+
+const heroEyebrowStyle: React.CSSProperties = {
+  ...eyebrowStyle,
+  color: playbookTheme.colors.orangeOnDark,
 };
 
 const hero: React.CSSProperties = {
