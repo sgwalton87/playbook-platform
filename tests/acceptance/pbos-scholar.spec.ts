@@ -38,8 +38,8 @@ test("Scholar completes governed onboarding and receives a durable dashboard", a
   expect(anonymous.status()).toBe(401);
 
   await page.goto("/login");
-  await page.getByLabel("Email").fill(email);
-  await page.getByLabel("Password").fill(password);
+  await page.getByRole("textbox", { name: "Email", exact: true }).fill(email);
+  await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Log In", exact: true }).click();
   await page.waitForURL(/\/dashboard/);
 
