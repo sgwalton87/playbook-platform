@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { AG_SUBJECT_NAMES, AG_REQUIREMENTS } from "@/lib/agCourses";
@@ -22,31 +22,31 @@ export default function TranscriptPage() {
   const [certificates, setCertificates] = useState<LegacyValue[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    (async () => {
-      const { data: u } = await supabase.auth.getUser();
-      if (!u.user) { router.replace("/login"); return; }
-      const [{ data: p }, { data: ag }, { data: certs }, { data: acts }] = await Promise.all([
-        supabase.from("profiles").select("*").eq("id", u.user.id).single(),
-        supabase.from("ag_progress").select("*").eq("user_id", u.user.id).order("updated_at", { ascending: false }),
-        supabase.from("certificates").select("*").eq("user_id", u.user.id),
-        supabase.from("student_activities").select("*").eq("student_id", u.user.id),
-      ]);
-      setProfile(p);
-      const record = buildScholarRecord({ profile: p, agProgress: ag || [], certificates: certs || [], activities: acts || [] });
-      setScholarRecord(record);
-      setAgProgress(record.academics.agProgress.map((a)=>({
-        subject: a.subject,
-        years_completed: a.yearsCompleted,
-        years_required: a.yearsRequired,
-        in_progress: a.inProgress,
-        courses_taken: a.coursesTaken,
-        current_course: a.currentCourse,
-      })));
-      setCertificates(certs||[]);
-      setLoading(false);
-    })();
+  const loadTranscript = useCallback(async () => {
+    const { data: u } = await supabase.auth.getUser();
+    if (!u.user) { router.replace("/login"); return; }
+    const [{ data: p }, { data: ag }, { data: certs }, { data: acts }] = await Promise.all([
+      supabase.from("profiles").select("*").eq("id", u.user.id).single(),
+      supabase.from("ag_progress").select("*").eq("user_id", u.user.id).order("updated_at", { ascending: false }),
+      supabase.from("certificates").select("*").eq("user_id", u.user.id),
+      supabase.from("student_activities").select("*").eq("student_id", u.user.id),
+    ]);
+    setProfile(p);
+    const record = buildScholarRecord({ profile: p, agProgress: ag || [], certificates: certs || [], activities: acts || [] });
+    setScholarRecord(record);
+    setAgProgress(record.academics.agProgress.map((a)=>({
+      subject: a.subject,
+      years_completed: a.yearsCompleted,
+      years_required: a.yearsRequired,
+      in_progress: a.inProgress,
+      courses_taken: a.coursesTaken,
+      current_course: a.currentCourse,
+    })));
+    setCertificates(certs||[]);
+    setLoading(false);
   }, [router]);
+
+  useEffect(() => { void loadTranscript(); }, [loadTranscript]);
 
   if (loading) return <><div style={{padding:"28px 32px",fontFamily:T.mono,fontSize:12,color:T.faint}}>Loading transcript...</div></>;
 
@@ -125,7 +125,7 @@ export default function TranscriptPage() {
         </div>
 
         <div style={{flex:1,minWidth:0}}>
-          <TranscriptUploadCard onParsed={() => window.location.reload()} />
+          <TranscriptUploadCard onParsed={() => void loadTranscript()} />
           <div className="no-print" style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:24}}>
             <h1 style={{fontFamily:T.anton,fontWeight:400,fontSize:28,textTransform:"uppercase",color:T.ink}}>Academic Transcript</h1>
             <button onClick={()=>window.print()} style={{fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:T.navy,color:"#fff",border:"none",borderRadius:12,padding:"10px 20px",cursor:"pointer"}}>🖨 Print / Save PDF</button>
