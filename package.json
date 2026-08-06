@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
@@ -39,7 +39,8 @@
     "pbos:status": "tsx pbos/commands/status.ts",
     "pbos:acceptance:prepare": "node scripts/pbos/prepare-browser.mjs",
     "test:acceptance:pbos": "playwright test tests/acceptance/pbos-scholar.spec.ts --project=chromium",
-    "test:acceptance:pbos:academic": "playwright test tests/acceptance/pbos-academic.spec.ts --project=chromium"
+    "test:acceptance:pbos:academic": "playwright test tests/acceptance/pbos-academic.spec.ts --project=chromium",
+    "test:visual:scholar": "playwright test tests/acceptance/pbos-scholar-visual.spec.ts --project=chromium"
   },
   "dependencies": {
     "@hcaptcha/react-hcaptcha": "^2.0.2",

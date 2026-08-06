@@ -69,7 +69,7 @@ describe("PLAYBOOK-SYSTEM-001 connector", () => {
     });
 
     it("fails closed when PBOS reports a non-legacy identity conflict", async () => {
-        const transport: PbosTransport = { async send<T>(request: PbosRequest) {
+        const transport: PbosTransport = { async send<_T>(request: PbosRequest) {
             return { success: false as const, apiVersion: "v1" as const, correlationId: request.correlationId,
                 error: { code: "CONFLICT", message: "Identity mapping already registered with different authority context." } };
         } };

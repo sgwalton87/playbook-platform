@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "screenId": "PGSL-007",
+  "title": "Scholar Dashboard",
+  "route": "/dashboard",
+  "authority": "USER_APPROVED_CANON_REFERENCE",
+  "implementationState": "IMPLEMENTED_PENDING_VISUAL_CERTIFICATION",
+  "runtime": {
+    "routeFile": "app/dashboard/page.tsx",
+    "componentFile": "components/dashboard/ScholarDashboardExperience.tsx",
+    "styleFile": "components/dashboard/ScholarDashboardExperience.module.css"
+  },
+  "assets": [
+    {
+      "assetId": "PLAYBOOK-EXPERIENCE-BOARD-2026-07-24",
+      "role": "CANONICAL_MULTI_SURFACE_REFERENCE",
+      "path": "docs/design/canon/scholar-dashboard/playbook-experience-board-2026-07-24.png",
+      "sha256": "3c8cd603f86b801fce62874fd4ef2654d067598b1268dec103ca1a6a64489aa7",
+      "required": true
+    },
+    {
+      "assetId": "PLAYBOOK-STARTING-FIVE-BOARD-2026-07-23",
+      "role": "CANONICAL_ONBOARDING_REFERENCE",
+      "path": "docs/design/canon/scholar-dashboard/starting-five-board-2026-07-23.png",
+      "sha256": "b227e81c776057c500e54a7bc5c5c1e43b988beac9b52ed0c029e452b92e777d",
+      "required": true
+    },
+    {
+      "assetId": "SCHOLAR-FUTURE-HERO-V1",
+      "role": "PRODUCTION_HERO",
+      "path": "public/brand/scholar-dashboard/scholar-future-hero-v1.png",
+      "sha256": "cd452e30c2bed656c8d3e16781569ec0c26d0e3a02d2583c4db016cbebff035b",
+      "required": true
+    }
+  ],
+  "viewports": [
+    { "name": "desktop", "width": 1440, "height": 900 },
+    { "name": "mobile", "width": 390, "height": 844 }
+  ],
+  "acceptance": {
+    "functionalSpec": "tests/acceptance/pbos-scholar.spec.ts",
+    "visualSpec": "tests/acceptance/pbos-scholar-visual.spec.ts",
+    "productOwnerApproval": "PENDING"
+  }
+}

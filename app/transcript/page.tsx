@@ -46,7 +46,10 @@ export default function TranscriptPage() {
     setLoading(false);
   }, [router]);
 
-  useEffect(() => { void loadTranscript(); }, [loadTranscript]);
+  useEffect(() => {
+    const hydration = window.setTimeout(() => { void loadTranscript(); }, 0);
+    return () => window.clearTimeout(hydration);
+  }, [loadTranscript]);
 
   if (loading) return <><div style={{padding:"28px 32px",fontFamily:T.mono,fontSize:12,color:T.faint}}>Loading transcript...</div></>;
 
