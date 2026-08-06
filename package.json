@@ -37,7 +37,8 @@
     "founder:list": "node scripts/founder/list.mjs",
     "pbos:next": "tsx pbos/commands/next.ts",
     "pbos:status": "tsx pbos/commands/status.ts",
-    "test:acceptance:pbos": "playwright install chromium && playwright test tests/acceptance/pbos-scholar.spec.ts --project=chromium"
+    "pbos:acceptance:prepare": "node scripts/pbos/prepare-browser.mjs",
+    "test:acceptance:pbos": "playwright test tests/acceptance/pbos-scholar.spec.ts --project=chromium"
   },
   "dependencies": {
     "@hcaptcha/react-hcaptcha": "^2.0.2",
