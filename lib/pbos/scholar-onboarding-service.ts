@@ -8,6 +8,7 @@ export interface ScholarJourneyRepository {
 
 export interface ScholarPbosRuntime {
   registerIdentity(userId: string): Promise<PlaybookIdentityMapping>;
+  verifyReady(identity: PlaybookIdentityMapping, correlationId: string): Promise<readonly string[]>;
   publishOnboarding(identity: PlaybookIdentityMapping, scholarRecordId: string, correlationId: string): Promise<readonly string[]>;
   projectDashboard(identity: PlaybookIdentityMapping, scholarRecordId: string, sectionIds: readonly string[], exchangeApprovalId: string, correlationId: string): Promise<readonly string[]>;
 }
@@ -30,7 +31,8 @@ export class ScholarOnboardingService {
     if (!input.idempotencyKey) throw new Error("Scholar journey idempotency key required.");
     const authority = authorizePlaybookFoundation({ userId: input.actorId, ownerId: input.ownerId, role: "SCHOLAR", approvalId: input.identityApprovalId });
     const identity = await this.runtime.registerIdentity(input.actorId);
-    const baseProvenance = [...authority.provenance, identity.pbosIdentity.provenance];
+    const readinessProvenance = await this.runtime.verifyReady(identity, input.idempotencyKey + "-health");
+    const baseProvenance = [...authority.provenance, identity.pbosIdentity.provenance, ...readinessProvenance];
     const record = await this.repository.persistOnboarding({ scholarId: input.ownerId, displayName: input.displayName,
       goalTitle: input.goalTitle, approvalId: input.identityApprovalId, idempotencyKey: input.idempotencyKey, provenance: baseProvenance });
     const onboardingProvenance = await this.runtime.publishOnboarding(identity, record.scholarRecordId, input.idempotencyKey + "-onboarding");

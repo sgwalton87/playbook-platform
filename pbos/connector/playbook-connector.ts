@@ -53,7 +53,7 @@ export class PlaybookConnector {
     health(identity: PlaybookIdentityMapping, purpose = "Verify Playbook PBOS runtime readiness."): Promise<PbosResponse> {
         return this.client.send("HEALTH_CHECK", {
             connectorId: PLAYBOOK_CONNECTOR_ID,
-            domainRegistrationId: "PLAYBOOK-DOMAIN-SCHOLAR-REGISTRATION-001",
+            domainRegistrationId: "PLAYBOOK-SCHOLAR-REGISTRATION-001",
             identityMappingId: identity.mappingId,
             purpose,
             correlationId: `playbook-health-${identity.externalIdentity.externalIdentityId}`
@@ -99,7 +99,7 @@ export class PlaybookConnector {
         if (!correlationId) throw new Error("Scholar runtime operations require a correlation ID.");
         return {
             connectorId: PLAYBOOK_CONNECTOR_ID,
-            domainRegistrationId: "PLAYBOOK-DOMAIN-SCHOLAR-REGISTRATION-001",
+            domainRegistrationId: "PLAYBOOK-SCHOLAR-REGISTRATION-001",
             identityMappingId: identity.mappingId,
             correlationId
         } as const;
