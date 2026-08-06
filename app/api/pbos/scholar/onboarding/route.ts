@@ -46,6 +46,14 @@ export async function POST(request: NextRequest) {
       }
     }, {
       registerIdentity: userId => connector.registerIdentity(userId, "SCHOLAR"),
+      async verifyReady(identity, correlationId) {
+        const response = await connector.health(identity, "Verify the certified Scholar runtime before durable onboarding.");
+        if (!response.success) throw new Error(response.error.message);
+        if (response.correlationId !== "playbook-health-" + identity.externalIdentity.externalIdentityId) {
+          throw new Error("PBOS Scholar health response correlation mismatch.");
+        }
+        return [...response.provenance, correlationId];
+      },
       async publishOnboarding(identity, scholarRecordId, correlationId) {
         const response = await connector.publishScholarOnboarding(identity, { eventType: "SCHOLAR_ONBOARDING_COMPLETED", schemaVersion: "1.0.0", scholarRecordId }, correlationId);
         if (!response.success) throw new Error(response.error.message); return response.provenance;

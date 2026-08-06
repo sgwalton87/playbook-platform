@@ -23,7 +23,17 @@ export class SignedPlaybookPbosTransport implements PbosTransport {
       "content-type": "application/json", "x-pbos-api-version": "v1", "x-pbos-organization-id": this.credentials.organizationId,
       "x-pbos-connector-id": this.credentials.connectorId, "x-pbos-key-id": this.credentials.keyId,
       "x-pbos-timestamp": timestamp, "x-pbos-nonce": nonce, "x-pbos-signature": signature
-    } });
-    return await response.json() as PbosResponse<T>;
+    }, signal: AbortSignal.timeout(15_000) });
+    const contentType = response.headers.get("content-type") ?? "";
+    if (!contentType.includes("application/json")) {
+      throw new Error("PBOS v1 transport returned non-JSON HTTP " + response.status + ".");
+    }
+    const result = await response.json() as PbosResponse<T> | { error?: unknown };
+    if (!("success" in result)) {
+      const detail = typeof result.error === "string" ? result.error : "PBOS request rejected.";
+      throw new Error(detail + " (HTTP " + response.status + ").");
+    }
+    if (result.correlationId !== request.correlationId) throw new Error("PBOS v1 response correlation mismatch.");
+    return result as PbosResponse<T>;
   }
 }

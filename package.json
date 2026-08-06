@@ -36,7 +36,9 @@
     "founder:update": "node scripts/founder/update.mjs",
     "founder:list": "node scripts/founder/list.mjs",
     "pbos:next": "tsx pbos/commands/next.ts",
-    "pbos:status": "tsx pbos/commands/status.ts"
+    "pbos:status": "tsx pbos/commands/status.ts",
+    "pbos:acceptance:prepare": "node scripts/pbos/prepare-browser.mjs",
+    "test:acceptance:pbos": "playwright test tests/acceptance/pbos-scholar.spec.ts --project=chromium"
   },
   "dependencies": {
     "@hcaptcha/react-hcaptcha": "^2.0.2",
@@ -69,6 +71,8 @@
     "tailwindcss": "^4",
     "tsx": "^4.22.5",
     "typescript": "^5",
-    "vitest": "^4.1.9"
+    "vitest": "^4.1.9",
+    "@axe-core/playwright": "^4.10.2",
+    "@playwright/test": "^1.55.0"
   }
 }

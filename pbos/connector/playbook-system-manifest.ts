@@ -45,7 +45,9 @@ export const playbookSystemManifest = {
 } as const;
 
 export const playbookDomainManifests = PLAYBOOK_DOMAINS.map((domainId) => ({
-    registrationId: `${domainId}-REGISTRATION-001`,
+    registrationId: domainId === "PLAYBOOK-DOMAIN-SCHOLAR"
+        ? "PLAYBOOK-SCHOLAR-REGISTRATION-001"
+        : `${domainId}-REGISTRATION-001`,
     connectorId: PLAYBOOK_CONNECTOR_ID,
     externalSystemId: PLAYBOOK_SYSTEM_ID,
     pbosSystemId: PLAYBOOK_OS_ID,

@@ -6,10 +6,16 @@ import { PlaybookPbosRuntimeClient } from "./pbos-runtime-client";
 
 class RecordingTransport implements PbosTransport {
     readonly requests: PbosRequest[] = [];
-    constructor(private readonly deniedOperation?: string) {}
+    constructor(private readonly deniedOperation?: string, private readonly legacyDuplicateIdentity = false) {}
 
     async send<T>(request: PbosRequest) {
         this.requests.push(request);
+        if (request.operation === "REGISTER_IDENTITY" && this.legacyDuplicateIdentity) return {
+            success: false as const,
+            apiVersion: "v1" as const,
+            correlationId: request.correlationId,
+            error: { code: "CONFLICT", message: `Identity mapping already registered: ${(request.payload as { mappingId: string }).mappingId}` }
+        };
         if (request.operation === this.deniedOperation) return {
             success: false as const,
             apiVersion: "v1" as const,
@@ -45,9 +51,31 @@ describe("PLAYBOOK-SYSTEM-001 connector", () => {
         const transport = new RecordingTransport();
         const connector = new PlaybookConnector(new PlaybookPbosRuntimeClient(transport));
         const identity = await connector.registerIdentity("supabase-user-001", "SCHOLAR");
-        expect(identity.pbosIdentity.provenance).toContain("supabase-user-001");
+        expect(identity.pbosIdentity).toMatchObject({
+            actorId: "PLAYBOOK-ACTOR-supabase-user-001",
+            provenance: "supabase-user-001"
+        });
         await connector.health(identity);
+        expect(transport.requests[0].idempotencyKey).toBe("playbook-map-supabase-user-001");
         expect(transport.requests.at(-1)?.operation).toBe("HEALTH_CHECK");
+    });
+
+    it("resumes a governed identity after an exact legacy duplicate response", async () => {
+        const transport = new RecordingTransport(undefined, true);
+        const connector = new PlaybookConnector(new PlaybookPbosRuntimeClient(transport));
+        const identity = await connector.registerIdentity("supabase-user-001", "SCHOLAR");
+        expect(identity.mappingId).toBe("PLAYBOOK-IDENTITY-supabase-user-001");
+        expect(transport.requests[0].idempotencyKey).toBe("playbook-map-supabase-user-001");
+    });
+
+    it("fails closed when PBOS reports a non-legacy identity conflict", async () => {
+        const transport: PbosTransport = { async send<T>(request: PbosRequest) {
+            return { success: false as const, apiVersion: "v1" as const, correlationId: request.correlationId,
+                error: { code: "CONFLICT", message: "Identity mapping already registered with different authority context." } };
+        } };
+        const connector = new PlaybookConnector(new PlaybookPbosRuntimeClient(transport));
+        await expect(connector.registerIdentity("supabase-user-001", "SCHOLAR"))
+            .rejects.toThrow("different authority context");
     });
 
     it("stops activation when PBOS denies certification", async () => {
