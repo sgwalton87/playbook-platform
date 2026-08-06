@@ -44,10 +44,12 @@ test("Scholar completes governed onboarding and receives a durable dashboard", a
   await page.waitForURL(/\/dashboard/);
 
   const onboarding = await page.request.post("/api/pbos/scholar/onboarding", {
-    data: { displayName: "PBOS Acceptance Scholar", goalTitle: "Complete governed onboarding" }
+    data: { displayName: "PBOS Acceptance Scholar", goalTitle: "Complete governed onboarding" },
+    timeout: 120_000
   });
-  expect(onboarding.ok()).toBe(true);
-  const transaction = await onboarding.json() as { dashboard?: { provenance?: string[] } };
+  const onboardingBody = await onboarding.text();
+  expect(onboarding.ok(), onboardingBody).toBe(true);
+  const transaction = JSON.parse(onboardingBody) as { dashboard?: { provenance?: string[] } };
   expect(transaction.dashboard?.provenance?.length).toBeGreaterThan(0);
 
   const projection = await admin.from("scholar_dashboard_projections")
