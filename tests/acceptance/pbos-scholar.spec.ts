@@ -62,6 +62,7 @@ test("Scholar completes governed onboarding and receives a durable dashboard", a
   expect((projection.data?.provenance as string[] | undefined)?.length).toBeGreaterThan(0);
 
   await page.setViewportSize({ width: 1440, height: 900 });
+  await expect(page.getByTestId("scholar-dashboard-canon")).toHaveAttribute("data-visual-canon", "PGSL-007");
   await page.screenshot({ path: artifacts + "/scholar-desktop.png", fullPage: true });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.reload();
@@ -83,7 +84,8 @@ test("Scholar completes governed onboarding and receives a durable dashboard", a
       { dimension: "DURABLE_DATA", passed: true, detail: "Owner-scoped dashboard projection was read from Supabase after mutation." },
       { dimension: "AUTHORITY", passed: true, detail: "Anonymous onboarding was denied before the authenticated transaction." },
       { dimension: "PBOS_INTEGRATION", passed: true, detail: "Signed PBOS transaction returned provenance-bearing dashboard evidence." },
-      { dimension: "SECURITY", passed: true, detail: "Synthetic credentials remained environment-bound and anonymous mutation failed closed." }
+      { dimension: "SECURITY", passed: true, detail: "Synthetic credentials remained environment-bound and anonymous mutation failed closed." },
+      { dimension: "VISUAL_CANON", passed: true, detail: "The runtime dashboard declared and rendered the PGSL-007 canonical experience contract." }
     ]
   }, null, 2));
 });
