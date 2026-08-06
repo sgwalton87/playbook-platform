@@ -25,11 +25,15 @@ export class SignedPlaybookPbosTransport implements PbosTransport {
       "x-pbos-timestamp": timestamp, "x-pbos-nonce": nonce, "x-pbos-signature": signature
     }, signal: AbortSignal.timeout(15_000) });
     const contentType = response.headers.get("content-type") ?? "";
-    if (!response.ok || !contentType.includes("application/json")) {
-      throw new Error("PBOS v1 transport rejected the signed request with HTTP " + response.status + ".");
+    if (!contentType.includes("application/json")) {
+      throw new Error("PBOS v1 transport returned non-JSON HTTP " + response.status + ".");
     }
-    const result = await response.json() as PbosResponse<T>;
+    const result = await response.json() as PbosResponse<T> | { error?: unknown };
+    if (!("success" in result)) {
+      const detail = typeof result.error === "string" ? result.error : "PBOS request rejected.";
+      throw new Error(detail + " (HTTP " + response.status + ").");
+    }
     if (result.correlationId !== request.correlationId) throw new Error("PBOS v1 response correlation mismatch.");
-    return result;
+    return result as PbosResponse<T>;
   }
 }

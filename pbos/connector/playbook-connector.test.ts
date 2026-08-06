@@ -45,7 +45,10 @@ describe("PLAYBOOK-SYSTEM-001 connector", () => {
         const transport = new RecordingTransport();
         const connector = new PlaybookConnector(new PlaybookPbosRuntimeClient(transport));
         const identity = await connector.registerIdentity("supabase-user-001", "SCHOLAR");
-        expect(identity.pbosIdentity.provenance).toContain("supabase-user-001");
+        expect(identity.pbosIdentity).toMatchObject({
+            actorId: "PLAYBOOK-ACTOR-supabase-user-001",
+            provenance: "supabase-user-001"
+        });
         await connector.health(identity);
         expect(transport.requests.at(-1)?.operation).toBe("HEALTH_CHECK");
     });

@@ -28,7 +28,7 @@ export class PlaybookIdentityMapper {
                 systemId: PLAYBOOK_OS_ID,
                 role,
                 authorityContext: [authority],
-                provenance: `${PLAYBOOK_SYSTEM_ID}:${userId}`,
+                provenance: userId,
                 active: true
             },
             mappedAt: new Date()
