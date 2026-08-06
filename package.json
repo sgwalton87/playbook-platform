@@ -38,7 +38,8 @@
     "pbos:next": "tsx pbos/commands/next.ts",
     "pbos:status": "tsx pbos/commands/status.ts",
     "pbos:acceptance:prepare": "node scripts/pbos/prepare-browser.mjs",
-    "test:acceptance:pbos": "playwright test tests/acceptance/pbos-scholar.spec.ts --project=chromium"
+    "test:acceptance:pbos": "playwright test tests/acceptance/pbos-scholar.spec.ts --project=chromium",
+    "test:acceptance:pbos:academic": "playwright test tests/acceptance/pbos-academic.spec.ts --project=chromium"
   },
   "dependencies": {
     "@hcaptcha/react-hcaptcha": "^2.0.2",

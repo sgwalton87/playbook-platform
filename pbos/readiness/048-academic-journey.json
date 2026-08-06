@@ -1,0 +1,23 @@
+{
+  "missionId": "048-academic-journey",
+  "systemId": "PLAYBOOK-SYSTEM-001",
+  "repository": "sgwalton87/playbook-platform",
+  "governedRevision": "a1ff6310107eeff48819a8929d569bd2f4de3ced",
+  "productionRunId": "eb5d8799-fac5-473c-8de8-e9cd5e7698c3",
+  "state": "IMPLEMENTED_PENDING_VALIDATION",
+  "journey": "TRANSCRIPT_TO_ACADEMIC_READINESS",
+  "surface": "WEB",
+  "implementation": [
+    "app/api/parse-transcript/route.ts",
+    "components/transcript/TranscriptUploadCard.tsx",
+    "lib/pbos/academic-transcript-journey.ts"
+  ],
+  "durableData": "supabase/migrations/202608050004_pbos_academic_journey.sql",
+  "acceptanceCriteria": [
+    "Authenticated identity—not browser input—owns every mutation",
+    "A-G and readiness evidence persist under RLS",
+    "Transcript input is bounded",
+    "PBOS communication is server-signed and provenance-bearing",
+    "Accessible UI states, security, lint, tests, and production build require independent evidence"
+  ]
+}

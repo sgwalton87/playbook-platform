@@ -1,183 +1,94 @@
+import { createHash } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { requireUser } from "@/lib/supabase/server";
+import { AcademicTranscriptJourneyService, validateTranscriptInput } from "@/lib/pbos/academic-transcript-journey";
+import { buildAcademicIntelligenceReport } from "@/lib/academic-intelligence";
+import { PlaybookConnector } from "@/pbos/connector/playbook-connector";
+import { PlaybookPbosRuntimeClient } from "@/pbos/connector/pbos-runtime-client";
+import { SignedPlaybookPbosTransport } from "@/pbos/connector/signed-server-transport";
 
 const AG_SUBJECTS = [
-  { key: "A", name: "History / Social Science", required: 2 },
-  { key: "B", name: "English", required: 4 },
-  { key: "C", name: "Mathematics", required: 3 },
-  { key: "D", name: "Laboratory Science", required: 2 },
-  { key: "E", name: "Language Other Than English", required: 2 },
-  { key: "F", name: "Visual & Performing Arts", required: 1 },
-  { key: "G", name: "College-Preparatory Elective", required: 1 },
-];
-
-type TranscriptParseBody = {
-  base64?: string;
-  mediaType?: string;
-  userId?: string;
-};
-
-type AgSubjectResult = {
-  years_required?: number | string;
-  years_completed?: number | string;
-  in_progress?: boolean;
-  courses_taken?: unknown[];
-  current_course?: string | null;
-};
-
+  { key: "A", name: "History / Social Science", required: 2 }, { key: "B", name: "English", required: 4 },
+  { key: "C", name: "Mathematics", required: 3 }, { key: "D", name: "Laboratory Science", required: 2 },
+  { key: "E", name: "Language Other Than English", required: 2 }, { key: "F", name: "Visual & Performing Arts", required: 1 },
+  { key: "G", name: "College-Preparatory Elective", required: 1 }
+] as const;
+type AgSubjectResult = { years_required?: number | string; years_completed?: number | string; in_progress?: boolean; courses_taken?: unknown[]; current_course?: string | null };
 type AgParseResult = Record<string, AgSubjectResult | undefined>;
+type AnthropicResponse = { content?: { text?: string }[]; error?: unknown };
 
-const PROMPT = `
-Analyze this student transcript and extract California A-G course completion data.
+const PROMPT = `Analyze this student transcript and return only JSON containing California A-G categories A through G. For each category include years_completed, years_required, in_progress, courses_taken, and current_course. Count only visible passing coursework when grades are available.`;
+function required(name: string): string { const value = process.env[name]; if (!value) throw new Error("Missing protected server configuration: " + name); return value; }
 
-Categories:
-A = History/Social Science
-B = English
-C = Mathematics
-D = Laboratory Science
-E = Language Other Than English
-F = Visual and Performing Arts
-G = College-Preparatory Elective
-
-For each category, return:
-- years_completed
-- years_required
-- in_progress
-- courses_taken with course name and grade if visible
-
-Count semester courses as 0.5 years and year-long courses as 1.0 year.
-Only courses completed with C or better should count as completed when grades are visible.
-If grade is not visible, include the course but still estimate completion from the transcript.
-
-Return ONLY valid JSON like this:
-{
-  "A": {
-    "years_completed": 2,
-    "years_required": 2,
-    "in_progress": false,
-    "courses_taken": ["World History - A", "US History - B"]
-  }
-}
-`;
-
-export async function POST(req: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
-    const { base64, mediaType, userId } = (await req.json()) as TranscriptParseBody;
-
-    if (!base64 || !mediaType || !userId) {
-      return NextResponse.json({ error: "Missing transcript data." }, { status: 400 });
-    }
-
-    const sourceBlock = {
-      type: "base64",
-      media_type: mediaType,
-      data: base64,
-    };
-
-    const contentBlock = mediaType.startsWith("image/")
-      ? { type: "image", source: sourceBlock }
-      : { type: "document", source: sourceBlock };
-
-    const apiResponse = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": process.env.ANTHROPIC_API_KEY || "",
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-6",
-        max_tokens: 2000,
-        messages: [
-          {
-            role: "user",
-            content: [contentBlock, { type: "text", text: PROMPT }],
-          },
-        ],
-      }),
-    });
-
-    const data = await apiResponse.json();
-
-    if (data.error) {
-      console.error("Transcript AI error:", data.error);
-      return NextResponse.json(
-        { error: "AI transcript reader failed. Please update manually." },
-        { status: 400 }
-      );
-    }
-
-    const text = data.content?.[0]?.text || "";
-    const rawJson =
-      text.match(/```json([\s\S]*?)```/)?.[1]?.trim() ||
-      text.match(/\{[\s\S]*\}/)?.[0];
-
-    if (!rawJson) {
-      console.error("No JSON found in transcript response:", text);
-      return NextResponse.json(
-        { error: "Could not extract A-G data from transcript." },
-        { status: 400 }
-      );
-    }
-
-    const parsed = JSON.parse(rawJson) as AgParseResult;
-
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY ||
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
-
-    if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      return NextResponse.json(
-        { error: "Missing SUPABASE_SERVICE_ROLE_KEY. Transcript parsing cannot save A-G rows." },
-        { status: 500 }
-      );
-    }
-
+    const { supabase, user } = await requireUser();
+    if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    const body = await request.json() as { base64?: unknown; mediaType?: unknown; requestId?: unknown };
+    const base64 = String(body.base64 ?? ""); const mediaType = String(body.mediaType ?? "");
+    validateTranscriptInput(base64, mediaType);
+    const requestId = String(body.requestId ?? "transcript-" + user.id + "-" + createHash("sha256").update(base64).digest("hex").slice(0, 16));
+    const aiResponse = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: {
+      "content-type": "application/json", "x-api-key": required("ANTHROPIC_API_KEY"), "anthropic-version": "2023-06-01"
+    }, body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 2000, messages: [{ role: "user", content: [
+      { type: mediaType.startsWith("image/") ? "image" : "document", source: { type: "base64", media_type: mediaType, data: base64 } },
+      { type: "text", text: PROMPT }
+    ] }] }) });
+    if (!aiResponse.ok) return NextResponse.json({ error: "Transcript intelligence is temporarily unavailable." }, { status: 502 });
+    const ai = await aiResponse.json() as AnthropicResponse;
+    if (ai.error) return NextResponse.json({ error: "Transcript intelligence could not read this file." }, { status: 422 });
+    const text = ai.content?.[0]?.text ?? "";
+    const raw = text.match(/```json([\s\S]*?)```/)?.[1]?.trim() ?? text.match(/\{[\s\S]*\}/)?.[0];
+    if (!raw) return NextResponse.json({ error: "Transcript evidence could not be extracted." }, { status: 422 });
+    const parsed = JSON.parse(raw) as AgParseResult;
     let agUpdates = 0;
-    const saved: unknown[] = [];
-
     for (const subject of AG_SUBJECTS) {
-      const val = parsed[subject.key] || {};
-
-      const payload = {
-        user_id: userId,
-        subject: subject.key,
-        subject_name: subject.name,
-        years_required: Number(val.years_required || subject.required),
-        years_completed: Number(val.years_completed || 0),
-        in_progress: Boolean(val.in_progress),
-        courses_taken: Array.isArray(val.courses_taken) ? val.courses_taken : [],
-        current_course: val.current_course || null,
-        updated_at: new Date().toISOString(),
-      };
-
-      const { data: row, error } = await supabase
-        .from("ag_progress")
-        .upsert(payload, { onConflict: "user_id,subject" })
-        .select()
-        .single();
-
-      if (error) {
-        console.error(`A-G upsert failed for ${subject.key}:`, error);
-      } else {
-        agUpdates++;
-        saved.push(row);
-      }
+      const value = parsed[subject.key] ?? {};
+      const result = await supabase.from("ag_progress").upsert({ user_id: user.id, subject: subject.key,
+        subject_name: subject.name, years_required: Number(value.years_required ?? subject.required),
+        years_completed: Number(value.years_completed ?? 0), in_progress: Boolean(value.in_progress),
+        courses_taken: Array.isArray(value.courses_taken) ? value.courses_taken : [], current_course: value.current_course ?? null,
+        updated_at: new Date().toISOString() }, { onConflict: "user_id,subject" });
+      if (result.error) throw new Error(result.error.message); agUpdates += 1;
     }
-
-    return NextResponse.json({
-      ok: true,
-      agUpdates,
-      parsed,
-      saved,
+    const courses = Object.entries(parsed).flatMap(([category, value]) => (value?.courses_taken ?? []).map(course => ({
+      name: typeof course === "string" ? course : "Transcript course", subject: category, credits: 10,
+      agCategory: category as "A" | "B" | "C" | "D" | "E" | "F" | "G", completed: true
+    })));
+    const readiness = buildAcademicIntelligenceReport(courses);
+    const client = new PlaybookPbosRuntimeClient(new SignedPlaybookPbosTransport(required("PBOS_API_URL"), {
+      organizationId: required("PBOS_ORGANIZATION_ID"), connectorId: required("PBOS_CONNECTOR_ID"),
+      keyId: required("PBOS_CONNECTOR_KEY_ID"), secretBase64: required("PBOS_CONNECTOR_SECRET_BASE64")
+    }));
+    const connector = new PlaybookConnector(client);
+    const journey = new AcademicTranscriptJourneyService({
+      async saveEvidence(input) {
+        const saved = await supabase.from("academic_journey_evidence").upsert({ owner_id: input.ownerId,
+          readiness_score: input.readinessScore, ag_updates: input.agUpdates, idempotency_key: input.idempotencyKey,
+          provenance: input.provenance }, { onConflict: "idempotency_key" }).select("id").single();
+        if (saved.error || !saved.data) throw new Error(saved.error?.message ?? "Academic evidence persistence failed.");
+        return { evidenceId: saved.data.id as string };
+      },
+      async completeEvidence(input) {
+        const completed = await supabase.from("academic_journey_evidence").update({ delivery_state: "DELIVERED",
+          provenance: input.provenance, delivered_at: new Date().toISOString() }).eq("id", input.evidenceId).eq("owner_id", input.ownerId);
+        if (completed.error) throw new Error(completed.error.message);
+      }
+    }, {
+      registerIdentity: userId => connector.registerIdentity(userId, "SCHOLAR"),
+      async publish(identity, evidenceId, readinessScore, correlationId) {
+        const response = await client.send("PUBLISH_LIFECYCLE_EVENT", { connectorId: "PLAYBOOK-CONNECTOR-001",
+          domainRegistrationId: "PLAYBOOK-SCHOLAR-REGISTRATION-001", identityMappingId: identity.mappingId,
+          correlationId, purpose: "Publish approved academic readiness evidence.", payload: {
+            eventType: "ACADEMIC_READINESS_UPDATED", schemaVersion: "1.0.0", evidenceId, readinessScore
+          } }, correlationId, correlationId);
+        if (!response.success) throw new Error(response.error.message); return response.provenance;
+      }
     });
-  } catch (err) {
-    console.error("parse-transcript error:", err);
-    return NextResponse.json(
-      { error: "Server error parsing transcript." },
-      { status: 500 }
-    );
+    const evidence = await journey.complete({ actorId: user.id, ownerId: user.id,
+      approvalId: required("PBOS_ACADEMIC_JOURNEY_APPROVAL_ID"), readinessScore: readiness.score, agUpdates, idempotencyKey: requestId });
+    return NextResponse.json({ ok: true, agUpdates, readiness, evidence });
+  } catch (error) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Transcript journey failed." }, { status: 500 });
   }
 }
