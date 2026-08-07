@@ -1,0 +1,21 @@
+{
+  "missionId": "048-application-journey",
+  "systemId": "PLAYBOOK-SYSTEM-001",
+  "repository": "sgwalton87/playbook-platform",
+  "governedRevision": "efb066981a404de205befc89d61ae73566b7fec0",
+  "productionRunId": "b3728d5f-4927-446b-a795-c4a09df38acc",
+  "state": "IMPLEMENTED_PENDING_VALIDATION",
+  "journey": "OPPORTUNITY_TO_APPLICATION",
+  "surface": "WEB",
+  "behavior": [
+    "Authenticated opportunity creates an owner-scoped workspace",
+    "Tasks, deadline, private documents, readiness, and status survive restart",
+    "Task and submission transitions publish signed PBOS lifecycle evidence"
+  ],
+  "acceptanceCriteria": [
+    "Browser input cannot choose record ownership",
+    "RLS and private storage isolate Scholars",
+    "UI has labelled controls and live success/error feedback",
+    "Independent validation and human certification bind to the generated revision"
+  ]
+}
