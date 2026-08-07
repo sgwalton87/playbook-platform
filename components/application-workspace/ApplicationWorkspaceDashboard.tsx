@@ -72,7 +72,7 @@ export default function ApplicationWorkspaceDashboard() {
     </PlaybookCard>
     {workspaces.map(workspace => { const tasks = workspace.application_workspace_tasks ?? []; const completed = tasks.filter(task => task.status === "COMPLETE").length;
       const readiness = tasks.length ? Math.round(completed / tasks.length * 100) : 0; return <section key={workspace.id} aria-labelledby={"workspace-" + workspace.id} style={section}>
-        <h2 id={"workspace-" + workspace.id}>{workspace.opportunity_name}</h2>
+        <h2 id={"workspace-" + workspace.id} style={{ color: "#0F172A" }}>{workspace.opportunity_name}</h2>
         <PlaybookMetrics><PlaybookMetric label="Readiness" value={String(readiness) + "%"} /><PlaybookMetric label="Tasks complete" value={String(completed) + "/" + String(tasks.length)} /><PlaybookMetric label="Deadline" value={workspace.deadline ?? "Not set"} /></PlaybookMetrics>
         <PlaybookGrid><PlaybookCard eyebrow="Tasks" title="Application checklist">{tasks.map(task => <label key={task.id} style={taskRow}>
           <input type="checkbox" checked={task.status === "COMPLETE"} disabled={busy || workspace.status === "submitted"} onChange={() => transition(workspace.id, task.status === "COMPLETE" ? "TASK_REOPENED" : "TASK_COMPLETED", task.id)} />{task.title}</label>)}</PlaybookCard>
