@@ -1,0 +1,25 @@
+{
+  "missionId": "048-support-journey",
+  "systemId": "PLAYBOOK-SYSTEM-001",
+  "repository": "sgwalton87/playbook-platform",
+  "governedRevision": "adc9bc31ab999cd142eb03b6d12997b047ddf2e3",
+  "productionRunId": "4559aabf-6b46-4be7-8b79-a5a611affeb2",
+  "state": "IMPLEMENTED_PENDING_VALIDATION",
+  "journey": "APPLICATION_TO_AUTHORIZED_SUPPORT",
+  "surface": "WEB",
+  "implementation": [
+    "components/application-workspace/ApplicationWorkspaceDashboard.tsx",
+    "components/application-workspace/ApplicationSupportRequestPanel.tsx",
+    "app/api/pbos/application-support/route.ts",
+    "lib/pbos/application-support-request.ts"
+  ],
+  "durableData": "supabase/migrations/202608050007_pbos_application_support.sql",
+  "acceptanceCriteria": [
+    "The authenticated Scholar—not browser input—owns the request",
+    "The workspace belongs to the Scholar",
+    "The selected active relationship grants support_tasks",
+    "The request is durable and idempotent under RLS",
+    "PBOS communication is server-signed and approval-bound",
+    "Accessible UI, security, tests and build require independent evidence"
+  ]
+}
