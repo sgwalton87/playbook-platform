@@ -19,6 +19,11 @@ test("READINESS-TO-OPPORTUNITY produces exact-revision functional evidence", asy
   await page.getByLabel("Password", { exact: true }).fill(required("PBOS_ACCEPTANCE_PASSWORD"));
   await page.getByRole("button", { name: "Log In", exact: true }).click();
   await page.waitForURL(/\/dashboard/);
+  const onboarding = await page.request.post("/api/pbos/scholar/onboarding", { data: {
+    displayName: "PBOS Acceptance Scholar", goalTitle: "Public Health"
+  } });
+  const onboardingBody = await onboarding.text();
+  expect(onboarding.ok(), onboardingBody).toBe(true);
   const discovery = await page.request.post("/api/pbos/opportunities");
   const discovered = await discovery.json() as { error?: string; matches?: Array<{ id: string; reasons?: string[] }> };
   expect(discovery.status(), "Opportunity discovery failed: " + (discovered.error ?? "unknown API error")).toBe(200);
