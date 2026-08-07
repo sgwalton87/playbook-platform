@@ -3,7 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireUser } from "@/lib/supabase/server";
 import { OpportunityJourneyService } from "@/lib/pbos/opportunity-journey-service";
 import type { DurableOpportunityMatch, OpportunityDecision, OpportunitySignals } from "@/lib/pbos/opportunity-journey-service";
-import { PlaybookIdentityMapper } from "@/pbos/connector/identity-mapper";
+import { PlaybookConnector } from "@/pbos/connector/playbook-connector";
+import type { PlaybookIdentityMapping } from "@/pbos/connector/contracts";
 import { PlaybookPbosRuntimeClient } from "@/pbos/connector/pbos-runtime-client";
 import { SignedPlaybookPbosTransport } from "@/pbos/connector/signed-server-transport";
 
@@ -18,16 +19,10 @@ function runtime() {
     organizationId: required("PBOS_ORGANIZATION_ID"), connectorId: required("PBOS_CONNECTOR_ID"),
     keyId: required("PBOS_CONNECTOR_KEY_ID"), secretBase64: required("PBOS_CONNECTOR_SECRET_BASE64")
   }));
-  const mapper = new PlaybookIdentityMapper();
+  const connector = new PlaybookConnector(client);
   return {
-    async registerIdentity(userId: string) {
-      const identity = mapper.mapSupabaseIdentity(userId, "SCHOLAR");
-      const response = await client.send("REGISTER_IDENTITY", identity, "opportunity-identity-" + userId,
-        "opportunity-identity-" + userId);
-      if (!response.success) throw new Error(response.error.message);
-      return identity;
-    },
-    async publish(identity: ReturnType<PlaybookIdentityMapper["mapSupabaseIdentity"]>, payload: Readonly<Record<string, unknown>>, correlationId: string) {
+    registerIdentity: (userId: string) => connector.registerIdentity(userId, "SCHOLAR"),
+    async publish(identity: PlaybookIdentityMapping, payload: Readonly<Record<string, unknown>>, correlationId: string) {
       const response = await client.send("PUBLISH_LIFECYCLE_EVENT", { connectorId: "PLAYBOOK-CONNECTOR-001",
         domainRegistrationId: "PLAYBOOK-SCHOLAR-REGISTRATION-001", identityMappingId: identity.mappingId,
         correlationId, purpose: "Publish an approved owner-scoped opportunity journey event.", payload }, correlationId, correlationId);

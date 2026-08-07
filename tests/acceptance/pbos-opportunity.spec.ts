@@ -20,8 +20,8 @@ test("READINESS-TO-OPPORTUNITY produces exact-revision functional evidence", asy
   await page.getByRole("button", { name: "Log In", exact: true }).click();
   await page.waitForURL(/\/dashboard/);
   const discovery = await page.request.post("/api/pbos/opportunities");
-  expect(discovery.status()).toBe(200);
-  const discovered = await discovery.json() as { matches?: Array<{ id: string; reasons?: string[] }> };
+  const discovered = await discovery.json() as { error?: string; matches?: Array<{ id: string; reasons?: string[] }> };
+  expect(discovery.status(), "Opportunity discovery failed: " + (discovered.error ?? "unknown API error")).toBe(200);
   expect(discovered.matches?.length ?? 0).toBeGreaterThan(0);
   expect(discovered.matches?.every(match => (match.reasons?.length ?? 0) > 0)).toBe(true);
   const match = discovered.matches![0];
