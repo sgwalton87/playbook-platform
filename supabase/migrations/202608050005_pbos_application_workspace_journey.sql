@@ -1,3 +1,22 @@
+create table if not exists public.application_workspaces (
+  id uuid primary key default gen_random_uuid(),
+  scholar_id uuid not null references auth.users(id),
+  opportunity_name text not null,
+  opportunity_type text not null,
+  deadline date,
+  requirements jsonb not null default '[]'::jsonb,
+  resume_version jsonb,
+  essays jsonb not null default '[]'::jsonb,
+  recommendation_request_ids jsonb not null default '[]'::jsonb,
+  evidence jsonb not null default '[]'::jsonb,
+  status text not null default 'building' check (status in ('building','ready','submitted','archived')),
+  created_at timestamptz not null default now()
+);
+alter table public.application_workspaces enable row level security;
+drop policy if exists "application-workspaces-own" on public.application_workspaces;
+create policy "application-workspaces-own" on public.application_workspaces for all to authenticated
+  using (auth.uid() = scholar_id) with check (auth.uid() = scholar_id);
+
 alter table public.application_workspaces add column if not exists opportunity_id text;
 alter table public.application_workspaces add column if not exists idempotency_key text;
 alter table public.application_workspaces add column if not exists delivery_state text not null default 'PENDING' check (delivery_state in ('PENDING','DELIVERED'));
