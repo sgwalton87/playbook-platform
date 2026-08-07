@@ -1,3 +1,4 @@
+import { createHash } from "crypto";
 import type { PlaybookIdentityMapping } from "../../pbos/connector/contracts";
 import { authorizePlaybookFoundation } from "./foundation";
 
@@ -20,6 +21,13 @@ export interface AcademicJourneyRuntime {
   publish(identity: PlaybookIdentityMapping, evidenceId: string, readinessScore: number, correlationId: string): Promise<readonly string[]>;
 }
 
+export function academicPublicationIdempotencyKey(identityMappingId: string, evidenceId: string, readinessScore: number): string {
+  const payload = { operation: "PUBLISH_LIFECYCLE_EVENT", connectorId: "PLAYBOOK-CONNECTOR-001",
+    domainRegistrationId: "PLAYBOOK-SCHOLAR-REGISTRATION-001", purpose: "Publish approved academic readiness evidence.",
+    identityMappingId, evidenceId, eventType: "ACADEMIC_READINESS_UPDATED", schemaVersion: "1.0.0", readinessScore };
+  return "academic-publish-" + createHash("sha256").update(JSON.stringify(payload)).digest("hex").slice(0, 24);
+}
+
 export class AcademicTranscriptJourneyService {
   constructor(private readonly repository: AcademicJourneyRepository, private readonly runtime: AcademicJourneyRuntime) {}
 
@@ -31,7 +39,8 @@ export class AcademicTranscriptJourneyService {
     const baseProvenance = [...authority.provenance, identity.pbosIdentity.provenance];
     const evidence = await this.repository.saveEvidence({ ownerId: input.ownerId, readinessScore: input.readinessScore,
       agUpdates: input.agUpdates, idempotencyKey: input.idempotencyKey, provenance: baseProvenance });
-    const runtimeProvenance = await this.runtime.publish(identity, evidence.evidenceId, input.readinessScore, input.idempotencyKey);
+    const publicationIdempotencyKey = academicPublicationIdempotencyKey(identity.mappingId, evidence.evidenceId, input.readinessScore);
+    const runtimeProvenance = await this.runtime.publish(identity, evidence.evidenceId, input.readinessScore, publicationIdempotencyKey);
     const provenance = [...baseProvenance, ...runtimeProvenance, input.approvalId];
     await this.repository.completeEvidence({ ownerId: input.ownerId, evidenceId: evidence.evidenceId, provenance });
     return { evidenceId: evidence.evidenceId, readinessScore: input.readinessScore, provenance };
