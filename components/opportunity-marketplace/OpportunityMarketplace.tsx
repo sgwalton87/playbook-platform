@@ -55,7 +55,7 @@ export default function OpportunityMarketplace() {
   return (
     <main style={{ background: "#F8F7F4", minHeight: "100vh", padding: "clamp(20px, 5vw, 48px)", fontFamily: "system-ui, sans-serif" }}>
       <section aria-labelledby="opportunity-heading" style={{ maxWidth: 1120, margin: "0 auto" }}>
-        <p style={{ fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "#64748B" }}>Opportunity Marketplace</p>
+        <p style={{ fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "#475569" }}>Opportunity Marketplace</p>
         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 20, alignItems: "end", marginBottom: 22 }}>
           <div><h1 id="opportunity-heading" style={{ fontSize: "clamp(30px, 6vw, 48px)", lineHeight: 1.05, color: "#0F172A", margin: 0 }}>Your explainable matches</h1>
             <p style={{ color: "#475569", maxWidth: 680, lineHeight: 1.65 }}>Matches use your verified Scholar evidence. Every recommendation explains why it appears, and save or dismiss choices remain private to your account.</p></div>
