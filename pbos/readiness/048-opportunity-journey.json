@@ -1,0 +1,25 @@
+{
+  "missionId": "048-opportunity-journey",
+  "systemId": "PLAYBOOK-SYSTEM-001",
+  "repository": "sgwalton87/playbook-platform",
+  "governedRevision": "4a26a721ace1b6d1ac4127b5863b98d6e91e4923",
+  "productionRunId": "55fe53e6-4a7d-4222-8ce2-0080f3d1f24f",
+  "state": "IMPLEMENTED_PENDING_VALIDATION",
+  "journey": "VERIFIED_SIGNALS_TO_EXPLAINABLE_OPPORTUNITY_DECISION",
+  "surface": "WEB",
+  "implementation": [
+    "app/opportunities/page.tsx",
+    "components/opportunity-marketplace/OpportunityMarketplace.tsx",
+    "app/api/pbos/opportunities/route.ts",
+    "lib/pbos/opportunity-journey-service.ts"
+  ],
+  "durableData": "supabase/migrations/202608050005_pbos_opportunity_journey.sql",
+  "acceptanceCriteria": [
+    "Authenticated identity owns every query and mutation",
+    "Only evidence-backed matches with human-readable reasons are persisted",
+    "Save and dismiss survive reload and PBOS denial remains recoverable",
+    "Signed PBOS events carry exact journey provenance without browser credentials",
+    "Responsive loading, empty, error, save, and dismiss states are accessible",
+    "Independent validation and human certification are required for completion"
+  ]
+}
