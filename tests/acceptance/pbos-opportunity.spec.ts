@@ -1,5 +1,4 @@
 import AxeBuilder from "@axe-core/playwright";
-import { createClient } from "@supabase/supabase-js";
 import { mkdir, writeFile } from "node:fs/promises";
 import { test, expect } from "@playwright/test";
 
