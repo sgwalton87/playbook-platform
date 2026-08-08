@@ -370,7 +370,7 @@ export default function AGTracker({
                         ? COLORS.green
                         : item.inProgress
                         ? COLORS.amber
-                        : COLORS.faint,
+                        : COLORS.muted,
                     }}
                   >
                     {item.met
