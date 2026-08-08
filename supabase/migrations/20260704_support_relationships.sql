@@ -14,18 +14,21 @@ create table if not exists public.support_relationships (
 
 alter table public.support_relationships enable row level security;
 
+drop policy if exists "Scholars can view their support relationships" on public.support_relationships;
 create policy "Scholars can view their support relationships"
 on public.support_relationships
 for select
 to authenticated
 using (auth.uid() = scholar_id);
 
+drop policy if exists "Supporters can view their scholar relationships" on public.support_relationships;
 create policy "Supporters can view their scholar relationships"
 on public.support_relationships
 for select
 to authenticated
 using (auth.uid() = supporter_id);
 
+drop policy if exists "Scholars can create support relationships" on public.support_relationships;
 create policy "Scholars can create support relationships"
 on public.support_relationships
 for insert
