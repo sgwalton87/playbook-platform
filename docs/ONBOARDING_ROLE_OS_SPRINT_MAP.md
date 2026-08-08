@@ -68,6 +68,18 @@
 
 **Acceptance gates:** centralized permission matrix, role-by-role E2E coverage, RLS verification, audit-ready agreement records, email/invite validation, analytics events, production build, and checklist/architecture/tech-debt reconciliation.
 
+## Product acceptance journeys
+
+| Journey ID | Canonical coverage |
+| --- | --- |
+| SCHOLAR-ONBOARDING-TO-DASHBOARD | Scholar onboarding and dashboard coverage. |
+| TRANSCRIPT-TO-ACADEMIC-READINESS | Transcript to academic readiness. |
+| READINESS-TO-OPPORTUNITY | Academic readiness to explainable opportunity matches. |
+| OPPORTUNITY-TO-APPLICATION | Opportunity to durable application workspace and private documents. |
+| APPLICATION-TO-AUTHORIZED-SUPPORT | Application to authorized support request. |
+| AUTHORIZED-SUPPORT-MESSAGING | Support relationship to governed durable messaging. |
+| EVENT-TO-ACKNOWLEDGED-NOTIFICATION | Domain events to idempotent notification and outbox journey. |
+
 ## Current architectural decisions
 
 - `/start` is the canonical onboarding route.
