@@ -1,5 +1,7 @@
 "use client";
 
+import ApplicationSupportRequestPanel from "@/components/application-workspace/ApplicationSupportRequestPanel";
+
 import { FormEvent, useEffect, useState } from "react";
 import { PlaybookCard, PlaybookGrid, PlaybookHero, PlaybookMetric, PlaybookMetrics, PlaybookPage, PlaybookPill } from "@/components/ui";
 
@@ -81,6 +83,7 @@ export default function ApplicationWorkspaceDashboard() {
           <PlaybookCard eyebrow="Status" title="Submission readiness"><PlaybookPill>{workspace.status}</PlaybookPill><p>{workspace.delivery_state === "DELIVERED" ? "PBOS lifecycle connected" : "PBOS delivery pending"}</p>
             {workspace.status === "ready" && <button disabled={busy} onClick={() => transition(workspace.id, "APPLICATION_SUBMITTED")}>Mark application submitted</button>}</PlaybookCard></PlaybookGrid>
       </section>; })}
+  <ApplicationSupportRequestPanel />
   </PlaybookPage>;
 }
 
