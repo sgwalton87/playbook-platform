@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "missionId": "048-canon-journeys",
+  "repository": "sgwalton87/playbook-platform",
+  "governedRevision": "c371d8b075b171a38fb578f4d08d421f085a850b",
+  "productionRunId": "590a8b1f-810b-4ec2-b994-5030f129e818",
+  "roleCount": 12,
+  "deliverySprints": [
+    "OR-001 — Canonical role registry and routing",
+    "OR-002 — Unified premium onboarding shell",
+    "OR-003 — Learner pathways",
+    "OR-004 — Family and trusted-support pathways",
+    "OR-005 — K–12 institutional pathways",
+    "OR-006 — College pathways",
+    "OR-007 — Opportunity partner pathways",
+    "OR-008 — Governance and release validation"
+  ],
+  "sourcePaths": [
+    "docs/GOVERNANCE/ROLE_REGISTRY.md",
+    "docs/ONBOARDING_ROLE_OS_SPRINT_MAP.md",
+    "docs/design/CANONICAL_ROUTE_MAP.md"
+  ],
+  "state": "CANON_COMPILED_PENDING_INDEPENDENT_VALIDATION",
+  "certificationBoundary": "Journey topology is not functional acceptance evidence."
+}
