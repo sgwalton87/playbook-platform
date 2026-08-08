@@ -2,6 +2,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import HomePage from "@/app/page";
+import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
 
 describe("Playbook landing canon", () => {
   it("renders the approved future-facing local Scholar experience", () => {
@@ -16,5 +17,6 @@ describe("Playbook landing canon", () => {
     expect(screen.getAllByRole("link", { name: /Join The Playbook/i })
       .every(link => link.getAttribute("href") === "/login?mode=signup"))
       .toBe(true);
+    expect("home" in PLAYBOOK_HERO_VISUALS).toBe(false);
   });
 });
