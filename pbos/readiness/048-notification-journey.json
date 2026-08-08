@@ -1,0 +1,23 @@
+{
+  "missionId": "048-notification-journey",
+  "systemId": "PLAYBOOK-SYSTEM-001",
+  "repository": "sgwalton87/playbook-platform",
+  "governedRevision": "b1d628c7d3bd51650d9d75eb8ce5c1f2b67eb089",
+  "productionRunId": "73e6a99a-c96f-492f-b92c-35b4b911890a",
+  "state": "IMPLEMENTED_PENDING_VALIDATION",
+  "journey": "EVENT_TO_ACKNOWLEDGED_NOTIFICATION",
+  "surface": "WEB",
+  "implementation": [
+    "app/api/notifications/route.ts",
+    "components/notifications-v2/NotificationCenter.tsx",
+    "lib/pbos/reliable-notifications.ts"
+  ],
+  "durableData": "supabase/migrations/202608050009_pbos_notification_outbox.sql",
+  "acceptanceCriteria": [
+    "Domain events are idempotent",
+    "Preferences govern delivery",
+    "Retry and escalation are bounded and observable",
+    "Acknowledgement persists",
+    "PBOS lifecycle provenance is server signed"
+  ]
+}
