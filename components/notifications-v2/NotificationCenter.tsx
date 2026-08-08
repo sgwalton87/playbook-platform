@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { PlaybookHero, PlaybookMetric, PlaybookMetrics, PlaybookPage, PlaybookPill } from "@/components/ui";
+import { PlaybookHero, PlaybookMetric, PlaybookMetrics, PlaybookPage } from "@/components/ui";
 type Notification = { id: string; type: string; title: string; body: string; href: string; priority: string; read: boolean; created_at: string };
 type Preference = { notification_type: string; mode: string }; type Failure = { id: string; event_type: string; attempt_count: number; last_error: string };
 type Filter = "all" | "unread" | "messages" | "actions" | "intelligence";
@@ -28,15 +28,16 @@ export default function NotificationCenter() {
     subtitle="Idempotent domain events, preferences, acknowledgement, bounded retry, escalation, and failure evidence in one governed center." />
     <PlaybookMetrics><PlaybookMetric label="Unread" value={String(notifications.filter(item=>!item.read).length)}/>
       <PlaybookMetric label="Delivery failures" value={String(failures.length)}/></PlaybookMetrics>
-    <p role="status" aria-live="polite">{loading?"Loading…":status}</p>{error&&<p role="alert">{error} <button onClick={()=>void reload()}>Retry</button></p>}
-    <section aria-label="Notification preferences"><h2>Delivery preferences</h2>{["message","mail_reply","shared_action","network_blocker"].map(type=><label key={type} style={{display:"block"}}>{type}
+    <p role="status" aria-live="polite" style={{color:"#0F172A"}}>{loading?"Loading…":status}</p>{error&&<p role="alert">{error} <button onClick={()=>void reload()}>Retry</button></p>}
+    <section aria-label="Notification preferences" style={{color:"#0F172A"}}><h2 style={{color:"#0F172A"}}>Delivery preferences</h2>{["message","mail_reply","shared_action","network_blocker"].map(type=><label key={type} style={{display:"block",color:"#0F172A"}}>{type}
       <select value={preferences.find(item=>item.notification_type===type)?.mode??"immediate"} onChange={event=>void act({action:"PREFERENCE",notificationType:type,mode:event.target.value})}>
         <option value="immediate">Immediate</option><option value="daily_digest">Daily digest</option><option value="weekly_digest">Weekly digest</option><option value="muted">Muted</option></select></label>)}</section>
-    <section><div style={{display:"flex",gap:8,flexWrap:"wrap"}}>{(["all","unread","messages","actions","intelligence"] as Filter[]).map(value=><button key={value}
+    <section style={{color:"#0F172A"}}><div style={{display:"flex",gap:8,flexWrap:"wrap"}}>{(["all","unread","messages","actions","intelligence"] as Filter[]).map(value=><button key={value}
       aria-pressed={filter===value} onClick={()=>setFilter(value)}>{value}</button>)}<button onClick={()=>void act({action:"READ_ALL"})}>Mark all read</button></div>
-      {!loading&&visible.length===0&&<p>Nothing needs attention in this view.</p>}{visible.map(item=><article key={item.id} style={{padding:16,borderBottom:"1px solid #E2E8F0",opacity:item.read?.7:1}}>
-        <PlaybookPill>{item.type}</PlaybookPill><h2>{item.title}</h2><p>{item.body}</p><Link href={item.href}>Open</Link>{!item.read&&<button onClick={()=>void act({action:"READ",notificationId:item.id})}>Mark read</button>}
-        <small>{item.priority} priority · {new Date(item.created_at).toLocaleString()}</small></article>)}</section>
+      {!loading&&visible.length===0&&<p style={{color:"#0F172A"}}>Nothing needs attention in this view.</p>}{visible.map(item=><article key={item.id} style={{padding:16,borderBottom:"1px solid #E2E8F0",opacity:item.read?.7:1,color:"#0F172A"}}>
+        <span style={{display:"inline-flex",background:"#FFF7ED",border:"1px solid #FDBA74",color:"#7C2D12",borderRadius:999,padding:"6px 9px",fontSize:11,fontWeight:900,textTransform:"uppercase"}}>{item.type}</span>
+        <h2 style={{color:"#0F172A"}}>{item.title}</h2><p style={{color:"#0F172A"}}>{item.body}</p><Link href={item.href} style={{color:"#1D4ED8"}}>Open</Link>{!item.read&&<button onClick={()=>void act({action:"READ",notificationId:item.id})}>Mark read</button>}
+        <small style={{color:"#334155"}}>{item.priority} priority · {new Date(item.created_at).toLocaleString()}</small></article>)}</section>
     {failures.length>0&&<section aria-label="Delivery failures"><h2>Delivery recovery</h2>{failures.map(item=><article key={item.id}><p>{item.event_type}: {item.last_error}</p>
       <button onClick={()=>void act({action:"RETRY",outboxId:item.id})}>Retry delivery</button></article>)}</section>}
   </PlaybookPage>;
