@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "missionId": "048-product-journeys",
+  "systemId": "PLAYBOOK-SYSTEM-001",
+  "repository": "sgwalton87/playbook-platform",
+  "startingRevision": "c0385d5ac38b2483ffaaad1072eab513951a2680",
+  "productionRunId": "2a97ceeb-b492-4014-926f-41e8866a7d83",
+  "state": "IMPLEMENTED_PENDING_INDEPENDENT_VALIDATION",
+  "runtimeAuthority": "PBOS_AUTONOMOUS_PRODUCTION_KERNEL",
+  "journeys": [
+    {
+      "journeyId": "SCHOLAR-ONBOARDING-TO-DASHBOARD",
+      "specification": "tests/acceptance/pbos-scholar.spec.ts"
+    },
+    {
+      "journeyId": "TRANSCRIPT-TO-ACADEMIC-READINESS",
+      "specification": "tests/acceptance/pbos-academic.spec.ts"
+    },
+    {
+      "journeyId": "READINESS-TO-OPPORTUNITY",
+      "specification": "tests/acceptance/pbos-opportunity.spec.ts"
+    },
+    {
+      "journeyId": "OPPORTUNITY-TO-APPLICATION",
+      "specification": "tests/acceptance/pbos-application.spec.ts"
+    },
+    {
+      "journeyId": "APPLICATION-TO-AUTHORIZED-SUPPORT",
+      "specification": "tests/acceptance/pbos-support.spec.ts"
+    },
+    {
+      "journeyId": "AUTHORIZED-SUPPORT-MESSAGING",
+      "specification": "tests/acceptance/pbos-messaging.spec.ts"
+    },
+    {
+      "journeyId": "EVENT-TO-ACKNOWLEDGED-NOTIFICATION",
+      "specification": "tests/acceptance/pbos-notifications.spec.ts"
+    }
+  ],
+  "requiredViewports": [
+    "DESKTOP_1440X900",
+    "MOBILE_390X844"
+  ],
+  "completionRule": "No journey is complete until exact-revision runtime, browser, accessibility, security and CI evidence pass."
+}
