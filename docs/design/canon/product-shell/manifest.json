@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "designCanonId": "PGDS-001",
+  "repository": "sgwalton87/playbook-platform",
+  "governedRevision": "ce53b996beb36d38407d8a6f496d2fbce06384eb",
+  "authoritySources": [
+    "docs/design/PLAYBOOK_DESIGN_SYSTEM.md",
+    "docs/UI_DESIGN_SYSTEM.md",
+    "styles/playbook-tokens.css",
+    "app/globals.css",
+    "components/shell/UnifiedAppShell.tsx"
+  ],
+  "routeCount": 93,
+  "state": "TARGET_BOUND_IMPLEMENTATION_PENDING",
+  "certificationBoundary": "No visual implementation or approval is inferred."
+}
