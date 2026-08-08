@@ -87,8 +87,16 @@ export async function POST(request: NextRequest) {
     const idempotencyKey = user.id + ":" + requestId;
     const staged = await supabase.from("pbos_messages").upsert({ conversation_id: conversationId, scholar_id: authority.scholarId,
       sender_id: user.id, body: normalized, idempotency_key: idempotencyKey, delivery_state: "PENDING",
-      moderation_state: "VISIBLE", provenance: authority.provenance }, { onConflict: "idempotency_key" }).select("id,conversation_id,sender_id,body,created_at").single();
-    if (staged.error || !staged.data) throw new Error(staged.error?.message ?? "Message persistence failed.");
+      moderation_state: "VISIBLE", provenance: authority.provenance }, { onConflict: "idempotency_key", ignoreDuplicates: true })
+      .select("id,conversation_id,sender_id,body,created_at").maybeSingle();
+    if (staged.error) throw new Error(staged.error.message);
+    let stagedMessage = staged.data;
+    if (!stagedMessage) {
+      const existingMessage = await supabase.from("pbos_messages").select("id,conversation_id,sender_id,body,created_at")
+        .eq("idempotency_key", idempotencyKey).eq("sender_id", user.id).maybeSingle();
+      if (existingMessage.error || !existingMessage.data) throw new Error(existingMessage.error?.message ?? "Message persistence failed.");
+      stagedMessage = existingMessage.data;
+    }
     const mapper = new PlaybookIdentityMapper(); const identity = mapper.mapSupabaseIdentity(user.id, authority.pbosRole);
     const client = new PlaybookPbosRuntimeClient(new SignedPlaybookPbosTransport(required("PBOS_API_URL"), {
       organizationId: required("PBOS_ORGANIZATION_ID"), connectorId: required("PBOS_CONNECTOR_ID"),
@@ -96,12 +104,12 @@ export async function POST(request: NextRequest) {
     const response = await client.send("PUBLISH_LIFECYCLE_EVENT", { connectorId: "PLAYBOOK-CONNECTOR-001",
       domainRegistrationId: "PLAYBOOK-SCHOLAR-REGISTRATION-001", identityMappingId: identity.mappingId,
       correlationId: idempotencyKey, purpose: "Publish an approved support message.", payload: {
-        eventType: "SUPPORT_MESSAGE_SENT", schemaVersion: "1.0.0", messageId: staged.data.id, conversationId
+        eventType: "SUPPORT_MESSAGE_SENT", schemaVersion: "1.0.0", messageId: stagedMessage.id, conversationId
       } }, idempotencyKey, idempotencyKey);
     if (!response.success) throw new Error(response.error.message);
     const provenance = [...authority.provenance, identity.pbosIdentity.provenance, ...response.provenance];
     const delivered = await supabase.from("pbos_messages").update({ delivery_state: "DELIVERED", provenance })
-      .eq("id", staged.data.id).eq("sender_id", user.id).select("id,conversation_id,sender_id,body,delivery_state,created_at").single();
+      .eq("id", stagedMessage.id).eq("sender_id", user.id).select("id,conversation_id,sender_id,body,delivery_state,created_at").single();
     if (delivered.error || !delivered.data) throw new Error(delivered.error?.message ?? "Message delivery finalization failed.");
     return NextResponse.json({ conversation, message: delivered.data }, { status: 201 });
   } catch (error) { return NextResponse.json({ error: error instanceof Error ? error.message : "Message delivery failed." }, { status: 500 }); }

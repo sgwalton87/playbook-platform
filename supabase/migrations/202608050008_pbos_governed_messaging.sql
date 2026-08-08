@@ -45,5 +45,9 @@ drop policy if exists "Governed participants update messages" on public.pbos_mes
 create policy "Governed participants update messages" on public.pbos_messages for update to authenticated using (
   sender_id=auth.uid() or exists (select 1 from public.pbos_conversation_participants p where p.conversation_id=pbos_messages.conversation_id and p.user_id=auth.uid()))
   with check (sender_id=auth.uid() or exists (select 1 from public.pbos_conversation_participants p where p.conversation_id=pbos_messages.conversation_id and p.user_id=auth.uid()));
+grant select, insert on public.pbos_conversations to authenticated;
+grant select, insert on public.pbos_conversation_participants to authenticated;
+grant update (muted_at,blocked_at,last_read_at) on public.pbos_conversation_participants to authenticated;
+grant select, insert on public.pbos_messages to authenticated;
 revoke update on public.pbos_messages from authenticated;
 grant update (delivery_state,moderation_state,reported_at,provenance) on public.pbos_messages to authenticated;
