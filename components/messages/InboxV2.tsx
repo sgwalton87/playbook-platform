@@ -49,22 +49,22 @@ export default function InboxV2() {
 
   return <PlaybookPage><PlaybookHero eyebrow="Governed Messaging" title="Your governed support conversations"
     subtitle="Durable messages, unread state, mute, block, reporting, and PBOS provenance stay inside authorized support relationships." />
-    <p role="status" aria-live="polite">{loading ? "Loading…" : status}</p>{error && <p role="alert">{error} <button onClick={() => void reload()}>Retry</button></p>}
-    <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 16 }}>
+    <p role="status" aria-live="polite" style={{ color: "#0F172A" }}>{loading ? "Loading…" : status}</p>{error && <p role="alert">{error} <button onClick={() => void reload()}>Retry</button></p>}
+    <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 16, color: "#0F172A" }}>
       <aside aria-label="Conversations">{conversations.map(conversation => <button key={conversation.id} onClick={() => setActiveId(conversation.id)}
         aria-pressed={conversation.id === active?.id} style={{ display: "block", width: "100%", padding: 14, marginBottom: 8, textAlign: "left" }}>
         <strong>{conversation.relationship?.relationship ?? "Support"}</strong> · {conversation.relationship?.supporter_email ?? "Scholar"}
         {conversation.unreadCount > 0 && <PlaybookPill>{conversation.unreadCount} unread</PlaybookPill>}</button>)}</aside>
-      <article>{!loading && !active && <p>No authorized conversation exists yet. Start from an active support relationship.</p>}
+      <article style={{ color: "#0F172A" }}>{!loading && !active && <p style={{ color: "#0F172A" }}>No authorized conversation exists yet. Start from an active support relationship.</p>}
         {active && <><div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <button onClick={() => void act("READ")}>Mark read</button>
           <button onClick={() => void act(active.participant?.muted_at ? "UNMUTE" : "MUTE")}>{active.participant?.muted_at ? "Unmute" : "Mute"}</button>
           <button onClick={() => void act(active.participant?.blocked_at ? "UNBLOCK" : "BLOCK")}>{active.participant?.blocked_at ? "Unblock" : "Block"}</button></div>
-          <form onSubmit={send}><label htmlFor="message-body">Message</label><textarea id="message-body" value={body}
+          <form onSubmit={send}><label htmlFor="message-body" style={{ color: "#0F172A" }}>Message</label><textarea id="message-body" value={body}
             onChange={event => setBody(event.target.value)} disabled={sending || Boolean(active.participant?.blocked_at)} maxLength={2000} required />
             <button disabled={sending || Boolean(active.participant?.blocked_at)}>{sending ? "Sending…" : "Send message"}</button></form>
-          <div aria-label="Message history">{active.messages.map(message => <article key={message.id} style={{ padding: 12, borderBottom: "1px solid #E2E8F0" }}>
-            <p>{message.body}</p><small>{message.delivery_state} · {new Date(message.created_at).toLocaleString()}</small>
+          <div aria-label="Message history">{active.messages.map(message => <article key={message.id} style={{ padding: 12, borderBottom: "1px solid #E2E8F0", color: "#0F172A" }}>
+            <p style={{ color: "#0F172A" }}>{message.body}</p><small style={{ color: "#0F172A" }}>{message.delivery_state} · {new Date(message.created_at).toLocaleString()}</small>
             <button onClick={() => void act("REPORT", message.id)}>Report</button></article>)}</div></>}
       </article></section></PlaybookPage>;
 }
