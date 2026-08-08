@@ -43,7 +43,7 @@ async function deliver(supabase: Awaited<ReturnType<typeof requireUser>>["supaba
   }
   const provenance = await publishPbos(userId, event, userId + ":" + event.eventKey);
   const priority = notificationPriorityForAttempt(event.priority, outbox.attempt_count);
-  const saved = await supabase.from("notifications").upsert({ user_id: userId, scholar_id: userId, type: event.type,
+  const saved = await supabase.from("pbos_notifications").upsert({ user_id: userId, scholar_id: userId, type: event.type,
     title: event.title, body: event.body, href: event.href, priority, read: false, delivery_status: "in_app",
     source_event_key: event.eventKey, provenance }, { onConflict: "user_id,source_event_key" })
     .select("id,user_id,type,title,body,href,priority,read,created_at,source_event_key").single();
@@ -57,7 +57,7 @@ export async function GET() {
   try { const { supabase, user } = await requireUser();
     if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
     const [notifications, preferences, failures] = await Promise.all([
-      supabase.from("notifications").select("id,user_id,scholar_id,type,title,body,href,priority,read,created_at,source_event_key")
+      supabase.from("pbos_notifications").select("id,user_id,scholar_id,type,title,body,href,priority,read,created_at,source_event_key")
         .eq("user_id", user.id).order("created_at", { ascending: false }),
       supabase.from("pbos_notification_preferences").select("notification_type,mode").eq("owner_id", user.id),
       supabase.from("pbos_notification_outbox").select("id,event_key,event_type,attempt_count,last_error,next_attempt_at")
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
       .eq("owner_id", user.id).eq("event_key", event.eventKey).maybeSingle();
     if (existing.error) throw new Error(existing.error.message);
     if (existing.data?.state === "DELIVERED") {
-      const notification = await supabase.from("notifications").select("id,user_id,type,title,body,href,priority,read,created_at,source_event_key")
+      const notification = await supabase.from("pbos_notifications").select("id,user_id,type,title,body,href,priority,read,created_at,source_event_key")
         .eq("user_id", user.id).eq("source_event_key", event.eventKey).single();
       if (notification.error) throw new Error(notification.error.message); return NextResponse.json({ notification: notification.data, idempotent: true });
     }
@@ -103,9 +103,9 @@ export async function PATCH(request: NextRequest) {
     if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
     const body = await request.json() as { action?: unknown; notificationId?: unknown; notificationType?: unknown; mode?: unknown; outboxId?: unknown };
     const action = notificationAction(String(body.action ?? ""));
-    if (action === "READ") { const updated = await supabase.from("notifications").update({ read: true, acknowledged_at: new Date().toISOString() })
+    if (action === "READ") { const updated = await supabase.from("pbos_notifications").update({ read: true, acknowledged_at: new Date().toISOString() })
       .eq("id", String(body.notificationId ?? "")).eq("user_id", user.id); if (updated.error) throw new Error(updated.error.message); }
-    if (action === "READ_ALL") { const updated = await supabase.from("notifications").update({ read: true, acknowledged_at: new Date().toISOString() })
+    if (action === "READ_ALL") { const updated = await supabase.from("pbos_notifications").update({ read: true, acknowledged_at: new Date().toISOString() })
       .eq("user_id", user.id).eq("read", false); if (updated.error) throw new Error(updated.error.message); }
     if (action === "PREFERENCE") { const type = notificationType(String(body.notificationType ?? "")); const mode = notificationMode(String(body.mode ?? ""));
       const updated = await supabase.from("pbos_notification_preferences").upsert({ owner_id: user.id, notification_type: type, mode,
