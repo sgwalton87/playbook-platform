@@ -1,133 +1,70 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { PlaybookHero, PlaybookPage, PlaybookPill } from "@/components/ui";
-import {
-  buildConversationMessage,
-  getDemoConversationMessages,
-  getDemoConversations,
-} from "@/lib/messages";
 
-export default function InboxV2() {
-  const conversations = useMemo(() => getDemoConversations(), []);
-  const [activeId, setActiveId] = useState(conversations[0].id);
-  const [body, setBody] = useState("");
-  const [messagesByThread, setMessagesByThread] = useState<Record<string, LegacyValue[]>>({
-    "support-network": getDemoConversationMessages("support-network"),
-    family: getDemoConversationMessages("family"),
-    mentor: getDemoConversationMessages("mentor"),
-    "fafsa-action": getDemoConversationMessages("fafsa-action"),
-  });
+type Message = { id: string; sender_id: string; body: string; delivery_state: string; moderation_state: string; created_at: string };
+type Conversation = { id: string; status: string; unreadCount: number; messages: Message[];
+  relationship?: { id?: string; supporter_email?: string; relationship?: string }; participant?: { muted_at?: string | null; blocked_at?: string | null } };
+type ConversationResponse = { conversations?: Conversation[]; error?: string };
 
-  const activeConversation = conversations.find((c) => c.id === activeId) || conversations[0];
-  const messages = messagesByThread[activeId] || [];
-
-  function sendMessage() {
-    if (!body.trim()) return;
-
-    const message = buildConversationMessage({
-      conversationId: activeId,
-      senderRole: "scholar",
-      senderName: "Maya",
-      body,
-    });
-
-    setMessagesByThread({
-      ...messagesByThread,
-      [activeId]: [message, ...messages],
-    });
-
-    setBody("");
-  }
-
-  return (
-    <PlaybookPage>
-      <PlaybookHero
-        eyebrow="Playbook Inbox v2"
-        title="A real inbox for the scholar support system."
-        subtitle="Direct messages, support-network threads, shared-action conversations, unread states, and email replies can live here."
-      />
-
-      <section style={shell} data-playbook-inbox-shell="true">
-        <aside style={sidebar}>
-          <p style={eyebrow}>Conversations</p>
-
-          {conversations.map((conversation) => (
-            <button
-              key={conversation.id}
-              onClick={() => setActiveId(conversation.id)}
-              style={{
-                ...threadButton,
-                borderColor: activeId === conversation.id ? "#F97316" : "#E2E8F0",
-              }}
-            >
-              <div style={threadTop}>
-                <strong>{conversation.title}</strong>
-                {conversation.unreadCount > 0 && <span style={unread}>{conversation.unreadCount}</span>}
-              </div>
-              <p style={preview}>{conversation.lastMessage}</p>
-              <PlaybookPill>{conversation.kind.replaceAll("_", " ")}</PlaybookPill>
-            </button>
-          ))}
-        </aside>
-
-        <section style={thread}>
-          <div style={threadHeader}>
-            <p style={eyebrow}>{activeConversation.kind.replaceAll("_", " ")}</p>
-            <h2 style={threadTitle}>{activeConversation.title}</h2>
-            <p style={participants}>{activeConversation.participants.join(" • ")}</p>
-          </div>
-
-          <div style={composer}>
-            <textarea
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-              placeholder="Write a message..."
-              style={textarea}
-            />
-            <button onClick={sendMessage} style={send}>Send</button>
-          </div>
-
-          <div style={messageList}>
-            {messages.map((message) => (
-              <article key={message.id} style={messageCard}>
-                <div style={messageTop}>
-                  <strong>{message.senderName}</strong>
-                  <span style={source}>{message.source}</span>
-                </div>
-                <p style={messageBody}>{message.body}</p>
-
-                {message.actionId && (
-                  <div style={attachment}>
-                    Attached action: {message.actionId.replaceAll("-", " ")}
-                  </div>
-                )}
-              </article>
-            ))}
-          </div>
-        </section>
-      </section>
-    </PlaybookPage>
-  );
+async function fetchConversations(): Promise<ConversationResponse> {
+  const response = await fetch("/api/support-network/messages", { cache: "no-store" });
+  const result = await response.json() as ConversationResponse;
+  if (!response.ok) throw new Error(result.error ?? "Inbox could not be loaded.");
+  return result;
 }
 
-const shell: React.CSSProperties = { maxWidth: 1180, margin: "0 auto", display: "grid", gridTemplateColumns: "330px 1fr", gap: 16 };
-const sidebar: React.CSSProperties = { background: "#fff", border: "1px solid #E2E8F0", borderRadius: 24, padding: 18, boxShadow: "0 16px 40px rgba(15,23,42,.06)", height: "fit-content" };
-const eyebrow: React.CSSProperties = { fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase", fontWeight: 950, color: "#F97316", margin: 0 };
-const threadButton: React.CSSProperties = { width: "100%", textAlign: "left", background: "#fff", border: "2px solid #E2E8F0", borderRadius: 16, padding: 14, marginTop: 12, cursor: "pointer" };
-const threadTop: React.CSSProperties = { display: "flex", justifyContent: "space-between", gap: 10, color: "#0F172A" };
-const unread: React.CSSProperties = { background: "#F97316", color: "#fff", borderRadius: 999, padding: "3px 7px", fontSize: 11, fontWeight: 950 };
-const preview: React.CSSProperties = { color: "#64748B", fontSize: 13, lineHeight: 1.45 };
-const thread: React.CSSProperties = { background: "#fff", border: "1px solid #E2E8F0", borderRadius: 24, padding: 22, boxShadow: "0 16px 40px rgba(15,23,42,.06)" };
-const threadHeader: React.CSSProperties = { borderBottom: "1px solid #E2E8F0", paddingBottom: 16, marginBottom: 16 };
-const threadTitle: React.CSSProperties = { color: "#0F172A", fontSize: 32, margin: "8px 0" };
-const participants: React.CSSProperties = { color: "#64748B", margin: 0 };
-const composer: React.CSSProperties = { display: "grid", gap: 10, marginBottom: 16 };
-const textarea: React.CSSProperties = { width: "100%", boxSizing: "border-box", minHeight: 100, border: "1px solid #E2E8F0", borderRadius: 16, padding: 14 };
-const send: React.CSSProperties = { width: "fit-content", background: "#F97316", color: "#fff", border: "none", borderRadius: 999, padding: "10px 14px", fontWeight: 950, cursor: "pointer" };
-const messageList: React.CSSProperties = { display: "grid", gap: 12 };
-const messageCard: React.CSSProperties = { background: "#F8FAFC", border: "1px solid #E2E8F0", borderRadius: 16, padding: 14 };
-const messageTop: React.CSSProperties = { display: "flex", justifyContent: "space-between", color: "#0F172A" };
-const source: React.CSSProperties = { background: "#E2E8F0", borderRadius: 999, padding: "4px 7px", fontSize: 11, fontWeight: 900 };
-const messageBody: React.CSSProperties = { color: "#334155", lineHeight: 1.55 };
-const attachment: React.CSSProperties = { background: "#FFF7ED", border: "1px solid #FED7AA", color: "#9A3412", borderRadius: 12, padding: 10, fontSize: 12, fontWeight: 850 };
+export default function InboxV2() {
+  const [conversations, setConversations] = useState<Conversation[]>([]); const [activeId, setActiveId] = useState("");
+  const [body, setBody] = useState(""); const [loading, setLoading] = useState(true); const [sending, setSending] = useState(false);
+  const [status, setStatus] = useState("Loading governed conversations…"); const [error, setError] = useState("");
+  const active = conversations.find(item => item.id === activeId) ?? conversations[0];
+
+  useEffect(() => { let active = true; void fetchConversations().then(result => { if (!active) return;
+      setConversations(result.conversations ?? []); setActiveId(current => current || result.conversations?.[0]?.id || "");
+      setStatus(result.conversations?.length ? "Governed messages are current." : "No support conversations yet.");
+    }).catch(cause => { if (active) { setError(cause instanceof Error ? cause.message : "Inbox could not be loaded."); setStatus(""); } })
+      .finally(() => { if (active) setLoading(false); }); return () => { active = false; }; }, []);
+
+  async function reload() { setLoading(true); setError(""); try { const result = await fetchConversations();
+    setConversations(result.conversations ?? []); setActiveId(current => current || result.conversations?.[0]?.id || "");
+    setStatus(result.conversations?.length ? "Governed messages are current." : "No support conversations yet.");
+  } catch (cause) { setError(cause instanceof Error ? cause.message : "Inbox could not be loaded."); setStatus(""); }
+  finally { setLoading(false); } }
+
+  async function send(event: FormEvent) { event.preventDefault(); if (!active || !body.trim()) return; setSending(true); setError("");
+    try { const response = await fetch("/api/support-network/messages", { method: "POST", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ relationshipId: active.relationship?.id, conversationId: active.id, body, requestId: crypto.randomUUID() }) });
+      const result = await response.json() as { error?: string }; if (!response.ok) throw new Error(result.error ?? "Message failed.");
+      setBody(""); setStatus("Message delivered with PBOS provenance."); await reload();
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "Message failed."); } finally { setSending(false); }
+  }
+  async function act(action: string, messageId?: string) { if (!active) return; setError("");
+    const response = await fetch("/api/support-network/messages", { method: "PATCH", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ action, conversationId: active.id, messageId }) });
+    const result = await response.json() as { error?: string }; if (!response.ok) { setError(result.error ?? "Action failed."); return; }
+    setStatus(action === "READ" ? "Conversation marked read." : "Conversation safety setting updated."); await reload();
+  }
+
+  return <PlaybookPage><PlaybookHero eyebrow="Governed Messaging" title="Your governed support conversations"
+    subtitle="Durable messages, unread state, mute, block, reporting, and PBOS provenance stay inside authorized support relationships." />
+    <p role="status" aria-live="polite" style={{ color: "#0F172A" }}>{loading ? "Loading…" : status}</p>{error && <p role="alert">{error} <button onClick={() => void reload()}>Retry</button></p>}
+    <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 16, color: "#0F172A" }}>
+      <aside aria-label="Conversations">{conversations.map(conversation => <button key={conversation.id} onClick={() => setActiveId(conversation.id)}
+        aria-pressed={conversation.id === active?.id} style={{ display: "block", width: "100%", padding: 14, marginBottom: 8, textAlign: "left" }}>
+        <strong>{conversation.relationship?.relationship ?? "Support"}</strong> · {conversation.relationship?.supporter_email ?? "Scholar"}
+        {conversation.unreadCount > 0 && <PlaybookPill>{conversation.unreadCount} unread</PlaybookPill>}</button>)}</aside>
+      <article style={{ color: "#0F172A" }}>{!loading && !active && <p style={{ color: "#0F172A" }}>No authorized conversation exists yet. Start from an active support relationship.</p>}
+        {active && <><div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <button onClick={() => void act("READ")}>Mark read</button>
+          <button onClick={() => void act(active.participant?.muted_at ? "UNMUTE" : "MUTE")}>{active.participant?.muted_at ? "Unmute" : "Mute"}</button>
+          <button onClick={() => void act(active.participant?.blocked_at ? "UNBLOCK" : "BLOCK")}>{active.participant?.blocked_at ? "Unblock" : "Block"}</button></div>
+          <form onSubmit={send}><label htmlFor="message-body" style={{ color: "#0F172A" }}>Message</label><textarea id="message-body" value={body}
+            onChange={event => setBody(event.target.value)} disabled={sending || Boolean(active.participant?.blocked_at)} maxLength={2000} required />
+            <button disabled={sending || Boolean(active.participant?.blocked_at)}>{sending ? "Sending…" : "Send message"}</button></form>
+          <div aria-label="Message history">{active.messages.map(message => <article key={message.id} style={{ padding: 12, borderBottom: "1px solid #E2E8F0", color: "#0F172A" }}>
+            <p style={{ color: "#0F172A" }}>{message.body}</p><small style={{ color: "#0F172A" }}>{message.delivery_state} · {new Date(message.created_at).toLocaleString()}</small>
+            <button onClick={() => void act("REPORT", message.id)}>Report</button></article>)}</div></>}
+      </article></section></PlaybookPage>;
+}

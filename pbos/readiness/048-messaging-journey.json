@@ -1,0 +1,22 @@
+{
+  "missionId": "048-messaging-journey",
+  "systemId": "PLAYBOOK-SYSTEM-001",
+  "repository": "sgwalton87/playbook-platform",
+  "governedRevision": "c816e88001c25e9ecfe12690a5cb201f466fb157",
+  "productionRunId": "f043cf27-ebd4-489b-8863-e41a52eaa190",
+  "state": "IMPLEMENTED_PENDING_VALIDATION",
+  "journey": "AUTHORIZED_SUPPORT_MESSAGING",
+  "surface": "WEB",
+  "implementation": [
+    "app/api/support-network/messages/route.ts",
+    "components/messages/InboxV2.tsx",
+    "lib/pbos/governed-messaging.ts"
+  ],
+  "durableData": "supabase/migrations/202608050008_pbos_governed_messaging.sql",
+  "acceptanceCriteria": [
+    "Authorized participants exchange durable messages",
+    "Unread, mute, block and reporting states persist",
+    "PBOS lifecycle provenance is server signed",
+    "Desktop and mobile browser acceptance passes"
+  ]
+}
