@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "missionId": "048-canon-journeys",
   "repository": "sgwalton87/playbook-platform",
-  "governedRevision": "c371d8b075b171a38fb578f4d08d421f085a850b",
+  "governedRevision": "72791a51c4d5e870e2ac3d1bea52481dff36b4da",
   "productionRunId": "590a8b1f-810b-4ec2-b994-5030f129e818",
   "roleCount": 12,
   "deliverySprints": [
@@ -19,6 +19,36 @@
     "docs/GOVERNANCE/ROLE_REGISTRY.md",
     "docs/ONBOARDING_ROLE_OS_SPRINT_MAP.md",
     "docs/design/CANONICAL_ROUTE_MAP.md"
+  ],
+  "productJourneys": [
+    {
+      "journeyId": "SCHOLAR-ONBOARDING-TO-DASHBOARD",
+      "canonicalCoverage": "Scholar onboarding and dashboard coverage."
+    },
+    {
+      "journeyId": "TRANSCRIPT-TO-ACADEMIC-READINESS",
+      "canonicalCoverage": "Transcript to academic readiness."
+    },
+    {
+      "journeyId": "READINESS-TO-OPPORTUNITY",
+      "canonicalCoverage": "Academic readiness to explainable opportunity matches."
+    },
+    {
+      "journeyId": "OPPORTUNITY-TO-APPLICATION",
+      "canonicalCoverage": "Opportunity to durable application workspace and private documents."
+    },
+    {
+      "journeyId": "APPLICATION-TO-AUTHORIZED-SUPPORT",
+      "canonicalCoverage": "Application to authorized support request."
+    },
+    {
+      "journeyId": "AUTHORIZED-SUPPORT-MESSAGING",
+      "canonicalCoverage": "Support relationship to governed durable messaging."
+    },
+    {
+      "journeyId": "EVENT-TO-ACKNOWLEDGED-NOTIFICATION",
+      "canonicalCoverage": "Domain events to idempotent notification and outbox journey."
+    }
   ],
   "state": "CANON_COMPILED_PENDING_INDEPENDENT_VALIDATION",
   "certificationBoundary": "Journey topology is not functional acceptance evidence."
