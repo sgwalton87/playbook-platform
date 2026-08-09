@@ -7,7 +7,7 @@ const walk = (dir) => readdirSync(dir).flatMap((name) => {
   return statSync(path).isDirectory() ? walk(path) : [path];
 });
 const pages = walk(join(root, "app")).filter((path) => /\/page\.(tsx?|jsx?)$/.test(path) && !path.includes("/api/"));
-const verifiedDesktopAndMobile = new Set(["/", "/about", "/login", "/check-email", "/reset-password", "/role-select"]);
+const verifiedDesktopAndMobile = new Set(["/", "/about", "/login", "/check-email", "/reset-password", "/role-select", "/family-os", "/mentor-os", "/educator-os", "/employer-os", "/university-os", "/district-os"]);
 const route = (path) => {
   const value = relative(join(root, "app"), path).replace(/(^|\/)page\.(tsx?|jsx?)$/, "").replace(/\([^/]+\)\//g, "");
   return value ? `/${value}` : "/";

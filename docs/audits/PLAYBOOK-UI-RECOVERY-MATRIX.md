@@ -32,12 +32,12 @@ This is an implementation control artifact. A mapping or marker is not completio
 | `/dashboard` | Canonical marker present | PGDS-001 | Unified authenticated shell | IN_PROGRESS_UNVERIFIED | PENDING | PENDING |
 | `/demo/founder-case-study` | Legacy/inline presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/demo` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
-| `/district-os` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
+| `/district-os` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | IMPLEMENTED_AND_VERIFIED | PASSED | PASSED |
 | `/economy` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
-| `/educator-os` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
-| `/employer-os` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
+| `/educator-os` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | IMPLEMENTED_AND_VERIFIED | PASSED | PASSED |
+| `/employer-os` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | IMPLEMENTED_AND_VERIFIED | PASSED | PASSED |
 | `/events` | Legacy/inline presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
-| `/family-os` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
+| `/family-os` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | IMPLEMENTED_AND_VERIFIED | PASSED | PASSED |
 | `/feed` | Legacy/inline presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/founder` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/gamification` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
@@ -50,7 +50,7 @@ This is an implementation control artifact. A mapping or marker is not completio
 | `/living-scholar` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/login` | Canonical marker present | PGDS-001 | Authentication shell | IMPLEMENTED_AND_VERIFIED | PASSED | PASSED |
 | `/mentor-connect` | Legacy/inline presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
-| `/mentor-os` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
+| `/mentor-os` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | IMPLEMENTED_AND_VERIFIED | PASSED | PASSED |
 | `/mentorship` | Legacy/inline presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/messages/[threadId]` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/messages` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
@@ -100,5 +100,5 @@ This is an implementation control artifact. A mapping or marker is not completio
 | `/transcript` | Legacy/inline presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/tutorial` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/u/[username]` | Legacy/inline presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
-| `/university-os` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
+| `/university-os` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | IMPLEMENTED_AND_VERIFIED | PASSED | PASSED |
 | `/workflows` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |

@@ -9,7 +9,7 @@ export function PlaybookPage({
   children: React.ReactNode;
 }) {
   return (
-    <main style={normalizedPageStyle}>
+    <main style={normalizedPageStyle} data-visual-canon="PGDS-001" data-playbook-surface="role-os-dashboard">
       <ExperienceModeBanner />
       {children}
     </main>
@@ -109,17 +109,22 @@ const heroEyebrowStyle: React.CSSProperties = {
 const hero: React.CSSProperties = {
   maxWidth: playbookTheme.layout.max,
   margin: "0 auto 18px",
-  background: playbookTheme.colors.ink,
+  background: "radial-gradient(circle at 88% 0%,rgba(249,115,22,.24),transparent 22rem),radial-gradient(circle at 20% 100%,rgba(86,67,120,.28),transparent 24rem),linear-gradient(135deg,#06172D,#0B2648 58%,#031023)",
   color: "#FFFFFF",
-  borderRadius: playbookTheme.radius.xl,
-  padding: 36,
+  border: "1px solid rgba(255,255,255,.14)",
+  borderRadius: "34px 8px 34px 8px",
+  padding: "clamp(30px,5vw,58px)",
   boxShadow: playbookTheme.shadow.hero,
 };
 
 const titleStyle: React.CSSProperties = {
   margin: "12px 0",
-  fontSize: 54,
-  lineHeight: 1,
+  fontFamily: "Anton, var(--pb-font)",
+  fontSize: "clamp(46px,7vw,86px)",
+  fontWeight: 400,
+  lineHeight: .92,
+  letterSpacing: "-.015em",
+  textTransform: "uppercase",
 };
 
 const subtitleStyle: React.CSSProperties = {
@@ -132,21 +137,23 @@ const subtitleStyle: React.CSSProperties = {
 const card: React.CSSProperties = {
   background: playbookTheme.colors.card,
   border: `1px solid ${playbookTheme.colors.line}`,
-  borderRadius: playbookTheme.radius.lg,
+  backdropFilter: "blur(16px)",
+  borderRadius: "24px 6px 24px 6px",
   padding: 24,
   boxShadow: playbookTheme.shadow.card,
 };
 
 const cardTitle: React.CSSProperties = {
   color: playbookTheme.colors.ink,
-  fontSize: 26,
+  fontSize: 28,
+  lineHeight: 1.08,
   margin: "8px 0 14px",
 };
 
 const metric: React.CSSProperties = {
   background: playbookTheme.colors.card,
   border: `1px solid ${playbookTheme.colors.line}`,
-  borderRadius: playbookTheme.radius.md,
+  borderRadius: "20px 6px 20px 6px",
   padding: 18,
 };
 
@@ -167,8 +174,8 @@ const button: React.CSSProperties = {
   display: "inline-flex",
   background: playbookTheme.colors.orange,
   color: "#FFFFFF",
-  borderRadius: playbookTheme.radius.pill,
-  padding: "10px 14px",
+  borderRadius: 9,
+  padding: "13px 18px",
   textDecoration: "none",
   fontWeight: 950,
 };

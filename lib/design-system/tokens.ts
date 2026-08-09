@@ -1,11 +1,11 @@
 export const playbookTheme = {
   colors: {
-    ink: "#0F172A",
-    slate: "#334155",
+    ink: "#06172D",
+    slate: "#203047",
     muted: "#64748B",
     line: "#E2E8F0",
-    canvas: "#F8F7F4",
-    card: "#FFFFFF",
+    canvas: "transparent",
+    card: "rgba(255,255,255,.90)",
     orange: "#C2410C",
     orangeBright: "#F97316",
     orangeOnDark: "#FDBA74",
@@ -19,12 +19,12 @@ export const playbookTheme = {
     sm: 12,
     md: 18,
     lg: 24,
-    xl: 30,
+    xl: 34,
     pill: 999,
   },
   shadow: {
-    card: "0 16px 40px rgba(15,23,42,.06)",
-    hero: "0 24px 70px rgba(15,23,42,.16)",
+    card: "0 18px 46px rgba(6,23,45,.09)",
+    hero: "0 34px 90px rgba(3,16,35,.28)",
   },
   layout: {
     max: 1180,
@@ -36,7 +36,7 @@ export const pageShellStyle: React.CSSProperties = {
   minHeight: "100vh",
   background: playbookTheme.colors.canvas,
   padding: playbookTheme.layout.pagePadding,
-  fontFamily: "system-ui, sans-serif",
+  fontFamily: "var(--pb-font)",
 };
 
 export const eyebrowStyle: React.CSSProperties = {

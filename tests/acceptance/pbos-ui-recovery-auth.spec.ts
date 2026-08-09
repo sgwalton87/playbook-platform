@@ -9,6 +9,15 @@ const routes = [
   { id: "role-select", path: "/role-select", heading: /One platform/i },
 ] as const;
 
+const roleOperatingSystems = [
+  { id: "family-os", path: "/family-os", heading: "Family OS" },
+  { id: "mentor-os", path: "/mentor-os", heading: "Mentor OS" },
+  { id: "educator-os", path: "/educator-os", heading: "Educator OS" },
+  { id: "employer-os", path: "/employer-os", heading: "Employer OS" },
+  { id: "university-os", path: "/university-os", heading: "University OS" },
+  { id: "district-os", path: "/district-os", heading: "District OS" },
+] as const;
+
 for (const viewport of [{ name: "desktop", width: 1440, height: 900 }, { name: "mobile", width: 390, height: 844 }]) {
   for (const route of routes) {
     test(`${route.id} renders PGDS-001 on ${viewport.name}`, async ({ page }) => {
@@ -59,6 +68,17 @@ for (const viewport of [{ name: "desktop", width: 1440, height: 900 }, { name: "
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
     await page.screenshot({ path: `artifacts/pbos-acceptance/ui-recovery-about-${viewport.name}.png`, fullPage: true });
   });
+
+  for (const roleOS of roleOperatingSystems) {
+    test(`${roleOS.id} inherits the canonical role OS foundation on ${viewport.name}`, async ({ page }) => {
+      await page.setViewportSize(viewport);
+      await page.goto(roleOS.path);
+      await expect(page.locator('[data-playbook-surface="role-os-dashboard"]')).toBeVisible();
+      await expect(page.getByRole("heading", { name: roleOS.heading, exact: true })).toBeVisible();
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+      await page.screenshot({ path: `artifacts/pbos-acceptance/ui-recovery-${roleOS.id}-${viewport.name}.png`, fullPage: true });
+    });
+  }
 }
 
 test("Studio Oracle owns one navigation shell", async ({ page }) => {
