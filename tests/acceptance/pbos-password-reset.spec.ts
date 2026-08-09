@@ -16,7 +16,7 @@ test("Password Reset exposes a responsive, accessible public request route", asy
   await page.goto("/reset-password");
   await expect(page.getByRole("heading", { name: "Request a secure reset link" })).toBeVisible();
   await expect(page.getByLabel("Email", { exact: true })).toBeVisible();
-  await expect(page.getByLabel("New password")).toHaveCount(0);
+  await expect(page.getByLabel("New password", { exact: true })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Return to login" })).toHaveAttribute("href", "/login");
 
   await page.setViewportSize({ width: 390, height: 844 });
@@ -79,7 +79,7 @@ test("Password Reset securely changes credentials while preserving profile autho
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/reset-password");
   await expect(page.getByRole("heading", { name: "Request a secure reset link" })).toBeVisible();
-  await expect(page.getByLabel("New password")).toHaveCount(0);
+  await expect(page.getByLabel("New password", { exact: true })).toHaveCount(0);
   await page.getByLabel("Email", { exact: true }).fill(email);
   await page.getByRole("button", { name: "Send reset link" }).click();
   await expect(page.getByRole("status")).toContainText("If an account matches that email");
@@ -102,7 +102,7 @@ test("Password Reset securely changes credentials while preserving profile autho
   await expect(page.getByRole("heading", { name: "Create a new password" })).toBeVisible();
 
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.getByLabel("New password").fill(resetPassword);
+  await page.getByLabel("New password", { exact: true }).fill(resetPassword);
   await page.getByLabel("Confirm new password").fill(`${resetPassword}-mismatch`);
   await page.getByRole("button", { name: "Update password" }).click();
   await expect(page.getByRole("alert")).toContainText("do not match");
