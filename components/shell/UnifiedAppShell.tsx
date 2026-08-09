@@ -133,7 +133,7 @@ export default function UnifiedAppShell({ children }: { children: React.ReactNod
           disabled={signingOut}
           aria-describedby={signOutError ? "sign-out-error" : undefined}
         >
-          <span>↪</span>
+          <span aria-hidden="true">↪</span>
           {open && <span>{signingOut ? "Signing out…" : "Sign out"}</span>}
         </button>
 
