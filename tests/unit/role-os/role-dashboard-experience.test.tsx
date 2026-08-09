@@ -10,9 +10,24 @@ describe("Role Dashboard Experiences", () => {
   });
 
   it("returns role-specific dashboard data", () => {
-    expect(getRoleDashboard("family").question).toContain("support");
-    expect(getRoleDashboard("educator").question).toContain("Who needs");
-    expect(getRoleDashboard("mentor").question).toContain("helping");
+    expect(getRoleDashboard("family").description).toContain("consent-based");
+    expect(getRoleDashboard("educator").description).toContain("verified institutional authority");
+    expect(getRoleDashboard("mentor").description).toContain("approved mentoring relationship");
+  });
+
+  it("does not present fabricated people or metrics as live records", () => {
+    const serialized = JSON.stringify([
+      getRoleDashboard("family"),
+      getRoleDashboard("educator"),
+      getRoleDashboard("district"),
+      getRoleDashboard("university"),
+      getRoleDashboard("employer"),
+      getRoleDashboard("mentor"),
+    ]);
+    expect(serialized).not.toContain("Maya");
+    expect(serialized).not.toContain("Kaiser Permanente");
+    expect(serialized).not.toContain("$6.3M");
+    expect(serialized).toContain("0 connected");
   });
 
   it("shared role dashboard component is defined", () => {

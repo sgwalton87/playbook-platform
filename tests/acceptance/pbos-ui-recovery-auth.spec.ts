@@ -75,6 +75,8 @@ for (const viewport of [{ name: "desktop", width: 1440, height: 900 }, { name: "
       await page.goto(roleOS.path);
       await expect(page.locator('[data-playbook-surface="role-os-dashboard"]')).toBeVisible();
       await expect(page.getByRole("heading", { name: roleOS.heading, exact: true })).toBeVisible();
+      await expect(page.getByText("Maya", { exact: false })).toHaveCount(0);
+      await expect(page.getByText("Kaiser Permanente", { exact: false })).toHaveCount(0);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
       await page.screenshot({ path: `artifacts/pbos-acceptance/ui-recovery-${roleOS.id}-${viewport.name}.png`, fullPage: true });
     });
