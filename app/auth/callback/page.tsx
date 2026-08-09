@@ -7,6 +7,7 @@ import { getPathway, normalizeRole } from "@/lib/onboarding/pathwayMap";
 import { getCanonicalOnboardingRoute } from "@/lib/onboarding";
 import { getGoogleRequestedRole } from "@/lib/auth/google";
 import { PKCE_CALLBACK_ERROR_MESSAGE } from "@/lib/auth/pkce";
+import { getEmailVerificationOtpType, hasVerifiedEmail } from "@/lib/auth/emailVerification";
 
 export default function AuthCallbackPage() {
   return (
@@ -26,17 +27,22 @@ function AuthCallbackContent() {
 
     async function finishAuth() {
       const tokenHash = params.get("token_hash");
-      const type = params.get("type") || "email";
+      const emailVerificationType = getEmailVerificationOtpType(params.get("type"));
 
       if (tokenHash) {
+        if (!emailVerificationType) {
+          window.location.replace("/check-email?status=invalid");
+          return;
+        }
+
         const { error } = await supabase.auth.verifyOtp({
           token_hash: tokenHash,
-          type: type as LegacyValue,
+          type: emailVerificationType,
         });
 
         if (error) {
           console.error("Auth token verification failed.");
-          window.location.replace("/login?error=auth_callback");
+          window.location.replace("/check-email?status=invalid");
           return;
         }
       } else {
@@ -54,7 +60,12 @@ function AuthCallbackContent() {
 
       const { data, error } = await supabase.auth.getUser();
 
-      if (error || !data.user) {
+      if (error || !data.user || !hasVerifiedEmail(data.user)) {
+        await supabase.auth.signOut();
+        if (tokenHash) {
+          window.location.replace("/check-email?status=invalid");
+          return;
+        }
         window.location.replace("/login?error=auth_callback");
         return;
       }

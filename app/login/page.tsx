@@ -127,7 +127,7 @@ function LoginContent() {
           email,
           password,
           options: {
-            emailRedirectTo: `${origin}/auth/callback?next=/pending`,
+            emailRedirectTo: `${origin}/auth/callback`,
             captchaToken: captchaToken || undefined,
             data: buildSignupMetadata(role),
           },
