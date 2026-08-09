@@ -21,7 +21,7 @@ const PUBLIC_ROUTES = [
 export default function SessionGuard() {
   const pathname = usePathname();
   const [showWarning, setShowWarning] = useState(false);
-  const [hasSession, setHasSession] = useState(false);
+  const [hasSession, setHasSession] = useState<boolean | null>(null);
   const expiringRef = useRef(false);
   const isPublic = PUBLIC_ROUTES.some(
     (route) => pathname === route || pathname.startsWith(route + "/")
@@ -43,7 +43,12 @@ export default function SessionGuard() {
   }, []);
 
   useEffect(() => {
-    if (isPublic || !hasSession) {
+    if (isPublic || hasSession !== false) return;
+    window.location.replace("/login");
+  }, [hasSession, isPublic]);
+
+  useEffect(() => {
+    if (isPublic || hasSession !== true) {
       if (!isPublic) return;
       localStorage.removeItem(SESSION_ACTIVITY_STORAGE_KEY);
       expiringRef.current = false;
@@ -129,7 +134,7 @@ export default function SessionGuard() {
     };
   }, [hasSession, isPublic, pathname]);
 
-  if (isPublic || !hasSession || !showWarning) return null;
+  if (isPublic || hasSession !== true || !showWarning) return null;
 
   return (
     <div className="playbook-session-warning" role="alertdialog" aria-modal="true" aria-labelledby="session-warning-title" aria-describedby="session-warning-description">
