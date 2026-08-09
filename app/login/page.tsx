@@ -471,7 +471,7 @@ const roleCard: React.CSSProperties = {
   display: "grid",
   gap: 6,
   cursor: "pointer",
-  color: "#64748B",
+  color: "#475569",
   fontSize: 12,
   lineHeight: 1.35,
 };
