@@ -17,6 +17,7 @@ import {
 import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
 import { getLoginDestination, getLoginErrorMessage, type LoginProfile } from "@/lib/auth/login";
 import { getRememberMePreference, setRememberMePreference } from "@/lib/auth/rememberMe";
+import { SESSION_TIMEOUT_MESSAGE } from "@/lib/auth/sessionTimeout";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 import "./login.css";
 
@@ -38,9 +39,10 @@ function LoginContent() {
   const [rememberMe, setRememberMe] = useState(false);
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("scholar");
-  const [status, setStatus] = useState(
-    params.get("error") ? GOOGLE_LOGIN_ERROR_MESSAGE : ""
-  );
+  const [status, setStatus] = useState(() => {
+    if (params.get("reason") === "session-timeout") return SESSION_TIMEOUT_MESSAGE;
+    return params.get("error") ? GOOGLE_LOGIN_ERROR_MESSAGE : "";
+  });
   const [loading, setLoading] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
