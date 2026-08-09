@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import { supabase } from "@/lib/supabaseClient";
@@ -16,6 +16,7 @@ import {
 } from "@/lib/auth";
 import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
 import { getLoginDestination, getLoginErrorMessage, type LoginProfile } from "@/lib/auth/login";
+import { getRememberMePreference, setRememberMePreference } from "@/lib/auth/rememberMe";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 import "./login.css";
 
@@ -33,8 +34,8 @@ function LoginContent() {
   const initialMode = params.get("mode") === "signup" ? "signup" : "login";
 
   const [mode, setMode] = useState<"login" | "signup">(initialMode);
-  const [email, setEmail] = useState(typeof window !== "undefined" ? localStorage.getItem("playbook_saved_email") || "" : "");
-  const [rememberEmail, setRememberEmail] = useState(typeof window !== "undefined" ? Boolean(localStorage.getItem("playbook_saved_email")) : false);
+  const [email, setEmail] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("scholar");
   const [status, setStatus] = useState(
@@ -44,6 +45,16 @@ function LoginContent() {
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   const isSignup = mode === "signup";
+
+  useEffect(() => {
+    let active = true;
+    queueMicrotask(() => {
+      if (active) setRememberMe(getRememberMePreference());
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const copy = useMemo(
     () =>
@@ -64,6 +75,8 @@ function LoginContent() {
   async function signInWithGoogle() {
     setStatus("");
     setLoading(true);
+
+    if (!isSignup) setRememberMePreference(rememberMe);
 
     try {
       const { error } = await supabase.auth.signInWithOAuth({
@@ -89,12 +102,6 @@ function LoginContent() {
     setLoading(true);
 
     try {
-      if (rememberEmail) {
-        localStorage.setItem("playbook_saved_email", email);
-      } else {
-        localStorage.removeItem("playbook_saved_email");
-      }
-
       if (isSignup) {
         const origin = window.location.origin;
 
@@ -121,6 +128,8 @@ function LoginContent() {
         window.location.href = `/check-email?${query.toString()}`;
         return;
       }
+
+      setRememberMePreference(rememberMe);
 
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -225,14 +234,22 @@ function LoginContent() {
             />
           </label>
 
-          <label style={rememberRow}>
-            <input
-              type="checkbox"
-              checked={rememberEmail}
-              onChange={(e) => setRememberEmail(e.target.checked)}
-            />
-            Save my email on this personal computer
-          </label>
+          {!isSignup && (
+            <div style={rememberGroup}>
+              <label style={rememberRow}>
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  aria-describedby="remember-me-help"
+                />
+                Remember me
+              </label>
+              <p id="remember-me-help" style={rememberHelp}>
+                Keep this session after you close the browser. Use only on a personal device.
+              </p>
+            </div>
+          )}
 
           <label style={label}>
             Password
@@ -476,6 +493,18 @@ const rememberRow: React.CSSProperties = {
   gap: 10,
   fontWeight: 800,
   color: "#64748B",
+};
+
+const rememberGroup: React.CSSProperties = {
+  display: "grid",
+  gap: 4,
+};
+
+const rememberHelp: React.CSSProperties = {
+  margin: "0 0 0 24px",
+  color: "#64748B",
+  fontSize: 12,
+  lineHeight: 1.45,
 };
 
 
