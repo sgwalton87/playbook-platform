@@ -5,6 +5,7 @@ import {
   getRoleDestination,
   normalizePlaybookRole,
 } from "@/lib/roles/registry";
+import { ROLE_ONBOARDING } from "@/lib/onboarding/config/roleConfigs";
 
 describe("canonical Playbook role registry", () => {
   it.each([
@@ -14,6 +15,8 @@ describe("canonical Playbook role registry", () => {
     ["recruiter", "college-coach"],
     ["admissions-officer", "college-admissions"],
     ["tay", "transition-youth"],
+    ["counselor", "high-school-counselor"],
+    ["international_athlete", "athlete-abroad"],
   ])("normalizes %s to %s", (input, expected) => {
     expect(normalizePlaybookRole(input)).toBe(expected);
   });
@@ -27,5 +30,13 @@ describe("canonical Playbook role registry", () => {
 
   it("routes coaches to the institutional support OS instead of Mentor OS", () => {
     expect(getRoleDestination("coach")).toBe("/educator-os");
+  });
+
+  it("exposes all fourteen canonical public onboarding pathways", () => {
+    expect(PUBLIC_ONBOARDING_ROLES).toHaveLength(14);
+    for (const role of PUBLIC_ONBOARDING_ROLES) {
+      expect(ROLE_ONBOARDING[role], `${role} must own role-specific onboarding`).toBeDefined();
+      expect(ROLE_ONBOARDING[role].length).toBeGreaterThanOrEqual(3);
+    }
   });
 });

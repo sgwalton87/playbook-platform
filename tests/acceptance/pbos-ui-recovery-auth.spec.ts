@@ -17,6 +17,13 @@ for (const viewport of [{ name: "desktop", width: 1440, height: 900 }, { name: "
       await expect(page.locator('[data-visual-canon="PGDS-001"]')).toBeVisible();
       await expect(page.getByRole("heading", { name: route.heading }).first()).toBeVisible();
       await expect(page.getByAltText(/Black male Scholar/i).first()).toBeVisible();
+      if (route.id === "signup") {
+        await expect(page.getByRole("button", { name: /Athlete Abroad/i })).toBeVisible();
+        await expect(page.getByRole("button", { name: /District \/ School Administrator/i })).toBeVisible();
+      }
+      if (route.id === "role-select") {
+        await expect(page.getByText("14 pathways", { exact: true })).toBeVisible();
+      }
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
       const accessibility = await new AxeBuilder({ page }).analyze();
       expect(accessibility.violations.filter((item) => ["serious", "critical"].includes(item.impact ?? ""))).toEqual([]);
@@ -31,6 +38,16 @@ for (const viewport of [{ name: "desktop", width: 1440, height: 900 }, { name: "
     await expect(page.locator('[data-visual-canon="PGDS-001"]')).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
     await page.screenshot({ path: `artifacts/pbos-acceptance/ui-recovery-product-shell-${viewport.name}.png`, fullPage: true });
+  });
+
+  test(`public landing keeps About and Explore visible on ${viewport.name}`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    await page.goto("/");
+    await expect(page.getByRole("navigation", { name: "Primary navigation" }).getByRole("link", { name: "About" })).toBeVisible();
+    await expect(page.getByRole("navigation", { name: "Primary navigation" }).getByRole("link", { name: "Explore" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Your future should not live/i })).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+    await page.screenshot({ path: `artifacts/pbos-acceptance/ui-recovery-landing-${viewport.name}.png`, fullPage: true });
   });
 }
 

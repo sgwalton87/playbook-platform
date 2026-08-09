@@ -5,12 +5,14 @@ export const PLAYBOOK_ROLES = {
   family: { label: "Parent / Guardian", osLabel: "Family OS", osRoute: "/family-os", onboarding: true },
   mentor: { label: "Mentor", osLabel: "Mentor OS", osRoute: "/mentor-os", onboarding: true },
   educator: { label: "Teacher / Educator", osLabel: "Educator OS", osRoute: "/educator-os", onboarding: true },
+  "high-school-counselor": { label: "High School Counselor", osLabel: "Counselor OS", osRoute: "/educator-os", onboarding: true },
   coach: { label: "High School Coach", osLabel: "Coach OS", osRoute: "/educator-os", onboarding: true },
   "college-coach": { label: "College Coach / Recruiter", osLabel: "Recruiting OS", osRoute: "/university-os", onboarding: true },
   "college-admissions": { label: "College Admissions", osLabel: "Admissions OS", osRoute: "/university-os", onboarding: true },
   "brand-partner": { label: "Brand Partner", osLabel: "Brand Partner OS", osRoute: "/brand-partner-os", onboarding: true },
-  employer: { label: "Employer / Workforce Partner", osLabel: "Employer OS", osRoute: "/employer-os", onboarding: false },
-  district: { label: "District / School Administrator", osLabel: "District OS", osRoute: "/district-os", onboarding: false },
+  employer: { label: "Employer / Workforce Partner", osLabel: "Employer OS", osRoute: "/employer-os", onboarding: true },
+  district: { label: "District / School Administrator", osLabel: "District OS", osRoute: "/district-os", onboarding: true },
+  "athlete-abroad": { label: "Athlete Abroad", osLabel: "Athlete Abroad OS", osRoute: "/athlete-abroad-os", onboarding: true },
   other: { label: "Community Partner", osLabel: "Playbook", osRoute: "/pending", onboarding: true },
 } as const;
 
@@ -25,8 +27,7 @@ export const ROLE_ALIASES: Record<string, PlaybookRole> = {
   parent: "family",
   guardian: "family",
   teacher: "educator",
-  counselor: "educator",
-  "high-school-counselor": "educator",
+  counselor: "high-school-counselor",
   "high-school-coach": "coach",
   recruiter: "college-coach",
   university: "college-admissions",
@@ -38,6 +39,8 @@ export const ROLE_ALIASES: Record<string, PlaybookRole> = {
   partner: "employer",
   admin: "district",
   school_admin: "district",
+  "athlete-abroad-enrollment": "athlete-abroad",
+  international_athlete: "athlete-abroad",
 };
 
 export function normalizePlaybookRole(role?: string | null): PlaybookRole {

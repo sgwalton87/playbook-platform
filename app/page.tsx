@@ -4,10 +4,10 @@ import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import styles from "./home.module.css";
 
 const signals = [
-  ["120K+", "Scholars"],
-  ["25K+", "Mentors"],
-  ["2K+", "Schools"],
-  ["50+", "States"],
+  ["14", "Role pathways"],
+  ["1", "Living record"],
+  ["Web", "Responsive access"],
+  ["You", "Own the journey"],
 ] as const;
 
 export default function HomePage() {
@@ -19,8 +19,8 @@ export default function HomePage() {
           <span><strong>The Playbook</strong><small>Run it.</small></span>
         </Link>
         <div className={styles.navLinks}>
-          <Link href="/about">About</Link>
-          <Link href="/opportunities">Explore</Link>
+          <Link href="/#about">About</Link>
+          <Link href="/#explore">Explore</Link>
           <Link href="/login">Log in</Link>
           <Link href="/login?mode=signup" className={styles.navAction}>Join The Playbook</Link>
         </div>
@@ -53,6 +53,28 @@ export default function HomePage() {
             className={styles.heroImage}
           />
           <div className={styles.futureCard}><span>Next play</span><strong>Own your record.</strong><small>Connect goals to real opportunity.</small></div>
+        </div>
+      </section>
+
+      <section id="about" className={styles.story} aria-labelledby="about-title">
+        <p className={styles.eyebrow}>One connected platform</p>
+        <div className={styles.storyGrid}>
+          <h2 id="about-title">Your future should not live in disconnected systems.</h2>
+          <div>
+            <p>The Playbook connects academic evidence, goals, trusted people, opportunities, and next actions around one role-aware record.</p>
+            <p>You choose your pathway. Your permissions shape what people can see and do. Your progress moves with you.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="explore" className={styles.explore} aria-labelledby="explore-title">
+        <div>
+          <p className={styles.eyebrow}>See what is possible</p>
+          <h2 id="explore-title">Build the record. Find the opportunity. Bring your team.</h2>
+        </div>
+        <div className={styles.exploreActions}>
+          <Link href="/login?mode=signup" className={styles.primary}>Choose your pathway <span>→</span></Link>
+          <Link href="/opportunities" className={styles.secondary}>Explore opportunities</Link>
         </div>
       </section>
     </main>

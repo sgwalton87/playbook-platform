@@ -13,10 +13,14 @@ const ROLE_DESCRIPTIONS: Partial<Record<keyof typeof PLAYBOOK_ROLES, string>> = 
   family: "Support your scholar with clear next steps, permissions, and deadlines.",
   mentor: "Guide scholars through goals, confidence, applications, and opportunity.",
   educator: "Support students with readiness signals, evidence, and interventions.",
+  "high-school-counselor": "Coordinate academic planning, applications, interventions, and trusted support.",
   coach: "Connect athlete development, academics, recruiting, and advocacy.",
   "college-coach": "Discover and support verified scholar-athlete talent.",
   "college-admissions": "Connect verified scholars with institutional pathways.",
   "brand-partner": "Create responsible campaigns, rewards, internships, and sponsorships.",
+  employer: "Create internships, work-based learning, and responsible hiring pathways.",
+  district: "Govern schools, cohorts, permissions, readiness signals, and interventions.",
+  "athlete-abroad": "Prepare academics, eligibility, travel, recruiting, and international transitions.",
 };
 
 export const roleOptions = PUBLIC_ONBOARDING_ROLES.map((role) => ({

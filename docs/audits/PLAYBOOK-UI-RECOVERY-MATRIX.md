@@ -57,7 +57,7 @@ This is an implementation control artifact. A mapping or marker is not completio
 | `/notifications` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/opportunities` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/opportunity-toolkit` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
-| `/page.tsx` | Canonical marker present | PGDS-001 | Unified authenticated shell | IN_PROGRESS_UNVERIFIED | PENDING | PENDING |
+| `/` | Canonical marker present | PGDS-001 | Public shell | IMPLEMENTED_AND_VERIFIED | PASSED | PASSED |
 | `/pending` | Canonical marker present | PGDS-001 | Authentication shell | IN_PROGRESS_UNVERIFIED | PENDING | PENDING |
 | `/permissions` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/portfolio/[shareId]` | Legacy/inline presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
