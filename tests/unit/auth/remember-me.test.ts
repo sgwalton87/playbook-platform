@@ -48,6 +48,28 @@ describe("Remember Me session persistence", () => {
     expect(writes[0]).toContain("Max-Age=31536000");
   });
 
+  it("keeps the one-time PKCE verifier scoped to the current browser session", () => {
+    const preferences = storage({ playbook_remember_session: "true" });
+    const writes: string[] = [];
+    const cookies = createRememberMeCookieMethods(() => "", (value) => writes.push(value), preferences);
+
+    cookies.setAll?.([{
+      name: "sb-project-auth-token-code-verifier",
+      value: "one-time-secret",
+      options: {
+        path: "/",
+        maxAge: 31_536_000,
+        expires: new Date("2030-01-01T00:00:00.000Z"),
+        sameSite: "lax",
+        secure: true,
+      },
+    }], {});
+
+    expect(writes[0]).not.toMatch(/Max-Age|Expires/);
+    expect(writes[0]).toContain("SameSite=Lax");
+    expect(writes[0]).toContain("Secure");
+  });
+
   it("always preserves Supabase token-deletion cookies", () => {
     const writes: string[] = [];
     const cookies = createRememberMeCookieMethods(

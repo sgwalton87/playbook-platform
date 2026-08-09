@@ -1,4 +1,5 @@
 import type { CookieMethodsBrowser } from "@supabase/ssr";
+import { isPkceVerifierCookie } from "@/lib/auth/pkce";
 
 const REMEMBER_ME_PREFERENCE = "playbook_remember_session";
 const LEGACY_SAVED_EMAIL = "playbook_saved_email";
@@ -53,10 +54,11 @@ function serializeCookie(
 
   // Supabase clears stale token chunks with Max-Age=0. That deletion must
   // always survive, even when new sessions are browser-session scoped.
-  if (options.maxAge === 0 || (remember && typeof options.maxAge === "number")) {
+  const isPkceVerifier = isPkceVerifierCookie(name);
+  if (options.maxAge === 0 || (remember && !isPkceVerifier && typeof options.maxAge === "number")) {
     parts.push(`Max-Age=${Math.floor(options.maxAge)}`);
   }
-  if (remember && options.expires) {
+  if (remember && !isPkceVerifier && options.expires) {
     parts.push(`Expires=${options.expires.toUTCString()}`);
   }
   if (options.domain) parts.push(`Domain=${options.domain}`);
