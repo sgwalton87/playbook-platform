@@ -21,6 +21,8 @@ import { SESSION_TIMEOUT_MESSAGE } from "@/lib/auth/sessionTimeout";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 import "./login.css";
 
+const HCAPTCHA_DEVELOPMENT_SITE_KEY = "10000000-ffff-ffff-ffff-000000000001";
+
 export default function LoginPage() {
   return (
     <Suspense fallback={<div style={{ padding: 40 }}>Loading...</div>}>
@@ -48,7 +50,8 @@ function LoginContent() {
   const [captchaKey, setCaptchaKey] = useState(0);
 
   const isSignup = mode === "signup";
-  const captchaSiteKey = process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY;
+  const captchaSiteKey = process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY
+    || (process.env.NODE_ENV === "development" ? HCAPTCHA_DEVELOPMENT_SITE_KEY : undefined);
   const captchaReady = Boolean(captchaSiteKey && captchaToken);
 
   useEffect(() => {
