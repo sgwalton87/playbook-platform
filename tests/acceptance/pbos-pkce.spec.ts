@@ -143,8 +143,8 @@ test("PKCE binds a one-time verifier to auth callback exchange", async ({ page, 
     .single();
   if (persisted.error) throw persisted.error;
   expect(persisted.data).toMatchObject({
-    role: "scholar",
-    profile_mode: "scholar",
+    role: "scholar-athlete",
+    profile_mode: "scholar-athlete",
     onboarding_completed: false,
     verification_status: "email_confirmed",
   });
