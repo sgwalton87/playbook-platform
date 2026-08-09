@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "missionId": "048-phase-01-item-remember-me",
+  "completionClaim": true,
+  "completedItems": [
+    "Remember Me"
+  ],
+  "remainingItems": [],
+  "routes": [
+    "/login",
+    "/dashboard"
+  ],
+  "browserSpec": "tests/acceptance/pbos-remember-me.spec.ts",
+  "acceptance": [
+    {
+      "dimension": "ROUTE",
+      "behavior": "The public /login route establishes the session and successful profile authority routes the remembered identity to /dashboard.",
+      "artifact": "tests/acceptance/pbos-remember-me.spec.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "USER_INTERFACE",
+      "behavior": "The responsive login form presents an unchecked Remember me control with trusted-device guidance and never pre-fills a retained email address.",
+      "artifact": "app/login/page.tsx",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "DURABLE_DATA",
+      "behavior": "Supabase Auth remains the durable identity authority while an opted-in refresh session survives a reconstructed browser context.",
+      "artifact": "tests/acceptance/pbos-remember-me.spec.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "AUTHORITY",
+      "behavior": "Remember Me changes only cookie lifetime; the existing durable profile role and onboarding state continue to determine the post-login destination.",
+      "artifact": "lib/auth/login.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "PBOS_INTEGRATION",
+      "behavior": "The browser journey writes the required exact-revision desktop, mobile, trace, accessibility, and result artifacts after execution.",
+      "artifact": "tests/acceptance/pbos-remember-me.spec.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "ACCEPTANCE_TEST",
+      "behavior": "One Playwright spec validates default session cookies, opted-in durable cookies, browser-context restoration, profile authority, responsive UI, and accessibility.",
+      "artifact": "tests/acceptance/pbos-remember-me.spec.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "ACCESSIBILITY",
+      "behavior": "The labeled checkbox is associated with device-safety help, mobile overflow is rejected, and axe analysis rejects serious or critical violations.",
+      "artifact": "tests/acceptance/pbos-remember-me.spec.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "SECURITY",
+      "behavior": "Sessions are browser-session scoped by default, durable expiry is retained only after explicit consent, and legacy saved email data is removed.",
+      "artifact": "tests/unit/auth/remember-me.test.ts",
+      "source": "IMPLEMENTATION"
+    }
+  ]
+}
