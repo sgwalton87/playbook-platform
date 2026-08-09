@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import CanonicalPublicNav from "@/components/public/CanonicalPublicNav";
+import CanonicalPublicFooter from "@/components/public/CanonicalPublicFooter";
 import styles from "./about.module.css";
 
 export default function AboutPage() {
@@ -26,6 +27,7 @@ export default function AboutPage() {
         <article><span>02</span><h2>Bring your people</h2><p>Families, mentors, educators, coaches, and partners act through scoped relationships.</p></article>
         <article><span>03</span><h2>Turn progress into opportunity</h2><p>Readiness becomes clear next actions, applications, support, and durable outcomes.</p></article>
       </section>
+      <CanonicalPublicFooter />
     </main>
   );
 }

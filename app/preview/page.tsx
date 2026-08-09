@@ -1,5 +1,6 @@
 import Link from "next/link";
 import CanonicalPublicNav from "@/components/public/CanonicalPublicNav";
+import CanonicalPublicFooter from "@/components/public/CanonicalPublicFooter";
 
 const previews = [
   ["Public landing", "/", "The public Playbook entry and canonical brand story."],
@@ -37,6 +38,7 @@ export default function PreviewPage() {
           </article>
         ))}
       </section>
+      <CanonicalPublicFooter />
     </main>
   );
 }

@@ -1,4 +1,5 @@
 import CanonicalPublicNav from "@/components/public/CanonicalPublicNav";
+import CanonicalPublicFooter from "@/components/public/CanonicalPublicFooter";
 import PublicNewsFeed from "@/components/public/PublicNewsFeed";
 
 export default function PublicNewsPage() {
@@ -11,6 +12,7 @@ export default function PublicNewsPage() {
         <p style={lead}>Read updates that Playbook members intentionally published for the community. Private records, support conversations, and unpublished activity stay private.</p>
       </section>
       <PublicNewsFeed />
+      <CanonicalPublicFooter />
     </main>
   );
 }

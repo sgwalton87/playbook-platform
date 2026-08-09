@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { roleOptions } from "@/lib/role-os/roleRoutes";
 import { getOnboardingDestination } from "@/lib/roles/registry";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
+import CanonicalPublicFooter from "@/components/public/CanonicalPublicFooter";
 import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -89,6 +90,7 @@ export default function RoleSelect() {
           </button>
         ))}
       </section>
+      <CanonicalPublicFooter />
     </main>
   );
 }

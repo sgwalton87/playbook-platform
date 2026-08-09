@@ -37,3 +37,20 @@ input { border: 1px solid #ddd; border-radius: 6px; }
 a { color: inherit; }
 button, input, textarea, select { font: inherit; }
 img, svg, video { max-width: 100%; }
+
+/* Cross-surface mobile guarantees. Individual role experiences retain their
+   own composition while shared primitives cannot escape the viewport. */
+:where(main, section, article, aside, nav, header, footer, div) { min-width: 0; }
+:where(table, input, textarea, select, button) { max-width: 100%; }
+
+@media (max-width: 900px) {
+  :where(button, [role="button"], input, select) { min-height: 44px; }
+  :where(input, textarea, select) { font-size: 16px; }
+  :where(table) { display: block; overflow-x: auto; overscroll-behavior-inline: contain; }
+  :where(pre, code) { max-width: 100%; overflow-wrap: anywhere; }
+}
+
+@media (max-width: 560px) {
+  :where(.playbook-button, .pb-button) { width: 100%; }
+  :where(.playbook-card, .pb-card) { max-width: 100%; }
+}

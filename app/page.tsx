@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import CanonicalPublicNav from "@/components/public/CanonicalPublicNav";
+import CanonicalPublicFooter from "@/components/public/CanonicalPublicFooter";
 import styles from "./home.module.css";
 
 const signals = [
@@ -66,6 +67,7 @@ export default function HomePage() {
           <Link href="/opportunities" className={styles.secondary}>Explore opportunities</Link>
         </div>
       </section>
+      <CanonicalPublicFooter />
     </main>
   );
 }
