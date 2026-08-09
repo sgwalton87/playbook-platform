@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "missionId": "048-phase-01-item-signup",
+  "completionClaim": true,
+  "completedItems": [
+    "Signup"
+  ],
+  "remainingItems": [],
+  "routes": [
+    "/login?mode=signup",
+    "/check-email",
+    "/start?first=1&role=family"
+  ],
+  "browserSpec": "tests/acceptance/pbos-signup.spec.ts",
+  "acceptance": [
+    {
+      "dimension": "ROUTE",
+      "behavior": "The public signup route creates an account, hands off to email confirmation, and routes the confirmed family role into canonical onboarding.",
+      "artifact": "tests/acceptance/pbos-signup.spec.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "USER_INTERFACE",
+      "behavior": "The role, email, password, confirmation, desktop, and mobile signup states are operable without horizontal overflow.",
+      "artifact": "app/login/page.tsx",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "DURABLE_DATA",
+      "behavior": "Supabase Auth durably stores the exact-revision account and its selected canonical role metadata.",
+      "artifact": "tests/acceptance/pbos-signup.spec.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "AUTHORITY",
+      "behavior": "Canonical role metadata controls the post-confirmation onboarding destination.",
+      "artifact": "lib/auth/signup.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "PBOS_INTEGRATION",
+      "behavior": "The acceptance spec writes the required exact-revision screenshots, trace, accessibility report, and PBOS result manifest.",
+      "artifact": "tests/acceptance/pbos-signup.spec.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "ACCEPTANCE_TEST",
+      "behavior": "One Playwright journey exercises real Supabase signup and confirmed-account onboarding on desktop and mobile.",
+      "artifact": "tests/acceptance/pbos-signup.spec.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "ACCESSIBILITY",
+      "behavior": "The mobile confirmation state is scanned for serious and critical axe violations and exports the complete report.",
+      "artifact": "tests/acceptance/pbos-signup.spec.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "SECURITY",
+      "behavior": "Signup requires an eight-character password, keeps role input canonical, and does not expose provider-specific account errors.",
+      "artifact": "tests/unit/auth/signup.test.ts",
+      "source": "IMPLEMENTATION"
+    }
+  ]
+}

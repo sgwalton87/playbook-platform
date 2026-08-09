@@ -48,7 +48,7 @@ function CheckEmailContent() {
         </p>
 
         <div style={selectedCard}>
-          <div style={smallEyebrow}>Selected pathway</div>
+          <div style={smallEyebrowDark}>Selected pathway</div>
           <h2 style={pathwayTitle}>{pathway.label}</h2>
           <p style={cardText}>{pathway.full}</p>
           <p style={nextStep}>{pathway.nextStep}</p>
@@ -62,7 +62,7 @@ function CheckEmailContent() {
       </section>
 
       <section style={rolesPanel}>
-        <div style={smallEyebrow}>All Playbook pathways</div>
+        <div style={smallEyebrowLight}>All Playbook pathways</div>
         <h2 style={panelTitle}>Every role supports the scholar journey.</h2>
 
         <div style={roleGrid}>
@@ -136,14 +136,23 @@ const selectedCard: React.CSSProperties = {
   maxWidth: 720,
 };
 
-const smallEyebrow: React.CSSProperties = {
+const smallEyebrowBase: React.CSSProperties = {
   fontFamily: "'Space Mono', monospace",
   fontSize: 10,
   fontWeight: 900,
   letterSpacing: ".16em",
   textTransform: "uppercase",
-  color: "#F97316",
   marginBottom: 10,
+};
+
+const smallEyebrowDark: React.CSSProperties = {
+  ...smallEyebrowBase,
+  color: "#FB923C",
+};
+
+const smallEyebrowLight: React.CSSProperties = {
+  ...smallEyebrowBase,
+  color: "#9A3412",
 };
 
 const pathwayTitle: React.CSSProperties = {
@@ -171,7 +180,7 @@ const actions: React.CSSProperties = {
 };
 
 const primary: React.CSSProperties = {
-  background: "#F97316",
+  background: "#C2410C",
   color: "#fff",
   padding: "15px 22px",
   borderRadius: 999,
@@ -212,6 +221,6 @@ const roleCard: React.CSSProperties = {
   borderRadius: 18,
   padding: 16,
   background: "#FFFFFF",
-  color: "#64748B",
+  color: "#475569",
   lineHeight: 1.45,
 };
