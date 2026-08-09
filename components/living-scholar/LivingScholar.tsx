@@ -10,7 +10,7 @@ import GrowthScore from "./GrowthScore";
 
 export default function LivingScholar() {
   const experience = buildLivingScholarExperience({
-    name: "Maya",
+    name: "Scholar",
     trustScore: 78,
   });
 

@@ -1,6 +1,6 @@
 export function getSupportWorkflow() {
   return {
-    scholar: "Maya Johnson",
+    scholar: "Scholar",
     opportunity: "Kaiser Permanente Health Careers Summer Internship",
     progress: 57,
     steps: [

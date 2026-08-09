@@ -14,7 +14,7 @@ export function buildLivingScholarExperience(input: {
   courses?: LegacyValue[];
   trustScore?: number;
 } = {}) {
-  const name = input.name || "Maya";
+  const name = input.name || "Scholar";
   const courses = input.courses || livingScholarDemoCourses;
   const trustScore = input.trustScore || 78;
 

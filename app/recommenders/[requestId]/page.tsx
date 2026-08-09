@@ -18,7 +18,7 @@ export default function RecommenderApprovalPage() {
   const approval = buildRecommendationApproval({
     requestId: "request-demo",
     recommenderName: "Coach Taylor",
-    letterText: "Maya is a disciplined scholar-athlete and emerging leader.",
+    letterText: "Scholar is a disciplined scholar-athlete and emerging leader.",
     status,
   });
 

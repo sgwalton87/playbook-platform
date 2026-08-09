@@ -10,6 +10,18 @@ import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import ProfileAvatar from "@/components/ProfileAvatar";
 import { supabase } from "@/lib/supabaseClient";
 
+const ROUTE_ROLE_PREVIEWS: Array<[string, string]> = [
+  ["/scholar-athlete-os", "scholar-athlete"],
+  ["/athlete-abroad-os", "athlete-abroad"],
+  ["/brand-partner-os", "brand-partner"],
+  ["/family-os", "family"],
+  ["/mentor-os", "mentor"],
+  ["/educator-os", "educator"],
+  ["/employer-os", "employer"],
+  ["/university-os", "college-admissions"],
+  ["/district-os", "district"],
+];
+
 const AUTH_FULLSCREEN_ROUTES = [
   "/",
   "/login",
@@ -45,9 +57,13 @@ export default function UnifiedAppShell({ children }: { children: React.ReactNod
     loadProfile();
   }, []);
 
+  const previewRole = ROUTE_ROLE_PREVIEWS.find(([route]) => pathname === route || pathname?.startsWith(`${route}/`))?.[1];
   const roleNav = useMemo(
-    () => getRoleNavigation(profile?.profile_mode, profile?.role),
-    [profile?.profile_mode, profile?.role]
+    // A role-OS route owns its preview navigation context. This prevents an
+    // authenticated Scholar profile from relabeling the Scholar-Athlete,
+    // partner, or support-role preview as "Scholar OS".
+    () => getRoleNavigation(previewRole || profile?.profile_mode, profile?.role),
+    [previewRole, profile?.profile_mode, profile?.role]
   );
 
   const founderNav = useMemo(() => {

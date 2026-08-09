@@ -21,7 +21,7 @@ export type LifeGraphEdgeType =
 
 export function buildLifeGraph() {
   const nodes = [
-    { id: "scholar-maya", type: "scholar", label: "Maya Johnson" },
+    { id: "scholar-record", type: "scholar", label: "Scholar" },
     { id: "course-biology", type: "course", label: "Biology" },
     { id: "skill-stem", type: "skill", label: "STEM Readiness" },
     { id: "goal-health-career", type: "goal", label: "Health Science Career" },
@@ -30,11 +30,11 @@ export function buildLifeGraph() {
   ];
 
   const edges = [
-    { from: "scholar-maya", to: "course-biology", type: "completed" },
+    { from: "scholar-record", to: "course-biology", type: "completed" },
     { from: "course-biology", to: "skill-stem", type: "unlocked" },
     { from: "skill-stem", to: "opp-kaiser", type: "unlocked" },
-    { from: "mentor-coach", to: "scholar-maya", type: "mentors" },
-    { from: "scholar-maya", to: "goal-health-career", type: "working_toward" },
+    { from: "mentor-coach", to: "scholar-record", type: "mentors" },
+    { from: "scholar-record", to: "goal-health-career", type: "working_toward" },
   ];
 
   return { nodes, edges };

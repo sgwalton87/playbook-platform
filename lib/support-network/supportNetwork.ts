@@ -1,9 +1,9 @@
 export function getSupportNetwork() {
   return {
-    scholar: "Maya Johnson",
+    scholar: "Scholar",
     center: "Scholar Record",
     nodes: [
-      { role: "Scholar", name: "Maya", connection: "Owns the record" },
+      { role: "Scholar", name: "Scholar", connection: "Owns the record" },
       { role: "Family", name: "Parent / Guardian", connection: "Supports deadlines and documents" },
       { role: "Educator", name: "Teacher / Counselor", connection: "Verifies readiness" },
       { role: "Mentor", name: "Trusted Adult", connection: "Coaches follow-through" },

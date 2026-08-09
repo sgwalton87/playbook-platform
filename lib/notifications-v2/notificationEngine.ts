@@ -94,8 +94,8 @@ export function getDemoNotifications(): PlaybookNotification[] {
   return [
     buildNotification({
       id: "notification-message-1",
-      userId: "scholar-maya",
-      scholarId: "scholar-maya",
+      userId: "scholar-record",
+      scholarId: "scholar-record",
       type: "message",
       title: "New message from your mentor",
       body: "Mock interview this weekend works.",
@@ -104,8 +104,8 @@ export function getDemoNotifications(): PlaybookNotification[] {
     }),
     buildNotification({
       id: "notification-invite-1",
-      userId: "scholar-maya",
-      scholarId: "scholar-maya",
+      userId: "scholar-record",
+      scholarId: "scholar-record",
       type: "invitation",
       title: "Support invitation accepted",
       body: "A new supporter joined your Playbook network.",
@@ -114,8 +114,8 @@ export function getDemoNotifications(): PlaybookNotification[] {
     }),
     buildNotification({
       id: "notification-action-1",
-      userId: "scholar-maya",
-      scholarId: "scholar-maya",
+      userId: "scholar-record",
+      scholarId: "scholar-record",
       type: "shared_action",
       title: "FAFSA documents need attention",
       body: "Your family support action is still open.",
@@ -124,8 +124,8 @@ export function getDemoNotifications(): PlaybookNotification[] {
     }),
     buildNotification({
       id: "notification-compass-1",
-      userId: "scholar-maya",
-      scholarId: "scholar-maya",
+      userId: "scholar-record",
+      scholarId: "scholar-record",
       type: "compass_alert",
       title: "Compass found a next best action",
       body: "Completing an open support task may improve readiness.",
@@ -134,8 +134,8 @@ export function getDemoNotifications(): PlaybookNotification[] {
     }),
     buildNotification({
       id: "notification-mail-1",
-      userId: "scholar-maya",
-      scholarId: "scholar-maya",
+      userId: "scholar-record",
+      scholarId: "scholar-record",
       type: "mail_reply",
       title: "New email reply in your support network",
       body: "A connected supporter replied by email.",

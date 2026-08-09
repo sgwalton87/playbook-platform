@@ -51,8 +51,8 @@ export function getDemoConversations() {
   return [
     buildConversation({
       id: "support-network",
-      scholarId: "scholar-maya",
-      title: "Maya's Support Network",
+      scholarId: "scholar-record",
+      title: "Scholar support Support Network",
       kind: "support_network",
       participants: ["Scholar", "Family", "Mentor", "Educator"],
       unreadCount: 3,
@@ -60,7 +60,7 @@ export function getDemoConversations() {
     }),
     buildConversation({
       id: "family",
-      scholarId: "scholar-maya",
+      scholarId: "scholar-record",
       title: "Family Thread",
       kind: "direct",
       participants: ["Scholar", "Family"],
@@ -69,7 +69,7 @@ export function getDemoConversations() {
     }),
     buildConversation({
       id: "mentor",
-      scholarId: "scholar-maya",
+      scholarId: "scholar-record",
       title: "Mentor Thread",
       kind: "direct",
       participants: ["Scholar", "Mentor"],
@@ -78,7 +78,7 @@ export function getDemoConversations() {
     }),
     buildConversation({
       id: "fafsa-action",
-      scholarId: "scholar-maya",
+      scholarId: "scholar-record",
       title: "FAFSA Shared Action",
       kind: "action_thread",
       participants: ["Scholar", "Family", "Educator"],

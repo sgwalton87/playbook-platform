@@ -14,8 +14,8 @@ import {
 
 export default function SharedPortfolioPage() {
   const share = buildPortfolioShare({
-    scholarId: "scholar-maya",
-    scholarName: "Maya Johnson",
+    scholarId: "scholar-record",
+    scholarName: "Scholar",
     targetUse: "internship",
     packet: {
       resume: true,

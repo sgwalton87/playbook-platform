@@ -3,16 +3,24 @@
 import { buildCompassReport } from "@/lib/compass";
 import { useMemo } from "react";
 
-export default function CompassCoreCard({ courses = [], trustScore = 40 }: { courses?: LegacyValue[]; trustScore?: number }) {
+export default function CompassCoreCard({ courses = [], trustScore = 0, dataState = "ready" }: { courses?: LegacyValue[]; trustScore?: number; dataState?: "loading" | "ready" | "error" }) {
   const report = useMemo(() => buildCompassReport({ courses, trustScore }), [courses, trustScore]);
 
   return (
     <section style={{background:"#fff",border:"1px solid #E2E8F0",borderRadius:24,padding:24}}>
       <p style={{fontSize:11,letterSpacing:"0.14em",textTransform:"uppercase",color:"#64748B",fontWeight:800}}>
-        Compass AI Core
+        Compass guidance
       </p>
 
-      <div style={{display:"flex",justifyContent:"space-between",gap:20,alignItems:"flex-start"}}>
+      {dataState === "loading" && <p role="status">Connecting your verified academic record…</p>}
+      {dataState === "error" && <p role="alert">Compass could not load your private record. No sample record has been substituted.</p>}
+      {dataState === "ready" && courses.length === 0 && (
+        <p role="status" style={{color:"#475569",lineHeight:1.6}}>
+          No verified course evidence is connected yet. Add a transcript or academic evidence to generate your guidance.
+        </p>
+      )}
+
+      {dataState === "ready" && courses.length > 0 && <div style={{display:"flex",justifyContent:"space-between",gap:20,alignItems:"flex-start"}}>
         <div>
           <h1 style={{fontSize:36,lineHeight:1,color:"#0F172A",margin:"8px 0"}}>
             {report.headline}
@@ -25,9 +33,9 @@ export default function CompassCoreCard({ courses = [], trustScore = 40 }: { cou
         <div style={{fontSize:46,fontWeight:900,color:"#F97316"}}>
           {report.score}%
         </div>
-      </div>
+      </div>}
 
-      <div style={{display:"grid",gap:12,marginTop:22}}>
+      {dataState === "ready" && courses.length > 0 && <div style={{display:"grid",gap:12,marginTop:22}}>
         {report.recommendations.map(rec => (
           <div key={rec.id} style={{border:"1px solid #E2E8F0",borderRadius:18,padding:16}}>
             <div style={{fontSize:11,fontWeight:900,color:"#F97316",textTransform:"uppercase"}}>
@@ -44,7 +52,7 @@ export default function CompassCoreCard({ courses = [], trustScore = 40 }: { cou
             </ul>
           </div>
         ))}
-      </div>
+      </div>}
     </section>
   );
 }

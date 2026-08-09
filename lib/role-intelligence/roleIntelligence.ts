@@ -2,7 +2,7 @@ import type { PlaybookRoleOS } from "@/lib/role-os";
 
 export function buildRoleRecommendations(role: PlaybookRoleOS) {
   const shared = {
-    scholar: "Maya Johnson",
+    scholar: "Scholar",
     signal: "Kaiser Permanente Health Careers Internship matched at 87%",
   };
 
@@ -15,7 +15,7 @@ export function buildRoleRecommendations(role: PlaybookRoleOS) {
     family: [
       "Review consent and transportation needs",
       "Help gather family schedule information",
-      "Celebrate Maya's Biology progress",
+      "Celebrate Scholar support Biology progress",
     ],
     educator: [
       "Verify Biology evidence",
@@ -24,7 +24,7 @@ export function buildRoleRecommendations(role: PlaybookRoleOS) {
     ],
     mentor: [
       "Schedule a mock interview",
-      "Review Maya's story",
+      "Review Scholar support story",
       "Practice career pathway questions",
     ],
     district: [
@@ -33,7 +33,7 @@ export function buildRoleRecommendations(role: PlaybookRoleOS) {
       "Prepare equity access briefing",
     ],
     university: [
-      "Add Maya to health science outreach list",
+      "Add Scholar to health science outreach list",
       "Review verified readiness signals",
       "Invite scholar to pathway event",
     ],
@@ -53,7 +53,7 @@ export function buildRoleRecommendations(role: PlaybookRoleOS) {
 
 export function buildRoleScenarios(role: PlaybookRoleOS) {
   const scenarios = {
-    learner: "What if Maya verifies Biology evidence?",
+    learner: "What if Scholar verifies Biology evidence?",
     family: "What if the family completes support documents?",
     educator: "What if the counselor verifies readiness?",
     mentor: "What if the mentor completes mock interview prep?",

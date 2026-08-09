@@ -28,7 +28,7 @@ const demoEvents: RewardEventType[] = [
 export default function RewardEconomyDashboard() {
   const ledger = demoEvents.map((eventType) =>
     buildCoinLedgerEntry({
-      scholarId: "scholar-maya",
+      scholarId: "scholar-record",
       eventType,
     })
   );
@@ -53,7 +53,7 @@ export default function RewardEconomyDashboard() {
         {demoEvents.map((eventType) => {
           const value = getRewardValue(eventType);
           const event = buildRewardEvent({
-            scholarId: "scholar-maya",
+            scholarId: "scholar-record",
             eventType,
           });
 

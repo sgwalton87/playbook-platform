@@ -11,7 +11,7 @@ import { askOracle } from "@/lib/oracle";
 const slides = [
   "Welcome",
   "The Problem",
-  "Meet Maya",
+  "Meet Scholar",
   "Academic DNA",
   "Opportunity Graph",
   "Compass",
