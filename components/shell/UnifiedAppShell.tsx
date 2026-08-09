@@ -80,6 +80,8 @@ export default function UnifiedAppShell({ children }: { children: React.ReactNod
   return (
     <div
       className="playbook-app-shell"
+      data-visual-canon="PGDS-001"
+      data-playbook-surface="authenticated-product-shell"
       style={{ gridTemplateColumns: open ? "var(--pb-sidebar-width) 1fr" : "var(--pb-sidebar-compact) 1fr" }}
     >
       <aside className="playbook-sidebar" data-playbook-sidebar="true">
@@ -88,7 +90,7 @@ export default function UnifiedAppShell({ children }: { children: React.ReactNod
         </button>
 
         <Link href={roleNav.home} className="playbook-brand">
-          <PlaybookLogo size={open ? 46 : 42} priority />
+          <PlaybookLogo size={open ? 64 : 48} priority />
           {open && (
             <span>
               <strong>Playbook OS</strong>
@@ -125,7 +127,7 @@ export default function UnifiedAppShell({ children }: { children: React.ReactNod
       <section className="playbook-main">
         <header className="playbook-mobile-header">
           <Link href={roleNav.home} className="playbook-brand" style={{ marginBottom: 0 }}>
-            <PlaybookLogo size={38} priority />
+            <PlaybookLogo size={48} priority />
             <span><strong>Playbook</strong><small>{roleNav.label}</small></span>
           </Link>
           <ProfileAvatar src={profile?.avatar_url} name={displayName} size={38} />

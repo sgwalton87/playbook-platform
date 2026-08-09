@@ -12,5 +12,8 @@ export function isPublicRoute(pathname: string) {
 }
 
 export function shouldUseAppShell(pathname: string) {
+  // Studio owns its purpose-built operator shell. Nesting it inside the product
+  // shell creates two competing navigation authorities on every Studio route.
+  if (pathname === "/studio" || pathname.startsWith("/studio/")) return false;
   return !isPublicRoute(pathname);
 }

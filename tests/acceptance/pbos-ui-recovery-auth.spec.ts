@@ -23,4 +23,20 @@ for (const viewport of [{ name: "desktop", width: 1440, height: 900 }, { name: "
       await page.screenshot({ path: `artifacts/pbos-acceptance/ui-recovery-${route.id}-${viewport.name}.png`, fullPage: true });
     });
   }
+
+  test(`authenticated product shell uses PGDS-001 on ${viewport.name}`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    await page.goto("/dashboard");
+    await expect(page.locator('[data-playbook-surface="authenticated-product-shell"]')).toBeVisible();
+    await expect(page.locator('[data-visual-canon="PGDS-001"]')).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+    await page.screenshot({ path: `artifacts/pbos-acceptance/ui-recovery-product-shell-${viewport.name}.png`, fullPage: true });
+  });
 }
+
+test("Studio Oracle owns one navigation shell", async ({ page }) => {
+  await page.goto("/studio/oracle");
+  await expect(page.locator('[data-playbook-surface="authenticated-product-shell"]')).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Studio", exact: true })).toHaveCount(1);
+  await expect(page.getByRole("navigation")).toHaveCount(1);
+});

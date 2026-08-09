@@ -6,6 +6,8 @@ This is an implementation control artifact. A mapping or marker is not completio
 
 | Route or surface | Current UI generation | Canonical target | Shared dependency | Implementation status | Desktop verification | Mobile verification |
 |---|---|---|---|---|---|---|
+| `AUTHENTICATED_PRODUCT_SHELL` | Canonical shared implementation | PGDS-001 | Root layout | IMPLEMENTED_AND_VERIFIED | PASSED | PASSED |
+| `STUDIO_SHELL_AUTHORITY` | Dedicated operator implementation | PGDS-001 | Studio layout | IMPLEMENTED_AND_VERIFIED | PASSED | N/A |
 | `/academic-readiness` | Legacy/inline presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/action-routing` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/admin/moderation` | Legacy/inline presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |

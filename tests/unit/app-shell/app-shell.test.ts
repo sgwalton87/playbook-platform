@@ -17,4 +17,9 @@ describe("Unified App Shell", () => {
     expect(shouldUseAppShell("/opportunity-toolkit")).toBe(true);
     expect(shouldUseAppShell("/store-v2")).toBe(true);
   });
+
+  it("does not nest the product shell around the dedicated Studio shell", () => {
+    expect(shouldUseAppShell("/studio")).toBe(false);
+    expect(shouldUseAppShell("/studio/oracle")).toBe(false);
+  });
 });

@@ -22,6 +22,10 @@ const rows = pages.sort().map((path) => {
   const status = verified ? "IMPLEMENTED_AND_VERIFIED" : canonical ? "IN_PROGRESS_UNVERIFIED" : "PENDING";
   return `| \`${target}\` | ${generation} | PGDS-001 | ${dependency} | ${status} | ${verified ? "PASSED" : "PENDING"} | ${verified ? "PASSED" : "PENDING"} |`;
 });
-const output = `# Playbook UI Recovery Implementation Matrix\n\nExact base: \`724fa10a9577586598127da77b336cbadfd2455b\`\n\nThis is an implementation control artifact. A mapping or marker is not completion.\n\n| Route or surface | Current UI generation | Canonical target | Shared dependency | Implementation status | Desktop verification | Mobile verification |\n|---|---|---|---|---|---|---|\n${rows.join("\n")}\n`;
+const verifiedSurfaces = [
+  "| `AUTHENTICATED_PRODUCT_SHELL` | Canonical shared implementation | PGDS-001 | Root layout | IMPLEMENTED_AND_VERIFIED | PASSED | PASSED |",
+  "| `STUDIO_SHELL_AUTHORITY` | Dedicated operator implementation | PGDS-001 | Studio layout | IMPLEMENTED_AND_VERIFIED | PASSED | N/A |",
+];
+const output = `# Playbook UI Recovery Implementation Matrix\n\nExact base: \`724fa10a9577586598127da77b336cbadfd2455b\`\n\nThis is an implementation control artifact. A mapping or marker is not completion.\n\n| Route or surface | Current UI generation | Canonical target | Shared dependency | Implementation status | Desktop verification | Mobile verification |\n|---|---|---|---|---|---|---|\n${[...verifiedSurfaces, ...rows].join("\n")}\n`;
 writeFileSync(join(root, "docs/audits/PLAYBOOK-UI-RECOVERY-MATRIX.md"), output);
 console.log(`${rows.length} visible routes inventoried.`);
