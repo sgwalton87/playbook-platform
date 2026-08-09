@@ -79,6 +79,22 @@ for (const viewport of [{ name: "desktop", width: 1440, height: 900 }, { name: "
       await page.screenshot({ path: `artifacts/pbos-acceptance/ui-recovery-${roleOS.id}-${viewport.name}.png`, fullPage: true });
     });
   }
+
+  test(`Scholar-Athlete OS renders its canonical connected journey on ${viewport.name}`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    await page.goto("/scholar-athlete-os");
+    await expect(page.locator('[data-testid="scholar-athlete-os"][data-visual-canon="PGSA-001"]')).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Build the student/i })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Review readiness" })).toHaveAttribute("href", "/academic-readiness");
+    await expect(page.getByRole("link", { name: "Open transcript" })).toHaveAttribute("href", "/transcript");
+    await expect(page.getByRole("link", { name: "Explore opportunities" }).first()).toHaveAttribute("href", "/opportunities");
+    await expect(page.getByText("Target University")).toHaveCount(0);
+    await expect(page.getByText("Dream College")).toHaveCount(0);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+    const accessibility = await new AxeBuilder({ page }).analyze();
+    expect(accessibility.violations.filter((item) => ["serious", "critical"].includes(item.impact ?? ""))).toEqual([]);
+    await page.screenshot({ path: `artifacts/pbos-acceptance/ui-recovery-scholar-athlete-os-${viewport.name}.png`, fullPage: true });
+  });
 }
 
 test("Studio Oracle owns one navigation shell", async ({ page }) => {
