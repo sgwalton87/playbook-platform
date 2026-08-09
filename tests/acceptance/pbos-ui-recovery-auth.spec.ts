@@ -49,6 +49,16 @@ for (const viewport of [{ name: "desktop", width: 1440, height: 900 }, { name: "
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
     await page.screenshot({ path: `artifacts/pbos-acceptance/ui-recovery-landing-${viewport.name}.png`, fullPage: true });
   });
+
+  test(`About renders the canonical public experience on ${viewport.name}`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    await page.goto("/about");
+    await expect(page.locator('[data-visual-canon="PGDS-001"]')).toBeVisible();
+    await expect(page.getByRole("heading", { name: /One record/i })).toBeVisible();
+    await expect(page.getByAltText(/Black male Scholar/i)).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+    await page.screenshot({ path: `artifacts/pbos-acceptance/ui-recovery-about-${viewport.name}.png`, fullPage: true });
+  });
 }
 
 test("Studio Oracle owns one navigation shell", async ({ page }) => {

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import PlaybookLogo from "@/components/brand/PlaybookLogo";
+import CanonicalPublicNav from "@/components/public/CanonicalPublicNav";
 import styles from "./home.module.css";
 
 const signals = [
@@ -13,18 +13,7 @@ const signals = [
 export default function HomePage() {
   return (
     <main className={styles.page} data-visual-canon="PLAYBOOK-LANDING-001">
-      <nav className={styles.nav} aria-label="Primary navigation">
-        <Link href="/" className={styles.brand} aria-label="The Playbook home">
-          <PlaybookLogo size={54} priority />
-          <span><strong>The Playbook</strong><small>Run it.</small></span>
-        </Link>
-        <div className={styles.navLinks}>
-          <Link href="/#about">About</Link>
-          <Link href="/#explore">Explore</Link>
-          <Link href="/login">Log in</Link>
-          <Link href="/login?mode=signup" className={styles.navAction}>Join The Playbook</Link>
-        </div>
-      </nav>
+      <CanonicalPublicNav />
 
       <section className={styles.hero}>
         <div className={styles.copy}>

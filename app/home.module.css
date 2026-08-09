@@ -19,15 +19,6 @@
 .exploreActions { min-width: min(100%, 280px); display: grid; gap: 12px; }
 .exploreActions a { display: inline-flex; min-height: 56px; padding: 0 24px; align-items: center; justify-content: center; border-radius: 8px; text-decoration: none; font-weight: 900; text-align: center; }
 
-.nav { position: relative; z-index: 10; width: min(1400px, calc(100% - 48px)); margin: auto; min-height: 92px; display: flex; align-items: center; justify-content: space-between; gap: 32px; }
-.brand { display: flex; align-items: center; gap: 12px; color: #fff; text-decoration: none; text-transform: uppercase; }
-.brand span { display: grid; line-height: 1; }
-.brand strong { font-family: Anton, sans-serif; font-size: 24px; letter-spacing: .04em; }
-.brand small { color: #ff5b1f; font: 800 12px/1.4 "Space Mono", monospace; font-style: italic; }
-.navLinks { display: flex; align-items: center; gap: clamp(18px, 2.4vw, 38px); }
-.navLinks a { color: #d9e4f0; text-decoration: none; font-weight: 750; }
-.navLinks .navAction { padding: 12px 20px; border-radius: 8px; color: #fff; background: #ff5b1f; box-shadow: 0 10px 30px rgba(255, 91, 31, .22); }
-
 .hero { width: min(1400px, calc(100% - 48px)); min-height: calc(100vh - 92px); margin: auto; display: grid; grid-template-columns: minmax(0, .92fr) minmax(420px, 1.08fr); align-items: center; gap: clamp(36px, 6vw, 96px); padding: 44px 0 72px; }
 .copy { position: relative; z-index: 2; min-width: 0; }
 .eyebrow { margin: 0 0 18px; color: #ff6c31; font: 900 12px/1 "Space Mono", monospace; letter-spacing: .22em; text-transform: uppercase; }
@@ -55,9 +46,6 @@
 .futureCard small { margin-top: 7px; color: #bdcbda; font-size: 13px; }
 
 @media (max-width: 900px) {
-  .nav { width: min(100% - 32px, 720px); min-height: 78px; flex-wrap: wrap; padding: 12px 0; }
-  .navLinks { width: 100%; justify-content: space-between; gap: 12px; padding-bottom: 8px; }
-  .navLinks a { font-size: 14px; }
   .hero { width: min(100% - 32px, 720px); grid-template-columns: 1fr; min-height: auto; padding: 54px 0 48px; }
   .visual { min-height: 620px; grid-row: 1; }
   .copy { grid-row: 2; }
@@ -66,10 +54,6 @@
 }
 
 @media (max-width: 560px) {
-  .brand strong { font-size: 19px; }
-  .brand small { font-size: 10px; }
-  .navLinks { display: grid; grid-template-columns: repeat(4, auto); }
-  .navLinks .navAction { padding: 10px 13px; font-size: 12px; white-space: nowrap; }
   .hero { padding-top: 24px; }
   .visual { min-height: 480px; border-radius: 28px 6px 28px 6px; }
   .copy h1 { font-size: clamp(54px, 17vw, 72px); }
