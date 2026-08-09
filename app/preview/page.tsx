@@ -3,6 +3,7 @@ import CanonicalPublicNav from "@/components/public/CanonicalPublicNav";
 
 const previews = [
   ["Public landing", "/", "The public Playbook entry and canonical brand story."],
+  ["Public newsfeed", "/news", "Community stories intentionally published for public viewing."],
   ["Choose your role", "/role-select", "Fourteen current onboarding pathways in one role-aware entry."],
   ["Scholar-Athlete OS", "/scholar-athlete-os", "Academics, eligibility, recruiting, NIL, money, and support."],
   ["Academic Readiness", "/academic-readiness", "Evidence → intelligence → action → support."],
@@ -14,6 +15,7 @@ const previews = [
   ["District OS", "/district-os", "Governed cohort and equity foundations."],
   ["Employer OS", "/employer-os", "Responsible opportunities and permissioned applications."],
   ["University OS", "/university-os", "Consent-based institutional pathways and outreach."],
+  ["Courses", "/login?next=/courses", "Sign in to protect personal progress, certificates, rewards, and learning records."],
 ] as const;
 
 export default function PreviewPage() {

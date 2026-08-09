@@ -11,3 +11,11 @@ test("role preview authority and Compass evidence are honest", async ({ page }) 
   await expect(page.getByText(/No verified course evidence is connected yet|No sample record has been substituted/i)).toBeVisible();
   await expect(page.getByText("60%", { exact: true })).toHaveCount(0);
 });
+
+test("public newsfeed opens without authentication", async ({ page }) => {
+  await page.goto("/news");
+  await expect(page).toHaveURL(/\/news$/);
+  await expect(page.locator('[data-testid="public-newsfeed"][data-visual-canon="PGNF-001"]')).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Real progress. Public stories/i })).toBeVisible();
+  await expect(page.getByText(/Loading published|No community stories|temporarily unavailable|From the Playbook community/i).first()).toBeVisible();
+});

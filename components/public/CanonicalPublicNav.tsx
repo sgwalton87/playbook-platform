@@ -11,6 +11,7 @@ export default function CanonicalPublicNav() {
       </Link>
       <div className={styles.links}>
         <Link href="/about">About</Link>
+        <Link href="/news">Newsfeed</Link>
         <Link href="/opportunities">Explore</Link>
         <Link href="/login">Log in</Link>
         <Link href="/login?mode=signup" className={styles.action}>Join The Playbook</Link>
