@@ -2,18 +2,18 @@
   width: min(1240px, 100%);
   display: grid;
   grid-template-columns: minmax(0, 0.85fr) minmax(380px, 1.15fr);
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 34px;
+  background: #07182f;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 28px 8px 28px 8px;
   overflow: hidden;
-  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.14);
+  box-shadow: 0 36px 100px rgba(0, 0, 0, 0.42);
 }
 
 .playbook-login-brand {
   position: relative;
   min-width: 0;
   min-height: 640px;
-  background: #0f172a;
+  background: #0d2948;
   color: #f8f7f4;
   overflow: hidden;
 }
@@ -38,6 +38,21 @@
   letter-spacing: -0.02em;
   text-transform: uppercase;
 }
+
+.playbook-auth-loading {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: #06172d;
+  color: #fff;
+  font: 800 14px/1.4 "Space Mono", monospace;
+  letter-spacing: .08em;
+}
+
+.playbook-login-card input::placeholder { color: #8fa3b9; }
+.playbook-login-card button:focus-visible,
+.playbook-login-card input:focus-visible,
+.playbook-login-card a:focus-visible { outline: 3px solid #ff8a50; outline-offset: 3px; }
 
 @media (max-width: 900px) {
   .playbook-login-card {

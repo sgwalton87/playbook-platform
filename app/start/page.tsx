@@ -235,10 +235,10 @@ function StartContent() {
     setSaving(false);
   }
 
-  if (!profile) return <main style={{ padding: 40 }}>Loading...</main>;
+  if (!profile) return <main data-visual-canon="PGDS-001" style={{ minHeight:"100vh",padding:40,background:"#06172d",color:"#fff" }}>Preparing your Playbook…</main>;
 
   return (
-    <main style={page}>
+    <main style={page} data-visual-canon="PGDS-001">
       {journeyError && <div role="alert" aria-live="assertive" style={{ margin: 16, padding: 16, border: "1px solid #B91C1C", borderRadius: 12, color: "#B91C1C" }}>{journeyError}</div>}
       {creating && (
         <div style={overlay}>
@@ -628,7 +628,7 @@ function FieldRenderer({ field, value, onChange, onBlur }: LegacyValue) {
   );
 }
 
-const page: React.CSSProperties = { minHeight: "100vh", background: "#F8F7F4", color: "#0F172A", padding: 24 };
+const page: React.CSSProperties = { minHeight: "100vh", background: "radial-gradient(circle at 82% 10%,rgba(255,91,31,.18),transparent 26%),linear-gradient(135deg,#06172D,#081D38 58%,#031023)", color: "#FFFFFF", padding: 24 };
 const hero: React.CSSProperties = { maxWidth: 1280, margin: "0 auto 22px", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(340px,1fr))", background: "#0F172A", borderRadius: 34, overflow: "hidden" };
 const heroText: React.CSSProperties = { padding: "clamp(26px,4vw,52px)", display: "flex", flexDirection: "column", justifyContent: "center" };
 const heroImageWrap: React.CSSProperties = { minHeight: 330 };
@@ -638,13 +638,13 @@ const heroTitle: React.CSSProperties = { fontFamily: "'Anton', sans-serif", font
 const heroBody: React.CSSProperties = { fontSize: 19, lineHeight: 1.45, color: "rgba(248,247,244,.76)", fontWeight: 700 };
 const progressWrap: React.CSSProperties = { maxWidth: 1280, margin: "0 auto 22px", display: "flex", gap: 10, overflowX: "auto" };
 const stepPill = (active: boolean): React.CSSProperties => ({ border: active ? "1px solid #F97316" : "1px solid #E2E8F0", background: active ? "#FFF7ED" : "#FFFFFF", borderRadius: 999, padding: "10px 14px", display: "flex", gap: 8, alignItems: "center", flexShrink: 0 });
-const card: React.CSSProperties = { maxWidth: 920, margin: "0 auto", background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 30, padding: "clamp(28px,5vw,58px)", boxShadow: "0 18px 42px rgba(15,23,42,.08)" };
+const card: React.CSSProperties = { maxWidth: 920, margin: "0 auto", background: "rgba(4,18,39,.92)", border: "1px solid rgba(255,255,255,.16)", borderRadius: "28px 8px 28px 8px", padding: "clamp(28px,5vw,58px)", boxShadow: "0 30px 80px rgba(0,0,0,.3)" };
 const formEyebrow: React.CSSProperties = { fontFamily: "'Space Mono', monospace", fontSize: 10, fontWeight: 900, letterSpacing: ".16em", textTransform: "uppercase", color: "#F97316", margin: 0 };
 const formTitle: React.CSSProperties = { fontSize: "clamp(34px,5vw,58px)", lineHeight: 1, margin: "8px 0" };
-const formBody: React.CSSProperties = { fontSize: 19, color: "#64748B", lineHeight: 1.5 };
+const formBody: React.CSSProperties = { fontSize: 19, color: "#B8C8DA", lineHeight: 1.5 };
 const fields: React.CSSProperties = { display: "grid", gap: 16, marginTop: 18 };
 const label: React.CSSProperties = { display: "grid", gap: 8, fontWeight: 900 };
-const input: React.CSSProperties = { border: "1px solid #CBD5E1", borderRadius: 16, padding: "15px 18px", fontSize: 18, width: "100%" };
+const input: React.CSSProperties = { border: "1px solid rgba(255,255,255,.22)", borderRadius: 14, padding: "15px 18px", fontSize: 18, width: "100%", background:"rgba(255,255,255,.08)", color:"#FFFFFF" };
 const actions: React.CSSProperties = { display: "flex", gap: 12, flexWrap: "wrap", marginTop: 24 };
 const primary: React.CSSProperties = { border: "none", borderRadius: 999, background: "#F97316", color: "#FFFFFF", padding: "15px 24px", fontWeight: 950, cursor: "pointer" };
 const secondary: React.CSSProperties = { border: "1px solid #CBD5E1", borderRadius: 999, background: "#FFFFFF", color: "#0F172A", padding: "15px 22px", fontWeight: 950, cursor: "pointer" };

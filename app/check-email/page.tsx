@@ -3,13 +3,13 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import { supabase } from "@/lib/supabaseClient";
 import { getUserPathway, USER_PATHWAYS } from "@/lib/auth";
+import CanonicalAuthShell from "@/components/auth/CanonicalAuthShell";
 
 export default function CheckEmailPage() {
   return (
-    <Suspense fallback={<div style={{ padding: 40 }}>Loading...</div>}>
+    <Suspense fallback={<div style={{ minHeight:"100vh",display:"grid",placeItems:"center",background:"#06172d",color:"white" }}>Preparing your Playbook…</div>}>
       <CheckEmailContent />
     </Suspense>
   );
@@ -34,13 +34,11 @@ function CheckEmailContent() {
   }
 
   return (
-    <main style={page}>
-      <section style={hero}>
-        <PlaybookLogo size={120} priority />
-
+    <CanonicalAuthShell eyebrow="Confirm your account" title="Check your inbox." description="One secure step protects your identity, your record, and the people connected to your future.">
+      <section>
         <p style={eyebrow}>Confirm your email</p>
 
-        <h1 style={title}>Check your inbox.</h1>
+        <h1 style={{...title,fontSize:"clamp(38px,5vw,58px)"}}>Confirmation sent</h1>
 
         <p style={lead}>
           We sent a confirmation link to <strong>{email}</strong>. Confirm your email first,
@@ -61,7 +59,7 @@ function CheckEmailContent() {
         </div>
       </section>
 
-      <section style={rolesPanel}>
+      <section style={{...rolesPanel,padding:"34px 0 0"}}>
         <div style={smallEyebrowLight}>All Playbook pathways</div>
         <h2 style={panelTitle}>Every role supports the scholar journey.</h2>
 
@@ -71,8 +69,8 @@ function CheckEmailContent() {
               key={item.role}
               style={{
                 ...roleCard,
-                borderColor: item.role === pathway.role ? "#F97316" : "#E2E8F0",
-                background: item.role === pathway.role ? "#FFF7ED" : "#FFFFFF",
+                borderColor: item.role === pathway.role ? "#FF6C31" : "rgba(255,255,255,.16)",
+                background: item.role === pathway.role ? "rgba(255,91,31,.16)" : "rgba(255,255,255,.05)",
               }}
             >
               <strong>{item.label}</strong>
@@ -81,26 +79,9 @@ function CheckEmailContent() {
           ))}
         </div>
       </section>
-    </main>
+    </CanonicalAuthShell>
   );
 }
-
-const page: React.CSSProperties = {
-  minHeight: "100vh",
-  background: "#F8F7F4",
-  color: "#0F172A",
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit,minmax(340px,1fr))",
-};
-
-const hero: React.CSSProperties = {
-  background: "#0F172A",
-  color: "#F8F7F4",
-  padding: "clamp(34px,6vw,76px)",
-  display: "flex",
-  flexDirection: "column",
-  justifyContent: "center",
-};
 
 const eyebrow: React.CSSProperties = {
   marginTop: 24,
@@ -123,7 +104,7 @@ const title: React.CSSProperties = {
 const lead: React.CSSProperties = {
   fontSize: 22,
   lineHeight: 1.5,
-  color: "rgba(248,247,244,.76)",
+  color: "#C7D5E5",
   maxWidth: 720,
 };
 
@@ -152,7 +133,7 @@ const smallEyebrowDark: React.CSSProperties = {
 
 const smallEyebrowLight: React.CSSProperties = {
   ...smallEyebrowBase,
-  color: "#9A3412",
+  color: "#FF8A50",
 };
 
 const pathwayTitle: React.CSSProperties = {
@@ -217,10 +198,10 @@ const roleGrid: React.CSSProperties = {
 };
 
 const roleCard: React.CSSProperties = {
-  border: "1.5px solid #E2E8F0",
+  border: "1.5px solid rgba(255,255,255,.16)",
   borderRadius: 18,
   padding: 16,
-  background: "#FFFFFF",
-  color: "#475569",
+  background: "rgba(255,255,255,.05)",
+  color: "#D9E4F0",
   lineHeight: 1.45,
 };
