@@ -8,6 +8,8 @@ import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import { supabase } from "@/lib/supabaseClient";
 import {
   buildSignupMetadata,
+  buildGoogleCallbackUrl,
+  GOOGLE_LOGIN_ERROR_MESSAGE,
   getSignupErrorMessage,
   SIGNUP_PASSWORD_MIN_LENGTH,
   USER_PATHWAYS,
@@ -35,7 +37,9 @@ function LoginContent() {
   const [rememberEmail, setRememberEmail] = useState(typeof window !== "undefined" ? Boolean(localStorage.getItem("playbook_saved_email")) : false);
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("scholar");
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState(
+    params.get("error") ? GOOGLE_LOGIN_ERROR_MESSAGE : ""
+  );
   const [loading, setLoading] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
@@ -58,15 +62,24 @@ function LoginContent() {
   );
 
   async function signInWithGoogle() {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=/start`,
-      },
-    });
+    setStatus("");
+    setLoading(true);
 
-    if (error) {
-      setStatus(error.message);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: buildGoogleCallbackUrl(window.location.origin, isSignup ? role : "scholar"),
+        },
+      });
+
+      if (error) {
+        setStatus(GOOGLE_LOGIN_ERROR_MESSAGE);
+      }
+    } catch {
+      setStatus(GOOGLE_LOGIN_ERROR_MESSAGE);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -260,8 +273,14 @@ function LoginContent() {
 
           {status && <div role="alert" aria-live="polite" style={statusBox}>{status}</div>}
 
-          <button type="button" onClick={signInWithGoogle} style={googleButton}>
-            Continue with Google
+          <button
+            type="button"
+            onClick={signInWithGoogle}
+            disabled={loading}
+            aria-busy={loading}
+            style={googleButton}
+          >
+            {loading ? "Opening Google..." : "Continue with Google"}
           </button>
 
           <div style={divider}>or</div>

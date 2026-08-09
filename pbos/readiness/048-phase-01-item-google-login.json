@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "missionId": "048-phase-01-item-google-login",
+  "completionClaim": true,
+  "completedItems": [
+    "Google Login"
+  ],
+  "remainingItems": [],
+  "routes": [
+    "/login",
+    "/auth/callback",
+    "/start?first=1&role=family",
+    "/mentor-os"
+  ],
+  "browserSpec": "tests/acceptance/pbos-google-login.spec.ts",
+  "acceptance": [
+    {
+      "dimension": "ROUTE",
+      "behavior": "Google OAuth starts from /login, returns through /auth/callback, and reaches canonical onboarding or the existing profile's OS route.",
+      "artifact": "tests/acceptance/pbos-google-login.spec.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "USER_INTERFACE",
+      "behavior": "The responsive login and signup modes expose an accessible Google action, busy state, and announced recoverable failure state.",
+      "artifact": "app/login/page.tsx",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "DURABLE_DATA",
+      "behavior": "The callback persists a canonical verified profile for the authenticated Google identity and rejects persistence failure.",
+      "artifact": "app/auth/callback/page.tsx",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "AUTHORITY",
+      "behavior": "A new Google identity may carry a normalized public signup role while an existing profile's role and onboarding state remain authoritative.",
+      "artifact": "lib/auth/google.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "PBOS_INTEGRATION",
+      "behavior": "The acceptance spec writes the required exact-revision screenshots, trace, accessibility report, and PBOS result manifest.",
+      "artifact": "tests/acceptance/pbos-google-login.spec.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "ACCEPTANCE_TEST",
+      "behavior": "One Playwright journey validates OAuth initiation, callback persistence, authority routing, desktop, mobile, accessibility, and exact-revision artifacts.",
+      "artifact": "tests/acceptance/pbos-google-login.spec.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "ACCESSIBILITY",
+      "behavior": "The Google action has visible text and busy semantics, and the mobile route rejects serious or critical axe violations.",
+      "artifact": "tests/acceptance/pbos-google-login.spec.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "SECURITY",
+      "behavior": "Callback errors are non-enumerating, role handoff is limited to new Google identities, and failed profile persistence signs out the session.",
+      "artifact": "tests/unit/auth/google.test.ts",
+      "source": "IMPLEMENTATION"
+    }
+  ]
+}
