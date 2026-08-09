@@ -6,8 +6,12 @@ import { Suspense, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import { supabase } from "@/lib/supabaseClient";
-import { USER_PATHWAYS } from "@/lib/auth";
-import { normalizeRole } from "@/lib/onboarding/pathwayMap";
+import {
+  buildSignupMetadata,
+  getSignupErrorMessage,
+  SIGNUP_PASSWORD_MIN_LENGTH,
+  USER_PATHWAYS,
+} from "@/lib/auth";
 import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
 import { getLoginDestination, getLoginErrorMessage, type LoginProfile } from "@/lib/auth/login";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
@@ -87,17 +91,12 @@ function LoginContent() {
           options: {
             emailRedirectTo: `${origin}/auth/callback?next=/pending`,
             captchaToken: captchaToken || undefined,
-            data: {
-              role: normalizeRole(role),
-              profile_mode: normalizeRole(role),
-              requested_role: normalizeRole(role),
-              verification_status: "email_pending",
-            },
+            data: buildSignupMetadata(role),
           },
         });
 
         if (error) {
-          setStatus(error.message);
+          setStatus(getSignupErrorMessage());
           return;
         }
 
@@ -232,11 +231,18 @@ function LoginContent() {
               type="password"
               autoComplete={isSignup ? "new-password" : "current-password"}
               required
-              minLength={6}
+              minLength={isSignup ? SIGNUP_PASSWORD_MIN_LENGTH : 6}
+              aria-describedby={isSignup ? "signup-password-help" : undefined}
               placeholder="Enter password"
               style={input}
             />
           </label>
+
+          {isSignup && (
+            <p id="signup-password-help" style={passwordHelp}>
+              Use at least {SIGNUP_PASSWORD_MIN_LENGTH} characters. Never reuse a password from another account.
+            </p>
+          )}
 
           {!isSignup && (
             <Link href="/reset-password" style={forgotPasswordLink}>
@@ -390,6 +396,13 @@ const input: React.CSSProperties = {
   padding: "15px 18px",
   fontSize: 18,
   outline: "none",
+};
+
+const passwordHelp: React.CSSProperties = {
+  color: "#475569",
+  fontSize: 13,
+  lineHeight: 1.5,
+  margin: "-10px 0 0",
 };
 
 const statusBox: React.CSSProperties = {

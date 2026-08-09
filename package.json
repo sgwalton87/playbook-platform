@@ -40,6 +40,7 @@
     "pbos:acceptance:prepare": "node scripts/pbos/prepare-browser.mjs",
     "test:acceptance:pbos": "playwright test tests/acceptance/pbos-scholar.spec.ts --project=chromium",
     "test:acceptance:pbos:login": "playwright test tests/acceptance/pbos-login.spec.ts --project=chromium",
+    "test:acceptance:pbos:signup": "playwright test tests/acceptance/pbos-signup.spec.ts --project=chromium",
     "test:acceptance:pbos:academic": "playwright test tests/acceptance/pbos-academic.spec.ts --project=chromium",
     "test:visual:scholar": "playwright test tests/acceptance/pbos-scholar-visual.spec.ts --project=chromium",
     "test:acceptance:pbos:opportunity": "playwright test tests/acceptance/pbos-opportunity.spec.ts --project=chromium",
