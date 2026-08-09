@@ -183,11 +183,11 @@ function LoginContent() {
                       onClick={() => setRole(option.role)}
                       style={{
                         ...roleCard,
-                        borderColor: active ? "#F97316" : "#E2E8F0",
+                        borderColor: active ? "#C2410C" : "#E2E8F0",
                         background: active ? "#FFF7ED" : "#FFFFFF",
                       }}
                     >
-                      <strong style={{ color: active ? "#F97316" : "#0F172A" }}>
+                      <strong style={{ color: active ? "#9A3412" : "#0F172A" }}>
                         {option.label}
                       </strong>
                       <span>{option.short}</span>
@@ -337,7 +337,7 @@ const formEyebrow: React.CSSProperties = {
   fontWeight: 900,
   letterSpacing: ".16em",
   textTransform: "uppercase",
-  color: "#F97316",
+  color: "#9A3412",
   margin: 0,
 };
 
@@ -404,7 +404,7 @@ const statusBox: React.CSSProperties = {
 const primaryButton: React.CSSProperties = {
   border: "none",
   borderRadius: 999,
-  background: "#F97316",
+  background: "#C2410C",
   color: "#FFFFFF",
   padding: "17px 24px",
   fontSize: 20,
@@ -424,7 +424,7 @@ const switchRow: React.CSSProperties = {
 const switchButton: React.CSSProperties = {
   border: "none",
   background: "transparent",
-  color: "#F97316",
+  color: "#9A3412",
   fontWeight: 950,
   cursor: "pointer",
 };
@@ -460,7 +460,7 @@ const googleButton: React.CSSProperties = {
 
 const divider: React.CSSProperties = {
   textAlign: "center",
-  color: "#94A3B8",
+  color: "#475569",
   fontWeight: 900,
   fontFamily: "'Space Mono', monospace",
   fontSize: 11,
