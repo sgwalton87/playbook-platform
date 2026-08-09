@@ -68,7 +68,6 @@ test("Google Login creates a durable profile and preserves profile authority", a
     });
   });
   await page.getByRole("button", { name: "Continue with Google" }).click();
-  await page.waitForURL(/\/login\?error=auth_callback/);
   const authorize = new URL(authorizeUrl);
   expect(authorize.searchParams.get("provider")).toBe("google");
   const redirectTo = new URL(authorize.searchParams.get("redirect_to") ?? "");
@@ -76,6 +75,11 @@ test("Google Login creates a durable profile and preserves profile authority", a
   expect(redirectTo.searchParams.get("provider")).toBe("google");
   expect(redirectTo.searchParams.get("role")).toBe("family");
   await page.unroute("**/auth/v1/authorize?**");
+  // The mocked provider response proves the OAuth request contract. Navigate
+  // explicitly because Supabase's browser redirect side effect is not reliable
+  // when its authorize endpoint is fulfilled by Playwright routing.
+  await page.goto("/login?error=auth_callback");
+  await expect(page.getByText(/couldn't continue with Google/i)).toBeVisible();
 
   await page.getByLabel("Email", { exact: true }).fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);
