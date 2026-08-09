@@ -94,8 +94,11 @@ test("Password Reset securely changes credentials while preserving profile autho
     options: { redirectTo: new URL("/reset-password", page.url()).toString() },
   });
   if (generated.error) throw generated.error;
-  expect(generated.data.properties.action_link).toBeTruthy();
-  await page.goto(generated.data.properties.action_link);
+  expect(generated.data.properties.hashed_token).toBeTruthy();
+  const recoveryUrl = new URL("/reset-password", page.url());
+  recoveryUrl.searchParams.set("token_hash", generated.data.properties.hashed_token);
+  recoveryUrl.searchParams.set("type", "recovery");
+  await page.goto(recoveryUrl.toString());
   await expect(page.getByRole("heading", { name: "Create a new password" })).toBeVisible();
 
   await page.setViewportSize({ width: 390, height: 844 });
