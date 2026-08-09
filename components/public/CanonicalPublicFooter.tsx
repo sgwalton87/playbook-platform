@@ -25,7 +25,7 @@ export default function CanonicalPublicFooter() {
         <FooterLinks title="The platform" links={productLinks} />
         <FooterLinks title="Featured journeys" links={journeyLinks} />
         <div className={styles.action}>
-          <p className={styles.label}>Build your next play</p>
+          <p className={styles.label}>Start your connected journey</p>
           <h2>Your future deserves a connected system.</h2>
           <Link href="/login?mode=signup">Join The Playbook →</Link>
         </div>
