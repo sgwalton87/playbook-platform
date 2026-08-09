@@ -166,7 +166,7 @@ Notes: Public Launch Readiness connects the live checklist to [RELEASE_PROCESS.m
 # Phase 1 — Identity & Authentication
 
 **Status:** 🟨 in progress
-**Completion:** 73%
+**Completion:** 80%
 
 - 🟩 Login
 - 🟩 Signup
@@ -176,7 +176,7 @@ Notes: Public Launch Readiness connects the live checklist to [RELEASE_PROCESS.m
 - 🟩 Logout
 - 🟩 Session Timeout
 - 🟩 Close Browser Logout
-- 🟦 CAPTCHA
+- 🟩 CAPTCHA
 - 🟦 PKCE
 - 🟨 Email Verification
 - 🟨 Hostinger Email

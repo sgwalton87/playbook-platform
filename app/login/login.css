@@ -39,6 +39,15 @@
   text-transform: uppercase;
 }
 
+.playbook-captcha-widget {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.playbook-captcha-widget iframe {
+  max-width: 100%;
+}
+
 @media (max-width: 900px) {
   .playbook-login-card {
     grid-template-columns: minmax(0, 1fr);

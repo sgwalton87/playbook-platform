@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "missionId": "048-phase-01-item-captcha",
+  "completionClaim": true,
+  "completedItems": [
+    "CAPTCHA"
+  ],
+  "remainingItems": [],
+  "routes": [
+    "/login?mode=signup"
+  ],
+  "browserSpec": "tests/acceptance/pbos-captcha.spec.ts",
+  "acceptance": [
+    {
+      "dimension": "ROUTE",
+      "behavior": "The public signup route renders the CAPTCHA security gate.",
+      "artifact": "app/login/page.tsx",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "USER_INTERFACE",
+      "behavior": "Desktop and mobile signup show required, complete, expired, error, and unavailable security-check states.",
+      "artifact": "app/login/login.css",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "DURABLE_DATA",
+      "behavior": "A verified challenge permits Supabase Auth to persist the exact-revision signup account.",
+      "artifact": "tests/acceptance/pbos-captcha.spec.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "AUTHORITY",
+      "behavior": "CAPTCHA-protected signup preserves the selected role in durable user metadata.",
+      "artifact": "lib/auth/signup.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "PBOS_INTEGRATION",
+      "behavior": "The existing login and Supabase signup flow carries the verified CAPTCHA token without a parallel runtime.",
+      "artifact": "app/login/page.tsx",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "ACCEPTANCE_TEST",
+      "behavior": "Playwright exercises the real challenge gate, outgoing signup request, persistence, desktop, and mobile behavior.",
+      "artifact": "tests/acceptance/pbos-captcha.spec.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "ACCESSIBILITY",
+      "behavior": "The labeled security region exposes live verification state and is scanned for serious or critical axe violations.",
+      "artifact": "tests/acceptance/pbos-captcha.spec.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "SECURITY",
+      "behavior": "Email signup fails closed until a challenge token exists and resets the one-time token after a rejected signup.",
+      "artifact": "app/login/page.tsx",
+      "source": "IMPLEMENTATION"
+    }
+  ]
+}
