@@ -221,6 +221,6 @@ const roleCard: React.CSSProperties = {
   borderRadius: 18,
   padding: 16,
   background: "#FFFFFF",
-  color: "#64748B",
+  color: "#475569",
   lineHeight: 1.45,
 };
