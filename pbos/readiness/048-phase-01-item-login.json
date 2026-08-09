@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "missionId": "048-phase-01-item-login",
+  "completionClaim": true,
+  "completedItems": [
+    "Login"
+  ],
+  "remainingItems": [],
+  "routes": [
+    "/login",
+    "/dashboard",
+    "/start"
+  ],
+  "browserSpec": "tests/acceptance/pbos-login.spec.ts",
+  "acceptance": [
+    {
+      "dimension": "ROUTE",
+      "behavior": "Successful credentials route through canonical profile authority and invalid credentials remain on /login.",
+      "artifact": "tests/acceptance/pbos-login.spec.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "USER_INTERFACE",
+      "behavior": "The responsive login form exposes labeled email and password controls, recovery navigation, busy state, and an announced error.",
+      "artifact": "app/login/page.tsx",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "DURABLE_DATA",
+      "behavior": "The acceptance journey verifies the Supabase Auth user and reload-persistent authenticated session.",
+      "artifact": "tests/acceptance/pbos-login.spec.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "AUTHORITY",
+      "behavior": "Profile onboarding state and normalized role select the canonical post-login destination.",
+      "artifact": "lib/auth/login.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "PBOS_INTEGRATION",
+      "behavior": "The browser journey emits the required PBOS exact-revision acceptance manifest after successful execution.",
+      "artifact": "tests/acceptance/pbos-login.spec.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "ACCEPTANCE_TEST",
+      "behavior": "One Playwright spec covers invalid credentials, successful login, durable reload, desktop, mobile, accessibility, security, and artifact creation.",
+      "artifact": "tests/acceptance/pbos-login.spec.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "ACCESSIBILITY",
+      "behavior": "The login status is announced and the browser journey rejects serious or critical axe violations.",
+      "artifact": "tests/acceptance/pbos-login.spec.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "SECURITY",
+      "behavior": "Credential failures use a non-enumerating message and profile-load failure signs out the newly established session.",
+      "artifact": "app/login/page.tsx",
+      "source": "IMPLEMENTATION"
+    }
+  ]
+}

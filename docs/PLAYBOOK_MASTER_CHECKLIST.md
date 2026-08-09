@@ -18,9 +18,9 @@ A task may be marked complete only after its interface, persistence, permissions
 # Phase 1 — Identity & Authentication
 
 **Status:** 🟨 in progress
-**Completion:** 41%
+**Completion:** 44%
 
-- 🟦 Login
+- 🟩 Login
 - 🟦 Signup
 - 🟦 Google Login
 - 🟨 Password Reset
@@ -37,7 +37,7 @@ A task may be marked complete only after its interface, persistence, permissions
 - ⬜ Authentication Security Testing
 - ⬜ Authentication Mobile Testing
 
-Notes: Auth interfaces and Supabase flows are present, including login/signup, OAuth, saved email, session timeout, close-browser logout, CAPTCHA, PKCE-style callback routes, and role selection. Items remain below Complete because the Definition of Done still requires full permissions, integration, build, and end-to-end validation evidence. Hostinger/email work is Partial pending production template and delivery validation.
+Notes: Login is Complete with Supabase password authentication, non-enumerating credential errors, profile-authority routing, recovery navigation, reload-persistent sessions, and an exact-revision desktop/mobile/accessibility acceptance specification. Other auth items remain below Complete until their own Definition of Done evidence is satisfied. Hostinger/email work is Partial pending production template and delivery validation.
 
 # Phase 2 — Onboarding
 

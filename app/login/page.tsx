@@ -1,13 +1,15 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { Suspense, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import { supabase } from "@/lib/supabaseClient";
 import { USER_PATHWAYS } from "@/lib/auth";
 import { normalizeRole } from "@/lib/onboarding/pathwayMap";
 import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
+import { getLoginDestination, getLoginErrorMessage, type LoginProfile } from "@/lib/auth/login";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 import "./login.css";
 
@@ -20,6 +22,7 @@ export default function LoginPage() {
 }
 
 function LoginContent() {
+  const router = useRouter();
   const params = useSearchParams();
   const initialMode = params.get("mode") === "signup" ? "signup" : "login";
 
@@ -107,17 +110,34 @@ function LoginContent() {
         return;
       }
 
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) {
-        setStatus(error.message);
+      if (error || !data.user || !data.session) {
+        setStatus(getLoginErrorMessage());
         return;
       }
 
-      window.location.href = "/dashboard";
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("onboarding_completed,profile_mode,role")
+        .eq("id", data.user.id)
+        .maybeSingle<LoginProfile>();
+
+      if (profileError) {
+        await supabase.auth.signOut();
+        setStatus("Your account was verified, but Playbook could not load your access profile. Please try again.");
+        return;
+      }
+
+      const metadataRole =
+        data.user.user_metadata?.profile_mode ||
+        data.user.user_metadata?.role ||
+        data.user.user_metadata?.requested_role;
+
+      router.replace(getLoginDestination(profile, metadataRole));
     } finally {
       setLoading(false);
     }
@@ -163,11 +183,11 @@ function LoginContent() {
                       onClick={() => setRole(option.role)}
                       style={{
                         ...roleCard,
-                        borderColor: active ? "#F97316" : "#E2E8F0",
+                        borderColor: active ? "#C2410C" : "#E2E8F0",
                         background: active ? "#FFF7ED" : "#FFFFFF",
                       }}
                     >
-                      <strong style={{ color: active ? "#F97316" : "#0F172A" }}>
+                      <strong style={{ color: active ? "#9A3412" : "#0F172A" }}>
                         {option.label}
                       </strong>
                       <span>{option.short}</span>
@@ -181,9 +201,12 @@ function LoginContent() {
           <label style={label}>
             Email
             <input
+              id="login-email"
+              name="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               type="email"
+              autoComplete="email"
               required
               placeholder="you@example.com"
               style={input}
@@ -202,15 +225,24 @@ function LoginContent() {
           <label style={label}>
             Password
             <input
+              id="login-password"
+              name="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               type="password"
+              autoComplete={isSignup ? "new-password" : "current-password"}
               required
               minLength={6}
               placeholder="Enter password"
               style={input}
             />
           </label>
+
+          {!isSignup && (
+            <Link href="/reset-password" style={forgotPasswordLink}>
+              Forgot your password?
+            </Link>
+          )}
 
           {isSignup && process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY && (
             <HCaptcha
@@ -220,7 +252,7 @@ function LoginContent() {
             />
           )}
 
-          {status && <div style={statusBox}>{status}</div>}
+          {status && <div role="alert" aria-live="polite" style={statusBox}>{status}</div>}
 
           <button type="button" onClick={signInWithGoogle} style={googleButton}>
             Continue with Google
@@ -228,7 +260,7 @@ function LoginContent() {
 
           <div style={divider}>or</div>
 
-          <button type="submit" disabled={loading} style={primaryButton}>
+          <button type="submit" disabled={loading} aria-busy={loading} style={primaryButton}>
             {loading ? "Working..." : copy.button}
           </button>
 
@@ -305,7 +337,7 @@ const formEyebrow: React.CSSProperties = {
   fontWeight: 900,
   letterSpacing: ".16em",
   textTransform: "uppercase",
-  color: "#F97316",
+  color: "#9A3412",
   margin: 0,
 };
 
@@ -372,7 +404,7 @@ const statusBox: React.CSSProperties = {
 const primaryButton: React.CSSProperties = {
   border: "none",
   borderRadius: 999,
-  background: "#F97316",
+  background: "#C2410C",
   color: "#FFFFFF",
   padding: "17px 24px",
   fontSize: 20,
@@ -392,9 +424,17 @@ const switchRow: React.CSSProperties = {
 const switchButton: React.CSSProperties = {
   border: "none",
   background: "transparent",
-  color: "#F97316",
+  color: "#9A3412",
   fontWeight: 950,
   cursor: "pointer",
+};
+
+const forgotPasswordLink: React.CSSProperties = {
+  alignSelf: "flex-end",
+  color: "#9A3412",
+  fontWeight: 900,
+  textDecoration: "underline",
+  textUnderlineOffset: 3,
 };
 
 
@@ -420,7 +460,7 @@ const googleButton: React.CSSProperties = {
 
 const divider: React.CSSProperties = {
   textAlign: "center",
-  color: "#94A3B8",
+  color: "#475569",
   fontWeight: 900,
   fontFamily: "'Space Mono', monospace",
   fontSize: 11,
