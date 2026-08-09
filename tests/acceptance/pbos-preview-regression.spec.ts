@@ -20,3 +20,20 @@ test("public newsfeed opens without authentication", async ({ page }) => {
   await expect(page.getByText(/Loading published|No community stories|From the Playbook community/i).first()).toBeVisible();
   await expect(page.getByText(/public feed is temporarily unavailable/i)).toHaveCount(0);
 });
+
+for (const viewport of [
+  { name: "desktop", width: 1440, height: 1000 },
+  { name: "mobile", width: 390, height: 844 },
+]) {
+  test(`public footer and responsive shells hold on ${viewport.name}`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    for (const route of ["/", "/preview", "/news", "/role-select", "/scholar-athlete-os", "/compass"]) {
+      await page.goto(route);
+      await expect(page.locator("body")).toBeVisible();
+      const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+      expect(overflow, `${route} escaped the ${viewport.name} viewport`).toBeLessThanOrEqual(1);
+    }
+    await page.goto("/preview");
+    await expect(page.getByTestId("canonical-public-footer")).toBeVisible();
+  });
+}
