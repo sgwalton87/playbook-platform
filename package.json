@@ -47,6 +47,7 @@
     "test:acceptance:pbos:logout": "playwright test tests/acceptance/pbos-logout.spec.ts --project=chromium",
     "test:acceptance:pbos:session-timeout": "playwright test tests/acceptance/pbos-session-timeout.spec.ts --project=chromium",
     "test:acceptance:pbos:close-browser-logout": "playwright test tests/acceptance/pbos-close-browser-logout.spec.ts --project=chromium",
+    "test:acceptance:pbos:captcha": "playwright test tests/acceptance/pbos-captcha.spec.ts --project=chromium",
     "test:acceptance:pbos:academic": "playwright test tests/acceptance/pbos-academic.spec.ts --project=chromium",
     "test:visual:scholar": "playwright test tests/acceptance/pbos-scholar-visual.spec.ts --project=chromium",
     "test:acceptance:pbos:opportunity": "playwright test tests/acceptance/pbos-opportunity.spec.ts --project=chromium",

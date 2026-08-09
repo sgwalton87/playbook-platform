@@ -18,7 +18,7 @@ A task may be marked complete only after its interface, persistence, permissions
 # Phase 1 — Identity & Authentication
 
 **Status:** 🟨 in progress
-**Completion:** 73%
+**Completion:** 80%
 
 - 🟩 Login
 - 🟩 Signup
@@ -28,7 +28,7 @@ A task may be marked complete only after its interface, persistence, permissions
 - 🟩 Logout
 - 🟩 Session Timeout
 - 🟩 Close Browser Logout
-- 🟦 CAPTCHA
+- 🟩 CAPTCHA
 - 🟦 PKCE
 - 🟨 Email Verification
 - 🟨 Hostinger Email

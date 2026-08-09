@@ -21,6 +21,8 @@ import { SESSION_TIMEOUT_MESSAGE } from "@/lib/auth/sessionTimeout";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 import "./login.css";
 
+const HCAPTCHA_DEVELOPMENT_SITE_KEY = "10000000-ffff-ffff-ffff-000000000001";
+
 export default function LoginPage() {
   return (
     <Suspense fallback={<div style={{ padding: 40 }}>Loading...</div>}>
@@ -45,8 +47,12 @@ function LoginContent() {
   });
   const [loading, setLoading] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaKey, setCaptchaKey] = useState(0);
 
   const isSignup = mode === "signup";
+  const captchaSiteKey = process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY
+    || (process.env.NODE_ENV === "development" ? HCAPTCHA_DEVELOPMENT_SITE_KEY : undefined);
+  const captchaReady = Boolean(captchaSiteKey && captchaToken);
 
   useEffect(() => {
     let active = true;
@@ -101,6 +107,16 @@ function LoginContent() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setStatus("");
+
+    if (isSignup && !captchaReady) {
+      setStatus(
+        captchaSiteKey
+          ? "Complete the security check before creating your account."
+          : "Account creation is temporarily unavailable because the security check is not configured."
+      );
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -118,6 +134,8 @@ function LoginContent() {
         });
 
         if (error) {
+          setCaptchaToken(null);
+          setCaptchaKey((current) => current + 1);
           setStatus(getSignupErrorMessage());
           return;
         }
@@ -282,12 +300,42 @@ function LoginContent() {
             </Link>
           )}
 
-          {isSignup && process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY && (
-            <HCaptcha
-              sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY}
-              onVerify={(token) => setCaptchaToken(token)}
-              onExpire={() => setCaptchaToken(null)}
-            />
+          {isSignup && (
+            <section aria-labelledby="signup-security-heading" style={captchaPanel}>
+              <div>
+                <h3 id="signup-security-heading" style={captchaHeading}>Security check</h3>
+                <p id="signup-security-help" style={captchaHelp}>
+                  Complete this check to protect Playbook accounts from automated signups.
+                </p>
+              </div>
+              {captchaSiteKey ? (
+                <div className="playbook-captcha-widget" aria-describedby="signup-security-help">
+                  <HCaptcha
+                    key={captchaKey}
+                    sitekey={captchaSiteKey}
+                    onVerify={(token) => {
+                      setCaptchaToken(token);
+                      setStatus("");
+                    }}
+                    onExpire={() => {
+                      setCaptchaToken(null);
+                      setStatus("The security check expired. Complete it again to continue.");
+                    }}
+                    onError={() => {
+                      setCaptchaToken(null);
+                      setStatus("The security check could not be completed. Please try again.");
+                    }}
+                  />
+                </div>
+              ) : (
+                <p role="status" style={captchaUnavailable}>
+                  Account creation is temporarily unavailable. Please try again later.
+                </p>
+              )}
+              <p role="status" aria-live="polite" style={captchaState}>
+                {captchaReady ? "Security check complete." : "Security check required."}
+              </p>
+            </section>
           )}
 
           {status && <div role="alert" aria-live="polite" style={statusBox}>{status}</div>}
@@ -304,7 +352,13 @@ function LoginContent() {
 
           <div style={divider}>or</div>
 
-          <button type="submit" disabled={loading} aria-busy={loading} style={primaryButton}>
+          <button
+            type="submit"
+            disabled={loading || (isSignup && !captchaReady)}
+            aria-busy={loading}
+            aria-describedby={isSignup ? "signup-security-help" : undefined}
+            style={primaryButton}
+          >
             {loading ? "Working..." : copy.button}
           </button>
 
@@ -417,7 +471,7 @@ const roleCard: React.CSSProperties = {
   display: "grid",
   gap: 6,
   cursor: "pointer",
-  color: "#64748B",
+  color: "#475569",
   fontSize: 12,
   lineHeight: 1.35,
 };
@@ -449,6 +503,42 @@ const statusBox: React.CSSProperties = {
   border: "1px solid #FED7AA",
   borderRadius: 16,
   padding: 14,
+  fontWeight: 800,
+};
+
+const captchaPanel: React.CSSProperties = {
+  display: "grid",
+  gap: 12,
+  padding: 16,
+  border: "1px solid #CBD5E1",
+  borderRadius: 16,
+  background: "#F8FAFC",
+};
+
+const captchaHeading: React.CSSProperties = {
+  margin: 0,
+  fontSize: 16,
+  color: "#0F172A",
+};
+
+const captchaHelp: React.CSSProperties = {
+  margin: "4px 0 0",
+  color: "#475569",
+  fontSize: 13,
+  lineHeight: 1.5,
+};
+
+const captchaState: React.CSSProperties = {
+  margin: 0,
+  color: "#475569",
+  fontSize: 13,
+  fontWeight: 800,
+};
+
+const captchaUnavailable: React.CSSProperties = {
+  margin: 0,
+  color: "#9A3412",
+  fontSize: 13,
   fontWeight: 800,
 };
 
