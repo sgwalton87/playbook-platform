@@ -1,36 +1,58 @@
 "use client";
 
+import {
+  PlaybookButton,
+  PlaybookCard,
+  PlaybookGrid,
+  PlaybookHero,
+  PlaybookMetric,
+  PlaybookMetrics,
+  PlaybookPage,
+} from "@/components/ui";
+
+const pathway = [
+  { label: "Academic passport", title: "Prepare records that can travel", body: "Organize transcripts, graduation evidence, eligibility context, and academic-equivalency needs.", href: "/transcript", action: "Open academic record" },
+  { label: "Athlete portfolio", title: "Present verified athletic evidence", body: "Connect film, position, measurements, honors, references, and the story behind your development.", href: "/profile", action: "Build athlete profile" },
+  { label: "Global discovery", title: "Explore countries and programs", body: "Research destinations, teams, academies, governing bodies, and responsible opportunity requirements.", href: "/opportunities", action: "Explore opportunities" },
+  { label: "People", title: "Track trusted international contacts", body: "Keep coaches, scouts, agents, clubs, supporters, and follow-ups inside an accountable network.", href: "/support-network", action: "Open support network" },
+  { label: "Money & contracts", title: "Understand the complete offer", body: "Prepare for housing, salary, travel, taxes, agent fees, contracts, and long-term financial decisions.", href: "/financial-intelligence", action: "Build financial readiness" },
+  { label: "Culture & safety", title: "Prepare for life beyond the field", body: "Plan language, food, healthcare, housing, travel documents, safeguarding, and emergency support.", href: "/courses/athletes-abroad-global-hub", action: "Start global course" },
+] as const;
+
 export default function AthleteAbroadOSPage() {
   return (
-    <main style={{padding:24}}>
-      <section style={{background:"#0F172A",color:"#F8F7F4",borderRadius:32,padding:"48px"}}>
-        <p style={{fontFamily:"'Space Mono', monospace",fontSize:11,letterSpacing:".16em",textTransform:"uppercase",color:"#F97316",fontWeight:900}}>
-          Athlete Abroad OS
-        </p>
-        <h1 style={{fontFamily:"'Anton', sans-serif",fontSize:"clamp(48px,8vw,92px)",lineHeight:.9,textTransform:"uppercase",margin:"12px 0"}}>
-          Take your game global.
-        </h1>
-        <p style={{fontSize:22,lineHeight:1.45,maxWidth:900,color:"rgba(248,247,244,.78)"}}>
-          A pathway for athletes exploring overseas, post-grad, academy, semi-pro, and professional opportunities after high school or college.
-        </p>
-      </section>
+    <PlaybookPage>
+      <div data-testid="athlete-abroad-os" data-visual-canon="PGAA-001">
+        <PlaybookHero
+          eyebrow="Athlete Abroad OS"
+          title="Take your game global without leaving your future behind."
+          subtitle="A connected international pathway for academics, eligibility, recruiting, contracts, culture, safety, and the trusted people making the move with you."
+        >
+          <div style={actions}>
+            <PlaybookButton href="/courses/athletes-abroad-global-hub">Start global readiness</PlaybookButton>
+            <PlaybookButton href="/opportunities" variant="secondary">Explore opportunities</PlaybookButton>
+          </div>
+        </PlaybookHero>
 
-      <section style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:16,marginTop:20}}>
-        {[
-          ["Eligibility Passport","Academic records, transcripts, diploma, NCAA/NAIA status, and transfer history."],
-          ["Athlete Portfolio","Film, stats, position, measurements, honors, references, and resume."],
-          ["Country Targets","Track leagues, countries, teams, agencies, visa needs, and deadlines."],
-          ["Agent / Contact Tracker","Organize coaches, scouts, agents, clubs, messages, and follow-ups."],
-          ["Money + Contract Prep","Understand housing, salary, travel, taxes, agent fees, and contract basics."],
-          ["Culture + Safety","Prepare for language, food, healthcare, housing, documents, and emergency contacts."]
-        ].map(([title,body])=>(
-          <article key={title} style={{background:"#FFFFFF",border:"1px solid #E2E8F0",borderRadius:24,padding:24}}>
-            <p style={{fontFamily:"'Space Mono', monospace",fontSize:10,letterSpacing:".14em",textTransform:"uppercase",color:"#F97316",fontWeight:900}}>Module</p>
-            <h2 style={{margin:"6px 0 8px"}}>{title}</h2>
-            <p style={{color:"#64748B",lineHeight:1.5}}>{body}</p>
-          </article>
-        ))}
-      </section>
-    </main>
+        <PlaybookMetrics>
+          <PlaybookMetric label="Verified destinations" value="0 connected" />
+          <PlaybookMetric label="Program conversations" value="0 connected" />
+          <PlaybookMetric label="Open document tasks" value="0 connected" />
+          <PlaybookMetric label="Authorized contacts" value="0 connected" />
+        </PlaybookMetrics>
+
+        <PlaybookGrid min={300}>
+          {pathway.map((item) => (
+            <PlaybookCard key={item.href} eyebrow={item.label} title={item.title}>
+              <p style={body}>{item.body}</p>
+              <PlaybookButton href={item.href}>{item.action}</PlaybookButton>
+            </PlaybookCard>
+          ))}
+        </PlaybookGrid>
+      </div>
+    </PlaybookPage>
   );
 }
+
+const actions: React.CSSProperties = { display: "flex", flexWrap: "wrap", gap: 10, marginTop: 22 };
+const body: React.CSSProperties = { color: "#52657B", lineHeight: 1.65, margin: "0 0 20px" };

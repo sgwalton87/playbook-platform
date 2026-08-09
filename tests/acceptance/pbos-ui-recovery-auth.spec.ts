@@ -97,6 +97,19 @@ for (const viewport of [{ name: "desktop", width: 1440, height: 900 }, { name: "
     expect(accessibility.violations.filter((item) => ["serious", "critical"].includes(item.impact ?? ""))).toEqual([]);
     await page.screenshot({ path: `artifacts/pbos-acceptance/ui-recovery-scholar-athlete-os-${viewport.name}.png`, fullPage: true });
   });
+
+  test(`Athlete Abroad OS renders its canonical global journey on ${viewport.name}`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    await page.goto("/athlete-abroad-os");
+    await expect(page.locator('[data-testid="athlete-abroad-os"][data-visual-canon="PGAA-001"]')).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Take your game global/i })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Open academic record" })).toHaveAttribute("href", "/transcript");
+    await expect(page.getByRole("link", { name: "Start global course" })).toHaveAttribute("href", "/courses/athletes-abroad-global-hub");
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+    const accessibility = await new AxeBuilder({ page }).analyze();
+    expect(accessibility.violations.filter((item) => ["serious", "critical"].includes(item.impact ?? ""))).toEqual([]);
+    await page.screenshot({ path: `artifacts/pbos-acceptance/ui-recovery-athlete-abroad-os-${viewport.name}.png`, fullPage: true });
+  });
 }
 
 test("Studio Oracle owns one navigation shell", async ({ page }) => {

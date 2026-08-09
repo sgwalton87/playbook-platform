@@ -15,7 +15,7 @@ This is an implementation control artifact. A mapping or marker is not completio
 | `/admin` | Legacy/inline presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/albums` | Legacy/inline presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/application-workspaces` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
-| `/athlete-abroad-os` | Legacy/inline presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
+| `/athlete-abroad-os` | Canonical pathway implementation | PGDS-001 / PGAA-001 | Unified authenticated shell + global journey routes | IMPLEMENTED_AND_VISUALLY_VERIFIED | PASSED | PASSED |
 | `/auth/callback` | Legacy/inline presentation | PGDS-001 | Authentication shell | PENDING | PENDING | PENDING |
 | `/badges` | Legacy/inline presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/brand-partner-os` | Legacy/inline presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
