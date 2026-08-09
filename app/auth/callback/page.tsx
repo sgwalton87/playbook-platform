@@ -1,11 +1,12 @@
 "use client";
 
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { getPathway, normalizeRole } from "@/lib/onboarding/pathwayMap";
 import { getCanonicalOnboardingRoute } from "@/lib/onboarding";
 import { getGoogleRequestedRole } from "@/lib/auth/google";
+import { PKCE_CALLBACK_ERROR_MESSAGE } from "@/lib/auth/pkce";
 
 export default function AuthCallbackPage() {
   return (
@@ -17,8 +18,12 @@ export default function AuthCallbackPage() {
 
 function AuthCallbackContent() {
   const params = useSearchParams();
+  const exchangeStarted = useRef(false);
 
   useEffect(() => {
+    if (exchangeStarted.current) return;
+    exchangeStarted.current = true;
+
     async function finishAuth() {
       const tokenHash = params.get("token_hash");
       const type = params.get("type") || "email";
@@ -30,8 +35,8 @@ function AuthCallbackContent() {
         });
 
         if (error) {
-          console.error("Auth token verification failed:", error.message);
-          window.location.href = "/login?error=auth_callback";
+          console.error("Auth token verification failed.");
+          window.location.replace("/login?error=auth_callback");
           return;
         }
       } else {
@@ -40,8 +45,8 @@ function AuthCallbackContent() {
         if (code) {
           const { error } = await supabase.auth.exchangeCodeForSession(code);
           if (error) {
-            console.error("Auth callback exchange failed:", error.message);
-            window.location.href = "/login?error=auth_callback";
+            console.error("Auth callback exchange failed.");
+            window.location.replace("/login?error=auth_callback");
             return;
           }
         }
@@ -50,7 +55,7 @@ function AuthCallbackContent() {
       const { data, error } = await supabase.auth.getUser();
 
       if (error || !data.user) {
-        window.location.href = "/login";
+        window.location.replace("/login?error=auth_callback");
         return;
       }
 
@@ -62,7 +67,7 @@ function AuthCallbackContent() {
 
       if (profileReadError) {
         console.error("Auth profile lookup failed.");
-        window.location.href = "/login?error=profile_unavailable";
+        window.location.replace("/login?error=profile_unavailable");
         return;
       }
 
@@ -99,14 +104,14 @@ function AuthCallbackContent() {
       if (profileWriteError) {
         console.error("Auth profile persistence failed.");
         await supabase.auth.signOut();
-        window.location.href = "/login?error=profile_unavailable";
+        window.location.replace("/login?error=profile_unavailable");
         return;
       }
 
       if (existing?.onboarding_completed) {
-        window.location.href = getPathway(existing.profile_mode || existing.role || role).osRoute;
+        window.location.replace(getPathway(existing.profile_mode || existing.role || role).osRoute);
       } else {
-        window.location.href = getCanonicalOnboardingRoute(role);
+        window.location.replace(getCanonicalOnboardingRoute(role));
       }
     }
 
@@ -114,8 +119,15 @@ function AuthCallbackContent() {
   }, [params]);
 
   return (
-    <main style={{ padding: 40 }}>
-      Confirming your email and opening your Playbook...
+    <main style={{ minHeight: "100vh", display: "grid", placeItems: "center", padding: 24 }}>
+      <section aria-labelledby="auth-callback-title" aria-live="polite" style={{ maxWidth: 520 }}>
+        <p style={{ margin: "0 0 8px", fontWeight: 700 }}>Secure sign-in</p>
+        <h1 id="auth-callback-title" style={{ margin: "0 0 12px" }}>Opening your Playbook</h1>
+        <p style={{ margin: 0 }}>
+          Confirming your identity with a one-time protected code. You will continue automatically.
+        </p>
+        <noscript>{PKCE_CALLBACK_ERROR_MESSAGE}</noscript>
+      </section>
     </main>
   );
 }
