@@ -88,7 +88,9 @@ test("Session Timeout protects an idle authenticated session on desktop and mobi
   });
   await page.clock.fastForward(60 * 1000);
   await page.waitForURL(/\/login\?reason=session-timeout/);
-  await expect(page.getByRole("alert")).toContainText("5 minutes of inactivity");
+  await expect(page.getByText("Your session ended after 5 minutes of inactivity. Log in again to continue securely.", {
+    exact: true,
+  })).toBeVisible();
   expect((await context.cookies()).filter((cookie) => cookie.name.startsWith("sb-"))).toEqual([]);
 
   await page.setViewportSize({ width: 390, height: 844 });
