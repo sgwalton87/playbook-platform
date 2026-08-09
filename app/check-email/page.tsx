@@ -171,7 +171,7 @@ const actions: React.CSSProperties = {
 };
 
 const primary: React.CSSProperties = {
-  background: "#F97316",
+  background: "#C2410C",
   color: "#fff",
   padding: "15px 22px",
   borderRadius: 999,
