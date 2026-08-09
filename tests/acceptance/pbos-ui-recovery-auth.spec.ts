@@ -110,6 +110,20 @@ for (const viewport of [{ name: "desktop", width: 1440, height: 900 }, { name: "
     expect(accessibility.violations.filter((item) => ["serious", "critical"].includes(item.impact ?? ""))).toEqual([]);
     await page.screenshot({ path: `artifacts/pbos-acceptance/ui-recovery-athlete-abroad-os-${viewport.name}.png`, fullPage: true });
   });
+
+  test(`Brand Partner OS renders its canonical responsible-opportunity journey on ${viewport.name}`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    await page.goto("/brand-partner-os");
+    await expect(page.locator('[data-testid="brand-partner-os"][data-visual-canon="PGBP-001"]')).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Power opportunity/i })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Create an opportunity" })).toHaveAttribute("href", "/opportunities");
+    await expect(page.getByRole("link", { name: "Review athlete journey" })).toHaveAttribute("href", "/scholar-athlete-os");
+    await expect(page.getByText("Coming Next", { exact: true })).toHaveCount(0);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+    const accessibility = await new AxeBuilder({ page }).analyze();
+    expect(accessibility.violations.filter((item) => ["serious", "critical"].includes(item.impact ?? ""))).toEqual([]);
+    await page.screenshot({ path: `artifacts/pbos-acceptance/ui-recovery-brand-partner-os-${viewport.name}.png`, fullPage: true });
+  });
 }
 
 test("Studio Oracle owns one navigation shell", async ({ page }) => {
