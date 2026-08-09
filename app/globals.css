@@ -37,3 +37,60 @@ input { border: 1px solid #ddd; border-radius: 6px; }
 a { color: inherit; }
 button, input, textarea, select { font: inherit; }
 img, svg, video { max-width: 100%; }
+.playbook-session-warning {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.72);
+  backdrop-filter: blur(8px);
+}
+
+.playbook-session-warning__card {
+  width: min(100%, 440px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 24px;
+  padding: clamp(24px, 5vw, 36px);
+  color: #f8fafc;
+  background: #0f172a;
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.4);
+}
+
+.playbook-session-warning__eyebrow {
+  margin: 0 0 8px;
+  color: #fb923c;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.playbook-session-warning__card h2 {
+  margin: 0 0 12px;
+  font-size: clamp(1.6rem, 5vw, 2.2rem);
+}
+
+.playbook-session-warning__card p:not(.playbook-session-warning__eyebrow) {
+  margin: 0 0 24px;
+  color: #cbd5e1;
+  line-height: 1.6;
+}
+
+.playbook-session-warning__card button {
+  width: 100%;
+  min-height: 48px;
+  border: 0;
+  border-radius: 14px;
+  color: #fff;
+  background: #c2410c;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.playbook-session-warning__card button:focus-visible {
+  outline: 3px solid #fdba74;
+  outline-offset: 3px;
+}
