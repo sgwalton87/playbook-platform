@@ -9,7 +9,7 @@ This is an implementation control artifact. A mapping or marker is not completio
 | `AUTHENTICATED_PRODUCT_SHELL` | Canonical shared implementation | PGDS-001 | Root layout | IMPLEMENTED_AND_VERIFIED | PASSED | PASSED |
 | `STUDIO_SHELL_AUTHORITY` | Dedicated operator implementation | PGDS-001 | Studio layout | IMPLEMENTED_AND_VERIFIED | PASSED | N/A |
 | `/about` | Canonical marker present | PGDS-001 | Unified authenticated shell | IMPLEMENTED_AND_VERIFIED | PASSED | PASSED |
-| `/academic-readiness` | Legacy/inline presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
+| `/academic-readiness` | Canonical evidence-to-action implementation | PGDS-001 / PGAR-001 | Unified authenticated shell + transcript/record/support routes | IMPLEMENTED_AND_VISUALLY_VERIFIED | PASSED | PASSED |
 | `/action-routing` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/admin/moderation` | Legacy/inline presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/admin` | Legacy/inline presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
