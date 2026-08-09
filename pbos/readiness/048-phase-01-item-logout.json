@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "missionId": "048-phase-01-item-logout",
+  "completionClaim": true,
+  "completedItems": [
+    "Logout"
+  ],
+  "remainingItems": [],
+  "routes": [
+    "/dashboard",
+    "/login"
+  ],
+  "browserSpec": "tests/acceptance/pbos-logout.spec.ts",
+  "acceptance": [
+    {
+      "dimension": "ROUTE",
+      "behavior": "Authenticated desktop and mobile navigation signs the user out and performs a document-safe redirect from /dashboard to /login.",
+      "artifact": "components/shell/UnifiedAppShell.tsx",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "USER_INTERFACE",
+      "behavior": "The shared authenticated shell exposes responsive Sign out controls with a disabled busy state and an announced recoverable error.",
+      "artifact": "components/shell/UnifiedAppShell.tsx",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "DURABLE_DATA",
+      "behavior": "Logout revokes authentication sessions without deleting or mutating the durable Supabase Auth identity or profile authority record.",
+      "artifact": "tests/acceptance/pbos-logout.spec.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "AUTHORITY",
+      "behavior": "Supabase Auth remains the session authority and global sign-out revokes refresh sessions for the authenticated identity.",
+      "artifact": "lib/auth/logout.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "PBOS_INTEGRATION",
+      "behavior": "The browser journey writes the required exact-revision desktop, mobile, trace, accessibility, and result artifacts after execution.",
+      "artifact": "tests/acceptance/pbos-logout.spec.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "ACCEPTANCE_TEST",
+      "behavior": "One Playwright spec exercises real login and logout twice across desktop and mobile, validates cookie removal and durable records, and emits PBOS artifacts.",
+      "artifact": "tests/acceptance/pbos-logout.spec.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "ACCESSIBILITY",
+      "behavior": "Sign out is a labeled native button, progress and failure states are conveyed programmatically, mobile overflow is rejected, and axe blocks serious or critical violations.",
+      "artifact": "tests/acceptance/pbos-logout.spec.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "SECURITY",
+      "behavior": "Logout requests provider-wide refresh-session revocation, clears Supabase browser cookies, and never exposes provider error details.",
+      "artifact": "tests/unit/auth/logout.test.ts",
+      "source": "IMPLEMENTATION"
+    }
+  ]
+}
