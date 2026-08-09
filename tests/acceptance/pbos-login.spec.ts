@@ -96,7 +96,8 @@ test("Login establishes a durable, authority-routed session on desktop and mobil
   await page.getByLabel("Password", { exact: true }).fill(`${password}-invalid`);
   await page.getByRole("button", { name: "Log In", exact: true }).click();
   await expect(page).toHaveURL(/\/login/);
-  await expect(page.getByRole("alert")).toContainText("couldn't log you in");
+  await expect(page.locator('[role="alert"][aria-live="polite"]'))
+    .toContainText("couldn't log you in");
   await page.screenshot({ path: `${artifacts}/048-phase-01-item-login-desktop.png`, fullPage: true });
 
   await page.setViewportSize({ width: 390, height: 844 });
