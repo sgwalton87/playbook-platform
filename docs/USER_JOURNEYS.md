@@ -1,7 +1,7 @@
 # User Journeys
 
 > Canonical owner: Playbook Product and Experience
-> Governed source revision: `c371d8b075b171a38fb578f4d08d421f085a850b`
+> Governed source revision: `d65e26040d88cde355102c314e3f5f3e1f577b61`
 > Compiled from `docs/GOVERNANCE/ROLE_REGISTRY.md`, `docs/ONBOARDING_ROLE_OS_SPRINT_MAP.md`, and `docs/design/CANONICAL_ROUTE_MAP.md`.
 > This topology records intended behavior and known gaps. It is not implementation or acceptance evidence.
 
@@ -27,6 +27,9 @@ A journey remains incomplete when any source field below is PARTIAL, MISSING, or
 | Transition-Aged Youth | VERIFIED: transition-youth signup option. | VERIFIED: ROLE_ONBOARDING["transition-youth"]. | VERIFIED/PARTIAL: /dashboard in pathway/navigation; no dedicated TAY OS route. | PARTIAL: no TAY-specific relationship kind; likely scholar permissions by fallback only. | PARTIAL: support/life-context fields captured through Scholar Support; no TAY verification workflow found. | PARTIAL |
 | Employer | VERIFIED: employer signup option. | MISSING: no ROLE_ONBOARDING.employer entry found, so onboarding falls back to Scholar if requested directly. | PARTIAL/MISSING: navigation has /employer-os, but pathway map has no employer entry and auth completion may default elsewhere. | VERIFIED: employer_partner permissions exist. | MISSING: employer verification workflow not found. | MISSING |
 | Other | VERIFIED: other signup option. | VERIFIED: ROLE_ONBOARDING.other. | VERIFIED/PARTIAL: pathway sends to /pending; navigation fallback sends to /dashboard. | MISSING: no other relationship kind or permissions found. | PARTIAL: pending page exists, but review workflow is not verified. | PARTIAL |
+| High School Counselor | MISSING: no canonical signup contract is declared. | MISSING: no role-specific onboarding implementation is declared. | /educator-os | MISSING: least-privilege authority contract is not accepted. | MISSING: role verification and consent are not accepted. | MISSING |
+| Athlete Abroad enrollment | MISSING: no canonical signup contract is declared. | MISSING: no role-specific onboarding implementation is declared. | /athlete-abroad-os | MISSING: least-privilege authority contract is not accepted. | MISSING: role verification and consent are not accepted. | MISSING |
+| District / School Administrator | MISSING: no canonical signup contract is declared. | MISSING: no role-specific onboarding implementation is declared. | /district-os | MISSING: least-privilege authority contract is not accepted. | MISSING: role verification and consent are not accepted. | MISSING |
 
 ## Scholar
 
@@ -208,6 +211,51 @@ A journey remains incomplete when any source field below is PARTIAL, MISSING, or
 
 **Current source status:** PARTIAL
 
+## High School Counselor
+
+1. **Discover and sign up:** MISSING: no canonical signup contract is declared.
+2. **Complete role onboarding:** MISSING: no role-specific onboarding implementation is declared.
+3. **Satisfy verification and consent:** MISSING: role verification and consent are not accepted.
+4. **Create or connect the canonical Playbook Record:** MISSING: durable Playbook Record projection is not accepted.
+5. **Create or connect the Scholar Record projection:** MISSING: Scholar Record relationship is not accepted.
+6. **Enter the permission-scoped OS:** /educator-os
+7. **Render the canonical dashboard:** MISSING: High School Counselor OS behavior is not accepted.
+8. **Enforce role authority:** MISSING: least-privilege authority contract is not accepted.
+9. **Persist the canonical record type:** MISSING: canonical record ownership is not declared.
+10. **Prove the outcome:** exact-revision desktop/mobile journey, durable data, authority denial, accessibility, security, recovery, and independent validation evidence are required.
+
+**Current source status:** MISSING
+
+## Athlete Abroad enrollment
+
+1. **Discover and sign up:** MISSING: no canonical signup contract is declared.
+2. **Complete role onboarding:** MISSING: no role-specific onboarding implementation is declared.
+3. **Satisfy verification and consent:** MISSING: role verification and consent are not accepted.
+4. **Create or connect the canonical Playbook Record:** MISSING: durable Playbook Record projection is not accepted.
+5. **Create or connect the Scholar Record projection:** MISSING: Scholar Record relationship is not accepted.
+6. **Enter the permission-scoped OS:** /athlete-abroad-os
+7. **Render the canonical dashboard:** MISSING: Athletes Abroad Hub behavior is not accepted.
+8. **Enforce role authority:** MISSING: least-privilege authority contract is not accepted.
+9. **Persist the canonical record type:** MISSING: canonical record ownership is not declared.
+10. **Prove the outcome:** exact-revision desktop/mobile journey, durable data, authority denial, accessibility, security, recovery, and independent validation evidence are required.
+
+**Current source status:** MISSING
+
+## District / School Administrator
+
+1. **Discover and sign up:** MISSING: no canonical signup contract is declared.
+2. **Complete role onboarding:** MISSING: no role-specific onboarding implementation is declared.
+3. **Satisfy verification and consent:** MISSING: role verification and consent are not accepted.
+4. **Create or connect the canonical Playbook Record:** MISSING: durable Playbook Record projection is not accepted.
+5. **Create or connect the Scholar Record projection:** MISSING: Scholar Record relationship is not accepted.
+6. **Enter the permission-scoped OS:** /district-os
+7. **Render the canonical dashboard:** MISSING: District / School Administrator OS behavior is not accepted.
+8. **Enforce role authority:** MISSING: least-privilege authority contract is not accepted.
+9. **Persist the canonical record type:** MISSING: canonical record ownership is not declared.
+10. **Prove the outcome:** exact-revision desktop/mobile journey, durable data, authority denial, accessibility, security, recovery, and independent validation evidence are required.
+
+**Current source status:** MISSING
+
 ## Dependency-ordered delivery journeys
 
 1. OR-001 — Canonical role registry and routing
@@ -219,7 +267,51 @@ A journey remains incomplete when any source field below is PARTIAL, MISSING, or
 7. OR-007 — Opportunity partner pathways
 8. OR-008 — Governance and release validation
 
+## Supported product acceptance journeys
+
+| Journey ID | Canonical coverage |
+| --- | --- |
+| ONBOARDING-SCHOLAR | Scholar onboarding: discovery, authentication, durable role onboarding, verification, record projection, authority-scoped OS landing, recovery, desktop, and mobile. |
+| ONBOARDING-SCHOLAR-ATHLETE | Scholar-Athlete onboarding: discovery, authentication, durable role onboarding, verification, record projection, authority-scoped OS landing, recovery, desktop, and mobile. |
+| ONBOARDING-PARENT-GUARDIAN | Parent / Guardian onboarding: discovery, authentication, durable role onboarding, verification, record projection, authority-scoped OS landing, recovery, desktop, and mobile. |
+| ONBOARDING-TEACHER-EDUCATOR | Teacher / Educator onboarding: discovery, authentication, durable role onboarding, verification, record projection, authority-scoped OS landing, recovery, desktop, and mobile. |
+| ONBOARDING-HIGH-SCHOOL-COUNSELOR | High School Counselor onboarding: discovery, authentication, durable role onboarding, verification, record projection, authority-scoped OS landing, recovery, desktop, and mobile. |
+| ONBOARDING-MENTOR | Mentor onboarding: discovery, authentication, durable role onboarding, verification, record projection, authority-scoped OS landing, recovery, desktop, and mobile. |
+| ONBOARDING-HIGH-SCHOOL-COACH | High School Coach onboarding: discovery, authentication, durable role onboarding, verification, record projection, authority-scoped OS landing, recovery, desktop, and mobile. |
+| ONBOARDING-COLLEGE-COACH-RECRUITER | College Coach / Recruiter onboarding: discovery, authentication, durable role onboarding, verification, record projection, authority-scoped OS landing, recovery, desktop, and mobile. |
+| ONBOARDING-COLLEGE-ADMISSIONS | College Admissions onboarding: discovery, authentication, durable role onboarding, verification, record projection, authority-scoped OS landing, recovery, desktop, and mobile. |
+| ONBOARDING-BRAND-PARTNER | Brand Partner onboarding: discovery, authentication, durable role onboarding, verification, record projection, authority-scoped OS landing, recovery, desktop, and mobile. |
+| ONBOARDING-EMPLOYER | Employer / Workforce Partner onboarding: discovery, authentication, durable role onboarding, verification, record projection, authority-scoped OS landing, recovery, desktop, and mobile. |
+| ONBOARDING-TRANSITION-AGED-YOUTH | Transition-Aged Youth onboarding: discovery, authentication, durable role onboarding, verification, record projection, authority-scoped OS landing, recovery, desktop, and mobile. |
+| ONBOARDING-ATHLETES-ABROAD | Athlete Abroad enrollment: discovery, authentication, durable role onboarding, verification, record projection, authority-scoped OS landing, recovery, desktop, and mobile. |
+| ONBOARDING-DISTRICT-SCHOOL-ADMIN | District / School Administrator onboarding: discovery, authentication, durable role onboarding, verification, record projection, authority-scoped OS landing, recovery, desktop, and mobile. |
+| ONBOARDING-COMMUNITY-PARTNER | Community Partner onboarding: discovery, authentication, durable role onboarding, verification, record projection, authority-scoped OS landing, recovery, desktop, and mobile. |
+| OS-SCHOLAR | Scholar OS at /dashboard: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
+| OS-SCHOLAR-ATHLETE | Scholar-Athlete OS at /scholar-athlete-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
+| OS-PARENT-GUARDIAN | Parent Guardian OS at /family-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
+| OS-TEACHER-EDUCATOR | Teacher Educator OS at /educator-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
+| OS-HIGH-SCHOOL-COUNSELOR | High School Counselor OS at /educator-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
+| OS-MENTOR | Mentor OS at /mentor-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
+| OS-HIGH-SCHOOL-COACH | High School Coach OS at /educator-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
+| OS-COLLEGE-COACH-RECRUITER | College Coach Recruiter OS at /university-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
+| OS-COLLEGE-ADMISSIONS | College Admissions OS at /university-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
+| OS-BRAND-PARTNER | Brand Partner OS at /brand-partner-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
+| OS-EMPLOYER | Employer OS at /employer-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
+| OS-FOUNDER | Founder OS at /founder: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
+| OS-ATHLETES-ABROAD | Athletes Abroad Hub at /athlete-abroad-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
+| OS-TRANSITION-AGED-YOUTH | Transition-Aged Youth OS at /dashboard: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
+| OS-DISTRICT-SCHOOL-ADMIN | District / School Administrator OS at /district-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
+| OS-COMMUNITY-PARTNER | Community Partner OS at /pending: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
+| OS-PLATFORM-ADMIN | Platform Administration OS at /admin: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
+| SCHOLAR-ONBOARDING-TO-DASHBOARD | Scholar onboarding and dashboard coverage. |
+| TRANSCRIPT-TO-ACADEMIC-READINESS | Transcript to academic readiness. |
+| READINESS-TO-OPPORTUNITY | Academic readiness to explainable opportunity matches. |
+| OPPORTUNITY-TO-APPLICATION | Opportunity to durable application workspace and private documents. |
+| APPLICATION-TO-AUTHORIZED-SUPPORT | Application to authorized support request. |
+| AUTHORIZED-SUPPORT-MESSAGING | Support relationship to governed durable messaging. |
+| EVENT-TO-ACKNOWLEDGED-NOTIFICATION | Domain events to idempotent notification and outbox journey. |
+
 ## Route coverage boundary
 
-The current canonical route map declares 24 human-facing screen rows. Route existence does not prove journey completion; every required state must be connected to one or more role journeys and an approved design-canon ID.
+The current canonical route map declares 93 human-facing screen rows. Route existence does not prove journey completion; every required state must be connected to one or more role journeys and an approved design-canon ID.
 
