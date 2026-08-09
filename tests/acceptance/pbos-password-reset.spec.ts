@@ -105,7 +105,7 @@ test("Password Reset securely changes credentials while preserving profile autho
   await page.getByLabel("New password", { exact: true }).fill(resetPassword);
   await page.getByLabel("Confirm new password").fill(`${resetPassword}-mismatch`);
   await page.getByRole("button", { name: "Update password" }).click();
-  await expect(page.getByRole("alert")).toContainText("do not match");
+  await expect(page.locator(".password-reset-error")).toContainText("do not match");
   await page.getByLabel("Confirm new password").fill(resetPassword);
   const hasHorizontalOverflow = await page.evaluate(
     () => document.documentElement.scrollWidth > document.documentElement.clientWidth
