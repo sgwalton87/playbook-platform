@@ -151,7 +151,8 @@ test("PKCE binds a one-time verifier to auth callback exchange", async ({ page, 
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/auth/callback?code=expired-one-time-code");
-  await expect(page.getByRole("heading", { name: "Opening your Playbook" })).toBeVisible();
+  await page.waitForURL(/\/login\?error=auth_callback/);
+  await expect(page.getByRole("alert")).toContainText("We couldn't continue with Google.");
   const hasHorizontalOverflow = await page.evaluate(
     () => document.documentElement.scrollWidth > document.documentElement.clientWidth
   );
