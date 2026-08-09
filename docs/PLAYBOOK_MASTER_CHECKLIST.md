@@ -18,11 +18,11 @@ A task may be marked complete only after its interface, persistence, permissions
 # Phase 1 — Identity & Authentication
 
 **Status:** 🟨 in progress
-**Completion:** 47%
+**Completion:** 50%
 
 - 🟩 Login
 - 🟩 Signup
-- 🟦 Google Login
+- 🟩 Google Login
 - 🟨 Password Reset
 - 🟦 Remember Me
 - 🟦 Logout
@@ -37,7 +37,7 @@ A task may be marked complete only after its interface, persistence, permissions
 - ⬜ Authentication Security Testing
 - ⬜ Authentication Mobile Testing
 
-Notes: Login is Complete with Supabase password authentication, non-enumerating credential errors, profile-authority routing, recovery navigation, reload-persistent sessions, and an exact-revision desktop/mobile/accessibility acceptance specification. Signup is Complete with canonical role metadata, durable Supabase Auth account creation, email-confirmation handoff, authority-routed onboarding, non-enumerating failure copy, responsive/accessibility coverage, unit tests, and an exact-revision acceptance specification. Other auth items remain below Complete until their own Definition of Done evidence is satisfied. Hostinger/email work is Partial pending production template and delivery validation.
+Notes: Login is Complete with Supabase password authentication, non-enumerating credential errors, profile-authority routing, recovery navigation, reload-persistent sessions, and an exact-revision desktop/mobile/accessibility acceptance specification. Signup is Complete with canonical role metadata, durable Supabase Auth account creation, email-confirmation handoff, authority-routed onboarding, non-enumerating failure copy, responsive/accessibility coverage, unit tests, and an exact-revision acceptance specification. Google Login is Complete with Supabase OAuth initiation, canonical role handoff for new Google identities, durable profile creation, existing-profile authority preservation, non-enumerating recovery, and an exact-revision desktop/mobile/accessibility acceptance specification. Other auth items remain below Complete until their own Definition of Done evidence is satisfied. Hostinger/email work is Partial pending production template and delivery validation.
 
 # Phase 2 — Onboarding
 

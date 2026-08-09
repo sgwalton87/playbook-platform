@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { getPathway, normalizeRole } from "@/lib/onboarding/pathwayMap";
 import { getCanonicalOnboardingRoute } from "@/lib/onboarding";
+import { getGoogleRequestedRole } from "@/lib/auth/google";
 
 export default function AuthCallbackPage() {
   return (
@@ -30,7 +31,7 @@ function AuthCallbackContent() {
 
         if (error) {
           console.error("Auth token verification failed:", error.message);
-          window.location.href = `/login?error=${encodeURIComponent(error.message)}`;
+          window.location.href = "/login?error=auth_callback";
           return;
         }
       } else {
@@ -40,7 +41,7 @@ function AuthCallbackContent() {
           const { error } = await supabase.auth.exchangeCodeForSession(code);
           if (error) {
             console.error("Auth callback exchange failed:", error.message);
-            window.location.href = `/login?error=${encodeURIComponent(error.message)}`;
+            window.location.href = "/login?error=auth_callback";
             return;
           }
         }
@@ -53,20 +54,37 @@ function AuthCallbackContent() {
         return;
       }
 
+      const { data: existing, error: profileReadError } = await supabase
+        .from("profiles")
+        .select("id,onboarding_completed,profile_mode,role")
+        .eq("id", data.user.id)
+        .maybeSingle();
+
+      if (profileReadError) {
+        console.error("Auth profile lookup failed.");
+        window.location.href = "/login?error=profile_unavailable";
+        return;
+      }
+
+      const googleRequestedRole = getGoogleRequestedRole(
+        params.get("provider"),
+        params.get("role"),
+        typeof data.user.app_metadata?.provider === "string"
+          ? data.user.app_metadata.provider
+          : null,
+        Boolean(existing)
+      );
       const role = normalizeRole(
+        existing?.profile_mode ||
+        existing?.role ||
+        googleRequestedRole ||
         data.user.user_metadata?.profile_mode ||
         data.user.user_metadata?.role ||
         data.user.user_metadata?.requested_role ||
         "scholar"
       );
 
-      const { data: existing } = await supabase
-        .from("profiles")
-        .select("id,onboarding_completed,profile_mode,role")
-        .eq("id", data.user.id)
-        .maybeSingle();
-
-      await supabase.from("profiles").upsert(
+      const { error: profileWriteError } = await supabase.from("profiles").upsert(
         {
           id: data.user.id,
           role: role,
@@ -77,6 +95,13 @@ function AuthCallbackContent() {
         },
         { onConflict: "id" }
       );
+
+      if (profileWriteError) {
+        console.error("Auth profile persistence failed.");
+        await supabase.auth.signOut();
+        window.location.href = "/login?error=profile_unavailable";
+        return;
+      }
 
       if (existing?.onboarding_completed) {
         window.location.href = getPathway(existing.profile_mode || existing.role || role).osRoute;
