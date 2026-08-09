@@ -51,15 +51,14 @@ export default function TranscriptPage() {
     return () => window.clearTimeout(hydration);
   }, [loadTranscript]);
 
-  if (loading) return <><div style={{padding:"28px 32px",fontFamily:T.mono,fontSize:12,color:T.faint}}>Loading transcript...</div></>;
+  if (loading) return <main data-testid="transcript-journey" data-visual-canon="PGTR-001" style={{minHeight:"100vh",padding:"28px 32px",background:"linear-gradient(135deg,#EEF4FA,#F7F3F7)",fontFamily:T.mono,fontSize:12,color:T.muted}}>Connecting your private academic record…</main>;
 
   const academic = scholarRecord?.academics;
   const agDone = academic?.agSummary.subjectsMet ?? agProgress.filter(a => a.years_completed >= a.years_required).length;
   const communityActivities = scholarRecord?.community.activities ?? [];
 
   return (
-    <>
-<>
+    <main data-testid="transcript-journey" data-visual-canon="PGTR-001" style={{minHeight:"100vh",padding:"24px clamp(16px,3vw,36px) 48px",background:"radial-gradient(circle at 90% 0%,rgba(249,115,22,.10),transparent 28rem),linear-gradient(135deg,#EEF4FA,#F7F3F7)"}}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');*,*::before,*::after{box-sizing:border-box;}@media print{.no-print{display:none!important;}}@media(max-width:900px){.transcript-layout{flex-direction:column!important;}.transcript-sidebar{position:static!important;width:100%!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;}.transcript-main{width:100%!important;}.transcript-title-row,.transcript-record-heading,.transcript-footer{align-items:flex-start!important;flex-direction:column!important;gap:12px!important;}.transcript-record-heading>div:last-child{text-align:left!important;}.transcript-meta-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;}.transcript-table-scroll{max-width:100%;overflow-x:auto!important;-webkit-overflow-scrolling:touch;}.transcript-table{min-width:720px;}}@media(max-width:520px){.transcript-sidebar,.transcript-meta-grid{grid-template-columns:1fr!important;}.transcript-title-row h1{margin-bottom:0!important;}.transcript-table{min-width:660px;}}`}</style>
       <div style={{marginBottom:24}}>
         <PlaybookStoryBanner
@@ -252,7 +251,6 @@ export default function TranscriptPage() {
           </div>
         </div>
       </div>
-    </>
-    </>
+    </main>
   );
 }

@@ -97,7 +97,7 @@ This is an implementation control artifact. A mapping or marker is not completio
 | `/studio/visual-qa` | Legacy/inline presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/support-messages` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/support-network` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
-| `/transcript` | Legacy/inline presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
+| `/transcript` | Canonical shell preserving authenticated transcript engine | PGDS-001 / PGTR-001 | Supabase record load + parser + A-G + print | IN_PROGRESS_UNVERIFIED | PENDING | PENDING |
 | `/tutorial` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/u/[username]` | Legacy/inline presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/university-os` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | IMPLEMENTED_AND_VERIFIED | PASSED | PASSED |
