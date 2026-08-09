@@ -1,6 +1,7 @@
 export const publicRoutes = [
   "/",
   "/about",
+  "/preview",
   "/login",
   "/reset-password",
   "/auth/callback",
@@ -8,6 +9,7 @@ export const publicRoutes = [
 
 export function isPublicRoute(pathname: string) {
   if (publicRoutes.includes(pathname)) return true;
+  if (pathname.startsWith("/preview/")) return true;
   if (pathname.startsWith("/invite/")) return true;
   return false;
 }
