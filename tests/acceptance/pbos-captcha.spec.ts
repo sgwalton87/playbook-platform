@@ -49,7 +49,9 @@ test("CAPTCHA gates signup and creates an authorized account after verification"
   await expect(page.getByText("Security check required.")).toBeVisible();
   await expect(createAccount).toBeDisabled();
 
-  const challenge = page.frameLocator('iframe[title*="hCaptcha"]');
+  const challenge = page.frameLocator(
+    'iframe[title="Widget containing checkbox for hCaptcha security challenge"]'
+  );
   await challenge.getByRole("checkbox").click();
   await expect(page.getByText("Security check complete.")).toBeVisible({ timeout: 30_000 });
   await expect(createAccount).toBeEnabled();
