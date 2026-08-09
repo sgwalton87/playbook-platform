@@ -70,7 +70,7 @@ This is an implementation control artifact. A mapping or marker is not completio
 | `/reward-economy` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/role-intelligence` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/role-select` | Shared or unclassified presentation | PGDS-001 | Authentication shell | IMPLEMENTED_AND_VERIFIED | PASSED | PASSED |
-| `/scholar-athlete-os` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
+| `/scholar-athlete-os` | Canonical owner-scoped implementation | PGDS-001 / PGSA-001 | Unified authenticated shell + athlete record projection | IN_PROGRESS_UNVERIFIED | PENDING | PENDING |
 | `/scholar-network` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/start` | Canonical marker present | PGDS-001 | Authentication shell | IN_PROGRESS_UNVERIFIED | PENDING | PENDING |
 | `/store-v2` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |

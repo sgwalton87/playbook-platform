@@ -166,6 +166,26 @@ function StartContent() {
     });
 
     await supabase.from("profiles").upsert(payload, { onConflict: "id" });
+
+    if (complete && role === "scholar-athlete") {
+      const graduationYear = Number(nextForm.graduation_year);
+      const governingPath = String(nextForm.target_division || "undecided")
+        .toLowerCase()
+        .replaceAll(" ", "_")
+        .replace("ncaa_", "ncaa_");
+      const { error: athleteError } = await supabase.from("athlete_profiles").upsert({
+        scholar_id: user.id,
+        sport: String(nextForm.primary_sport || "Not specified"),
+        position: nextForm.position || null,
+        graduation_year: Number.isInteger(graduationYear) ? graduationYear : new Date().getFullYear() + 1,
+        governing_path: ["ncaa_d1", "ncaa_d2", "ncaa_d3", "naia", "juco"].includes(governingPath) ? governingPath : "undecided",
+        highlight_url: nextForm.highlight_link || null,
+        target_schools: topSchools,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: "scholar_id" });
+      if (athleteError) throw new Error("Your Scholar-Athlete profile could not be connected. Your onboarding answers remain saved.");
+    }
+
     setProfile((prev: LegacyValue) => ({ ...prev, ...payload }));
   }
 

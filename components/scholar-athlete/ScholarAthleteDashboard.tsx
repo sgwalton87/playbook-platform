@@ -1,265 +1,238 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
+
+import {
+  PlaybookButton,
+  PlaybookCard,
+  PlaybookGrid,
+  PlaybookHero,
+  PlaybookMetric,
+  PlaybookMetrics,
+  PlaybookPage,
+  PlaybookPill,
+} from "@/components/ui/PlaybookPage";
 import {
   buildAthleteNextActions,
   getNILPortfolioSummary,
   getRecruitingPipelineSummary,
 } from "@/lib/scholar-athlete";
+import type { NILDeal, RecruitingTarget } from "@/lib/scholar-athlete";
+import { supabase } from "@/lib/supabaseClient";
+
+const journeyCards = [
+  {
+    eyebrow: "Eligibility intelligence",
+    title: "Protect your eligibility",
+    body: "Bring grades, credits, requirements, and verification evidence into one readiness view.",
+    href: "/academic-readiness",
+    action: "Review readiness",
+  },
+  {
+    eyebrow: "Academic record",
+    title: "Turn your transcript into a plan",
+    body: "See the courses, milestones, and evidence shaping your path to graduation and college.",
+    href: "/transcript",
+    action: "Open transcript",
+  },
+  {
+    eyebrow: "Recruiting command center",
+    title: "Own your recruiting pipeline",
+    body: "Move from discovery to coach conversations, visits, offers, and informed decisions.",
+    href: "/opportunities",
+    action: "Explore opportunities",
+  },
+  {
+    eyebrow: "Athlete Abroad",
+    title: "Build a global playing future",
+    body: "Explore international pathways while keeping academics, eligibility, and support connected.",
+    href: "/courses/athletes-abroad-global-hub",
+    action: "Explore globally",
+  },
+  {
+    eyebrow: "NIL & financial intelligence",
+    title: "Build value that lasts",
+    body: "Prepare for responsible partnerships, compensation, taxes, saving, and long-term ownership.",
+    href: "/financial-intelligence",
+    action: "Build my foundation",
+  },
+  {
+    eyebrow: "Support network",
+    title: "Keep your people in the play",
+    body: "Coordinate family, coaches, mentors, counselors, and trusted supporters around the next move.",
+    href: "/support-network",
+    action: "Open support network",
+  },
+] as const;
 
 export default function ScholarAthleteDashboard() {
-  const recruiting = getRecruitingPipelineSummary([
-    {
-      id: "1",
-      schoolName: "Target University",
-      stage: "conversation",
-    },
-    {
-      id: "2",
-      schoolName: "Dream College",
-      stage: "visit",
-    },
-  ]);
+  const [targets, setTargets] = useState<RecruitingTarget[]>([]);
+  const [deals, setDeals] = useState<NILDeal[]>([]);
+  const [eligibilityStatus, setEligibilityStatus] = useState("action_needed");
+  const [dataState, setDataState] = useState<"loading" | "ready" | "error">("loading");
 
-  const nil = getNILPortfolioSummary([]);
+  useEffect(() => {
+    let active = true;
+    async function loadAthleteRecord() {
+      const { data: auth, error: authError } = await supabase.auth.getUser();
+      if (!active) return;
+      if (authError || !auth.user) {
+        setDataState("error");
+        return;
+      }
+      const [targetResult, dealResult, eligibilityResult] = await Promise.all([
+        supabase.from("recruiting_targets").select("*").eq("scholar_id", auth.user.id),
+        supabase.from("nil_deals").select("*").eq("scholar_id", auth.user.id),
+        supabase.from("athlete_eligibility_checks").select("status").eq("scholar_id", auth.user.id).order("checked_at", { ascending: false }).limit(1),
+      ]);
+      if (!active) return;
+      if (targetResult.error || dealResult.error || eligibilityResult.error) {
+        setDataState("error");
+        return;
+      }
+      setTargets((targetResult.data || []).map((target) => ({
+        id: target.id,
+        schoolName: target.school_name,
+        athleticProgram: target.athletic_program || undefined,
+        division: target.division || undefined,
+        coachName: target.coach_name || undefined,
+        coachEmail: target.coach_email || undefined,
+        stage: target.stage,
+        nextAction: target.next_action || undefined,
+        nextActionDueAt: target.next_action_due_at || undefined,
+        notes: target.notes || undefined,
+      })) as RecruitingTarget[]);
+      setDeals((dealResult.data || []).map((deal) => ({
+        id: deal.id,
+        brandName: deal.brand_name,
+        opportunityTitle: deal.opportunity_title,
+        stage: deal.stage,
+        compensationType: deal.compensation_type || undefined,
+        compensationAmount: deal.compensation_amount == null ? undefined : Number(deal.compensation_amount),
+        deliverables: Array.isArray(deal.deliverables) ? deal.deliverables : [],
+        contractStatus: deal.contract_status,
+        disclosureStatus: deal.disclosure_status,
+        paymentStatus: deal.payment_status,
+      })) as NILDeal[]);
+      setEligibilityStatus(eligibilityResult.data?.[0]?.status || "action_needed");
+      setDataState("ready");
+    }
+    void loadAthleteRecord();
+    return () => { active = false; };
+  }, []);
 
+  const recruiting = useMemo(() => getRecruitingPipelineSummary(targets), [targets]);
+  const nil = useMemo(() => getNILPortfolioSummary(deals), [deals]);
   const actions = buildAthleteNextActions({
-    eligibilityStatus: "action_needed",
+    eligibilityStatus,
     recruitingTargets: recruiting.total,
     activeDeals: nil.activeDeals,
     financialPlanComplete: false,
   });
 
   return (
-    <main style={page}>
-      <section style={hero}>
-        <div>
-          <p style={eyebrow}>Scholar-Athlete OS</p>
-          <h1 style={title}>
-            Academics. Athletics. Recruiting. NIL. Future.
-          </h1>
-          <p style={sub}>
-            One command center for the complete scholar-athlete journey.
+    <PlaybookPage>
+      <div data-testid="scholar-athlete-os" data-visual-canon="PGSA-001">
+        <PlaybookHero
+          eyebrow="Scholar-Athlete OS"
+          title="Build the student. Build the athlete. Build the future."
+          subtitle="One connected command center for academics, eligibility, recruiting, NIL, money, wellness, and the people helping you move forward."
+        >
+          <div style={heroActions}>
+            <PlaybookButton href="/academic-readiness">See my next play</PlaybookButton>
+            <PlaybookButton href="/opportunities" variant="secondary">Explore opportunities</PlaybookButton>
+          </div>
+        </PlaybookHero>
+
+        <section style={statusRail} aria-label="Scholar-Athlete status">
+          <div>
+            <PlaybookPill>Live journey foundation</PlaybookPill>
+            <h2 style={statusTitle}>Your whole journey, one play at a time.</h2>
+          </div>
+          <p style={statusCopy} role={dataState === "error" ? "alert" : undefined}>
+            {dataState === "loading" && "Connecting your private eligibility, recruiting, and NIL records…"}
+            {dataState === "ready" && "Your private athlete record is connected. Empty totals mean no verified activity is recorded yet—no demo activity is presented as yours."}
+            {dataState === "error" && "Your athlete records are temporarily unavailable. Nothing has been changed; try again after refreshing or contact your support team."}
           </p>
-        </div>
+        </section>
 
-        <div style={identity}>
-          <strong>Scholar-Athlete Profile</strong>
-          <span>Eligibility intelligence active</span>
-        </div>
-      </section>
+        <PlaybookMetrics>
+          <PlaybookMetric label="Eligibility" value={formatStatus(eligibilityStatus)} />
+          <PlaybookMetric label="Recruiting targets" value={`${recruiting.total} verified`} />
+          <PlaybookMetric label="Campus visits" value={`${recruiting.visits} recorded`} />
+          <PlaybookMetric label="NIL partnerships" value={`${nil.activeDeals} active`} />
+        </PlaybookMetrics>
 
-      <section style={metrics}>
-        <Metric label="Eligibility" value="Action Needed" />
-        <Metric label="Recruiting Pipeline" value={`${recruiting.total} programs`} />
-        <Metric label="Visits" value={`${recruiting.visits}`} />
-        <Metric label="NIL Deals" value={`${nil.activeDeals} active`} />
-      </section>
-
-      <section style={grid}>
-        <Panel
-          eyebrow="Eligibility Intelligence"
-          title="Protect your eligibility"
-          body="Track academic evidence, requirements, verification, and governing-body readiness."
-        />
-
-        <Panel
-          eyebrow="Recruiting Command Center"
-          title="Own your recruiting pipeline"
-          body="Track programs, coaches, conversations, visits, offers, deadlines, and next actions."
-        />
-
-        <Panel
-          eyebrow="NIL Deal Room"
-          title="Manage opportunities professionally"
-          body="Track brands, compensation, contracts, disclosures, deliverables, and payments."
-        />
-
-        <Panel
-          eyebrow="Financial Intelligence"
-          title="Turn opportunity into a foundation"
-          body="Connect income tracking to budgeting, saving, tax education, and long-term investing lessons."
-        />
-      </section>
-
-      <section style={actionsSection}>
-        <p style={eyebrow}>Athlete Compass</p>
-        <h2 style={sectionTitle}>Your next best actions</h2>
-
-        <div style={actionGrid}>
-          {actions.map((action) => (
-            <article key={action.title} style={actionCard}>
-              <span style={severity}>{action.severity}</span>
-              <h3>{action.title}</h3>
-              <p style={body}>{action.detail}</p>
-            </article>
+        <PlaybookGrid min={300}>
+          {journeyCards.map((journey) => (
+            <PlaybookCard key={journey.href} eyebrow={journey.eyebrow} title={journey.title}>
+              <p style={body}>{journey.body}</p>
+              <PlaybookButton href={journey.href}>{journey.action}</PlaybookButton>
+            </PlaybookCard>
           ))}
-        </div>
-      </section>
-    </main>
+        </PlaybookGrid>
+
+        <section style={compassSection}>
+          <div style={compassHeading}>
+            <div>
+              <p style={eyebrow}>Athlete Compass</p>
+              <h2 style={sectionTitle}>Your next best actions</h2>
+            </div>
+            <PlaybookButton href="/messages" variant="secondary">Message my team</PlaybookButton>
+          </div>
+          <div style={actionGrid}>
+            {actions.map((action, index) => (
+              <article key={action.title} style={actionCard}>
+                <span style={actionNumber}>{String(index + 1).padStart(2, "0")}</span>
+                <div>
+                  <span style={severity}>{action.severity}</span>
+                  <h3 style={actionTitle}>{action.title}</h3>
+                  <p style={body}>{action.detail}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      </div>
+    </PlaybookPage>
   );
 }
 
-function Metric(props: { label: string; value: string }) {
-  return (
-    <article style={metric}>
-      <span style={metricLabel}>{props.label}</span>
-      <strong style={metricValue}>{props.value}</strong>
-    </article>
-  );
+function formatStatus(value: string) {
+  return value.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
-function Panel(props: {
-  eyebrow: string;
-  title: string;
-  body: string;
-}) {
-  return (
-    <article style={panel}>
-      <p style={eyebrow}>{props.eyebrow}</p>
-      <h2 style={panelTitle}>{props.title}</h2>
-      <p style={body}>{props.body}</p>
-    </article>
-  );
-}
-
-const page: React.CSSProperties = {
-  minHeight: "100vh",
-  padding: 32,
-  background: "#F8F7F4",
-  fontFamily: "system-ui, sans-serif",
-};
-
-const hero: React.CSSProperties = {
+const heroActions: React.CSSProperties = { display: "flex", flexWrap: "wrap", gap: 10, marginTop: 24 };
+const statusRail: React.CSSProperties = {
   maxWidth: 1180,
   margin: "0 auto 18px",
-  padding: 36,
-  borderRadius: 30,
-  background: "#0F172A",
-  color: "#FFFFFF",
-  display: "flex",
-  justifyContent: "space-between",
-  gap: 24,
-  flexWrap: "wrap",
-};
-
-const eyebrow: React.CSSProperties = {
-  margin: 0,
-  color: "#F97316",
-  fontWeight: 950,
-  fontSize: 11,
-  letterSpacing: ".14em",
-  textTransform: "uppercase",
-};
-
-const title: React.CSSProperties = {
-  maxWidth: 760,
-  margin: "12px 0",
-  fontSize: 54,
-  lineHeight: 1,
-};
-
-const sub: React.CSSProperties = {
-  maxWidth: 700,
-  color: "#CBD5E1",
-  fontSize: 17,
-  lineHeight: 1.6,
-};
-
-const identity: React.CSSProperties = {
-  alignSelf: "flex-end",
+  padding: "22px clamp(20px,4vw,34px)",
   display: "grid",
-  gap: 4,
-  padding: 16,
-  borderRadius: 16,
-  background: "rgba(255,255,255,.08)",
+  gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))",
+  alignItems: "center",
+  gap: 20,
+  color: "#F8FAFC",
+  background: "linear-gradient(115deg,#102A4A,#102238 60%,#2B1838)",
+  border: "1px solid rgba(255,255,255,.12)",
+  borderRadius: "8px 30px 8px 30px",
 };
-
-const metrics: React.CSSProperties = {
-  maxWidth: 1180,
-  margin: "0 auto 16px",
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
-  gap: 12,
-};
-
-const metric: React.CSSProperties = {
-  padding: 18,
-  background: "#FFFFFF",
-  border: "1px solid #E2E8F0",
-  borderRadius: 18,
-};
-
-const metricLabel: React.CSSProperties = {
-  display: "block",
-  color: "#64748B",
-  fontSize: 12,
-  fontWeight: 800,
-};
-
-const metricValue: React.CSSProperties = {
-  display: "block",
-  marginTop: 8,
-  color: "#0F172A",
-  fontSize: 22,
-};
-
-const grid: React.CSSProperties = {
-  maxWidth: 1180,
-  margin: "0 auto",
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-  gap: 14,
-};
-
-const panel: React.CSSProperties = {
-  background: "#FFFFFF",
-  border: "1px solid #E2E8F0",
-  borderRadius: 22,
-  padding: 22,
-};
-
-const panelTitle: React.CSSProperties = {
-  color: "#0F172A",
-  fontSize: 25,
-  margin: "10px 0",
-};
-
-const body: React.CSSProperties = {
-  color: "#64748B",
-  lineHeight: 1.6,
-};
-
-const actionsSection: React.CSSProperties = {
+const statusTitle: React.CSSProperties = { margin: "12px 0 0", fontSize: "clamp(25px,4vw,38px)", lineHeight: 1.05 };
+const statusCopy: React.CSSProperties = { margin: 0, color: "#C9D8E8", lineHeight: 1.65 };
+const body: React.CSSProperties = { color: "#52657B", lineHeight: 1.65, margin: "0 0 20px" };
+const compassSection: React.CSSProperties = {
   maxWidth: 1180,
   margin: "18px auto 0",
-  background: "#FFFFFF",
-  border: "1px solid #E2E8F0",
-  borderRadius: 24,
-  padding: 24,
+  padding: "clamp(22px,4vw,36px)",
+  color: "#F8FAFC",
+  background: "linear-gradient(145deg,#06172D,#0B2648)",
+  border: "1px solid rgba(255,255,255,.12)",
+  borderRadius: "30px 8px 30px 8px",
 };
-
-const sectionTitle: React.CSSProperties = {
-  color: "#0F172A",
-  fontSize: 32,
-};
-
-const actionGrid: React.CSSProperties = {
-  display: "grid",
-  gap: 12,
-};
-
-const actionCard: React.CSSProperties = {
-  border: "1px solid #E2E8F0",
-  borderRadius: 16,
-  padding: 16,
-};
-
-const severity: React.CSSProperties = {
-  color: "#9A3412",
-  background: "#FFF7ED",
-  borderRadius: 999,
-  padding: "5px 8px",
-  fontSize: 10,
-  fontWeight: 950,
-  textTransform: "uppercase",
-};
+const compassHeading: React.CSSProperties = { display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "end", gap: 18 };
+const eyebrow: React.CSSProperties = { margin: 0, color: "#FF9D5C", fontWeight: 950, fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase" };
+const sectionTitle: React.CSSProperties = { margin: "9px 0 0", fontSize: "clamp(30px,5vw,48px)", lineHeight: 1 };
+const actionGrid: React.CSSProperties = { display: "grid", gap: 12, marginTop: 24 };
+const actionCard: React.CSSProperties = { display: "grid", gridTemplateColumns: "44px minmax(0,1fr)", gap: 15, padding: 18, background: "rgba(255,255,255,.07)", border: "1px solid rgba(255,255,255,.12)", borderRadius: "18px 5px 18px 5px" };
+const actionNumber: React.CSSProperties = { color: "#FF9D5C", fontSize: 19, fontWeight: 950 };
+const actionTitle: React.CSSProperties = { margin: "9px 0 4px", color: "#FFFFFF", fontSize: 21 };
+const severity: React.CSSProperties = { display: "inline-flex", color: "#FFD5B7", fontSize: 10, fontWeight: 950, letterSpacing: ".12em", textTransform: "uppercase" };
