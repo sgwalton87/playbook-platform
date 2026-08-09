@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "missionId": "048-canon-journeys",
   "repository": "sgwalton87/playbook-platform",
-  "governedRevision": "72791a51c4d5e870e2ac3d1bea52481dff36b4da",
-  "productionRunId": "590a8b1f-810b-4ec2-b994-5030f129e818",
-  "roleCount": 12,
+  "governedRevision": "d65e26040d88cde355102c314e3f5f3e1f577b61",
+  "productionRunId": "552fdf48-e75a-4271-9295-80bf076fef85",
+  "roleCount": 15,
   "deliverySprints": [
     "OR-001 — Canonical role registry and routing",
     "OR-002 — Unified premium onboarding shell",
@@ -22,32 +22,199 @@
   ],
   "productJourneys": [
     {
+      "journeyId": "ONBOARDING-SCHOLAR",
+      "canonicalCoverage": "Scholar onboarding: discovery, authentication, durable role onboarding, verification, record projection, authority-scoped OS landing, recovery, desktop, and mobile.",
+      "specification": "tests/acceptance/pbos-onboarding-scholar.spec.ts"
+    },
+    {
+      "journeyId": "ONBOARDING-SCHOLAR-ATHLETE",
+      "canonicalCoverage": "Scholar-Athlete onboarding: discovery, authentication, durable role onboarding, verification, record projection, authority-scoped OS landing, recovery, desktop, and mobile.",
+      "specification": "tests/acceptance/pbos-onboarding-scholar-athlete.spec.ts"
+    },
+    {
+      "journeyId": "ONBOARDING-PARENT-GUARDIAN",
+      "canonicalCoverage": "Parent / Guardian onboarding: discovery, authentication, durable role onboarding, verification, record projection, authority-scoped OS landing, recovery, desktop, and mobile.",
+      "specification": "tests/acceptance/pbos-onboarding-parent-guardian.spec.ts"
+    },
+    {
+      "journeyId": "ONBOARDING-TEACHER-EDUCATOR",
+      "canonicalCoverage": "Teacher / Educator onboarding: discovery, authentication, durable role onboarding, verification, record projection, authority-scoped OS landing, recovery, desktop, and mobile.",
+      "specification": "tests/acceptance/pbos-onboarding-teacher-educator.spec.ts"
+    },
+    {
+      "journeyId": "ONBOARDING-HIGH-SCHOOL-COUNSELOR",
+      "canonicalCoverage": "High School Counselor onboarding: discovery, authentication, durable role onboarding, verification, record projection, authority-scoped OS landing, recovery, desktop, and mobile.",
+      "specification": "tests/acceptance/pbos-onboarding-high-school-counselor.spec.ts"
+    },
+    {
+      "journeyId": "ONBOARDING-MENTOR",
+      "canonicalCoverage": "Mentor onboarding: discovery, authentication, durable role onboarding, verification, record projection, authority-scoped OS landing, recovery, desktop, and mobile.",
+      "specification": "tests/acceptance/pbos-onboarding-mentor.spec.ts"
+    },
+    {
+      "journeyId": "ONBOARDING-HIGH-SCHOOL-COACH",
+      "canonicalCoverage": "High School Coach onboarding: discovery, authentication, durable role onboarding, verification, record projection, authority-scoped OS landing, recovery, desktop, and mobile.",
+      "specification": "tests/acceptance/pbos-onboarding-high-school-coach.spec.ts"
+    },
+    {
+      "journeyId": "ONBOARDING-COLLEGE-COACH-RECRUITER",
+      "canonicalCoverage": "College Coach / Recruiter onboarding: discovery, authentication, durable role onboarding, verification, record projection, authority-scoped OS landing, recovery, desktop, and mobile.",
+      "specification": "tests/acceptance/pbos-onboarding-college-coach-recruiter.spec.ts"
+    },
+    {
+      "journeyId": "ONBOARDING-COLLEGE-ADMISSIONS",
+      "canonicalCoverage": "College Admissions onboarding: discovery, authentication, durable role onboarding, verification, record projection, authority-scoped OS landing, recovery, desktop, and mobile.",
+      "specification": "tests/acceptance/pbos-onboarding-college-admissions.spec.ts"
+    },
+    {
+      "journeyId": "ONBOARDING-BRAND-PARTNER",
+      "canonicalCoverage": "Brand Partner onboarding: discovery, authentication, durable role onboarding, verification, record projection, authority-scoped OS landing, recovery, desktop, and mobile.",
+      "specification": "tests/acceptance/pbos-onboarding-brand-partner.spec.ts"
+    },
+    {
+      "journeyId": "ONBOARDING-EMPLOYER",
+      "canonicalCoverage": "Employer / Workforce Partner onboarding: discovery, authentication, durable role onboarding, verification, record projection, authority-scoped OS landing, recovery, desktop, and mobile.",
+      "specification": "tests/acceptance/pbos-onboarding-employer.spec.ts"
+    },
+    {
+      "journeyId": "ONBOARDING-TRANSITION-AGED-YOUTH",
+      "canonicalCoverage": "Transition-Aged Youth onboarding: discovery, authentication, durable role onboarding, verification, record projection, authority-scoped OS landing, recovery, desktop, and mobile.",
+      "specification": "tests/acceptance/pbos-onboarding-transition-aged-youth.spec.ts"
+    },
+    {
+      "journeyId": "ONBOARDING-ATHLETES-ABROAD",
+      "canonicalCoverage": "Athlete Abroad enrollment: discovery, authentication, durable role onboarding, verification, record projection, authority-scoped OS landing, recovery, desktop, and mobile.",
+      "specification": "tests/acceptance/pbos-onboarding-athletes-abroad.spec.ts"
+    },
+    {
+      "journeyId": "ONBOARDING-DISTRICT-SCHOOL-ADMIN",
+      "canonicalCoverage": "District / School Administrator onboarding: discovery, authentication, durable role onboarding, verification, record projection, authority-scoped OS landing, recovery, desktop, and mobile.",
+      "specification": "tests/acceptance/pbos-onboarding-district-school-admin.spec.ts"
+    },
+    {
+      "journeyId": "ONBOARDING-COMMUNITY-PARTNER",
+      "canonicalCoverage": "Community Partner onboarding: discovery, authentication, durable role onboarding, verification, record projection, authority-scoped OS landing, recovery, desktop, and mobile.",
+      "specification": "tests/acceptance/pbos-onboarding-community-partner.spec.ts"
+    },
+    {
+      "journeyId": "OS-SCHOLAR",
+      "canonicalCoverage": "Scholar OS at /dashboard: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery.",
+      "specification": "tests/acceptance/pbos-os-scholar.spec.ts"
+    },
+    {
+      "journeyId": "OS-SCHOLAR-ATHLETE",
+      "canonicalCoverage": "Scholar-Athlete OS at /scholar-athlete-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery.",
+      "specification": "tests/acceptance/pbos-os-scholar-athlete.spec.ts"
+    },
+    {
+      "journeyId": "OS-PARENT-GUARDIAN",
+      "canonicalCoverage": "Parent Guardian OS at /family-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery.",
+      "specification": "tests/acceptance/pbos-os-parent-guardian.spec.ts"
+    },
+    {
+      "journeyId": "OS-TEACHER-EDUCATOR",
+      "canonicalCoverage": "Teacher Educator OS at /educator-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery.",
+      "specification": "tests/acceptance/pbos-os-teacher-educator.spec.ts"
+    },
+    {
+      "journeyId": "OS-HIGH-SCHOOL-COUNSELOR",
+      "canonicalCoverage": "High School Counselor OS at /educator-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery.",
+      "specification": "tests/acceptance/pbos-os-high-school-counselor.spec.ts"
+    },
+    {
+      "journeyId": "OS-MENTOR",
+      "canonicalCoverage": "Mentor OS at /mentor-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery.",
+      "specification": "tests/acceptance/pbos-os-mentor.spec.ts"
+    },
+    {
+      "journeyId": "OS-HIGH-SCHOOL-COACH",
+      "canonicalCoverage": "High School Coach OS at /educator-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery.",
+      "specification": "tests/acceptance/pbos-os-high-school-coach.spec.ts"
+    },
+    {
+      "journeyId": "OS-COLLEGE-COACH-RECRUITER",
+      "canonicalCoverage": "College Coach Recruiter OS at /university-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery.",
+      "specification": "tests/acceptance/pbos-os-college-coach-recruiter.spec.ts"
+    },
+    {
+      "journeyId": "OS-COLLEGE-ADMISSIONS",
+      "canonicalCoverage": "College Admissions OS at /university-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery.",
+      "specification": "tests/acceptance/pbos-os-college-admissions.spec.ts"
+    },
+    {
+      "journeyId": "OS-BRAND-PARTNER",
+      "canonicalCoverage": "Brand Partner OS at /brand-partner-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery.",
+      "specification": "tests/acceptance/pbos-os-brand-partner.spec.ts"
+    },
+    {
+      "journeyId": "OS-EMPLOYER",
+      "canonicalCoverage": "Employer OS at /employer-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery.",
+      "specification": "tests/acceptance/pbos-os-employer.spec.ts"
+    },
+    {
+      "journeyId": "OS-FOUNDER",
+      "canonicalCoverage": "Founder OS at /founder: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery.",
+      "specification": "tests/acceptance/pbos-os-founder.spec.ts"
+    },
+    {
+      "journeyId": "OS-ATHLETES-ABROAD",
+      "canonicalCoverage": "Athletes Abroad Hub at /athlete-abroad-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery.",
+      "specification": "tests/acceptance/pbos-os-athletes-abroad.spec.ts"
+    },
+    {
+      "journeyId": "OS-TRANSITION-AGED-YOUTH",
+      "canonicalCoverage": "Transition-Aged Youth OS at /dashboard: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery.",
+      "specification": "tests/acceptance/pbos-os-transition-aged-youth.spec.ts"
+    },
+    {
+      "journeyId": "OS-DISTRICT-SCHOOL-ADMIN",
+      "canonicalCoverage": "District / School Administrator OS at /district-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery.",
+      "specification": "tests/acceptance/pbos-os-district-school-admin.spec.ts"
+    },
+    {
+      "journeyId": "OS-COMMUNITY-PARTNER",
+      "canonicalCoverage": "Community Partner OS at /pending: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery.",
+      "specification": "tests/acceptance/pbos-os-community-partner.spec.ts"
+    },
+    {
+      "journeyId": "OS-PLATFORM-ADMIN",
+      "canonicalCoverage": "Platform Administration OS at /admin: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery.",
+      "specification": "tests/acceptance/pbos-os-platform-admin.spec.ts"
+    },
+    {
       "journeyId": "SCHOLAR-ONBOARDING-TO-DASHBOARD",
-      "canonicalCoverage": "Scholar onboarding and dashboard coverage."
+      "canonicalCoverage": "Scholar onboarding and dashboard coverage.",
+      "specification": "tests/acceptance/pbos-scholar.spec.ts"
     },
     {
       "journeyId": "TRANSCRIPT-TO-ACADEMIC-READINESS",
-      "canonicalCoverage": "Transcript to academic readiness."
+      "canonicalCoverage": "Transcript to academic readiness.",
+      "specification": "tests/acceptance/pbos-academic.spec.ts"
     },
     {
       "journeyId": "READINESS-TO-OPPORTUNITY",
-      "canonicalCoverage": "Academic readiness to explainable opportunity matches."
+      "canonicalCoverage": "Academic readiness to explainable opportunity matches.",
+      "specification": "tests/acceptance/pbos-opportunity.spec.ts"
     },
     {
       "journeyId": "OPPORTUNITY-TO-APPLICATION",
-      "canonicalCoverage": "Opportunity to durable application workspace and private documents."
+      "canonicalCoverage": "Opportunity to durable application workspace and private documents.",
+      "specification": "tests/acceptance/pbos-application.spec.ts"
     },
     {
       "journeyId": "APPLICATION-TO-AUTHORIZED-SUPPORT",
-      "canonicalCoverage": "Application to authorized support request."
+      "canonicalCoverage": "Application to authorized support request.",
+      "specification": "tests/acceptance/pbos-support.spec.ts"
     },
     {
       "journeyId": "AUTHORIZED-SUPPORT-MESSAGING",
-      "canonicalCoverage": "Support relationship to governed durable messaging."
+      "canonicalCoverage": "Support relationship to governed durable messaging.",
+      "specification": "tests/acceptance/pbos-messaging.spec.ts"
     },
     {
       "journeyId": "EVENT-TO-ACKNOWLEDGED-NOTIFICATION",
-      "canonicalCoverage": "Domain events to idempotent notification and outbox journey."
+      "canonicalCoverage": "Domain events to idempotent notification and outbox journey.",
+      "specification": "tests/acceptance/pbos-notifications.spec.ts"
     }
   ],
   "state": "CANON_COMPILED_PENDING_INDEPENDENT_VALIDATION",

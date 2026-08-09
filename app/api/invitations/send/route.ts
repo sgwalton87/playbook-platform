@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-
-
-import {
-  buildInvitationEmail,
-  buildInvitationRecord,
-} from "@/lib/invitations/server";
-
+import { buildInvitationEmail, buildInvitationRecord } from "@/lib/invitations/server";
 import type { RelationshipKind } from "@/lib/permissions";
 import { buildSupportInvitationEmail, sendPlaybookEmail } from "@/lib/email";
 import { createClient } from "@supabase/supabase-js";
+
+export async function GET() {
+  return NextResponse.json(
+    { ok: true, route: "invitations.send", health: "ready" },
+    { status: 200 }
+  );
+}
 
 function getSupabaseAdmin() {
   return createClient(
@@ -29,10 +30,7 @@ export async function POST(req: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const record = buildInvitationRecord({
@@ -43,27 +41,20 @@ export async function POST(req: NextRequest) {
       relationship: body.relationship as RelationshipKind,
     });
 
-    const { error } = await supabase
-      .from("support_invitations")
-      .insert({
-        id: record.id,
-        scholar_id: record.scholarId,
-        scholar_name: record.scholarName,
-        invitee_name: record.inviteeName,
-        invitee_email: record.inviteeEmail,
-        relationship: record.relationship,
-        status: record.status,
-        token: record.token,
-        permissions: record.permissions,
-        destination: record.destination,
-      });
+    const { error } = await supabase.from("support_invitations").insert({
+      id: record.id,
+      scholar_id: record.scholarId,
+      scholar_name: record.scholarName,
+      invitee_name: record.inviteeName,
+      invitee_email: record.inviteeEmail,
+      relationship: record.relationship,
+      status: record.status,
+      token: record.token,
+      permissions: record.permissions,
+      destination: record.destination,
+    });
 
-    if (error) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-      );
-    }
+    if (error) return NextResponse.json({ error: error.message }, { status: 400 });
 
     const email = buildInvitationEmail({
       inviteeName: record.inviteeName,
@@ -95,9 +86,6 @@ export async function POST(req: NextRequest) {
       deliveryStatus: "sent",
     });
   } catch {
-    return NextResponse.json(
-      { error: "Unable to create invitation." },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Unable to create invitation." }, { status: 500 });
   }
 }
