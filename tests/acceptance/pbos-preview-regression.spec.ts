@@ -17,5 +17,6 @@ test("public newsfeed opens without authentication", async ({ page }) => {
   await expect(page).toHaveURL(/\/news$/);
   await expect(page.locator('[data-testid="public-newsfeed"][data-visual-canon="PGNF-001"]')).toBeVisible();
   await expect(page.getByRole("heading", { name: /Real progress. Public stories/i })).toBeVisible();
-  await expect(page.getByText(/Loading published|No community stories|temporarily unavailable|From the Playbook community/i).first()).toBeVisible();
+  await expect(page.getByText(/Loading published|No community stories|From the Playbook community/i).first()).toBeVisible();
+  await expect(page.getByText(/public feed is temporarily unavailable/i)).toHaveCount(0);
 });
