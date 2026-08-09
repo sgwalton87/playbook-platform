@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import { supabase } from "@/lib/supabaseClient";
@@ -35,9 +35,7 @@ function LoginContent() {
 
   const [mode, setMode] = useState<"login" | "signup">(initialMode);
   const [email, setEmail] = useState("");
-  const [rememberMe, setRememberMe] = useState(
-    typeof window !== "undefined" ? getRememberMePreference() : false
-  );
+  const [rememberMe, setRememberMe] = useState(false);
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("scholar");
   const [status, setStatus] = useState(
@@ -47,6 +45,16 @@ function LoginContent() {
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   const isSignup = mode === "signup";
+
+  useEffect(() => {
+    let active = true;
+    queueMicrotask(() => {
+      if (active) setRememberMe(getRememberMePreference());
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const copy = useMemo(
     () =>
