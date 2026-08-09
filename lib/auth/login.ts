@@ -11,9 +11,9 @@ export function getLoginDestination(
   profile: LoginProfile | null,
   metadataRole?: string | null
 ): string {
-  const role = normalizePlaybookRole(
-    profile?.profile_mode || profile?.role || metadataRole
-  );
+  const role = normalizePlaybookRole(profile?.onboarding_completed
+    ? profile.profile_mode || profile.role || metadataRole
+    : metadataRole || profile?.profile_mode || profile?.role);
 
   return profile?.onboarding_completed
     ? getRoleDestination(role)

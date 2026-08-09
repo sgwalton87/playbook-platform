@@ -22,6 +22,14 @@ describe("login authority routing", () => {
     );
   });
 
+  it("uses signup metadata while an auto-created profile is still awaiting onboarding", () => {
+    expect(getLoginDestination({
+      onboarding_completed: false,
+      profile_mode: "scholar-athlete",
+      role: "scholar-athlete",
+    }, "family")).toBe("/start?first=1&role=family");
+  });
+
   it("uses the profile role instead of untrusted metadata for an onboarded account", () => {
     expect(
       getLoginDestination(
