@@ -98,8 +98,16 @@ Playbook OS provides independent operating systems built on one shared platform.
 - Brand Partner OS
 - Founder OS
 - Athlete Abroad Hub
+- Transition-Aged Youth OS
+- District / School Administrator OS
+- Community Partner OS
+- Platform Administration OS
 
-All operating systems inherit shared platform services while exposing role-specific dashboards, workflows, permissions, navigation, and intelligence. This keeps the platform cohesive while allowing each audience to operate in a purpose-built environment.
+The executable registry declares exactly 17 unique OS identifiers and routes.
+Operating systems may share platform components, but they do not share route
+identity. Route presence is only implementation evidence; each OS still needs
+role-specific workflows, permissions, durable data, recovery, and acceptance
+evidence before certification.
 
 ## Role Dashboard Architecture
 Dashboards are route-level experiences under `app/` that compose shared navigation, domain engines, and reusable components. Role dashboards should expose next actions, evidence status, opportunity status, messages, notifications, and trust/safety states relevant to that role.

@@ -46,6 +46,28 @@ const dashboards: Record<PlaybookRoleOS, RoleDashboardDefinition> = {
       sharedCards.profile,
     ],
   },
+  counselor: {
+    title: "Counselor OS",
+    description: "Coordinate academic plans, applications, interventions, and trusted support within verified school authority.",
+    metrics: [{ label: "Authorized scholars", value: "0 connected" }, { label: "Plan reviews", value: "0 open" }, { label: "Application actions", value: "0 open" }, { label: "Support referrals", value: "0 connected" }],
+    cards: [
+      { label: "Academic planning", title: "Review a scholar’s verified path", body: "Readiness evidence remains unavailable until the scholar or institution grants the required authority.", href: "/academic-readiness", action: "Open readiness" },
+      { label: "Applications", title: "Coordinate accountable next steps", body: "Track application work only for scholars connected to your verified counseling scope.", href: "/application-workspaces", action: "Open applications" },
+      sharedCards.messages,
+      sharedCards.profile,
+    ],
+  },
+  coach: {
+    title: "Coach OS",
+    description: "Connect roster authority, academic readiness, recruiting support, and athlete advocacy without weakening scholar ownership.",
+    metrics: [{ label: "Authorized athletes", value: "0 connected" }, { label: "Roster actions", value: "0 open" }, { label: "Readiness alerts", value: "0 connected" }, { label: "Recruiting requests", value: "0 connected" }],
+    cards: [
+      { label: "Roster authority", title: "Connect athletes through consent", body: "No athlete profile or academic evidence appears before a governed roster relationship is active.", href: "/invitations", action: "Review invitations" },
+      { label: "Athlete advocacy", title: "Support the whole scholar-athlete", body: "Coordinate academics and recruiting only within the permissions granted by the athlete.", href: "/academic-readiness", action: "Open readiness" },
+      sharedCards.messages,
+      sharedCards.profile,
+    ],
+  },
   district: {
     title: "District OS",
     description: "Govern readiness and opportunity access with institution-scoped evidence and privacy controls.",
@@ -68,6 +90,28 @@ const dashboards: Record<PlaybookRoleOS, RoleDashboardDefinition> = {
       { label: "Invitations", title: "Build consent-based outreach", body: "Invite scholars into a real pathway without manufacturing match scores.", href: "/invitations", action: "Open invitations" },
     ],
   },
+  recruiter: {
+    title: "Recruiting OS",
+    description: "Discover and communicate with verified scholar-athletes through consented institutional recruiting authority.",
+    metrics: [{ label: "Authorized athletes", value: "0 connected" }, { label: "Active programs", value: "0 connected" }, { label: "Recruiting requests", value: "0 sent" }, { label: "Responses", value: "0 received" }],
+    cards: [
+      { label: "Recruiting authority", title: "Define the program you represent", body: "Institution, sport, division, eligibility, and communication boundaries must be verified before discovery.", href: "/profile", action: "Review recruiting profile" },
+      { label: "Verified talent", title: "Request access—never assume it", body: "Scholar-athlete evidence remains private until a governed recruiting connection is approved.", href: "/opportunities", action: "Open recruiting pathways" },
+      sharedCards.messages,
+      { label: "Invitations", title: "Create consent-based outreach", body: "Invite athletes into a real program pathway with transparent requirements and no invented match score.", href: "/invitations", action: "Open invitations" },
+    ],
+  },
+  admissions: {
+    title: "Admissions OS",
+    description: "Connect verified scholar readiness to transparent institutional admissions and enrollment pathways.",
+    metrics: [{ label: "Authorized scholars", value: "0 connected" }, { label: "Open pathways", value: "0 connected" }, { label: "Applications", value: "0 connected" }, { label: "Enrollment actions", value: "0 open" }],
+    cards: [
+      { label: "Institution authority", title: "Publish transparent criteria", body: "Programs, requirements, deadlines, cost, and support must be connected before outreach begins.", href: "/profile", action: "Review institution profile" },
+      { label: "Applications", title: "Review permissioned evidence", body: "Scholar records appear only through a real application or explicit access grant.", href: "/application-workspaces", action: "Open applications" },
+      sharedCards.messages,
+      { label: "Opportunity", title: "Create an enrollment pathway", body: "Connect eligible scholars to honest, explainable institutional opportunities.", href: "/opportunities", action: "Open opportunities" },
+    ],
+  },
   employer: {
     title: "Employer OS",
     description: "Publish responsible opportunities and review consented, verified evidence—not invented readiness scores.",
@@ -88,6 +132,28 @@ const dashboards: Record<PlaybookRoleOS, RoleDashboardDefinition> = {
       { label: "Support network", title: "Coordinate the scholar’s next step", body: "Use shared actions after the scholar grants the appropriate support permissions.", href: "/support-network", action: "Open support network" },
       sharedCards.messages,
       sharedCards.profile,
+    ],
+  },
+  "transition-youth": {
+    title: "Transition-Aged Youth OS",
+    description: "Build a supported plan across education, employment, housing, life skills, trusted relationships, and independent adulthood.",
+    metrics: [{ label: "Plan milestones", value: "0 connected" }, { label: "Supporters", value: "0 authorized" }, { label: "Open actions", value: "0 connected" }, { label: "Opportunity matches", value: "0 connected" }],
+    cards: [
+      { label: "My plan", title: "Build the next stable step", body: "Connect goals and evidence across school, work, and independent living without fabricated progress.", href: "/journey", action: "Open my journey" },
+      { label: "Trusted support", title: "Choose who can help", body: "Supporters see only the information and actions you explicitly authorize.", href: "/support-network", action: "Open support network" },
+      sharedCards.messages,
+      sharedCards.profile,
+    ],
+  },
+  community: {
+    title: "Community Partner OS",
+    description: "Connect verified programs, referrals, events, and resources to scholars through accountable organization authority.",
+    metrics: [{ label: "Verified programs", value: "0 connected" }, { label: "Authorized referrals", value: "0 connected" }, { label: "Community events", value: "0 connected" }, { label: "Open actions", value: "0 connected" }],
+    cards: [
+      { label: "Organization authority", title: "Verify the partner you represent", body: "Programs and referrals remain unavailable until organization authority and safeguarding expectations are verified.", href: "/profile", action: "Review partner profile" },
+      { label: "Programs", title: "Connect real community support", body: "Publish eligibility, capacity, location, dates, and responsible referral boundaries.", href: "/opportunities", action: "Open opportunities" },
+      { label: "Community", title: "Coordinate governed events", body: "Create and manage events only after partner authority is active.", href: "/community-events", action: "Open events" },
+      sharedCards.messages,
     ],
   },
 };

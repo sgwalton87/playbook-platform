@@ -21,13 +21,13 @@ A journey remains incomplete when any source field below is PARTIAL, MISSING, or
 | Family | VERIFIED: family signup option. | VERIFIED: ROLE_ONBOARDING.family. | VERIFIED: /family-os. | VERIFIED: parent_guardian relationship permissions. | PARTIAL: invite/dependent fields exist; no consent/approval workflow verified. | PARTIAL |
 | Mentor | VERIFIED: mentor signup option. | VERIFIED: ROLE_ONBOARDING.mentor. | VERIFIED: /mentor-os. | VERIFIED: mentor relationship permissions. | MISSING: no mentor eligibility/background/approval workflow found. | PARTIAL |
 | Educator | VERIFIED: educator signup option. | VERIFIED: ROLE_ONBOARDING.educator. | VERIFIED: /educator-os. | VERIFIED: educator relationship permissions. | PARTIAL: official school email captured; no institutional approval workflow verified. | PARTIAL |
-| High School Coach | VERIFIED: coach signup option. | VERIFIED: ROLE_ONBOARDING.coach. | PARTIAL: pathway/navigation route to /mentor-os, while role destination helper maps coach-like roles to /educator-os. | MISSING: no coach-specific relationship kind; role destination helper groups coach with educator. | PARTIAL: official school email captured; no approval workflow verified. | PARTIAL |
-| College Coach / Recruiter | VERIFIED: college-coach signup option. | VERIFIED: ROLE_ONBOARDING["college-coach"]. | VERIFIED/PARTIAL: /university-os is wired, but not a dedicated Recruiting OS route. | PARTIAL: university partner permissions exist; no college-coach-specific kind found. | PARTIAL: institutional/NCAA fields captured; no approval workflow verified. | PARTIAL |
-| College Admissions Officer | VERIFIED: college-admissions signup option. | VERIFIED: ROLE_ONBOARDING["college-admissions"]. | VERIFIED/PARTIAL: /university-os is wired, but not a dedicated Admissions OS route. | VERIFIED/PARTIAL: university partner permissions fit admissions; no admissions-specific kind found. | PARTIAL: official .edu email captured; no approval workflow verified. | PARTIAL |
-| Transition-Aged Youth | VERIFIED: transition-youth signup option. | VERIFIED: ROLE_ONBOARDING["transition-youth"]. | VERIFIED/PARTIAL: /dashboard in pathway/navigation; no dedicated TAY OS route. | PARTIAL: no TAY-specific relationship kind; likely scholar permissions by fallback only. | PARTIAL: support/life-context fields captured through Scholar Support; no TAY verification workflow found. | PARTIAL |
+| High School Coach | VERIFIED: coach signup option. | VERIFIED: ROLE_ONBOARDING.coach. | VERIFIED: /coach-os. | MISSING: authority intentionally fails closed pending an accepted coach relationship contract. | PARTIAL: official school email captured; no approval workflow verified. | PARTIAL |
+| College Coach / Recruiter | VERIFIED: college-coach signup option. | VERIFIED: ROLE_ONBOARDING["college-coach"]. | VERIFIED: /recruiting-os. | MISSING: authority intentionally fails closed pending an accepted recruiter relationship contract. | PARTIAL: institutional/NCAA fields captured; no approval workflow verified. | PARTIAL |
+| College Admissions Officer | VERIFIED: college-admissions signup option. | VERIFIED: ROLE_ONBOARDING["college-admissions"]. | VERIFIED: /admissions-os. | MISSING: authority intentionally fails closed pending an accepted admissions relationship contract. | PARTIAL: official .edu email captured; no approval workflow verified. | PARTIAL |
+| Transition-Aged Youth | VERIFIED: transition-youth signup option. | VERIFIED: ROLE_ONBOARDING["transition-youth"]. | VERIFIED: /transition-youth-os. | PARTIAL: explicitly uses the scholar relationship boundary pending a TAY-specific decision. | PARTIAL: support/life-context fields captured through Scholar Support; no TAY verification workflow found. | PARTIAL |
 | Employer | VERIFIED: employer signup option. | MISSING: no ROLE_ONBOARDING.employer entry found, so onboarding falls back to Scholar if requested directly. | PARTIAL/MISSING: navigation has /employer-os, but pathway map has no employer entry and auth completion may default elsewhere. | VERIFIED: employer_partner permissions exist. | MISSING: employer verification workflow not found. | MISSING |
-| Other | VERIFIED: other signup option. | VERIFIED: ROLE_ONBOARDING.other. | VERIFIED/PARTIAL: pathway sends to /pending; navigation fallback sends to /dashboard. | MISSING: no other relationship kind or permissions found. | PARTIAL: pending page exists, but review workflow is not verified. | PARTIAL |
-| High School Counselor | MISSING: no canonical signup contract is declared. | MISSING: no role-specific onboarding implementation is declared. | /educator-os | MISSING: least-privilege authority contract is not accepted. | MISSING: role verification and consent are not accepted. | MISSING |
+| Community Partner (`other`) | VERIFIED: other signup option. | VERIFIED: ROLE_ONBOARDING.other. | VERIFIED: /community-partner-os. | MISSING: authority intentionally fails closed pending an accepted community-partner relationship contract. | PARTIAL: onboarding exists, but review workflow is not verified. | PARTIAL |
+| High School Counselor | MISSING: no public signup key is declared. | MISSING: no role-specific onboarding implementation is declared. | VERIFIED: /counselor-os route exists. | MISSING: least-privilege authority contract is not accepted and access fails closed. | MISSING: role verification and consent are not accepted. | MISSING |
 | Athlete Abroad enrollment | MISSING: no canonical signup contract is declared. | MISSING: no role-specific onboarding implementation is declared. | /athlete-abroad-os | MISSING: least-privilege authority contract is not accepted. | MISSING: role verification and consent are not accepted. | MISSING |
 | District / School Administrator | MISSING: no canonical signup contract is declared. | MISSING: no role-specific onboarding implementation is declared. | /district-os | MISSING: least-privilege authority contract is not accepted. | MISSING: role verification and consent are not accepted. | MISSING |
 
@@ -128,9 +128,9 @@ A journey remains incomplete when any source field below is PARTIAL, MISSING, or
 3. **Satisfy verification and consent:** PARTIAL: official school email captured; no approval workflow verified.
 4. **Create or connect the canonical Playbook Record:** PARTIAL: model supports coach records; onboarding completion does not create record.
 5. **Create or connect the Scholar Record projection:** MISSING: athlete/scholar roster relationship workflow not found.
-6. **Enter the permission-scoped OS:** PARTIAL: pathway/navigation route to /mentor-os, while role destination helper maps coach-like roles to /educator-os.
-7. **Render the canonical dashboard:** PARTIAL: no dedicated dashboard; uses Mentor OS label/route in navigation.
-8. **Enforce role authority:** MISSING: no coach-specific relationship kind; role destination helper groups coach with educator.
+6. **Enter the permission-scoped OS:** VERIFIED: /coach-os.
+7. **Render the canonical dashboard:** PARTIAL: the dedicated route renders an honest zero state; browser acceptance remains pending.
+8. **Enforce role authority:** MISSING: authority intentionally fails closed pending an accepted coach relationship contract.
 9. **Persist the canonical record type:** VERIFIED: coach Playbook Graph enum.
 10. **Prove the outcome:** exact-revision desktop/mobile journey, durable data, authority denial, accessibility, security, recovery, and independent validation evidence are required.
 
@@ -143,9 +143,9 @@ A journey remains incomplete when any source field below is PARTIAL, MISSING, or
 3. **Satisfy verification and consent:** PARTIAL: institutional/NCAA fields captured; no approval workflow verified.
 4. **Create or connect the canonical Playbook Record:** PARTIAL: model supports organization records; onboarding completion does not create record.
 5. **Create or connect the Scholar Record projection:** MISSING: access to Scholar-Athlete Records not wired to verified recruiting workflow.
-6. **Enter the permission-scoped OS:** VERIFIED/PARTIAL: /university-os is wired, but not a dedicated Recruiting OS route.
-7. **Render the canonical dashboard:** PARTIAL: uses University OS dashboard, not a dedicated recruiting dashboard.
-8. **Enforce role authority:** PARTIAL: university partner permissions exist; no college-coach-specific kind found.
+6. **Enter the permission-scoped OS:** VERIFIED: /recruiting-os.
+7. **Render the canonical dashboard:** PARTIAL: the dedicated route renders an honest zero state; browser acceptance remains pending.
+8. **Enforce role authority:** MISSING: authority intentionally fails closed pending an accepted recruiter relationship contract.
 9. **Persist the canonical record type:** VERIFIED/PARTIAL: organization enum can represent institution; no college-coach enum found.
 10. **Prove the outcome:** exact-revision desktop/mobile journey, durable data, authority denial, accessibility, security, recovery, and independent validation evidence are required.
 
@@ -158,9 +158,9 @@ A journey remains incomplete when any source field below is PARTIAL, MISSING, or
 3. **Satisfy verification and consent:** PARTIAL: official .edu email captured; no approval workflow verified.
 4. **Create or connect the canonical Playbook Record:** PARTIAL: model supports organization records; onboarding completion does not create record.
 5. **Create or connect the Scholar Record projection:** MISSING: scholar search/access is not wired to admissions criteria workflow.
-6. **Enter the permission-scoped OS:** VERIFIED/PARTIAL: /university-os is wired, but not a dedicated Admissions OS route.
-7. **Render the canonical dashboard:** PARTIAL: uses University OS dashboard, not a dedicated admissions dashboard.
-8. **Enforce role authority:** VERIFIED/PARTIAL: university partner permissions fit admissions; no admissions-specific kind found.
+6. **Enter the permission-scoped OS:** VERIFIED: /admissions-os.
+7. **Render the canonical dashboard:** PARTIAL: the dedicated route renders an honest zero state; browser acceptance remains pending.
+8. **Enforce role authority:** MISSING: authority intentionally fails closed pending an accepted admissions relationship contract.
 9. **Persist the canonical record type:** VERIFIED/PARTIAL: organization enum can represent institution; no admissions enum found.
 10. **Prove the outcome:** exact-revision desktop/mobile journey, durable data, authority denial, accessibility, security, recovery, and independent validation evidence are required.
 
@@ -173,9 +173,9 @@ A journey remains incomplete when any source field below is PARTIAL, MISSING, or
 3. **Satisfy verification and consent:** PARTIAL: support/life-context fields captured through Scholar Support; no TAY verification workflow found.
 4. **Create or connect the canonical Playbook Record:** PARTIAL: model can likely use scholar record; onboarding completion does not create it.
 5. **Create or connect the Scholar Record projection:** PARTIAL: Scholar Record concepts apply; TAY-specific record not verified.
-6. **Enter the permission-scoped OS:** VERIFIED/PARTIAL: /dashboard in pathway/navigation; no dedicated TAY OS route.
-7. **Render the canonical dashboard:** PARTIAL: uses Scholar dashboard.
-8. **Enforce role authority:** PARTIAL: no TAY-specific relationship kind; likely scholar permissions by fallback only.
+6. **Enter the permission-scoped OS:** VERIFIED: /transition-youth-os.
+7. **Render the canonical dashboard:** PARTIAL: the dedicated route renders an honest zero state; browser acceptance remains pending.
+8. **Enforce role authority:** PARTIAL: explicitly uses the scholar relationship boundary pending a TAY-specific governance decision.
 9. **Persist the canonical record type:** PARTIAL: no TAY enum; closest Playbook Graph type is scholar.
 10. **Prove the outcome:** exact-revision desktop/mobile journey, durable data, authority denial, accessibility, security, recovery, and independent validation evidence are required.
 
@@ -196,16 +196,16 @@ A journey remains incomplete when any source field below is PARTIAL, MISSING, or
 
 **Current source status:** MISSING
 
-## Other
+## Community Partner (`other`)
 
 1. **Discover and sign up:** VERIFIED: other signup option.
 2. **Complete role onboarding:** VERIFIED: ROLE_ONBOARDING.other.
 3. **Satisfy verification and consent:** PARTIAL: pending page exists, but review workflow is not verified.
 4. **Create or connect the canonical Playbook Record:** MISSING: no record creation found.
 5. **Create or connect the Scholar Record projection:** MISSING: not applicable unless later assigned a scholar-like role.
-6. **Enter the permission-scoped OS:** VERIFIED/PARTIAL: pathway sends to /pending; navigation fallback sends to /dashboard.
-7. **Render the canonical dashboard:** PARTIAL: no dedicated dashboard; fallback Playbook navigation/dashboard.
-8. **Enforce role authority:** MISSING: no other relationship kind or permissions found.
+6. **Enter the permission-scoped OS:** VERIFIED: /community-partner-os.
+7. **Render the canonical dashboard:** PARTIAL: the dedicated route renders an honest zero state; browser acceptance remains pending.
+8. **Enforce role authority:** MISSING: authority intentionally fails closed pending an accepted community-partner relationship contract.
 9. **Persist the canonical record type:** MISSING: no other Playbook Graph enum.
 10. **Prove the outcome:** exact-revision desktop/mobile journey, durable data, authority denial, accessibility, security, recovery, and independent validation evidence are required.
 
@@ -218,8 +218,8 @@ A journey remains incomplete when any source field below is PARTIAL, MISSING, or
 3. **Satisfy verification and consent:** MISSING: role verification and consent are not accepted.
 4. **Create or connect the canonical Playbook Record:** MISSING: durable Playbook Record projection is not accepted.
 5. **Create or connect the Scholar Record projection:** MISSING: Scholar Record relationship is not accepted.
-6. **Enter the permission-scoped OS:** /educator-os
-7. **Render the canonical dashboard:** MISSING: High School Counselor OS behavior is not accepted.
+6. **Enter the permission-scoped OS:** VERIFIED: /counselor-os.
+7. **Render the canonical dashboard:** PARTIAL: the dedicated route renders an honest zero state; browser acceptance remains pending.
 8. **Enforce role authority:** MISSING: least-privilege authority contract is not accepted.
 9. **Persist the canonical record type:** MISSING: canonical record ownership is not declared.
 10. **Prove the outcome:** exact-revision desktop/mobile journey, durable data, authority denial, accessibility, security, recovery, and independent validation evidence are required.
@@ -290,18 +290,18 @@ A journey remains incomplete when any source field below is PARTIAL, MISSING, or
 | OS-SCHOLAR-ATHLETE | Scholar-Athlete OS at /scholar-athlete-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
 | OS-PARENT-GUARDIAN | Parent Guardian OS at /family-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
 | OS-TEACHER-EDUCATOR | Teacher Educator OS at /educator-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
-| OS-HIGH-SCHOOL-COUNSELOR | High School Counselor OS at /educator-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
+| OS-HIGH-SCHOOL-COUNSELOR | High School Counselor OS at /counselor-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
 | OS-MENTOR | Mentor OS at /mentor-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
-| OS-HIGH-SCHOOL-COACH | High School Coach OS at /educator-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
-| OS-COLLEGE-COACH-RECRUITER | College Coach Recruiter OS at /university-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
-| OS-COLLEGE-ADMISSIONS | College Admissions OS at /university-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
+| OS-HIGH-SCHOOL-COACH | High School Coach OS at /coach-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
+| OS-COLLEGE-COACH-RECRUITER | College Coach Recruiter OS at /recruiting-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
+| OS-COLLEGE-ADMISSIONS | College Admissions OS at /admissions-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
 | OS-BRAND-PARTNER | Brand Partner OS at /brand-partner-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
 | OS-EMPLOYER | Employer OS at /employer-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
 | OS-FOUNDER | Founder OS at /founder: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
 | OS-ATHLETES-ABROAD | Athletes Abroad Hub at /athlete-abroad-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
-| OS-TRANSITION-AGED-YOUTH | Transition-Aged Youth OS at /dashboard: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
+| OS-TRANSITION-AGED-YOUTH | Transition-Aged Youth OS at /transition-youth-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
 | OS-DISTRICT-SCHOOL-ADMIN | District / School Administrator OS at /district-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
-| OS-COMMUNITY-PARTNER | Community Partner OS at /pending: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
+| OS-COMMUNITY-PARTNER | Community Partner OS at /community-partner-os: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
 | OS-PLATFORM-ADMIN | Platform Administration OS at /admin: role-specific navigation, durable data, actions, authority denial, responsive design, accessibility, security, and recovery. |
 | SCHOLAR-ONBOARDING-TO-DASHBOARD | Scholar onboarding and dashboard coverage. |
 | TRANSCRIPT-TO-ACADEMIC-READINESS | Transcript to academic readiness. |
@@ -314,4 +314,3 @@ A journey remains incomplete when any source field below is PARTIAL, MISSING, or
 ## Route coverage boundary
 
 The current canonical route map declares 93 human-facing screen rows. Route existence does not prove journey completion; every required state must be connected to one or more role journeys and an approved design-canon ID.
-

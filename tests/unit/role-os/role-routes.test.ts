@@ -6,6 +6,11 @@ describe("Role OS routing", () => {
     expect(getRoleDestination("family")).toBe("/family-os");
   });
 
+  it("does not collapse distinct role operating systems onto shared fallbacks", () => {
+    const destinations = roleOptions.map((option) => option.href);
+    expect(new Set(destinations).size).toBe(destinations.length);
+  });
+
   it("exposes every completed public onboarding pathway", () => {
     expect(roleOptions.length).toBe(14);
     expect(roleOptions.map((option) => option.role)).toContain("scholar-athlete");

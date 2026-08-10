@@ -1,11 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { getAllRoleOS, getRoleOS } from "@/lib/role-os";
+import { assertCanonicalOperatingSystemRegistry, getAllRoleOS, getRoleOS,
+  PLAYBOOK_OPERATING_SYSTEMS } from "@/lib/role-os";
 import { getRoleDashboard } from "@/lib/role-os/roleDashboards";
 import RoleDashboardExperience from "@/components/role-os/dashboards/RoleDashboardExperience";
 
 describe("Role Dashboard Experiences", () => {
-  it("includes seven role operating systems including Mentor OS", () => {
-    expect(getAllRoleOS().length).toBe(7);
+  it("preserves seventeen first-class OS destinations and thirteen shared dashboard definitions", () => {
+    expect(() => assertCanonicalOperatingSystemRegistry()).not.toThrow();
+    expect(PLAYBOOK_OPERATING_SYSTEMS).toHaveLength(17);
+    expect(new Set(PLAYBOOK_OPERATING_SYSTEMS.map((system) => system.route)).size).toBe(17);
+    expect(getAllRoleOS().length).toBe(13);
     expect(getRoleOS("mentor").title).toBe("Mentor OS");
   });
 
@@ -13,6 +17,12 @@ describe("Role Dashboard Experiences", () => {
     expect(getRoleDashboard("family").description).toContain("consent-based");
     expect(getRoleDashboard("educator").description).toContain("verified institutional authority");
     expect(getRoleDashboard("mentor").description).toContain("approved mentoring relationship");
+    expect(getRoleDashboard("counselor").description).toContain("verified school authority");
+    expect(getRoleDashboard("coach").description).toContain("scholar ownership");
+    expect(getRoleDashboard("recruiter").description).toContain("consented institutional recruiting authority");
+    expect(getRoleDashboard("admissions").description).toContain("institutional admissions");
+    expect(getRoleDashboard("transition-youth").description).toContain("independent adulthood");
+    expect(getRoleDashboard("community").description).toContain("organization authority");
   });
 
   it("does not present fabricated people or metrics as live records", () => {
@@ -23,6 +33,12 @@ describe("Role Dashboard Experiences", () => {
       getRoleDashboard("university"),
       getRoleDashboard("employer"),
       getRoleDashboard("mentor"),
+      getRoleDashboard("counselor"),
+      getRoleDashboard("coach"),
+      getRoleDashboard("recruiter"),
+      getRoleDashboard("admissions"),
+      getRoleDashboard("transition-youth"),
+      getRoleDashboard("community"),
     ]);
     expect(serialized).not.toContain("Maya");
     expect(serialized).not.toContain("Kaiser Permanente");

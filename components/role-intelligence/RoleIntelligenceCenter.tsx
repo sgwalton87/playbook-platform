@@ -12,10 +12,16 @@ const roles: PlaybookRoleOS[] = [
   "learner",
   "family",
   "educator",
+  "counselor",
+  "coach",
   "mentor",
   "district",
   "university",
+  "recruiter",
+  "admissions",
   "employer",
+  "transition-youth",
+  "community",
 ];
 
 export default function RoleIntelligenceCenter() {
@@ -29,7 +35,7 @@ export default function RoleIntelligenceCenter() {
     <main style={page}>
       <section style={hero}>
         <p style={eyebrow}>Role-Aware Intelligence Platform</p>
-        <h1 style={title}>One scholar signal. Seven intelligent experiences.</h1>
+        <h1 style={title}>One governed signal. Thirteen role-aware experiences.</h1>
         <p style={sub}>
           Recommendations and scenarios now change based on the user&apos;s relationship to the scholar.
         </p>
