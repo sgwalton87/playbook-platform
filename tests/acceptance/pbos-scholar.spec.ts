@@ -32,6 +32,16 @@ test("Scholar completes governed onboarding and receives a durable dashboard", a
     if (updated.error) throw updated.error;
   }
 
+  const resetProfile = await admin.from("profiles").upsert({
+    id: user.id,
+    role: "scholar",
+    profile_mode: "scholar",
+    onboarding_completed: false,
+    onboarding_data: {},
+    verification_status: "email_confirmed",
+  }, { onConflict: "id" });
+  if (resetProfile.error) throw resetProfile.error;
+
   const anonymous = await request.post("/api/pbos/scholar/onboarding", {
     data: { displayName: "PBOS Acceptance Scholar", goalTitle: "Complete governed onboarding" }
   });
@@ -41,16 +51,42 @@ test("Scholar completes governed onboarding and receives a durable dashboard", a
   await page.getByRole("textbox", { name: "Email", exact: true }).fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Log In", exact: true }).click();
-  await page.waitForURL(/\/dashboard/);
+  await page.waitForURL(/\/start/);
+  await expect(page.getByRole("heading", { name: "Build the record that opens your next door." })).toBeVisible();
 
-  const onboarding = await page.request.post("/api/pbos/scholar/onboarding", {
-    data: { displayName: "PBOS Acceptance Scholar", goalTitle: "Complete governed onboarding" },
-    timeout: 120_000
-  });
+  const finish = page.getByRole("button", { name: "Finish + Create Profile" });
+  for (let step = 0; step < 10 && !(await finish.isVisible()); step += 1) {
+    await page.getByRole("button", { name: "Skip for now" }).click();
+  }
+  await expect(finish).toBeVisible();
+  await page.getByLabel("I have read and agree to The Playbook User Agreement.").check();
+
+  const [onboarding] = await Promise.all([
+    page.waitForResponse(response => response.url().includes("/api/pbos/scholar/onboarding") && response.request().method() === "POST"),
+    finish.click(),
+  ]);
   const onboardingBody = await onboarding.text();
   expect(onboarding.ok(), onboardingBody).toBe(true);
   const transaction = JSON.parse(onboardingBody) as { dashboard?: { provenance?: string[] } };
   expect(transaction.dashboard?.provenance?.length).toBeGreaterThan(0);
+  await page.waitForURL(/\/dashboard/, { timeout: 30_000 });
+
+  const completedProfile = await admin.from("profiles")
+    .select("role,profile_mode,onboarding_completed,community_safety_agreed")
+    .eq("id", user.id).single();
+  if (completedProfile.error) throw completedProfile.error;
+  expect(completedProfile.data).toMatchObject({
+    role: "scholar",
+    profile_mode: "scholar",
+    onboarding_completed: true,
+    community_safety_agreed: true,
+  });
+
+  const scholarProfile = await admin.from("scholar_profiles")
+    .select("id,onboarding_status")
+    .eq("id", user.id).single();
+  if (scholarProfile.error) throw scholarProfile.error;
+  expect(scholarProfile.data).toMatchObject({ id: user.id, onboarding_status: "DASHBOARD_READY" });
 
   const projection = await admin.from("scholar_dashboard_projections")
     .select("scholar_id,goal_id,section_ids,exchange_approval_id,provenance")
@@ -80,7 +116,7 @@ test("Scholar completes governed onboarding and receives a durable dashboard", a
     journeyId: "SCHOLAR-ONBOARDING-TO-DASHBOARD",
     commit: required("PBOS_ACCEPTANCE_COMMIT"),
     checks: [
-      { dimension: "ROUTE", passed: true, detail: "Login, onboarding API, and dashboard routes executed." },
+      { dimension: "ROUTE", passed: true, detail: "Login, the complete seven-step onboarding UI, and dashboard routes executed." },
       { dimension: "DURABLE_DATA", passed: true, detail: "Owner-scoped dashboard projection was read from Supabase after mutation." },
       { dimension: "AUTHORITY", passed: true, detail: "Anonymous onboarding was denied before the authenticated transaction." },
       { dimension: "PBOS_INTEGRATION", passed: true, detail: "Signed PBOS transaction returned provenance-bearing dashboard evidence." },

@@ -5,7 +5,7 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import { supabase } from "@/lib/supabaseClient";
-import { ALL_COLLEGE_OPTIONS, CAREER_OPTIONS, ACTIVITY_OPTIONS, CALIFORNIA_DISTRICTS, createInitialOnboardingData, getOnboardingCompletionDestination, getOnboardingSteps, mapOnboardingToProfilePayload, validateOnboardingStep } from "@/lib/onboarding";
+import { ALL_COLLEGE_OPTIONS, CAREER_OPTIONS, ACTIVITY_OPTIONS, CALIFORNIA_DISTRICTS, assertRoleOnboardingCompletionSupported, createInitialOnboardingData, getOnboardingCompletionDestination, getOnboardingSteps, mapOnboardingToProfilePayload, validateOnboardingStep } from "@/lib/onboarding";
 import { normalizeRole } from "@/lib/onboarding/pathwayMap";
 import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
 
@@ -232,6 +232,7 @@ function StartContent() {
       setCreating(true);
       setJourneyError(null);
       try {
+        assertRoleOnboardingCompletionSupported(role);
         await persist(true);
         const response = await fetch("/api/pbos/scholar/onboarding", {
           method: "POST",
