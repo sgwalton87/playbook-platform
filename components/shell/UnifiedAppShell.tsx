@@ -9,6 +9,7 @@ import { getRoleNavigation, type NavItem } from "@/lib/navigation";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import ProfileAvatar from "@/components/ProfileAvatar";
 import { supabase } from "@/lib/supabaseClient";
+import { logout } from "@/lib/auth/logout";
 
 const ROUTE_ROLE_PREVIEWS: Array<[string, string]> = [
   ["/scholar-athlete-os", "scholar-athlete"],
@@ -38,6 +39,8 @@ export default function UnifiedAppShell({ children }: { children: React.ReactNod
   const router = useRouter();
   const [profile, setProfile] = useState<LegacyValue>(null);
   const [open, setOpen] = useState(true);
+  const [signingOut, setSigningOut] = useState(false);
+  const [signOutError, setSignOutError] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadProfile() {
@@ -80,8 +83,21 @@ export default function UnifiedAppShell({ children }: { children: React.ReactNod
   }
 
   async function handleSignOut() {
-    await supabase.auth.signOut();
-    window.location.href = "/login";
+    if (signingOut) return;
+
+    setSigningOut(true);
+    setSignOutError(null);
+    const result = await logout(supabase);
+
+    if (!result.ok) {
+      setSignOutError(result.message);
+      setSigningOut(false);
+      return;
+    }
+
+    // A document navigation guarantees authenticated client state is not
+    // retained by mounted routes after the provider session is revoked.
+    window.location.replace("/login");
   }
 
   const displayName =
@@ -127,9 +143,16 @@ export default function UnifiedAppShell({ children }: { children: React.ReactNod
 
         <ShellNav items={roleNav.items} pathname={pathname} compact={!open} />
 
-        <button onClick={handleSignOut} className="playbook-signout" style={{ justifyContent: open ? "flex-start" : "center" }}>
-          <span>↪</span>
-          {open && <span>Sign Out</span>}
+        <button
+          type="button"
+          onClick={handleSignOut}
+          className="playbook-signout"
+          style={{ justifyContent: open ? "flex-start" : "center" }}
+          disabled={signingOut}
+          aria-describedby={signOutError ? "sign-out-error" : undefined}
+        >
+          <span aria-hidden="true">↪</span>
+          {open && <span>{signingOut ? "Signing out…" : "Sign out"}</span>}
         </button>
 
         {open && founderNav.length > 0 && (
@@ -147,7 +170,22 @@ export default function UnifiedAppShell({ children }: { children: React.ReactNod
             <span><strong>Playbook</strong><small>{roleNav.label}</small></span>
           </Link>
           <ProfileAvatar src={profile?.avatar_url} name={displayName} size={38} />
+          <button
+            type="button"
+            onClick={handleSignOut}
+            className="playbook-signout"
+            disabled={signingOut}
+            aria-describedby={signOutError ? "sign-out-error" : undefined}
+          >
+            {signingOut ? "Signing out…" : "Sign out"}
+          </button>
         </header>
+
+        {signOutError && (
+          <p id="sign-out-error" role="alert" aria-live="polite" className="playbook-signout-error">
+            {signOutError}
+          </p>
+        )}
 
         <header className="playbook-topbar">
           <button onClick={() => router.back()} className="playbook-topbar__back">← Back</button>

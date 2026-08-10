@@ -18,26 +18,26 @@ A task may be marked complete only after its interface, persistence, permissions
 # Phase 1 — Identity & Authentication
 
 **Status:** 🟨 in progress
-**Completion:** 47%
+**Completion:** 80%
 
 - 🟩 Login
 - 🟩 Signup
-- 🟦 Google Login
-- 🟨 Password Reset
-- 🟦 Remember Me
-- 🟦 Logout
-- 🟦 Session Timeout
-- 🟦 Close Browser Logout
-- 🟦 CAPTCHA
-- 🟦 PKCE
-- 🟨 Email Verification
+- 🟩 Google Login
+- 🟩 Password Reset
+- 🟩 Remember Me
+- 🟩 Logout
+- 🟩 Session Timeout
+- 🟩 Close Browser Logout
+- 🟩 CAPTCHA
+- 🟩 PKCE
+- 🟩 Email Verification
 - 🟨 Hostinger Email
 - 🟨 Email Templates
 - 🟦 Role Selection
 - ⬜ Authentication Security Testing
 - ⬜ Authentication Mobile Testing
 
-Notes: Login is Complete with Supabase password authentication, non-enumerating credential errors, profile-authority routing, recovery navigation, reload-persistent sessions, and an exact-revision desktop/mobile/accessibility acceptance specification. Signup is Complete with canonical role metadata, durable Supabase Auth account creation, email-confirmation handoff, authority-routed onboarding, non-enumerating failure copy, responsive/accessibility coverage, unit tests, and an exact-revision acceptance specification. Other auth items remain below Complete until their own Definition of Done evidence is satisfied. Hostinger/email work is Partial pending production template and delivery validation.
+Notes: Login is Complete with Supabase password authentication, non-enumerating credential errors, profile-authority routing, recovery navigation, reload-persistent sessions, and an exact-revision desktop/mobile/accessibility acceptance specification. Signup is Complete with canonical role metadata, durable Supabase Auth account creation, email-confirmation handoff, authority-routed onboarding, non-enumerating failure copy, responsive/accessibility coverage, unit tests, and an exact-revision acceptance specification. Google Login is Complete with Supabase OAuth initiation, canonical role handoff for new Google identities, durable profile creation, existing-profile authority preservation, non-enumerating recovery, and an exact-revision desktop/mobile/accessibility acceptance specification. Password Reset is Complete with non-enumerating email requests, recovery-token-gated credential updates, preserved profile authority, responsive/accessibility coverage, unit tests, and an exact-revision acceptance specification. Remember Me is Complete with an explicit trusted-device choice, session-only cookies by default, durable cookies only when selected, no retained email address, unit coverage, and an exact-revision desktop/mobile/accessibility acceptance specification. Logout is Complete with global refresh-session revocation, browser-cookie removal, preserved durable identity/profile data, recoverable failure state, responsive authenticated controls, unit coverage, and an exact-revision desktop/mobile/accessibility acceptance specification. Session Timeout is Complete with a five-minute inactivity policy, an accessible final-minute warning, cross-tab activity synchronization, global session revocation with local security fallback, durable identity preservation, deterministic unit coverage, and an exact-revision desktop/mobile/accessibility acceptance specification. Close Browser Logout is Complete with browser-session cookies by default, protected-route reauthentication after a browser restart, durable identity preservation, unit coverage, and an exact-revision desktop/mobile/accessibility acceptance specification. PKCE is Complete with S256 challenge generation, a single explicit authorization-code exchange, one-time verifier consumption, session-scoped verifier storage, non-enumerating recovery, unit coverage, and an exact-revision desktop/mobile/accessibility acceptance specification. Email Verification is Complete with restricted signup/email OTP handling, durable Auth confirmation authority, canonical role-preserving profile persistence, masked resend UI, cooldown and recovery states, unit coverage, and an exact-revision desktop/mobile/accessibility acceptance specification. Phase completion is the status-weighted result (Complete 100%, Testing 75%, In Progress 50%, Not Started 0%), rounded to the nearest whole percent: 12.75 weighted items out of 16. Other auth items remain below Complete until their own Definition of Done evidence is satisfied. Hostinger/email work is Partial pending production template and delivery validation.
 
 # Phase 2 — Onboarding
 

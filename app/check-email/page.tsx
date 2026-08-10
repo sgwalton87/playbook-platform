@@ -1,11 +1,20 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
-import { getUserPathway, USER_PATHWAYS } from "@/lib/auth";
 import CanonicalAuthShell from "@/components/auth/CanonicalAuthShell";
+import {
+  buildEmailVerificationCallbackUrl,
+  EMAIL_VERIFICATION_INVALID_LINK_MESSAGE,
+  EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS,
+  EMAIL_VERIFICATION_RESEND_ERROR_MESSAGE,
+  getUserPathway,
+  isResendableEmail,
+  maskEmail,
+  USER_PATHWAYS,
+} from "@/lib/auth";
 
 export default function CheckEmailPage() {
   return (
@@ -17,20 +26,44 @@ export default function CheckEmailPage() {
 
 function CheckEmailContent() {
   const params = useSearchParams();
-  const email = params.get("email") || "your email";
+  const email = params.get("email");
   const role = params.get("role") || "scholar";
   const pathway = getUserPathway(role);
+  const canResend = isResendableEmail(email);
+  const [status, setStatus] = useState(
+    params.get("status") === "invalid" ? EMAIL_VERIFICATION_INVALID_LINK_MESSAGE : ""
+  );
+  const [secondsRemaining, setSecondsRemaining] = useState(0);
+  const [sending, setSending] = useState(false);
+  const displayedEmail = useMemo(() => (canResend ? maskEmail(email) : "your email address"), [canResend, email]);
+
+  useEffect(() => {
+    if (secondsRemaining <= 0) return;
+    const timer = window.setTimeout(() => setSecondsRemaining((current) => current - 1), 1000);
+    return () => window.clearTimeout(timer);
+  }, [secondsRemaining]);
 
   async function resendConfirmation() {
+    if (!canResend || secondsRemaining > 0 || sending) return;
+    setSending(true);
+    setStatus("");
+
     const { error } = await supabase.auth.resend({
       type: "signup",
       email,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback?next=/pending`,
+        emailRedirectTo: buildEmailVerificationCallbackUrl(window.location.origin),
       },
     });
 
-    alert(error ? error.message : "Confirmation email resent. Check your inbox and spam folder.");
+    setSending(false);
+    if (error) {
+      setStatus(EMAIL_VERIFICATION_RESEND_ERROR_MESSAGE);
+      return;
+    }
+
+    setSecondsRemaining(EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS);
+    setStatus("A new verification email is on its way. Check your inbox and spam folder.");
   }
 
   return (
@@ -41,7 +74,7 @@ function CheckEmailContent() {
         <h1 style={{...title,fontSize:"clamp(38px,5vw,58px)"}}>Confirmation sent</h1>
 
         <p style={lead}>
-          We sent a confirmation link to <strong>{email}</strong>. Confirm your email first,
+          We sent a confirmation link to <strong>{displayedEmail}</strong>. Confirm your email first,
           then your selected pathway can move into profile verification.
         </p>
 
@@ -53,10 +86,24 @@ function CheckEmailContent() {
         </div>
 
         <div style={actions}>
-          <button onClick={resendConfirmation} style={primary}>Resend Confirmation Email</button>
+          <button
+            disabled={!canResend || secondsRemaining > 0 || sending}
+            onClick={resendConfirmation}
+            style={{ ...primary, opacity: !canResend || secondsRemaining > 0 || sending ? 0.65 : 1 }}
+          >
+            {sending
+              ? "Sending…"
+              : secondsRemaining > 0
+                ? `Resend available in ${secondsRemaining}s`
+                : "Resend verification email"}
+          </button>
           <a href="/login" style={secondary}>Back to Login</a>
           <Link href="/" style={secondary}>Return Home</Link>
         </div>
+        {!canResend && (
+          <p style={helperText}>Return to signup or login to enter your email address securely.</p>
+        )}
+        <p role="status" aria-live="polite" style={statusText}>{status}</p>
       </section>
 
       <section style={{...rolesPanel,padding:"34px 0 0"}}>
@@ -167,6 +214,22 @@ const primary: React.CSSProperties = {
   borderRadius: 999,
   textDecoration: "none",
   fontWeight: 950,
+  border: 0,
+  cursor: "pointer",
+};
+
+const helperText: React.CSSProperties = {
+  color: "rgba(248,247,244,.72)",
+  lineHeight: 1.5,
+  margin: "16px 0 0",
+};
+
+const statusText: React.CSSProperties = {
+  color: "#FDBA74",
+  fontWeight: 800,
+  lineHeight: 1.5,
+  minHeight: 24,
+  margin: "16px 0 0",
 };
 
 const secondary: React.CSSProperties = {

@@ -2,20 +2,26 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import { supabase } from "@/lib/supabaseClient";
 import {
   buildSignupMetadata,
+  buildGoogleCallbackUrl,
+  GOOGLE_LOGIN_ERROR_MESSAGE,
   getSignupErrorMessage,
   SIGNUP_PASSWORD_MIN_LENGTH,
   USER_PATHWAYS,
 } from "@/lib/auth";
 import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
 import { getLoginDestination, getLoginErrorMessage, type LoginProfile } from "@/lib/auth/login";
+import { getRememberMePreference, setRememberMePreference } from "@/lib/auth/rememberMe";
+import { SESSION_TIMEOUT_MESSAGE } from "@/lib/auth/sessionTimeout";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 import "./login.css";
+
+const HCAPTCHA_DEVELOPMENT_SITE_KEY = "10000000-ffff-ffff-ffff-000000000001";
 
 export default function LoginPage() {
   return (
@@ -31,15 +37,32 @@ function LoginContent() {
   const initialMode = params.get("mode") === "signup" ? "signup" : "login";
 
   const [mode, setMode] = useState<"login" | "signup">(initialMode);
-  const [email, setEmail] = useState(typeof window !== "undefined" ? localStorage.getItem("playbook_saved_email") || "" : "");
-  const [rememberEmail, setRememberEmail] = useState(typeof window !== "undefined" ? Boolean(localStorage.getItem("playbook_saved_email")) : false);
+  const [email, setEmail] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("scholar");
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState(() => {
+    if (params.get("reason") === "session-timeout") return SESSION_TIMEOUT_MESSAGE;
+    return params.get("error") ? GOOGLE_LOGIN_ERROR_MESSAGE : "";
+  });
   const [loading, setLoading] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaKey, setCaptchaKey] = useState(0);
 
   const isSignup = mode === "signup";
+  const captchaSiteKey = process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY
+    || (process.env.NODE_ENV === "development" ? HCAPTCHA_DEVELOPMENT_SITE_KEY : undefined);
+  const captchaReady = Boolean(captchaSiteKey && captchaToken);
+
+  useEffect(() => {
+    let active = true;
+    queueMicrotask(() => {
+      if (active) setRememberMe(getRememberMePreference());
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const copy = useMemo(
     () =>
@@ -58,30 +81,45 @@ function LoginContent() {
   );
 
   async function signInWithGoogle() {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=/start`,
-      },
-    });
+    setStatus("");
+    setLoading(true);
 
-    if (error) {
-      setStatus(error.message);
+    if (!isSignup) setRememberMePreference(rememberMe);
+
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: buildGoogleCallbackUrl(window.location.origin, isSignup ? role : "scholar"),
+        },
+      });
+
+      if (error) {
+        setStatus(GOOGLE_LOGIN_ERROR_MESSAGE);
+      }
+    } catch {
+      setStatus(GOOGLE_LOGIN_ERROR_MESSAGE);
+    } finally {
+      setLoading(false);
     }
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setStatus("");
+
+    if (isSignup && !captchaReady) {
+      setStatus(
+        captchaSiteKey
+          ? "Complete the security check before creating your account."
+          : "Account creation is temporarily unavailable because the security check is not configured."
+      );
+      return;
+    }
+
     setLoading(true);
 
     try {
-      if (rememberEmail) {
-        localStorage.setItem("playbook_saved_email", email);
-      } else {
-        localStorage.removeItem("playbook_saved_email");
-      }
-
       if (isSignup) {
         const origin = window.location.origin;
 
@@ -89,13 +127,15 @@ function LoginContent() {
           email,
           password,
           options: {
-            emailRedirectTo: `${origin}/auth/callback?next=/pending`,
+            emailRedirectTo: `${origin}/auth/callback`,
             captchaToken: captchaToken || undefined,
             data: buildSignupMetadata(role),
           },
         });
 
         if (error) {
+          setCaptchaToken(null);
+          setCaptchaKey((current) => current + 1);
           setStatus(getSignupErrorMessage());
           return;
         }
@@ -108,6 +148,8 @@ function LoginContent() {
         window.location.href = `/check-email?${query.toString()}`;
         return;
       }
+
+      setRememberMePreference(rememberMe);
 
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -212,14 +254,22 @@ function LoginContent() {
             />
           </label>
 
-          <label style={rememberRow}>
-            <input
-              type="checkbox"
-              checked={rememberEmail}
-              onChange={(e) => setRememberEmail(e.target.checked)}
-            />
-            Save my email on this personal computer
-          </label>
+          {!isSignup && (
+            <div style={rememberGroup}>
+              <label style={rememberRow}>
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  aria-describedby="remember-me-help"
+                />
+                Remember me
+              </label>
+              <p id="remember-me-help" style={rememberHelp}>
+                Keep this session after you close the browser. Use only on a personal device.
+              </p>
+            </div>
+          )}
 
           <label style={label}>
             Password
@@ -250,23 +300,65 @@ function LoginContent() {
             </Link>
           )}
 
-          {isSignup && process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY && (
-            <HCaptcha
-              sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY}
-              onVerify={(token) => setCaptchaToken(token)}
-              onExpire={() => setCaptchaToken(null)}
-            />
+          {isSignup && (
+            <section aria-labelledby="signup-security-heading" style={captchaPanel}>
+              <div>
+                <h3 id="signup-security-heading" style={captchaHeading}>Security check</h3>
+                <p id="signup-security-help" style={captchaHelp}>
+                  Complete this check to protect Playbook accounts from automated signups.
+                </p>
+              </div>
+              {captchaSiteKey ? (
+                <div className="playbook-captcha-widget" aria-describedby="signup-security-help">
+                  <HCaptcha
+                    key={captchaKey}
+                    sitekey={captchaSiteKey}
+                    onVerify={(token) => {
+                      setCaptchaToken(token);
+                      setStatus("");
+                    }}
+                    onExpire={() => {
+                      setCaptchaToken(null);
+                      setStatus("The security check expired. Complete it again to continue.");
+                    }}
+                    onError={() => {
+                      setCaptchaToken(null);
+                      setStatus("The security check could not be completed. Please try again.");
+                    }}
+                  />
+                </div>
+              ) : (
+                <p role="status" style={captchaUnavailable}>
+                  Account creation is temporarily unavailable. Please try again later.
+                </p>
+              )}
+              <p role="status" aria-live="polite" style={captchaState}>
+                {captchaReady ? "Security check complete." : "Security check required."}
+              </p>
+            </section>
           )}
 
           {status && <div role="alert" aria-live="polite" style={statusBox}>{status}</div>}
 
-          <button type="button" onClick={signInWithGoogle} style={googleButton}>
-            Continue with Google
+          <button
+            type="button"
+            onClick={signInWithGoogle}
+            disabled={loading}
+            aria-busy={loading}
+            style={googleButton}
+          >
+            {loading ? "Opening Google..." : "Continue with Google"}
           </button>
 
           <div style={divider}>or</div>
 
-          <button type="submit" disabled={loading} aria-busy={loading} style={primaryButton}>
+          <button
+            type="submit"
+            disabled={loading || (isSignup && !captchaReady)}
+            aria-busy={loading}
+            aria-describedby={isSignup ? "signup-security-help" : undefined}
+            style={primaryButton}
+          >
             {loading ? "Working..." : copy.button}
           </button>
 
@@ -418,6 +510,42 @@ const statusBox: React.CSSProperties = {
   fontWeight: 800,
 };
 
+const captchaPanel: React.CSSProperties = {
+  display: "grid",
+  gap: 12,
+  padding: 16,
+  border: "1px solid #CBD5E1",
+  borderRadius: 16,
+  background: "#F8FAFC",
+};
+
+const captchaHeading: React.CSSProperties = {
+  margin: 0,
+  fontSize: 16,
+  color: "#0F172A",
+};
+
+const captchaHelp: React.CSSProperties = {
+  margin: "4px 0 0",
+  color: "#475569",
+  fontSize: 13,
+  lineHeight: 1.5,
+};
+
+const captchaState: React.CSSProperties = {
+  margin: 0,
+  color: "#475569",
+  fontSize: 13,
+  fontWeight: 800,
+};
+
+const captchaUnavailable: React.CSSProperties = {
+  margin: 0,
+  color: "#9A3412",
+  fontSize: 13,
+  fontWeight: 800,
+};
+
 const primaryButton: React.CSSProperties = {
   border: "none",
   borderRadius: 999,
@@ -461,6 +589,18 @@ const rememberRow: React.CSSProperties = {
   gap: 10,
   fontWeight: 800,
   color: "#B8C8DA",
+};
+
+const rememberGroup: React.CSSProperties = {
+  display: "grid",
+  gap: 4,
+};
+
+const rememberHelp: React.CSSProperties = {
+  margin: "0 0 0 24px",
+  color: "#64748B",
+  fontSize: 12,
+  lineHeight: 1.45,
 };
 
 

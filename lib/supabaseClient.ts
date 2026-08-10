@@ -1,4 +1,6 @@
 import { createBrowserClient } from "@supabase/ssr";
+import { rememberMeCookieMethods } from "@/lib/auth/rememberMe";
+import { PLAYBOOK_PKCE_AUTH_OPTIONS } from "@/lib/auth/pkce";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -13,10 +15,7 @@ export const supabase = createBrowserClient(
   supabaseUrl || "https://placeholder.supabase.co",
   supabaseAnonKey || "placeholder-anon-key",
   {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true,
-    },
+    cookies: rememberMeCookieMethods,
+    auth: PLAYBOOK_PKCE_AUTH_OPTIONS,
   }
 );

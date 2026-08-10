@@ -162,6 +162,16 @@
   padding: 10px 14px;
   margin-top: 10px;
 }
+.playbook-signout:disabled { cursor: wait; opacity: .72; }
+.playbook-signout-error {
+  margin: 12px 20px 0;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  background: #fff1f2;
+  color: #9f1239;
+  padding: 10px 12px;
+  font-weight: 800;
+}
 .playbook-founder-section { margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.12); }
 .playbook-section-label { color: rgba(255,250,244,.56); margin-bottom: 10px; }
 

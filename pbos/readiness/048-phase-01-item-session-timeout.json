@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "missionId": "048-phase-01-item-session-timeout",
+  "completionClaim": true,
+  "completedItems": [
+    "Session Timeout"
+  ],
+  "remainingItems": [],
+  "routes": [
+    "/dashboard",
+    "/login?reason=session-timeout"
+  ],
+  "browserSpec": "tests/acceptance/pbos-session-timeout.spec.ts",
+  "acceptance": [
+    {
+      "dimension": "ROUTE",
+      "behavior": "Authenticated routes mount the inactivity guard and expired sessions return to the login route with a timeout reason.",
+      "artifact": "app/layout.tsx",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "USER_INTERFACE",
+      "behavior": "Desktop and mobile users receive a focused, accessible final-minute warning with a Stay signed in action.",
+      "artifact": "components/auth/SessionGuard.tsx",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "DURABLE_DATA",
+      "behavior": "Timeout revokes authentication without deleting the durable Supabase identity or profile record.",
+      "artifact": "tests/acceptance/pbos-session-timeout.spec.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "AUTHORITY",
+      "behavior": "The timeout path uses the canonical global session-revocation boundary and removes the local session if global revocation fails.",
+      "artifact": "lib/auth/logout.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "PBOS_INTEGRATION",
+      "behavior": "The exact-revision acceptance specification writes all required PBOS evidence files only after its checks pass.",
+      "artifact": "tests/acceptance/pbos-session-timeout.spec.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "ACCEPTANCE_TEST",
+      "behavior": "One Playwright journey exercises real login, warning, expiry, cookie clearing, durable profile preservation, desktop, and mobile behavior.",
+      "artifact": "tests/acceptance/pbos-session-timeout.spec.ts",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "ACCESSIBILITY",
+      "behavior": "The warning uses alert-dialog semantics, labelled copy, initial focus, keyboard activation, responsive layout, and axe analysis.",
+      "artifact": "components/auth/SessionGuard.tsx",
+      "source": "IMPLEMENTATION"
+    },
+    {
+      "dimension": "SECURITY",
+      "behavior": "Five idle minutes expire the session despite refresh-token persistence, with visibility checks and cross-tab activity synchronization.",
+      "artifact": "lib/auth/sessionTimeout.ts",
+      "source": "IMPLEMENTATION"
+    }
+  ]
+}

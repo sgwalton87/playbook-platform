@@ -9,16 +9,16 @@ This is an implementation control artifact. A mapping or marker is not completio
 | `AUTHENTICATED_PRODUCT_SHELL` | Canonical shared implementation | PGDS-001 | Root layout | IMPLEMENTED_AND_VERIFIED | PASSED | PASSED |
 | `STUDIO_SHELL_AUTHORITY` | Dedicated operator implementation | PGDS-001 | Studio layout | IMPLEMENTED_AND_VERIFIED | PASSED | N/A |
 | `/about` | Canonical marker present | PGDS-001 | Unified authenticated shell | IMPLEMENTED_AND_VERIFIED | PASSED | PASSED |
-| `/academic-readiness` | Canonical evidence-to-action implementation | PGDS-001 / PGAR-001 | Unified authenticated shell + transcript/record/support routes | IMPLEMENTED_AND_VISUALLY_VERIFIED | PASSED | PASSED |
+| `/academic-readiness` | Canonical marker present | PGDS-001 | Unified authenticated shell | IN_PROGRESS_UNVERIFIED | PENDING | PENDING |
 | `/action-routing` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/admin/moderation` | Legacy/inline presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/admin` | Legacy/inline presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/albums` | Legacy/inline presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/application-workspaces` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
-| `/athlete-abroad-os` | Canonical pathway implementation | PGDS-001 / PGAA-001 | Unified authenticated shell + global journey routes | IMPLEMENTED_AND_VISUALLY_VERIFIED | PASSED | PASSED |
+| `/athlete-abroad-os` | Canonical marker present | PGDS-001 | Unified authenticated shell | IN_PROGRESS_UNVERIFIED | PENDING | PENDING |
 | `/auth/callback` | Legacy/inline presentation | PGDS-001 | Authentication shell | PENDING | PENDING | PENDING |
 | `/badges` | Legacy/inline presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
-| `/brand-partner-os` | Canonical authenticated partner implementation | PGDS-001 / PGBP-001 | Unified authenticated shell + partner profile + journey routes | IMPLEMENTED_AND_VISUALLY_VERIFIED | PASSED | PASSED |
+| `/brand-partner-os` | Canonical marker present | PGDS-001 | Unified authenticated shell | IN_PROGRESS_UNVERIFIED | PENDING | PENDING |
 | `/certificates` | Legacy/inline presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/check-email` | Canonical marker present | PGDS-001 | Authentication shell | IMPLEMENTED_AND_VERIFIED | PASSED | PASSED |
 | `/collaboration` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
@@ -55,6 +55,7 @@ This is an implementation control artifact. A mapping or marker is not completio
 | `/messages/[threadId]` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/messages` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/network-intelligence` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
+| `/news` | Canonical marker present | PGDS-001 | Unified authenticated shell | IN_PROGRESS_UNVERIFIED | PENDING | PENDING |
 | `/notifications` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/opportunities` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/opportunity-toolkit` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
@@ -62,6 +63,7 @@ This is an implementation control artifact. A mapping or marker is not completio
 | `/pending` | Canonical marker present | PGDS-001 | Authentication shell | IN_PROGRESS_UNVERIFIED | PENDING | PENDING |
 | `/permissions` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/portfolio/[shareId]` | Legacy/inline presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
+| `/preview` | Canonical marker present | PGDS-001 | Unified authenticated shell | IN_PROGRESS_UNVERIFIED | PENDING | PENDING |
 | `/profile` | Legacy/inline presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/recommenders/[requestId]` | Legacy/inline presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/recommenders` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
@@ -70,7 +72,7 @@ This is an implementation control artifact. A mapping or marker is not completio
 | `/reward-economy` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/role-intelligence` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/role-select` | Shared or unclassified presentation | PGDS-001 | Authentication shell | IMPLEMENTED_AND_VERIFIED | PASSED | PASSED |
-| `/scholar-athlete-os` | Canonical owner-scoped implementation | PGDS-001 / PGSA-001 | Unified authenticated shell + athlete record projection | IMPLEMENTED_AND_VISUALLY_VERIFIED | PASSED | PASSED |
+| `/scholar-athlete-os` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/scholar-network` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/start` | Canonical marker present | PGDS-001 | Authentication shell | IN_PROGRESS_UNVERIFIED | PENDING | PENDING |
 | `/store-v2` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
@@ -97,7 +99,7 @@ This is an implementation control artifact. A mapping or marker is not completio
 | `/studio/visual-qa` | Legacy/inline presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/support-messages` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/support-network` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
-| `/transcript` | Canonical shell preserving authenticated transcript engine | PGDS-001 / PGTR-001 | Supabase record load + parser + A-G + print | IN_PROGRESS_UNVERIFIED | PENDING | PENDING |
+| `/transcript` | Canonical marker present | PGDS-001 | Unified authenticated shell | IN_PROGRESS_UNVERIFIED | PENDING | PENDING |
 | `/tutorial` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/u/[username]` | Legacy/inline presentation | PGDS-001 | Unified authenticated shell | PENDING | PENDING | PENDING |
 | `/university-os` | Shared or unclassified presentation | PGDS-001 | Unified authenticated shell | IMPLEMENTED_AND_VERIFIED | PASSED | PASSED |

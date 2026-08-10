@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import UnifiedAppShell from "@/components/shell/UnifiedAppShell";
+import SessionGuard from "@/components/auth/SessionGuard";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -19,7 +20,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body suppressHydrationWarning={true}>
-        <ThemeProvider><UnifiedAppShell>{children}</UnifiedAppShell></ThemeProvider>
+        <ThemeProvider>
+          <SessionGuard />
+          <UnifiedAppShell>{children}</UnifiedAppShell>
+        </ThemeProvider>
       </body>
     </html>
   );

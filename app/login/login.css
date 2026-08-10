@@ -54,6 +54,15 @@
 .playbook-login-card input:focus-visible,
 .playbook-login-card a:focus-visible { outline: 3px solid #ff8a50; outline-offset: 3px; }
 
+.playbook-captcha-widget {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.playbook-captcha-widget iframe {
+  max-width: 100%;
+}
+
 @media (max-width: 900px) {
   .playbook-login-card {
     grid-template-columns: minmax(0, 1fr);
