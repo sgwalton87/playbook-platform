@@ -25,12 +25,12 @@ The role system is currently distributed across multiple files rather than one e
 | Family | VERIFIED: `family` signup option. | VERIFIED: `ROLE_ONBOARDING.family`. | VERIFIED: `/family-os`. | VERIFIED: `app/family-os/page.tsx`. | VERIFIED: `parent_guardian` relationship permissions. | VERIFIED: `parent` Playbook Graph enum. | PARTIAL: model supports parent records; onboarding completion does not create record. | MISSING: family should link to scholar record; link workflow not verified. | PARTIAL: invite/dependent fields exist; no consent/approval workflow verified. | PARTIAL |
 | Mentor | VERIFIED: `mentor` signup option. | VERIFIED: `ROLE_ONBOARDING.mentor`. | VERIFIED: `/mentor-os`. | VERIFIED: `app/mentor-os/page.tsx`. | VERIFIED: `mentor` relationship permissions. | VERIFIED: `mentor` Playbook Graph enum. | PARTIAL: model supports mentor records; onboarding completion does not create record. | MISSING: not applicable except assigned scholars; no link creation verified. | MISSING: no mentor eligibility/background/approval workflow found. | PARTIAL |
 | Educator | VERIFIED: `educator` signup option. | VERIFIED: `ROLE_ONBOARDING.educator`. | VERIFIED: `/educator-os`. | VERIFIED: `app/educator-os/page.tsx`. | VERIFIED: `educator` relationship permissions. | VERIFIED: `educator` Playbook Graph enum. | PARTIAL: model supports educator records; onboarding completion does not create record. | MISSING: not applicable except supported scholars; no roster/cohort link creation verified. | PARTIAL: official school email captured; no institutional approval workflow verified. | PARTIAL |
-| High School Coach | VERIFIED: `coach` signup option. | VERIFIED: `ROLE_ONBOARDING.coach`. | PARTIAL: pathway/navigation route to `/mentor-os`, while role destination helper maps coach-like roles to `/educator-os`. | PARTIAL: no dedicated dashboard; uses Mentor OS label/route in navigation. | MISSING: no coach-specific relationship kind; role destination helper groups coach with educator. | VERIFIED: `coach` Playbook Graph enum. | PARTIAL: model supports coach records; onboarding completion does not create record. | MISSING: athlete/scholar roster relationship workflow not found. | PARTIAL: official school email captured; no approval workflow verified. | PARTIAL |
-| College Coach / Recruiter | VERIFIED: `college-coach` signup option. | VERIFIED: `ROLE_ONBOARDING["college-coach"]`. | VERIFIED/PARTIAL: `/university-os` is wired, but not a dedicated Recruiting OS route. | PARTIAL: uses University OS dashboard, not a dedicated recruiting dashboard. | PARTIAL: university partner permissions exist; no college-coach-specific kind found. | VERIFIED/PARTIAL: `organization` enum can represent institution; no college-coach enum found. | PARTIAL: model supports organization records; onboarding completion does not create record. | MISSING: access to Scholar-Athlete Records not wired to verified recruiting workflow. | PARTIAL: institutional/NCAA fields captured; no approval workflow verified. | PARTIAL |
-| College Admissions Officer | VERIFIED: `college-admissions` signup option. | VERIFIED: `ROLE_ONBOARDING["college-admissions"]`. | VERIFIED/PARTIAL: `/university-os` is wired, but not a dedicated Admissions OS route. | PARTIAL: uses University OS dashboard, not a dedicated admissions dashboard. | VERIFIED/PARTIAL: university partner permissions fit admissions; no admissions-specific kind found. | VERIFIED/PARTIAL: `organization` enum can represent institution; no admissions enum found. | PARTIAL: model supports organization records; onboarding completion does not create record. | MISSING: scholar search/access is not wired to admissions criteria workflow. | PARTIAL: official .edu email captured; no approval workflow verified. | PARTIAL |
-| Transition-Aged Youth | VERIFIED: `transition-youth` signup option. | VERIFIED: `ROLE_ONBOARDING["transition-youth"]`. | VERIFIED/PARTIAL: `/dashboard` in pathway/navigation; no dedicated TAY OS route. | PARTIAL: uses Scholar dashboard. | PARTIAL: no TAY-specific relationship kind; likely scholar permissions by fallback only. | PARTIAL: no TAY enum; closest Playbook Graph type is `scholar`. | PARTIAL: model can likely use scholar record; onboarding completion does not create it. | PARTIAL: Scholar Record concepts apply; TAY-specific record not verified. | PARTIAL: support/life-context fields captured through Scholar Support; no TAY verification workflow found. | PARTIAL |
+| High School Coach | VERIFIED: `coach` signup option. | VERIFIED: `ROLE_ONBOARDING.coach`. | VERIFIED: `/coach-os`. | PARTIAL: dedicated route with an honest zero-state dashboard; no browser certification. | MISSING: coach authority intentionally fails closed until an accepted relationship contract exists. | VERIFIED: `coach` Playbook Graph enum. | PARTIAL: model supports coach records; onboarding completion does not create record. | MISSING: athlete/scholar roster relationship workflow not found. | PARTIAL: official school email captured; no approval workflow verified. | PARTIAL |
+| College Coach / Recruiter | VERIFIED: `college-coach` signup option. | VERIFIED: `ROLE_ONBOARDING["college-coach"]`. | VERIFIED: `/recruiting-os`. | PARTIAL: dedicated route with an honest zero-state dashboard; no browser certification. | MISSING: recruiter authority intentionally fails closed until an accepted relationship contract exists. | VERIFIED/PARTIAL: `organization` enum can represent institution; no college-coach enum found. | PARTIAL: model supports organization records; onboarding completion does not create record. | MISSING: access to Scholar-Athlete Records not wired to verified recruiting workflow. | PARTIAL: institutional/NCAA fields captured; no approval workflow verified. | PARTIAL |
+| College Admissions Officer | VERIFIED: `college-admissions` signup option. | VERIFIED: `ROLE_ONBOARDING["college-admissions"]`. | VERIFIED: `/admissions-os`. | PARTIAL: dedicated route with an honest zero-state dashboard; no browser certification. | MISSING: admissions authority intentionally fails closed until an accepted relationship contract exists. | VERIFIED/PARTIAL: `organization` enum can represent institution; no admissions enum found. | PARTIAL: model supports organization records; onboarding completion does not create record. | MISSING: scholar search/access is not wired to admissions criteria workflow. | PARTIAL: official .edu email captured; no approval workflow verified. | PARTIAL |
+| Transition-Aged Youth | VERIFIED: `transition-youth` signup option. | VERIFIED: `ROLE_ONBOARDING["transition-youth"]`. | VERIFIED: `/transition-youth-os`. | PARTIAL: dedicated route with an honest zero-state dashboard; no browser certification. | PARTIAL: explicitly inherits the existing scholar relationship boundary pending a TAY-specific governance decision. | PARTIAL: no TAY enum; closest Playbook Graph type is `scholar`. | PARTIAL: model can likely use scholar record; onboarding completion does not create it. | PARTIAL: Scholar Record concepts apply; TAY-specific record not verified. | PARTIAL: support/life-context fields captured through Scholar Support; no TAY verification workflow found. | PARTIAL |
 | Employer | VERIFIED: `employer` signup option. | MISSING: no `ROLE_ONBOARDING.employer` entry found, so onboarding falls back to Scholar if requested directly. | PARTIAL/MISSING: navigation has `/employer-os`, but pathway map has no `employer` entry and auth completion may default elsewhere. | VERIFIED: `app/employer-os/page.tsx` exists. | VERIFIED: `employer_partner` permissions exist. | VERIFIED/PARTIAL: `organization` enum fits employer records; no employer-specific enum found. | PARTIAL: model supports organization records; onboarding completion does not create record. | MISSING: not applicable except candidates; no access workflow verified. | MISSING: employer verification workflow not found. | MISSING |
-| Other | VERIFIED: `other` signup option. | VERIFIED: `ROLE_ONBOARDING.other`. | VERIFIED/PARTIAL: pathway sends to `/pending`; navigation fallback sends to `/dashboard`. | PARTIAL: no dedicated dashboard; fallback Playbook navigation/dashboard. | MISSING: no `other` relationship kind or permissions found. | MISSING: no `other` Playbook Graph enum. | MISSING: no record creation found. | MISSING: not applicable unless later assigned a scholar-like role. | PARTIAL: pending page exists, but review workflow is not verified. | PARTIAL |
+| Community Partner (`other`) | VERIFIED: `other` signup option. | VERIFIED: `ROLE_ONBOARDING.other`. | VERIFIED: `/community-partner-os`. | PARTIAL: dedicated route with an honest zero-state dashboard; no browser certification. | MISSING: community-partner authority intentionally fails closed until an accepted relationship contract exists. | MISSING: no community-partner Playbook Graph enum. | MISSING: no record creation found. | MISSING: not applicable unless later assigned a scholar relationship. | PARTIAL: onboarding exists, but review workflow is not verified. | PARTIAL |
 
 ## Role details
 
@@ -139,9 +139,9 @@ Each role below expands the canonical table with description, implementation sta
 - **Verification requirements:** PARTIAL: official school email captured; approval workflow not verified.
 - **Playbook Record type:** VERIFIED: `coach`.
 - **Scholar Record applicability:** MISSING for own record; athlete/scholar roster links not verified.
-- **Operating System route:** PARTIAL: pathway/navigation use `/mentor-os`; role destination helper maps coach-like roles to `/educator-os`.
-- **Dashboard component:** PARTIAL: no dedicated coach dashboard; Mentor OS route used in navigation.
-- **Navigation configuration:** VERIFIED/PARTIAL: `ROLE_NAVIGATION.coach` exists but shares Mentor OS home.
+- **Operating System route:** VERIFIED: `/coach-os`.
+- **Dashboard component:** PARTIAL: `app/coach-os/page.tsx` renders the canonical shared role dashboard with an honest zero state; browser acceptance remains pending.
+- **Navigation configuration:** VERIFIED: `ROLE_NAVIGATION.coach` points to the distinct route.
 - **Permission set:** MISSING: no coach-specific relationship kind found.
 - **Data model(s):** PARTIAL: `profiles.onboarding_data`, Playbook Graph coach type, athlete tables exist separately.
 - **Completion hook:** MISSING: no coach record/roster creation on completion found.
@@ -155,9 +155,9 @@ Each role below expands the canonical table with description, implementation sta
 - **Verification requirements:** PARTIAL: institutional/NCAA fields captured; verification workflow not found.
 - **Playbook Record type:** PARTIAL: `organization` can represent institution; college-coach-specific type not found.
 - **Scholar Record applicability:** MISSING: access to verified Scholar-Athlete Records not wired to a verified recruiting workflow.
-- **Operating System route:** PARTIAL: `/university-os` shared route, no dedicated Recruiting OS route.
-- **Dashboard component:** PARTIAL: `app/university-os/page.tsx` shared dashboard.
-- **Navigation configuration:** VERIFIED/PARTIAL: `ROLE_NAVIGATION["college-coach"]`.
+- **Operating System route:** VERIFIED: `/recruiting-os`.
+- **Dashboard component:** PARTIAL: `app/recruiting-os/page.tsx` renders the canonical shared role dashboard with an honest zero state; browser acceptance remains pending.
+- **Navigation configuration:** VERIFIED: `ROLE_NAVIGATION["college-coach"]` points to the distinct route.
 - **Permission set:** PARTIAL: `university_partner` permissions exist; no college-coach-specific kind found.
 - **Data model(s):** PARTIAL: `profiles.onboarding_data`, Playbook Graph organization type, athlete/recruiting tables.
 - **Completion hook:** MISSING: no institution/recruiting authorization record creation on completion found.
@@ -171,9 +171,9 @@ Each role below expands the canonical table with description, implementation sta
 - **Verification requirements:** PARTIAL: official .edu email captured; institution approval workflow not verified.
 - **Playbook Record type:** PARTIAL: `organization` can represent institution; admissions-specific type not found.
 - **Scholar Record applicability:** MISSING: live scholar search/access workflow not verified.
-- **Operating System route:** PARTIAL: `/university-os` shared route, no dedicated Admissions OS route.
-- **Dashboard component:** PARTIAL: `app/university-os/page.tsx` shared dashboard.
-- **Navigation configuration:** VERIFIED/PARTIAL: `ROLE_NAVIGATION["college-admissions"]`.
+- **Operating System route:** VERIFIED: `/admissions-os`.
+- **Dashboard component:** PARTIAL: `app/admissions-os/page.tsx` renders the canonical shared role dashboard with an honest zero state; browser acceptance remains pending.
+- **Navigation configuration:** VERIFIED: `ROLE_NAVIGATION["college-admissions"]` points to the distinct route.
 - **Permission set:** PARTIAL: `university_partner` permissions fit, no admissions-specific kind found.
 - **Data model(s):** PARTIAL: `profiles.onboarding_data`, Playbook Graph organization/verification/match tables.
 - **Completion hook:** MISSING: no institution/admissions membership record creation on completion found.
@@ -187,9 +187,9 @@ Each role below expands the canonical table with description, implementation sta
 - **Verification requirements:** PARTIAL: email/profile status only; TAY-specific workflow not found.
 - **Playbook Record type:** PARTIAL: no TAY enum; closest available type is `scholar`.
 - **Scholar Record applicability:** PARTIAL: applicable if treated as scholar; onboarding creation not verified.
-- **Operating System route:** PARTIAL: `/dashboard`; no dedicated TAY OS route.
-- **Dashboard component:** PARTIAL: `app/dashboard/page.tsx` shared Scholar dashboard.
-- **Navigation configuration:** VERIFIED/PARTIAL: `ROLE_NAVIGATION["transition-youth"]`.
+- **Operating System route:** VERIFIED: `/transition-youth-os`.
+- **Dashboard component:** PARTIAL: `app/transition-youth-os/page.tsx` renders the canonical shared role dashboard with an honest zero state; browser acceptance remains pending.
+- **Navigation configuration:** VERIFIED: `ROLE_NAVIGATION["transition-youth"]` points to the distinct route.
 - **Permission set:** PARTIAL: no TAY-specific relationship kind found.
 - **Data model(s):** PARTIAL: `profiles.onboarding_data`, Playbook Graph scholar-like tables, support relationships.
 - **Completion hook:** MISSING: no TAY-specific record/link creation on completion found.
@@ -212,16 +212,16 @@ Each role below expands the canonical table with description, implementation sta
 - **Current implementation status:** MISSING.
 - **Source files:** `lib/auth/userPathways.ts`; `lib/navigation/roleNavigation.ts`; `lib/permissions/rolePermissions.ts`; `app/employer-os/page.tsx`; `supabase/migrations/20260701_playbook_graph.sql`.
 
-### Other / Community Partner
-- **Description:** Catch-all/community partner role routed toward pending/review rather than a dedicated OS.
+### Community Partner (`other`)
+- **Description:** Community partner pathway with distinct OS identity; organization, review, and authority contracts remain incomplete.
 - **Signup pathway:** VERIFIED: `other` in `USER_PATHWAYS`.
 - **Onboarding flow:** VERIFIED: `ROLE_ONBOARDING.other`; identity, network, agreement.
 - **Verification requirements:** PARTIAL: `/pending` reads verification status; manual review workflow not verified.
 - **Playbook Record type:** MISSING: no `other` enum found.
 - **Scholar Record applicability:** MISSING unless reassigned to scholar-like role; no evidence found.
-- **Operating System route:** PARTIAL: pathway `/pending`; navigation fallback `/dashboard`.
-- **Dashboard component:** PARTIAL: `app/pending/page.tsx` review-state UI; no dedicated OS dashboard.
-- **Navigation configuration:** PARTIAL: `ROLE_NAVIGATION.other` fallback.
+- **Operating System route:** VERIFIED: `/community-partner-os`.
+- **Dashboard component:** PARTIAL: `app/community-partner-os/page.tsx` renders the canonical shared role dashboard with an honest zero state; browser acceptance remains pending.
+- **Navigation configuration:** VERIFIED: `ROLE_NAVIGATION.other` points to the distinct route.
 - **Permission set:** MISSING: no `other` relationship kind found.
 - **Data model(s):** PARTIAL: profile verification/onboarding columns only.
 - **Completion hook:** MISSING: no review assignment or record creation hook found.

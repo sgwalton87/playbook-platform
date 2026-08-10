@@ -52,7 +52,10 @@ export function destinationForRelationship(relationship: RelationshipKind) {
     educator: getRoleDestination("educator"),
     mentor: getRoleDestination("mentor"),
     district_admin: getRoleDestination("district"),
-    university_partner: getRoleDestination("university"),
+    // A generic university relationship does not prove whether the invitee is
+    // a recruiter or admissions officer. Keep it at the neutral university
+    // boundary until that role is explicitly selected and verified.
+    university_partner: "/university-os",
     employer_partner: getRoleDestination("employer"),
   };
 

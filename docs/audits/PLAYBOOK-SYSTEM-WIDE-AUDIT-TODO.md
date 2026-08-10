@@ -39,10 +39,13 @@ COMPLETE`; completion still requires the evidence contract below.
   global responsive CSS, and the shared shell have been resolved.
 - [x] Focused design/auth validation passes (34 tests) and the production build
   compiles all 129 application/API routes.
-- [ ] Full repository suite passes on the converged revision.
-- [ ] Converged PR #77 head is pushed and exact-head GitHub/Vercel checks pass.
-- [ ] PR #77 is merged into `main`.
-- [ ] The exact `main` merge commit passes independent build and browser proof.
+- [x] Full repository suite passed on the converged PR #77 revision (126 files,
+  394 tests).
+- [x] Converged PR #77 head passed exact-head GitHub and Vercel checks.
+- [x] PR #77 merged into `main` as `9b0b5a7579fd342e3c98f5c703f33972dd5ecaa9`.
+- [ ] The exact `main` merge commit passes independent browser proof. Its tree
+  matches the validated PR head, but that does not replace merge-commit browser
+  evidence.
 
 ### Connection truth
 
@@ -51,21 +54,24 @@ COMPLETE`; completion still requires the evidence contract below.
 | Identity/authentication capabilities | 9 of 9 | 0 of 9 exact-merge browser-certified | Exact-revision browser proof remains. |
 | Canonical role registry keys | 15 of 15 | 0 of 15 role journeys certified | Every role still needs durable onboarding, authority, recovery, and acceptance proof. |
 | Public role-specific onboarding choices | 14 of 14 | 0 of 14 certified | Entry configuration exists; end-to-end completion does not. |
-| Distinct OS destination routes | 11 declared of 17 required | 0 of 17 certified | Six destinations are not represented as distinct routes; shared fallbacks still hide role-specific gaps. |
-| Visible route design convergence | 12 of 96 verified | 12 of 96 UI-verified only | 9 are in progress/unverified and 75 remain pending. |
+| Distinct OS destination routes | 17 of 17 implemented | 0 of 17 certified | Six new first-class routes remove shared destination fallbacks; authority, durable data, recovery, and browser proof remain open. |
+| Visible route design convergence | 12 of 102 verified | 12 of 102 UI-verified only | 15 are in progress/unverified and 75 remain pending. |
 | Canonical delivery phases | 0 of 15 | 0 of 15 | No whole-product phase may be called complete yet. |
 
 ### Immediate build checklist
 
 - [x] Reconcile PR #77 with the merged authentication work.
-- [ ] Run the complete unit/integration suite after reconciliation.
-- [ ] Push the exact converged revision and clear draft/conflicting PR state.
-- [ ] Require green exact-head GitHub and Vercel validation.
-- [ ] Merge PR #77 and validate the exact `main` merge commit.
+- [x] Run the complete unit/integration suite after reconciliation.
+- [x] Push the exact converged revision and clear PR #77 draft/conflicting state.
+- [x] Require green exact-head GitHub and Vercel validation.
+- [x] Merge PR #77 and preserve its exact validation lineage.
 - [ ] Recompile the canonical product graph; replace the historical 89-blocker
   count with current stable blocker IDs.
-- [ ] Publish the missing six OS destination definitions from canonical
-  authority before implementing route fallbacks as if they were complete.
+- [x] Publish the missing six OS destination definitions from canonical
+  authority without treating route materialization as journey completion.
+- [ ] Accept explicit least-privilege authority contracts for Counselor, Coach,
+  Recruiter, Admissions, and Community Partner; these roles currently fail
+  closed rather than inheriting unrelated authority.
 - [ ] Execute Scholar as the golden end-to-end role contract.
 - [ ] Apply that proven contract to the remaining 14 registry roles and all 17
   OS destinations.
@@ -95,10 +101,14 @@ COMPLETE`; completion still requires the evidence contract below.
 ### P0.2 One role registry and destination resolver
 
 - [ ] Make signup, auth callback, invitations, onboarding, navigation, and completion use one canonical role resolver.
-- [ ] Resolve High School Coach ambiguity between `/mentor-os` and `/educator-os`.
-- [ ] Resolve Community Partner/Other ambiguity between `/pending` and `/dashboard`.
-- [ ] Add complete canonical pathways for High School Counselor, Employer, Athletes Abroad, and District/School Administrator.
-- [ ] Prove all 15 onboarding pathway keys and all 17 OS destinations with unit tests.
+- [x] Resolve High School Coach route ambiguity with `/coach-os`.
+- [x] Resolve Community Partner/Other route ambiguity with `/community-partner-os`.
+- [ ] Complete canonical onboarding and authority pathways for High School
+  Counselor, Employer, Athletes Abroad, District/School Administrator, and
+  Community Partner. Their route destinations now exist, but their journeys do
+  not yet satisfy the evidence contract.
+- [x] Prove 14 public onboarding choices resolve to unique destinations and all
+  17 OS identifiers/routes are unique with unit tests.
 
 ### P0.3 Scholar golden journey
 

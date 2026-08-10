@@ -28,8 +28,13 @@ describe("canonical Playbook role registry", () => {
     }
   });
 
-  it("routes coaches to the institutional support OS instead of Mentor OS", () => {
-    expect(getRoleDestination("coach")).toBe("/educator-os");
+  it("gives every role pathway a first-class OS destination", () => {
+    expect(getRoleDestination("high-school-counselor")).toBe("/counselor-os");
+    expect(getRoleDestination("coach")).toBe("/coach-os");
+    expect(getRoleDestination("college-coach")).toBe("/recruiting-os");
+    expect(getRoleDestination("college-admissions")).toBe("/admissions-os");
+    expect(getRoleDestination("transition-youth")).toBe("/transition-youth-os");
+    expect(getRoleDestination("other")).toBe("/community-partner-os");
   });
 
   it("exposes all fourteen canonical public onboarding pathways", () => {

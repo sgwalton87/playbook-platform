@@ -151,10 +151,10 @@ export const ROLE_NAVIGATION: Record<string, RoleNavigation> = {
   },
 
   "high-school-counselor": {
-    home: "/educator-os",
+    home: "/counselor-os",
     label: "Counselor OS",
     items: [
-      { label: "Counselor Dashboard", href: "/educator-os", icon: "◎" },
+      { label: "Counselor Dashboard", href: "/counselor-os", icon: "◎" },
       { label: "Academic Readiness", href: "/academic-readiness", icon: "△" },
       SHARED_OPPORTUNITIES,
       SHARED_COURSES,
@@ -164,12 +164,12 @@ export const ROLE_NAVIGATION: Record<string, RoleNavigation> = {
   },
 
   coach: {
-    home: "/educator-os",
+    home: "/coach-os",
     label: "Coach OS",
     items: [
       {
         label: "Coach Dashboard",
-        href: "/educator-os",
+        href: "/coach-os",
         icon: "📋",
       },
       {
@@ -185,12 +185,12 @@ export const ROLE_NAVIGATION: Record<string, RoleNavigation> = {
   },
 
   "college-coach": {
-    home: "/university-os",
+    home: "/recruiting-os",
     label: "Recruiting OS",
     items: [
       {
         label: "Recruiting Dashboard",
-        href: "/university-os",
+        href: "/recruiting-os",
         icon: "🔎",
       },
       SHARED_OPPORTUNITIES,
@@ -200,12 +200,12 @@ export const ROLE_NAVIGATION: Record<string, RoleNavigation> = {
   },
 
   "college-admissions": {
-    home: "/university-os",
+    home: "/admissions-os",
     label: "Admissions OS",
     items: [
       {
         label: "Admissions Dashboard",
-        href: "/university-os",
+        href: "/admissions-os",
         icon: "🏛️",
       },
       SHARED_OPPORTUNITIES,
@@ -215,10 +215,10 @@ export const ROLE_NAVIGATION: Record<string, RoleNavigation> = {
   },
 
   "transition-youth": {
-    home: "/dashboard",
+    home: "/transition-youth-os",
     label: "TAY OS",
     items: [
-      { label: "Dashboard", href: "/dashboard", icon: "🏠" },
+      { label: "TAY Dashboard", href: "/transition-youth-os", icon: "🏠" },
       { label: "Start Here", href: "/start", icon: "▶️" },
       { label: "Compass", href: "/compass", icon: "🧭" },
       SHARED_OPPORTUNITIES,
@@ -270,10 +270,10 @@ export const ROLE_NAVIGATION: Record<string, RoleNavigation> = {
   },
 
   other: {
-    home: "/dashboard",
-    label: "Playbook",
+    home: "/community-partner-os",
+    label: "Community Partner OS",
     items: [
-      { label: "Dashboard", href: "/dashboard", icon: "🏠" },
+      { label: "Partner Dashboard", href: "/community-partner-os", icon: "🏠" },
       SHARED_OPPORTUNITIES,
       SHARED_COURSES,
       SHARED_MESSAGES,
