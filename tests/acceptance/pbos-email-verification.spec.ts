@@ -80,7 +80,7 @@ test("Email verification confirms durable identity and preserves role authority"
   });
 
   let resendBody = "";
-  await page.route("**/auth/v1/resend", async (route) => {
+  await page.route("**/auth/v1/resend**", async (route) => {
     resendBody = route.request().postData() ?? "";
     await route.fulfill({ status: 200, contentType: "application/json", body: "{}" });
   });
@@ -89,7 +89,7 @@ test("Email verification confirms durable identity and preserves role authority"
   await expect(page.getByRole("button", { name: /Resend available in/ })).toBeDisabled();
   expect(resendBody).toContain(email);
   expect(resendBody).toContain("/auth/callback");
-  await page.unroute("**/auth/v1/resend");
+  await page.unroute("**/auth/v1/resend**");
 
   await page.goto(`/auth/callback?token_hash=${encodeURIComponent(tokenHash)}&type=signup&role=scholar`);
   await page.waitForURL(/\/start\?first=1&role=family/);
@@ -177,7 +177,7 @@ test("Email verification is responsive, accessible, and secure without provider 
     created_at: "2026-08-09T11:00:00.000Z",
   };
 
-  await page.route("**/auth/v1/resend", (route) =>
+  await page.route("**/auth/v1/resend**", (route) =>
     route.fulfill({ status: 200, contentType: "application/json", body: "{}" })
   );
   await page.route("**/auth/v1/verify", (route) =>
