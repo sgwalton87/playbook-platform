@@ -8,7 +8,7 @@ export default function StoreV2() {
   const balance = getCoinBalance();
   const items = getStoreItems();
   const campaign = connectNILPromotion({
-    athleteId: "athlete-maya",
+    athleteId: "athlete-record",
     brandPartner: "Brand Partner",
     storeItemId: "training-kit",
   });

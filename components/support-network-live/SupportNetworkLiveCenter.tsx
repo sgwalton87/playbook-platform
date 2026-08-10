@@ -7,7 +7,7 @@ import {
   getDemoSupportThread,
 } from "@/lib/support-network-live";
 
-const DEMO_SCHOLAR_ID = "scholar-maya";
+const DEMO_SCHOLAR_ID = "scholar-record";
 
 export default function SupportNetworkLiveCenter() {
   const [body, setBody] = useState("");

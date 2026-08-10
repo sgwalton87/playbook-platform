@@ -33,7 +33,7 @@ export default function InvitationCenter() {
         inviteeName,
         inviteeEmail,
         relationship,
-        scholarName: "Maya Johnson",
+        scholarName: "Scholar",
       }),
     });
 

@@ -28,10 +28,10 @@ export default function PendingPage() {
     })();
   },[router]);
 
-  if(loading)return<div style={{minHeight:"100vh",background:T.cream,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:T.mono,fontSize:12,color:T.faint}}>Loading...</div>;
+  if(loading)return<div data-visual-canon="PGDS-001" style={{minHeight:"100vh",background:"#06172D",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:T.mono,fontSize:12,color:"#C7D5E5"}}>Preparing your Playbook…</div>;
 
   return(
-    <div style={{minHeight:"100vh",background:T.cream,fontFamily:T.sans,color:T.ink,display:"flex",alignItems:"center",justifyContent:"center",padding:"40px 20px"}}>
+    <div data-visual-canon="PGDS-001" style={{minHeight:"100vh",background:"radial-gradient(circle at 78% 12%,rgba(255,91,31,.2),transparent 28%),linear-gradient(135deg,#06172D,#081D38 56%,#031023)",fontFamily:T.sans,color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",padding:"40px 20px"}}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');*{box-sizing:border-box;margin:0;padding:0;}`}</style>
       <div style={{width:"100%",maxWidth:520}}>
         <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:28,justifyContent:"center"}}>

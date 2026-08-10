@@ -559,6 +559,60 @@ const NETWORK: OnboardingStep = {
   ],
 };
 
+const COUNSELOR_CONTEXT: OnboardingStep = {
+  id: "counselor-context",
+  phase: "Institutional Context",
+  title: "Connect your counseling practice.",
+  body: "Tell us where you work and how you support students so access can remain institution- and relationship-scoped.",
+  fields: [
+    { key: "school", label: "School", type: "text", placeholder: "School name" },
+    { key: "school_district", label: "District", type: "district", placeholder: "District name" },
+    { key: "official_email", label: "Official school email", type: "text", placeholder: "you@school.org" },
+    { key: "counselor_scope", label: "Primary support areas", type: "multi-select", options: ["Academic planning", "College applications", "Financial aid", "Career planning", "Student wellbeing", "Transition support"] },
+  ],
+};
+
+const EMPLOYER_CONTEXT: OnboardingStep = {
+  id: "employer-context",
+  phase: "Organization & Opportunity",
+  title: "Build your workforce pathway.",
+  body: "Describe your organization, verification contact, and the opportunities you intend to offer.",
+  fields: [
+    { key: "organization_name", label: "Organization", type: "text", placeholder: "Organization name" },
+    { key: "official_email", label: "Official work email", type: "text", placeholder: "you@organization.com" },
+    { key: "organization_website", label: "Organization website", type: "text", placeholder: "https://" },
+    { key: "opportunity_types", label: "Opportunity types", type: "multi-select", options: ["Internships", "Apprenticeships", "Work-based learning", "Job shadowing", "Career talks", "Entry-level roles"] },
+    { key: "candidate_audience", label: "Candidate audience", type: "textarea", placeholder: "Who should be able to discover these opportunities?" },
+  ],
+};
+
+const DISTRICT_CONTEXT: OnboardingStep = {
+  id: "district-context",
+  phase: "Institutional Authority",
+  title: "Verify your district or school scope.",
+  body: "PBOS uses this context to keep cohorts, readiness signals, and interventions inside the correct authority boundary.",
+  fields: [
+    { key: "school_district", label: "District", type: "district", placeholder: "District name" },
+    { key: "school", label: "School or department", type: "text", placeholder: "School or central office" },
+    { key: "official_email", label: "Official institutional email", type: "text", placeholder: "you@district.org" },
+    { key: "administrator_title", label: "Title", type: "text", placeholder: "Role or title" },
+    { key: "administrative_scope", label: "Authority scope", type: "multi-select", options: ["District", "School", "Program", "Counseling", "Athletics", "College and career readiness"] },
+  ],
+};
+
+const ATHLETE_ABROAD_CONTEXT: OnboardingStep = {
+  id: "athlete-abroad-context",
+  phase: "Global Pathway",
+  title: "Prepare your international pathway.",
+  body: "Connect your academic, athletic, travel, and transition context without exposing private records outside authorized relationships.",
+  fields: [
+    { key: "destination_regions", label: "Destination regions", type: "multi-select", options: ["United States", "Canada", "United Kingdom", "Europe", "Australia / New Zealand", "Other"] },
+    { key: "passport_readiness", label: "Passport readiness", type: "select", options: ["Ready", "In progress", "Need guidance", "Not started"] },
+    { key: "eligibility_context", label: "Eligibility context", type: "textarea", placeholder: "Share the governing body, league, school, or program requirements you are working through." },
+    { key: "international_support_needs", label: "Transition support", type: "multi-select", options: ["Academic equivalency", "Eligibility", "Recruiting", "Visa guidance", "Housing", "Financial planning", "Travel readiness"] },
+  ],
+};
+
 const USER_AGREEMENT: OnboardingStep = {
   id: "community-safety",
   phase: "Final Step · User Agreement",
@@ -619,6 +673,12 @@ export const ROLE_ONBOARDING: Record<string, OnboardingStep[]> = {
     NETWORK,
     USER_AGREEMENT,
   ],
+  "high-school-counselor": [
+    IDENTITY("High School Counselor"),
+    COUNSELOR_CONTEXT,
+    NETWORK,
+    USER_AGREEMENT,
+  ],
   coach: [
     IDENTITY("High School Coach"),
     HIGH_SCHOOL_COACH_CONTEXT,
@@ -652,6 +712,28 @@ export const ROLE_ONBOARDING: Record<string, OnboardingStep[]> = {
     SCHOLAR_GOALS,
     ATHLETE_PROFILE,
     SCHOLAR_ACTIVITIES,
+    NETWORK,
+    USER_AGREEMENT,
+  ],
+  employer: [
+    IDENTITY("Employer / Workforce Partner"),
+    EMPLOYER_CONTEXT,
+    NETWORK,
+    USER_AGREEMENT,
+  ],
+  district: [
+    IDENTITY("District / School Administrator"),
+    DISTRICT_CONTEXT,
+    NETWORK,
+    USER_AGREEMENT,
+  ],
+  "athlete-abroad": [
+    IDENTITY("Athlete Abroad"),
+    SCHOLAR_SUPPORT,
+    SCHOLAR_ACADEMIC,
+    ATHLETE_PROFILE,
+    ATHLETE_RECRUITING,
+    ATHLETE_ABROAD_CONTEXT,
     NETWORK,
     USER_AGREEMENT,
   ],

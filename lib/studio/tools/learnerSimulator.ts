@@ -7,7 +7,7 @@ export function generateDemoLearner(input: {
   const pathway = input.pathway || "Health Science + Community Leadership";
 
   return {
-    name: input.name || "Maya Johnson",
+    name: input.name || "Scholar",
     gradeLevel: input.gradeLevel || 10,
     pathway,
     trustScore: input.trustScore || 78,

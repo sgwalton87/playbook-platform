@@ -1,6 +1,6 @@
 :root {
-  --pb-navy: #10233f;
-  --pb-navy-dark: #071427;
+  --pb-navy: #071a35;
+  --pb-navy-dark: #020b19;
   --pb-orange: #c2410c;
   --pb-orange-bright: #f97316;
   --pb-orange-on-dark: #fdba74;
@@ -15,7 +15,7 @@
   --pb-error: #dc2626;
   --pb-info: #2563eb;
   --pb-border: #e7dccd;
-  --pb-bg: #f8f3ea;
+  --pb-bg: #eef4fb;
   --pb-radius-sm: 12px;
   --pb-radius-md: 18px;
   --pb-radius-lg: 24px;
@@ -50,8 +50,9 @@
   min-height: 100vh;
   display: grid;
   background:
-    radial-gradient(circle at top left, rgba(249, 115, 22, .12), transparent 32rem),
-    linear-gradient(135deg, var(--pb-bg), #fffaf4 48%, #f1f5f9);
+    radial-gradient(circle at 88% 0%, rgba(96, 75, 130, .16), transparent 36rem),
+    radial-gradient(circle at 15% 10%, rgba(249, 115, 22, .10), transparent 30rem),
+    linear-gradient(145deg, #f8fbff, var(--pb-bg) 58%, #f6f1f7);
   transition: grid-template-columns .22s ease;
 }
 
@@ -64,7 +65,8 @@
   box-sizing: border-box;
   overflow-y: auto;
   background:
-    radial-gradient(circle at 20% 0%, rgba(249, 115, 22, .26), transparent 18rem),
+    radial-gradient(circle at 12% 0%, rgba(249, 115, 22, .22), transparent 16rem),
+    radial-gradient(circle at 100% 72%, rgba(85, 66, 118, .30), transparent 20rem),
     linear-gradient(180deg, var(--pb-navy), var(--pb-navy-dark));
   border-right: 1px solid rgba(255, 255, 255, .10);
   box-shadow: 16px 0 44px rgba(7, 20, 39, .16);
@@ -98,6 +100,7 @@
 
 .playbook-brand {
   margin-bottom: 18px;
+  min-height: 66px;
 }
 
 .playbook-brand strong { letter-spacing: -.03em; }
@@ -135,15 +138,16 @@
 
 .playbook-sidebar nav { display: grid; gap: 8px; }
 .playbook-nav-item {
-  border-radius: 16px;
+  border: 1px solid transparent;
+  border-radius: 14px 20px 14px 14px;
   padding: 11px 12px;
   color: rgba(255,250,244,.80);
   font-weight: 900;
   transition: background .16s ease, color .16s ease, transform .16s ease;
 }
-.playbook-nav-item:hover { background: rgba(255,255,255,.10); transform: translateX(2px); }
+.playbook-nav-item:hover { background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.12); transform: translateX(2px); }
 .playbook-nav-item--active {
-  background: linear-gradient(135deg, var(--pb-orange), #fb923c);
+  background: linear-gradient(135deg, #c83c08, #f97316);
   color: var(--pb-white);
   box-shadow: 0 12px 28px rgba(249, 115, 22, .30);
 }
@@ -180,7 +184,7 @@
   gap: 16px;
   padding: 14px 24px;
   border-bottom: 1px solid rgba(231, 220, 205, .88);
-  background: rgba(255,250,244,.86);
+  background: rgba(248,251,255,.82);
   backdrop-filter: blur(16px);
   position: sticky;
   top: 0;
@@ -222,8 +226,10 @@
     z-index: 25;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 16px;
-    background: linear-gradient(135deg, var(--pb-navy), var(--pb-navy-dark));
+    padding: calc(12px + env(safe-area-inset-top)) 16px 12px;
+    background:
+      radial-gradient(circle at 85% 0%, rgba(249,115,22,.22), transparent 12rem),
+      linear-gradient(135deg, var(--pb-navy), var(--pb-navy-dark));
     color: var(--pb-white);
     box-shadow: var(--pb-shadow-soft);
   }
@@ -251,7 +257,10 @@
     border-radius: 16px;
     font-size: 10px;
     font-weight: 900;
+    min-width: 0;
+    overflow: hidden;
   }
+  .playbook-mobile-bottom-nav a span:last-child { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .playbook-mobile-bottom-nav a[data-active="true"] { background: var(--pb-orange); color: var(--pb-white); }
 }
 .playbook-button--secondary { background: var(--pb-white); color: var(--pb-navy); border: 1px solid var(--pb-border); }
@@ -282,4 +291,11 @@
 .playbook-tabs button { border: 0; border-radius: var(--pb-radius-pill); background: transparent; padding: 9px 14px; font-weight: 900; color: var(--pb-muted); }
 .playbook-tabs button[aria-selected="true"] { background: var(--pb-navy); color: white; }
 .playbook-input { min-height: 46px; width: 100%; border: 1px solid var(--pb-border); border-radius: var(--pb-radius-md); background: var(--pb-white); color: var(--pb-slate); padding: 10px 14px; }
-@media (max-width: 700px) { .playbook-page-header { display: block; } .playbook-card { padding: 18px; } }
+@media (max-width: 700px) {
+  .playbook-page-header { display: block; }
+  .playbook-card { padding: 18px; }
+  .playbook-page-header h1 { font-size: clamp(32px,11vw,48px); }
+  .playbook-page-header span { font-size: 16px; }
+  .playbook-tabs { display: flex; width: 100%; overflow-x: auto; }
+  .playbook-tabs button { flex: 0 0 auto; }
+}

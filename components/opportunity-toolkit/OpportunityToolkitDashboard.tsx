@@ -21,7 +21,7 @@ import {
 
 export default function OpportunityToolkitDashboard() {
   const resume = buildResumeProfile({
-    name: "Maya Johnson",
+    name: "Scholar",
     headline: "Scholar-athlete, future health leader, and community builder",
     education: ["Oakland High School — Class of 2027"],
     leadership: ["Peer mentor", "Team captain"],
@@ -34,7 +34,7 @@ export default function OpportunityToolkitDashboard() {
   const readiness = scoreResumeReadiness(resume);
 
   const bragSheet = buildBragSheet({
-    scholarName: "Maya Johnson",
+    scholarName: "Scholar",
     goals: ["Attend college", "Explore health careers", "Earn scholarships"],
     proudMoments: ["Improved academic consistency", "Led teammates through adversity"],
     challengesOvercome: ["Balanced athletics and academics"],
@@ -43,7 +43,7 @@ export default function OpportunityToolkitDashboard() {
   });
 
   const letter = buildRecommendationLetter({
-    scholarName: "Maya Johnson",
+    scholarName: "Scholar",
     recommenderName: "Coach Taylor",
     recommenderRole: "coach",
     opportunityName: "Health Careers Internship",
@@ -52,7 +52,7 @@ export default function OpportunityToolkitDashboard() {
   });
 
   const packet = buildPortfolioPacket({
-    scholarName: "Maya Johnson",
+    scholarName: "Scholar",
     resume,
     bragSheet,
     recommendationLetter: letter,

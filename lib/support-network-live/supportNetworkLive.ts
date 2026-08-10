@@ -30,12 +30,12 @@ export function createSharedAction(input: {
 export function getDemoSupportThread() {
   return [
     createSupportMessage({
-      scholarId: "scholar-maya",
+      scholarId: "scholar-record",
       senderRole: "family",
       body: "I can help gather the documents tonight.",
     }),
     createSupportMessage({
-      scholarId: "scholar-maya",
+      scholarId: "scholar-record",
       senderRole: "mentor",
       body: "I can do a mock interview this weekend.",
     }),
@@ -45,13 +45,13 @@ export function getDemoSupportThread() {
 export function getDemoSharedActions() {
   return [
     createSharedAction({
-      scholarId: "scholar-maya",
+      scholarId: "scholar-record",
       assignedRole: "family",
       title: "Upload support documents",
       detail: "Consent, transportation, and schedule info.",
     }),
     createSharedAction({
-      scholarId: "scholar-maya",
+      scholarId: "scholar-record",
       assignedRole: "mentor",
       title: "Schedule mock interview",
       detail: "Prepare for health careers internship.",

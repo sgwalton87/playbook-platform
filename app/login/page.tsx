@@ -25,7 +25,7 @@ const HCAPTCHA_DEVELOPMENT_SITE_KEY = "10000000-ffff-ffff-ffff-000000000001";
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div style={{ padding: 40 }}>Loading...</div>}>
+    <Suspense fallback={<div className="playbook-auth-loading">Preparing your Playbook…</div>}>
       <LoginContent />
     </Suspense>
   );
@@ -185,8 +185,8 @@ function LoginContent() {
   }
 
   return (
-    <main style={page}>
-      <section className="playbook-login-card">
+    <main style={page} data-visual-canon="PGDS-001" data-auth-surface={isSignup ? "signup" : "login"}>
+      <section className="playbook-login-card" aria-labelledby="playbook-auth-title">
         <div className="playbook-login-brand">
           <Image unoptimized width={1200} height={800}
             src={isSignup ? PLAYBOOK_HERO_VISUALS.signup.image : PLAYBOOK_HERO_VISUALS.login.image}
@@ -195,9 +195,9 @@ function LoginContent() {
           />
           <div style={brandOverlay} />
           <div className="playbook-login-brand-content">
-            <PlaybookLogo size={138} priority />
+            <PlaybookLogo size={82} priority />
             <p style={eyebrow}>The Playbook</p>
-            <h1 className="playbook-login-title">{copy.title}</h1>
+            <h1 id="playbook-auth-title" className="playbook-login-title">{copy.title}</h1>
             <p style={body}>{copy.body}</p>
           </div>
         </div>
@@ -224,11 +224,11 @@ function LoginContent() {
                       onClick={() => setRole(option.role)}
                       style={{
                         ...roleCard,
-                        borderColor: active ? "#C2410C" : "#E2E8F0",
-                        background: active ? "#FFF7ED" : "#FFFFFF",
+                        borderColor: active ? "#FF6C31" : "rgba(255,255,255,.18)",
+                        background: active ? "rgba(255,91,31,.18)" : "rgba(255,255,255,.05)",
                       }}
                     >
-                      <strong style={{ color: active ? "#9A3412" : "#0F172A" }}>
+                      <strong style={{ color: active ? "#FF8A50" : "#FFFFFF" }}>
                         {option.label}
                       </strong>
                       <span>{option.short}</span>
@@ -383,11 +383,11 @@ function LoginContent() {
 const page: React.CSSProperties = {
   minHeight: "100vh",
   background:
-    "radial-gradient(circle at 10% 10%, rgba(249,115,22,.16), transparent 28%), #F8F7F4",
+    "radial-gradient(circle at 78% 16%, rgba(255,91,31,.22), transparent 30%), linear-gradient(135deg,#06172D 0%,#081D38 56%,#031023 100%)",
   display: "grid",
   placeItems: "center",
   padding: 24,
-  color: "#0F172A",
+  color: "#FFFFFF",
 };
 
 const brandImage: React.CSSProperties = {
@@ -427,6 +427,8 @@ const form: React.CSSProperties = {
   flexDirection: "column",
   justifyContent: "center",
   gap: 18,
+  background: "rgba(4,18,39,.94)",
+  color: "#FFFFFF",
 };
 
 const formEyebrow: React.CSSProperties = {
@@ -435,7 +437,7 @@ const formEyebrow: React.CSSProperties = {
   fontWeight: 900,
   letterSpacing: ".16em",
   textTransform: "uppercase",
-  color: "#9A3412",
+  color: "#FF9A6C",
   margin: 0,
 };
 
@@ -450,7 +452,7 @@ const sectionLabel: React.CSSProperties = {
   fontWeight: 900,
   letterSpacing: ".14em",
   textTransform: "uppercase",
-  color: "#64748B",
+  color: "#9FB2C8",
   marginBottom: 10,
 };
 
@@ -471,7 +473,7 @@ const roleCard: React.CSSProperties = {
   display: "grid",
   gap: 6,
   cursor: "pointer",
-  color: "#475569",
+  color: "#B8C8DA",
   fontSize: 12,
   lineHeight: 1.35,
 };
@@ -483,15 +485,17 @@ const label: React.CSSProperties = {
 };
 
 const input: React.CSSProperties = {
-  border: "1px solid #CBD5E1",
+  border: "1px solid rgba(255,255,255,.24)",
   borderRadius: 16,
   padding: "15px 18px",
   fontSize: 18,
   outline: "none",
+  background: "rgba(255,255,255,.08)",
+  color: "#FFFFFF",
 };
 
 const passwordHelp: React.CSSProperties = {
-  color: "#475569",
+  color: "#B8C8DA",
   fontSize: 13,
   lineHeight: 1.5,
   margin: "-10px 0 0",
@@ -558,21 +562,21 @@ const switchRow: React.CSSProperties = {
   justifyContent: "center",
   gap: 8,
   flexWrap: "wrap",
-  color: "#64748B",
+  color: "#B8C8DA",
   fontWeight: 800,
 };
 
 const switchButton: React.CSSProperties = {
   border: "none",
   background: "transparent",
-  color: "#9A3412",
+  color: "#FF9A6C",
   fontWeight: 950,
   cursor: "pointer",
 };
 
 const forgotPasswordLink: React.CSSProperties = {
   alignSelf: "flex-end",
-  color: "#9A3412",
+  color: "#FF9A6C",
   fontWeight: 900,
   textDecoration: "underline",
   textUnderlineOffset: 3,
@@ -584,7 +588,7 @@ const rememberRow: React.CSSProperties = {
   alignItems: "center",
   gap: 10,
   fontWeight: 800,
-  color: "#64748B",
+  color: "#B8C8DA",
 };
 
 const rememberGroup: React.CSSProperties = {
@@ -601,10 +605,10 @@ const rememberHelp: React.CSSProperties = {
 
 
 const googleButton: React.CSSProperties = {
-  border: "1px solid #CBD5E1",
+  border: "1px solid rgba(255,255,255,.28)",
   borderRadius: 999,
-  background: "#FFFFFF",
-  color: "#0F172A",
+  background: "rgba(255,255,255,.08)",
+  color: "#FFFFFF",
   padding: "16px 22px",
   fontSize: 18,
   fontWeight: 950,
@@ -613,7 +617,7 @@ const googleButton: React.CSSProperties = {
 
 const divider: React.CSSProperties = {
   textAlign: "center",
-  color: "#475569",
+  color: "#B8C8DA",
   fontWeight: 900,
   fontFamily: "'Space Mono', monospace",
   fontSize: 11,

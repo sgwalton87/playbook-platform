@@ -19,7 +19,7 @@ export default function ScholarNetworkDashboard() {
     <main style={page}>
       <section style={hero}>
         <p style={eyebrow}>Scholar Network Dashboard</p>
-        <h1 style={title}>Maya&apos;s connected support ecosystem</h1>
+        <h1 style={title}>Scholar&apos;s connected support ecosystem</h1>
         <p style={sub}>
           Supporters, invitations, messages, shared actions, and blockers now live in one scholar-centered view.
         </p>

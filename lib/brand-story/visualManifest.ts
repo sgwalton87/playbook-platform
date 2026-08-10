@@ -5,14 +5,12 @@ export const PLAYBOOK_HERO_VISUALS = {
     alt: "Graduates celebrating together",
   },
   login: {
-    image:
-      "https://images.unsplash.com/photo-1529390079861-591de354faf5?w=1600&q=90",
-    alt: "Smiling students studying together",
+    image: "/brand/scholar-dashboard/scholar-future-hero-v1.png",
+    alt: "A Black male Scholar holding a tablet and looking confidently toward his future",
   },
   signup: {
-    image:
-      "https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?w=1600&q=90",
-    alt: "Diverse scholars walking together on campus",
+    image: "/brand/scholar-dashboard/scholar-future-hero-v1.png",
+    alt: "A Black male Scholar holding a tablet and looking confidently toward his future",
   },
   athlete: {
     image:
@@ -20,9 +18,8 @@ export const PLAYBOOK_HERO_VISUALS = {
     alt: "Young athletes preparing for competition",
   },
   start: {
-    image:
-      "https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?w=1600&q=90",
-    alt: "Diverse scholars walking together on campus",
+    image: "/brand/scholar-dashboard/scholar-future-hero-v1.png",
+    alt: "A Black male Scholar holding a tablet and looking confidently toward his future",
   },
   transcript: {
     image:

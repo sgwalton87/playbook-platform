@@ -39,7 +39,7 @@ export function canRelationship(kind: RelationshipKind, permission: Permission) 
 
 export function getRelationshipGraph() {
   return [
-    { name: "Maya", relationship: "scholar", permissions: getPermissionsForRelationship("scholar") },
+    { name: "Scholar", relationship: "scholar", permissions: getPermissionsForRelationship("scholar") },
     { name: "Parent / Guardian", relationship: "parent_guardian", permissions: getPermissionsForRelationship("parent_guardian") },
     { name: "Ms. Rivera", relationship: "educator", permissions: getPermissionsForRelationship("educator") },
     { name: "Coach Taylor", relationship: "mentor", permissions: getPermissionsForRelationship("mentor") },

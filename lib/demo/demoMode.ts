@@ -1,6 +1,6 @@
 export const demoLearner = {
-  id: "demo-learner-maya-johnson",
-  name: "Maya Johnson",
+  id: "demo-scholar-record",
+  name: "Scholar",
   gradeLevel: 10,
   school: "East Oakland Freedom High",
   city: "Oakland, CA",

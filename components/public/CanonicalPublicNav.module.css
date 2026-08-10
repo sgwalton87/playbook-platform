@@ -1,0 +1,21 @@
+.nav { position: relative; z-index: 10; width: min(1400px, calc(100% - 48px)); margin: auto; min-height: 92px; display: flex; align-items: center; justify-content: space-between; gap: 32px; }
+.brand { display: flex; align-items: center; gap: 12px; color: #fff; text-decoration: none; text-transform: uppercase; }
+.brand span { display: grid; line-height: 1; }
+.brand strong { font-family: Anton, sans-serif; font-size: 24px; letter-spacing: .04em; }
+.brand small { color: #ff6c31; font: 800 12px/1.4 "Space Mono", monospace; font-style: italic; }
+.links { display: flex; align-items: center; gap: clamp(18px, 2.4vw, 38px); }
+.links a { color: #d9e4f0; text-decoration: none; font-weight: 750; }
+.links .action { padding: 12px 20px; border-radius: 8px; color: #fff; background: #d0440d; box-shadow: 0 10px 30px rgba(255, 91, 31, .22); }
+
+@media (max-width: 900px) {
+  .nav { width: min(100% - 32px, 720px); min-height: 78px; flex-wrap: wrap; padding: 12px 0; }
+  .links { width: 100%; justify-content: space-between; gap: 12px; padding-bottom: 8px; }
+  .links a { font-size: 14px; }
+}
+
+@media (max-width: 560px) {
+  .brand strong { font-size: 19px; }
+  .brand small { font-size: 10px; }
+  .links { display: grid; grid-template-columns: repeat(4, auto); }
+  .links .action { padding: 10px 13px; font-size: 12px; white-space: nowrap; }
+}

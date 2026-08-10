@@ -23,8 +23,8 @@ import {
 
 export default function RecommenderWorkflowDashboard() {
   const request = buildRecommenderRequest({
-    scholarId: "scholar-maya",
-    scholarName: "Maya Johnson",
+    scholarId: "scholar-record",
+    scholarName: "Scholar",
     recommenderName: "Coach Taylor",
     recommenderEmail: "coach@example.com",
     recommenderRole: "coach",
@@ -42,7 +42,7 @@ export default function RecommenderWorkflowDashboard() {
   });
 
   const resume = buildResumeProfile({
-    name: "Maya Johnson",
+    name: "Scholar",
     education: ["Oakland High School"],
     athletics: ["Varsity basketball"],
     leadership: ["Team captain"],
@@ -50,7 +50,7 @@ export default function RecommenderWorkflowDashboard() {
   });
 
   const bragSheet = buildBragSheet({
-    scholarName: "Maya Johnson",
+    scholarName: "Scholar",
     goals: ["College", "Health career pathway"],
     proudMoments: ["Academic improvement"],
     challengesOvercome: ["Balancing athletics and academics"],
@@ -59,7 +59,7 @@ export default function RecommenderWorkflowDashboard() {
   });
 
   const pdfPayload = buildPortfolioPdfPayload({
-    scholarName: "Maya Johnson",
+    scholarName: "Scholar",
     targetUse: "internship",
     resume,
     bragSheet,

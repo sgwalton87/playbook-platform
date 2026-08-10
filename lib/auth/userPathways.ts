@@ -50,6 +50,13 @@ export const USER_PATHWAYS: UserPathway[] = [
     nextStep: "After confirming your email, you will complete Educator onboarding.",
   },
   {
+    role: "high-school-counselor",
+    label: "High School Counselor",
+    short: "Academic planning, applications, student support, and interventions.",
+    full: "High school counselors coordinate academic planning, applications, trusted support, and permission-scoped student interventions.",
+    nextStep: "After confirming your email, you will complete Counselor onboarding.",
+  },
+  {
     role: "coach",
     label: "High School Coach",
     short: "Roster support, player advocacy, film, and recruiting recommendations.",
@@ -83,6 +90,20 @@ export const USER_PATHWAYS: UserPathway[] = [
     short: "Internships, work-based learning, hiring pathways, and career exposure.",
     full: "Employers create opportunities for internships, apprenticeships, work-based learning, and career exploration.",
     nextStep: "After confirming your email, you will complete Employer onboarding.",
+  },
+  {
+    role: "district",
+    label: "District / School Administrator",
+    short: "School governance, cohorts, readiness signals, and scoped support.",
+    full: "District and school administrators coordinate verified institutions, cohorts, permissions, readiness signals, and accountable interventions.",
+    nextStep: "After confirming your email, you will complete District onboarding.",
+  },
+  {
+    role: "athlete-abroad",
+    label: "Athlete Abroad",
+    short: "Academics, eligibility, travel readiness, recruiting, and global transition.",
+    full: "Athletes preparing for international pathways connect academic evidence, eligibility, recruiting, travel readiness, and trusted support.",
+    nextStep: "After confirming your email, you will complete Athlete Abroad onboarding.",
   },
   {
     role: "other",

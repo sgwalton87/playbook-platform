@@ -121,7 +121,7 @@ function ResetPasswordContent() {
   }
 
   return (
-    <main className="password-reset-page">
+    <main className="password-reset-page" data-design-canon="PGDS-001">
       <section className="password-reset-card" aria-labelledby="password-reset-title">
         <aside className="password-reset-brand">
           <PlaybookLogo size={132} priority />

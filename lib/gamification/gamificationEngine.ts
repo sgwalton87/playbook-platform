@@ -45,9 +45,9 @@ export function awardCoins(input: {
 
 export function getDemoCoinLedger() {
   return [
-    awardCoins({ scholarId: "scholar-maya", action: "course.completed" }),
-    awardCoins({ scholarId: "scholar-maya", action: "evidence.verified" }),
-    awardCoins({ scholarId: "scholar-maya", action: "shared_action.completed" }),
+    awardCoins({ scholarId: "scholar-record", action: "course.completed" }),
+    awardCoins({ scholarId: "scholar-record", action: "evidence.verified" }),
+    awardCoins({ scholarId: "scholar-record", action: "shared_action.completed" }),
   ];
 }
 

@@ -150,13 +150,26 @@ export const ROLE_NAVIGATION: Record<string, RoleNavigation> = {
     ],
   },
 
+  "high-school-counselor": {
+    home: "/educator-os",
+    label: "Counselor OS",
+    items: [
+      { label: "Counselor Dashboard", href: "/educator-os", icon: "◎" },
+      { label: "Academic Readiness", href: "/academic-readiness", icon: "△" },
+      SHARED_OPPORTUNITIES,
+      SHARED_COURSES,
+      SHARED_MESSAGES,
+      SHARED_PROFILE,
+    ],
+  },
+
   coach: {
-    home: "/mentor-os",
+    home: "/educator-os",
     label: "Coach OS",
     items: [
       {
         label: "Coach Dashboard",
-        href: "/mentor-os",
+        href: "/educator-os",
         icon: "📋",
       },
       {
@@ -225,6 +238,32 @@ export const ROLE_NAVIGATION: Record<string, RoleNavigation> = {
         icon: "💼",
       },
       SHARED_OPPORTUNITIES,
+      SHARED_MESSAGES,
+      SHARED_PROFILE,
+    ],
+  },
+
+  district: {
+    home: "/district-os",
+    label: "District OS",
+    items: [
+      { label: "District Dashboard", href: "/district-os", icon: "▦" },
+      { label: "Academic Readiness", href: "/academic-readiness", icon: "△" },
+      SHARED_OPPORTUNITIES,
+      SHARED_MESSAGES,
+      SHARED_PROFILE,
+    ],
+  },
+
+  "athlete-abroad": {
+    home: "/athlete-abroad-os",
+    label: "Athlete Abroad OS",
+    items: [
+      { label: "Global Dashboard", href: "/athlete-abroad-os", icon: "◉" },
+      { label: "Start Here", href: "/start", icon: "▶" },
+      { label: "Academic Readiness", href: "/academic-readiness", icon: "△" },
+      SHARED_OPPORTUNITIES,
+      SHARED_COURSES,
       SHARED_MESSAGES,
       SHARED_PROFILE,
     ],

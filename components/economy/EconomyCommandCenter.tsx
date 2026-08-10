@@ -19,7 +19,7 @@ export default function EconomyCommandCenter() {
   const tourProgress = getTourProgress({ role: "scholar_athlete", completedStepIds: ["dashboard", "messages"] });
 
   const policy = buildRewardPolicyDecision({
-    scholarId: "scholar-maya",
+    scholarId: "scholar-record",
     eventType: "application.ready",
     sourceId: "app-1",
     alreadyProcessedKeys: [],
@@ -27,7 +27,7 @@ export default function EconomyCommandCenter() {
 
   const products = getDemoStoreCatalog();
   const redemption = buildRedemptionTransaction({
-    scholarId: "scholar-maya",
+    scholarId: "scholar-record",
     productId: products[0].id,
     coinPrice: products[0].coinPrice,
     currentBalance: 900,
@@ -43,7 +43,7 @@ export default function EconomyCommandCenter() {
     id: "campaign-1",
     partnerId: partner.id,
     storeProductId: products[0].id,
-    athleteId: "athlete-maya",
+    athleteId: "athlete-record",
     deliverables: ["Product feature", "Training reflection"],
   });
 

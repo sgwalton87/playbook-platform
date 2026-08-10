@@ -9,7 +9,7 @@ export type SupportRole =
 
 export function getSharedOpportunityPlan() {
   return {
-    scholar: "Maya Johnson",
+    scholar: "Scholar",
     opportunity: "Kaiser Permanente Health Careers Summer Internship",
     matchScore: 87,
     deadline: "April 15",
@@ -33,7 +33,7 @@ export function getSharedOpportunityPlan() {
       {
         role: "mentor",
         title: "Practice interview",
-        action: "Schedule a mock interview and review Maya's story.",
+        action: "Schedule a mock interview and review Scholar support story.",
       },
       {
         role: "district",
@@ -43,7 +43,7 @@ export function getSharedOpportunityPlan() {
       {
         role: "university",
         title: "Pathway signal",
-        action: "Flag Maya for future health science outreach.",
+        action: "Flag Scholar for future health science outreach.",
       },
       {
         role: "employer",
