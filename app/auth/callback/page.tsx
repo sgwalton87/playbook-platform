@@ -90,7 +90,13 @@ function AuthCallbackContent() {
           : null,
         Boolean(existing)
       );
+      const verifiedSignupRole = tokenHash && emailVerificationType === "signup"
+        ? data.user.user_metadata?.profile_mode ||
+          data.user.user_metadata?.role ||
+          data.user.user_metadata?.requested_role
+        : null;
       const role = normalizeRole(
+        verifiedSignupRole ||
         existing?.profile_mode ||
         existing?.role ||
         googleRequestedRole ||
