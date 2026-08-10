@@ -1,0 +1,20 @@
+diff --git a/docs/design/CANONICAL_ROUTE_MAP.md b/docs/DESIGN/CANONICAL_ROUTE_MAP.md
+similarity index 100%
+rename from docs/design/CANONICAL_ROUTE_MAP.md
+rename to docs/DESIGN/CANONICAL_ROUTE_MAP.md
+diff --git a/docs/design/FUNCTIONAL_WIRING_BACKLOG.md b/docs/DESIGN/FUNCTIONAL_WIRING_BACKLOG.md
+similarity index 100%
+rename from docs/design/FUNCTIONAL_WIRING_BACKLOG.md
+rename to docs/DESIGN/FUNCTIONAL_WIRING_BACKLOG.md
+diff --git a/docs/design/OVERNIGHT_DESIGN_REPORT.md b/docs/DESIGN/OVERNIGHT_DESIGN_REPORT.md
+similarity index 100%
+rename from docs/design/OVERNIGHT_DESIGN_REPORT.md
+rename to docs/DESIGN/OVERNIGHT_DESIGN_REPORT.md
+diff --git a/docs/design/PAGE_APPROVAL_CHECKLIST.md b/docs/DESIGN/PAGE_APPROVAL_CHECKLIST.md
+similarity index 100%
+rename from docs/design/PAGE_APPROVAL_CHECKLIST.md
+rename to docs/DESIGN/PAGE_APPROVAL_CHECKLIST.md
+diff --git a/docs/design/VISUAL_DEVIATIONS.md b/docs/DESIGN/VISUAL_DEVIATIONS.md
+similarity index 100%
+rename from docs/design/VISUAL_DEVIATIONS.md
+rename to docs/DESIGN/VISUAL_DEVIATIONS.md
