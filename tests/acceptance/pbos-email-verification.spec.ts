@@ -80,7 +80,9 @@ test("Email verification confirms durable identity and preserves role authority"
   });
 
   let resendBody = "";
+  let resendUrl = "";
   await page.route("**/auth/v1/resend**", async (route) => {
+    resendUrl = route.request().url();
     resendBody = route.request().postData() ?? "";
     await route.fulfill({ status: 200, contentType: "application/json", body: "{}" });
   });
@@ -88,7 +90,7 @@ test("Email verification confirms durable identity and preserves role authority"
   await expect(page.getByRole("status")).toContainText("A new verification email is on its way.");
   await expect(page.getByRole("button", { name: /Resend available in/ })).toBeDisabled();
   expect(resendBody).toContain(email);
-  expect(resendBody).toContain("/auth/callback");
+  expect(new URL(resendUrl).searchParams.get("redirect_to")).toContain("/auth/callback");
   await page.unroute("**/auth/v1/resend**");
 
   await page.goto(`/auth/callback?token_hash=${encodeURIComponent(tokenHash)}&type=signup&role=scholar`);
