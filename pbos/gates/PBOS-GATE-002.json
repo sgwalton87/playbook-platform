@@ -1,0 +1,26 @@
+{
+  "id": "PBOS-GATE-002",
+  "title": "Make build robust without unrelated provider keys",
+  "status": "complete",
+  "priority": 95,
+  "dependencies": ["PBOS-GATE-001"],
+  "handbook_refs": [
+    "docs/DATABASE.md#configuration",
+    "docs/MASTER_CHECKLIST.md#current-priorities",
+    "docs/auto_sprint.md#recommended-first-auto-sprints"
+  ],
+  "tasks": [
+    "Ensure build and page-data generation do not fail from missing optional provider keys.",
+    "Document required vs optional secrets in app startup and integration layers.",
+    "Add deterministic fallback behavior for provider-dependent paths without weakening security.",
+    "Capture evidence that static generation and route checks remain stable under minimal environment settings."
+  ],
+  "definition_of_done": [
+    "Static build remains green when optional provider keys are absent or placeholder.",
+    "Route-level behavior degrades safely for non-critical provider operations.",
+    "Environment contract for local/CI/runtime secret requirements is documented.",
+    "Build and lint evidence is refreshed and archived."
+  ],
+  "validation": ["docs", "lint", "build", "test"],
+  "next_gate": null
+}

@@ -1,22 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-function getSupabaseAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-}
+import { requireUser } from "@/lib/supabase/server";
 
 export async function POST(req: NextRequest) {
+  const { supabase, user } = await requireUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
-    const supabase = getSupabaseAdmin();
     const body = await req.json();
+    const bodyPartnerId = body.partnerId || user.id;
 
     const { data, error } = await supabase
       .from("nil_store_campaigns")
       .insert({
-        partner_id: body.partnerId,
+        partner_id: bodyPartnerId,
         athlete_profile_id: body.athleteProfileId,
         product_id: body.productId,
         title: body.title,
@@ -40,7 +39,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
-  const supabase = getSupabaseAdmin();
+  const { supabase } = await requireUser();
 
   const { data, error } = await supabase
     .from("nil_store_campaigns")

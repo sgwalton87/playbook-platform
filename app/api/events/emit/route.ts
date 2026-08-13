@@ -4,27 +4,66 @@ import {
   convertEventToNotification,
   resolveRecipients,
 } from "@/lib/event-notifications";
-import { createClient } from "@supabase/supabase-js";
-
-
-function getSupabaseAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-}
+import { requireUser } from "@/lib/supabase/server";
 
 export async function POST(req: NextRequest) {
-  const supabase = getSupabaseAdmin();
+  const { supabase, user } = await requireUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
   try {
     const body = await req.json();
 
+    const requestedScholarId = String(body.scholarId || "");
+    const actorRole = typeof body.actorRole === "string" ? body.actorRole : undefined;
+
+    if (!requestedScholarId || String(body.type || "").trim().length === 0) {
+      return NextResponse.json(
+        { error: "Missing event type or scholarId." },
+        { status: 400 }
+      );
+    }
+
+    if (body.actorId && body.actorId !== user.id) {
+      return NextResponse.json(
+        { error: "Actor identity does not match authenticated user." },
+        { status: 403 }
+      );
+    }
+
+    const userIsScholar = requestedScholarId === user.id;
+
+    if (!userIsScholar) {
+      const { data: relationship, error: relationshipError } = await supabase
+        .from("support_relationships")
+        .select("id")
+        .eq("scholar_id", requestedScholarId)
+        .eq("supporter_id", user.id)
+        .eq("status", "active")
+        .maybeSingle();
+
+      if (relationshipError) {
+        return NextResponse.json(
+          { error: relationshipError.message },
+          { status: 400 }
+        );
+      }
+
+      if (!relationship) {
+        return NextResponse.json(
+          { error: "No relationship access to this scholar." },
+          { status: 403 }
+        );
+      }
+    }
+
     const event = buildPlaybookEvent({
       type: body.type,
-      scholarId: body.scholarId,
-      actorId: body.actorId,
-      actorRole: body.actorRole,
+      scholarId: requestedScholarId,
+      actorId: user.id,
+      actorRole,
       payload: body.payload || {},
     });
 

@@ -58,6 +58,25 @@ export function updateStateForPlanning(state: EngineState, selectedGate: string 
   const validationHash = crypto.createHash("sha256").update(JSON.stringify({ selectedGate, blockers })).digest("hex");
   const environment = detectReleaseEnvironment();
   const promotion = resolvePromotionState(environment);
+
+  const nextReleaseState = promotion.state;
+  const isNoopPromotionTransition = state.release.currentState === nextReleaseState;
+  const release = isNoopPromotionTransition
+    ? {
+        ...state.release,
+        transitionTimestamp: new Date().toISOString(),
+        transitionReason: promotion.reason,
+        environment,
+        blockingConditions: promotion.blockers,
+      }
+    : createTransition({
+      previousState: state.release.currentState,
+      currentState: nextReleaseState,
+      transitionReason: promotion.reason,
+      environment,
+      blockingConditions: promotion.blockers,
+    });
+
   return {
     ...state,
     currentGate: selectedGate,
@@ -66,12 +85,6 @@ export function updateStateForPlanning(state: EngineState, selectedGate: string 
     lastRun: new Date().toISOString(),
     validationHash,
     resumeToken: createResumeToken(),
-    release: createTransition({
-      previousState: "ENGINEERING_APPROVED",
-      currentState: promotion.state,
-      transitionReason: promotion.reason,
-      environment,
-      blockingConditions: promotion.blockers,
-    }),
+    release,
   };
 }

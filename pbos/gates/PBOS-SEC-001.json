@@ -1,0 +1,26 @@
+{
+  "id": "PBOS-SEC-001",
+  "title": "Audit service-role API authorization and governance",
+  "status": "complete",
+  "priority": 65,
+  "dependencies": ["PBOS-QA-001", "PBOS-RLS-001", "PBOS-UI-001"],
+  "handbook_refs": [
+    "docs/RELEASE_PROCESS.md#security",
+    "docs/DATABASE.md#role-based-access-and-rpc",
+    "docs/ARCHITECTURE.md#api-strategy"
+  ],
+  "tasks": [
+    "Enumerate API routes that use `SUPABASE_SERVICE_ROLE_KEY` and document why each route needs elevation.",
+    "Verify route-level authorization checks and actor constraints for every privileged service-role path.",
+    "Define or apply service-role usage controls where elevation is not justified.",
+    "Create an auditable security artifact that classifies routes by risk and remediation state."
+  ],
+  "definition_of_done": [
+    "Complete service-role route audit with route-level risk tags and owner ownership.",
+    "High-risk routes have explicit justification and remediation plan before merge.",
+    "No new sensitive data handling paths are added without governance evidence.",
+    "Release evidence artifacts are generated and linked for the next audit sweep."
+  ],
+  "validation": ["docs", "sec:audit"],
+  "next_gate": null
+}

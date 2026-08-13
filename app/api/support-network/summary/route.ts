@@ -1,20 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-function getSupabaseAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-}
+import { requireUser } from "@/lib/supabase/server";
 
 export async function GET(req: NextRequest) {
-  const supabase = getSupabaseAdmin();
+  const { supabase, user } = await requireUser();
 
-  const scholarId = req.nextUrl.searchParams.get("scholarId");
+  if (!user) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
 
-  if (!scholarId) {
-    return NextResponse.json({ error: "Missing scholarId" }, { status: 400 });
+  const requestedScholarId = req.nextUrl.searchParams.get("scholarId");
+  const scholarId = requestedScholarId || user.id;
+
+  if (requestedScholarId && requestedScholarId !== user.id) {
+    return NextResponse.json(
+      { error: "Forbidden" },
+      { status: 403 }
+    );
   }
 
   const [relationships, invitations, messages, actions] = await Promise.all([

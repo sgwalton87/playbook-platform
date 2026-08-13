@@ -1,31 +1,52 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getTourProgress, type GuidedRole } from "@/lib/guided-experience";
-import { createClient } from "@supabase/supabase-js";
+import { requireUser } from "@/lib/supabase/server";
 
-function getSupabaseAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+const allowedRoles: ReadonlyArray<GuidedRole> = [
+  "scholar",
+  "scholar_athlete",
+  "family",
+  "educator",
+  "mentor",
+  "district",
+  "university",
+  "employer",
+];
+
+function isGuidedRole(value: unknown): value is GuidedRole {
+  return typeof value === "string" && (allowedRoles as ReadonlyArray<string>).includes(value);
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = getSupabaseAdmin();
+  const { supabase, user } = await requireUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
   const body = await req.json();
+  const completedStepIds = Array.isArray(body.completedStepIds)
+    ? body.completedStepIds.map(String)
+    : [];
+
+  if (!isGuidedRole(body.role)) {
+    return NextResponse.json({ error: "Invalid role." }, { status: 400 });
+  }
+
+  const role = body.role;
 
   const progress = getTourProgress({
-    role: body.role as GuidedRole,
-    completedStepIds: body.completedStepIds || [],
+    role,
+    completedStepIds,
   });
 
   const { data, error } = await supabase
     .from("guided_tour_progress")
     .upsert({
-      user_id: body.userId,
-      role: body.role,
-      completed_step_ids: body.completedStepIds || [],
-      skipped: body.skipped || false,
+      user_id: user.id,
+      role,
+      completed_step_ids: completedStepIds,
+      skipped: Boolean(body.skipped),
     })
     .select()
     .single();

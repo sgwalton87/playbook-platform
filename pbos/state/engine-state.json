@@ -1,12 +1,16 @@
 {
-  "currentGate": "PBOS-GATE-001",
+  "currentGate": null,
   "completedGates": [],
   "failedGates": [],
-  "blockedGates": [],
-  "blockedBy": [],
-  "lastRun": "2026-07-24T04:11:58.536Z",
+  "blockedGates": [
+    "SingleSprintRule"
+  ],
+  "blockedBy": [
+    "SingleSprintRule"
+  ],
+  "lastRun": "2026-08-10T08:56:39.679Z",
   "handbookVersion": "2026-07-24",
-  "validationHash": "5f9075ce03b03315b0a08e5a2c622aa9c4bbd97ba91a67f697c9de041de06dab",
+  "validationHash": "ac1224c16df205813b8b2f2193de9535d343585dab9cdf7fd7079712a700258d",
   "configurationHash": null,
   "futureCompatibility": [
     "execution",
@@ -16,26 +20,21 @@
     "ship"
   ],
   "engineVersion": "3.0.0",
-  "resumeToken": "132b2aead337f087dc21f071",
+  "resumeToken": "fbe4428a28c047f1b2c9151a",
   "executionMode": "planning",
   "release": {
-    "currentState": "PROMOTION_PENDING",
-    "previousState": "ENGINEERING_APPROVED",
-    "transitionTimestamp": "2026-07-24T04:11:58.538Z",
-    "transitionReason": "Engineering review remains valid, but repository promotion is pending because the environment cannot complete remote GitHub operations.",
+    "currentState": "PROMOTION_COMPLETE",
+    "previousState": "PROMOTION_PENDING",
+    "transitionTimestamp": "2026-08-10T08:56:39.676Z",
+    "transitionReason": "Repository promotion can complete in this environment.",
     "environment": {
       "name": "codex",
-      "gitRemoteAvailable": false,
-      "gitCredentialsAvailable": false,
+      "gitRemoteAvailable": true,
+      "gitCredentialsAvailable": true,
       "repositoryWritable": true,
-      "pullRequestPossible": false,
-      "tagCreationPossible": false
+      "pullRequestPossible": true,
+      "tagCreationPossible": true
     },
-    "blockingConditions": [
-      "Git remote unavailable",
-      "Git credentials unavailable",
-      "Pull Request creation unavailable",
-      "Release tag creation unavailable"
-    ]
+    "blockingConditions": []
   }
 }

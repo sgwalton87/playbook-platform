@@ -1,7 +1,7 @@
 {
   "id": "PBOS-RLS-001",
   "title": "Validate production RLS and role access",
-  "status": "blocked",
+  "status": "complete",
   "priority": 90,
   "dependencies": ["PBOS-GATE-001"],
   "handbook_refs": [

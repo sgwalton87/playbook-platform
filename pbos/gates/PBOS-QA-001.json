@@ -1,7 +1,7 @@
 {
   "id": "PBOS-QA-001",
   "title": "Establish browser E2E launch smoke coverage",
-  "status": "blocked",
+  "status": "complete",
   "priority": 70,
   "dependencies": ["PBOS-GATE-001", "PBOS-RLS-001", "PBOS-UI-001"],
   "handbook_refs": [
@@ -20,5 +20,5 @@
     "Failures are classified as product, environment, or test-harness issues."
   ],
   "validation": ["docs"],
-  "next_gate": null
+  "next_gate": "PBOS-SEC-001"
 }

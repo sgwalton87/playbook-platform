@@ -5,42 +5,31 @@ import {
   buildInvitationEmail,
   buildInvitationRecord,
 } from "@/lib/invitations/server";
-
-import type { RelationshipKind } from "@/lib/permissions";
+import { parseInvitationSendPayload } from "@/lib/api/contracts/invitations";
 import { buildSupportInvitationEmail, sendPlaybookEmail } from "@/lib/email";
-import { createClient } from "@supabase/supabase-js";
-
-function getSupabaseAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-}
+import { requireUser } from "@/lib/supabase/server";
 
 export async function POST(req: NextRequest) {
-  const supabase = getSupabaseAdmin();
+  const { supabase, user } = await requireUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
   try {
-    const body = await req.json();
+    const payload = await req.json();
+    const parsed = parseInvitationSendPayload(payload);
 
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+    if (!parsed.ok) {
+      return NextResponse.json({ error: parsed.error }, { status: 400 });
     }
 
     const record = buildInvitationRecord({
       scholarId: user.id,
-      scholarName: body.scholarName || "Scholar",
-      inviteeName: body.inviteeName,
-      inviteeEmail: body.inviteeEmail,
-      relationship: body.relationship as RelationshipKind,
+      scholarName: parsed.value.scholarName,
+      inviteeName: parsed.value.inviteeName,
+      inviteeEmail: parsed.value.inviteeEmail,
+      relationship: parsed.value.relationship,
     });
 
     const { error } = await supabase

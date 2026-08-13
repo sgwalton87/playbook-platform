@@ -1,0 +1,13 @@
+{
+  "mission": "PBOS-SEC-001",
+  "generatedAt": "2026-08-10T09:07:21.959Z",
+  "scope": "app/api route handlers using SUPABASE_SERVICE_ROLE_KEY",
+  "summary": {
+    "serviceRoleRouteCount": 0,
+    "highRiskRoutes": 0,
+    "mediumRiskRoutes": 0,
+    "lowRiskRoutes": 0,
+    "riskCounts": {}
+  },
+  "findings": []
+}

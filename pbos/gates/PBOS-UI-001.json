@@ -1,7 +1,7 @@
 {
   "id": "PBOS-UI-001",
   "title": "Audit AppShell and design system consistency",
-  "status": "blocked",
+  "status": "complete",
   "priority": 80,
   "dependencies": ["PBOS-GATE-001", "PBOS-RLS-001"],
   "handbook_refs": [

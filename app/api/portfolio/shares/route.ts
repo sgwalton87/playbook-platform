@@ -1,22 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildPortfolioShare } from "@/lib/portfolio-sharing";
-import { createClient } from "@supabase/supabase-js";
-
-function getSupabaseAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-}
+import { requireUser } from "@/lib/supabase/server";
 
 export async function POST(req: NextRequest) {
-  const supabase = getSupabaseAdmin();
+  const { supabase, user } = await requireUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
   try {
     const body = await req.json();
+    const scholarId = body.scholarId || user.id;
+
+    if (body.scholarId && body.scholarId !== user.id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
 
     const share = buildPortfolioShare({
-      scholarId: body.scholarId,
+      scholarId,
       scholarName: body.scholarName,
       targetUse: body.targetUse,
       packet: body.packet,
@@ -27,7 +29,7 @@ export async function POST(req: NextRequest) {
       .from("portfolio_shares")
       .insert({
         share_id: share.id,
-        scholar_id: body.scholarId,
+        scholar_id: scholarId,
         scholar_name: share.scholarName,
         target_use: share.targetUse,
         packet: share.packet,
@@ -55,12 +57,17 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  const supabase = getSupabaseAdmin();
+  const { supabase, user } = await requireUser();
 
-  const scholarId = req.nextUrl.searchParams.get("scholarId");
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
-  if (!scholarId) {
-    return NextResponse.json({ error: "Missing scholarId" }, { status: 400 });
+  const requestedScholarId = req.nextUrl.searchParams.get("scholarId");
+  const scholarId = requestedScholarId || user.id;
+
+  if (requestedScholarId && requestedScholarId !== user.id) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   const { data, error } = await supabase

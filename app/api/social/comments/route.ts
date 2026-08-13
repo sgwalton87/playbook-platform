@@ -1,26 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-function admin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-}
+import { requireUser } from "@/lib/supabase/server";
 
 export async function POST(req: NextRequest) {
-  const body = await req.json();
-  const supabase = admin();
+  const { supabase, user } = await requireUser();
 
-  if (!body.body?.trim()) {
-    return NextResponse.json({ error: "Comment is required." }, { status: 400 });
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const body = await req.json();
+
+  if (!body.postId || !body.body?.trim()) {
+    return NextResponse.json({ error: "Post id and comment body are required." }, { status: 400 });
   }
 
   const { data, error } = await supabase
     .from("feed_post_comments")
     .insert({
       post_id: body.postId,
-      user_id: body.userId,
+      user_id: user.id,
       body: body.body.trim(),
     })
     .select()
@@ -29,7 +27,7 @@ export async function POST(req: NextRequest) {
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
 
   await supabase.from("coin_ledger").insert({
-    scholar_id: body.userId,
+    scholar_id: user.id,
     event_type: "comment.created",
     source_id: body.postId,
     coins: 2,
@@ -41,10 +39,15 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const body = await req.json();
-  const supabase = admin();
+  const { supabase, user } = await requireUser();
 
-  if (!body.commentId || !body.userId || !body.body?.trim()) {
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const body = await req.json();
+
+  if (!body.commentId || !body.body?.trim()) {
     return NextResponse.json({ error: "Missing comment edit data." }, { status: 400 });
   }
 
@@ -52,7 +55,7 @@ export async function PATCH(req: NextRequest) {
     .from("feed_post_comments")
     .update({ body: body.body.trim() })
     .eq("id", body.commentId)
-    .eq("user_id", body.userId)
+    .eq("user_id", user.id)
     .select()
     .single();
 
@@ -62,10 +65,15 @@ export async function PATCH(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const body = await req.json();
-  const supabase = admin();
+  const { supabase, user } = await requireUser();
 
-  if (!body.commentId || !body.userId) {
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const body = await req.json();
+
+  if (!body.commentId) {
     return NextResponse.json({ error: "Missing comment delete data." }, { status: 400 });
   }
 
@@ -73,7 +81,7 @@ export async function DELETE(req: NextRequest) {
     .from("feed_post_comments")
     .delete()
     .eq("id", body.commentId)
-    .eq("user_id", body.userId);
+    .eq("user_id", user.id);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
 

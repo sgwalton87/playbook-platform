@@ -10,6 +10,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
+    "test:synthetic": "node scripts/test-synthetic.mjs",
+    "sec:audit": "node scripts/audit-service-role-routes.mjs",
+    "rls:matrix": "node scripts/collect-rls-matrix.mjs",
     "log:event": "bash scripts/log-dev-event.sh",
     "log:build-pass": "bash scripts/log-build-pass.sh",
     "log:sprint": "bash scripts/log-sprint.sh",
@@ -35,8 +38,8 @@
     "founder:docs": "node scripts/founder/generate-docs.mjs",
     "founder:update": "node scripts/founder/update.mjs",
     "founder:list": "node scripts/founder/list.mjs",
-    "pbos:next": "tsx pbos/commands/next.ts",
-    "pbos:status": "tsx pbos/commands/status.ts"
+    "pbos:next": "node --import tsx pbos/commands/next.ts",
+    "pbos:status": "node --import tsx pbos/commands/status.ts"
   },
   "dependencies": {
     "@hcaptcha/react-hcaptcha": "^2.0.2",
@@ -55,6 +58,7 @@
     "stripe": "^22.2.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",

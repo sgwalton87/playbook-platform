@@ -2,27 +2,63 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   buildCoinLedgerEntry,
   buildRewardEvent,
+  getRewardValue,
   type RewardEventType,
 } from "@/lib/reward-events";
-import { createClient } from "@supabase/supabase-js";
+import { requireUser } from "@/lib/supabase/server";
 
+const ALLOWED_REWARD_TYPES: readonly RewardEventType[] = [
+  "course.completed",
+  "module.completed",
+  "invitation.sent",
+  "invitation.accepted",
+  "shared_action.completed",
+  "goal.completed",
+  "evidence.verified",
+  "message.sent",
+  "milestone.completed",
+  "portfolio.shared",
+  "recommendation.approved",
+  "application.ready",
+  "athlete.eligibility_progress",
+  "store.redemption",
+];
 
-function getSupabaseAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+function isRewardEventType(value: unknown): value is RewardEventType {
+  return (
+    typeof value === "string" &&
+    (ALLOWED_REWARD_TYPES as readonly string[]).includes(value)
   );
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = getSupabaseAdmin();
+  const { supabase, user } = await requireUser();
+
+  if (!user) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
 
   try {
     const body = await req.json();
 
+    const scholarId = body.scholarId || user.id;
+
+    if (scholarId !== user.id) {
+      return NextResponse.json({ error: "Forbidden." }, { status: 403 });
+    }
+
+    if (!isRewardEventType(body.eventType) || !getRewardValue(body.eventType)) {
+      return NextResponse.json({ error: "Invalid reward event type." }, { status: 400 });
+    }
+
+    const eventType = body.eventType as RewardEventType;
+
     const event = buildRewardEvent({
-      scholarId: body.scholarId,
-      eventType: body.eventType as RewardEventType,
+      scholarId,
+      eventType,
       sourceId: body.sourceId,
       payload: body.payload || {},
     });
@@ -38,8 +74,8 @@ export async function POST(req: NextRequest) {
     }
 
     const ledgerEntry = buildCoinLedgerEntry({
-      scholarId: body.scholarId,
-      eventType: body.eventType as RewardEventType,
+      scholarId,
+      eventType,
       sourceId: body.sourceId,
     });
 

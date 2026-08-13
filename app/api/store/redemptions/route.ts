@@ -1,28 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buildRedemptionTransaction } from "@/lib/store-economy";
-import { createClient } from "@supabase/supabase-js";
-
-function getSupabaseAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-}
+import { parseStoreRedemptionPayload } from "@/lib/api/contracts/store";
+import { requireUser } from "@/lib/supabase/server";
 
 export async function POST(req: NextRequest) {
-  const supabase = getSupabaseAdmin();
+  const { supabase, user } = await requireUser();
 
-  const body = await req.json();
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const payload = await req.json();
+  const parsed = parseStoreRedemptionPayload(payload);
+
+  if (!parsed.ok) {
+    return NextResponse.json({ error: parsed.error }, { status: 400 });
+  }
+
+  const body = parsed.value;
+
+  if (body.scholarId && body.scholarId !== user.id) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const scholarId = body.scholarId || user.id;
 
   const { data: ledger } = await supabase
     .from("coin_ledger")
     .select("coins,xp")
-    .eq("scholar_id", body.scholarId);
+    .eq("scholar_id", scholarId);
 
   const balance = (ledger || []).reduce((sum, entry) => sum + Number(entry.coins || 0), 0);
 
   const transaction = buildRedemptionTransaction({
-    scholarId: body.scholarId,
+    scholarId,
     productId: body.productId,
     coinPrice: body.coinPrice,
     currentBalance: balance,
@@ -35,7 +46,7 @@ export async function POST(req: NextRequest) {
   const { data, error } = await supabase
     .from("store_redemptions")
     .insert({
-      scholar_id: body.scholarId,
+      scholar_id: scholarId,
       product_id: body.productId,
       coins_spent: body.coinPrice,
       shipping_payload: body.shippingPayload || {},
@@ -46,7 +57,7 @@ export async function POST(req: NextRequest) {
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
 
   await supabase.from("coin_ledger").insert({
-    scholar_id: body.scholarId,
+    scholar_id: scholarId,
     event_type: "store.redemption",
     source_id: data.id,
     coins: -Math.abs(body.coinPrice),

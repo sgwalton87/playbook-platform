@@ -5,24 +5,20 @@ import {
   buildRecommenderRequest,
   updateRecommenderRequestStatus,
 } from "@/lib/recommenders";
-import { createClient } from "@supabase/supabase-js";
-
-
-function getSupabaseAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-}
+import { requireUser } from "@/lib/supabase/server";
 
 export async function POST(req: NextRequest) {
-  const supabase = getSupabaseAdmin();
+  const { supabase, user } = await requireUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
   try {
     const body = await req.json();
 
     const request = buildRecommenderRequest({
-      scholarId: body.scholarId,
+      scholarId: user.id,
       scholarName: body.scholarName,
       recommenderName: body.recommenderName,
       recommenderEmail: body.recommenderEmail,
@@ -36,7 +32,7 @@ export async function POST(req: NextRequest) {
     const { data, error } = await supabase
       .from("recommender_requests")
       .insert({
-        scholar_id: body.scholarId,
+        scholar_id: user.id,
         scholar_name: request.scholarName,
         recommender_name: request.recommenderName,
         recommender_email: request.recommenderEmail,
@@ -61,7 +57,8 @@ export async function POST(req: NextRequest) {
 
     await supabase.from("playbook_events").insert({
       type: "action.assigned",
-      scholar_id: body.scholarId,
+      scholar_id: user.id,
+      actor_id: user.id,
       payload: {
         title: "Recommendation request sent",
         detail: `${request.recommenderName} was asked to write a letter for ${request.opportunityName}.`,

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { requireUser } from "@/lib/supabase/server";
 
 type MentorDirectoryProfile = {
   display_name?: string | null;
@@ -17,18 +17,21 @@ type MentorDirectoryPostBody = {
   searchable?: boolean;
 };
 
-function admin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+function isSupportedText(value: unknown) {
+  return typeof value === "string" && value.trim().length > 0;
 }
 
 export async function GET(req: NextRequest) {
+  const { supabase, user } = await requireUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const q = req.nextUrl.searchParams.get("q")?.toLowerCase() || "";
   const role = req.nextUrl.searchParams.get("role") || "";
 
-  let query = admin()
+  let query = supabase
     .from("support_directory_profiles")
     .select("*")
     .eq("searchable", true)
@@ -42,30 +45,48 @@ export async function GET(req: NextRequest) {
 
   const filtered = ((data || []) as MentorDirectoryProfile[]).filter((person) => {
     if (!q) return true;
+
     return [
       person.display_name,
       person.role,
       person.organization,
       ...(person.expertise || []),
-    ].join(" ").toLowerCase().includes(q);
+    ]
+      .join(" ")
+      .toLowerCase()
+      .includes(q);
   });
 
   return NextResponse.json({ mentors: filtered });
 }
 
 export async function POST(req: NextRequest) {
-  const body = (await req.json()) as MentorDirectoryPostBody;
+  const { supabase, user } = await requireUser();
 
-  const { data, error } = await admin()
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const body = (await req.json()) as MentorDirectoryPostBody;
+  const role = body.role || "";
+
+  if (!isSupportedText(role) || !isSupportedText(body.displayName)) {
+    return NextResponse.json({ error: "Invalid profile data." }, { status: 400 });
+  }
+
+  const { data, error } = await supabase
     .from("support_directory_profiles")
-    .upsert({
-      user_id: body.userId,
-      role: body.role,
-      display_name: body.displayName,
-      organization: body.organization || null,
-      expertise: body.expertise || [],
-      searchable: body.searchable ?? true,
-    }, { onConflict: "user_id" })
+    .upsert(
+      {
+        user_id: user.id,
+        role,
+        display_name: body.displayName,
+        organization: body.organization || null,
+        expertise: body.expertise || [],
+        searchable: body.searchable ?? true,
+      },
+      { onConflict: "user_id" }
+    )
     .select()
     .single();
 

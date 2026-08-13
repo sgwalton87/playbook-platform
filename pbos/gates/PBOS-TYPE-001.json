@@ -1,0 +1,25 @@
+{
+  "id": "PBOS-TYPE-001",
+  "title": "Reduce high-risk any usage at external boundaries",
+  "status": "complete",
+  "priority": 75,
+  "dependencies": ["PBOS-GATE-002", "PBOS-GATE-001", "PBOS-SEC-001"],
+  "handbook_refs": [
+    "docs/ARCHITECTURE.md#typing-and-contracts",
+    "docs/MASTER_CHECKLIST.md#current-priorities",
+    "docs/auto_sprint.md#recommended-first-auto-sprints"
+  ],
+  "tasks": [
+    "Identify high-risk `any` typed inputs from external API and provider boundaries.",
+    "Replace with explicit discriminated/domain contracts where enforcement is safe.",
+    "Add regression tests for mapped domains where external payload shapes are parsed or transformed."
+  ],
+  "definition_of_done": [
+    "High-risk `any` usage on external boundary contracts is reduced and documented.",
+    "Domain contracts compile under `npm run build`.",
+    "Regression coverage captures representative external payload shapes.",
+    "Release evidence records before/after risk surface reduction."
+  ],
+  "validation": ["docs", "lint", "build", "test"],
+  "next_gate": null
+}

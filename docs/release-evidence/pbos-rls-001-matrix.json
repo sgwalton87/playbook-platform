@@ -1,0 +1,436 @@
+{
+  "mission": "PBOS-RLS-001",
+  "generatedAt": "2026-08-10T09:09:17.687Z",
+  "source": {
+    "scope": "all files in supabase/migrations",
+    "countFiles": 24,
+    "files": [
+      "20260701_playbook_graph.sql",
+      "20260704_application_toolkit_persistence.sql",
+      "20260704_application_toolkit_rls.sql",
+      "20260704_coin_ledger_reward_events.sql",
+      "20260704_notifications_events.sql",
+      "20260704_role_invitations.sql",
+      "20260704_scholar_athlete_os.sql",
+      "20260704_store_brand_guided_economy.sql",
+      "20260704_support_messages_actions.sql",
+      "20260704_support_relationships.sql",
+      "20260705_fix_ag_progress_upsert.sql",
+      "20260705_mentor_directory_events.sql",
+      "20260705_profile_albums.sql",
+      "20260705_social_comments_reactions.sql",
+      "20260705_social_comments_reactions_fix.sql",
+      "20260705_social_safety_trust.sql",
+      "202607070001_profile_onboarding_flow.sql",
+      "202607070002_onboarding_options.sql",
+      "20260810_rls_policies_fills.sql",
+      "20260810_rls_policies_hardening.sql",
+      "20260811_rls_policies_service_routes.sql",
+      "20260812_mail_gateway_ingest_function.sql",
+      "20260813_rls_service_route_hardening.sql",
+      "20260814_rls_hardening_patch_set.sql"
+    ]
+  },
+  "summary": {
+    "rlsEnabledTables": 45,
+    "tablesWithCreatePolicies": 45,
+    "policyStatements": 78,
+    "tablesMissingPolicies": 0
+  },
+  "missingPolicyTables": [],
+  "matrix": [
+    {
+      "table": "achievements",
+      "rlsEnabled": true,
+      "policyCount": 1,
+      "policyNames": [
+        "Users can manage own achievements"
+      ]
+    },
+    {
+      "table": "ag_progress",
+      "rlsEnabled": true,
+      "policyCount": 2,
+      "policyNames": [
+        "Students can view own ag progress",
+        "Students can update own ag progress"
+      ]
+    },
+    {
+      "table": "application_workspaces",
+      "rlsEnabled": true,
+      "policyCount": 1,
+      "policyNames": [
+        "Scholars can manage own application workspaces"
+      ]
+    },
+    {
+      "table": "athlete_eligibility_checks",
+      "rlsEnabled": true,
+      "policyCount": 1,
+      "policyNames": [
+        "Scholars can manage own athlete eligibility checks"
+      ]
+    },
+    {
+      "table": "athlete_financial_entries",
+      "rlsEnabled": true,
+      "policyCount": 1,
+      "policyNames": [
+        "Scholars can manage own athlete financial entries"
+      ]
+    },
+    {
+      "table": "athlete_profiles",
+      "rlsEnabled": true,
+      "policyCount": 1,
+      "policyNames": [
+        "Scholars can manage own athlete profiles"
+      ]
+    },
+    {
+      "table": "brand_partners",
+      "rlsEnabled": true,
+      "policyCount": 1,
+      "policyNames": [
+        "Authenticated users can view active brand partners"
+      ]
+    },
+    {
+      "table": "coin_ledger",
+      "rlsEnabled": true,
+      "policyCount": 1,
+      "policyNames": [
+        "Scholars can manage own coin ledger"
+      ]
+    },
+    {
+      "table": "community_event_rsvps",
+      "rlsEnabled": true,
+      "policyCount": 1,
+      "policyNames": [
+        "Users manage own rsvps"
+      ]
+    },
+    {
+      "table": "community_events",
+      "rlsEnabled": true,
+      "policyCount": 1,
+      "policyNames": [
+        "Read public events"
+      ]
+    },
+    {
+      "table": "content_mutes",
+      "rlsEnabled": true,
+      "policyCount": 1,
+      "policyNames": [
+        "Users manage own content mutes"
+      ]
+    },
+    {
+      "table": "evidence",
+      "rlsEnabled": true,
+      "policyCount": 1,
+      "policyNames": [
+        "Users can manage own evidence"
+      ]
+    },
+    {
+      "table": "evidence_packs",
+      "rlsEnabled": true,
+      "policyCount": 1,
+      "policyNames": [
+        "Users can manage own evidence packs"
+      ]
+    },
+    {
+      "table": "feed_post_comments",
+      "rlsEnabled": true,
+      "policyCount": 4,
+      "policyNames": [
+        "Users can view feed comments",
+        "Users can create own feed comments",
+        "Anyone authenticated can read feed comments",
+        "Users can manage own feed comments"
+      ]
+    },
+    {
+      "table": "feed_post_reactions",
+      "rlsEnabled": true,
+      "policyCount": 3,
+      "policyNames": [
+        "Users can view feed reactions",
+        "Anyone authenticated can read feed reactions",
+        "Users can manage own feed reactions"
+      ]
+    },
+    {
+      "table": "guided_tour_progress",
+      "rlsEnabled": true,
+      "policyCount": 1,
+      "policyNames": [
+        "Users can manage own guided tour progress"
+      ]
+    },
+    {
+      "table": "moderation_actions",
+      "rlsEnabled": true,
+      "policyCount": 3,
+      "policyNames": [
+        "Moderators can view moderation actions",
+        "Moderators can insert moderation actions",
+        "Moderators can update moderation actions"
+      ]
+    },
+    {
+      "table": "nil_deals",
+      "rlsEnabled": true,
+      "policyCount": 1,
+      "policyNames": [
+        "Scholars can manage own NIL deals"
+      ]
+    },
+    {
+      "table": "nil_store_campaigns",
+      "rlsEnabled": true,
+      "policyCount": 1,
+      "policyNames": [
+        "Users can manage own nil store campaigns"
+      ]
+    },
+    {
+      "table": "notifications",
+      "rlsEnabled": true,
+      "policyCount": 4,
+      "policyNames": [
+        "Users can read own notifications",
+        "Users can insert own notifications",
+        "Users can update own notifications",
+        "Users can delete own notifications"
+      ]
+    },
+    {
+      "table": "onboarding_options",
+      "rlsEnabled": true,
+      "policyCount": 2,
+      "policyNames": [
+        "Options are viewable by authenticated users",
+        "Authenticated users can add options"
+      ]
+    },
+    {
+      "table": "opportunity_matches",
+      "rlsEnabled": true,
+      "policyCount": 1,
+      "policyNames": [
+        "Users can manage own opportunity matches"
+      ]
+    },
+    {
+      "table": "outcomes",
+      "rlsEnabled": true,
+      "policyCount": 1,
+      "policyNames": [
+        "Users can manage own outcomes"
+      ]
+    },
+    {
+      "table": "playbook_events",
+      "rlsEnabled": true,
+      "policyCount": 4,
+      "policyNames": [
+        "Users can read own playbook events",
+        "Users can insert own playbook events",
+        "Users can update own playbook events",
+        "Users can delete own playbook events"
+      ]
+    },
+    {
+      "table": "playbook_records",
+      "rlsEnabled": true,
+      "policyCount": 1,
+      "policyNames": [
+        "Users can manage own playbook records"
+      ]
+    },
+    {
+      "table": "portfolio_shares",
+      "rlsEnabled": true,
+      "policyCount": 1,
+      "policyNames": [
+        "Scholars can manage own portfolio shares"
+      ]
+    },
+    {
+      "table": "profile_album_photos",
+      "rlsEnabled": true,
+      "policyCount": 2,
+      "policyNames": [
+        "Users can read album photos",
+        "Users manage own album photos"
+      ]
+    },
+    {
+      "table": "profile_albums",
+      "rlsEnabled": true,
+      "policyCount": 2,
+      "policyNames": [
+        "Users can read public albums",
+        "Users manage own albums"
+      ]
+    },
+    {
+      "table": "recommender_requests",
+      "rlsEnabled": true,
+      "policyCount": 2,
+      "policyNames": [
+        "Scholars can manage own recommender requests",
+        "Recommenders can view requests by email"
+      ]
+    },
+    {
+      "table": "recruiting_targets",
+      "rlsEnabled": true,
+      "policyCount": 1,
+      "policyNames": [
+        "Scholars can manage own recruiting targets"
+      ]
+    },
+    {
+      "table": "reflections",
+      "rlsEnabled": true,
+      "policyCount": 1,
+      "policyNames": [
+        "Users can manage own reflections"
+      ]
+    },
+    {
+      "table": "reward_events",
+      "rlsEnabled": true,
+      "policyCount": 1,
+      "policyNames": [
+        "Scholars can manage own reward events"
+      ]
+    },
+    {
+      "table": "scholar_vault_items",
+      "rlsEnabled": true,
+      "policyCount": 1,
+      "policyNames": [
+        "Users can manage own vault items"
+      ]
+    },
+    {
+      "table": "shared_actions",
+      "rlsEnabled": true,
+      "policyCount": 4,
+      "policyNames": [
+        "Users can read own shared actions",
+        "Users can create own shared actions",
+        "Users can update own shared actions",
+        "Users can delete own shared actions"
+      ]
+    },
+    {
+      "table": "store_products",
+      "rlsEnabled": true,
+      "policyCount": 1,
+      "policyNames": [
+        "Authenticated users can view active store products"
+      ]
+    },
+    {
+      "table": "store_redemptions",
+      "rlsEnabled": true,
+      "policyCount": 1,
+      "policyNames": [
+        "Users can manage own store redemptions"
+      ]
+    },
+    {
+      "table": "support_directory_profiles",
+      "rlsEnabled": true,
+      "policyCount": 2,
+      "policyNames": [
+        "Read searchable directory",
+        "Users manage own directory profile"
+      ]
+    },
+    {
+      "table": "support_invitations",
+      "rlsEnabled": true,
+      "policyCount": 4,
+      "policyNames": [
+        "Users can create support invitations",
+        "Scholars can view their invitations",
+        "Invitees can read invitations by email",
+        "Invitees can update their invitation status"
+      ]
+    },
+    {
+      "table": "support_messages",
+      "rlsEnabled": true,
+      "policyCount": 4,
+      "policyNames": [
+        "Users can read own support messages",
+        "Users can create own support messages",
+        "Users can update own support messages",
+        "Users can delete own support messages"
+      ]
+    },
+    {
+      "table": "support_relationships",
+      "rlsEnabled": true,
+      "policyCount": 4,
+      "policyNames": [
+        "Scholars can view their support relationships",
+        "Supporters can view their scholar relationships",
+        "Scholars can create support relationships",
+        "Supporters can create relationships"
+      ]
+    },
+    {
+      "table": "timeline_events",
+      "rlsEnabled": true,
+      "policyCount": 1,
+      "policyNames": [
+        "Users can manage own timeline events"
+      ]
+    },
+    {
+      "table": "trust_reports",
+      "rlsEnabled": true,
+      "policyCount": 3,
+      "policyNames": [
+        "Users can manage own trust reports",
+        "Users create own reports",
+        "Users view own reports"
+      ]
+    },
+    {
+      "table": "user_blocks",
+      "rlsEnabled": true,
+      "policyCount": 1,
+      "policyNames": [
+        "Users manage own blocks"
+      ]
+    },
+    {
+      "table": "user_mutes",
+      "rlsEnabled": true,
+      "policyCount": 1,
+      "policyNames": [
+        "Users manage own mutes"
+      ]
+    },
+    {
+      "table": "verifications",
+      "rlsEnabled": true,
+      "policyCount": 1,
+      "policyNames": [
+        "Users can manage own verifications"
+      ]
+    }
+  ]
+}

@@ -1,17 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-function admin() {
-  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
-}
+import { requireUser } from "@/lib/supabase/server";
 
 export async function POST(req: NextRequest) {
+  const { supabase, user } = await requireUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const body = await req.json();
-  const supabase = admin();
+  const userId = body.userId || user.id;
+
+  if (body.userId && body.userId !== user.id) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
 
   const { data, error } = await supabase.from("profile_album_photos").insert({
     album_id: body.albumId,
-    user_id: body.userId,
+    user_id: userId,
     image_url: body.imageUrl,
     caption: body.caption || null,
     sort_order: body.sortOrder || 0,
