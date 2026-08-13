@@ -2,206 +2,201 @@
 
 ## Purpose
 
-Convert the exact-revision system audit into the dependency-ordered work PBOS must execute before The Playbook may be called complete, launch-ready, or certified.
+This is the dependency-ordered execution board PBOS must follow before Playbook may be called complete, launch-ready, or certified.
 
-## Ownership
+## Reconciled baseline
 
-Owned by Playbook Product and Engineering. PBOS may plan, implement, validate, and preserve evidence. Human owners retain authority over production promotion, external accounts, compliance approval, and final certification.
+- Current implementation baseline: `4a2d1ca90a12c0be24b9e7bede1c15e82756bd40` (`main`, merged PR #90).
+- Reconciled: 2026-08-12.
+- Historical blocker counts and percentages are intentionally retired until the canonical compiler is re-run against a current executable environment.
+- PR #77 canonical UI/auth convergence is merged.
+- PR #89 materialized all 17 unique OS destinations.
+- PR #90 implemented the real Scholar completion adapter and prevents unsupported roles from completing through it.
+- PR #79 is closed as superseded by merged PR #80.
+- PR #88 remains the active Hostinger Email package and requires external production delivery evidence.
 
-## Baseline
+This board records current execution truth. It does not itself certify the product.
 
-- Audited product revision: `cc5ff3e2139fe547c0f0ee0aaadf4ab33600b12d`.
-- Recovery continuation revisions: `2a7700c4b8c7787554c6ca35453341c50786716c` and `43693bd`.
-- Canonical compiler result at the audited revision: `CERTIFICATION_READY=false`, 89 blockers.
-- Canonical phase completion: 0 of 15 phases complete.
-- Intelligence traceability: 18 implemented, 24 partial, 16 missing.
-- Route convergence: 93 of 95 audited visible routes mapped and design-bound.
-- Role onboarding certification: 0 of 15 pathways complete.
-- UI recovery matrix: 18 verified, 4 in progress/unverified, 74 pending.
+## Evidence contract
 
-This board is not completion evidence. Every checked item requires exact-revision implementation and the evidence contract below.
+Every completed mission must record the governed revision and prove, where applicable:
 
-## Active convergence snapshot — 2026-08-09
+- interface and responsive states;
+- durable persistence and restart/recovery;
+- least-privilege application authorization and Supabase RLS, including denial tests;
+- loading, empty, error, success and restricted states;
+- accessibility with no serious/critical violations;
+- focused tests, repository checks and production build;
+- browser-level acceptance against the exact governed revision;
+- reconciled architecture/data/design/status/release documentation;
+- independent validation evidence, with human production approval kept separate.
 
-This snapshot supersedes optimistic UI percentages while PR #77 is being
-converged with Playbook `main`. `IMPLEMENTED` is not treated as `FUNCTIONALLY
-COMPLETE`; completion still requires the evidence contract below.
+## P0 — Canonical current-state convergence
 
-### Delivery lineage
+- [x] Establish `4a2d1ca90a12c0be24b9e7bede1c15e82756bd40` as the post-PR #90 reconciliation baseline.
+- [x] Reconcile `docs/MASTER_CHECKLIST.md` to current implementation truth.
+- [x] Retire `docs/PLAYBOOK_MASTER_CHECKLIST.md` as a duplicate independent status authority.
+- [x] Reconcile `docs/USER_JOURNEYS.md` to the post-PR #90 Scholar contract and post-PR #89 OS destinations.
+- [x] Reconcile the functional wiring backlog so resolved Coach routing is not re-opened.
+- [x] Close duplicate Password Reset PR #79 as superseded.
+- [x] Preserve PR #88 as the active Hostinger Email package rather than falsely marking it complete.
+- [x] Publish a machine-readable current-state manifest under `pbos/readiness/PLAYBOOK_CURRENT_STATE.json`.
+- [ ] Re-run the canonical product graph/compiler in an executable PBOS environment and publish fresh stable blocker IDs. Do not inherit the old `89 blockers` count.
+- [ ] Reconcile any generated graph/readiness artifacts whose values are superseded by the fresh compiler output.
 
-- [x] PR #77 contains the canonical public shell, auth shell, role routing,
-  Scholar-Athlete recovery, Athlete Abroad, Brand Partner, Academic Readiness,
-  Transcript shell, public Preview, public Newsfeed, footer, and responsive
-  safeguards.
-- [x] The nine identity/authentication changes merged through PRs #78 and
-  #80–#87 have been integrated locally without discarding the canonical UI.
-- [x] Merge conflicts across login, email confirmation, password recovery,
-  global responsive CSS, and the shared shell have been resolved.
-- [x] Focused design/auth validation passes (34 tests) and the production build
-  compiles all 129 application/API routes.
-- [x] Full repository suite passed on the converged PR #77 revision (126 files,
-  394 tests).
-- [x] Converged PR #77 head passed exact-head GitHub and Vercel checks.
-- [x] PR #77 merged into `main` as `9b0b5a7579fd342e3c98f5c703f33972dd5ecaa9`.
-- [ ] The exact `main` merge commit passes independent browser proof. Its tree
-  matches the validated PR head, but that does not replace merge-commit browser
-  evidence.
+## P0 — Authority and data safety
 
-### Connection truth
+### Explicit authority contracts
 
-| Connection boundary | Declared / implemented | Functionally complete | Remaining truth |
-| --- | ---: | ---: | --- |
-| Identity/authentication capabilities | 9 of 9 | 0 of 9 exact-merge browser-certified | Exact-revision browser proof remains. |
-| Canonical role registry keys | 15 of 15 | 0 of 15 role journeys certified | Every role still needs durable onboarding, authority, recovery, and acceptance proof. |
-| Public role-specific onboarding choices | 14 of 14 | 0 of 14 certified | Entry configuration exists; end-to-end completion does not. |
-| Distinct OS destination routes | 17 of 17 implemented | 0 of 17 certified | Six new first-class routes remove shared destination fallbacks; authority, durable data, recovery, and browser proof remain open. |
-| Visible route design convergence | 12 of 102 verified | 12 of 102 UI-verified only | 15 are in progress/unverified and 75 remain pending. |
-| Canonical delivery phases | 0 of 15 | 0 of 15 | No whole-product phase may be called complete yet. |
+- [ ] Counselor — accepted least-privilege authority and school verification.
+- [ ] Coach — accepted least-privilege authority and scholar-athlete roster relationship.
+- [ ] Recruiter — accepted institution/recruiter authority and governed athlete-record access.
+- [ ] Admissions — accepted institution/admissions authority and criteria-scoped scholar access.
+- [ ] Community Partner — accepted partner authority and review/verification workflow.
 
-### Immediate build checklist
+### Additional role model decisions
 
-- [x] Reconcile PR #77 with the merged authentication work.
-- [x] Run the complete unit/integration suite after reconciliation.
-- [x] Push the exact converged revision and clear PR #77 draft/conflicting state.
-- [x] Require green exact-head GitHub and Vercel validation.
-- [x] Merge PR #77 and preserve its exact validation lineage.
-- [ ] Recompile the canonical product graph; replace the historical 89-blocker
-  count with current stable blocker IDs.
-- [x] Publish the missing six OS destination definitions from canonical
-  authority without treating route materialization as journey completion.
-- [ ] Accept explicit least-privilege authority contracts for Counselor, Coach,
-  Recruiter, Admissions, and Community Partner; these roles currently fail
-  closed rather than inheriting unrelated authority.
-- [ ] Execute Scholar as the golden end-to-end role contract.
-- [ ] Apply that proven contract to the remaining 14 registry roles and all 17
-  OS destinations.
+- [ ] Employer — canonical onboarding, organization verification, opportunity authority.
+- [ ] Transition-Aged Youth — explicit canonical record and relationship/authority model.
+- [ ] Athlete Abroad — enrollment, consent, record ownership and OS authority.
+- [ ] District / School Administrator — institutional onboarding and scoped administrator authority.
 
-## Evidence contract for every item
+### RLS / authorization
 
-- [ ] Exact commit SHA and governed source digests recorded.
-- [ ] Interface and responsive states verified on desktop and mobile.
-- [ ] Durable persistence and recovery behavior verified where state changes.
-- [ ] Least-privilege application permissions and Supabase RLS verified, including denial tests.
-- [ ] Loading, empty, error, success, and restricted states verified.
-- [ ] Accessibility validation has no serious or critical violations.
-- [ ] Focused tests, repository lint, and production build pass.
-- [ ] Browser-level acceptance passes against the exact revision.
-- [ ] Architecture, database, design, checklist, and release documentation are reconciled.
-- [ ] Independent validation evidence is attached; human approval remains separate.
+- [ ] Inventory launch tables, policies, privileged APIs and service-role boundaries.
+- [ ] Prove Scholar-owned, supporter, institution, partner and administrator policies.
+- [ ] Add negative tests for cross-user access, expired invitation, removed relationship, wrong institution and unapproved role.
+- [ ] Verify public Newsfeed disclosure returns only explicitly public data and disclosure-safe author fields.
+- [ ] Record migration, policy, rollback and production-environment evidence.
 
-## P0 — Restore canonical authority and a provable reference journey
+## P1 — Replicate the Scholar completion contract
 
-### P0.1 Exact-revision product graph refresh
+PR #90 is the required implementation pattern. Every role must get its own adapter/authority; no role may complete through Scholar fallback.
 
-- [ ] Compile the PBOS canonical graph against the current pushed recovery revision.
-- [ ] Add `/about`, `/preview`, and `/news` to the governed route map with approved design-canon bindings or remove them from launch scope through an accepted decision.
-- [ ] Reconcile `docs/MASTER_CHECKLIST.md`, role journey authority, UI recovery matrix, intelligence traceability, and release status with observed implementation.
-- [ ] Publish the new blocker inventory by stable blocker ID; do not inherit the older 89 count without recompilation.
+- [ ] Scholar — finish exact merge-revision browser/RLS/recovery certification as required by the release gate.
+- [ ] Scholar-Athlete — athlete record + compliance/eligibility + dedicated relationship semantics.
+- [ ] Transition-Aged Youth — explicit model + adapter.
+- [ ] Family — invitation/consent/dependent relationship + recovery.
+- [ ] Mentor — eligibility/approval + scholar assignment + revocation.
+- [ ] Educator — institution verification + roster/cohort relationship.
+- [ ] Counselor — onboarding + verification + authority + scholar access.
+- [ ] Coach — verification + authority + roster/athlete relationship.
+- [ ] District/Administrator — institution authority + roster/data scope.
+- [ ] Recruiter — verification + authority + governed athlete search/access.
+- [ ] Admissions — verification + authority + governed scholar search/access.
+- [ ] Brand Partner — organization verification + partner authority + opportunity intent.
+- [ ] Employer — organization onboarding/verification + opportunity authority.
+- [ ] Athlete Abroad — canonical enrollment/consent/ownership/OS entry.
+- [ ] Community Partner — verification/review + accepted authority.
 
-### P0.2 One role registry and destination resolver
+## P1 — Starting Five / relationship fabric
 
-- [ ] Make signup, auth callback, invitations, onboarding, navigation, and completion use one canonical role resolver.
-- [x] Resolve High School Coach route ambiguity with `/coach-os`.
-- [x] Resolve Community Partner/Other route ambiguity with `/community-partner-os`.
-- [ ] Complete canonical onboarding and authority pathways for High School
-  Counselor, Employer, Athletes Abroad, District/School Administrator, and
-  Community Partner. Their route destinations now exist, but their journeys do
-  not yet satisfy the evidence contract.
-- [x] Prove 14 public onboarding choices resolve to unique destinations and all
-  17 OS identifiers/routes are unique with unit tests.
+- [ ] Invitations are durable, expirable and revocable.
+- [ ] Accepted invitations produce canonical relationship records.
+- [ ] Relationship grants are consent-aware and least-privilege.
+- [ ] Removal/revocation removes downstream access immediately.
+- [ ] Authorized support is reusable by applications, messaging, notifications and recommendations.
+- [ ] Demo/default invitations are removed from production paths.
 
-### P0.3 Scholar golden journey
+## P1 — Connected product pathways
 
-- [ ] Complete Scholar signup → verification → `/start` onboarding → Playbook Record projection → permission-scoped dashboard.
-- [ ] Persist onboarding progress, agreements, recovery, and completion state.
-- [ ] Prove owner access and non-owner denial at both application and RLS boundaries.
-- [ ] Pass desktop, mobile, accessibility, restart/recovery, and browser acceptance.
-- [ ] Use this journey as the required contract for every other role; do not mark Scholar complete from UI-only evidence.
+### Opportunity and applications
 
-### P0.4 Production authorization and data safety
+- [ ] Playbook/Scholar Record → readiness → explainable opportunity match.
+- [ ] Opportunity → durable application workspace → private documents → submission state.
+- [ ] Application → authorized supporter collaboration → governed messaging.
+- [ ] Submission/outcome → canonical Record/Timeline/Trust updates.
 
-- [ ] Inventory every launch table, policy, privileged API route, and service-role boundary.
-- [ ] Complete Scholar-owned, supporter, institution, partner, and admin RLS validation.
-- [ ] Add negative permission tests for cross-user, expired invitation, removed relationship, wrong institution, and unapproved role access.
-- [ ] Verify public Newsfeed returns only explicitly public posts and only disclosure-safe author fields.
-- [ ] Record migration, policy, rollback, and production-environment evidence.
+### Learning and rewards
 
-## P1 — Close the highest-impact connected product gaps
+- [ ] Course/module completion persists durably.
+- [ ] Completion produces evidence, certificate/badge and governed XP/coins.
+- [ ] Evidence updates Record/Timeline/Trust and can influence opportunity readiness.
+- [ ] Reward/store transactions are durable, auditable and abuse-resistant.
+- [ ] Inventory, redemption authorization, failure recovery and balance integrity are proven.
 
-### P1.1 Onboarding package
+### Messaging and notifications
 
-- [ ] Apply the Scholar contract to Scholar-Athlete and Transition-Aged Youth.
-- [ ] Complete family and mentor invite/consent/recovery pathways.
-- [ ] Complete educator, counselor, coach, and district verification and roster relationships.
-- [ ] Complete college recruiter/admissions verification, criteria, compliance, and distinct experiences.
-- [ ] Complete Brand Partner and Employer organization verification, permissions, and opportunity intent.
-- [ ] Complete Athletes Abroad enrollment, consent, record ownership, and OS entry.
+- [ ] Participant-scoped durable conversations/messages.
+- [ ] Attachments, read state, block/report and recovery.
+- [ ] Event → outbox → idempotent notification → acknowledgement.
+- [ ] Unauthorized/removed participant denial tests.
 
-### P1.2 Starting Five support package
+### Feed and network
 
-- [ ] Make invitations durable, expirable, revocable, and relationship-producing.
-- [ ] Enforce consent-aware support access and removal across every downstream surface.
-- [ ] Connect authorized support to applications, messaging, notifications, and recommendations.
-- [ ] Remove remaining demonstration invitation defaults from production paths.
+- [ ] Private/network/public visibility from DB policy through UI.
+- [ ] Author identity, create/edit/delete, media, comments, reactions, shares, moderation, pagination/reporting.
+- [ ] `/news` disclosure boundary against production-like data.
+- [ ] Connections, mutuals, profile links, notifications and messaging integration.
 
-### P1.3 Messaging and notification package
+### Academic / Compass
 
-- [ ] Complete durable participant-scoped conversations and messages.
-- [ ] Verify read state, attachments, safety actions, blocking/reporting, and recovery.
-- [ ] Prove event → outbox → idempotent notification → acknowledgement.
-- [ ] Pass unauthorized participant and removed-relationship denial tests.
+- [ ] Transcript → A-G/readiness → FAFSA/application state.
+- [ ] Compass consumes versioned permission-scoped Record inputs.
+- [ ] Recommendation includes evidence, provenance, confidence, human decision and outcome lifecycle.
 
-### P1.4 Compass and intelligence package
+### Recruiting
 
-- [ ] Replace demonstration inputs with versioned, permission-scoped Scholar Record inputs.
-- [ ] Close the 16 missing and 24 partial traceability requirements.
-- [ ] Add provenance, explainability, lifecycle, review state, and human-agency controls.
-- [ ] Prove deterministic recommendation and scoring behavior with tests.
+- [ ] Scholar-Athlete Record → eligibility → target/recruiter/coach access → visit/offer → outcome.
+- [ ] NIL readiness remains advisory/compliance-aware and permission-scoped.
 
-### P1.5 Newsfeed and network package
+### Events
 
-- [ ] Verify private, network, and public visibility semantics from database policy through UI.
-- [ ] Complete author identity, create/edit/delete, media, comments, reactions, sharing, moderation, pagination, and reporting.
-- [ ] Validate the public `/news` disclosure boundary and failure behavior against production-like data.
-- [ ] Complete connections, mutuals, notification, profile-link, and messaging integration.
+- [ ] Discover → RSVP → calendar/reminder → attendance/check-in → networking/outcome.
 
-### P1.6 Opportunity, application, and Store package
+## P2 — Intelligence convergence
 
-- [ ] Prove readiness → explainable opportunity matches using verified record data.
-- [ ] Prove opportunity → durable application workspace → private documents → submission state.
-- [ ] Prove application → authorized supporter → governed messaging.
-- [ ] Replace demonstration reward/store ledgers with durable, abuse-resistant transactions.
-- [ ] Verify balances, redemption authorization, inventory, failure recovery, and audit history.
+- [ ] Re-run current intelligence traceability before quoting missing/partial counts.
+- [ ] Replace demo inputs with canonical permission-scoped Record inputs.
+- [ ] Close all current missing/partial traceability requirements.
+- [ ] Add provenance, explainability, lifecycle/review state and human-agency controls.
+- [ ] Prove deterministic recommendation/scoring behavior where required.
 
-## P2 — Complete canonical interface convergence
+## P3 — Canonical interface convergence
 
-- [ ] Finish every `PENDING` and `IN_PROGRESS_UNVERIFIED` row in `docs/audits/PLAYBOOK-UI-RECOVERY-MATRIX.md` or remove the surface from governed launch scope through an accepted decision.
-- [ ] Prioritize Compass, Feed, Messages, Connections, Opportunities, Profile, Notifications, Support Network, Courses, Events, and Store.
-- [ ] Remove duplicate routes, backup artifacts, dead components, and competing business logic after canonical replacements are proven.
-- [ ] Validate semantic structure, keyboard navigation, focus, contrast, reduced motion, mobile, tablet, desktop, and empty/error/restricted states.
-- [ ] Capture screenshot and browser evidence at the same exact revision used for tests and build.
+- [ ] Reconcile the UI recovery matrix after the fresh current-state compiler/audit.
+- [ ] Complete or explicitly remove from launch scope every pending/in-progress governed surface.
+- [ ] Prioritize the connected hotspots: Compass, Feed, Messages, Connections, Opportunities, Profile, Notifications, Support Network, Courses, Events and Store.
+- [ ] Remove dead/duplicate routes, backup artifacts and competing business logic only after canonical replacements are proven.
+- [ ] Complete semantic, keyboard, focus, contrast, reduced-motion and responsive acceptance.
+- [ ] Capture screenshot/browser evidence at the same governed revision used for tests/build.
 
-## P3 — Platform QA and launch operations
+## P4 — Launch operations
 
-- [ ] Complete role-by-role browser E2E for all supported launch roles.
-- [ ] Complete device, browser, accessibility, performance, and recovery matrices.
-- [ ] Establish production monitoring, alert ownership, error reporting, and operational dashboards.
-- [ ] Finalize analytics taxonomy without weakening privacy or consent.
-- [ ] Complete security, privacy, compliance, and data-retention review.
-- [ ] Prove application and database rollback procedures.
-- [ ] Execute soft launch, feedback intake, incident response, and release-note workflows.
-- [ ] Obtain independent human validation and explicit launch approval.
+- [ ] Role-by-role browser E2E for every launch role.
+- [ ] Device/browser/accessibility/performance/recovery matrices.
+- [ ] Production monitoring, alert ownership, error reporting and dashboards.
+- [ ] Privacy-respecting analytics taxonomy.
+- [ ] Security, privacy, compliance and data-retention review.
+- [ ] Application/database rollback proof.
+- [ ] Production email/notification delivery evidence.
+- [ ] Soft launch, feedback intake, incident response and release notes.
+- [ ] Independent human validation and explicit launch approval.
 
-## PBOS execution order
+## External / human gates
 
-1. Recompile the canonical product graph at the current governed revision.
-2. Materialize blocker-derived missions in priority order: authority → Scholar journey → RLS → connected hotspots → UI convergence → operations.
-3. Execute one bounded mission package at a time in an isolated branch/worktree.
-4. Require implementation, validation, evidence, and exact-revision lineage before mission completion.
-5. Reconcile the graph after every merged package; never manually decrement blockers.
-6. Keep `048-product-journeys` queued until `certificationReady` is true.
-7. Advance web staging, mobile, store, and CIP-050 certification only through their declared dependency and human gates.
+PBOS may skip these during a bounded implementation pass only if the dependent feature remains explicitly blocked and fail-closed:
+
+- Hostinger/SMTP credentials and production delivery verification.
+- Production Supabase/Vercel evidence unavailable to the executing environment.
+- Third-party account approvals/billing.
+- Compliance/legal approval.
+- Final production promotion and launch authorization.
+
+Skipping an external gate never converts it to Complete.
+
+## Execution order
+
+1. Run the current canonical graph and publish stable blockers.
+2. Close authority/RLS blockers.
+3. Replicate the Scholar contract role by role.
+4. Build the Starting Five relationship fabric.
+5. Close connected product pathways.
+6. Converge intelligence on canonical data.
+7. Finish UI/browser evidence.
+8. Complete operational and human release gates.
+9. Reconcile after every merge; never manually decrement blocker counts.
 
 ## Final exit gate
 
-The Playbook is done only when the canonical graph reports zero blockers, all 15 phases satisfy their acceptance contracts, every launch role and connected journey has exact-revision functional evidence, repository CI and production build pass, operational gates pass, and independent human certification is recorded.
+Playbook is done only when the current canonical graph reports zero unresolved release blockers, every launch role satisfies the journey evidence contract, connected journeys are durable and permission-safe, repository and production validation pass at the same governed revision, operational gates pass, and independent human certification is recorded.
