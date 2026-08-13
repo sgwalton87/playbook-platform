@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "reconciledAt": "2026-08-12",
+  "baselineRevision": "4a2d1ca90a12c0be24b9e7bede1c15e82756bd40",
+  "authority": {
+    "humanReadable": "docs/MASTER_CHECKLIST.md",
+    "journeys": "docs/USER_JOURNEYS.md",
+    "executionBoard": "docs/audits/PLAYBOOK-SYSTEM-WIDE-AUDIT-TODO.md",
+    "functionalWiring": "docs/design/FUNCTIONAL_WIRING_BACKLOG.md",
+    "duplicateChecklistDeprecated": "docs/PLAYBOOK_MASTER_CHECKLIST.md"
+  },
+  "truthRules": [
+    "Repository implementation evidence outranks historical Drive exports and stale checklist percentages.",
+    "Route existence is not functional completion.",
+    "Unsupported role completion must fail closed rather than use the Scholar adapter.",
+    "External or human gates may be skipped only while their dependent capability remains explicitly blocked.",
+    "Historical blocker counts must not be reused after implementation changes; recompile the canonical graph."
+  ],
+  "lineage": {
+    "legacyLandingRemoved": {"pr": 76, "status": "merged"},
+    "canonicalUiRecovery": {"pr": 77, "mergeRevision": "9b0b5a7579fd342e3c98f5c703f33972dd5ecaa9", "status": "merged"},
+    "distinctOsDestinations": {"pr": 89, "count": 17, "status": "merged"},
+    "scholarReferenceJourney": {"pr": 90, "status": "merged", "reportedTests": 410, "reportedTestFiles": 127, "reportedBuildRoutes": 135},
+    "duplicatePasswordReset": {"pr": 79, "status": "closed-superseded", "supersededBy": 80},
+    "hostingerEmail": {"pr": 88, "status": "open-external-gate"}
+  },
+  "journeys": {
+    "scholar": "REFERENCE_IMPLEMENTATION",
+    "scholarAthlete": "PARTIAL",
+    "parentGuardian": "PARTIAL",
+    "mentor": "PARTIAL",
+    "educator": "PARTIAL",
+    "coach": "FAIL_CLOSED",
+    "recruiter": "FAIL_CLOSED",
+    "admissions": "FAIL_CLOSED",
+    "transitionAgedYouth": "PARTIAL",
+    "employer": "PARTIAL_MISSING",
+    "brandPartner": "PARTIAL",
+    "communityPartner": "FAIL_CLOSED",
+    "counselor": "FAIL_CLOSED_MISSING",
+    "athleteAbroad": "MISSING",
+    "districtAdministrator": "MISSING"
+  },
+  "releaseBlockers": [
+    "fresh canonical graph and stable blocker IDs",
+    "role authority contracts",
+    "production RLS and negative authorization evidence",
+    "remaining role completion adapters",
+    "Starting Five relationship fabric",
+    "connected Opportunity/Application, Learning/Rewards, Messaging/Notifications, Feed/Network, Academic, Recruiting, Events and Store workflows",
+    "intelligence convergence on canonical permission-scoped data",
+    "remaining route/browser/accessibility convergence",
+    "monitoring and analytics",
+    "security/privacy/compliance/data-retention review",
+    "soft launch and independent human certification"
+  ],
+  "nextExecutionOrder": [
+    "recompile_current_graph",
+    "authority_and_rls",
+    "replicate_scholar_contract",
+    "starting_five_relationship_fabric",
+    "connected_product_pathways",
+    "intelligence_convergence",
+    "ui_browser_convergence",
+    "operations_and_launch_gates"
+  ],
+  "certificationReady": false
+}
