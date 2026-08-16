@@ -7,17 +7,19 @@ import {
 import PermissionsGraph from "@/components/permissions/PermissionsGraph";
 
 describe("Role OS Permissions", () => {
-  it("returns permissions for educator", () => {
-    expect(getPermissionsForRelationship("educator")).toContain("verify_evidence");
+  it("keeps unproven educator relationships at zero data authority", () => {
+    expect(getPermissionsForRelationship("educator")).toEqual([]);
   });
 
   it("checks permission access", () => {
     expect(canRelationship("parent_guardian", "verify_evidence")).toBe(false);
     expect(canRelationship("mentor", "support_tasks")).toBe(true);
+    expect(canRelationship("educator", "verify_evidence")).toBe(false);
   });
 
   it("returns relationship graph", () => {
-    expect(getRelationshipGraph().length).toBe(7);
+    expect(getRelationshipGraph().length).toBe(8);
+    expect(getRelationshipGraph().some((entry) => entry.relationship === "coach")).toBe(true);
   });
 
   it("component is defined", () => {
