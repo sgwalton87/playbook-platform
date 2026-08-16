@@ -25,6 +25,7 @@ export const AUDIT_CONTROL_CHECKS: AuditControlCheck[] = [
       "support_invitation_authority_preflight.sql",
       "profile_authority_preflight.sql",
       "moderation_authority_preflight.sql",
+      "application_workspace_authority_preflight.sql",
     ],
     forbidden: ["supabase link", "db push", "--linked", "SUPABASE_ACCESS_TOKEN"],
   },
@@ -47,6 +48,20 @@ export const AUDIT_CONTROL_CHECKS: AuditControlCheck[] = [
     file: "app/api/application-workspaces/route.ts",
     required: ["requireLearnerAuthority", "requireOnboarding: true", "pbosRoleForLearner"],
     forbidden: ["registerIdentity: userId => connector.registerIdentity(userId, \"SCHOLAR\")"],
+  },
+  {
+    id: "audit-application-database-authority",
+    category: "security",
+    description: "Application tables and storage must independently enforce learner authority and canonical workspace lineage.",
+    file: "supabase/migrations/202608160022_application_workspace_authority_hardening.sql",
+    required: [
+      "current_user_is_onboarded_learner",
+      "application-workspaces-own",
+      "application-tasks-own",
+      "application-documents-own",
+      "application-document-storage-own",
+      "workspace.scholar_id = (select auth.uid())",
+    ],
   },
   {
     id: "audit-moderation-authority",
