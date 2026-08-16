@@ -50,7 +50,13 @@ using (
   or supporter_id = (select auth.uid())
 );
 
-create or replace function public.capture_relationship_security_event()
+-- SECURITY DEFINER helpers remain outside the exposed Data API schema.
+create schema if not exists private;
+revoke all on schema private from public;
+revoke all on schema private from anon;
+revoke all on schema private from authenticated;
+
+create or replace function private.capture_relationship_security_event()
 returns trigger
 language plpgsql
 security definer
@@ -104,9 +110,9 @@ begin
 end;
 $$;
 
-revoke all on function public.capture_relationship_security_event() from public;
-revoke all on function public.capture_relationship_security_event() from anon;
-revoke all on function public.capture_relationship_security_event() from authenticated;
+revoke all on function private.capture_relationship_security_event() from public;
+revoke all on function private.capture_relationship_security_event() from anon;
+revoke all on function private.capture_relationship_security_event() from authenticated;
 
 drop trigger if exists support_relationship_security_observability
   on public.support_relationships;
@@ -114,4 +120,4 @@ create trigger support_relationship_security_observability
 after insert or update of status, permissions
 on public.support_relationships
 for each row
-execute function public.capture_relationship_security_event();
+execute function private.capture_relationship_security_event();
