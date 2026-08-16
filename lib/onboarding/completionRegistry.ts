@@ -40,7 +40,7 @@ export const ROLE_ONBOARDING_COMPLETION: Record<PlaybookRole, RoleOnboardingComp
   "college-coach": contract("college-coach", "RECRUITING_AUTHORITY", "authority-pending", "Approved institutional recruiting identity evidence plus separately approved sport, geography, graduation-class, contact, and compliance scope."),
   "college-admissions": contract("college-admissions", "ADMISSIONS_AUTHORITY", "authority-pending", "Approved admissions identity evidence plus separately approved territory, search, contact, and engagement scope."),
   "brand-partner": contract("brand-partner", "BRAND_AUTHORITY", "authority-pending", "Verified organization identity, campaign authority, and compliance scope."),
-  employer: contract("employer", "EMPLOYER_AUTHORITY", "authority-pending", "Verified organization identity and opportunity/hiring authority."),
+  employer: contract("employer", "EMPLOYER_AUTHORITY", "authority-pending", "Approved employer organization identity plus separately approved opportunity-publishing scope; candidate access remains application/sharing-scoped."),
   district: contract("district", "DISTRICT_AUTHORITY", "authority-pending", "Approved administrator identity evidence plus separately approved district, school, program, or functional administrative scope."),
   "athlete-abroad": contract("athlete-abroad", "ATHLETE_ABROAD_RECORD", "authority-pending", "Self-owned athlete pathway plus governed international/eligibility contract."),
   other: contract("other", "COMMUNITY_PARTNER_AUTHORITY", "authority-pending", "Verified Community Partner identity and explicit relationship scope."),
