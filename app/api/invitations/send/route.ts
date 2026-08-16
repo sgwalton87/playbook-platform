@@ -12,10 +12,13 @@ import { requireUser } from "@/lib/supabase/server";
 const RELATIONSHIP_KINDS = new Set<RelationshipKind>([
   "parent_guardian",
   "educator",
+  "counselor",
   "mentor",
   "coach",
   "district_admin",
-  "university_partner",
+  "college_recruiter",
+  "college_admissions",
+  "community_partner",
   "employer_partner",
 ]);
 
@@ -58,7 +61,7 @@ export async function POST(req: NextRequest) {
     const inviteeEmail = String(body.inviteeEmail || "").trim().toLowerCase();
 
     if (!relationship || !RELATIONSHIP_KINDS.has(relationship)) {
-      return NextResponse.json({ error: "Invalid support relationship." }, { status: 400 });
+      return NextResponse.json({ error: "Invalid or legacy support relationship. Choose the exact role relationship." }, { status: 400 });
     }
     if (!inviteeName || !inviteeEmail) {
       return NextResponse.json({ error: "Invitee name and email are required." }, { status: 400 });
