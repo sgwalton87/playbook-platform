@@ -1,9 +1,9 @@
 -- Safe public Scholar Record projection and public-media boundary.
 --
 -- public.profiles remains the canonical identity/profile record and keeps its
--- owner-only RLS. This migration exposes only an explicit presentation-grade
--- subset through a narrow RPC. Internal onboarding, verification, household,
--- safety, administration, contact, and authority fields remain inaccessible.
+-- owner-only RLS. This migration exposes only explicit presentation-grade
+-- projections. Internal onboarding, verification, household, safety,
+-- administration, contact, and authority fields remain inaccessible.
 
 create or replace function public.get_public_scholar_profile(requested_username text)
 returns table (
@@ -124,6 +124,49 @@ grant execute on function public.get_public_scholar_profile(text) to anon, authe
 
 comment on function public.get_public_scholar_profile(text) is
   'Returns only presentation-grade learner profile fields when the profile is public or owned by the caller. Canonical data remains in public.profiles.';
+
+-- Shared surfaces such as Feed may resolve presentation-grade learner identity
+-- without reopening public.profiles. Requested IDs are bounded to avoid turning
+-- the projection into an unrestricted directory export.
+create or replace function public.get_public_scholar_identities(requested_ids uuid[])
+returns table (
+  id uuid,
+  username text,
+  full_name text,
+  first_name text,
+  last_name text,
+  role text,
+  avatar_url text
+)
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select
+    p.id,
+    p.username,
+    p.full_name,
+    p.first_name,
+    p.last_name,
+    private.normalize_playbook_profile_role(coalesce(p.profile_mode, p.role, p.requested_role)) as role,
+    p.avatar_url
+  from public.profiles p
+  where cardinality(requested_ids) between 1 and 100
+    and p.id = any(requested_ids)
+    and private.normalize_playbook_profile_role(coalesce(p.profile_mode, p.role, p.requested_role))
+      in ('scholar', 'scholar-athlete', 'transition-youth')
+    and (
+      p.profile_visibility = 'public'
+      or p.id = auth.uid()
+    );
+$$;
+
+revoke all on function public.get_public_scholar_identities(uuid[]) from public, anon, authenticated;
+grant execute on function public.get_public_scholar_identities(uuid[]) to anon, authenticated;
+
+comment on function public.get_public_scholar_identities(uuid[]) is
+  'Returns a bounded set of presentation-grade public learner identities for shared platform surfaces.';
 
 -- Feed rows must respect their declared visibility. Historical unconditional
 -- SELECT policies accidentally made every feed row public.
