@@ -74,7 +74,7 @@
     "eventsMentorship": "IMPLEMENTED_CERTIFICATION_OPEN",
     "notificationAttention": "IMPLEMENTED_CERTIFICATION_OPEN",
     "supportRelationshipActiveScholarContext": "IMPLEMENTED_CERTIFICATION_OPEN",
-    "messaging": "PARTIAL",
+    "messaging": "IMPLEMENTED_SECURITY_GAP",
     "academic": "PARTIAL",
     "recruiting": "PARTIAL",
     "intelligenceOutcomeMeasurement": "PARTIAL"
@@ -82,10 +82,10 @@
   "releaseBlockers": [
     "exact-revision browser E2E for all 15 roles and canonical connected pathways",
     "mobile/device/accessibility/recovery certification",
+    "Messaging attachment authority and direct-RLS relationship-revocation closure",
     "Supabase Auth leaked-password protection configuration and verification",
     "legacy Supabase performance-advisor debt triage",
     "production outbound email/template/delivery certification",
-    "remaining Messaging lifecycle gaps",
     "complete Academic outcome journey",
     "complete Recruiting outcome journey",
     "monitoring and privacy-respecting analytics",
@@ -93,8 +93,8 @@
     "soft launch, rollback proof, release notes, feedback loop, and independent human launch approval"
   ],
   "nextExecutionOrder": [
+    "messaging_revocation_and_attachment_authority",
     "browser_and_accessibility_certification",
-    "messaging_lifecycle_completion",
     "academic_outcome_journey",
     "recruiting_outcome_journey",
     "supabase_auth_and_performance_gates",
