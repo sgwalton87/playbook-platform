@@ -1,4 +1,7 @@
-export const NOTIFICATION_TYPES = ["message","invitation","shared_action","compass_alert","mail_reply","network_blocker","recommendation"] as const;
+export const NOTIFICATION_TYPES = [
+  "message","invitation","shared_action","compass_alert","mail_reply","network_blocker","recommendation",
+  "verification","opportunity","milestone","intervention",
+] as const;
 export const NOTIFICATION_MODES = ["immediate","daily_digest","weekly_digest","muted"] as const;
 export type GovernedNotificationType = typeof NOTIFICATION_TYPES[number];
 export type GovernedNotificationMode = typeof NOTIFICATION_MODES[number];
