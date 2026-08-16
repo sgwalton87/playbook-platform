@@ -23,6 +23,13 @@ select to_regprocedure('public.get_network_member_identities(uuid[])') is not nu
   \quit 1
 \endif
 
+select to_regprocedure('private.can_resolve_network_identity(uuid)') is not null as private_helper_exists \gset
+\if :private_helper_exists
+\else
+  \echo 'missing private network evidence helper'
+  \quit 1
+\endif
+
 select has_function_privilege('anon', 'public.get_public_member_identities(uuid[])', 'EXECUTE') as anon_member_identity_exec \gset
 \if :anon_member_identity_exec
 \else
@@ -42,6 +49,12 @@ select has_function_privilege('anon', 'public.get_network_member_identities(uuid
   \quit 1
 \endif
 
+select has_function_privilege('authenticated', 'private.can_resolve_network_identity(uuid)', 'EXECUTE') as auth_private_helper_exec \gset
+\if :auth_private_helper_exec
+  \echo 'authenticated must not call the private relationship evidence helper directly'
+  \quit 1
+\endif
+
 select has_function_privilege('authenticated', 'public.get_public_network_directory(text,integer)', 'EXECUTE') as auth_directory_exec \gset
 \if :auth_directory_exec
 \else
@@ -56,8 +69,6 @@ select has_function_privilege('authenticated', 'public.get_network_member_identi
   \quit 1
 \endif
 
--- Owner-only profiles remain owner-only; this package must not reopen direct
--- directory reads through RLS policy changes.
 select count(*) = 0 as broad_profile_select_policy_absent
 from pg_policies
 where schemaname = 'public'
