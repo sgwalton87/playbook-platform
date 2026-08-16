@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { PlaybookCard, PlaybookGrid, PlaybookHero, PlaybookMetric, PlaybookMetrics, PlaybookPage, PlaybookPill } from "@/components/ui";
 
 type Course = {
@@ -37,6 +37,18 @@ export default function CoursesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  async function refreshCatalog() {
+    setLoading(true);
+    setError("");
+    try {
+      setCourses(await loadCatalog());
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Learning catalog could not be loaded.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   useEffect(() => {
     let active = true;
     void loadCatalog().then((items) => { if (active) setCourses(items); })
@@ -50,11 +62,11 @@ export default function CoursesPage() {
   const inProgress = published.filter((course) => course.completedModules > 0 && !course.completed);
   const completed = published.filter((course) => course.completed);
   const nextCourse = inProgress[0] || published.find((course) => !course.completed) || null;
-  const totalModules = useMemo(() => published.reduce((total, course) => total + course.moduleCount, 0), [published]);
+  const totalModules = published.reduce((total, course) => total + course.moduleCount, 0);
 
   return (
     <PlaybookPage>
-      <PlaybookHero eyebrow="Playbook Learning" title="Build skills that become durable evidence" subtitle="Courses are now loaded from the canonical learning catalog. Module progress, reflections, rewards, badges, and credentials persist to your Playbook record instead of living in page constants." />
+      <PlaybookHero eyebrow="Playbook Learning" title="Build skills that become durable evidence" subtitle="Courses are loaded from the canonical learning catalog. Module progress, reflections, rewards, badges, and credentials persist to your Playbook record instead of living in page constants." />
       <PlaybookMetrics>
         <PlaybookMetric label="Available courses" value={loading ? "…" : String(published.length)} />
         <PlaybookMetric label="In progress" value={loading ? "…" : String(inProgress.length)} />
@@ -62,7 +74,7 @@ export default function CoursesPage() {
         <PlaybookMetric label="Modules" value={loading ? "…" : String(totalModules)} />
       </PlaybookMetrics>
 
-      {error && <div role="alert" style={alert}>{error} <button onClick={() => location.reload()}>Retry</button></div>}
+      {error && <div role="alert" style={alert}>{error} <button type="button" onClick={() => void refreshCatalog()}>Retry</button></div>}
       {loading ? <div style={state}>Loading canonical learning catalog…</div> : (
         <>
           <section style={actions} aria-label="Learning actions">
