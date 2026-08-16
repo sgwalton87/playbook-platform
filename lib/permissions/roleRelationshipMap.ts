@@ -7,6 +7,7 @@ export function mapRoleToRelationship(role: PlaybookRoleOS): RelationshipKind {
     family: "parent_guardian",
     educator: "educator",
     mentor: "mentor",
+    coach: "coach",
     district: "district_admin",
     university: "university_partner",
     employer: "employer_partner",
