@@ -1,4 +1,6 @@
 import type { CommunityExperience, ScholarCommunityRecord } from "./community";
+import type { ExperienceCollection } from "../experiences";
+import type { CanonicalAIProfile } from "../portfolio/ai-foundation";
 
 export type AcademicAssessment = { total?: string | null; composite?: string | null; evidence: LegacyValue[] };
 
@@ -89,6 +91,7 @@ export interface ScholarRecord {
   };
   career: { idealProfession?: string | null; desiredSalaryRange?: string | null };
   community: ScholarCommunityRecord;
+  experiences: ExperienceCollection;
   achievements: { total: number; certificates: LegacyValue[]; badges: LegacyValue[]; activities: CommunityExperience[]; posts: LegacyValue[] };
   service: { volunteerHours: number; activities: CommunityExperience[] };
   leadership: {
@@ -98,7 +101,19 @@ export interface ScholarRecord {
     leadershipScore: number;
   };
   readiness: { portfolioCompletion: number; opportunityReadiness: number };
-  ai: Record<string, LegacyValue>;
+  ai: {
+    academicSummary: unknown;
+    collegeRecommendations: unknown;
+    transcriptAnalysis: unknown;
+    scholarshipEligibility: unknown;
+    academicCoaching: unknown;
+    progressForecasting: unknown;
+    canonicalProfile: CanonicalAIProfile;
+    resume: CanonicalAIProfile["resume"];
+    scholarship: CanonicalAIProfile["scholarship"];
+    recruiting: CanonicalAIProfile["recruiting"];
+    studentSnapshot: CanonicalAIProfile["studentSnapshot"];
+  };
 }
 
 export interface ProfileAcademicForm {
