@@ -50,12 +50,15 @@ export function destinationForRelationship(relationship: RelationshipKind) {
     scholar: getRoleDestination("scholar"),
     parent_guardian: getRoleDestination("family"),
     educator: getRoleDestination("educator"),
+    counselor: getRoleDestination("high-school-counselor"),
     mentor: getRoleDestination("mentor"),
     coach: getRoleDestination("coach"),
     district_admin: getRoleDestination("district"),
-    // A generic university relationship does not prove whether the invitee is
-    // a recruiter or admissions officer. Keep it at the neutral university
-    // boundary until that role is explicitly selected and verified.
+    college_recruiter: getRoleDestination("college-coach"),
+    college_admissions: getRoleDestination("college-admissions"),
+    community_partner: getRoleDestination("other"),
+    // Legacy compatibility only. New invitation creation should select the
+    // exact Recruiting or Admissions relationship identity instead.
     university_partner: "/university-os",
     employer_partner: getRoleDestination("employer"),
   };
@@ -80,9 +83,9 @@ export function getDemoInvitations() {
     ),
     updateInvitationStatus(
       createSupportInvitation({
-        inviteeName: "University Outreach",
-        inviteeEmail: "university@example.com",
-        relationship: "university_partner",
+        inviteeName: "College Recruiter",
+        inviteeEmail: "recruiter@college.edu",
+        relationship: "college_recruiter",
       }),
       "declined"
     ),
