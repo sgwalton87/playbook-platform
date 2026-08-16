@@ -7,6 +7,7 @@ on:
       - "scripts/pbos/prepare-local-supabase-migrations.mjs"
       - ".github/workflows/database-certification.yml"
       - "tests/unit/support-relationships/**"
+      - "tests/unit/onboarding/profile-authority-hardening.test.ts"
   workflow_dispatch:
 
 permissions:
@@ -53,6 +54,9 @@ jobs:
 
       - name: Certify invitation authority boundary
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/support_invitation_authority_preflight.sql
+
+      - name: Certify profile authority boundary
+        run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/profile_authority_preflight.sql
 
       - name: Stop isolated local Supabase
         if: always()
