@@ -66,11 +66,13 @@ export async function POST(request: NextRequest) {
       }
 
       if (profileResult.data.verification_status !== "approved") {
+        // Role equality has already been resolved from this authenticated
+        // profile. Use the owner ID alone so legacy null profile_mode rows still
+        // receive the durable pending state.
         const pending = await supabase
           .from("profiles")
           .update({ verification_status: "pending" })
-          .eq("id", user.id)
-          .eq("profile_mode", normalizedRole);
+          .eq("id", user.id);
         if (pending.error) throw new Error(pending.error.message);
       }
 
