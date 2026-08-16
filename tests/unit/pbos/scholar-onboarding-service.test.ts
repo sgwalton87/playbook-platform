@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { ScholarOnboardingService } from "../../../lib/pbos/scholar-onboarding-service";
 
-function identity(userId: string, role: "SCHOLAR" | "SCHOLAR_ATHLETE") {
+function identity(userId: string, role: "SCHOLAR" | "SCHOLAR_ATHLETE" | "TRANSITION_YOUTH") {
   return {
     mappingId: "mapping-1",
     externalIdentity: { externalIdentityId: userId, externalSystemId: "PLAYBOOK-SYSTEM-001" as const, role, authorityReferences: [], active: true },
@@ -46,6 +46,27 @@ describe("governed Scholar onboarding-to-dashboard", () => {
     expect(persisted).toEqual([
       { role: "SCHOLAR_ATHLETE" },
       { role: "SCHOLAR_ATHLETE", sections: ["identity", "goals", "athletics"] },
+    ]);
+  });
+
+  it("keeps Transition-Aged Youth on the canonical Scholar Record with support projection", async () => {
+    const persisted: Array<{ role: string; sections?: readonly string[] }> = [];
+    const service = new ScholarOnboardingService({
+      persistOnboarding: async input => { persisted.push({ role: input.role }); return { scholarRecordId: input.scholarId, goalId: "goal-tay" }; },
+      persistDashboard: async input => { persisted.push({ role: input.role, sections: input.sectionIds }); }
+    }, {
+      registerIdentity: async userId => identity(userId, "TRANSITION_YOUTH"),
+      verifyReady: async () => ["pbos:health"], publishOnboarding: async () => ["pbos:onboarding"], projectDashboard: async () => ["pbos:dashboard"]
+    });
+    const result = await service.complete({ actorId: "tay-1", ownerId: "tay-1", displayName: "TAY One",
+      goalTitle: "Build my next-step plan", role: "TRANSITION_YOUTH", identityApprovalId: "tay-identity-approval",
+      exchangeApprovalId: "tay-exchange-approval", idempotencyKey: "tay-journey-1" });
+    expect(result.role).toBe("TRANSITION_YOUTH");
+    expect(result.scholarRecordId).toBe("tay-1");
+    expect(result.sectionIds).toEqual(["identity", "goals", "support"]);
+    expect(persisted).toEqual([
+      { role: "TRANSITION_YOUTH" },
+      { role: "TRANSITION_YOUTH", sections: ["identity", "goals", "support"] },
     ]);
   });
 
