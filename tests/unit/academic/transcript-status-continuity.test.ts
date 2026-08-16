@@ -17,7 +17,8 @@ describe("transcript status continuity", () => {
     expect(source).toContain("transcript-sidebar");
     expect(source).toContain('className="transcript-table"');
     expect(source).toContain('color:"rgba(248,247,244,.72)"');
-    expect(source).toContain('color:"#9A3412"');
+    // #92400E on #FFF7ED is the current high-contrast in-progress label pair.
+    expect(source).toContain('color:"#92400E"');
     expect(source).toContain('aria-label="A-G education requirements"');
     expect(source).toContain("tabIndex={0}");
     expect(source).toContain('color:"#475569"');

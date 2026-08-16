@@ -1,355 +1,182 @@
 "use client";
-import { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
-import { addReward } from "@/lib/gamification";
-import CourseDetailHeader from "@/components/courses/CourseDetailHeader";
 
-const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",blue:"#3B82F6",green:"#10B981",amber:"#F59E0B",purple:"#8B5CF6",mono:"'Space Mono', monospace",sans:"'Hanken Grotesk', system-ui, sans-serif",anton:"'Anton', sans-serif"};
+import Image from "next/image";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { PlaybookCard, PlaybookGrid, PlaybookHero, PlaybookMetric, PlaybookMetrics, PlaybookPage, PlaybookPill } from "@/components/ui";
 
-const COURSES:Record<string,LegacyValue>={
-  "college-application-playbook":{title:"College Application Playbook",pillar:"College",pillarColor:"#0EA5E9",img:"https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200&q=80",desc:"Build your college list, complete applications, connect FAFSA, CalKIDS, and scholarship milestones.",xpPerModule:50,coinsPerModule:10,modules:[
-    {id:1,title:"Build Your College List",duration:"15 min",type:"Planning",desc:"Identify reach, match, and safety schools that fit your goals."},
-    {id:2,title:"Create Your Application Accounts",duration:"20 min",type:"Action Step",desc:"Set up your college application portals and track login milestones."},
-    {id:3,title:"FAFSA and Financial Aid",duration:"18 min",type:"External Milestone",desc:"Visit fafsa.gov and prepare the documents needed for aid."},
-    {id:4,title:"CalKIDS and College Savings",duration:"14 min",type:"External Milestone",desc:"Visit calkids.org and check eligibility for college savings funds."},
-    {id:5,title:"Personal Statement Prep",duration:"22 min",type:"Writing Lab",desc:"Draft a personal statement that tells your story with clarity and purpose."},
-    {id:6,title:"Submit and Track Applications",duration:"20 min",type:"Final Project",desc:"Create your application tracker and complete your college readiness plan."},
-  ]},
-  "captains-mindset":{title:"Captain's Mindset",pillar:"Leadership",pillarColor:"#F97316",img:"https://images.unsplash.com/photo-1546519638405-a4c8b5bd3c5e?w=1200&q=80",desc:"Lead by example on and off the court with proven captaincy frameworks.",xpPerModule:50,coinsPerModule:10,modules:[
-    {id:1,title:"What Makes a Captain?",duration:"12 min",type:"Video + Reading",desc:"Explore the difference between a player and a leader. Understand what captaincy really demands."},
-    {id:2,title:"Accountability Starts With You",duration:"15 min",type:"Video + Quiz",desc:"Real leaders hold themselves first. Learn the accountability frameworks used by elite sports teams."},
-    {id:3,title:"Building Trust With Your Team",duration:"18 min",type:"Video + Activity",desc:"Trust is the foundation of every great team. Learn how to build it intentionally."},
-    {id:4,title:"Leading Through Adversity",duration:"14 min",type:"Video + Reflection",desc:"What separates good captains from great ones is how they perform when things go wrong."},
-    {id:5,title:"Communication On and Off the Court",duration:"16 min",type:"Video + Quiz",desc:"Learn the communication skills that translate from the locker room to the classroom."},
-    {id:6,title:"Your Leadership Playbook",duration:"20 min",type:"Final Project",desc:"Create your personal leadership plan. Submit it to earn your certificate."},
-  ]},
-  "money-in-the-game":{title:"Money in the Game",pillar:"Finance",pillarColor:"#3B82F6",img:"https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1200&q=80",desc:"Budgeting, saving, and NIL fundamentals built specifically for young athletes.",xpPerModule:50,coinsPerModule:10,modules:[
-    {id:1,title:"Money 101 for Athletes",duration:"10 min",type:"Video + Reading",desc:"Why athletes lose money fast — and how to never be that story."},
-    {id:2,title:"Build Your First Budget",duration:"18 min",type:"Interactive",desc:"A step-by-step budget built for your real life as a student athlete."},
-    {id:3,title:"Saving vs Investing",duration:"15 min",type:"Video + Quiz",desc:"What's the difference and when should you do which?"},
-    {id:4,title:"NIL Basics for Under-18",duration:"20 min",type:"Video + Reading",desc:"Name, Image, Likeness explained simply. What you can and can't do before 18."},
-    {id:5,title:"Taxes — Yes, Athletes Pay Them",duration:"14 min",type:"Video + Quiz",desc:"Don't get caught off guard. Learn what you owe and why."},
-    {id:6,title:"Credit Scores Explained",duration:"12 min",type:"Video + Reading",desc:"What is a credit score, why does it matter, and how do you build one?"},
-    {id:7,title:"Avoiding Financial Traps",duration:"16 min",type:"Video + Activity",desc:"The most common money mistakes young athletes make — and how to dodge every one."},
-    {id:8,title:"Your Financial Game Plan",duration:"22 min",type:"Final Project",desc:"Build your complete financial plan. Submit to earn your Finance certificate card."},
-  ]},
-  "mind-of-an-athlete":{title:"Mind of an Athlete",pillar:"SEL",pillarColor:"#8B5CF6",img:"https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=1200&q=80",desc:"Build resilience and manage pressure with social-emotional tools.",xpPerModule:50,coinsPerModule:10,modules:[
-    {id:1,title:"Understanding Your Emotions",duration:"12 min",type:"Video + Reflection",desc:"Elite athletes feel everything — they just know how to process it."},
-    {id:2,title:"Pressure and Performance",duration:"15 min",type:"Video + Activity",desc:"Why pressure breaks some athletes and fuels others."},
-    {id:3,title:"Building Resilience",duration:"14 min",type:"Video + Quiz",desc:"Resilience isn't about never falling. It's about how fast you get back up."},
-    {id:4,title:"Identity Beyond the Sport",duration:"18 min",type:"Video + Reflection",desc:"What happens when the game ends? Build an identity that goes beyond your jersey number."},
-    {id:5,title:"Your Mental Performance Plan",duration:"20 min",type:"Final Project",desc:"Create your personal mental performance toolkit. Submit to earn your SEL certificate."},
-  ]},
+type Module = {
+  module_key: string;
+  position: number;
+  title: string;
+  duration_minutes: number;
+  module_type: string;
+  summary: string;
+  content: string;
+  completion_mode: "acknowledge" | "reflection";
+  required: boolean;
+  progress: { module_key: string; reflection: string | null; completed_at: string } | null;
 };
 
-function CertCard({title,pillar,color}:{title:string;pillar:string;color:string}) {
-  return(
-    <div style={{position:"relative",borderRadius:14,padding:2,background:"linear-gradient(135deg,#F59E0B,#F97316,#8B5CF6,#3B82F6,#10B981)",boxShadow:"0 8px 32px rgba(0,0,0,.2)",width:160,flexShrink:0}}>
-      <div style={{background:T.navy,borderRadius:12,padding:"16px 14px",minHeight:200,display:"flex",flexDirection:"column",alignItems:"center"}}>
-        <div style={{display:"flex",justifyContent:"space-between",width:"100%",marginBottom:12}}>
-          <span style={{fontFamily:T.mono,fontSize:8,color:"rgba(255,255,255,.4)",letterSpacing:"0.1em"}}>ERA 1/4</span>
-          <span style={{fontFamily:T.mono,fontSize:8,background:T.orange,color:"#fff",padding:"2px 6px",borderRadius:4}}>UNCOMMON</span>
-        </div>
-        <div style={{width:56,height:56,borderRadius:"50%",background:"rgba(255,255,255,.06)",border:`2px solid ${color}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:24,marginBottom:12}}>🎓</div>
-        <div style={{fontFamily:T.anton,fontSize:11,color,textTransform:"uppercase",textAlign:"center",letterSpacing:"0.04em",marginBottom:4}}>{title}</div>
-        <div style={{fontFamily:T.mono,fontSize:8,color:"rgba(255,255,255,.3)",textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:12}}>{pillar}</div>
-        <div style={{marginTop:"auto",paddingTop:8,width:"100%",borderTop:"1px solid rgba(255,255,255,.08)",textAlign:"center"}}>
-          <div style={{fontFamily:T.mono,fontSize:7,color:"rgba(255,255,255,.2)",letterSpacing:"0.08em"}}>PLAYBOOK SERIES · VALIDATED</div>
-        </div>
-      </div>
-    </div>
-  );
+type Course = {
+  slug: string;
+  title: string;
+  description: string;
+  pillar: string;
+  image_url: string | null;
+  status: string;
+  xp_per_module: number;
+  coins_per_module: number;
+  course_xp_bonus: number;
+  course_coin_bonus: number;
+  certificate_name: string;
+};
+
+type CourseResponse = { course?: Course; modules?: Module[]; credential?: { id: string; credential_name: string; issued_at: string } | null; error?: string };
+
+async function getCourse(slug: string): Promise<CourseResponse> {
+  const response = await fetch(`/api/learning/courses/${encodeURIComponent(slug)}`, { cache: "no-store" });
+  const result = await response.json() as CourseResponse;
+  if (!response.ok) throw new Error(result.error || "Course could not be loaded.");
+  return result;
 }
 
-export default function CourseModulePage() {
-  const router=useRouter();
-  const params=useParams();
-  const slug=params?.slug as string;
-  const course=COURSES[slug];
-  const [completedIds,setCompletedIds]=useState<number[]>([]);
-  const [toast,setToast]=useState<string|null>(null);
-  const [userId,setUserId]=useState<string|null>(null);
-  const [claimed,setClaimed]=useState(false);
-  const [authed,setAuthed]=useState(false);
+export default function CoursePage() {
+  const params = useParams<{ slug: string }>();
+  const slug = String(params?.slug || "");
+  const [course, setCourse] = useState<Course | null>(null);
+  const [modules, setModules] = useState<Module[]>([]);
+  const [credential, setCredential] = useState<CourseResponse["credential"]>(null);
+  const [openModule, setOpenModule] = useState<string | null>(null);
+  const [reflections, setReflections] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [message, setMessage] = useState("Loading course…");
+  const [error, setError] = useState("");
 
-  useEffect(()=>{
-    (async()=>{
-      const{data:u}=await supabase.auth.getUser();
-      if(!u.user){router.replace("/login");return;}
-      setUserId(u.user.id);
-      const { data: progressRow } = await supabase
-        .from("course_progress")
-        .select("completed_modules, completed")
-        .eq("user_id", u.user.id)
-        .eq("course_slug", slug)
-        .maybeSingle();
+  async function load() {
+    setError("");
+    const result = await getCourse(slug);
+    setCourse(result.course || null);
+    setModules(result.modules || []);
+    setCredential(result.credential || null);
+    const firstOpen = (result.modules || []).find((module) => !module.progress)?.module_key || result.modules?.[0]?.module_key || null;
+    setOpenModule((current) => current || firstOpen);
+    setMessage(result.credential ? "Course complete. Credential issued." : "Course progress is current.");
+    setLoading(false);
+  }
 
-      if (progressRow?.completed) {
-        setCompletedIds(course.modules.map((m:LegacyValue) => m.id));
-        setClaimed(true);
-      } else if (progressRow?.completed_modules?.length) {
-        setCompletedIds(progressRow.completed_modules);
-      }
+  useEffect(() => {
+    if (!slug) return;
+    let active = true;
+    void getCourse(slug).then((result) => {
+      if (!active) return;
+      setCourse(result.course || null); setModules(result.modules || []); setCredential(result.credential || null);
+      setOpenModule((result.modules || []).find((module) => !module.progress)?.module_key || result.modules?.[0]?.module_key || null);
+      setMessage(result.credential ? "Course complete. Credential issued." : "Course progress is current.");
+    }).catch((cause) => { if (active) setError(cause instanceof Error ? cause.message : "Course could not be loaded."); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [slug]);
 
-      setAuthed(true);
-    })();
-  },[course.modules, router, slug]);
-
-  useEffect(()=>{if(!toast)return;const t=setTimeout(()=>setToast(null),5000);return()=>clearTimeout(t);},[toast]);
-
-  const completeModule=async(moduleId:number)=>{
-    if(!userId||completedIds.includes(moduleId))return;
-    const newCompleted=[...completedIds,moduleId];
-    setCompletedIds(newCompleted);
-    await supabase
-      .from("course_progress")
-      .upsert(
-        {
-          user_id: userId,
-          course_slug: slug,
-          completed_modules: newCompleted,
-          completed: newCompleted.length === course.modules.length,
-          completed_at: newCompleted.length === course.modules.length ? new Date().toISOString() : null,
-        },
-        { onConflict: "user_id,course_slug" }
-      );
-    // Award XP and coins
-    await addReward(userId,{coins:course.coinsPerModule,xp:course.xpPerModule});
-    if(newCompleted.length===course.modules.length){
-      setToast(`🎓 Course complete! Certificate unlocked · +${course.xpPerModule*course.modules.length} XP total`);
-    } else {
-      setToast(`⚡ +${course.xpPerModule} XP · +${course.coinsPerModule} coins — Module ${moduleId} complete!`);
-    }
-  };
-
-  const fireConfetti = async () => {
-    const confetti = (await import("canvas-confetti")).default;
-
-    confetti({
-      particleCount: 160,
-      spread: 95,
-      origin: { y: 0.6 },
-    });
-
-    setTimeout(() => {
-      confetti({
-        particleCount: 90,
-        spread: 120,
-        origin: { y: 0.7 },
-      });
-    }, 250);
-  };
-
-  const claimCert=async()=>{
-    if(!userId || !course)return;
-
-    setClaimed(true);
-
-    await fireConfetti();
-
-    const allModules = course.modules.map((m:LegacyValue)=>m.id);
-
-    const { error: progressError } = await supabase
-      .from("course_progress")
-      .upsert(
-        {
-          user_id: userId,
-          course_slug: slug,
-          completed_modules: allModules,
-          completed: true,
-          completed_at: new Date().toISOString(),
-        },
-        { onConflict: "user_id,course_slug" }
-      );
-
-    if(progressError){
-      alert(progressError.message);
-      setClaimed(false);
+  async function complete(module: Module) {
+    if (module.progress) return;
+    const reflection = (reflections[module.module_key] || "").trim();
+    if (module.completion_mode === "reflection" && reflection.length < 20) {
+      setError("Write a meaningful reflection of at least 20 characters before completing this module.");
       return;
     }
+    setBusy(module.module_key); setError("");
+    try {
+      const response = await fetch(`/api/learning/courses/${encodeURIComponent(slug)}`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ moduleKey: module.module_key, reflection: reflection || null }),
+      });
+      const result = await response.json() as { outcome?: { course_completed?: boolean; coins_awarded?: number; xp_awarded?: number }; error?: string };
+      if (!response.ok) throw new Error(result.error || "Module could not be completed.");
+      const outcome = result.outcome;
+      setMessage(outcome?.course_completed
+        ? `Course complete. +${outcome.xp_awarded || 0} XP and +${outcome.coins_awarded || 0} coins were issued idempotently.`
+        : `Module complete. +${outcome?.xp_awarded || 0} XP and +${outcome?.coins_awarded || 0} coins were issued.`);
+      await load();
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "Module could not be completed."); }
+    finally { setBusy(null); }
+  }
 
-    const { data: existingCert } = await supabase
-      .from("certificates")
-      .select("id")
-      .eq("user_id", userId)
-      .eq("course_slug", slug)
-      .maybeSingle();
+  const completedCount = modules.filter((module) => module.progress).length;
+  const requiredCount = modules.filter((module) => module.required).length;
+  const percent = requiredCount ? Math.round(completedCount / requiredCount * 100) : 0;
+  const totalMinutes = useMemo(() => modules.reduce((total, module) => total + module.duration_minutes, 0), [modules]);
 
-    if(!existingCert){
-      const { error: certError } = await supabase
-        .from("certificates")
-        .insert({
-          user_id: userId,
-          course_slug: slug,
-          certificate_name: `${course.title} Certificate`,
-          issued_at: new Date().toISOString(),
-        });
+  if (loading) return <PlaybookPage><div style={state}>Loading canonical course…</div></PlaybookPage>;
+  if (!course) return <PlaybookPage><PlaybookCard eyebrow="Learning" title="Course not found"><Link href="/courses">Return to Courses</Link></PlaybookCard></PlaybookPage>;
 
-      if(certError){
-        alert(certError.message);
-        setClaimed(false);
-        return;
-      }
-    }
+  return (
+    <PlaybookPage>
+      <PlaybookHero eyebrow={`${course.pillar} · Canonical Learning`} title={course.title} subtitle={course.description} />
+      <PlaybookMetrics>
+        <PlaybookMetric label="Progress" value={`${percent}%`} />
+        <PlaybookMetric label="Modules" value={`${completedCount}/${requiredCount}`} />
+        <PlaybookMetric label="Learning time" value={`${totalMinutes} min`} />
+        <PlaybookMetric label="Credential" value={credential ? "Earned" : "Locked"} />
+      </PlaybookMetrics>
+      <div role="status" aria-live="polite" style={status}>{message}</div>
+      {error && <div role="alert" style={alert}>{error}</div>}
 
-    await supabase.from("feed_posts").insert({
-      user_id: userId,
-      post_type: "course_completed",
-      title: `🎓 Completed ${course.title}`,
-      body: `Certificate unlocked for ${course.title}.`,
-      visibility: "public",
-    });
+      {course.image_url && <div style={heroMedia}><Image unoptimized fill src={course.image_url} alt="" style={{ objectFit: "cover" }} /></div>}
 
-    setToast("🏆 Certificate added to your profile, transcript, and certificate vault!");
-    setTimeout(()=>router.push("/certificates"),2500);
-  };
+      {credential && <PlaybookCard eyebrow="Credential issued" title={credential.credential_name}>
+        <p style={copy}>Issued {new Date(credential.issued_at).toLocaleDateString()}. This credential is backed by durable completion evidence.</p>
+        <div style={buttonRow}><Link href="/certificates" style={primaryLink}>Open credential vault</Link><Link href="/badges" style={secondaryLink}>View badges</Link></div>
+      </PlaybookCard>}
 
-  if(!course)return(
-    <div style={{minHeight:"100vh",background:T.cream,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:T.mono,fontSize:12,color:T.faint}}>
-      Course not found. <button onClick={()=>router.push("/courses")} style={{marginLeft:10,color:T.orange,background:"none",border:"none",cursor:"pointer",fontFamily:T.mono}}>← Back</button>
-    </div>
-  );
-
-  const totalModules=course.modules.length;
-  const completedCount=completedIds.length;
-  const pct=Math.round((completedCount/totalModules)*100);
-  const isComplete=completedCount===totalModules;
-  const nextModuleId=course.modules.find((m:LegacyValue)=>!completedIds.includes(m.id))?.id;
-
-  if(!authed)return<div style={{minHeight:"100vh",background:T.cream,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:T.mono,fontSize:12,color:T.faint}}>Loading…</div>;
-
-  return(
-    <div style={{minHeight:"100vh",background:T.cream,fontFamily:T.sans,color:T.ink}}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}::selection{background:${T.orange};color:#fff;}.pb-mod:hover{border-color:${T.orange}!important;}img{display:block;}`}</style>
-
-      {toast&&<div style={{position:"fixed",top:20,right:20,zIndex:9999,background:T.navy,color:"#F8F7F4",padding:"13px 18px",borderRadius:14,fontFamily:T.mono,fontSize:12,fontWeight:700,letterSpacing:"0.04em",boxShadow:"0 8px 32px rgba(15,23,42,.35)",maxWidth:380,lineHeight:1.5}}>{toast}</div>}
-
-      <div
-        style={{
-          width: "100%",
-          maxWidth: 1180,
-          margin: "0 auto",
-          padding: "24px 32px 56px",
-        }}
-      >
-        <CourseDetailHeader
-          title={course.title}
-          pillar={course.pillar}
-          pillarColor={course.pillarColor}
-          image={course.img}
-          description={course.desc}
-          completedCount={completedCount}
-          totalModules={totalModules}
-          percent={pct}
-          xpEarned={course.xpPerModule * completedCount}
-          coinsEarned={course.coinsPerModule * completedCount}
-        />
-
-        {/* Certificate claim */}
-        {isComplete&&(
-          <div style={{background:T.navy,borderRadius:18,padding:"24px 28px",marginBottom:18,display:"grid",gridTemplateColumns:"1fr auto",gap:24,alignItems:"center",overflow:"hidden",position:"relative"}}>
-            <div style={{position:"absolute",top:-30,right:180,width:120,height:120,borderRadius:"50%",background:T.orange,opacity:.08,pointerEvents:"none"}}/>
-            <div>
-              <div style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.18em",textTransform:"uppercase",color:T.orange,marginBottom:10}}>🏆 Course complete!</div>
-              <h3 style={{fontFamily:T.anton,fontWeight:400,fontSize:"clamp(20px,3vw,30px)",textTransform:"uppercase",color:"#F8F7F4",lineHeight:1,marginBottom:12}}>Claim your certificate</h3>
-              <p style={{fontSize:13,color:"rgba(248,247,244,.55)",lineHeight:1.6,maxWidth:"44ch",marginBottom:18}}>
-                You&apos;ve completed all {totalModules} modules. Your certificate card is ready — it will appear on your profile and transcript.
-              </p>
-              {!claimed?(
-                <button onClick={claimCert} style={{fontFamily:T.mono,fontSize:12,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:T.orange,color:"#fff",border:"none",borderRadius:999,padding:"13px 24px",cursor:"pointer"}}>
-                  Claim certificate → Profile
-                </button>
-              ):(
-                <span style={{fontFamily:T.mono,fontSize:12,color:T.green,fontWeight:700}}>✓ Certificate claimed</span>
-              )}
-            </div>
-            <CertCard title={course.title} pillar={course.pillar} color={course.pillarColor}/>
-          </div>
-        )}
-
-        <div style={{display:"grid",gridTemplateColumns:"1fr 260px",gap:20}}>
-          {/* Modules */}
-          <div>
-            <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.14em",textTransform:"uppercase",color:T.muted,marginBottom:14}}>Modules</p>
-            <div style={{display:"flex",flexDirection:"column",gap:10}}>
-              {course.modules.map((mod:LegacyValue)=>{
-                const done=completedIds.includes(mod.id);
-                const isNext=mod.id===nextModuleId;
-                const locked=!done&&!isNext&&mod.id>1&&!completedIds.includes(mod.id-1);
-                return(
-                  <div key={mod.id} className="pb-mod"
-                    style={{background:T.surface,border:`1.5px solid ${done?T.green+"44":isNext?T.orange+"44":T.line}`,borderRadius:14,padding:"16px 18px",transition:"border-color 0.15s",opacity:locked?.5:1}}>
-                    <div style={{display:"flex",gap:14,alignItems:"flex-start"}}>
-                      <div style={{width:40,height:40,borderRadius:"50%",background:done?T.green:isNext?T.orange:T.line,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontSize:16,color:"#fff",fontWeight:700,fontFamily:T.mono,transition:"background 0.2s"}}>
-                        {done?"✓":locked?"🔒":mod.id}
-                      </div>
-                      <div style={{flex:1,minWidth:0}}>
-                        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:4,flexWrap:"wrap",gap:6}}>
-                          <h3 style={{fontSize:14,fontWeight:700,color:done?T.muted:T.ink}}>{mod.title}</h3>
-                          <div style={{display:"flex",gap:8,flexShrink:0}}>
-                            <span style={{fontFamily:T.mono,fontSize:10,color:T.faint}}>{mod.duration}</span>
-                            <span style={{fontFamily:T.mono,fontSize:9,color:T.muted,background:T.surface2,padding:"2px 7px",borderRadius:999,border:`1px solid ${T.line}`}}>{mod.type}</span>
-                          </div>
-                        </div>
-                        <p style={{fontSize:13,color:T.muted,lineHeight:1.55,marginBottom:done?0:12}}>{mod.desc}</p>
-                        {!done&&!locked&&(
-                          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-                            <div style={{display:"flex",gap:10}}>
-                              <span style={{fontFamily:T.mono,fontSize:10,color:T.orange}}>+{course.xpPerModule} XP</span>
-                              <span style={{fontFamily:T.mono,fontSize:10,color:T.amber}}>+{course.coinsPerModule} coins</span>
-                            </div>
-                            <button onClick={()=>completeModule(mod.id)}
-                              style={{fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",background:isNext?T.orange:T.surface2,color:isNext?"#fff":T.muted,border:`1px solid ${isNext?T.orange:T.line}`,borderRadius:999,padding:"8px 16px",cursor:"pointer",transition:"all 0.15s"}}>
-                              {isNext?"Start module →":"Complete →"}
-                            </button>
-                          </div>
-                        )}
-                        {done&&(
-                          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
-                            <div style={{fontFamily:T.mono,fontSize:10,color:T.green,fontWeight:700}}>
-                              ✓ Completed · +{course.xpPerModule} XP earned
-                            </div>
-                            <button
-                              onClick={()=>setToast(`Reviewing Module ${mod.id}: ${mod.title}`)}
-                              style={{fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",background:T.surface2,color:T.ink,border:`1px solid ${T.line}`,borderRadius:999,padding:"8px 16px",cursor:"pointer"}}
-                            >
-                              Review module →
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Sidebar */}
-          <div style={{display:"flex",flexDirection:"column",gap:14}}>
-            <div style={{background:T.navy,borderRadius:16,padding:"16px 18px"}}>
-              <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.12em",textTransform:"uppercase",color:T.orange,marginBottom:14}}>Course rewards</p>
-              {[{icon:"⚡",label:"XP per module",value:`+${course.xpPerModule}`},{icon:"💰",label:"Coins per module",value:`+${course.coinsPerModule}`},{icon:"⭐",label:"Total XP",value:`+${course.xpPerModule*totalModules}`},{icon:"🎓",label:"Certificate card",value:"On completion"},{icon:"🏅",label:"Badge unlock",value:"On completion"}].map(r=>(
-                <div key={r.label} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px 0",borderBottom:"1px solid rgba(255,255,255,.07)"}}>
-                  <div style={{display:"flex",gap:8,alignItems:"center"}}>
-                    <span style={{fontSize:14}}>{r.icon}</span>
-                    <span style={{fontSize:12,color:"rgba(248,247,244,.5)"}}>{r.label}</span>
-                  </div>
-                  <span style={{fontFamily:T.mono,fontSize:11,color:T.orange,fontWeight:700}}>{r.value}</span>
-                </div>
-              ))}
-            </div>
-            <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:16,padding:"14px 16px"}}>
-              <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.12em",textTransform:"uppercase",color:T.muted,marginBottom:12}}>Certificate preview</p>
-              <div style={{display:"flex",justifyContent:"center",opacity:isComplete?1:0.35,transition:"opacity 0.4s"}}>
-                <CertCard title={course.title} pillar={course.pillar} color={course.pillarColor}/>
-              </div>
-              {!isComplete&&<p style={{fontFamily:T.mono,fontSize:10,color:T.faint,textAlign:"center",marginTop:10}}>Complete all modules to unlock</p>}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+      <section style={sectionHeader}><p style={eyebrow}>Course modules</p><h2 style={heading}>Learn → reflect → prove completion</h2></section>
+      <PlaybookGrid min={340}>
+        {modules.map((module) => {
+          const open = openModule === module.module_key;
+          return <PlaybookCard key={module.module_key} eyebrow={`Module ${module.position} · ${module.module_type}`} title={module.title}>
+            <div style={moduleMeta}><PlaybookPill>{module.duration_minutes} min</PlaybookPill><PlaybookPill>{module.completion_mode === "reflection" ? "Reflection required" : "Acknowledge"}</PlaybookPill>{module.progress && <PlaybookPill>Completed</PlaybookPill>}</div>
+            <p style={copy}>{module.summary}</p>
+            <button onClick={() => setOpenModule(open ? null : module.module_key)} style={secondaryButton}>{open ? "Hide lesson" : "Open lesson"}</button>
+            {open && <div style={lesson}>
+              <p style={lessonCopy}>{module.content}</p>
+              {module.progress ? <div style={completedBox}>
+                <strong>Completed {new Date(module.progress.completed_at).toLocaleString()}</strong>
+                {module.progress.reflection && <p style={copy}>Your reflection: {module.progress.reflection}</p>}
+              </div> : <>
+                {module.completion_mode === "reflection" && <label style={reflectionLabel}>Your reflection
+                  <textarea value={reflections[module.module_key] || ""} onChange={(event) => setReflections((current) => ({ ...current, [module.module_key]: event.target.value }))} minLength={20} maxLength={4000} rows={5} style={textarea} placeholder="What did you learn, decide, or plan to do next?" />
+                </label>}
+                <button onClick={() => void complete(module)} disabled={busy === module.module_key} style={primaryButton}>{busy === module.module_key ? "Recording…" : "Complete module"}</button>
+              </>}
+            </div>}
+          </PlaybookCard>;
+        })}
+      </PlaybookGrid>
+      <div style={buttonRow}><Link href="/courses" style={secondaryLink}>← All courses</Link><Link href="/store" style={secondaryLink}>Reward Store</Link></div>
+    </PlaybookPage>
   );
 }
+
+const state: React.CSSProperties = { maxWidth: 1180, margin: "0 auto", padding: 30, borderRadius: 20, background: "#FFFFFF", color: "#64748B" };
+const status: React.CSSProperties = { maxWidth: 1180, margin: "0 auto 14px", color: "#334155" };
+const alert: React.CSSProperties = { maxWidth: 1180, margin: "0 auto 14px", padding: 13, borderRadius: 12, background: "#FEF2F2", border: "1px solid #FCA5A5", color: "#991B1B" };
+const heroMedia: React.CSSProperties = { position: "relative", maxWidth: 1180, minHeight: 280, margin: "0 auto 22px", borderRadius: "28px 8px 28px 8px", overflow: "hidden", background: "#E2E8F0" };
+const sectionHeader: React.CSSProperties = { maxWidth: 1180, margin: "30px auto 16px" };
+const eyebrow: React.CSSProperties = { margin: 0, color: "#EA580C", fontSize: 11, fontWeight: 950, letterSpacing: ".14em", textTransform: "uppercase" };
+const heading: React.CSSProperties = { margin: "7px 0", color: "#0F172A", fontSize: "clamp(28px,4vw,42px)" };
+const moduleMeta: React.CSSProperties = { display: "flex", gap: 7, flexWrap: "wrap", marginBottom: 12 };
+const copy: React.CSSProperties = { color: "#64748B", lineHeight: 1.6 };
+const lesson: React.CSSProperties = { marginTop: 15, padding: 16, borderRadius: 16, background: "#F8FAFC", border: "1px solid #E2E8F0" };
+const lessonCopy: React.CSSProperties = { color: "#334155", lineHeight: 1.75, fontSize: 16 };
+const completedBox: React.CSSProperties = { marginTop: 14, padding: 13, borderRadius: 12, background: "#ECFDF5", border: "1px solid #A7F3D0", color: "#065F46" };
+const reflectionLabel: React.CSSProperties = { display: "grid", gap: 7, marginTop: 14, color: "#0F172A", fontWeight: 850 };
+const textarea: React.CSSProperties = { width: "100%", resize: "vertical", border: "1px solid #CBD5E1", borderRadius: 12, padding: 12, background: "#FFFFFF", color: "#0F172A" };
+const buttonRow: React.CSSProperties = { maxWidth: 1180, margin: "18px auto", display: "flex", gap: 9, flexWrap: "wrap" };
+const baseButton: React.CSSProperties = { borderRadius: 999, padding: "10px 14px", fontWeight: 900, cursor: "pointer" };
+const primaryButton: React.CSSProperties = { ...baseButton, marginTop: 13, border: 0, background: "#F97316", color: "#FFFFFF" };
+const secondaryButton: React.CSSProperties = { ...baseButton, border: "1px solid #CBD5E1", background: "#FFFFFF", color: "#0F172A" };
+const primaryLink: React.CSSProperties = { display: "inline-block", padding: "10px 14px", borderRadius: 999, background: "#F97316", color: "#FFFFFF", textDecoration: "none", fontWeight: 900 };
+const secondaryLink: React.CSSProperties = { ...primaryLink, background: "#FFFFFF", color: "#0F172A", border: "1px solid #CBD5E1" };

@@ -1,27 +1,13 @@
 "use client";
-
-import { rewardStore } from "@/lib/store";
-
-export default function StorePage() {
-  return (
-    <main style={{ padding: 20 }}>
-      <h1>🛒 XP Store</h1>
-
-      {rewardStore.map((item) => (
-        <div
-          key={item.id}
-          style={{
-            padding: 12,
-            marginBottom: 10,
-            border: "1px solid #ddd",
-            borderRadius: 8,
-          }}
-        >
-          <h3>{item.name}</h3>
-          <p>{item.description}</p>
-          <strong>{item.cost} XP</strong>
-        </div>
-      ))}
-    </main>
-  );
-}
+import { useEffect, useState } from "react";
+import { PlaybookCard,PlaybookGrid,PlaybookHero,PlaybookMetric,PlaybookMetrics,PlaybookPage,PlaybookPill } from "@/components/ui";
+type Item={id:string;product_key:string;name:string;category:string;coin_price:number;inventory:number;requires_approval:boolean;active:boolean};
+type Redemption={id:string;product_id:string;coins_spent:number;fulfillment_status:string;created_at:string};
+type Payload={items?:Item[];redemptions?:Redemption[];balance?:number;xp?:number;error?:string};
+async function fetchStore(){const r=await fetch('/api/rewards/store',{cache:'no-store'});const j=await r.json() as Payload;if(!r.ok)throw new Error(j.error||'Store unavailable.');return j;}
+export default function StorePage(){const[items,setItems]=useState<Item[]>([]),[redemptions,setRedemptions]=useState<Redemption[]>([]);const[balance,setBalance]=useState(0),[xp,setXp]=useState(0);const[loading,setLoading]=useState(true),[busy,setBusy]=useState(''),[error,setError]=useState(''),[status,setStatus]=useState('Loading governed Store…');
+async function load(){const j=await fetchStore();setItems(j.items||[]);setRedemptions(j.redemptions||[]);setBalance(j.balance||0);setXp(j.xp||0);setLoading(false);setStatus('Store balance, inventory, and fulfillment state are current.');}
+useEffect(()=>{let active=true;void fetchStore().then(j=>{if(!active)return;setItems(j.items||[]);setRedemptions(j.redemptions||[]);setBalance(j.balance||0);setXp(j.xp||0);setStatus('Store state is current.');}).catch(e=>active&&setError(e instanceof Error?e.message:'Store unavailable.')).finally(()=>active&&setLoading(false));return()=>{active=false}},[]);
+async function redeem(item:Item){setBusy(item.id);setError('');try{const r=await fetch('/api/rewards/store',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({productId:item.id,requestId:crypto.randomUUID(),shippingPayload:{}})});const j=await r.json() as {redemption?:{remaining_balance?:number};error?:string};if(!r.ok)throw new Error(j.error||'Redemption failed.');setStatus(`${item.name} redeemed. Fulfillment is now pending.`);await load();}catch(e){setError(e instanceof Error?e.message:'Redemption failed.')}finally{setBusy('')}}
+return <PlaybookPage><PlaybookHero eyebrow="Playbook Reward Store" title="Spend what you actually earned" subtitle="The Store uses the existing atomic product → redemption → coin-ledger authority. Price, inventory, identity, balance, and debit are resolved inside Postgres."/><PlaybookMetrics><PlaybookMetric label="Coin balance" value={loading?'…':String(balance)}/><PlaybookMetric label="XP" value={loading?'…':String(xp)}/><PlaybookMetric label="Products" value={loading?'…':String(items.length)}/><PlaybookMetric label="Redemptions" value={loading?'…':String(redemptions.length)}/></PlaybookMetrics><p role="status" style={s}>{loading?'Loading…':status}</p>{error&&<div role="alert" style={a}>{error}</div>}<PlaybookGrid min={300}>{items.map(i=>{const ok=balance>=i.coin_price&&i.inventory>0;return <PlaybookCard key={i.id} eyebrow={i.category} title={i.name}><div style={p}>{i.coin_price} <small>coins</small></div><div style={row}><PlaybookPill>{i.inventory} remaining</PlaybookPill>{i.requires_approval&&<PlaybookPill>Approval required</PlaybookPill>}</div><button disabled={!ok||busy===i.id} onClick={()=>void redeem(i)} style={ok?btn:off}>{busy===i.id?'Redeeming…':!i.inventory?'Out of stock':ok?'Redeem':`Need ${i.coin_price-balance} more coins`}</button></PlaybookCard>})}</PlaybookGrid><section style={{maxWidth:1180,margin:'28px auto 12px'}}><h2>Redemption history</h2></section>{redemptions.length?<PlaybookGrid min={280}>{redemptions.map(r=>{const item=items.find(i=>i.id===r.product_id);return <PlaybookCard key={r.id} eyebrow={r.fulfillment_status} title={item?.name||'Reward'}><PlaybookPill>{r.coins_spent} coins</PlaybookPill><p>Redeemed {new Date(r.created_at).toLocaleString()}</p></PlaybookCard>})}</PlaybookGrid>:<PlaybookCard eyebrow="History" title="No redemptions yet"><p>Earn coins from governed learning and milestone actions, then redeem them here.</p></PlaybookCard>}</PlaybookPage>}
+const s:React.CSSProperties={maxWidth:1180,margin:'0 auto 14px',color:'#334155'},a:React.CSSProperties={maxWidth:1180,margin:'0 auto 14px',padding:12,background:'#FEF2F2',color:'#991B1B',borderRadius:12},p:React.CSSProperties={fontSize:38,fontWeight:950,color:'#F97316',margin:'8px 0 14px'},row:React.CSSProperties={display:'flex',gap:7,flexWrap:'wrap',marginBottom:14},btn:React.CSSProperties={width:'100%',border:0,borderRadius:999,padding:11,fontWeight:900,background:'#F97316',color:'#fff',cursor:'pointer'},off:React.CSSProperties={...btn,background:'#E2E8F0',color:'#94A3B8',cursor:'not-allowed'};
