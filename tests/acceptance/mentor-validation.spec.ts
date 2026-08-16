@@ -78,7 +78,7 @@ test("Scholar-invited mentor requires governed support-system validation", async
   const scholar = await ensureUser(credentials.scholar[0], credentials.scholar[1], "scholar");
   const mentor = await ensureUser(credentials.mentor[0], credentials.mentor[1], "mentor");
   const validatorOne = await ensureUser(credentials.validatorOne[0], credentials.validatorOne[1], "educator");
-  const validatorTwo = await ensureUser(credentials.validatorTwo[0], credentials.validatorTwo[1], "family");
+  const validatorTwo = await ensureUser(credentials.validatorTwo[0], credentials.validatorTwo[1], "other");
 
   await admin.from("mentor_validation_approvals").delete().neq("id", "00000000-0000-0000-0000-000000000000");
   await admin.from("mentor_validation_requests").delete().eq("scholar_id", scholar.id).eq("mentor_user_id", mentor.id);
@@ -143,24 +143,38 @@ test("Scholar-invited mentor requires governed support-system validation", async
   const prematureFinalize = await postJson(page, "/api/mentor-validation/finalize", { validationRequestId });
   expect(prematureFinalize.status).toBe(403);
 
+  // First ordinary support-system approval occurs through Educator OS.
   await resetAuth(context, page);
   await login(page, credentials.validatorOne[0], credentials.validatorOne[1]);
-  const firstApproval = await postJson(page, "/api/mentor-validation/approve", { validationRequestId });
-  expect(firstApproval.status, JSON.stringify(firstApproval.body)).toBe(200);
-  expect(firstApproval.body.validation.approvalCount).toBe(1);
-  expect(firstApproval.body.validation.thresholdMet).toBe(false);
+  await page.goto("/educator-os");
+  await expect(page.getByTestId("mentor-validation-queue")).toBeVisible();
+  await page.getByRole("button", { name: "Approve Mentor", exact: true }).click();
+  await expect(page.getByRole("button", { name: "You approved", exact: true })).toBeVisible();
+
+  const firstApprovalRows = await admin.from("mentor_validation_approvals")
+    .select("approver_user_id")
+    .eq("request_id", validationRequestId);
+  if (firstApprovalRows.error) throw firstApprovalRows.error;
+  expect(new Set((firstApprovalRows.data ?? []).map((row) => row.approver_user_id)).size).toBe(1);
 
   await resetAuth(context, page);
   await login(page, credentials.mentor[0], credentials.mentor[1]);
   const oneApprovalFinalize = await postJson(page, "/api/mentor-validation/finalize", { validationRequestId });
   expect(oneApprovalFinalize.status).toBe(403);
 
+  // Second distinct support-system approval occurs through Community Partner OS.
   await resetAuth(context, page);
   await login(page, credentials.validatorTwo[0], credentials.validatorTwo[1]);
-  const secondApproval = await postJson(page, "/api/mentor-validation/approve", { validationRequestId });
-  expect(secondApproval.status, JSON.stringify(secondApproval.body)).toBe(200);
-  expect(secondApproval.body.validation.approvalCount).toBe(2);
-  expect(secondApproval.body.validation.thresholdMet).toBe(true);
+  await page.goto("/community-partner-os");
+  await expect(page.getByTestId("mentor-validation-queue")).toBeVisible();
+  await page.getByRole("button", { name: "Approve Mentor", exact: true }).click();
+  await expect(page.getByRole("button", { name: "You approved", exact: true })).toBeVisible();
+
+  const secondApprovalRows = await admin.from("mentor_validation_approvals")
+    .select("approver_user_id")
+    .eq("request_id", validationRequestId);
+  if (secondApprovalRows.error) throw secondApprovalRows.error;
+  expect(new Set((secondApprovalRows.data ?? []).map((row) => row.approver_user_id)).size).toBe(2);
 
   await resetAuth(context, page);
   await login(page, credentials.mentor[0], credentials.mentor[1]);
