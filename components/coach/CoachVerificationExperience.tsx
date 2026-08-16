@@ -21,6 +21,12 @@ type VerificationRequest = {
 
 type LoadState = "loading" | "ready" | "error";
 
+type CoachLoadResult = {
+  error?: string;
+  onboardingCompleted?: boolean;
+  request?: VerificationRequest | null;
+};
+
 export default function CoachVerificationExperience() {
   const [state, setState] = useState<LoadState>("loading");
   const [request, setRequest] = useState<VerificationRequest | null>(null);
@@ -28,13 +34,34 @@ export default function CoachVerificationExperience() {
   const [message, setMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  async function load() {
+  useEffect(() => {
+    let cancelled = false;
+    void fetch("/api/coach-verification", { cache: "no-store" })
+      .then(async (response) => ({ response, result: await response.json() as CoachLoadResult }))
+      .then(({ response, result }) => {
+        if (cancelled) return;
+        if (!response.ok) {
+          setMessage(result.error ?? "Coach verification could not be loaded.");
+          setState("error");
+          return;
+        }
+        setOnboardingCompleted(Boolean(result.onboardingCompleted));
+        setRequest(result.request ?? null);
+        setMessage(null);
+        setState("ready");
+      })
+      .catch((error: unknown) => {
+        if (cancelled) return;
+        setMessage(error instanceof Error ? error.message : "Coach verification could not be loaded.");
+        setState("error");
+      });
+
+    return () => { cancelled = true; };
+  }, []);
+
+  async function reloadAfterMutation() {
     const response = await fetch("/api/coach-verification", { cache: "no-store" });
-    const result = await response.json() as {
-      error?: string;
-      onboardingCompleted?: boolean;
-      request?: VerificationRequest | null;
-    };
+    const result = await response.json() as CoachLoadResult;
     if (!response.ok) {
       setMessage(result.error ?? "Coach verification could not be loaded.");
       setState("error");
@@ -42,13 +69,8 @@ export default function CoachVerificationExperience() {
     }
     setOnboardingCompleted(Boolean(result.onboardingCompleted));
     setRequest(result.request ?? null);
-    setMessage(null);
     setState("ready");
   }
-
-  useEffect(() => {
-    void load();
-  }, []);
 
   async function submit() {
     setSubmitting(true);
@@ -61,7 +83,7 @@ export default function CoachVerificationExperience() {
       return;
     }
     setMessage(result.message ?? "Coach verification submitted.");
-    await load();
+    await reloadAfterMutation();
   }
 
   if (state === "loading") {
@@ -74,10 +96,7 @@ export default function CoachVerificationExperience() {
 
   if (!onboardingCompleted) {
     return (
-      <CoachSurface
-        title="Complete Coach onboarding first"
-        body="Your Coach OS is independent. Finish the Coach-specific onboarding questionnaire before submitting institutional verification evidence."
-      >
+      <CoachSurface title="Complete Coach onboarding first" body="Your Coach OS is independent. Finish the Coach-specific onboarding questionnaire before submitting institutional verification evidence.">
         <PlaybookButton href="/start?first=1&role=coach">Return to Coach onboarding</PlaybookButton>
       </CoachSurface>
     );
@@ -85,50 +104,21 @@ export default function CoachVerificationExperience() {
 
   if (!request) {
     return (
-      <CoachSurface
-        title="Submit Coach verification"
-        body="Playbook will submit the school, official school email, sport, coaching role, experience, roster, and athlete-support evidence from your Coach onboarding. Submission does not create Scholar access and does not authorize Mentor validation."
-        message={message}
-      >
-        <button onClick={() => void submit()} disabled={submitting} style={buttonStyle}>
-          {submitting ? "Submitting…" : "Submit verification evidence"}
-        </button>
+      <CoachSurface title="Submit Coach verification" body="Playbook will submit the school, official school email, sport, coaching role, experience, roster, and athlete-support evidence from your Coach onboarding. Submission does not create Scholar access and does not authorize Mentor validation." message={message}>
+        <button onClick={() => void submit()} disabled={submitting} style={buttonStyle}>{submitting ? "Submitting…" : "Submit verification evidence"}</button>
       </CoachSurface>
     );
   }
 
   if (request.status === "approved") {
-    return (
-      <CoachSurface
-        title="Identity verification approved"
-        body="Your coaching identity evidence is approved. Scholar/athlete relationship authority is still required before Coach permissions or Mentor-validation authority can activate."
-      >
-        <Evidence request={request} />
-      </CoachSurface>
-    );
+    return <CoachSurface title="Identity verification approved" body="Your coaching identity evidence is approved. Scholar/athlete relationship authority is still required before Coach permissions or Mentor-validation authority can activate."><Evidence request={request} /></CoachSurface>;
   }
 
   if (request.status === "rejected") {
-    return (
-      <CoachSurface
-        title="Coach verification needs attention"
-        body="No Coach authority is active. Review the evidence and follow the verification guidance before resubmitting."
-        message={request.review_notes}
-      >
-        <Evidence request={request} />
-      </CoachSurface>
-    );
+    return <CoachSurface title="Coach verification needs attention" body="No Coach authority is active. Review the evidence and follow the verification guidance before resubmitting." message={request.review_notes}><Evidence request={request} /></CoachSurface>;
   }
 
-  return (
-    <CoachSurface
-      title={request.status === "under_review" ? "Coach verification is under review" : "Coach verification is pending"}
-      body="You are in the correct Coach OS, but Scholar data, roster access, Coach permissions, and Mentor-validation authority remain locked until both identity verification and a governed Scholar/athlete relationship are proven."
-      message={message}
-    >
-      <Evidence request={request} />
-    </CoachSurface>
-  );
+  return <CoachSurface title={request.status === "under_review" ? "Coach verification is under review" : "Coach verification is pending"} body="You are in the correct Coach OS, but Scholar data, roster access, Coach permissions, and Mentor-validation authority remain locked until both identity verification and a governed Scholar/athlete relationship are proven." message={message}><Evidence request={request} /></CoachSurface>;
 }
 
 function Evidence({ request }: { request: VerificationRequest }) {
@@ -144,18 +134,7 @@ function Evidence({ request }: { request: VerificationRequest }) {
 }
 
 function CoachSurface({ title, body, message, children }: { title: string; body: string; message?: string | null; children?: React.ReactNode }) {
-  return (
-    <PlaybookPage>
-      <section style={surfaceStyle} data-testid="coach-verification-gate">
-        <p style={eyebrowStyle}>Coach OS · Independent verification</p>
-        <h1 style={titleStyle}>{title}</h1>
-        <p style={bodyStyle}>{body}</p>
-        {message && <div style={noticeStyle}>{message}</div>}
-        <div style={{ marginTop: 22 }}>{children}</div>
-        <div style={routeStyle}>Canonical destination: <strong>/coach-os</strong></div>
-      </section>
-    </PlaybookPage>
-  );
+  return <PlaybookPage><section style={surfaceStyle} data-testid="coach-verification-gate"><p style={eyebrowStyle}>Coach OS · Independent verification</p><h1 style={titleStyle}>{title}</h1><p style={bodyStyle}>{body}</p>{message && <div style={noticeStyle}>{message}</div>}<div style={{ marginTop: 22 }}>{children}</div><div style={routeStyle}>Canonical destination: <strong>/coach-os</strong></div></section></PlaybookPage>;
 }
 
 const surfaceStyle: React.CSSProperties = { maxWidth: 900, margin: "40px auto", padding: "clamp(28px,5vw,52px)", borderRadius: 28, background: "#071A33", color: "#FFFFFF" };
