@@ -1,7 +1,7 @@
 "use client";
 
-import RoleDashboardExperience from "@/components/role-os/dashboards/RoleDashboardExperience";
+import MentorValidationExperience from "@/components/mentor/MentorValidationExperience";
 
 export default function MentorOSPage() {
-  return <RoleDashboardExperience role="mentor" />;
+  return <MentorValidationExperience />;
 }
