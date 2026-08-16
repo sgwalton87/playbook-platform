@@ -11,12 +11,26 @@ import type { RelationshipKind } from "@/lib/permissions";
 const relationships: { label: string; value: RelationshipKind }[] = [
   { label: "Family / Guardian", value: "parent_guardian" },
   { label: "Educator", value: "educator" },
+  { label: "High School Counselor", value: "counselor" },
   { label: "Mentor", value: "mentor" },
   { label: "Coach", value: "coach" },
-  { label: "District Admin", value: "district_admin" },
-  { label: "University Partner", value: "university_partner" },
+  { label: "District Administrator", value: "district_admin" },
+  { label: "College Coach / Recruiter", value: "college_recruiter" },
+  { label: "College Admissions", value: "college_admissions" },
+  { label: "Community Partner", value: "community_partner" },
   { label: "Employer Partner", value: "employer_partner" },
 ];
+
+const ZERO_DATA_RELATIONSHIPS = new Set<RelationshipKind>([
+  "educator",
+  "counselor",
+  "coach",
+  "district_admin",
+  "college_recruiter",
+  "college_admissions",
+  "community_partner",
+  "employer_partner",
+]);
 
 export default function InvitationCenter() {
   const [inviteeName, setInviteeName] = useState("Coach Taylor");
@@ -45,10 +59,7 @@ export default function InvitationCenter() {
       return;
     }
 
-    setInvitations((current) => [
-      json.invitation,
-      ...current,
-    ]);
+    setInvitations((current) => [json.invitation, ...current]);
   }
 
   function changeStatus(id: string, status: "accepted" | "declined") {
@@ -61,7 +72,7 @@ export default function InvitationCenter() {
         <p style={eyebrow}>Role Invitations</p>
         <h1 style={title}>Invite the scholar support network.</h1>
         <p style={sub}>
-          Scholars can invite family, educators, mentors, verified coaches, universities, employers, and partners into the correct OS. Each relationship follows its own verification and permission contract.
+          Scholars choose the exact relationship they are inviting. Counselor, Recruiting, Admissions, Community, Coach, Educator, District, and Employer invitations route to distinct Operating Systems and begin with zero Scholar-data authority until their independent verification contracts are satisfied.
         </p>
       </section>
 
@@ -83,9 +94,9 @@ export default function InvitationCenter() {
             ))}
           </select>
 
-          {relationship === "coach" && (
-            <p style={coachNotice}>
-              Coach invitations create no Scholar-data permissions. The invited Coach must complete Coach onboarding and have approved Coach identity evidence before the relationship can activate.
+          {ZERO_DATA_RELATIONSHIPS.has(relationship) && (
+            <p style={authorityNotice}>
+              This invitation identifies the relationship and correct OS only. It grants no Scholar-data permissions until the invited role completes its independent verification and scope requirements.
             </p>
           )}
 
@@ -164,6 +175,6 @@ const body: React.CSSProperties = { color:"#64748B", fontSize:13, lineHeight:1.5
 const chips: React.CSSProperties = { display:"flex", flexWrap:"wrap", gap:8, marginTop:10 };
 const chip: React.CSSProperties = { background:"#FFF7ED", border:"1px solid #FED7AA", color:"#9A3412", borderRadius:999, padding:"6px 9px", fontSize:11, fontWeight:800 };
 const neutralChip: React.CSSProperties = { background:"#F8FAFC", border:"1px solid #CBD5E1", color:"#334155", borderRadius:999, padding:"6px 9px", fontSize:11, fontWeight:800 };
-const coachNotice: React.CSSProperties = { margin:"12px 0 0", padding:12, borderRadius:12, background:"#F8FAFC", border:"1px solid #CBD5E1", color:"#475569", fontSize:12, lineHeight:1.5 };
+const authorityNotice: React.CSSProperties = { margin:"12px 0 0", padding:12, borderRadius:12, background:"#F8FAFC", border:"1px solid #CBD5E1", color:"#475569", fontSize:12, lineHeight:1.5 };
 const smallButton: React.CSSProperties = { background:"#10B981", color:"#fff", border:"none", borderRadius:999, padding:"8px 10px", fontWeight:900, cursor:"pointer" };
 const smallButtonGhost: React.CSSProperties = { background:"#F8FAFC", color:"#0F172A", border:"1px solid #E2E8F0", borderRadius:999, padding:"8px 10px", fontWeight:900, cursor:"pointer" };
