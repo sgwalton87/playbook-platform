@@ -3,9 +3,9 @@
 -- Authenticated clients retain read/acknowledge/preferences/retry, but cannot
 -- manufacture notification or outbox rows or rewrite trusted event payloads.
 
-revoke insert, update, delete on public.pbos_notifications from authenticated;
-revoke insert, update, delete on public.pbos_notification_outbox from authenticated;
-revoke insert, update, delete on public.pbos_notification_preferences from authenticated;
+revoke insert, update, delete on public.pbos_notifications from authenticated, anon;
+revoke insert, update, delete on public.pbos_notification_outbox from authenticated, anon;
+revoke insert, update, delete on public.pbos_notification_preferences from authenticated, anon;
 grant select on public.pbos_notifications, public.pbos_notification_outbox, public.pbos_notification_preferences to authenticated;
 
 drop policy if exists "Owners manage PBOS notifications" on public.pbos_notifications;
@@ -239,26 +239,6 @@ begin
 end;
 $$;
 
-create or replace function private.notify_opportunity_recommendation()
-returns trigger language plpgsql security definer set search_path='' as $$
-begin
-  if tg_op='INSERT' then
-    perform private.enqueue_notification_event(new.owner_id,'opportunity:'||new.id::text,'opportunity','New opportunity match',new.title||' matched your current verified signals.','/opportunities',case when new.score>=85 then 'high' else 'medium' end);
-  end if;
-  return new;
-end;
-$$;
-
-create or replace function private.notify_application_event()
-returns trigger language plpgsql security definer set search_path='' as $$
-declare workspace_name text;
-begin
-  select opportunity_name into workspace_name from public.application_workspaces where id=new.workspace_id;
-  perform private.enqueue_notification_event(new.scholar_id,'application:'||new.id::text,'milestone','Application progress updated',coalesce(workspace_name,'Your application')||' moved forward: '||replace(lower(new.event_type),'_',' ')||'.','/application-workspaces','medium');
-  return new;
-end;
-$$;
-
 create or replace function private.notify_learning_credential()
 returns trigger language plpgsql security definer set search_path='' as $$
 begin
@@ -268,22 +248,18 @@ end;
 $$;
 
 revoke all on function private.notify_verification_review() from public,anon,authenticated;
-revoke all on function private.notify_opportunity_recommendation() from public,anon,authenticated;
-revoke all on function private.notify_application_event() from public,anon,authenticated;
 revoke all on function private.notify_learning_credential() from public,anon,authenticated;
 
 drop trigger if exists verification_review_notification on public.verification_review_events;
 create trigger verification_review_notification after insert on public.verification_review_events
 for each row execute function private.notify_verification_review();
 
-drop trigger if exists opportunity_recommendation_notification on public.pbos_opportunity_recommendations;
-create trigger opportunity_recommendation_notification after insert on public.pbos_opportunity_recommendations
-for each row execute function private.notify_opportunity_recommendation();
-
-drop trigger if exists application_event_notification on public.application_workspace_events;
-create trigger application_event_notification after insert on public.application_workspace_events
-for each row execute function private.notify_application_event();
-
 drop trigger if exists learning_credential_notification on public.learning_credentials;
 create trigger learning_credential_notification after insert on public.learning_credentials
 for each row execute function private.notify_learning_credential();
+
+-- Opportunity recommendations and application events remain intentionally absent
+-- from the trusted producer set until their older owner-FOR-ALL mutation policies
+-- are narrowed. A user-writable lifecycle table is not accepted as system truth.
+drop trigger if exists opportunity_recommendation_notification on public.pbos_opportunity_recommendations;
+drop trigger if exists application_event_notification on public.application_workspace_events;
