@@ -17,6 +17,12 @@ type VerificationRequest = {
   review_notes: string | null;
 };
 
+type EducatorLoadResult = {
+  error?: string;
+  onboardingCompleted?: boolean;
+  request?: VerificationRequest | null;
+};
+
 export default function EducatorVerificationExperience() {
   const [loading, setLoading] = useState(true);
   const [onboardingCompleted, setOnboardingCompleted] = useState(false);
@@ -24,21 +30,40 @@ export default function EducatorVerificationExperience() {
   const [message, setMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  async function load() {
+  useEffect(() => {
+    let cancelled = false;
+    void fetch("/api/educator-verification", { cache: "no-store" })
+      .then(async (response) => ({ response, result: await response.json() as EducatorLoadResult }))
+      .then(({ response, result }) => {
+        if (cancelled) return;
+        if (!response.ok) {
+          setMessage(result.error ?? "Educator verification could not be loaded.");
+          setLoading(false);
+          return;
+        }
+        setOnboardingCompleted(Boolean(result.onboardingCompleted));
+        setRequest(result.request ?? null);
+        setMessage(null);
+        setLoading(false);
+      })
+      .catch((error: unknown) => {
+        if (cancelled) return;
+        setMessage(error instanceof Error ? error.message : "Educator verification could not be loaded.");
+        setLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, []);
+
+  async function reloadAfterMutation() {
     const response = await fetch("/api/educator-verification", { cache: "no-store" });
-    const result = await response.json() as { error?: string; onboardingCompleted?: boolean; request?: VerificationRequest | null };
+    const result = await response.json() as EducatorLoadResult;
     if (!response.ok) {
       setMessage(result.error ?? "Educator verification could not be loaded.");
-      setLoading(false);
       return;
     }
     setOnboardingCompleted(Boolean(result.onboardingCompleted));
     setRequest(result.request ?? null);
-    setMessage(null);
-    setLoading(false);
   }
-
-  useEffect(() => { void load(); }, []);
 
   async function submit() {
     setSubmitting(true);
@@ -51,7 +76,7 @@ export default function EducatorVerificationExperience() {
       return;
     }
     setMessage(result.message ?? "Educator verification submitted.");
-    await load();
+    await reloadAfterMutation();
   }
 
   if (loading) return <Surface title="Preparing Educator verification…" body="Checking your onboarding and school evidence." />;
