@@ -126,4 +126,32 @@ begin
   end if;
 end $$;
 
+-- Canonical Scholar journey tables retain one owner-only ALL policy each, with identical
+-- USING/WITH CHECK ownership semantics and statement-cached auth.uid() evaluation.
+with expected(tablename,policyname,owner_column) as (
+  values
+    ('scholar_profiles','scholar-profile-own','id'),
+    ('scholar_goals','scholar-goals-own','scholar_id'),
+    ('scholar_milestones','scholar-milestones-own','scholar_id'),
+    ('scholar_dashboard_projections','scholar-dashboard-own','scholar_id'),
+    ('academic_journey_evidence','academic-evidence-own','owner_id'),
+    ('pbos_opportunity_recommendations','pbos-opportunities-own','owner_id')
+), target as (
+  select e.*, p.cmd, p.roles, p.qual, p.with_check
+  from expected e
+  join pg_policies p
+    on p.schemaname='public'
+   and p.tablename=e.tablename
+   and p.policyname=e.policyname
+)
+select count(*)=6
+   and bool_and(cmd='ALL')
+   and bool_and(qual ilike '%select auth.uid()%')
+   and bool_and(with_check ilike '%select auth.uid()%')
+   and bool_and(qual ilike '%' || owner_column || '%')
+   and bool_and(with_check ilike '%' || owner_column || '%')
+as scholar_core_owner_policies_cached
+from target \gset
+\if :scholar_core_owner_policies_cached \else \echo 'canonical Scholar owner policies must remain symmetric and statement-cached' \quit 1 \endif
+
 rollback;
