@@ -18,7 +18,7 @@ as $$
       select 1 from public.profiles p
       join public.educator_verification_requests v on v.educator_user_id = p.id
       where p.id = user_id
-        and coalesce(p.profile_mode,p.role,p.requested_role) = 'educator'
+        and coalesce(p.profile_mode,p.role::text,p.requested_role) = 'educator'
         and p.onboarding_completed = true
         and v.status = 'approved'
     )
@@ -26,7 +26,7 @@ as $$
       select 1 from public.profiles p
       join public.counselor_verification_requests v on v.counselor_user_id = p.id
       where p.id = user_id
-        and coalesce(p.profile_mode,p.role,p.requested_role) = 'high-school-counselor'
+        and coalesce(p.profile_mode,p.role::text,p.requested_role) = 'high-school-counselor'
         and p.onboarding_completed = true
         and v.status = 'approved'
     )
@@ -34,7 +34,7 @@ as $$
       select 1 from public.profiles p
       join public.district_verification_requests v on v.administrator_user_id = p.id
       where p.id = user_id
-        and coalesce(p.profile_mode,p.role,p.requested_role) = 'district'
+        and coalesce(p.profile_mode,p.role::text,p.requested_role) = 'district'
         and p.onboarding_completed = true
         and v.status = 'approved'
     )
@@ -42,7 +42,7 @@ as $$
       select 1 from public.profiles p
       join public.recruiting_verification_requests v on v.recruiter_user_id = p.id
       where p.id = user_id
-        and coalesce(p.profile_mode,p.role,p.requested_role) = 'college-coach'
+        and coalesce(p.profile_mode,p.role::text,p.requested_role) = 'college-coach'
         and p.onboarding_completed = true
         and v.status = 'approved'
     )
@@ -50,7 +50,7 @@ as $$
       select 1 from public.profiles p
       join public.admissions_verification_requests v on v.admissions_user_id = p.id
       where p.id = user_id
-        and coalesce(p.profile_mode,p.role,p.requested_role) = 'college-admissions'
+        and coalesce(p.profile_mode,p.role::text,p.requested_role) = 'college-admissions'
         and p.onboarding_completed = true
         and v.status = 'approved'
     )
@@ -58,7 +58,7 @@ as $$
       select 1 from public.profiles p
       join public.community_partner_verification_requests v on v.partner_user_id = p.id
       where p.id = user_id
-        and coalesce(p.profile_mode,p.role,p.requested_role) = 'other'
+        and coalesce(p.profile_mode,p.role::text,p.requested_role) = 'other'
         and p.onboarding_completed = true
         and v.status = 'approved'
         and v.service_scope_status = 'approved'
@@ -67,7 +67,7 @@ as $$
       select 1 from public.profiles p
       join public.employer_verification_requests v on v.employer_user_id = p.id
       where p.id = user_id
-        and coalesce(p.profile_mode,p.role,p.requested_role) = 'employer'
+        and coalesce(p.profile_mode,p.role::text,p.requested_role) = 'employer'
         and p.onboarding_completed = true
         and v.status = 'approved'
     )
@@ -216,7 +216,7 @@ begin
       select 1 from public.profiles p
       join public.coach_verification_requests v on v.coach_user_id = p.id
       where p.id = authenticated_user_id
-        and coalesce(p.profile_mode,p.role,p.requested_role) = 'coach'
+        and coalesce(p.profile_mode,p.role::text,p.requested_role) = 'coach'
         and p.onboarding_completed = true
         and v.status = 'approved'
     ) then
