@@ -4,8 +4,12 @@ import { getPermissionsForRelationship } from "@/lib/permissions";
 describe("relationship default-deny policy", () => {
   it.each([
     "educator",
+    "counselor",
     "coach",
     "district_admin",
+    "college_recruiter",
+    "college_admissions",
+    "community_partner",
     "university_partner",
     "employer_partner",
   ] as const)("keeps %s at zero data permissions until independent authority activates", (relationship) => {
