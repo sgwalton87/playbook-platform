@@ -36,8 +36,6 @@ export const ROLE_ALIASES: Record<string, PlaybookRole> = {
   "admissions-officer": "college-admissions",
   brand_partner: "brand-partner",
   workforce: "employer",
-  partner: "employer",
-  admin: "district",
   school_admin: "district",
   "athlete-abroad-enrollment": "athlete-abroad",
   international_athlete: "athlete-abroad",
@@ -59,7 +57,9 @@ export function normalizePlaybookRole(role?: string | null): PlaybookRole {
 /**
  * Resolve a canonical role without silent fallback. Unknown or empty roles are
  * rejected so one role can never inherit Scholar onboarding or authority by
- * accident.
+ * accident. Generic words such as `admin` and `partner` are intentionally not
+ * aliases because they are ambiguous between platform administration, district
+ * administration, employer/workforce partners, and community partners.
  */
 export function requirePlaybookRole(role?: string | null): PlaybookRole {
   const key = String(role ?? "").trim().toLowerCase();
