@@ -1,13 +1,19 @@
 import { getRoleDefinition, normalizePlaybookRole } from "@/lib/roles/registry";
 
-export type SupportedOnboardingCompletionRole = "scholar" | "scholar-athlete" | "transition-youth";
+export type SupportedOnboardingCompletionRole =
+  | "scholar"
+  | "scholar-athlete"
+  | "transition-youth"
+  | "educator"
+  | "high-school-counselor"
+  | "coach";
 
 /**
- * A role may only be marked complete after its durable execution adapter is
- * connected. Scholar is the golden contract; Scholar-Athlete and Transition-
- * Aged Youth inherit the canonical Scholar Record contract while projecting
- * role-specific sections. Every other role remains resumable but fail-closed
- * until it has equivalent authority, persistence, and evidence.
+ * This guard permits only roles whose next governed onboarding action is
+ * implemented. Learner roles can complete immediately through their role-bound
+ * PBOS adapter. Institutional roles may submit independent verification
+ * evidence, but remain incomplete and route to /pending until privileged review.
+ * Relationship-gated and authority-pending roles remain fail-closed.
  */
 export function assertRoleOnboardingCompletionSupported(
   role?: string | null
@@ -16,11 +22,14 @@ export function assertRoleOnboardingCompletionSupported(
   if (
     normalized !== "scholar" &&
     normalized !== "scholar-athlete" &&
-    normalized !== "transition-youth"
+    normalized !== "transition-youth" &&
+    normalized !== "educator" &&
+    normalized !== "high-school-counselor" &&
+    normalized !== "coach"
   ) {
     const definition = getRoleDefinition(normalized);
     throw new Error(
-      `${definition.label} onboarding is saved but cannot be completed until its governed role adapter is connected.`
+      `${definition.label} onboarding is saved but cannot advance until its governed role adapter is connected.`
     );
   }
   return normalized;
