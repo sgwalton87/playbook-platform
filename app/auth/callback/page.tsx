@@ -120,16 +120,12 @@ function AuthCallbackContent() {
         return;
       }
 
-      const { error: profileWriteError } = await supabase.from("profiles").upsert(
-        {
-          id: data.user.id,
-          role,
-          profile_mode: role,
-          requested_role: role,
-          verification_status: "email_confirmed",
-          onboarding_completed: existing?.onboarding_completed || false,
-        },
-        { onConflict: "id" }
+      // Durable identity creation/confirmation is authority-bearing. The client
+      // may request the verified signup role, but only the governed RPC may
+      // create the profile or confirm that it matches existing durable identity.
+      const { error: profileWriteError } = await supabase.rpc(
+        "initialize_playbook_profile",
+        { desired_role: role }
       );
 
       if (profileWriteError) {
