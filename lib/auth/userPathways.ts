@@ -4,6 +4,7 @@ export type UserPathway = {
   short: string;
   full: string;
   nextStep: string;
+  entryMode?: "self-service" | "scholar-invitation";
 };
 
 export const USER_PATHWAYS: UserPathway[] = [
@@ -38,9 +39,10 @@ export const USER_PATHWAYS: UserPathway[] = [
   {
     role: "mentor",
     label: "Mentor",
-    short: "Guide scholars through goals, applications, and life transitions.",
-    full: "Mentors offer guidance, expertise, recommendations, career support, and trusted adult relationships.",
-    nextStep: "After confirming your email, you will complete Mentor onboarding.",
+    short: "Scholar invitation required, followed by support-system validation.",
+    full: "Mentors offer guidance, expertise, recommendations, career support, and trusted adult relationships only after a Scholar invitation and the governed validation threshold.",
+    nextStep: "Use the Scholar invitation link to create or sign in to your account, complete Mentor onboarding, and enter Mentor OS for validation.",
+    entryMode: "scholar-invitation",
   },
   {
     role: "educator",
