@@ -28,58 +28,43 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-
       - name: Set up Supabase CLI
         uses: supabase/setup-cli@v2
         with:
           version: latest
           github-token: ${{ github.token }}
-
       - name: Normalize legacy migration versions locally
         run: node scripts/pbos/prepare-local-supabase-migrations.mjs
-
       - name: Start isolated local Supabase
         run: supabase start
-
       - name: Replay full migration chain from zero
         run: supabase db reset --local
-
       - name: Verify migration history is local only
         run: supabase migration list --local
-
       - name: Install PostgreSQL client
         run: sudo apt-get update && sudo apt-get install -y postgresql-client
-
       - name: Certify relationship authority boundary
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/relationship_authority_preflight.sql
-
       - name: Certify invitation authority boundary
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/support_invitation_authority_preflight.sql
-
       - name: Certify profile authority boundary
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/profile_authority_preflight.sql
-
       - name: Certify moderation authority boundary
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/moderation_authority_preflight.sql
-
       - name: Certify application workspace authority boundary
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/application_workspace_authority_preflight.sql
-
       - name: Certify public Scholar Record projection boundary
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/public_scholar_record_projection_preflight.sql
-
       - name: Certify network and feed projection boundary
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/network_feed_projection_preflight.sql
-
       - name: Certify canonical learning and economy boundary
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/canonical_learning_economy_preflight.sql
-
       - name: Certify canonical community operations boundary
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/community_operations_preflight.sql
-
+      - name: Certify notification authority boundary
+        run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/notification_authority_preflight.sql
       - name: Certify verification reviewer authority boundary
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/verification_reviewer_authority_preflight.sql
-
       - name: Stop isolated local Supabase
         if: always()
         run: supabase stop --no-backup
