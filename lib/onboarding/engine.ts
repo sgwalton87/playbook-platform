@@ -11,6 +11,10 @@ function resolveExplicitOnboardingRole(role?: string | null): PlaybookRole {
   return requirePlaybookRole(role);
 }
 
+function publicCompletionSlug(role: PlaybookRole): string {
+  return role === "other" ? "community-partner" : role;
+}
+
 export function getOnboardingSteps(role?: string | null): OnboardingStep[] {
   const normalized = resolveExplicitOnboardingRole(role);
   const configured = ROLE_ONBOARDING[normalized];
@@ -33,7 +37,7 @@ export function getOnboardingCompletionDestination(role?: string | null): string
 
 export function getOnboardingCompletionEndpoint(role?: string | null): string {
   const normalized = resolveExplicitOnboardingRole(role);
-  return `/api/pbos/onboarding/${encodeURIComponent(normalized)}`;
+  return `/api/pbos/onboarding/${encodeURIComponent(publicCompletionSlug(normalized))}`;
 }
 
 export function normalizeOnboardingRole(role?: string | null): PlaybookRole {
