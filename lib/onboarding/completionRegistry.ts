@@ -3,6 +3,7 @@ import { PLAYBOOK_ROLES, type PlaybookRole } from "@/lib/roles/registry";
 export type OnboardingAdapterState =
   | "implemented"
   | "relationship-gated"
+  | "verification-gated"
   | "authority-pending";
 
 export interface RoleOnboardingCompletionContract {
@@ -34,9 +35,9 @@ export const ROLE_ONBOARDING_COMPLETION: Record<PlaybookRole, RoleOnboardingComp
   "transition-youth": contract("transition-youth", "TRANSITION_YOUTH_RECORD", "implemented", "Authenticated self-owned TAY Scholar Record specialization."),
   family: contract("family", "FAMILY_RELATIONSHIP", "relationship-gated", "Accepted scholar-originated Parent/Guardian relationship plus Family PBOS runtime certification."),
   mentor: contract("mentor", "MENTOR_VALIDATION", "relationship-gated", "Scholar invitation plus Mentor validation threshold plus Mentor PBOS runtime certification."),
-  educator: contract("educator", "EDUCATOR_AUTHORITY", "authority-pending", "Verified educator identity and scholar/institution relationship authority."),
-  "high-school-counselor": contract("high-school-counselor", "COUNSELOR_AUTHORITY", "authority-pending", "Verified counselor identity, school scope, and scholar relationship authority."),
-  coach: contract("coach", "HIGH_SCHOOL_COACH_AUTHORITY", "authority-pending", "Verified high-school coach identity and athlete relationship authority."),
+  educator: contract("educator", "EDUCATOR_VERIFICATION", "verification-gated", "Submitted and privileged-approved Educator verification request; scholar access remains separately relationship-scoped."),
+  "high-school-counselor": contract("high-school-counselor", "COUNSELOR_VERIFICATION", "verification-gated", "Submitted and privileged-approved Counselor verification request; caseload access remains separately relationship-scoped."),
+  coach: contract("coach", "HIGH_SCHOOL_COACH_VERIFICATION", "verification-gated", "Submitted and privileged-approved High School Coach verification request; roster access remains separately relationship-scoped."),
   "college-coach": contract("college-coach", "RECRUITING_AUTHORITY", "authority-pending", "Verified institution/recruiting identity and approved recruiting scope."),
   "college-admissions": contract("college-admissions", "ADMISSIONS_AUTHORITY", "authority-pending", "Verified admissions identity and approved institutional scope."),
   "brand-partner": contract("brand-partner", "BRAND_AUTHORITY", "authority-pending", "Verified organization identity, campaign authority, and compliance scope."),
