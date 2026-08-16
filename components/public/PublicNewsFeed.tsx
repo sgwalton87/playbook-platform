@@ -13,6 +13,17 @@ type PublicPost = {
   createdAt: string;
   author: string;
   role: string;
+  pillar: string | null;
+};
+
+type PublicIdentity = {
+  id: string;
+  username: string | null;
+  full_name: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  role: string | null;
+  avatar_url: string | null;
 };
 
 export default function PublicNewsFeed() {
@@ -24,7 +35,7 @@ export default function PublicNewsFeed() {
     async function loadPublicPosts() {
       const { data: rows, error } = await supabase
         .from("feed_posts")
-        .select("id,user_id,title,body,image_url,media_url,created_at")
+        .select("id,user_id,title,body,image_url,media_url,created_at,pillar")
         .eq("visibility", "public")
         .order("created_at", { ascending: false })
         .limit(30);
@@ -35,21 +46,23 @@ export default function PublicNewsFeed() {
         return;
       }
 
-      const authorIds = [...new Set((rows || []).map((post) => post.user_id).filter(Boolean))];
-      const { data: profiles } = authorIds.length
-        ? await supabase
-            .from("profiles")
-            .select("id,first_name,full_name,username,role")
-            .in("id", authorIds)
-        : { data: [] as LegacyValue[] };
+      const authorIds = [...new Set((rows || []).map((post) => post.user_id).filter(Boolean))].slice(0, 100);
+      const identityResult = authorIds.length
+        ? await supabase.rpc("get_public_member_identities", { requested_ids: authorIds })
+        : { data: [] as PublicIdentity[], error: null };
+
       if (!active) return;
+      if (identityResult.error) {
+        setState("error");
+        return;
+      }
 
       const authors = new Map(
-        (profiles || []).map((profile) => [
-          profile.id,
+        ((identityResult.data || []) as PublicIdentity[]).map((identity) => [
+          identity.id,
           {
-            name: profile.full_name || profile.first_name || profile.username || "Playbook community member",
-            role: formatRole(profile.role),
+            name: identity.full_name || [identity.first_name, identity.last_name].filter(Boolean).join(" ") || identity.username || "Playbook community member",
+            role: formatRole(identity.role),
           },
         ]),
       );
@@ -64,6 +77,7 @@ export default function PublicNewsFeed() {
           createdAt: post.created_at,
           author: author.name,
           role: author.role,
+          pillar: post.pillar || null,
         };
       }));
       setState("ready");
@@ -87,7 +101,7 @@ export default function PublicNewsFeed() {
           )}
           <div style={cardBody}>
             <div style={meta}>
-              <span>{post.role}</span>
+              <span>{post.pillar ? `${post.pillar} · ${post.role}` : post.role}</span>
               <time dateTime={post.createdAt}>{formatDate(post.createdAt)}</time>
             </div>
             <h2 style={cardTitle}>{post.title || "From the Playbook community"}</h2>
