@@ -25,7 +25,6 @@ export default function EducatorVerificationExperience() {
   const [submitting, setSubmitting] = useState(false);
 
   async function load() {
-    setLoading(true);
     const response = await fetch("/api/educator-verification", { cache: "no-store" });
     const result = await response.json() as { error?: string; onboardingCompleted?: boolean; request?: VerificationRequest | null };
     if (!response.ok) {
