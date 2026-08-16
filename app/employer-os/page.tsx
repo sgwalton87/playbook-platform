@@ -1,7 +1,7 @@
 "use client";
 
-import RoleDashboardExperience from "@/components/role-os/dashboards/RoleDashboardExperience";
+import EmployerVerificationExperience from "@/components/employer/EmployerVerificationExperience";
 
 export default function EmployerOSPage() {
-  return <RoleDashboardExperience role="employer" />;
+  return <EmployerVerificationExperience />;
 }
