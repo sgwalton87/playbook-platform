@@ -1,9 +1,20 @@
 export type PortfolioShareStatus = "draft" | "active" | "expired" | "revoked";
 
+export const PORTFOLIO_SHARE_TARGET_USES = [
+  "college",
+  "scholarship",
+  "internship",
+  "job",
+  "recruiting",
+  "nil",
+] as const;
+
+export type PortfolioShareTargetUse = (typeof PORTFOLIO_SHARE_TARGET_USES)[number];
+
 export function buildPortfolioShare(input: {
   scholarId: string;
   scholarName: string;
-  targetUse: "college" | "scholarship" | "internship" | "job" | "recruiting" | "nil";
+  targetUse: PortfolioShareTargetUse;
   packet: LegacyValue;
   expiresAt?: string;
 }) {
