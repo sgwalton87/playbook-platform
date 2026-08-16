@@ -1,4 +1,5 @@
--- Governed Learning + Reward Authority
+-- Governed Learning Authority. Store redemption remains on the already-certified
+-- public.redeem_store_product -> private.redeem_store_product transaction.
 
 create or replace function private.record_learning_reward(
   learner_id uuid,
@@ -70,6 +71,7 @@ declare
   total_done integer;
 begin
   if learner_id is null then raise exception 'Authentication required.' using errcode='42501'; end if;
+  if not private.current_user_is_onboarded_learner() then raise exception 'Learning completion is restricted to onboarded learner accounts.' using errcode='42501'; end if;
 
   select * into course_row from public.learning_courses c
   where c.slug = requested_course_slug and c.status = 'published';
@@ -124,42 +126,6 @@ begin
 end;
 $$;
 
-create or replace function public.redeem_reward_store_item(requested_item_id text)
-returns table (redemption_id uuid, remaining_coins integer, redemption_status text)
-language plpgsql
-security definer
-set search_path = ''
-as $$
-declare
-  learner_id uuid := auth.uid();
-  item public.reward_store_items%rowtype;
-  current_coins integer;
-  redemption uuid := gen_random_uuid();
-begin
-  if learner_id is null then raise exception 'Authentication required.' using errcode='42501'; end if;
-  select * into item from public.reward_store_items i where i.id=requested_item_id and i.status='active' for update;
-  if not found then raise exception 'Reward item is unavailable.' using errcode='P0002'; end if;
-  if item.inventory is not null and item.inventory <= 0 then raise exception 'Reward item is out of stock.' using errcode='P0001'; end if;
-
-  perform pg_advisory_xact_lock(hashtext('reward-store:' || learner_id::text));
-  select coalesce(sum(l.coins),0) into current_coins from public.coin_ledger l where l.scholar_id=learner_id;
-  if current_coins < item.coin_cost then raise exception 'Insufficient Playbook Coins.' using errcode='P0001'; end if;
-
-  insert into public.reward_store_redemptions (id,user_id,item_id,coin_cost,status)
-  values (redemption,learner_id,item.id,item.coin_cost,'pending');
-  insert into public.coin_ledger (scholar_id,event_type,source_id,coins,xp,reason)
-  values (learner_id,'store.redemption',redemption::text,-item.coin_cost,25,'Redeemed ' || item.name);
-  insert into public.reward_events (scholar_id,event_type,source_id,payload,processed)
-  values (learner_id,'store.redemption',redemption::text,jsonb_build_object('item_id',item.id,'coins',-item.coin_cost,'xp',25),true);
-  update public.profiles set coin_balance=coalesce(coin_balance,0)-item.coin_cost,xp=coalesce(xp,0)+25,updated_at=now() where id=learner_id;
-  if item.inventory is not null then update public.reward_store_items set inventory=inventory-1,updated_at=now() where id=item.id; end if;
-
-  return query select redemption,current_coins-item.coin_cost,'pending'::text;
-end;
-$$;
-
 revoke all on function private.record_learning_reward(uuid,text,text,integer,integer,text) from public,anon,authenticated;
 revoke all on function public.complete_learning_module(text,text,text) from public,anon,authenticated;
-revoke all on function public.redeem_reward_store_item(text) from public,anon,authenticated;
 grant execute on function public.complete_learning_module(text,text,text) to authenticated;
-grant execute on function public.redeem_reward_store_item(text) to authenticated;
