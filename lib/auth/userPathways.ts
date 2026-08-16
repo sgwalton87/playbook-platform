@@ -109,10 +109,10 @@ export const USER_PATHWAYS: UserPathway[] = [
   },
   {
     role: "other",
-    label: "Other",
-    short: "Community partner or other support role.",
-    full: "Other users may request access as community partners or support roles.",
-    nextStep: "After confirming your email, your access may be reviewed.",
+    label: "Community Partner",
+    short: "Programs, referrals, resources, events, and accountable community support.",
+    full: "Community partners connect verified programs, services, referrals, events, and local capacity to the Scholar journey through explicit relationship scope.",
+    nextStep: "After confirming your email, you will complete Community Partner onboarding and enter Community Partner OS for authority review.",
   },
 ];
 
