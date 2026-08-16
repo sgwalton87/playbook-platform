@@ -59,7 +59,9 @@ export const AUDIT_CONTROL_CHECKS: AuditControlCheck[] = [
     category: "routing",
     description: "Generic admin/partner aliases must fail closed instead of granting a public role.",
     file: "lib/roles/registry.ts",
-    forbidden: ["admin: \"district\"", "partner: \"employer\""],
+    // Match complete object-entry lines so safe aliases such as school_admin do
+    // not trigger the generic-admin prohibition by substring.
+    forbidden: ["\n  admin: \"district\"", "\n  partner: \"employer\""],
   },
   {
     id: "audit-sentinel-present",
