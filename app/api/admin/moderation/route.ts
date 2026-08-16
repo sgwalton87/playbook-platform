@@ -32,7 +32,7 @@ export async function GET() {
   }
 
   const { data, error } = await supabase
-    .from("trust_reports")
+    .from("moderation_reports")
     .select("*")
     .in("status", ["open", "reviewing"])
     .order("created_at", { ascending: false });
@@ -76,7 +76,7 @@ export async function PATCH(req: NextRequest) {
   }
 
   const { data, error } = await supabase
-    .from("trust_reports")
+    .from("moderation_reports")
     .update({
       status: body.status,
       resolution_note: body.note || null,
