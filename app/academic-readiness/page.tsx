@@ -88,6 +88,7 @@ export default function AcademicReadinessPage() {
     const nextApplications = (applicationResult.data || []) as ApplicationWorkspaceSummary[];
     const nextSnapshot = buildAcademicReadinessSnapshot({ agProgress: nextAgProgress, applications: nextApplications });
     const idempotencyKey = `academic-readiness:${ownerId}:${nextSnapshot.primaryRecommendation.key}:${nextSnapshot.readinessScore}`;
+    const now = new Date().toISOString();
 
     const { data: record, error: evidenceError } = await supabase
       .from("academic_journey_evidence")
@@ -98,14 +99,14 @@ export default function AcademicReadinessPage() {
           ag_updates: nextSnapshot.agSubjectsMet,
           idempotency_key: idempotencyKey,
           delivery_state: "DELIVERED",
-          delivered_at: new Date().toISOString(),
+          delivered_at: now,
           recommendation_key: nextSnapshot.primaryRecommendation.key,
           primary_recommendation: nextSnapshot.primaryRecommendation,
           provenance: [
             { source: "ag_progress", count: nextAgProgress.length },
             { source: "application_workspaces", count: nextApplications.length },
           ],
-          updated_at: new Date().toISOString(),
+          updated_at: now,
         },
         { onConflict: "idempotency_key" }
       )
@@ -141,16 +142,20 @@ export default function AcademicReadinessPage() {
           completed_at: now,
         }
       : evidenceRecord.outcome;
+    const updatePayload: Record<string, unknown> = {
+      decision_state: decision,
+      decision_at: now,
+      updated_at: now,
+    };
+
+    if (decision === "COMPLETED") {
+      updatePayload.outcome = outcome;
+      updatePayload.outcome_at = now;
+    }
 
     const { error: updateError } = await supabase
       .from("academic_journey_evidence")
-      .update({
-        decision_state: decision,
-        decision_at: decision === "COMPLETED" ? undefined : now,
-        outcome,
-        outcome_at: decision === "COMPLETED" ? now : undefined,
-        updated_at: now,
-      })
+      .update(updatePayload)
       .eq("id", evidenceRecord.id)
       .eq("owner_id", userId);
 
