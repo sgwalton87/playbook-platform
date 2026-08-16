@@ -1,7 +1,7 @@
 "use client";
 
-import RoleDashboardExperience from "@/components/role-os/dashboards/RoleDashboardExperience";
+import EducatorVerificationExperience from "@/components/educator/EducatorVerificationExperience";
 
 export default function EducatorOSPage() {
-  return <RoleDashboardExperience role="educator" />;
+  return <EducatorVerificationExperience />;
 }
