@@ -25,8 +25,14 @@ export function mapOnboardingToProfilePayload(input: {
     dream_school: input.data.dream_school || null,
     ideal_profession: input.data.ideal_profession || null,
     onboarding_data: { ...input.data, top_schools: topSchools, activities, invite_supporters: inviteSupporters, onboarding_step_index: input.stepIndex },
-    onboarding_completed: input.complete,
-    onboarding_completed_at: input.complete ? new Date().toISOString() : null,
+    // The client may save the final form and required role artifacts before
+    // governed completion runs, but it may not certify completion itself.
+    // Non-final autosaves explicitly remain incomplete; final completion fields
+    // are committed only by the authenticated server completion boundary.
+    ...(input.complete ? {} : {
+      onboarding_completed: false,
+      onboarding_completed_at: null,
+    }),
     public_profile_complete: Boolean(input.data.full_name && input.data.username && input.data.bio),
     community_safety_agreed: Boolean(input.data.community_safety_agreed),
     community_safety_agreed_at: input.data.community_safety_agreed ? new Date().toISOString() : null,
