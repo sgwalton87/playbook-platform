@@ -10,7 +10,7 @@ import type { PlaybookRoleOS } from "@/lib/role-os";
 import {
   PLAYBOOK_ROLES,
   getRoleDestination,
-  normalizePlaybookRole,
+  requirePlaybookRole,
   type PlaybookRole,
 } from "@/lib/roles/registry";
 import { supabase } from "@/lib/supabaseClient";
@@ -86,7 +86,15 @@ export function CanonicalRoleAuthorityGate({
         return;
       }
 
-      const durableRole = normalizePlaybookRole(profile.data.profile_mode ?? profile.data.role);
+      let durableRole: PlaybookRole;
+      try {
+        durableRole = requirePlaybookRole(profile.data.profile_mode ?? profile.data.role);
+      } catch (error) {
+        setMessage(error instanceof Error ? error.message : "The durable Playbook role is invalid.");
+        setState("error");
+        return;
+      }
+
       if (durableRole !== role) {
         router.replace(getRoleDestination(durableRole));
         return;
