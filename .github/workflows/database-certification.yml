@@ -8,6 +8,7 @@ on:
       - ".github/workflows/database-certification.yml"
       - "tests/unit/support-relationships/**"
       - "tests/unit/onboarding/profile-authority-hardening.test.ts"
+      - "tests/unit/public-profile/**"
   workflow_dispatch:
 
 permissions:
@@ -63,6 +64,9 @@ jobs:
 
       - name: Certify application workspace authority boundary
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/application_workspace_authority_preflight.sql
+
+      - name: Certify public Scholar Record projection boundary
+        run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/public_scholar_record_projection_preflight.sql
 
       - name: Stop isolated local Supabase
         if: always()
