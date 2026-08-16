@@ -19,7 +19,7 @@ create policy "Employers can view own verification request" on public.employer_v
 drop policy if exists "Employers can submit own verification request" on public.employer_verification_requests;
 create policy "Employers can submit own verification request" on public.employer_verification_requests for insert to authenticated with check (
   employer_user_id = (select auth.uid()) and status = 'pending' and exists (
-    select 1 from public.profiles p where p.id = (select auth.uid()) and coalesce(p.profile_mode,p.role,p.requested_role) = 'employer' and p.onboarding_completed = true
+    select 1 from public.profiles p where p.id = (select auth.uid()) and coalesce(p.profile_mode,p.role::text,p.requested_role) = 'employer' and p.onboarding_completed = true
   )
 );
 
