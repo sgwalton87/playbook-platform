@@ -12,6 +12,7 @@ const relationships: { label: string; value: RelationshipKind }[] = [
   { label: "Family / Guardian", value: "parent_guardian" },
   { label: "Educator", value: "educator" },
   { label: "Mentor", value: "mentor" },
+  { label: "Coach", value: "coach" },
   { label: "District Admin", value: "district_admin" },
   { label: "University Partner", value: "university_partner" },
   { label: "Employer Partner", value: "employer_partner" },
@@ -20,7 +21,7 @@ const relationships: { label: string; value: RelationshipKind }[] = [
 export default function InvitationCenter() {
   const [inviteeName, setInviteeName] = useState("Coach Taylor");
   const [inviteeEmail, setInviteeEmail] = useState("coach@example.com");
-  const [relationship, setRelationship] = useState<RelationshipKind>("mentor");
+  const [relationship, setRelationship] = useState<RelationshipKind>("coach");
   const [invitations, setInvitations] = useState<SupportInvitation[]>(getDemoInvitations());
 
   async function sendInvite() {
@@ -60,7 +61,7 @@ export default function InvitationCenter() {
         <p style={eyebrow}>Role Invitations</p>
         <h1 style={title}>Invite the scholar support network.</h1>
         <p style={sub}>
-          Scholars can invite family, educators, mentors, universities, employers, and partners into the right OS with relationship-aware permissions.
+          Scholars can invite family, educators, mentors, verified coaches, universities, employers, and partners into the correct OS. Each relationship follows its own verification and permission contract.
         </p>
       </section>
 
@@ -82,6 +83,12 @@ export default function InvitationCenter() {
             ))}
           </select>
 
+          {relationship === "coach" && (
+            <p style={coachNotice}>
+              Coach invitations create no Scholar-data permissions. The invited Coach must complete Coach onboarding and have approved Coach identity evidence before the relationship can activate.
+            </p>
+          )}
+
           <button onClick={sendInvite} style={button}>Send invite</button>
         </article>
 
@@ -101,7 +108,9 @@ export default function InvitationCenter() {
                 <p style={body}>{invite.relationship.replaceAll("_", " ")} → {invite.destination}</p>
 
                 <div style={chips}>
-                  {invite.permissions.slice(0, 4).map(permission => (
+                  {invite.permissions.length === 0 ? (
+                    <span style={neutralChip}>relationship identity only · no Scholar data</span>
+                  ) : invite.permissions.slice(0, 4).map(permission => (
                     <span key={permission} style={chip}>{permission.replaceAll("_", " ")}</span>
                   ))}
                 </div>
@@ -154,5 +163,7 @@ const inviteCard: React.CSSProperties = { border:"1px solid #E2E8F0", borderRadi
 const body: React.CSSProperties = { color:"#64748B", fontSize:13, lineHeight:1.5, margin:"6px 0" };
 const chips: React.CSSProperties = { display:"flex", flexWrap:"wrap", gap:8, marginTop:10 };
 const chip: React.CSSProperties = { background:"#FFF7ED", border:"1px solid #FED7AA", color:"#9A3412", borderRadius:999, padding:"6px 9px", fontSize:11, fontWeight:800 };
+const neutralChip: React.CSSProperties = { background:"#F8FAFC", border:"1px solid #CBD5E1", color:"#334155", borderRadius:999, padding:"6px 9px", fontSize:11, fontWeight:800 };
+const coachNotice: React.CSSProperties = { margin:"12px 0 0", padding:12, borderRadius:12, background:"#F8FAFC", border:"1px solid #CBD5E1", color:"#475569", fontSize:12, lineHeight:1.5 };
 const smallButton: React.CSSProperties = { background:"#10B981", color:"#fff", border:"none", borderRadius:999, padding:"8px 10px", fontWeight:900, cursor:"pointer" };
 const smallButtonGhost: React.CSSProperties = { background:"#F8FAFC", color:"#0F172A", border:"1px solid #E2E8F0", borderRadius:999, padding:"8px 10px", fontWeight:900, cursor:"pointer" };
