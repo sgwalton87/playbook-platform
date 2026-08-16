@@ -52,7 +52,7 @@ function syntheticTranscriptPdf(): Buffer {
   return Buffer.from(pdf, "binary");
 }
 
-test("Scholar transcript produces durable academic readiness through PBOS", async ({ page, request, context }) => {
+test("Scholar transcript produces durable academic readiness, decision, and outcome evidence through PBOS", async ({ page, request, context }) => {
   const artifacts = "artifacts/pbos-acceptance";
   await mkdir(artifacts, { recursive: true });
   await context.tracing.start({ screenshots: true, snapshots: true, sources: true });
@@ -81,29 +81,53 @@ test("Scholar transcript produces durable academic readiness through PBOS", asyn
   const progress = await withSupabaseRetry("Academic progress verification",
     () => admin.from("ag_progress").select("user_id,subject").eq("user_id", user.id));
   expect(progress.data).toHaveLength(7);
-  const evidence = await withSupabaseRetry("Academic evidence verification", () => admin.from("academic_journey_evidence")
+  const transcriptEvidence = await withSupabaseRetry("Academic evidence verification", () => admin.from("academic_journey_evidence")
     .select("owner_id,readiness_score,ag_updates,delivery_state,provenance")
     .eq("owner_id", user.id).order("created_at", { ascending: false }).limit(1).maybeSingle());
-  expect(evidence.data).toMatchObject({ owner_id: user.id, ag_updates: 7, delivery_state: "DELIVERED" });
-  expect((evidence.data?.provenance as string[] | undefined)?.length).toBeGreaterThan(0);
+  expect(transcriptEvidence.data).toMatchObject({ owner_id: user.id, ag_updates: 7, delivery_state: "DELIVERED" });
+  expect((transcriptEvidence.data?.provenance as unknown[] | undefined)?.length).toBeGreaterThan(0);
+
+  await page.goto("/academic-readiness");
+  await expect(page.getByTestId("academic-readiness")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Your academic record should produce a next play." })).toBeVisible();
+  await expect(page.getByText(/confidence$/)).toBeVisible();
+  await expect(page.getByText("Why Playbook is recommending this")).toBeVisible();
+  await page.getByRole("button", { name: "Not this play" }).click();
+  await expect(page.getByText("REJECTED", { exact: true })).toBeVisible();
+
+  const decisionEvidence = await withSupabaseRetry("Academic decision verification", () => admin.from("academic_journey_evidence")
+    .select("owner_id,recommendation_key,primary_recommendation,decision_state,decision_at,provenance")
+    .eq("owner_id", user.id)
+    .not("recommendation_key", "is", null)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle());
+  expect(decisionEvidence.data?.owner_id).toBe(user.id);
+  expect(decisionEvidence.data?.recommendation_key).toBeTruthy();
+  expect(decisionEvidence.data?.primary_recommendation).toBeTruthy();
+  expect(decisionEvidence.data?.decision_state).toBe("REJECTED");
+  expect(decisionEvidence.data?.decision_at).toBeTruthy();
 
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.screenshot({ path: artifacts + "/academic-desktop.png", fullPage: true });
+  await page.screenshot({ path: artifacts + "/academic-readiness-desktop.png", fullPage: true });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.reload();
-  await expect(page.getByRole("button", { name: "Upload Transcript" })).toBeVisible();
-  await page.screenshot({ path: artifacts + "/academic-mobile.png", fullPage: true });
+  await expect(page.getByTestId("academic-readiness")).toBeVisible();
+  await expect(page.getByText("Why Playbook is recommending this")).toBeVisible();
+  await page.screenshot({ path: artifacts + "/academic-readiness-mobile.png", fullPage: true });
   const accessibility = await new AxeBuilder({ page }).analyze();
   const blocking = accessibility.violations.filter(violation => ["serious", "critical"].includes(violation.impact ?? ""));
   await writeFile(artifacts + "/academic-accessibility.json", JSON.stringify(accessibility, null, 2));
   expect(blocking).toEqual([]);
   await context.tracing.stop({ path: artifacts + "/academic-trace.zip" });
-  await writeFile(artifacts + "/academic-acceptance.json", JSON.stringify({ schemaVersion: 1,
-    journeyId: "TRANSCRIPT-TO-ACADEMIC-READINESS", commit: required("PBOS_ACCEPTANCE_COMMIT"),
+  await writeFile(artifacts + "/academic-acceptance.json", JSON.stringify({ schemaVersion: 2,
+    journeyId: "TRANSCRIPT-TO-ACADEMIC-DECISION-OUTCOME", commit: required("PBOS_ACCEPTANCE_COMMIT"),
     checks: [
-      { dimension: "DURABLE_DATA", passed: true, detail: "Transcript-derived readiness survived an authenticated database read." },
-      { dimension: "PBOS_INTEGRATION", passed: true, detail: "The approval-bound transcript exchange produced provenance-bearing academic evidence." },
+      { dimension: "DURABLE_DATA", passed: true, detail: "Transcript-derived readiness and the Scholar decision survived authenticated database reads." },
+      { dimension: "PBOS_INTEGRATION", passed: true, detail: "Transcript evidence converged into an explainable recommendation with provenance and a persisted human decision." },
+      { dimension: "HUMAN_AGENCY", passed: true, detail: "The Scholar could reject the recommendation without an automatic consequential action." },
       { dimension: "AUTHORITY", passed: true, detail: "Anonymous transcript mutation was denied before authenticated execution." },
-      { dimension: "SECURITY", passed: true, detail: "Protected academic configuration remained server controlled." }
+      { dimension: "SECURITY", passed: true, detail: "Protected academic configuration remained server controlled and persisted through owner-authorized records." },
+      { dimension: "ACCESSIBILITY", passed: true, detail: "The converged Academic Readiness experience had no serious or critical axe violations at the certified revision." }
     ] }, null, 2));
 });
