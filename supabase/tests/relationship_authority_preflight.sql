@@ -37,7 +37,7 @@ begin
 end;
 $$;
 
--- Every new exposed relationship/verification table must have RLS enabled.
+-- Every exposed relationship/verification table must have RLS enabled.
 do $$
 declare
   insecure text[];
@@ -141,7 +141,7 @@ begin
 end;
 $$;
 
--- Core RLS policies required for participant-visible canonical state and audit history.
+-- Core participant read policy and audit-history read policy.
 do $$
 declare
   missing text[] := array[]::text[];
@@ -149,16 +149,9 @@ begin
   if not exists (
     select 1 from pg_policies
      where schemaname='public' and tablename='support_relationships'
-       and policyname='Scholars can view their support relationships'
+       and policyname='Relationship participants can view support relationships'
   ) then
-    missing := array_append(missing, 'support_relationships Scholar SELECT policy');
-  end if;
-  if not exists (
-    select 1 from pg_policies
-     where schemaname='public' and tablename='support_relationships'
-       and policyname='Supporters can view their scholar relationships'
-  ) then
-    missing := array_append(missing, 'support_relationships supporter SELECT policy');
+    missing := array_append(missing, 'support_relationships participant SELECT policy');
   end if;
   if not exists (
     select 1 from pg_policies
@@ -170,6 +163,55 @@ begin
 
   if cardinality(missing) > 0 then
     raise exception 'Missing required RLS policies: %', missing;
+  end if;
+end;
+$$;
+
+-- Relationship creation must be invitation/verification bound. The original
+-- Scholar-owner insert policy is a bypass and must never survive the full stack.
+do $$
+declare
+  missing text[] := array[]::text[];
+begin
+  if exists (
+    select 1 from pg_policies
+     where schemaname='public' and tablename='support_relationships'
+       and policyname='Scholars can create support relationships'
+  ) then
+    raise exception 'Broad Scholar support_relationships INSERT policy is still present.';
+  end if;
+
+  if not exists (
+    select 1 from pg_policies
+     where schemaname='public' and tablename='support_relationships'
+       and policyname='Family invitees can activate invited support relationships'
+  ) then
+    missing := array_append(missing, 'Family invitation-bound INSERT policy');
+  end if;
+  if not exists (
+    select 1 from pg_policies
+     where schemaname='public' and tablename='support_relationships'
+       and policyname='Validated mentors can activate invited support relationships'
+  ) then
+    missing := array_append(missing, 'Mentor validation-bound INSERT policy');
+  end if;
+  if not exists (
+    select 1 from pg_policies
+     where schemaname='public' and tablename='support_relationships'
+       and policyname='Verified coaches can activate invited coach relationships'
+  ) then
+    missing := array_append(missing, 'Coach verification-bound INSERT policy');
+  end if;
+  if not exists (
+    select 1 from pg_policies
+     where schemaname='public' and tablename='support_relationships'
+       and policyname='Verified external supporters can activate zero-data relationships'
+  ) then
+    missing := array_append(missing, 'Verified exact-role zero-data INSERT policy');
+  end if;
+
+  if cardinality(missing) > 0 then
+    raise exception 'Missing specialized relationship activation policies: %', missing;
   end if;
 end;
 $$;
