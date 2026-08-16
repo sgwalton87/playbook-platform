@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - "supabase/**"
+      - "scripts/pbos/prepare-local-supabase-migrations.mjs"
       - ".github/workflows/database-certification.yml"
       - "tests/unit/support-relationships/**"
   workflow_dispatch:
@@ -31,6 +32,9 @@ jobs:
         with:
           version: latest
           github-token: ${{ github.token }}
+
+      - name: Normalize legacy migration versions locally
+        run: node scripts/pbos/prepare-local-supabase-migrations.mjs
 
       - name: Start isolated local Supabase
         run: supabase start
