@@ -1,12 +1,31 @@
-import { normalizePlaybookRole } from "@/lib/roles/registry";
+import { requirePlaybookRole } from "@/lib/roles/registry";
 
 export const GOOGLE_LOGIN_ERROR_MESSAGE =
   "We couldn't continue with Google. Please try again or use your email and password.";
 
-export function buildGoogleCallbackUrl(origin: string, requestedRole: string): string {
+export type GoogleAuthSurface = "login" | "signup";
+
+function detectGoogleAuthSurface(): GoogleAuthSurface {
+  if (typeof document === "undefined") return "signup";
+  const surface = document
+    .querySelector<HTMLElement>("[data-auth-surface]")
+    ?.dataset.authSurface;
+  return surface === "login" ? "login" : "signup";
+}
+
+export function buildGoogleCallbackUrl(
+  origin: string,
+  requestedRole?: string | null,
+  authSurface?: GoogleAuthSurface
+): string {
   const callback = new URL("/auth/callback", origin);
   callback.searchParams.set("provider", "google");
-  callback.searchParams.set("role", normalizePlaybookRole(requestedRole));
+
+  const surface = authSurface ?? detectGoogleAuthSurface();
+  if (surface === "signup") {
+    callback.searchParams.set("role", requirePlaybookRole(requestedRole));
+  }
+
   return callback.toString();
 }
 
@@ -25,5 +44,5 @@ export function getGoogleRequestedRole(
     return null;
   }
 
-  return normalizePlaybookRole(requestedRole);
+  return requirePlaybookRole(requestedRole);
 }
