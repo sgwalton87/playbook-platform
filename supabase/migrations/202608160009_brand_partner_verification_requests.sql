@@ -27,7 +27,7 @@ create policy "Brand partners can submit own verification request" on public.bra
   brand_user_id = (select auth.uid()) and status = 'pending'
   and campaign_scope_approved = false and compliance_scope_approved = false
   and exists (
-    select 1 from public.profiles p where p.id = (select auth.uid()) and coalesce(p.profile_mode,p.role,p.requested_role) = 'brand-partner' and p.onboarding_completed = true
+    select 1 from public.profiles p where p.id = (select auth.uid()) and coalesce(p.profile_mode,p.role::text,p.requested_role) = 'brand-partner' and p.onboarding_completed = true
   )
 );
 
