@@ -61,6 +61,9 @@ jobs:
       - name: Certify moderation authority boundary
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/moderation_authority_preflight.sql
 
+      - name: Certify application workspace authority boundary
+        run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/application_workspace_authority_preflight.sql
+
       - name: Stop isolated local Supabase
         if: always()
         run: supabase stop --no-backup
