@@ -47,17 +47,23 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invitation claim returned no result." }, { status: 500 });
     }
 
+    const pendingMentorValidation = claim.activation_state === "pending_validation";
+
     return NextResponse.json({
       ok: true,
-      destination: claim.destination,
+      destination: pendingMentorValidation ? "/pending" : claim.destination,
+      activationState: claim.activation_state,
+      validationRequestId: claim.validation_request_id ?? null,
       eventHint:
         status === "accepted"
           ? {
-              type: "invitation.accepted",
+              type: pendingMentorValidation ? "mentor.validation_requested" : "invitation.accepted",
               scholarId: claim.scholar_id,
               payload: {
-                title: "Support invitation accepted",
-                detail: `${claim.invitee_name} joined the support network.`,
+                title: pendingMentorValidation ? "Mentor validation requested" : "Support invitation accepted",
+                detail: pendingMentorValidation
+                  ? `${claim.invitee_name} accepted the mentor invitation and is awaiting support-system validation.`
+                  : `${claim.invitee_name} joined the support network.`,
               },
             }
           : null,
