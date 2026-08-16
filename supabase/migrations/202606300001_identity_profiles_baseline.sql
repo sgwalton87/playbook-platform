@@ -1,6 +1,10 @@
 -- Foundational identity baseline reconstructed from the live Playbook OS schema.
 -- This migration restores the missing canonical origin for public.profiles so a
 -- fresh local database can replay repository migrations deterministically.
+--
+-- IMPORTANT: public.profiles.role is TEXT in the hosted Playbook database. The
+-- legacy member_role enum still exists for historical compatibility, but the
+-- canonical profiles.role column must not be reconstructed as that enum.
 
 create extension if not exists pgcrypto;
 
@@ -27,7 +31,7 @@ create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   username text,
   full_name text,
-  role public.member_role not null default 'scholar_athlete',
+  role text not null default 'scholar_athlete',
   avatar_url text,
   cover_url text,
   bio text,
