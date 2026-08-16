@@ -15,6 +15,7 @@ export type RelationshipKind =
   | "parent_guardian"
   | "educator"
   | "mentor"
+  | "coach"
   | "district_admin"
   | "university_partner"
   | "employer_partner";
@@ -25,6 +26,11 @@ export function getPermissionsForRelationship(kind: RelationshipKind): Permissio
     parent_guardian: ["view_progress", "view_deadlines", "support_tasks"],
     educator: ["view_progress", "verify_evidence", "recommend_actions", "view_cohort"],
     mentor: ["view_progress", "recommend_actions", "support_tasks"],
+    // Coach relationship identity is established separately from Coach data
+    // permissions. An active verified relationship may validate Mentor identity,
+    // but grants zero Scholar-data permissions until a dedicated Coach access
+    // contract explicitly authorizes them.
+    coach: [],
     district_admin: ["view_cohort", "view_equity_metrics"],
     university_partner: ["view_verified_record", "recommend_actions"],
     employer_partner: ["view_verified_record", "create_opportunities", "review_candidates"],
@@ -42,7 +48,8 @@ export function getRelationshipGraph() {
     { name: "Scholar", relationship: "scholar", permissions: getPermissionsForRelationship("scholar") },
     { name: "Parent / Guardian", relationship: "parent_guardian", permissions: getPermissionsForRelationship("parent_guardian") },
     { name: "Ms. Rivera", relationship: "educator", permissions: getPermissionsForRelationship("educator") },
-    { name: "Coach Taylor", relationship: "mentor", permissions: getPermissionsForRelationship("mentor") },
+    { name: "Mentor", relationship: "mentor", permissions: getPermissionsForRelationship("mentor") },
+    { name: "Coach", relationship: "coach", permissions: getPermissionsForRelationship("coach") },
     { name: "District Success Team", relationship: "district_admin", permissions: getPermissionsForRelationship("district_admin") },
     { name: "University Outreach", relationship: "university_partner", permissions: getPermissionsForRelationship("university_partner") },
     { name: "Workforce Partner", relationship: "employer_partner", permissions: getPermissionsForRelationship("employer_partner") },
