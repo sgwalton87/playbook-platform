@@ -1,27 +1,26 @@
-import { getRoleDefinition, normalizePlaybookRole } from "@/lib/roles/registry";
+import {
+  PLAYBOOK_ROLES,
+  requirePlaybookRole,
+  type PlaybookRole,
+} from "@/lib/roles/registry";
 
-export type SupportedOnboardingCompletionRole = "scholar" | "scholar-athlete" | "transition-youth";
+export type SupportedOnboardingCompletionRole = PlaybookRole;
 
 /**
- * A role may only be marked complete after its durable execution adapter is
- * connected. Scholar is the golden contract; Scholar-Athlete and Transition-
- * Aged Youth inherit the canonical Scholar Record contract while projecting
- * role-specific sections. Every other role remains resumable but fail-closed
- * until it has equivalent authority, persistence, and evidence.
+ * Assert that the selected role has its own registered onboarding contract.
+ * This authorizes submission of the role-specific profile only; it does not
+ * activate relationship, institutional, recruiting, hiring, or data-access
+ * authority. Those gates remain server-side and role-specific.
+ *
+ * The legacy function name is retained because the existing onboarding client
+ * calls it before persisting the final step.
  */
 export function assertRoleOnboardingCompletionSupported(
   role?: string | null
 ): SupportedOnboardingCompletionRole {
-  const normalized = normalizePlaybookRole(role);
-  if (
-    normalized !== "scholar" &&
-    normalized !== "scholar-athlete" &&
-    normalized !== "transition-youth"
-  ) {
-    const definition = getRoleDefinition(normalized);
-    throw new Error(
-      `${definition.label} onboarding is saved but cannot be completed until its governed role adapter is connected.`
-    );
+  const normalized = requirePlaybookRole(role);
+  if (!PLAYBOOK_ROLES[normalized].onboarding) {
+    throw new Error(`${normalized} does not have an onboarding contract.`);
   }
   return normalized;
 }
