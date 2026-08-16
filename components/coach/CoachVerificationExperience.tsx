@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import RoleDashboardExperience from "@/components/role-os/dashboards/RoleDashboardExperience";
 import { PlaybookButton, PlaybookCard, PlaybookPage } from "@/components/ui";
 
 type VerificationRequest = {
@@ -30,7 +29,6 @@ export default function CoachVerificationExperience() {
   const [submitting, setSubmitting] = useState(false);
 
   async function load() {
-    setState("loading");
     const response = await fetch("/api/coach-verification", { cache: "no-store" });
     const result = await response.json() as {
       error?: string;
@@ -100,9 +98,6 @@ export default function CoachVerificationExperience() {
   }
 
   if (request.status === "approved") {
-    // Approval evidence alone is not enough to create a Scholar relationship.
-    // Until the separate athlete/Scholar relationship contract is certified,
-    // keep the Coach OS restricted instead of treating approval as access.
     return (
       <CoachSurface
         title="Identity verification approved"
@@ -148,17 +143,7 @@ function Evidence({ request }: { request: VerificationRequest }) {
   );
 }
 
-function CoachSurface({
-  title,
-  body,
-  message,
-  children,
-}: {
-  title: string;
-  body: string;
-  message?: string | null;
-  children?: React.ReactNode;
-}) {
+function CoachSurface({ title, body, message, children }: { title: string; body: string; message?: string | null; children?: React.ReactNode }) {
   return (
     <PlaybookPage>
       <section style={surfaceStyle} data-testid="coach-verification-gate">
