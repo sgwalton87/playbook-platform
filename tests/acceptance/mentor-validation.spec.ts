@@ -65,7 +65,13 @@ test("Scholar-invited mentor requires governed support-system validation", async
       const updated = await admin.auth.admin.updateUserById(user.id, { password, email_confirm: true });
       if (updated.error) throw updated.error;
     }
-    await admin.from("profiles").upsert({ id: user.id, email, role, profile_mode: role }, { onConflict: "id" });
+    await admin.from("profiles").upsert({
+      id: user.id,
+      email,
+      role,
+      profile_mode: role,
+      onboarding_completed: true,
+    }, { onConflict: "id" });
     return user;
   }
 
@@ -117,9 +123,13 @@ test("Scholar-invited mentor requires governed support-system validation", async
   const accepted = await postJson(page, "/api/invitations/accept", { token, status: "accepted" });
   expect(accepted.status, JSON.stringify(accepted.body)).toBe(200);
   expect(accepted.body.activationState).toBe("pending_validation");
-  expect(accepted.body.destination).toBe("/pending");
+  expect(accepted.body.destination).toBe("/mentor-os");
   const validationRequestId = String(accepted.body.validationRequestId ?? "");
   expect(validationRequestId).toBeTruthy();
+
+  await page.goto("/mentor-os");
+  await expect(page.getByTestId("mentor-validation-pending")).toBeVisible();
+  await expect(page.getByText("Mentor validation is in progress")).toBeVisible();
 
   const prematureRelationship = await admin.from("support_relationships")
     .select("id")
