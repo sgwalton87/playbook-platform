@@ -51,7 +51,10 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       ok: true,
-      destination: pendingMentorValidation ? "/pending" : claim.destination,
+      // Every accepted role enters its own Operating System. Mentor OS is
+      // responsible for rendering the pending-validation gate without exposing
+      // Scholar data before the threshold is satisfied.
+      destination: claim.destination,
       activationState: claim.activation_state,
       validationRequestId: claim.validation_request_id ?? null,
       eventHint:
