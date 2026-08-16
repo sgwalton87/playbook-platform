@@ -170,7 +170,6 @@ $$;
 
 revoke all on function private.can_resolve_network_identity(uuid) from public, anon, authenticated;
 revoke all on function public.get_network_member_identities(uuid[]) from public, anon, authenticated;
-grant execute on function private.can_resolve_network_identity(uuid) to authenticated;
 grant execute on function public.get_network_member_identities(uuid[]) to authenticated;
 
 comment on function public.get_network_member_identities(uuid[]) is
