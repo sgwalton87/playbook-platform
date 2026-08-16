@@ -31,37 +31,55 @@ declare
   relationship_row public.support_relationships%rowtype;
 begin
   if actor_id is null then raise exception 'Authentication required.' using errcode='42501'; end if;
-
   if requested_relationship_id is null then
     delete from public.active_support_scholar_contexts where supporter_id=actor_id;
     return jsonb_build_object('ok',true,'cleared',true);
   end if;
-
   select * into relationship_row
     from public.support_relationships
    where id=requested_relationship_id
      and supporter_id=actor_id
      and status='active'
    for share;
-
-  if not found then
-    raise exception 'Active support relationship required.' using errcode='42501';
-  end if;
-
+  if not found then raise exception 'Active support relationship required.' using errcode='42501'; end if;
   insert into public.active_support_scholar_contexts(supporter_id,relationship_id,scholar_id,selected_at,updated_at)
   values(actor_id,relationship_row.id,relationship_row.scholar_id,now(),now())
   on conflict(supporter_id) do update
-    set relationship_id=excluded.relationship_id,
-        scholar_id=excluded.scholar_id,
-        selected_at=now(),
-        updated_at=now();
-
-  return jsonb_build_object(
-    'ok',true,
-    'relationshipId',relationship_row.id,
-    'scholarId',relationship_row.scholar_id
-  );
+    set relationship_id=excluded.relationship_id, scholar_id=excluded.scholar_id, selected_at=now(), updated_at=now();
+  return jsonb_build_object('ok',true,'relationshipId',relationship_row.id,'scholarId',relationship_row.scholar_id);
 end;
+$$;
+
+create or replace function public.get_available_support_scholar_contexts()
+returns table (
+  relationship_id uuid,
+  scholar_id uuid,
+  display_name text,
+  username text,
+  avatar_url text,
+  relationship text,
+  permissions jsonb,
+  created_at timestamptz
+)
+language sql
+stable
+security definer
+set search_path=''
+as $$
+  select
+    r.id,
+    r.scholar_id,
+    coalesce(nullif(trim(p.full_name),''), nullif(trim(concat_ws(' ',p.first_name,p.last_name)),''), p.username, 'Scholar') as display_name,
+    p.username,
+    p.avatar_url,
+    r.relationship,
+    r.permissions,
+    r.created_at
+  from public.support_relationships r
+  join public.profiles p on p.id=r.scholar_id
+  where r.supporter_id=auth.uid()
+    and r.status='active'
+  order by r.created_at desc;
 $$;
 
 create or replace function public.get_active_support_scholar_context()
@@ -100,11 +118,15 @@ as $$
 $$;
 
 revoke all on function public.set_active_support_scholar_context(uuid) from public,anon,authenticated;
+revoke all on function public.get_available_support_scholar_contexts() from public,anon,authenticated;
 revoke all on function public.get_active_support_scholar_context() from public,anon,authenticated;
 grant execute on function public.set_active_support_scholar_context(uuid) to authenticated;
+grant execute on function public.get_available_support_scholar_contexts() to authenticated;
 grant execute on function public.get_active_support_scholar_context() to authenticated;
 
 comment on function public.set_active_support_scholar_context(uuid) is
   'Selects or clears the current Scholar focus only when auth.uid() is the supporter on an active support relationship.';
+comment on function public.get_available_support_scholar_contexts() is
+  'Lists bounded presentation identity and permission keys only for active Scholar relationships where auth.uid() is the supporter.';
 comment on function public.get_active_support_scholar_context() is
   'Returns bounded presentation identity, relationship type, and granted permission keys for the currently selected active support relationship.';
