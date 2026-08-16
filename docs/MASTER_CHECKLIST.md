@@ -37,7 +37,7 @@ Status vocabulary:
 - PR #134 removed recurring frontend navigation/avatar quality warnings without changing authority.
 - PR #136 recorded hosted-production privilege reconciliation and performance hardening after the full Aug. 16 migration stack was promoted.
 - PR #137 rebuilt `/preview` as a 15-role Product Review Center derived from the canonical role registry and removed `University OS` as a separately presented role.
-- Current production baseline before this documentation-only reconciliation: `main` revision `2f87a0732532aace3902b363d0290bd7716427f1`; exact production deployment was initiated automatically after merge and must be READY before that revision is called production-certified.
+- Current production baseline: `main` revision `2f87a0732532aace3902b363d0290bd7716427f1`; the exact Vercel production deployment is READY. Browser/visual certification remains a separate unproven release layer.
 
 ## Production authority truth
 
@@ -72,7 +72,7 @@ Remaining Supabase release items include the manual Auth setting for leaked-pass
 | 12 Partner / Institution Authority | IMPLEMENTED / CERTIFICATION OPEN | Verification/review foundations exist for Educator, Counselor, Coach, District, Recruiter, Admissions, Employer, Brand Partner, Community Partner and Athlete Abroad readiness. Relationship/data scope remains independently permission-bound. Full meaningful-action browser journeys remain open. |
 | 13 Notifications / Attention | IMPLEMENTED / CERTIFICATION OPEN | Trusted notification producers, owner acknowledgement/preferences/retry, and Attention Center are wired. Browser delivery/recovery evidence remains open. |
 | 14 Founder / Admin | IMPLEMENTED / PARTIAL | Verification Review Center and bounded operator authority exist. Monitoring, analytics, release operations, and broader production administration remain incomplete. |
-| 15 Platform QA / Release | PARTIAL | CI, dependency audit, full production build, from-zero DB certification, hosted migration promotion, and Vercel deployments are strong. Exact-revision browser E2E, accessibility/device matrix, remaining Supabase/Auth configuration, legacy performance debt, monitoring/analytics, compliance, soft launch and independent human approval remain open. |
+| 15 Platform QA / Release | PARTIAL | CI, dependency audit, full production build, from-zero DB certification, hosted migration promotion, and exact-revision Vercel production deployment are strong. Exact-revision browser E2E, accessibility/device matrix, remaining Supabase/Auth configuration, legacy performance debt, monitoring/analytics, compliance, soft launch and independent human approval remain open. |
 
 ## Role journey status
 
