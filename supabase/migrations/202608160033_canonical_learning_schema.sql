@@ -78,6 +78,7 @@ alter table public.achievement_badges enable row level security;
 
 grant select on public.learning_courses, public.learning_modules to authenticated;
 grant select on public.learning_module_progress, public.learning_credentials, public.achievement_badges to authenticated;
+grant select on public.store_products, public.store_redemptions, public.coin_ledger to authenticated;
 
 drop policy if exists "Authenticated can view published learning courses" on public.learning_courses;
 create policy "Authenticated can view published learning courses" on public.learning_courses for select to authenticated
@@ -95,3 +96,9 @@ create policy "Users view own learning credentials" on public.learning_credentia
 
 drop policy if exists "Users view own achievement badges" on public.achievement_badges;
 create policy "Users view own achievement badges" on public.achievement_badges for select to authenticated using (user_id = auth.uid());
+
+drop policy if exists "Authenticated can view active store products" on public.store_products;
+create policy "Authenticated can view active store products" on public.store_products for select to authenticated using (active = true);
+
+drop policy if exists "Users view own store redemptions" on public.store_redemptions;
+create policy "Users view own store redemptions" on public.store_redemptions for select to authenticated using (scholar_id = auth.uid());
