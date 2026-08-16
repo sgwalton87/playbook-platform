@@ -43,10 +43,29 @@ export const ROLE_ALIASES: Record<string, PlaybookRole> = {
   international_athlete: "athlete-abroad",
 };
 
+/**
+ * Compatibility normalizer for legacy surfaces that intentionally default to
+ * Scholar when no role exists. Authority-bearing onboarding and completion
+ * paths must use requirePlaybookRole instead.
+ */
 export function normalizePlaybookRole(role?: string | null): PlaybookRole {
   const key = String(role || "scholar").trim().toLowerCase();
   if (key in PLAYBOOK_ROLES) return key as PlaybookRole;
   return ROLE_ALIASES[key] || "scholar";
+}
+
+/**
+ * Resolve a canonical role without silent fallback. Unknown or empty roles are
+ * rejected so one role can never inherit Scholar onboarding or authority by
+ * accident.
+ */
+export function requirePlaybookRole(role?: string | null): PlaybookRole {
+  const key = String(role ?? "").trim().toLowerCase();
+  if (!key) throw new Error("A Playbook role is required.");
+  if (key in PLAYBOOK_ROLES) return key as PlaybookRole;
+  const alias = ROLE_ALIASES[key];
+  if (alias) return alias;
+  throw new Error(`Unsupported Playbook role: ${key}`);
 }
 
 export function getRoleDefinition(role?: string | null) {
