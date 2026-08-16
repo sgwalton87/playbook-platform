@@ -3,7 +3,6 @@ import { getPathway } from "./pathwayMap";
 import {
   PLAYBOOK_ROLES,
   ROLE_ALIASES,
-  normalizePlaybookRole,
   type PlaybookRole,
 } from "@/lib/roles/registry";
 import type { OnboardingData, OnboardingStep } from "./types";
