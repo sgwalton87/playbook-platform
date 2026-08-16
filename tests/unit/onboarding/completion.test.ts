@@ -11,6 +11,11 @@ describe("role onboarding completion authority", () => {
     expect(assertRoleOnboardingCompletionSupported("athlete")).toBe("scholar-athlete");
   });
 
+  it("permits Transition-Aged Youth through a self-owned Scholar Record specialization", () => {
+    expect(assertRoleOnboardingCompletionSupported("transition-youth")).toBe("transition-youth");
+    expect(assertRoleOnboardingCompletionSupported("tay")).toBe("transition-youth");
+  });
+
   it.each([
     "family",
     "educator",
@@ -22,7 +27,6 @@ describe("role onboarding completion authority", () => {
     "brand-partner",
     "employer",
     "athlete-abroad",
-    "transition-youth",
     "district",
     "other",
   ])("keeps %s resumable but fail-closed", (role) => {
