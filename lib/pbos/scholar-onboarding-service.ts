@@ -1,7 +1,7 @@
 import type { PlaybookIdentityMapping, PlaybookRole } from "../../pbos/connector/contracts";
 import { authorizePlaybookFoundation } from "./foundation";
 
-export type SupportedScholarRecordRole = Extract<PlaybookRole, "SCHOLAR" | "SCHOLAR_ATHLETE">;
+export type SupportedScholarRecordRole = Extract<PlaybookRole, "SCHOLAR" | "SCHOLAR_ATHLETE" | "TRANSITION_YOUTH">;
 
 export interface ScholarJourneyRepository {
   persistOnboarding(input: { scholarId: string; displayName: string; goalTitle: string; role: SupportedScholarRecordRole; approvalId: string; idempotencyKey: string; provenance: readonly string[] }): Promise<{ scholarRecordId: string; goalId: string }>;
@@ -43,7 +43,11 @@ export class ScholarOnboardingService {
     const record = await this.repository.persistOnboarding({ scholarId: input.ownerId, displayName: input.displayName,
       goalTitle: input.goalTitle, role, approvalId: input.identityApprovalId, idempotencyKey: input.idempotencyKey, provenance: baseProvenance });
     const onboardingProvenance = await this.runtime.publishOnboarding(identity, record.scholarRecordId, input.idempotencyKey + "-onboarding");
-    const sectionIds = role === "SCHOLAR_ATHLETE" ? (["identity", "goals", "athletics"] as const) : (["identity", "goals"] as const);
+    const sectionIds = role === "SCHOLAR_ATHLETE"
+      ? (["identity", "goals", "athletics"] as const)
+      : role === "TRANSITION_YOUTH"
+        ? (["identity", "goals", "support"] as const)
+        : (["identity", "goals"] as const);
     const dashboardProvenance = await this.runtime.projectDashboard(identity, record.scholarRecordId, sectionIds,
       input.exchangeApprovalId, input.idempotencyKey + "-dashboard");
     const provenance = [...baseProvenance, ...onboardingProvenance, ...dashboardProvenance, input.exchangeApprovalId];
