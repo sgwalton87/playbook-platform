@@ -17,7 +17,8 @@ describe("Role OS Permissions", () => {
   });
 
   it("returns relationship graph", () => {
-    expect(getRelationshipGraph().length).toBe(7);
+    expect(getRelationshipGraph().length).toBe(8);
+    expect(getRelationshipGraph().some((entry) => entry.relationship === "coach")).toBe(true);
   });
 
   it("component is defined", () => {
