@@ -97,6 +97,12 @@ export default function AdminPage() {
   }), [requests]);
 
   async function review(request: ReviewRequest, decision: "under_review" | "approved" | "rejected") {
+    const decisionReason = (notes[request.request_id] || "").trim();
+    if ((decision === "approved" || decision === "rejected") && !decisionReason) {
+      setError("Record a decision reason before approving or rejecting verification.");
+      return;
+    }
+
     setBusyId(request.request_id);
     setError("");
 
@@ -107,7 +113,7 @@ export default function AdminPage() {
         requestType: request.request_type,
         requestId: request.request_id,
         decision,
-        notes: notes[request.request_id] || null,
+        notes: decisionReason || null,
       }),
     });
 
@@ -163,45 +169,53 @@ export default function AdminPage() {
         </section>
       ) : (
         <PlaybookGrid min={340}>
-          {requests.map((request) => (
-            <PlaybookCard
-              key={`${request.request_type}-${request.request_id}`}
-              eyebrow={LABELS[request.request_type] || request.request_type}
-              title={request.status === "under_review" ? "Review in progress" : "Evidence ready for review"}
-            >
-              <div style={metaRow}>
-                <PlaybookPill>{request.status.replace("_", " ")}</PlaybookPill>
-                <span style={dateText}>{new Date(request.submitted_at).toLocaleString()}</span>
-              </div>
+          {requests.map((request) => {
+            const decisionReason = (notes[request.request_id] || "").trim();
+            const finalDecisionDisabled = busyId === request.request_id || !decisionReason;
+            return (
+              <PlaybookCard
+                key={`${request.request_type}-${request.request_id}`}
+                eyebrow={LABELS[request.request_type] || request.request_type}
+                title={request.status === "under_review" ? "Review in progress" : "Evidence ready for review"}
+              >
+                <div style={metaRow}>
+                  <PlaybookPill>{request.status.replace("_", " ")}</PlaybookPill>
+                  <span style={dateText}>{new Date(request.submitted_at).toLocaleString()}</span>
+                </div>
 
-              <div style={evidenceGrid}>
-                {Object.entries(request.evidence || {}).map(([key, value]) => (
-                  <div key={key} style={evidenceRow}>
-                    <span style={evidenceLabel}>{readable(key)}</span>
-                    <strong style={evidenceValue}>{displayValue(value)}</strong>
-                  </div>
-                ))}
-              </div>
+                <div style={evidenceGrid}>
+                  {Object.entries(request.evidence || {}).map(([key, value]) => (
+                    <div key={key} style={evidenceRow}>
+                      <span style={evidenceLabel}>{readable(key)}</span>
+                      <strong style={evidenceValue}>{displayValue(value)}</strong>
+                    </div>
+                  ))}
+                </div>
 
-              <label style={notesLabel}>
-                Review notes
-                <textarea
-                  value={notes[request.request_id] || ""}
-                  onChange={(event) => setNotes((current) => ({ ...current, [request.request_id]: event.target.value }))}
-                  placeholder="Record evidence considered, follow-up needed, or reason for the decision."
-                  rows={3}
-                  maxLength={4000}
-                  style={notesInput}
-                />
-              </label>
+                <label style={notesLabel}>
+                  Decision reason
+                  <textarea
+                    value={notes[request.request_id] || ""}
+                    onChange={(event) => setNotes((current) => ({ ...current, [request.request_id]: event.target.value }))}
+                    placeholder="Record the evidence considered and the reason for approval or rejection."
+                    rows={3}
+                    maxLength={4000}
+                    style={notesInput}
+                    aria-describedby={`review-reason-${request.request_id}`}
+                  />
+                </label>
+                <p id={`review-reason-${request.request_id}`} style={reasonHelp}>
+                  Required for approval or rejection. Optional while marking a request under review.
+                </p>
 
-              <div style={actions}>
-                <button type="button" disabled={busyId === request.request_id} onClick={() => void review(request, "under_review")} style={secondaryButton}>Mark reviewing</button>
-                <button type="button" disabled={busyId === request.request_id} onClick={() => void review(request, "rejected")} style={dangerButton}>Reject</button>
-                <button type="button" disabled={busyId === request.request_id} onClick={() => void review(request, "approved")} style={primaryButton}>Approve</button>
-              </div>
-            </PlaybookCard>
-          ))}
+                <div style={actions}>
+                  <button type="button" disabled={busyId === request.request_id} onClick={() => void review(request, "under_review")} style={secondaryButton}>Mark reviewing</button>
+                  <button type="button" disabled={finalDecisionDisabled} onClick={() => void review(request, "rejected")} style={{ ...dangerButton, opacity: finalDecisionDisabled ? 0.55 : 1 }}>Reject</button>
+                  <button type="button" disabled={finalDecisionDisabled} onClick={() => void review(request, "approved")} style={{ ...primaryButton, opacity: finalDecisionDisabled ? 0.55 : 1 }}>Approve</button>
+                </div>
+              </PlaybookCard>
+            );
+          })}
         </PlaybookGrid>
       )}
     </PlaybookPage>
@@ -220,6 +234,7 @@ const evidenceLabel: React.CSSProperties = { color: "#64748B", fontSize: 12, fon
 const evidenceValue: React.CSSProperties = { color: "#0F172A", fontSize: 12, overflowWrap: "anywhere" };
 const notesLabel: React.CSSProperties = { display: "grid", gap: 7, color: "#334155", fontSize: 12, fontWeight: 900 };
 const notesInput: React.CSSProperties = { width: "100%", boxSizing: "border-box", resize: "vertical", border: "1px solid #CBD5E1", borderRadius: 10, padding: 12, font: "inherit", color: "#0F172A", background: "#F8FAFC" };
+const reasonHelp: React.CSSProperties = { margin: "7px 0 0", color: "#64748B", fontSize: 11, lineHeight: 1.45 };
 const actions: React.CSSProperties = { display: "flex", flexWrap: "wrap", gap: 8, marginTop: 16 };
 const baseButton: React.CSSProperties = { border: 0, borderRadius: 9, padding: "11px 14px", fontWeight: 950, cursor: "pointer" };
 const primaryButton: React.CSSProperties = { ...baseButton, background: "#F97316", color: "#fff" };
