@@ -1,15 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireUser } from "@/lib/supabase/server";
+import { requireLearnerAuthority, type LearnerRole } from "@/lib/auth/learner-authority";
 import { ApplicationWorkspaceJourneyService, APPLICATION_TYPES, type ApplicationTaskInput, type ApplicationType } from "@/lib/pbos/application-workspace-journey";
 import { PlaybookConnector } from "@/pbos/connector/playbook-connector";
 import { PlaybookPbosRuntimeClient } from "@/pbos/connector/pbos-runtime-client";
 import { SignedPlaybookPbosTransport } from "@/pbos/connector/signed-server-transport";
+import type { PlaybookRole } from "@/pbos/connector/contracts";
 
 function required(name: string): string { const value = process.env[name]; if (!value) throw new Error("Missing protected server configuration: " + name); return value; }
 function runtime() { return new PlaybookPbosRuntimeClient(new SignedPlaybookPbosTransport(required("PBOS_API_URL"), {
   organizationId: required("PBOS_ORGANIZATION_ID"), connectorId: required("PBOS_CONNECTOR_ID"),
   keyId: required("PBOS_CONNECTOR_KEY_ID"), secretBase64: required("PBOS_CONNECTOR_SECRET_BASE64")
 })); }
+
+function pbosRoleForLearner(role: LearnerRole): PlaybookRole {
+  return role === "scholar-athlete" ? "SCHOLAR_ATHLETE" : role === "transition-youth" ? "TRANSITION_YOUTH" : "SCHOLAR";
+}
 
 function applicationService(supabase: Awaited<ReturnType<typeof requireUser>>["supabase"]) {
   const client = runtime(); const connector = new PlaybookConnector(client);
@@ -59,7 +65,7 @@ function applicationService(supabase: Awaited<ReturnType<typeof requireUser>>["s
       if (saved.error) throw new Error(saved.error.message);
     }
   }, {
-    registerIdentity: userId => connector.registerIdentity(userId, "SCHOLAR"),
+    registerIdentity: (userId, role) => connector.registerIdentity(userId, role),
     async publish(identity, input) {
       const response = await client.send("PUBLISH_LIFECYCLE_EVENT", { connectorId: "PLAYBOOK-CONNECTOR-001",
         domainRegistrationId: "PLAYBOOK-SCHOLAR-REGISTRATION-001", identityMappingId: identity.mappingId,
@@ -76,6 +82,7 @@ export async function GET() {
   try {
     const { supabase, user } = await requireUser();
     if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    await requireLearnerAuthority(supabase, user.id, { requireOnboarding: true });
     const result = await supabase.from("application_workspaces").select("id,opportunity_id,opportunity_name,opportunity_type,deadline,status,delivery_state,created_at,updated_at,application_workspace_tasks(id,title,due_at,status),application_workspace_documents(id,file_name,media_type,size_bytes,created_at)")
       .eq("scholar_id", user.id).order("updated_at", { ascending: false });
     if (result.error) throw new Error(result.error.message);
@@ -87,6 +94,7 @@ export async function POST(request: NextRequest) {
   try {
     const { supabase, user } = await requireUser();
     if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    const learnerRole = await requireLearnerAuthority(supabase, user.id, { requireOnboarding: true });
     const body = await request.json() as { opportunityId?: unknown; opportunityName?: unknown; opportunityType?: unknown;
       deadline?: unknown; tasks?: unknown; requestId?: unknown };
     const opportunityType = String(body.opportunityType ?? "") as ApplicationType;
@@ -96,7 +104,7 @@ export async function POST(request: NextRequest) {
         title: String(value.title ?? ""), dueAt: value.dueAt ? String(value.dueAt) : null };
     }) : undefined;
     const output = await applicationService(supabase).create({ actorId: user.id, ownerId: user.id,
-      approvalId: required("PBOS_APPLICATION_JOURNEY_APPROVAL_ID"), opportunityId: String(body.opportunityId ?? ""),
+      role: pbosRoleForLearner(learnerRole), approvalId: required("PBOS_APPLICATION_JOURNEY_APPROVAL_ID"), opportunityId: String(body.opportunityId ?? ""),
       opportunityName: String(body.opportunityName ?? ""), opportunityType,
       deadline: body.deadline ? String(body.deadline) : null, tasks,
       idempotencyKey: String(body.requestId ?? "application-" + user.id + "-" + String(body.opportunityId ?? "")) });
@@ -108,11 +116,12 @@ export async function PATCH(request: NextRequest) {
   try {
     const { supabase, user } = await requireUser();
     if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    const learnerRole = await requireLearnerAuthority(supabase, user.id, { requireOnboarding: true });
     const body = await request.json() as { workspaceId?: unknown; taskId?: unknown; action?: unknown; requestId?: unknown };
     const action = String(body.action ?? "");
     if (!["TASK_COMPLETED", "TASK_REOPENED", "APPLICATION_SUBMITTED"].includes(action)) return NextResponse.json({ error: "Application action is invalid." }, { status: 400 });
     const output = await applicationService(supabase).transition({ actorId: user.id, ownerId: user.id,
-      approvalId: required("PBOS_APPLICATION_JOURNEY_APPROVAL_ID"), workspaceId: String(body.workspaceId ?? ""),
+      role: pbosRoleForLearner(learnerRole), approvalId: required("PBOS_APPLICATION_JOURNEY_APPROVAL_ID"), workspaceId: String(body.workspaceId ?? ""),
       taskId: body.taskId ? String(body.taskId) : undefined,
       action: action as "TASK_COMPLETED" | "TASK_REOPENED" | "APPLICATION_SUBMITTED",
       idempotencyKey: String(body.requestId ?? "application-transition-" + user.id + "-" + Date.now()) });
