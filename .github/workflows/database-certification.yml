@@ -68,6 +68,9 @@ jobs:
       - name: Certify public Scholar Record projection boundary
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/public_scholar_record_projection_preflight.sql
 
+      - name: Certify network and feed projection boundary
+        run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/network_feed_projection_preflight.sql
+
       - name: Certify verification reviewer authority boundary
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/verification_reviewer_authority_preflight.sql
 
