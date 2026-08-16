@@ -1,7 +1,7 @@
 "use client";
 
-import RoleDashboardExperience from "@/components/role-os/dashboards/RoleDashboardExperience";
+import CoachVerificationExperience from "@/components/coach/CoachVerificationExperience";
 
 export default function CoachOSPage() {
-  return <RoleDashboardExperience role="coach" />;
+  return <CoachVerificationExperience />;
 }
