@@ -18,7 +18,7 @@ with check (
     select 1
       from public.profiles as profile
      where profile.id = (select auth.uid())
-       and coalesce(profile.profile_mode, profile.role, profile.requested_role)
+       and coalesce(profile.profile_mode, profile.role::text, profile.requested_role)
          in ('scholar', 'scholar-athlete', 'transition-youth')
   )
   and status = 'pending'
