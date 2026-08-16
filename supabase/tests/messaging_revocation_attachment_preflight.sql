@@ -59,7 +59,8 @@ where schemaname='public' and tablename='pbos_message_attachments'
 \endif
 
 select count(*) = 3 as attachment_storage_policy_set_complete
-from pg_policies where schemaname='storage' and tablename='objects'
+from pg_policies
+where schemaname='storage' and tablename='objects'
   and policyname in (
     'Current participants upload message attachments',
     'Current participants read message attachments',
@@ -72,7 +73,8 @@ from pg_policies where schemaname='storage' and tablename='objects'
 \endif
 
 select count(*) = 1 as participant_select_active_guard
-from pg_policies where schemaname='public' and tablename='pbos_conversation_participants'
+from pg_policies
+where schemaname='public' and tablename='pbos_conversation_participants'
   and policyname='Participants view their state'
   and qual ilike '%pbos_user_has_active_conversation_access%' \gset
 \if :participant_select_active_guard
@@ -82,7 +84,8 @@ from pg_policies where schemaname='public' and tablename='pbos_conversation_part
 \endif
 
 select count(*) = 1 as participant_update_active_guard
-from pg_policies where schemaname='public' and tablename='pbos_conversation_participants'
+from pg_policies
+where schemaname='public' and tablename='pbos_conversation_participants'
   and policyname='Participants update their state'
   and qual ilike '%pbos_user_has_active_conversation_access%'
   and with_check ilike '%pbos_user_has_active_conversation_access%' \gset
@@ -93,7 +96,8 @@ from pg_policies where schemaname='public' and tablename='pbos_conversation_part
 \endif
 
 select count(*) = 3 as message_active_guard_count
-from pg_policies where schemaname='public' and tablename='pbos_messages'
+from pg_policies
+where schemaname='public' and tablename='pbos_messages'
   and policyname in (
     'Governed participants view messages',
     'Governed participants send messages',
@@ -106,16 +110,11 @@ from pg_policies where schemaname='public' and tablename='pbos_messages'
   \quit 1
 \endif
 
--- Supabase lint 0003: stable auth helpers should be initPlans, not per-row calls.
+-- Supabase lint 0003: all governed Messaging policies cache stable auth.uid().
 select count(*) = 12 as public_messaging_uid_initplans
 from pg_policies
 where schemaname='public'
-  and tablename in (
-    'pbos_conversations',
-    'pbos_conversation_participants',
-    'pbos_messages',
-    'pbos_message_attachments'
-  )
+  and tablename in ('pbos_conversations','pbos_conversation_participants','pbos_messages','pbos_message_attachments')
   and (coalesce(qual, '') || ' ' || coalesce(with_check, '')) ilike '%SELECT auth.uid()%' \gset
 \if :public_messaging_uid_initplans
 \else
@@ -138,32 +137,37 @@ where schemaname='storage' and tablename='objects'
   \quit 1
 \endif
 
-select count(*) = 2 as messaging_jwt_initplans
+-- Conversation creation must cache the JWT object before extracting email.
+select count(*) = 1 as conversation_jwt_object_cached
 from pg_policies
-where (
-  (
-    schemaname='public'
-    and tablename='pbos_conversations'
-    and policyname='Governed actors create conversations'
-  ) or (
-    schemaname='storage'
-    and tablename='objects'
-    and policyname='Current participants upload message attachments'
-  )
-)
-  and (coalesce(qual, '') || ' ' || coalesce(with_check, '')) ilike '%SELECT%auth.jwt()%' \gset
-\if :messaging_jwt_initplans
+where schemaname='public'
+  and tablename='pbos_conversations'
+  and policyname='Governed actors create conversations'
+  and with_check ilike '%SELECT auth.jwt()%'
+  and with_check not ilike '%SELECT (auth.jwt() ->>%' \gset
+\if :conversation_jwt_object_cached
 \else
-  \echo 'Messaging email authorization must cache auth.jwt() evaluation'
+  \echo 'conversation creation must cache auth.jwt() before email extraction'
+  \quit 1
+\endif
+
+select count(*) = 1 as storage_jwt_cached
+from pg_policies
+where schemaname='storage' and tablename='objects'
+  and policyname='Current participants upload message attachments'
+  and with_check ilike '%SELECT%auth.jwt()%' \gset
+\if :storage_jwt_cached
+\else
+  \echo 'message attachment upload must cache auth.jwt() evaluation'
   \quit 1
 \endif
 
 select count(*) = 0 as broad_profile_select_policy_absent
 from pg_policies
-where schemaname = 'public'
-  and tablename = 'profiles'
-  and cmd = 'SELECT'
-  and (qual = 'true' or qual ilike '%profile_visibility%public%') \gset
+where schemaname='public'
+  and tablename='profiles'
+  and cmd='SELECT'
+  and (qual='true' or qual ilike '%profile_visibility%public%') \gset
 \if :broad_profile_select_policy_absent
 \else
   \echo 'public.profiles gained a broad select policy'
