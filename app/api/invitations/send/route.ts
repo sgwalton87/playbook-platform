@@ -6,6 +6,7 @@ import {
 } from "@/lib/invitations/server";
 import type { RelationshipKind } from "@/lib/permissions";
 import { buildSupportInvitationEmail, sendPlaybookEmail } from "@/lib/email";
+import { normalizePlaybookRole } from "@/lib/roles/registry";
 import { requireUser } from "@/lib/supabase/server";
 
 const RELATIONSHIP_KINDS = new Set<RelationshipKind>([
@@ -17,11 +18,37 @@ const RELATIONSHIP_KINDS = new Set<RelationshipKind>([
   "employer_partner",
 ]);
 
+const SCHOLAR_RECORD_ROLES = new Set([
+  "scholar",
+  "scholar-athlete",
+  "transition-youth",
+]);
+
 export async function POST(req: NextRequest) {
   try {
     const { supabase, user } = await requireUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const inviterProfile = await supabase
+      .from("profiles")
+      .select("role,profile_mode,full_name")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (inviterProfile.error) {
+      return NextResponse.json({ error: inviterProfile.error.message }, { status: 400 });
+    }
+
+    const inviterRole = normalizePlaybookRole(
+      inviterProfile.data?.profile_mode ?? inviterProfile.data?.role
+    );
+    if (!SCHOLAR_RECORD_ROLES.has(inviterRole)) {
+      return NextResponse.json(
+        { error: "Only a self-owned Scholar Record account may invite members into its support system." },
+        { status: 403 }
+      );
     }
 
     const body = await req.json();
@@ -35,10 +62,14 @@ export async function POST(req: NextRequest) {
     if (!inviteeName || !inviteeEmail) {
       return NextResponse.json({ error: "Invitee name and email are required." }, { status: 400 });
     }
+    if (user.email?.trim().toLowerCase() === inviteeEmail) {
+      return NextResponse.json({ error: "A Scholar cannot invite the same account as its own supporter." }, { status: 400 });
+    }
 
+    const scholarName = String(inviterProfile.data?.full_name || "Scholar").trim();
     const record = buildInvitationRecord({
       scholarId: user.id,
-      scholarName: body.scholarName || "Scholar",
+      scholarName,
       inviteeName,
       inviteeEmail,
       relationship,
@@ -87,7 +118,7 @@ export async function POST(req: NextRequest) {
         fromType: "onboarding",
       });
     } catch (deliveryError) {
-      // The invitation remains durable and visible to its scholar owner. Email
+      // The invitation remains durable and visible to its Scholar owner. Email
       // delivery is an external transport concern and may be retried without
       // silently deleting the consent artifact.
       return NextResponse.json(
