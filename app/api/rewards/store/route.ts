@@ -7,9 +7,9 @@ export async function GET() {
     if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
 
     const [items, ledger, redemptions] = await Promise.all([
-      supabase.from("reward_store_items").select("id,name,description,coin_cost,inventory,fulfillment_type,status,image_url,sort_order").eq("status", "active").order("sort_order"),
+      supabase.from("store_products").select("id,product_key,name,category,coin_price,inventory,requires_approval,active").eq("active", true).order("coin_price"),
       supabase.from("coin_ledger").select("coins,xp,created_at").eq("scholar_id", user.id),
-      supabase.from("reward_store_redemptions").select("id,item_id,coin_cost,status,redeemed_at,fulfilled_at").eq("user_id", user.id).order("redeemed_at", { ascending: false }).limit(25),
+      supabase.from("store_redemptions").select("id,product_id,coins_spent,fulfillment_status,created_at").eq("scholar_id", user.id).order("created_at", { ascending: false }).limit(25),
     ]);
     const error = items.error || ledger.error || redemptions.error;
     if (error) throw new Error(error.message);
@@ -26,11 +26,16 @@ export async function POST(request: NextRequest) {
   try {
     const { supabase, user } = await requireUser();
     if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
-    const body = await request.json() as { itemId?: unknown };
-    const itemId = String(body.itemId ?? "").trim();
-    if (!itemId) return NextResponse.json({ error: "Reward item is required." }, { status: 400 });
+    const body = await request.json() as { productId?: unknown; shippingPayload?: unknown; requestId?: unknown };
+    const productId = String(body.productId ?? "").trim();
+    const requestId = String(body.requestId ?? "").trim();
+    if (!productId || !requestId) return NextResponse.json({ error: "Product and idempotency request ID are required." }, { status: 400 });
 
-    const result = await supabase.rpc("redeem_reward_store_item", { requested_item_id: itemId });
+    const result = await supabase.rpc("redeem_store_product", {
+      product_id_input: productId,
+      shipping_payload_input: body.shippingPayload && typeof body.shippingPayload === "object" ? body.shippingPayload : {},
+      request_id_input: requestId,
+    });
     if (result.error) throw new Error(result.error.message);
     return NextResponse.json({ ok: true, redemption: result.data?.[0] || null }, { status: 201 });
   } catch (error) {
