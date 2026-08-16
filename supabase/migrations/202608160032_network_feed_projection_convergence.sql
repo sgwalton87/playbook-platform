@@ -88,6 +88,66 @@ grant execute on function public.get_public_network_directory(text, integer) to 
 comment on function public.get_public_network_directory(text, integer) is
   'Authenticated, bounded network discovery over public Playbook presentation fields only. Canonical profiles remain owner-scoped.';
 
+-- A relationship-aware identity resolver is intentionally separate from public
+-- discovery. It allows a caller to resolve minimal identity for people who are
+-- already connected or are in a pending connection request with the caller,
+-- even when that person is not currently public. It never exposes profile data
+-- beyond presentation-grade identity fields.
+create or replace function public.get_network_member_identities(requested_ids uuid[])
+returns table (
+  id uuid,
+  username text,
+  full_name text,
+  first_name text,
+  last_name text,
+  role text,
+  avatar_url text,
+  school text,
+  sport text
+)
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select
+    p.id,
+    p.username,
+    p.full_name,
+    p.first_name,
+    p.last_name,
+    private.normalize_playbook_profile_role(coalesce(p.profile_mode, p.role, p.requested_role)) as role,
+    p.avatar_url,
+    p.school,
+    p.sport
+  from public.profiles p
+  where auth.uid() is not null
+    and cardinality(requested_ids) between 1 and 100
+    and p.id = any(requested_ids)
+    and (
+      p.profile_visibility = 'public'
+      or exists (
+        select 1 from public.user_connections c
+        where (c.user_id = auth.uid() and c.connected_user_id = p.id)
+           or (c.user_id = p.id and c.connected_user_id = auth.uid())
+      )
+      or exists (
+        select 1 from public.connection_requests r
+        where r.status = 'pending'
+          and (
+            (r.requester_id = auth.uid() and r.recipient_id = p.id)
+            or (r.requester_id = p.id and r.recipient_id = auth.uid())
+          )
+      )
+    );
+$$;
+
+revoke all on function public.get_network_member_identities(uuid[]) from public, anon, authenticated;
+grant execute on function public.get_network_member_identities(uuid[]) to authenticated;
+
+comment on function public.get_network_member_identities(uuid[]) is
+  'Resolves minimal presentation identity for public profiles or governed connection partners/pending requests. No broader profile authority is granted.';
+
 -- The historical feed table predates the repository migration origin. Add the
 -- optional canonical pillar metadata only when the deployed table exists.
 do $$
