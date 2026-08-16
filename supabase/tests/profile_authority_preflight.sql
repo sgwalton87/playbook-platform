@@ -154,4 +154,39 @@ as scholar_core_owner_policies_cached
 from target \gset
 \if :scholar_core_owner_policies_cached \else \echo 'canonical Scholar owner policies must remain symmetric and statement-cached' \quit 1 \endif
 
+-- Direct owner/creator legacy and planning policies are optimized only when present.
+-- Preserve each policy's existing shape: the three planning ALL policies remain USING-only,
+-- playbook_records remains symmetric USING/WITH CHECK, and onboarding_options remains INSERT-only.
+with expected(tablename,policyname,cmd,owner_column,requires_check) as (
+  values
+    ('ag_progress','Users manage own ag_progress','ALL','user_id',false),
+    ('college_list','Users manage own college_list','ALL','user_id',false),
+    ('deadlines','Users manage own deadlines','ALL','user_id',false),
+    ('playbook_records','Users can manage own playbook records','ALL','profile_id',true),
+    ('onboarding_options','Users add options','INSERT','created_by',true)
+), existing_expected as (
+  select e.*
+  from expected e
+  where to_regclass('public.' || e.tablename) is not null
+), target as (
+  select e.*, p.roles, p.qual, p.with_check
+  from existing_expected e
+  join pg_policies p
+    on p.schemaname='public'
+   and p.tablename=e.tablename
+   and p.policyname=e.policyname
+   and p.cmd=e.cmd
+)
+select (select count(*) from target) = (select count(*) from existing_expected)
+   and coalesce(bool_and((coalesce(qual,'') || ' ' || coalesce(with_check,'')) ilike '%select auth.uid()%'),true)
+   and coalesce(bool_and((coalesce(qual,'') || ' ' || coalesce(with_check,'')) ilike '%' || owner_column || '%'),true)
+   and coalesce(bool_and(case
+       when tablename in ('ag_progress','college_list','deadlines') then with_check is null
+       when tablename='playbook_records' then qual is not null and with_check is not null
+       when tablename='onboarding_options' then qual is null and with_check is not null
+       else false end),true)
+as direct_owner_policy_shapes_cached
+from target \gset
+\if :direct_owner_policy_shapes_cached \else \echo 'direct owner policies must preserve historical shape and use statement-cached auth.uid()' \quit 1 \endif
+
 rollback;
