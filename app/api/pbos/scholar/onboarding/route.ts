@@ -15,6 +15,12 @@ function approvalsFor(role: SupportedScholarRecordRole) {
       exchangeApprovalId: required("PBOS_SCHOLAR_ATHLETE_EXCHANGE_APPROVAL_ID"),
     };
   }
+  if (role === "TRANSITION_YOUTH") {
+    return {
+      identityApprovalId: required("PBOS_TRANSITION_YOUTH_IDENTITY_APPROVAL_ID"),
+      exchangeApprovalId: required("PBOS_TRANSITION_YOUTH_EXCHANGE_APPROVAL_ID"),
+    };
+  }
   return {
     identityApprovalId: required("PBOS_SCHOLAR_IDENTITY_APPROVAL_ID"),
     exchangeApprovalId: required("PBOS_SCHOLAR_EXCHANGE_APPROVAL_ID"),
@@ -32,10 +38,18 @@ export async function POST(request: NextRequest) {
       .maybeSingle();
     if (profileResult.error) throw new Error(profileResult.error.message);
     const normalizedRole = normalizePlaybookRole(profileResult.data?.profile_mode ?? profileResult.data?.role);
-    if (normalizedRole !== "scholar" && normalizedRole !== "scholar-athlete") {
-      return NextResponse.json({ error: "This PBOS completion adapter is restricted to Scholar Record roles." }, { status: 403 });
+    if (
+      normalizedRole !== "scholar" &&
+      normalizedRole !== "scholar-athlete" &&
+      normalizedRole !== "transition-youth"
+    ) {
+      return NextResponse.json({ error: "This PBOS completion adapter is restricted to self-owned Scholar Record roles." }, { status: 403 });
     }
-    const pbosRole: SupportedScholarRecordRole = normalizedRole === "scholar-athlete" ? "SCHOLAR_ATHLETE" : "SCHOLAR";
+    const pbosRole: SupportedScholarRecordRole = normalizedRole === "scholar-athlete"
+      ? "SCHOLAR_ATHLETE"
+      : normalizedRole === "transition-youth"
+        ? "TRANSITION_YOUTH"
+        : "SCHOLAR";
 
     if (pbosRole === "SCHOLAR_ATHLETE") {
       const athlete = await supabase.from("athlete_profiles")
@@ -52,7 +66,12 @@ export async function POST(request: NextRequest) {
     const displayName = String(body.displayName ?? "").trim();
     const goalTitle = String(body.goalTitle ?? "").trim();
     if (!displayName || !goalTitle) return NextResponse.json({ error: "Display name and Scholar goal are required." }, { status: 400 });
-    const idempotencyKey = (pbosRole === "SCHOLAR_ATHLETE" ? "scholar-athlete-onboarding-" : "scholar-onboarding-") + user.id;
+    const prefix = pbosRole === "SCHOLAR_ATHLETE"
+      ? "scholar-athlete-onboarding-"
+      : pbosRole === "TRANSITION_YOUTH"
+        ? "transition-youth-onboarding-"
+        : "scholar-onboarding-";
+    const idempotencyKey = prefix + user.id;
     const connector = new PlaybookConnector(new PlaybookPbosRuntimeClient(new SignedPlaybookPbosTransport(required("PBOS_API_URL"), {
       organizationId: required("PBOS_ORGANIZATION_ID"), connectorId: required("PBOS_CONNECTOR_ID"),
       keyId: required("PBOS_CONNECTOR_KEY_ID"), secretBase64: required("PBOS_CONNECTOR_SECRET_BASE64")
