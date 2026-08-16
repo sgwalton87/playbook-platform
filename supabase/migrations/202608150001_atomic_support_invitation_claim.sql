@@ -1,8 +1,9 @@
--- Govern support-network consent as one atomic, authenticated claim.
+-- Govern Family support-network consent as one atomic, authenticated claim.
 -- The invitee must be the signed-in account whose JWT email matches the
--- invitation. Acceptance creates exactly one relationship and consumes the
--- invitation in the same transaction; decline consumes it without creating
--- access.
+-- invitation. Parent/Guardian acceptance creates exactly one relationship and
+-- consumes the invitation in the same transaction; decline consumes it without
+-- creating access. Other relationship types remain fail-closed until their
+-- verification contracts are implemented.
 
 create unique index if not exists support_relationships_source_invitation_unique
   on public.support_relationships (source_invitation_id)
@@ -52,6 +53,13 @@ begin
 
   if invitation_row.status <> 'pending' then
     raise exception 'Invitation is already %.', invitation_row.status using errcode = '23505';
+  end if;
+
+  -- Family is the only support relationship whose accepted authority contract
+  -- is complete in this package. Mentor, Educator, District, University, and
+  -- Employer relationships require separate verification/authority contracts.
+  if invitation_row.relationship <> 'parent_guardian' then
+    raise exception 'This relationship requires a governed verification contract before access can be activated.' using errcode = '42501';
   end if;
 
   if desired_status = 'accepted' then
