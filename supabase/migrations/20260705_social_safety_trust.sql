@@ -1,4 +1,4 @@
-create table if not exists public.trust_reports (
+create table if not exists public.moderation_reports (
   id uuid primary key default gen_random_uuid(),
   reporter_id uuid not null,
   target_type text not null check (
@@ -16,8 +16,8 @@ create table if not exists public.trust_reports (
   created_at timestamptz not null default now()
 );
 
-create index if not exists trust_reports_status_idx
-on public.trust_reports(status, created_at desc);
+create index if not exists moderation_reports_status_idx
+on public.moderation_reports(status, created_at desc);
 
 
 create table if not exists public.user_blocks (
@@ -64,7 +64,7 @@ create table if not exists public.content_mutes (
 
 create table if not exists public.moderation_actions (
   id uuid primary key default gen_random_uuid(),
-  report_id uuid references public.trust_reports(id) on delete set null,
+  report_id uuid references public.moderation_reports(id) on delete set null,
   moderator_id uuid not null,
   action_type text not null check (
     action_type in (
@@ -83,24 +83,24 @@ create table if not exists public.moderation_actions (
 );
 
 
-alter table public.trust_reports enable row level security;
+alter table public.moderation_reports enable row level security;
 alter table public.user_blocks enable row level security;
 alter table public.user_mutes enable row level security;
 alter table public.content_mutes enable row level security;
 alter table public.moderation_actions enable row level security;
 
 
-drop policy if exists "Users create own reports" on public.trust_reports;
+drop policy if exists "Users create own reports" on public.moderation_reports;
 create policy "Users create own reports"
-on public.trust_reports
+on public.moderation_reports
 for insert
 to authenticated
 with check (auth.uid() = reporter_id);
 
 
-drop policy if exists "Users view own reports" on public.trust_reports;
+drop policy if exists "Users view own reports" on public.moderation_reports;
 create policy "Users view own reports"
-on public.trust_reports
+on public.moderation_reports
 for select
 to authenticated
 using (auth.uid() = reporter_id);
