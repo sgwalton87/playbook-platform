@@ -32,6 +32,9 @@ describe("buildScholarRecord", () => {
     expect(record.service.volunteerHours).toBe(5);
     expect(record.community.activities[0].name).toBe("Activity");
     expect(record.readiness.opportunityReadiness).toBeGreaterThan(0);
+    expect(record.ai.canonicalProfile.version).toBe("scholar-ai-foundation.v1");
+    expect(record.ai.resume.name).toBe("Test Scholar");
+    expect(record.ai.scholarship.matchingInputs).toContain("Weighted GPA: 3.8");
   });
 
   it("canonicalizes community experiences for AI-ready querying", () => {
@@ -46,6 +49,7 @@ describe("buildScholarRecord", () => {
     expect(record.community.leadershipPositions[0].roleTitle).toBe("President");
     expect(record.community.volunteerWork[0].volunteerHours).toBe(12);
     expect(record.community.internships[0].organization).toBe("Health Center");
+    expect(record.experiences.internships[0].organization).toBe("Health Center");
     expect(record.achievements.activities).toBe(record.community.activities);
   });
 
@@ -60,5 +64,6 @@ describe("buildScholarRecord", () => {
     expect(record.id).toBe("scholar-2");
     expect(record.achievements.total).toBe(0);
     expect(record.readiness.portfolioCompletion).toBeGreaterThanOrEqual(0);
+    expect(record.ai.studentSnapshot.nextBestInputs).toContain("Add transcript courses");
   });
 });

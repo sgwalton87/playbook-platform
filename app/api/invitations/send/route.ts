@@ -28,6 +28,13 @@ const SCHOLAR_RECORD_ROLES = new Set([
   "transition-youth",
 ]);
 
+export async function GET() {
+  return NextResponse.json(
+    { ok: true, route: "invitations.send", health: "ready" },
+    { status: 200 }
+  );
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { supabase, user } = await requireUser();

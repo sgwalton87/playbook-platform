@@ -1,6 +1,12 @@
 import { AG_REQUIREMENTS, AG_SUBJECT_NAMES } from "@/lib/agCourses";
 import type { ScholarRecord, ScholarRecordInput, ProfileAcademicForm } from "./types";
-import { buildCommunityRecord } from "./community";
+import { buildCommunityRecord, type RawCommunityActivity } from "./community";
+import { buildCanonicalAIProfile } from "../portfolio/ai-foundation";
+import {
+  buildExperienceCollection,
+  translateActivitiesToExperiences,
+  translateCertificatesToExperiences,
+} from "../experiences";
 
 const SUBJECTS = ["A", "B", "C", "D", "E", "F", "G"];
 
@@ -60,11 +66,72 @@ export function buildScholarRecord(input: ScholarRecordInput = {}): ScholarRecor
   const totalCompleted = agProgress.reduce((sum, row) => sum + Math.min(row.yearsCompleted, row.yearsRequired), 0);
   const achievements = { certificates: input.certificates || [], badges: input.badges || [], activities: input.activities || [], posts: input.posts || [] };
   const totalAchievements = achievements.certificates.length + achievements.badges.length + achievements.activities.length + achievements.posts.length;
-  const community = buildCommunityRecord(achievements.activities);
+  const rawActivities = achievements.activities as unknown as RawCommunityActivity[];
+  const community = buildCommunityRecord(rawActivities);
+  const experiences = buildExperienceCollection([
+    ...translateActivitiesToExperiences(rawActivities),
+    ...translateCertificatesToExperiences(achievements.certificates),
+  ]);
   const volunteerHours = community.volunteerHours;
   const fullName = value(profile.full_name, [profile.first_name, profile.last_name].filter(Boolean).join(" "), profile.username, "Scholar") || "Scholar";
   const academicFields = [profile.school, profile.grade, profile.grad_year, profile.weighted_gpa || profile.gpa, profile.unweighted_gpa, profile.sat_score, profile.act_score, profile.dream_school].filter(Boolean).length;
   const portfolioCompletion = Math.min(100, Math.round((academicFields / 8) * 100));
+  const opportunityReadiness = Math.min(100, Math.round(portfolioCompletion * 0.55 + Math.min(totalAchievements, 10) * 3 + Math.min(volunteerHours, 100) * 0.15));
+
+  const canonicalAIProfile = buildCanonicalAIProfile({
+    rawProfile: profile as unknown as Record<string, unknown>,
+    portfolio: {
+      identity: {
+        id: String(profile.id || ""),
+        username: profile.username || null,
+        role: profile.role || null,
+        firstName: profile.first_name || null,
+        lastName: profile.last_name || null,
+        fullName,
+        avatarUrl: profile.avatar_url || null,
+        bio: profile.bio || null,
+        school: profile.school || null,
+        city: profile.city || null,
+        state: profile.state || null,
+        grade: profile.grade || null,
+        graduationYear: value(profile.grad_year, profile.graduation_year) ? String(value(profile.grad_year, profile.graduation_year)) : null,
+      },
+      academics: {
+        weightedGpa: value(profile.weighted_gpa, profile.gpa) ? String(value(profile.weighted_gpa, profile.gpa)) : null,
+        unweightedGpa: value(profile.unweighted_gpa) ? String(value(profile.unweighted_gpa)) : null,
+        dreamSchool: profile.dream_school || null,
+        intendedMajor: profile.intended_major || null,
+        satScore: value(profile.sat_score) ? String(value(profile.sat_score)) : null,
+        actScore: value(profile.act_score) ? String(value(profile.act_score)) : null,
+      },
+      career: {
+        idealProfession: profile.ideal_profession || null,
+        desiredSalaryRange: profile.desired_salary_range || null,
+      },
+      athletics: {
+        sport: profile.sport || null,
+        position: profile.position || null,
+        height: profile.height || null,
+        weight: profile.weight || null,
+        travelTeam: profile.travel_team || null,
+        coachName: profile.coach_name || null,
+        coachEmail: profile.coach_email || null,
+        recruitingStatus: profile.recruiting_status || profile.recruiting_interest || null,
+        highlightVideo: profile.highlight_video || profile.highlight_reel_url || null,
+      },
+      pillars: Array.isArray(profile.pillars) ? profile.pillars : [],
+    },
+    certificates: achievements.certificates,
+    badges: achievements.badges,
+    badgeRows: achievements.badges,
+    activities: rawActivities,
+    courses: courseHistory,
+    posts: achievements.posts,
+    xp: profile.xp,
+    coins: profile.coin_balance,
+    intelligence: { completion: { percent: portfolioCompletion } },
+  });
+
   return {
     id: profile.id || "",
     rawProfile: profile,
@@ -93,6 +160,7 @@ export function buildScholarRecord(input: ScholarRecordInput = {}): ScholarRecor
     },
     career: { idealProfession: profile.ideal_profession || null, desiredSalaryRange: profile.desired_salary_range || null },
     community,
+    experiences,
     achievements: { total: totalAchievements, ...achievements, activities: community.activities },
     service: { volunteerHours, activities: community.activities },
     leadership: {
@@ -103,9 +171,21 @@ export function buildScholarRecord(input: ScholarRecordInput = {}): ScholarRecor
     },
     readiness: {
       portfolioCompletion,
-      opportunityReadiness: Math.min(100, Math.round(portfolioCompletion * 0.55 + Math.min(totalAchievements, 10) * 3 + Math.min(volunteerHours, 100) * 0.15)),
+      opportunityReadiness,
     },
-    ai: { academicSummary: null, collegeRecommendations: null, transcriptAnalysis: null, scholarshipEligibility: null, academicCoaching: null, progressForecasting: null },
+    ai: {
+      academicSummary: null,
+      collegeRecommendations: null,
+      transcriptAnalysis: null,
+      scholarshipEligibility: null,
+      academicCoaching: null,
+      progressForecasting: null,
+      canonicalProfile: canonicalAIProfile,
+      resume: canonicalAIProfile.resume,
+      scholarship: canonicalAIProfile.scholarship,
+      recruiting: canonicalAIProfile.recruiting,
+      studentSnapshot: canonicalAIProfile.studentSnapshot,
+    },
   };
 }
 

@@ -19,6 +19,7 @@ export default function PortfolioEngine({ record }: Props) {
       record?.career?.idealProfession,
       record?.athletics?.sport,
       record?.identity?.school,
+      ...(record?.experiences?.all || []).map((experience: LegacyValue) => experience.title),
     ].filter(Boolean),
   });
 
