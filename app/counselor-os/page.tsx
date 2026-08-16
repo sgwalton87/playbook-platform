@@ -1,7 +1,7 @@
 "use client";
 
-import RoleDashboardExperience from "@/components/role-os/dashboards/RoleDashboardExperience";
+import CounselorVerificationExperience from "@/components/counselor/CounselorVerificationExperience";
 
 export default function CounselorOSPage() {
-  return <RoleDashboardExperience role="counselor" />;
+  return <CounselorVerificationExperience />;
 }
