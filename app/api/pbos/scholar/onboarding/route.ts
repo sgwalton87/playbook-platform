@@ -36,15 +36,26 @@ function approvalsFor(role: SupportedScholarRecordRole) {
 
 async function finalizeProfileCompletion(
   supabase: Awaited<ReturnType<typeof requireUser>>["supabase"],
-  userId: string
+  userId: string,
+  expectedRole: string,
+  markVerificationPending = false
 ) {
-  const completedAt = new Date().toISOString();
-  const result = await supabase
-    .from("profiles")
-    .update({ onboarding_completed: true, onboarding_completed_at: completedAt })
-    .eq("id", userId);
+  const result = await supabase.rpc("complete_playbook_onboarding", {
+    expected_role: expectedRole,
+    mark_verification_pending: markVerificationPending,
+  });
   if (result.error) throw new Error(result.error.message);
-  return completedAt;
+
+  const completedProfile = await supabase
+    .from("profiles")
+    .select("onboarding_completed_at")
+    .eq("id", userId)
+    .single();
+  if (completedProfile.error) throw new Error(completedProfile.error.message);
+  if (!completedProfile.data.onboarding_completed_at) {
+    throw new Error("Governed onboarding completion did not persist a completion timestamp.");
+  }
+  return completedProfile.data.onboarding_completed_at as string;
 }
 
 export async function POST(request: NextRequest) {
@@ -67,19 +78,16 @@ export async function POST(request: NextRequest) {
     );
     const contract = getRoleOnboardingCompletionContract(normalizedRole);
 
-    // Compatibility gateway: the existing onboarding client still posts here.
-    // Role equality is resolved from the authenticated durable profile. The
-    // client may persist final form data but may not mark onboarding complete.
+    // Compatibility gateway for older callers. Durable role is resolved from
+    // the authenticated profile; profile authority mutation still goes through
+    // the same governed completion RPC used by the canonical role endpoint.
     if (contract.state !== "implemented") {
-      if (profileResult.data.verification_status !== "approved") {
-        const pending = await supabase
-          .from("profiles")
-          .update({ verification_status: "pending" })
-          .eq("id", user.id);
-        if (pending.error) throw new Error(pending.error.message);
-      }
-
-      const completedAt = await finalizeProfileCompletion(supabase, user.id);
+      const completedAt = await finalizeProfileCompletion(
+        supabase,
+        user.id,
+        normalizedRole,
+        true
+      );
       return NextResponse.json(
         {
           ok: true,
@@ -251,7 +259,11 @@ export async function POST(request: NextRequest) {
       exchangeApprovalId: approvals.exchangeApprovalId,
       idempotencyKey,
     });
-    const completedAt = await finalizeProfileCompletion(supabase, user.id);
+    const completedAt = await finalizeProfileCompletion(
+      supabase,
+      user.id,
+      normalizedRole
+    );
     return NextResponse.json({ ok: true, onboardingCompletedAt: completedAt, dashboard: output });
   } catch (error) {
     return NextResponse.json(
