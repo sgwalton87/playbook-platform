@@ -1,4 +1,6 @@
--- Canonical learning and reward schema.
+-- Canonical learning schema. Store/reward redemption intentionally continues to
+-- use the already-governed store_products -> store_redemptions -> coin_ledger
+-- authority rather than introducing a parallel economy.
 create table if not exists public.learning_courses (
   slug text primary key,
   title text not null,
@@ -68,42 +70,14 @@ create table if not exists public.achievement_badges (
   unique(user_id, badge_key, source_id)
 );
 
-create table if not exists public.reward_store_items (
-  id text primary key,
-  name text not null,
-  description text not null,
-  coin_cost integer not null check (coin_cost >= 0),
-  inventory integer check (inventory is null or inventory >= 0),
-  fulfillment_type text not null default 'manual' check (fulfillment_type in ('manual','digital','experience')),
-  status text not null default 'active' check (status in ('active','paused','archived')),
-  image_url text,
-  sort_order integer not null default 0,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-
-create table if not exists public.reward_store_redemptions (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references public.profiles(id) on delete cascade,
-  item_id text not null references public.reward_store_items(id),
-  coin_cost integer not null check (coin_cost >= 0),
-  status text not null default 'pending' check (status in ('pending','fulfilled','cancelled','refunded')),
-  redeemed_at timestamptz not null default now(),
-  fulfilled_at timestamptz,
-  cancelled_at timestamptz,
-  created_at timestamptz not null default now()
-);
-
 alter table public.learning_courses enable row level security;
 alter table public.learning_modules enable row level security;
 alter table public.learning_module_progress enable row level security;
 alter table public.learning_credentials enable row level security;
 alter table public.achievement_badges enable row level security;
-alter table public.reward_store_items enable row level security;
-alter table public.reward_store_redemptions enable row level security;
 
-grant select on public.learning_courses, public.learning_modules, public.reward_store_items to authenticated;
-grant select on public.learning_module_progress, public.learning_credentials, public.achievement_badges, public.reward_store_redemptions to authenticated;
+grant select on public.learning_courses, public.learning_modules to authenticated;
+grant select on public.learning_module_progress, public.learning_credentials, public.achievement_badges to authenticated;
 
 drop policy if exists "Authenticated can view published learning courses" on public.learning_courses;
 create policy "Authenticated can view published learning courses" on public.learning_courses for select to authenticated
@@ -111,7 +85,7 @@ using (status in ('published','coming_soon'));
 
 drop policy if exists "Authenticated can view published learning modules" on public.learning_modules;
 create policy "Authenticated can view published learning modules" on public.learning_modules for select to authenticated
-using (exists (select 1 from public.learning_courses c where c.slug = course_slug and c.status in ('published','coming_soon')));
+using (exists (select 1 from public.learning_courses c where c.slug = learning_modules.course_slug and c.status in ('published','coming_soon')));
 
 drop policy if exists "Users view own learning progress" on public.learning_module_progress;
 create policy "Users view own learning progress" on public.learning_module_progress for select to authenticated using (user_id = auth.uid());
@@ -121,9 +95,3 @@ create policy "Users view own learning credentials" on public.learning_credentia
 
 drop policy if exists "Users view own achievement badges" on public.achievement_badges;
 create policy "Users view own achievement badges" on public.achievement_badges for select to authenticated using (user_id = auth.uid());
-
-drop policy if exists "Authenticated can view active reward items" on public.reward_store_items;
-create policy "Authenticated can view active reward items" on public.reward_store_items for select to authenticated using (status = 'active');
-
-drop policy if exists "Users view own redemptions" on public.reward_store_redemptions;
-create policy "Users view own redemptions" on public.reward_store_redemptions for select to authenticated using (user_id = auth.uid());
