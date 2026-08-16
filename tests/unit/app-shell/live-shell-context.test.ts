@@ -19,6 +19,13 @@ describe("live authenticated shell context", () => {
     expect(route).not.toContain("security definer");
   });
 
+  it("treats the hardened notification authority as read-only shell context", () => {
+    expect(route).toContain('.from("pbos_notifications").select');
+    expect(route).not.toContain('.from("pbos_notifications").insert');
+    expect(route).not.toContain('.from("pbos_notifications").update');
+    expect(route).not.toContain('.from("pbos_notifications").upsert');
+  });
+
   it("surfaces real context in desktop and mobile shell navigation", () => {
     expect(shell).toContain('fetch("/api/shell/context"');
     expect(shell).toContain("Live context");
