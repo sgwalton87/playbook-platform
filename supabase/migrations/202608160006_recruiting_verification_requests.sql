@@ -36,7 +36,7 @@ with check (
   and exists (
     select 1 from public.profiles p
     where p.id = (select auth.uid())
-      and coalesce(p.profile_mode,p.role,p.requested_role) = 'college-coach'
+      and coalesce(p.profile_mode,p.role::text,p.requested_role) = 'college-coach'
       and p.onboarding_completed = true
   )
 );
