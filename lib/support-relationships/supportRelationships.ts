@@ -1,5 +1,4 @@
 import { getPermissionsForRelationship, type RelationshipKind } from "@/lib/permissions";
-import { destinationForRelationship } from "@/lib/invitations";
 
 export function buildSupportRelationship(input: {
   scholarId: string;
@@ -18,6 +17,5 @@ export function buildSupportRelationship(input: {
     permissions: getPermissionsForRelationship(input.relationship),
     source_invitation_id: input.sourceInvitationId || null,
     status: "active",
-    destination: destinationForRelationship(input.relationship),
   };
 }
