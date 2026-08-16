@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { mapOnboardingToProfilePayload } from "@/lib/onboarding/supabaseMapping";
 
 describe("onboarding finalization boundary", () => {
-  it("keeps ordinary autosaves explicitly incomplete", () => {
+  it("keeps ordinary autosaves unable to write completion authority", () => {
     const payload = mapOnboardingToProfilePayload({
       userId: "user-1",
       role: "educator",
@@ -10,8 +10,8 @@ describe("onboarding finalization boundary", () => {
       stepIndex: 2,
       complete: false,
     });
-    expect(payload.onboarding_completed).toBe(false);
-    expect(payload.onboarding_completed_at).toBeNull();
+    expect("onboarding_completed" in payload).toBe(false);
+    expect("onboarding_completed_at" in payload).toBe(false);
   });
 
   it("does not allow the client mapper to certify final completion", () => {
