@@ -11,8 +11,10 @@ describe("signup authority metadata", () => {
     });
   });
 
-  it("falls back to the least surprising public scholar role", () => {
-    expect(buildSignupMetadata("not-a-role").role).toBe("scholar");
+  it("fails closed instead of substituting Scholar for an unknown or missing role", () => {
+    expect(() => buildSignupMetadata("not-a-role")).toThrow("Unsupported Playbook role");
+    expect(() => buildSignupMetadata("")).toThrow("role is required");
+    expect(() => buildSignupMetadata(null)).toThrow("role is required");
   });
 
   it("does not expose provider or account-enumeration details", () => {
