@@ -6,7 +6,9 @@ const read = (file: string) => fs.readFileSync(path.join(process.cwd(), file), "
 
 const publicProfile = read("app/u/[username]/page.tsx");
 const feed = read("app/feed/page.tsx");
+const publicFeed = read("components/public/PublicNewsFeed.tsx");
 const migration = read("supabase/migrations/202608160030_public_scholar_record_projection.sql");
+const networkMigration = read("supabase/migrations/202608160032_network_feed_projection_convergence.sql");
 
 describe("public Scholar Record projection", () => {
   it("routes public profile reads through the bounded Scholar projection", () => {
@@ -16,14 +18,24 @@ describe("public Scholar Record projection", () => {
     expect(publicProfile).toContain('const galleryPrefix=`${profileData.id}/gallery`');
   });
 
-  it("keeps shared Feed identity enrichment off the canonical profiles table", () => {
-    expect(feed).toContain('rpc("get_public_scholar_identities"');
+  it("keeps shared Feed identity enrichment off cross-user profile reads", () => {
+    expect(feed).toContain('rpc("get_public_member_identities"');
+    expect(publicFeed).toContain('rpc("get_public_member_identities"');
     expect(feed).not.toContain('.from("profiles").select("id,first_name,last_name,full_name,username,role,avatar_url").in(');
-    expect(feed).toContain('const galleryPrefix=`${u.user.id}/gallery`');
-    expect(feed).toContain('const filename=`${userId}/${folder}/');
+    expect(publicFeed).not.toContain('.from("profiles")');
+    expect(feed).toContain('const path = `${userId}/${folder}/');
   });
 
-  it("exposes only learner public projections and fixes public feed/media policy", () => {
+  it("keeps the multi-role public identity projection bounded to public presentation fields", () => {
+    expect(networkMigration).toContain("get_public_member_identities");
+    expect(networkMigration).toContain("cardinality(requested_ids) between 1 and 100");
+    expect(networkMigration).toContain("p.profile_visibility = 'public'");
+    expect(networkMigration).not.toMatch(/get_public_member_identities[\s\S]*\bverification_status\b/i);
+    expect(networkMigration).not.toMatch(/get_public_member_identities[\s\S]*\bonboarding_completed\b/i);
+    expect(networkMigration).not.toMatch(/get_public_member_identities[\s\S]*\bis_admin\b/i);
+  });
+
+  it("exposes only learner public Scholar Record projections and fixes public feed/media policy", () => {
     expect(migration).toContain("get_public_scholar_profile");
     expect(migration).toContain("get_public_scholar_identities");
     expect(migration).toContain("in ('scholar', 'scholar-athlete', 'transition-youth')");
