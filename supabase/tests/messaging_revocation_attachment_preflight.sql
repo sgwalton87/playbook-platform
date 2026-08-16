@@ -106,6 +106,58 @@ from pg_policies where schemaname='public' and tablename='pbos_messages'
   \quit 1
 \endif
 
+-- Supabase lint 0003: stable auth helpers should be initPlans, not per-row calls.
+select count(*) = 12 as public_messaging_uid_initplans
+from pg_policies
+where schemaname='public'
+  and tablename in (
+    'pbos_conversations',
+    'pbos_conversation_participants',
+    'pbos_messages',
+    'pbos_message_attachments'
+  )
+  and (coalesce(qual, '') || ' ' || coalesce(with_check, '')) ilike '%SELECT auth.uid()%' \gset
+\if :public_messaging_uid_initplans
+\else
+  \echo 'one or more public Messaging policies still lacks cached auth.uid() evaluation'
+  \quit 1
+\endif
+
+select count(*) = 3 as storage_messaging_uid_initplans
+from pg_policies
+where schemaname='storage' and tablename='objects'
+  and policyname in (
+    'Current participants upload message attachments',
+    'Current participants read message attachments',
+    'Uploaders delete staged message attachment objects'
+  )
+  and (coalesce(qual, '') || ' ' || coalesce(with_check, '')) ilike '%SELECT auth.uid()%' \gset
+\if :storage_messaging_uid_initplans
+\else
+  \echo 'one or more Messaging Storage policies still lacks cached auth.uid() evaluation'
+  \quit 1
+\endif
+
+select count(*) = 2 as messaging_jwt_initplans
+from pg_policies
+where (
+  (
+    schemaname='public'
+    and tablename='pbos_conversations'
+    and policyname='Governed actors create conversations'
+  ) or (
+    schemaname='storage'
+    and tablename='objects'
+    and policyname='Current participants upload message attachments'
+  )
+)
+  and (coalesce(qual, '') || ' ' || coalesce(with_check, '')) ilike '%SELECT%auth.jwt()%' \gset
+\if :messaging_jwt_initplans
+\else
+  \echo 'Messaging email authorization must cache auth.jwt() evaluation'
+  \quit 1
+\endif
+
 select count(*) = 0 as broad_profile_select_policy_absent
 from pg_policies
 where schemaname = 'public'
