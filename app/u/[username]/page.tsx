@@ -16,7 +16,6 @@ import TrustScoreCard from "@/components/trust/TrustScoreCard";
 import { buildScholarRecord, type RawCommunityActivity } from "@/lib/scholar";
 
 const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",blue:"#3B82F6",green:"#10B981",amber:"#F59E0B",purple:"#8B5CF6",mono:"'Space Mono', monospace",sans:"'Hanken Grotesk', system-ui, sans-serif",anton:"'Anton', sans-serif"};
-const SURL="https://oexgxnybeixwadgtdtzp.supabase.co";
 
 const CERT_META:Record<string,{color:string;era:string;rarity:string;rarityColor:string;gradient:string}>={
   "captains-mindset":{color:T.orange,era:"ERA 1/4",rarity:"UNCOMMON",rarityColor:T.orange,gradient:"linear-gradient(135deg,#F59E0B,#F97316,#8B5CF6,#3B82F6)"},
@@ -67,15 +66,24 @@ export default function PublicProfilePage() {
   useEffect(()=>{
     (async()=>{
       const{data:userData}=await supabase.auth.getUser();
-      if(userData.user)setViewerId(userData.user.id);
-      const{data:profileData,error}=await supabase.from("profiles").select("*").ilike("username",username).maybeSingle();
+      const authenticatedUserId=userData.user?.id||"";
+      if(authenticatedUserId)setViewerId(authenticatedUserId);
+
+      const{data:profileData,error}=await supabase
+        .rpc("get_public_scholar_profile",{requested_username:username})
+        .maybeSingle();
       if(error||!profileData){setLoading(false);return;}
+
       const[{data:certData},{data:badgeData},{data:feedData}]=await Promise.all([
         supabase.from("certificates").select("*").eq("user_id",profileData.id).order("issued_at",{ascending:false}),
         supabase.from("user_badges").select("id,awarded_at,badges(id,name,description,image_url)").eq("user_id",profileData.id).order("awarded_at",{ascending:false}),
-        supabase.from("feed_posts").select("*").eq("user_id",profileData.id).or("visibility.eq.public,visibility.is.null").order("created_at",{ascending:false}).limit(50),
+        supabase.from("feed_posts").select("*").eq("user_id",profileData.id).eq("visibility","public").order("created_at",{ascending:false}).limit(50),
       ]);
-      const {data:activityData}=await supabase.from("student_activities").select("*").eq("student_id",profileData.id).order("created_at",{ascending:false});
+
+      const activityData=authenticatedUserId===profileData.id
+        ? (await supabase.from("student_activities").select("*").eq("student_id",profileData.id).order("created_at",{ascending:false})).data
+        : [];
+
       const profileBadges=checkBadges(profileData);
       const combinedBadges=[
         ...profileBadges.map((name:string)=>({id:`profile-${name}`,displayName:name})),
@@ -86,9 +94,13 @@ export default function PublicProfilePage() {
       setBadges(combinedBadges);
       setPosts(feedData||[]);
       setActivities((activityData||[]) as RawCommunityActivity[]);
+
       const photoPostUrls=(feedData||[]).filter((p:LegacyValue)=>p.image_url).map((p:LegacyValue)=>p.image_url);
-      const{data:files}=await supabase.storage.from("photos").list("gallery",{limit:100,sortBy:{column:"created_at",order:"desc"}});
-      const storageUrls=(files||[]).filter((f:LegacyValue)=>f.name!==".emptyFolderPlaceholder").map((f:LegacyValue)=>`${SURL}/storage/v1/object/public/photos/gallery/${f.name}`);
+      const galleryPrefix=`${profileData.id}/gallery`;
+      const{data:files}=await supabase.storage.from("photos").list(galleryPrefix,{limit:100,sortBy:{column:"created_at",order:"desc"}});
+      const storageUrls=(files||[])
+        .filter((f:LegacyValue)=>f.name!==".emptyFolderPlaceholder")
+        .map((f:LegacyValue)=>supabase.storage.from("photos").getPublicUrl(`${galleryPrefix}/${f.name}`).data.publicUrl);
       setGallery([...photoPostUrls,...storageUrls]);
       setLoading(false);
     })();
@@ -98,6 +110,7 @@ export default function PublicProfilePage() {
     if(!profile?.id)return;
     const channel=supabase.channel(`public-profile-${profile.id}`)
       .on("postgres_changes",{event:"INSERT",schema:"public",table:"feed_posts",filter:`user_id=eq.${profile.id}`},(payload)=>{
+        if(payload.new.visibility!=="public"&&viewerId!==profile.id)return;
         setPosts(curr=>curr.some(p=>p.id===payload.new.id)?curr:[payload.new,...curr]);
         if(payload.new.image_url)setGallery(prev=>[payload.new.image_url,...prev]);
       })
@@ -106,14 +119,16 @@ export default function PublicProfilePage() {
       })
       .subscribe();
     return()=>{supabase.removeChannel(channel);};
-  },[profile?.id]);
+  },[profile?.id,viewerId]);
 
-  const uploadPhoto=async(photoFile:File,folder:string):Promise<string|null>=>{
-    const ext=photoFile.name.split(".").pop()||"jpg";
-    const filename=`${folder}/${Date.now()}.${ext}`;
-    const{error}=await supabase.storage.from("photos").upload(filename,photoFile,{cacheControl:"3600",upsert:true});
+  const uploadPhoto=async(photoFile:File,folder:"feed"|"gallery"):Promise<string|null>=>{
+    if(!viewerId||!profile?.id||viewerId!==profile.id)return null;
+    const ext=(photoFile.name.split(".").pop()||"jpg").replace(/[^a-zA-Z0-9]/g,"").toLowerCase()||"jpg";
+    const stem=photoFile.name.replace(/\.[^.]+$/,"").replace(/[^a-zA-Z0-9_-]/g,"-").slice(0,80)||"photo";
+    const filename=`${viewerId}/${folder}/${Date.now()}-${stem}.${ext}`;
+    const{error}=await supabase.storage.from("photos").upload(filename,photoFile,{cacheControl:"3600",upsert:false});
     if(error){console.error(error.message);return null;}
-    return`${SURL}/storage/v1/object/public/photos/${filename}`;
+    return supabase.storage.from("photos").getPublicUrl(filename).data.publicUrl;
   };
 
   const handleFileSelect=(e:React.ChangeEvent<HTMLInputElement>)=>{
@@ -138,6 +153,7 @@ export default function PublicProfilePage() {
 
   const handleGalleryUpload=async(e:React.ChangeEvent<HTMLInputElement>)=>{
     const f=e.target.files?.[0];if(!f)return;
+    if(!viewerId||!profile?.id||viewerId!==profile.id)return;
     setUploading(true);
     const url=await uploadPhoto(f,"gallery");
     if(url){setGallery(prev=>[url,...prev]);await supabase.from("feed_posts").insert({user_id:viewerId,post_type:"photo",body:"",image_url:url,visibility:"public"});}
