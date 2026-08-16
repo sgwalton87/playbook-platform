@@ -42,7 +42,7 @@ export const ROLE_ONBOARDING_COMPLETION: Record<PlaybookRole, RoleOnboardingComp
   "brand-partner": contract("brand-partner", "BRAND_AUTHORITY", "authority-pending", "Approved organization identity plus separately approved campaign and compliance scope."),
   employer: contract("employer", "EMPLOYER_AUTHORITY", "authority-pending", "Approved employer organization identity plus separately approved opportunity-publishing scope; candidate access remains application/sharing-scoped."),
   district: contract("district", "DISTRICT_AUTHORITY", "authority-pending", "Approved administrator identity evidence plus separately approved district, school, program, or functional administrative scope."),
-  "athlete-abroad": contract("athlete-abroad", "ATHLETE_ABROAD_RECORD", "authority-pending", "Self-owned athlete pathway plus governed international/eligibility contract."),
+  "athlete-abroad": contract("athlete-abroad", "ATHLETE_ABROAD_RECORD", "authority-pending", "Self-owned Athlete Abroad record plus reviewed global-readiness evidence and approved jurisdiction scope for jurisdiction-sensitive capabilities."),
   other: contract("other", "COMMUNITY_PARTNER_AUTHORITY", "authority-pending", "Approved Community Partner organization identity plus approved service scope; Scholar-specific access requires a separately governed exact relationship."),
 };
 
