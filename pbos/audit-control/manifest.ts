@@ -24,6 +24,7 @@ export const AUDIT_CONTROL_CHECKS: AuditControlCheck[] = [
       "relationship_authority_preflight.sql",
       "support_invitation_authority_preflight.sql",
       "profile_authority_preflight.sql",
+      "moderation_authority_preflight.sql",
     ],
     forbidden: ["supabase link", "db push", "--linked", "SUPABASE_ACCESS_TOKEN"],
   },
@@ -46,6 +47,18 @@ export const AUDIT_CONTROL_CHECKS: AuditControlCheck[] = [
     file: "app/api/application-workspaces/route.ts",
     required: ["requireLearnerAuthority", "requireOnboarding: true", "pbosRoleForLearner"],
     forbidden: ["registerIdentity: userId => connector.registerIdentity(userId, \"SCHOLAR\")"],
+  },
+  {
+    id: "audit-moderation-authority",
+    category: "security",
+    description: "Founder/Admin moderation must be backed by narrow database authority rather than route-only checks.",
+    file: "supabase/migrations/202608160021_moderation_admin_authority.sql",
+    required: [
+      "current_user_is_platform_moderator",
+      "Platform moderators can review reports",
+      "Platform moderators can update reports",
+      "Platform moderators can record moderation actions",
+    ],
   },
   {
     id: "audit-brand-gate",
