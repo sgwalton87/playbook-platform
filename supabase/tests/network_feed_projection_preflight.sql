@@ -59,4 +59,57 @@ where schemaname='public' and tablename='profiles' and cmd='SELECT'
   and (qual='true' or qual ilike '%profile_visibility%public%') \gset
 \if :broad_profile_select_policy_absent \else \echo 'public.profiles gained a broad select policy; projection boundary failed' \quit 1 \endif
 
+-- High-traffic social/attention policies keep the same ownership semantics while
+-- caching auth.uid() once per statement. This prevents per-row auth initPlan work.
+with expected(tablename,policyname,cmd) as (
+  values
+    ('posts','Authenticated users can create posts','INSERT'),
+    ('posts','Users can update own posts','UPDATE'),
+    ('posts','Users can delete own posts','DELETE'),
+    ('notifications','Users can view own notifications','SELECT'),
+    ('notifications','Users can update own notifications','UPDATE'),
+    ('connections','Users can view own connections','SELECT'),
+    ('connections','Users can create connection requests','INSERT'),
+    ('connection_requests','Users can view own connection requests','SELECT'),
+    ('connection_requests','Users can create connection requests','INSERT'),
+    ('connection_requests','Recipients can respond to connection requests','UPDATE'),
+    ('user_connections','Users can view own connections','SELECT'),
+    ('user_connections','Users can create own connections','INSERT'),
+    ('user_connections','Users can remove own connections','DELETE')
+)
+select count(*)=13 as social_attention_policy_set_intact
+from expected e
+join pg_policies p
+  on p.schemaname='public'
+ and p.tablename=e.tablename
+ and p.policyname=e.policyname
+ and p.cmd=e.cmd \gset
+\if :social_attention_policy_set_intact \else \echo 'social/attention RLS policy set changed unexpectedly' \quit 1 \endif
+
+with target as (
+  select p.*
+  from pg_policies p
+  where p.schemaname='public'
+    and (p.tablename,p.policyname) in (
+      ('posts','Authenticated users can create posts'),
+      ('posts','Users can update own posts'),
+      ('posts','Users can delete own posts'),
+      ('notifications','Users can view own notifications'),
+      ('notifications','Users can update own notifications'),
+      ('connections','Users can view own connections'),
+      ('connections','Users can create connection requests'),
+      ('connection_requests','Users can view own connection requests'),
+      ('connection_requests','Users can create connection requests'),
+      ('connection_requests','Recipients can respond to connection requests'),
+      ('user_connections','Users can view own connections'),
+      ('user_connections','Users can create own connections'),
+      ('user_connections','Users can remove own connections')
+    )
+)
+select count(*)=13
+   and bool_and((coalesce(qual,'') || ' ' || coalesce(with_check,'')) ilike '%select auth.uid()%')
+as social_attention_auth_inputs_cached
+from target \gset
+\if :social_attention_auth_inputs_cached \else \echo 'social/attention RLS auth.uid() inputs must use statement-cached SELECT form' \quit 1 \endif
+
 rollback;
