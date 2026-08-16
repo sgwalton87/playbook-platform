@@ -1,11 +1,7 @@
 "use client";
 
-import { CanonicalRoleAuthorityGate } from "@/components/role-os/RoleAuthorityGate";
+import AthleteAbroadReadinessGate from "@/components/athlete-abroad/AthleteAbroadReadinessGate";
 
 export default function AthleteAbroadOSLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <CanonicalRoleAuthorityGate role="athlete-abroad">
-      {children}
-    </CanonicalRoleAuthorityGate>
-  );
+  return <AthleteAbroadReadinessGate>{children}</AthleteAbroadReadinessGate>;
 }
