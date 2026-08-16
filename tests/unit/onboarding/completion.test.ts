@@ -1,37 +1,24 @@
 import { describe, expect, it } from "vitest";
 import { assertRoleOnboardingCompletionSupported } from "@/lib/onboarding";
+import { PUBLIC_ONBOARDING_ROLES } from "@/lib/roles/registry";
 
-describe("role onboarding completion authority", () => {
-  it("permits the connected Scholar golden contract", () => {
-    expect(assertRoleOnboardingCompletionSupported("scholar")).toBe("scholar");
+describe("role onboarding submission authority", () => {
+  it("permits every registered public role to submit its own onboarding profile", () => {
+    for (const role of PUBLIC_ONBOARDING_ROLES) {
+      expect(assertRoleOnboardingCompletionSupported(role)).toBe(role);
+    }
   });
 
-  it("permits Scholar-Athlete only through its governed Scholar Record adapter", () => {
-    expect(assertRoleOnboardingCompletionSupported("scholar-athlete")).toBe("scholar-athlete");
+  it("resolves documented aliases without changing the canonical role", () => {
     expect(assertRoleOnboardingCompletionSupported("athlete")).toBe("scholar-athlete");
-  });
-
-  it("permits Transition-Aged Youth through a self-owned Scholar Record specialization", () => {
-    expect(assertRoleOnboardingCompletionSupported("transition-youth")).toBe("transition-youth");
     expect(assertRoleOnboardingCompletionSupported("tay")).toBe("transition-youth");
+    expect(assertRoleOnboardingCompletionSupported("parent")).toBe("family");
+    expect(assertRoleOnboardingCompletionSupported("counselor")).toBe("high-school-counselor");
+    expect(assertRoleOnboardingCompletionSupported("recruiter")).toBe("college-coach");
   });
 
-  it.each([
-    "family",
-    "educator",
-    "high-school-counselor",
-    "mentor",
-    "coach",
-    "college-coach",
-    "college-admissions",
-    "brand-partner",
-    "employer",
-    "athlete-abroad",
-    "district",
-    "other",
-  ])("keeps %s resumable but fail-closed", (role) => {
-    expect(() => assertRoleOnboardingCompletionSupported(role)).toThrow(
-      "onboarding is saved but cannot be completed"
-    );
+  it("fails closed for missing or unknown roles instead of substituting Scholar", () => {
+    expect(() => assertRoleOnboardingCompletionSupported("")).toThrow("role is required");
+    expect(() => assertRoleOnboardingCompletionSupported("not-a-role")).toThrow("Unsupported Playbook role");
   });
 });
