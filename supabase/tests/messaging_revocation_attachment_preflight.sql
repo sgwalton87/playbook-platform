@@ -141,6 +141,7 @@ where schemaname='storage' and tablename='objects'
 select count(*) = 2 as messaging_jwt_initplans
 from pg_policies
 where (
+  (
     schemaname='public'
     and tablename='pbos_conversations'
     and policyname='Governed actors create conversations'
@@ -149,6 +150,7 @@ where (
     and tablename='objects'
     and policyname='Current participants upload message attachments'
   )
+)
   and (coalesce(qual, '') || ' ' || coalesce(with_check, '')) ilike '%SELECT%auth.jwt()%' \gset
 \if :messaging_jwt_initplans
 \else
