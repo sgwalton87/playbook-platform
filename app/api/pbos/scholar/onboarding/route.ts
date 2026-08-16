@@ -38,6 +38,22 @@ export async function POST(request: NextRequest) {
       .maybeSingle();
     if (profileResult.error) throw new Error(profileResult.error.message);
     const normalizedRole = normalizePlaybookRole(profileResult.data?.profile_mode ?? profileResult.data?.role);
+
+    // Compatibility bridge for the existing Start client. Preserve the POST
+    // method/body with a 307 and move institutional roles onto their canonical,
+    // independently governed completion endpoint. New clients should call the
+    // role-bound endpoint directly.
+    if (
+      normalizedRole === "educator" ||
+      normalizedRole === "high-school-counselor" ||
+      normalizedRole === "coach"
+    ) {
+      return NextResponse.redirect(
+        new URL(`/api/pbos/onboarding/${normalizedRole}`, request.url),
+        307
+      );
+    }
+
     if (
       normalizedRole !== "scholar" &&
       normalizedRole !== "scholar-athlete" &&
