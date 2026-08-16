@@ -7,12 +7,19 @@ export type RecommenderRequestStatus =
   | "approved"
   | "revision_requested";
 
+export const RECOMMENDER_ROLES = ["educator", "mentor", "coach", "family", "employer"] as const;
+export type RecommenderRole = (typeof RECOMMENDER_ROLES)[number];
+
+export function isRecommenderRole(value: unknown): value is RecommenderRole {
+  return typeof value === "string" && (RECOMMENDER_ROLES as readonly string[]).includes(value);
+}
+
 export function buildRecommenderRequest(input: {
   scholarId: string;
   scholarName: string;
   recommenderName: string;
   recommenderEmail: string;
-  recommenderRole: "educator" | "mentor" | "coach" | "family" | "employer";
+  recommenderRole: RecommenderRole;
   opportunityName: string;
   evidence: string[];
 }) {
