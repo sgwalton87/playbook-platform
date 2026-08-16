@@ -26,6 +26,7 @@ describe("canonical Playbook role registry", () => {
     ["tay", "transition-youth"],
     ["counselor", "high-school-counselor"],
     ["international_athlete", "athlete-abroad"],
+    ["community-partner", "other"],
   ])("normalizes %s to %s", (input, expected) => {
     expect(normalizePlaybookRole(input)).toBe(expected);
     expect(normalizeOnboardingRole(input)).toBe(expected);
@@ -41,8 +42,9 @@ describe("canonical Playbook role registry", () => {
       expect(getOnboardingCompletionDestination(role)).toBe(getRoleDestination(role));
       expect(getRoleDestination(role)).toMatch(/^\//);
 
+      const publicSlug = role === "other" ? "community-partner" : role;
       const endpoint = getOnboardingCompletionEndpoint(role);
-      expect(endpoint).toBe(`/api/pbos/onboarding/${role}`);
+      expect(endpoint).toBe(`/api/pbos/onboarding/${publicSlug}`);
       endpoints.add(endpoint);
       destinations.add(getRoleDestination(role));
     }
