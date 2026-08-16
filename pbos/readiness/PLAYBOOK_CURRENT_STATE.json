@@ -36,7 +36,8 @@
   },
   "hostedDatabase": {
     "projectRef": "oexgxnybeixwadgtdtzp",
-    "canonicalMigrationFrontier": "202608160039",
+    "canonicalFeatureMigrationFrontier": "202608160039",
+    "canonicalReconciliationFrontier": "202608160043",
     "productionPromotion": "completed",
     "profileDirectSelect": "owner-only",
     "remainingConfigGates": [
