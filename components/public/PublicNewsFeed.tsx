@@ -13,7 +13,20 @@ type PublicPost = {
   createdAt: string;
   author: string;
   role: string;
+  category: string | null;
 };
+
+type PublicIdentity = {
+  id: string;
+  username: string | null;
+  full_name: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  role: string | null;
+  avatar_url: string | null;
+};
+
+const CANONICAL_CATEGORIES = new Set(["leadership", "finance", "civic", "sel", "college", "nil", "community"]);
 
 export default function PublicNewsFeed() {
   const [posts, setPosts] = useState<PublicPost[]>([]);
@@ -24,7 +37,7 @@ export default function PublicNewsFeed() {
     async function loadPublicPosts() {
       const { data: rows, error } = await supabase
         .from("feed_posts")
-        .select("id,user_id,title,body,image_url,media_url,created_at")
+        .select("id,user_id,title,body,image_url,media_url,created_at,post_type")
         .eq("visibility", "public")
         .order("created_at", { ascending: false })
         .limit(30);
@@ -35,27 +48,30 @@ export default function PublicNewsFeed() {
         return;
       }
 
-      const authorIds = [...new Set((rows || []).map((post) => post.user_id).filter(Boolean))];
-      const { data: profiles } = authorIds.length
-        ? await supabase
-            .from("profiles")
-            .select("id,first_name,full_name,username,role")
-            .in("id", authorIds)
-        : { data: [] as LegacyValue[] };
+      const authorIds = [...new Set((rows || []).map((post) => post.user_id).filter(Boolean))].slice(0, 100);
+      const identityResult = authorIds.length
+        ? await supabase.rpc("get_public_member_identities", { requested_ids: authorIds })
+        : { data: [] as PublicIdentity[], error: null };
+
       if (!active) return;
+      if (identityResult.error) {
+        setState("error");
+        return;
+      }
 
       const authors = new Map(
-        (profiles || []).map((profile) => [
-          profile.id,
+        ((identityResult.data || []) as PublicIdentity[]).map((identity) => [
+          identity.id,
           {
-            name: profile.full_name || profile.first_name || profile.username || "Playbook community member",
-            role: formatRole(profile.role),
+            name: identity.full_name || [identity.first_name, identity.last_name].filter(Boolean).join(" ") || identity.username || "Playbook community member",
+            role: formatLabel(identity.role),
           },
         ]),
       );
 
       setPosts((rows || []).map((post) => {
         const author = authors.get(post.user_id) || { name: "Playbook community member", role: "Community" };
+        const normalizedType = String(post.post_type || "").trim().toLowerCase();
         return {
           id: post.id,
           title: post.title || null,
@@ -64,6 +80,7 @@ export default function PublicNewsFeed() {
           createdAt: post.created_at,
           author: author.name,
           role: author.role,
+          category: CANONICAL_CATEGORIES.has(normalizedType) ? formatLabel(normalizedType) : null,
         };
       }));
       setState("ready");
@@ -87,7 +104,7 @@ export default function PublicNewsFeed() {
           )}
           <div style={cardBody}>
             <div style={meta}>
-              <span>{post.role}</span>
+              <span>{post.category ? `${post.category} · ${post.role}` : post.role}</span>
               <time dateTime={post.createdAt}>{formatDate(post.createdAt)}</time>
             </div>
             <h2 style={cardTitle}>{post.title || "From the Playbook community"}</h2>
@@ -123,7 +140,7 @@ function formatDate(value: string) {
     : date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
-function formatRole(value: unknown) {
+function formatLabel(value: unknown) {
   return String(value || "Community").replaceAll("_", " ").replaceAll("-", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
