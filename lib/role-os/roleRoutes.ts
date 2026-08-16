@@ -21,6 +21,7 @@ const ROLE_DESCRIPTIONS: Partial<Record<keyof typeof PLAYBOOK_ROLES, string>> = 
   employer: "Create internships, work-based learning, and responsible hiring pathways.",
   district: "Govern schools, cohorts, permissions, readiness signals, and interventions.",
   "athlete-abroad": "Prepare academics, eligibility, travel, recruiting, and international transitions.",
+  other: "Connect community services and trusted support without inheriting Scholar-data authority.",
 };
 
 export const roleOptions = PUBLIC_ONBOARDING_ROLES.map((role) => ({
