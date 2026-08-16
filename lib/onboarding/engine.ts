@@ -1,4 +1,5 @@
 import { ROLE_ONBOARDING } from "./config/roleConfigs";
+import { getRoleOnboardingCompletionContract } from "./completionRegistry";
 import { getPathway } from "./pathwayMap";
 import {
   PLAYBOOK_ROLES,
@@ -39,6 +40,8 @@ export function getCanonicalOnboardingRoute(role?: string | null): string {
 
 export function getOnboardingCompletionDestination(role?: string | null): string {
   const normalized = resolveExplicitOnboardingRole(role);
+  const contract = getRoleOnboardingCompletionContract(normalized);
+  if (contract.state === "verification-gated") return "/pending";
   return getPathway(normalized).osRoute;
 }
 
