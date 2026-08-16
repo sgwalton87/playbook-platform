@@ -30,9 +30,15 @@ describe("relationship security observability", () => {
     expect(migration).toContain("supporter_id = (select auth.uid())");
   });
 
+  it("keeps the security-definer trigger helper outside the exposed public schema", () => {
+    expect(migration).toContain("create schema if not exists private");
+    expect(migration).toContain("create or replace function private.capture_relationship_security_event()");
+    expect(migration).toContain("revoke all on schema private from authenticated");
+  });
+
   it("captures events from canonical relationship mutations rather than duplicate writes", () => {
     expect(migration).toContain("after insert or update of status, permissions");
     expect(migration).toContain("on public.support_relationships");
-    expect(migration).toContain("execute function public.capture_relationship_security_event()");
+    expect(migration).toContain("execute function private.capture_relationship_security_event()");
   });
 });
