@@ -63,8 +63,7 @@ begin
       relationship,
       permissions,
       source_invitation_id,
-      status,
-      destination
+      status
     ) values (
       invitation_row.scholar_id,
       authenticated_user_id,
@@ -73,8 +72,7 @@ begin
       invitation_row.relationship,
       invitation_row.permissions,
       invitation_row.id,
-      'active',
-      invitation_row.destination
+      'active'
     );
 
     update public.support_invitations
