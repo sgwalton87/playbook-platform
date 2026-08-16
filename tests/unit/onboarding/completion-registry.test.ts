@@ -29,7 +29,7 @@ describe("independent onboarding completion contracts", () => {
     expect(new Set(destinations).size).toBe(PUBLIC_ONBOARDING_ROLES.length);
   });
 
-  it("only marks already-governed learner adapters implemented", () => {
+  it("classifies completion by governed authority state", () => {
     expect(getRoleOnboardingCompletionContract("scholar").state).toBe("implemented");
     expect(getRoleOnboardingCompletionContract("scholar-athlete").state).toBe("implemented");
     expect(getRoleOnboardingCompletionContract("transition-youth").state).toBe("implemented");
@@ -37,10 +37,11 @@ describe("independent onboarding completion contracts", () => {
     expect(getRoleOnboardingCompletionContract("family").state).toBe("relationship-gated");
     expect(getRoleOnboardingCompletionContract("mentor").state).toBe("relationship-gated");
 
+    for (const role of ["educator", "high-school-counselor", "coach"] as const) {
+      expect(getRoleOnboardingCompletionContract(role).state).toBe("verification-gated");
+    }
+
     for (const role of [
-      "educator",
-      "high-school-counselor",
-      "coach",
       "college-coach",
       "college-admissions",
       "brand-partner",
@@ -58,5 +59,20 @@ describe("independent onboarding completion contracts", () => {
     expect(getRoleOnboardingCompletionContract("mentor").adapter).toBe("MENTOR_VALIDATION");
     expect(getRoleOnboardingCompletionContract("family").destination).toBe("/family-os");
     expect(getRoleOnboardingCompletionContract("mentor").destination).toBe("/mentor-os");
+  });
+
+  it("keeps Educator, Counselor, and Coach as independent verification adapters", () => {
+    expect(getRoleOnboardingCompletionContract("educator")).toMatchObject({
+      adapter: "EDUCATOR_VERIFICATION",
+      destination: "/educator-os",
+    });
+    expect(getRoleOnboardingCompletionContract("high-school-counselor")).toMatchObject({
+      adapter: "COUNSELOR_VERIFICATION",
+      destination: "/counselor-os",
+    });
+    expect(getRoleOnboardingCompletionContract("coach")).toMatchObject({
+      adapter: "HIGH_SCHOOL_COACH_VERIFICATION",
+      destination: "/coach-os",
+    });
   });
 });
