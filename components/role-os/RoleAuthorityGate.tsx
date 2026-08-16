@@ -40,8 +40,21 @@ export default function RoleAuthorityGate({
   roleOS: PlaybookRoleOS;
   children: React.ReactNode;
 }) {
+  return (
+    <CanonicalRoleAuthorityGate role={OS_TO_ROLE[roleOS]}>
+      {children}
+    </CanonicalRoleAuthorityGate>
+  );
+}
+
+export function CanonicalRoleAuthorityGate({
+  role,
+  children,
+}: {
+  role: PlaybookRole;
+  children: React.ReactNode;
+}) {
   const router = useRouter();
-  const role = OS_TO_ROLE[roleOS];
   const contract = useMemo(() => getRoleOnboardingCompletionContract(role), [role]);
   const [state, setState] = useState<GateState>("loading");
   const [relationshipReady, setRelationshipReady] = useState(false);
