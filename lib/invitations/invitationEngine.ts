@@ -51,6 +51,7 @@ export function destinationForRelationship(relationship: RelationshipKind) {
     parent_guardian: getRoleDestination("family"),
     educator: getRoleDestination("educator"),
     mentor: getRoleDestination("mentor"),
+    coach: getRoleDestination("coach"),
     district_admin: getRoleDestination("district"),
     // A generic university relationship does not prove whether the invitee is
     // a recruiter or admissions officer. Keep it at the neutral university
@@ -72,8 +73,8 @@ export function getDemoInvitations() {
     updateInvitationStatus(
       createSupportInvitation({
         inviteeName: "Coach Taylor",
-        inviteeEmail: "mentor@example.com",
-        relationship: "mentor",
+        inviteeEmail: "coach@example.com",
+        relationship: "coach",
       }),
       "accepted"
     ),
