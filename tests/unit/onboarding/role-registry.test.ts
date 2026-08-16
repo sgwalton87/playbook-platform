@@ -6,6 +6,7 @@ import {
   getRoleDestination,
   normalizePlaybookRole,
   requirePlaybookRole,
+  type PlaybookRole,
 } from "@/lib/roles/registry";
 import {
   getOnboardingCompletionDestination,
@@ -82,6 +83,27 @@ describe("canonical Playbook role registry", () => {
     expect(ids).not.toContain("athlete-recruiting");
     expect(ids).toContain("scholar-support");
     expect(ids).toContain("scholar-goals");
+  });
+
+  it("keeps authority-bearing invitations out of role onboarding", () => {
+    const selfOwnedRoles: PlaybookRole[] = ["scholar", "scholar-athlete", "transition-youth"];
+    for (const role of selfOwnedRoles) {
+      const steps = getOnboardingSteps(role);
+      expect(steps.map((step) => step.id)).toContain("support-plan");
+      expect(steps.map((step) => step.id)).not.toContain("network");
+      expect(steps.find((step) => step.id === "support-plan")?.body).toContain("No invitation or access is created here");
+    }
+
+    for (const role of PUBLIC_ONBOARDING_ROLES.filter((candidate) => !selfOwnedRoles.includes(candidate))) {
+      const steps = getOnboardingSteps(role);
+      expect(steps.map((step) => step.id)).not.toContain("network");
+      expect(steps.map((step) => step.id)).not.toContain("support-plan");
+    }
+
+    expect(getOnboardingSteps("mentor").flatMap((step) => step.fields.map((field) => field.key)))
+      .not.toContain("invite_supporters");
+    expect(getOnboardingSteps("other").map((step) => step.id))
+      .toContain("community-partner-context");
   });
 
   it("declares Mentor as a Scholar-invitation entry pathway", () => {
