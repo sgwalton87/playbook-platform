@@ -1,481 +1,409 @@
 "use client";
+
 import Image from "next/image";
-import { useEffect, useState, useRef } from "react";
+import Link from "next/link";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { PlaybookCard, PlaybookGrid, PlaybookHero, PlaybookMetric, PlaybookMetrics, PlaybookPage, PlaybookPill } from "@/components/ui";
 import { supabase } from "@/lib/supabaseClient";
 
-const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",blue:"#3B82F6",green:"#10B981",purple:"#8B5CF6",mono:"'Space Mono', monospace",sans:"'Hanken Grotesk', system-ui, sans-serif",anton:"'Anton', sans-serif"};
-const FILTERS=["All","Leadership","Finance","Civic","SEL"];
-const LEADERS=[{name:"Jordan M.",initials:"JM",color:T.green,img:"https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&q=80",xp:890,rank:1},{name:"Aisha T.",initials:"AT",color:T.blue,img:"https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&q=80",xp:760,rank:2},{name:"Marcus D.",initials:"MD",color:T.purple,img:null,xp:640,rank:3},{name:"You",initials:"SW",color:T.orange,img:null,xp:340,rank:4}];
+const CATEGORIES = ["All", "Leadership", "Finance", "Civic", "SEL", "College", "NIL", "Community"] as const;
+type Category = (typeof CATEGORIES)[number];
+
+type PublicIdentity = {
+  id: string;
+  username: string | null;
+  full_name: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  role: string | null;
+  avatar_url: string | null;
+};
+
+type Comment = {
+  id: string;
+  post_id: string;
+  user_id: string;
+  body: string;
+  created_at: string;
+  author: string;
+};
+
+type FeedPost = {
+  id: string;
+  userId: string;
+  author: string;
+  username: string | null;
+  avatarUrl: string | null;
+  role: string;
+  title: string | null;
+  body: string;
+  imageUrl: string | null;
+  createdAt: string;
+  category: Category;
+  likes: number;
+  liked: boolean;
+  comments: Comment[];
+};
+
+function displayName(identity: Partial<PublicIdentity>) {
+  return identity.full_name || [identity.first_name, identity.last_name].filter(Boolean).join(" ") || identity.username || "Playbook member";
+}
+
+function label(value: unknown) {
+  return String(value || "Community").replaceAll("_", " ").replaceAll("-", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function categoryFromPostType(value: unknown): Category {
+  const normalized = String(value || "").trim().toLowerCase();
+  const mapping: Record<string, Category> = {
+    leadership: "Leadership",
+    finance: "Finance",
+    civic: "Civic",
+    sel: "SEL",
+    college: "College",
+    nil: "NIL",
+    community: "Community",
+  };
+  return mapping[normalized] || "Community";
+}
 
 export default function FeedPage() {
-  const router=useRouter();
-  const postFileRef=useRef<HTMLInputElement>(null);
-  const galleryFileRef=useRef<HTMLInputElement>(null);
-  const [posts,setPosts]=useState<LegacyValue[]>([]);
-  const [filter,setFilter]=useState("All");
-  const [newPost,setNewPost]=useState("");
-  const [userName,setUserName]=useState("Scholar");
-  const [userInitials,setUserInitials]=useState("SW");
-  const [userRole,setUserRole]=useState("member");
-  const [userUsername,setUserUsername]=useState<string|null>(null);
-  const [userId,setUserId]=useState<string|null>(null);
-  const [tab,setTab]=useState<"feed"|"gallery">("feed");
-  const [pendingPhoto,setPendingPhoto]=useState<string|null>(null);
-  const [pendingFile,setPendingFile]=useState<File|null>(null);
-  const [gallery,setGallery]=useState<string[]>([]);
-  const [lightbox,setLightbox]=useState<string|null>(null);
-  const [loading,setLoading]=useState(true);
-  const [uploading,setUploading]=useState(false);
-  const [commentsByPost,setCommentsByPost]=useState<Record<string,LegacyValue[]>>({});
+  const router = useRouter();
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [userIdentity, setUserIdentity] = useState<PublicIdentity | null>(null);
+  const [posts, setPosts] = useState<FeedPost[]>([]);
+  const [gallery, setGallery] = useState<string[]>([]);
+  const [tab, setTab] = useState<"feed" | "gallery">("feed");
+  const [filter, setFilter] = useState<Category>("All");
+  const [body, setBody] = useState("");
+  const [category, setCategory] = useState<Category>("Community");
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [pendingPreview, setPendingPreview] = useState<string | null>(null);
+  const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>({});
+  const [editingComment, setEditingComment] = useState<string | null>(null);
+  const [editDraft, setEditDraft] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [message, setMessage] = useState("Loading published Playbook stories…");
+  const [error, setError] = useState("");
 
-  useEffect(()=>{
-    (async()=>{
-      const{data:u}=await supabase.auth.getUser();
-      if(!u.user){router.replace("/login");return;}
-      setUserId(u.user.id);
+  async function load() {
+    setError("");
+    const { data: authData } = await supabase.auth.getUser();
+    const user = authData.user;
+    if (!user) {
+      router.replace("/login?next=/feed");
+      return;
+    }
+    setUserId(user.id);
 
-      const{data:p}=await supabase.from("profiles").select("first_name,last_name,full_name,username,role,avatar_url").eq("id",u.user.id).single();
-      const name=p?.full_name||p?.first_name||"Scholar";
-      setUserName(p?.first_name||"Scholar");
-      setUserInitials(name.split(" ").map((n:string)=>n[0]).join("").toUpperCase().slice(0,2));
-      setUserRole(p?.role||"member");
-      setUserUsername(p?.username||null);
+    const [profileResult, postsResult] = await Promise.all([
+      supabase.from("profiles").select("id,username,full_name,first_name,last_name,role,avatar_url").eq("id", user.id).single(),
+      supabase.from("feed_posts").select("id,user_id,post_type,title,body,image_url,media_url,created_at,visibility").eq("visibility", "public").order("created_at", { ascending: false }).limit(50),
+    ]);
+    if (profileResult.error) throw new Error(profileResult.error.message);
+    if (postsResult.error) throw new Error(postsResult.error.message);
 
-      const{data:dbPosts,error}=await supabase
-        .from("feed_posts")
-        .select("id,user_id,post_type,title,body,image_url,media_url,created_at,visibility")
-        .eq("visibility","public")
-        .order("created_at",{ascending:false})
-        .limit(50);
+    const ownIdentity: PublicIdentity = {
+      id: profileResult.data.id,
+      username: profileResult.data.username,
+      full_name: profileResult.data.full_name,
+      first_name: profileResult.data.first_name,
+      last_name: profileResult.data.last_name,
+      role: profileResult.data.role,
+      avatar_url: profileResult.data.avatar_url,
+    };
+    setUserIdentity(ownIdentity);
 
-      if(error)console.error("Feed error:",error.message);
+    const rows = postsResult.data || [];
+    const postIds = rows.map((post) => post.id);
+    const identityIds = [...new Set(rows.map((post) => post.user_id).filter(Boolean))].slice(0, 100);
 
-      if(dbPosts&&dbPosts.length>0){
-        const postIds=dbPosts.map((post:LegacyValue)=>post.id);
-        const{data:reactionRows}=await supabase.from("feed_post_reactions").select("post_id,user_id").in("post_id",postIds);
-        const{data:commentRows}=await supabase.from("feed_post_comments").select("id,post_id,user_id,body,created_at").in("post_id",postIds).order("created_at",{ascending:true});
+    const [identityResult, reactionResult, commentResult] = await Promise.all([
+      identityIds.length ? supabase.rpc("get_public_member_identities", { requested_ids: identityIds }) : Promise.resolve({ data: [] as PublicIdentity[], error: null }),
+      postIds.length ? supabase.from("feed_post_reactions").select("id,post_id,user_id,reaction").in("post_id", postIds) : Promise.resolve({ data: [], error: null }),
+      postIds.length ? supabase.from("feed_post_comments").select("id,post_id,user_id,body,created_at").in("post_id", postIds).order("created_at", { ascending: true }) : Promise.resolve({ data: [], error: null }),
+    ]);
+    if (identityResult.error) throw new Error(identityResult.error.message);
+    if (reactionResult.error) throw new Error(reactionResult.error.message);
+    if (commentResult.error) throw new Error(commentResult.error.message);
 
-        const identityIds=[...new Set([
-          ...dbPosts.map((post:LegacyValue)=>post.user_id),
-          ...(commentRows||[]).map((comment:LegacyValue)=>comment.user_id),
-        ].filter(Boolean))].slice(0,100);
-        const{data:publicIdentities}=identityIds.length
-          ? await supabase.rpc("get_public_scholar_identities",{requested_ids:identityIds})
-          : {data:[] as LegacyValue[]};
-        const profileMap:Record<string,{name:string;role:string;avatar_url:string|null;username:string|null}>={};
-        (publicIdentities||[]).forEach((identity:LegacyValue)=>{
-          profileMap[identity.id]={
-            name:identity.full_name||[identity.first_name,identity.last_name].filter(Boolean).join(" ")||identity.username||"Scholar",
-            role:identity.role||"Scholar",
-            avatar_url:identity.avatar_url||null,
-            username:identity.username||null,
-          };
-        });
-        if(p){
-          profileMap[u.user.id]={
-            name:p.full_name||[p.first_name,p.last_name].filter(Boolean).join(" ")||p.username||"Scholar",
-            role:p.role||"Scholar",
-            avatar_url:p.avatar_url||null,
-            username:p.username||null,
-          };
-        }
+    const commentUserIds = [...new Set((commentResult.data || []).map((comment) => comment.user_id).filter(Boolean))].slice(0, 100);
+    const commentIdentityResult = commentUserIds.length
+      ? await supabase.rpc("get_public_member_identities", { requested_ids: commentUserIds })
+      : { data: [] as PublicIdentity[], error: null };
+    if (commentIdentityResult.error) throw new Error(commentIdentityResult.error.message);
 
-        const groupedComments:Record<string,LegacyValue[]>={};
-        (commentRows||[]).forEach((comment:LegacyValue)=>{
-          const cp=profileMap[comment.user_id]||{};
-          const author=cp.name||"Playbook Member";
-          groupedComments[comment.post_id]=[
-            ...(groupedComments[comment.post_id]||[]),
-            {...comment,author,role:cp.role||"member"}
-          ];
-        });
-        setCommentsByPost(groupedComments);
+    const identities = new Map<string, PublicIdentity>();
+    for (const identity of (identityResult.data || []) as PublicIdentity[]) identities.set(identity.id, identity);
+    for (const identity of (commentIdentityResult.data || []) as PublicIdentity[]) identities.set(identity.id, identity);
+    identities.set(user.id, ownIdentity);
 
-        const reactionCounts:Record<string,number>={};
-        const commentCounts:Record<string,number>={};
-        const likedByMe=new Set<string>();
-        (reactionRows||[]).forEach((reaction:LegacyValue)=>{reactionCounts[reaction.post_id]=(reactionCounts[reaction.post_id]||0)+1;if(reaction.user_id===u.user.id)likedByMe.add(reaction.post_id);});
-        (commentRows||[]).forEach((comment:LegacyValue)=>{commentCounts[comment.post_id]=(commentCounts[comment.post_id]||0)+1;});
+    const reactionsByPost = new Map<string, { count: number; liked: boolean }>();
+    for (const reaction of reactionResult.data || []) {
+      const current = reactionsByPost.get(reaction.post_id) || { count: 0, liked: false };
+      current.count += 1;
+      if (reaction.user_id === user.id && reaction.reaction === "like") current.liked = true;
+      reactionsByPost.set(reaction.post_id, current);
+    }
 
-        setPosts(dbPosts.map((post:LegacyValue)=>{
-          const authorProfile=profileMap[post.user_id]||{name:"Scholar",role:"Scholar",avatar_url:null,username:null};
-          const authorName=authorProfile.name;
-          const initials=authorName.split(" ").map((part:string)=>part[0]).join("").toUpperCase().slice(0,2);
-          const d=new Date(post.created_at);
-          const timeStr=d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})+" · "+d.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"});
-          const imgUrl=post.image_url||post.media_url||null;
-          return{
-            id:post.id,author:authorName,initials,
-            color:post.user_id===u.user.id?T.orange:T.blue,
-            role:authorProfile.role,time:timeStr,
-            title:post.title||null,
-            content:post.body||"",
-            pillar:"Leadership",pillarColor:T.orange,
-            coverImg:imgUrl,likes:reactionCounts[post.id]||0,comments:commentCounts[post.id]||0,liked:likedByMe.has(post.id),
-            isOwn:post.user_id===u.user.id,
-          };
-        }));
-      }
+    const commentsByPost = new Map<string, Comment[]>();
+    for (const comment of commentResult.data || []) {
+      const identity = identities.get(comment.user_id);
+      const normalized: Comment = {
+        id: comment.id,
+        post_id: comment.post_id,
+        user_id: comment.user_id,
+        body: comment.body,
+        created_at: comment.created_at,
+        author: identity ? displayName(identity) : "Playbook member",
+      };
+      commentsByPost.set(comment.post_id, [...(commentsByPost.get(comment.post_id) || []), normalized]);
+    }
 
-      const galleryPrefix=`${u.user.id}/gallery`;
-      const{data:files}=await supabase.storage.from("photos").list(galleryPrefix,{limit:100,sortBy:{column:"created_at",order:"desc"}});
-      if(files&&files.length>0){
-        setGallery(files
-          .filter((file:LegacyValue)=>file.name!==".emptyFolderPlaceholder")
-          .map((file:LegacyValue)=>supabase.storage.from("photos").getPublicUrl(`${galleryPrefix}/${file.name}`).data.publicUrl));
-      }
+    setPosts(rows.map((post): FeedPost => {
+      const identity = identities.get(post.user_id);
+      const reaction = reactionsByPost.get(post.id) || { count: 0, liked: false };
+      return {
+        id: post.id,
+        userId: post.user_id,
+        author: identity ? displayName(identity) : "Playbook member",
+        username: identity?.username || null,
+        avatarUrl: identity?.avatar_url || null,
+        role: label(identity?.role),
+        title: post.title || null,
+        body: post.body || "",
+        imageUrl: post.image_url || post.media_url || null,
+        createdAt: post.created_at,
+        category: categoryFromPostType(post.post_type),
+        likes: reaction.count,
+        liked: reaction.liked,
+        comments: commentsByPost.get(post.id) || [],
+      };
+    }));
 
-      const{data:photoPosts}=await supabase
-        .from("feed_posts")
-        .select("image_url,media_url")
-        .eq("user_id",u.user.id)
-        .eq("visibility","public")
-        .not("image_url","is",null)
-        .limit(50);
-      if(photoPosts){
-        const photoUrls=photoPosts.map((post:LegacyValue)=>post.image_url||post.media_url).filter(Boolean);
-        if(photoUrls.length>0)setGallery(prev=>[...photoUrls,...prev]);
-      }
+    const prefix = `${user.id}/gallery`;
+    const galleryResult = await supabase.storage.from("photos").list(prefix, { limit: 100, sortBy: { column: "created_at", order: "desc" } });
+    if (!galleryResult.error) {
+      setGallery((galleryResult.data || []).filter((file) => file.name !== ".emptyFolderPlaceholder").map((file) => supabase.storage.from("photos").getPublicUrl(`${prefix}/${file.name}`).data.publicUrl));
+    }
 
+    setMessage(rows.length ? "Published stories are current." : "No public stories yet. Publish the first one.");
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    const id = window.setTimeout(() => { void load().catch((cause) => {
+      setError(cause instanceof Error ? cause.message : "Feed could not be loaded.");
       setLoading(false);
-    })();
-  },[router]);
+    }); }, 0);
+    return () => window.clearTimeout(id);
+  }, []);
 
-  const uploadPhoto=async(photoFile:File,folder:"feed"|"gallery"):Promise<string|null>=>{
-    if(!userId)return null;
-    const ext=(photoFile.name.split(".").pop()||"jpg").replace(/[^a-zA-Z0-9]/g,"").toLowerCase()||"jpg";
-    const stem=photoFile.name.replace(/\.[^.]+$/,"").replace(/[^a-zA-Z0-9_-]/g,"-").slice(0,80)||"photo";
-    const filename=`${userId}/${folder}/${Date.now()}-${stem}.${ext}`;
-    const{error}=await supabase.storage.from("photos").upload(filename,photoFile,{cacheControl:"3600",upsert:false});
-    if(error){console.error("Upload error:",error.message);return null;}
-    return supabase.storage.from("photos").getPublicUrl(filename).data.publicUrl;
-  };
+  async function uploadPhoto(file: File, folder: "feed" | "gallery") {
+    if (!userId) return null;
+    const ext = (file.name.split(".").pop() || "jpg").replace(/[^a-zA-Z0-9]/g, "").toLowerCase() || "jpg";
+    const stem = file.name.replace(/\.[^.]+$/, "").replace(/[^a-zA-Z0-9_-]/g, "-").slice(0, 60) || "photo";
+    const path = `${userId}/${folder}/${Date.now()}-${stem}.${ext}`;
+    const upload = await supabase.storage.from("photos").upload(path, file, { cacheControl: "3600", upsert: false });
+    if (upload.error) throw new Error(upload.error.message);
+    return supabase.storage.from("photos").getPublicUrl(path).data.publicUrl;
+  }
 
-  const handlePostFileSelect=(e:React.ChangeEvent<HTMLInputElement>)=>{
-    const f=e.target.files?.[0];if(!f)return;
-    setPendingFile(f);setPendingPhoto(URL.createObjectURL(f));
-  };
-
-  const handlePost=async()=>{
-    if(!newPost.trim()&&!pendingFile)return;
-    if(!userId)return;
-    setUploading(true);
-    let imageUrl:string|null=null;
-
-    if(pendingFile){
-      imageUrl=await uploadPhoto(pendingFile,"feed");
-      if(imageUrl)setGallery(prev=>[imageUrl!,...prev]);
-    }
-
-    const{data:saved,error}=await supabase.from("feed_posts").insert({
-      user_id:userId,
-      post_type:"text",
-      body:newPost,
-      image_url:imageUrl,
-      visibility:"public",
-    }).select().single();
-
-    if(error){console.error("Post error:",error.message);setUploading(false);return;}
-
-    setPosts(prev=>[{
-      id:saved?.id||Date.now().toString(),
-      author:userName,initials:userInitials,color:T.orange,
-      role:userRole,time:"Just now",
-      title:null,content:newPost,
-      pillar:"Leadership",pillarColor:T.orange,
-      coverImg:imageUrl,likes:0,comments:0,liked:false,isOwn:true,
-    },...prev]);
-
-    setNewPost("");setPendingPhoto(null);setPendingFile(null);
-    if(postFileRef.current)postFileRef.current.value="";
-    setUploading(false);
-  };
-
-  const handleGalleryUpload=async(e:React.ChangeEvent<HTMLInputElement>)=>{
-    const f=e.target.files?.[0];if(!f||!userId)return;
-    setUploading(true);
-    const url=await uploadPhoto(f,"gallery");
-    if(url){
-      setGallery(prev=>[url,...prev]);
-      await supabase.from("feed_posts").insert({
-        user_id:userId,post_type:"photo",
-        body:"",image_url:url,visibility:"public",
+  async function publish() {
+    if (!userId || (!body.trim() && !pendingFile)) return;
+    setBusy("publish"); setError("");
+    try {
+      const imageUrl = pendingFile ? await uploadPhoto(pendingFile, "feed") : null;
+      const result = await supabase.from("feed_posts").insert({
+        user_id: userId,
+        post_type: category.toLowerCase(),
+        body: body.trim(),
+        image_url: imageUrl,
+        visibility: "public",
       });
-    }
-    if(galleryFileRef.current)galleryFileRef.current.value="";
-    setUploading(false);
-  };
+      if (result.error) throw new Error(result.error.message);
+      setBody(""); setPendingFile(null); setPendingPreview(null); setCategory("Community");
+      if (fileRef.current) fileRef.current.value = "";
+      await load();
+      setMessage("Story published to the public Playbook feed.");
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "Story could not be published."); }
+    finally { setBusy(null); }
+  }
 
-  const toggleLike=async(id:string)=>{
-    if(!userId)return;
-    setPosts(p=>p.map(x=>x.id===id?{...x,liked:!x.liked,likes:x.liked?Math.max(0,x.likes-1):x.likes+1}:x));
-    await fetch("/api/social/reactions",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({postId:id,reaction:"like"})
-    });
-  };
-  const addComment=async(id:string)=>{
-    if(!userId)return;
-    const body=window.prompt("Write a comment");
-    if(!body?.trim())return;
-    setPosts(p=>p.map(x=>x.id===id?{...x,comments:x.comments+1}:x));
-    const optimisticComment={id:`local-${Date.now()}`,post_id:id,user_id:userId,body,created_at:new Date().toISOString(),author:userName,role:userRole};
-    setCommentsByPost(current=>({...current,[id]:[...(current[id]||[]),optimisticComment]}));
-    await fetch("/api/social/comments",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({postId:id,body})
-    });
-  };
+  async function uploadGallery(file?: File) {
+    if (!file || !userId) return;
+    setBusy("gallery"); setError("");
+    try {
+      const url = await uploadPhoto(file, "gallery");
+      const result = await supabase.from("feed_posts").insert({ user_id: userId, post_type: "community", body: "", image_url: url, visibility: "public" });
+      if (result.error) throw new Error(result.error.message);
+      await load(); setMessage("Gallery photo published.");
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "Gallery photo could not be published."); }
+    finally { setBusy(null); }
+  }
 
-  const editComment=async(postId:string,comment:LegacyValue)=>{
-    if(!userId||comment.user_id!==userId)return;
-    const body=window.prompt("Edit your comment",comment.body);
-    if(!body?.trim())return;
+  async function toggleLike(post: FeedPost) {
+    setBusy(post.id); setError("");
+    try {
+      const response = await fetch("/api/social/reactions", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ postId: post.id, reaction: "like" }) });
+      const result = await response.json() as { error?: string };
+      if (!response.ok) throw new Error(result.error || "Reaction failed.");
+      await load();
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "Reaction failed."); }
+    finally { setBusy(null); }
+  }
 
-    setCommentsByPost(current=>({
-      ...current,
-      [postId]:(current[postId]||[]).map((c:LegacyValue)=>c.id===comment.id?{...c,body}:c)
-    }));
+  async function addComment(postId: string) {
+    const draft = (commentDrafts[postId] || "").trim();
+    if (!draft) return;
+    setBusy(postId); setError("");
+    try {
+      const response = await fetch("/api/social/comments", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ postId, body: draft }) });
+      const result = await response.json() as { error?: string };
+      if (!response.ok) throw new Error(result.error || "Comment failed.");
+      setCommentDrafts((current) => ({ ...current, [postId]: "" }));
+      await load();
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "Comment failed."); }
+    finally { setBusy(null); }
+  }
 
-    await fetch("/api/social/comments",{
-      method:"PATCH",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({commentId:comment.id,body})
-    });
-  };
+  async function saveComment(comment: Comment) {
+    const next = editDraft.trim(); if (!next) return;
+    setBusy(comment.id); setError("");
+    try {
+      const response = await fetch("/api/social/comments", { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ commentId: comment.id, body: next }) });
+      const result = await response.json() as { error?: string };
+      if (!response.ok) throw new Error(result.error || "Comment update failed.");
+      setEditingComment(null); setEditDraft(""); await load();
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "Comment update failed."); }
+    finally { setBusy(null); }
+  }
 
-  const deleteComment=async(postId:string,comment:LegacyValue)=>{
-    if(!userId||comment.user_id!==userId)return;
-    if(!window.confirm("Delete this comment?"))return;
+  async function deleteComment(comment: Comment) {
+    setBusy(comment.id); setError("");
+    try {
+      const response = await fetch("/api/social/comments", { method: "DELETE", headers: { "content-type": "application/json" }, body: JSON.stringify({ commentId: comment.id }) });
+      const result = await response.json() as { error?: string };
+      if (!response.ok) throw new Error(result.error || "Comment delete failed.");
+      await load();
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "Comment delete failed."); }
+    finally { setBusy(null); }
+  }
 
-    setCommentsByPost(current=>({
-      ...current,
-      [postId]:(current[postId]||[]).filter((c:LegacyValue)=>c.id!==comment.id)
-    }));
-    setPosts(p=>p.map(x=>x.id===postId?{...x,comments:Math.max(0,x.comments-1)}:x));
+  const visible = useMemo(() => filter === "All" ? posts : posts.filter((post) => post.category === filter), [filter, posts]);
 
-    await fetch("/api/social/comments",{
-      method:"DELETE",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({commentId:comment.id})
-    });
-  };
+  return (
+    <PlaybookPage>
+      <PlaybookHero eyebrow="Community Newsfeed" title="Show the work. Share the win. Build the next connection." subtitle="Public stories use presentation-grade identity only. Private records, support conversations, and unpublished progress remain outside the feed." />
+      <PlaybookMetrics>
+        <PlaybookMetric label="Published stories" value={String(posts.length)} />
+        <PlaybookMetric label="Your gallery" value={String(gallery.length)} />
+        <PlaybookMetric label="Categories" value="7" />
+      </PlaybookMetrics>
+      <div role="status" aria-live="polite" style={status}>{loading ? "Loading…" : message}</div>
+      {error && <div role="alert" style={alert}>{error} <button onClick={() => void load()}>Retry</button></div>}
 
-  const filtered=filter==="All"?posts:posts.filter(p=>p.pillar===filter);
+      <section style={tabRow} aria-label="Feed views">
+        <button onClick={() => setTab("feed")} aria-pressed={tab === "feed"} style={tab === "feed" ? activeTab : tabButton}>Feed</button>
+        <button onClick={() => setTab("gallery")} aria-pressed={tab === "gallery"} style={tab === "gallery" ? activeTab : tabButton}>Gallery</button>
+      </section>
 
-  if(loading)return<div style={{minHeight:"100vh",background:T.cream,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:T.mono,fontSize:12,color:T.faint}}>Loading feed...</div>;
+      {tab === "gallery" ? (
+        <>
+          <PlaybookCard eyebrow="Your public gallery" title="Photos you intentionally published">
+            <input type="file" accept="image/png,image/jpeg,image/webp" disabled={busy !== null} onChange={(event) => void uploadGallery(event.target.files?.[0])} />
+          </PlaybookCard>
+          {gallery.length === 0 ? <PlaybookCard eyebrow="Gallery" title="No gallery photos yet"><p style={copy}>Upload the first photo you want visible in your public Playbook story.</p></PlaybookCard> :
+            <div style={galleryGrid}>{gallery.map((src) => <div key={src} style={galleryTile}><Image unoptimized fill src={src} alt="Published Playbook gallery item" style={{ objectFit: "cover" }} /></div>)}</div>}
+        </>
+      ) : (
+        <>
+          <PlaybookCard eyebrow="Publish" title={`What are you building${userIdentity ? `, ${userIdentity.first_name || "Scholar"}` : ""}?`}>
+            <textarea value={body} onChange={(event) => setBody(event.target.value)} maxLength={4000} placeholder="Share progress, a milestone, a lesson, or a public opportunity update." style={composer} />
+            <div style={composerControls}>
+              <select value={category} onChange={(event) => setCategory(event.target.value as Category)} style={select} aria-label="Story category">
+                {CATEGORIES.filter((value) => value !== "All").map((value) => <option key={value}>{value}</option>)}
+              </select>
+              <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp" onChange={(event) => { const file = event.target.files?.[0] || null; setPendingFile(file); setPendingPreview(file ? URL.createObjectURL(file) : null); }} />
+              <button onClick={() => void publish()} disabled={busy !== null || (!body.trim() && !pendingFile)} style={primaryButton}>{busy === "publish" ? "Publishing…" : "Publish story"}</button>
+            </div>
+            {pendingPreview && <div style={preview}><Image unoptimized fill src={pendingPreview} alt="Selected upload preview" style={{ objectFit: "cover" }} /></div>}
+          </PlaybookCard>
 
-  return(
-    <div style={{minHeight:"100vh",background:T.cream,fontFamily:T.sans,color:T.ink}}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
-        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-        ::selection{background:${T.orange};color:#fff;}
-        .pb-post:hover{border-color:${T.orange}!important;}
-        .pb-like:hover{color:${T.orange}!important;}
-        .pb-gal:hover{opacity:.8!important;transform:scale(1.03);}
-        .pb-upload:hover{border-color:${T.orange}!important;background:${T.orangeL}!important;}
-        textarea{resize:none;}textarea::placeholder{color:${T.faint};}textarea:focus{border-color:${T.orange}!important;outline:none;}
-      `}</style>
+          <section style={filterRow} aria-label="Filter stories">
+            {CATEGORIES.map((value) => <button key={value} onClick={() => setFilter(value)} aria-pressed={filter === value} style={filter === value ? activeFilter : filterButton}>{value}</button>)}
+          </section>
 
-      {lightbox&&(
-        <div onClick={()=>setLightbox(null)} style={{position:"fixed",inset:0,zIndex:9999,background:"rgba(0,0,0,.93)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>
-          <Image unoptimized width={1200} height={800} src={lightbox} alt="" style={{maxWidth:"90vw",maxHeight:"90vh",objectFit:"contain",borderRadius:12}}/>
-          <button onClick={()=>setLightbox(null)} style={{position:"absolute",top:20,right:24,background:"rgba(255,255,255,.15)",border:"none",color:"#fff",fontSize:20,cursor:"pointer",borderRadius:"50%",width:40,height:40}}>✕</button>
-        </div>
+          {!loading && visible.length === 0 ? <PlaybookCard eyebrow="Feed" title="No stories in this category yet"><p style={copy}>Choose another category or publish the first story here.</p></PlaybookCard> :
+            <PlaybookGrid min={330}>
+              {visible.map((post) => (
+                <PlaybookCard key={post.id} eyebrow={`${post.category} · ${post.role}`} title={post.title || post.author}>
+                  <div style={authorRow}>
+                    <div style={avatar}>{post.avatarUrl ? <Image unoptimized width={48} height={48} src={post.avatarUrl} alt="" style={avatarImage} /> : post.author.slice(0, 1).toUpperCase()}</div>
+                    <div><strong style={{ color: "#0F172A" }}>{post.author}</strong>{post.username && <div><Link href={`/u/${post.username}`} style={profileLink}>@{post.username}</Link></div>}<small style={meta}>{new Date(post.createdAt).toLocaleString()}</small></div>
+                  </div>
+                  <p style={postBody}>{post.body}</p>
+                  {post.imageUrl && <div style={postMedia}><Image unoptimized fill src={post.imageUrl} alt="Published story media" style={{ objectFit: "cover" }} /></div>}
+                  <div style={actions}>
+                    <button disabled={busy === post.id} onClick={() => void toggleLike(post)} style={post.liked ? likedButton : secondaryButton}>{post.liked ? "♥" : "♡"} {post.likes}</button>
+                    <PlaybookPill>{post.comments.length} comments</PlaybookPill>
+                  </div>
+                  <div style={comments}>
+                    {post.comments.map((comment) => <article key={comment.id} style={commentCard}>
+                      <strong>{comment.author}</strong>
+                      {editingComment === comment.id ? <>
+                        <textarea value={editDraft} onChange={(event) => setEditDraft(event.target.value)} maxLength={4000} style={commentInput} />
+                        <div style={actions}><button onClick={() => void saveComment(comment)} disabled={busy === comment.id} style={primaryButton}>Save</button><button onClick={() => { setEditingComment(null); setEditDraft(""); }} style={secondaryButton}>Cancel</button></div>
+                      </> : <p style={commentText}>{comment.body}</p>}
+                      {comment.user_id === userId && editingComment !== comment.id && <div style={actions}><button onClick={() => { setEditingComment(comment.id); setEditDraft(comment.body); }} style={textButton}>Edit</button><button onClick={() => void deleteComment(comment)} disabled={busy === comment.id} style={textButton}>Delete</button></div>}
+                    </article>)}
+                    <div style={commentComposer}>
+                      <input value={commentDrafts[post.id] || ""} onChange={(event) => setCommentDrafts((current) => ({ ...current, [post.id]: event.target.value }))} maxLength={4000} placeholder="Write a comment" style={commentInput} />
+                      <button disabled={busy === post.id || !(commentDrafts[post.id] || "").trim()} onClick={() => void addComment(post.id)} style={primaryButton}>Comment</button>
+                    </div>
+                  </div>
+                </PlaybookCard>
+              ))}
+            </PlaybookGrid>}
+        </>
       )}
-
-      <div style={{padding:"26px 40px 60px",maxWidth:1180,margin:"0 auto"}}>
-        <section style={{background:T.navy,borderRadius:32,padding:"38px 36px",marginBottom:18,boxShadow:"0 18px 42px rgba(15,23,42,.10)"}}>
-          <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.2em",textTransform:"uppercase",color:T.orange,marginBottom:14,fontWeight:900}}>Community</p>
-          <h1 style={{fontFamily:T.sans,fontWeight:950,fontSize:"clamp(36px,5vw,56px)",color:"#F8F7F4",lineHeight:1.02,letterSpacing:"-.04em",marginBottom:18}}>Share your journey.</h1>
-          <p style={{fontSize:18,lineHeight:1.55,color:"rgba(248,247,244,.78)",maxWidth:720,marginBottom:22}}>
-            Post updates, photos, accomplishments, questions, club moments, sports highlights, and milestones with the Playbook community.
-          </p>
-          <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
-          {(["feed","gallery"]as const).map(t=>(
-            <button key={t} onClick={()=>setTab(t)} style={{fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:tab===t?T.navy:"transparent",color:tab===t?"#F8F7F4":T.muted,border:`1.5px solid ${tab===t?T.navy:T.line}`,borderRadius:999,padding:"9px 20px",cursor:"pointer",transition:"all 0.15s"}}>
-              {t==="feed"?"📣 Feed":`📸 Gallery (${gallery.length})`}
-            </button>
-          ))}
-          </div>
-        </section>
-
-        {tab==="feed"&&(
-          <div style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) 280px",gap:20}}>
-            <div>
-              <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:24,padding:"22px 24px",marginBottom:16}}>
-                <div style={{display:"flex",gap:12,alignItems:"flex-start",marginBottom:12}}>
-                  <div style={{width:40,height:40,borderRadius:"50%",background:T.orange,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:T.anton,fontSize:15,color:"#fff",flexShrink:0}}>{userInitials}</div>
-                  <textarea value={newPost} onChange={e=>setNewPost(e.target.value)} placeholder="Share something with the network..." rows={3} style={{flex:1,background:T.surface2,border:`1.5px solid ${T.line}`,borderRadius:12,padding:"10px 14px",fontSize:14,color:T.ink,fontFamily:T.sans,transition:"border-color 0.15s",width:"100%"}}/>
-                </div>
-                {pendingPhoto&&(
-                  <div style={{position:"relative",marginBottom:12,borderRadius:12,overflow:"hidden",maxHeight:220}}>
-                    <Image unoptimized width={1200} height={800} src={pendingPhoto} alt="Preview" style={{width:"100%",objectFit:"cover",display:"block",maxHeight:220}}/>
-                    <button onClick={()=>{setPendingPhoto(null);setPendingFile(null);if(postFileRef.current)postFileRef.current.value="";}} style={{position:"absolute",top:8,right:8,background:"rgba(0,0,0,.6)",border:"none",color:"#fff",borderRadius:"50%",width:28,height:28,cursor:"pointer",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
-                  </div>
-                )}
-                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                  <label className="pb-upload" style={{display:"flex",alignItems:"center",gap:8,fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",color:pendingPhoto?T.orange:T.muted,background:pendingPhoto?T.orangeL:T.surface2,border:`1.5px solid ${pendingPhoto?T.orange:T.line}`,borderRadius:999,padding:"9px 16px",cursor:"pointer",transition:"all 0.15s"}}>
-                    📷 {pendingPhoto?"Photo attached":"Add photo"}
-                    <input ref={postFileRef} type="file" accept="image/*" onChange={handlePostFileSelect} style={{display:"none"}}/>
-                  </label>
-                  <button onClick={handlePost} disabled={uploading||(!newPost.trim()&&!pendingFile)} style={{fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",background:(newPost.trim()||pendingFile)&&!uploading?T.orange:T.line,color:(newPost.trim()||pendingFile)&&!uploading?"#fff":T.faint,border:"none",borderRadius:999,padding:"10px 22px",cursor:(newPost.trim()||pendingFile)&&!uploading?"pointer":"default",transition:"all 0.15s"}}>
-                    {uploading?"Uploading...":"Post →"}
-                  </button>
-                </div>
-              </div>
-
-              <div style={{display:"flex",gap:6,marginBottom:16,flexWrap:"wrap"}}>
-                {FILTERS.map(f=>(
-                  <button key={f} onClick={()=>setFilter(f)} style={{fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:filter===f?T.navy:"transparent",color:filter===f?"#F8F7F4":T.muted,border:`1.5px solid ${filter===f?T.navy:T.line}`,borderRadius:999,padding:"7px 14px",cursor:"pointer",transition:"all 0.15s"}}>{f}</button>
-                ))}
-              </div>
-
-              {filtered.length===0?(
-                <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:24,padding:"48px 24px",textAlign:"center"}}>
-                  <div style={{fontSize:36,marginBottom:14}}>📣</div>
-                  <h3 style={{fontFamily:T.anton,fontSize:20,textTransform:"uppercase",color:T.ink,marginBottom:8}}>Nothing here yet</h3>
-                  <p style={{fontFamily:T.mono,fontSize:11,color:T.faint}}>Be the first to post something to the network.</p>
-                </div>
-              ):(
-                <div style={{display:"flex",flexDirection:"column",gap:12}}>
-                  {filtered.map(post=>(
-                    <div key={post.id} className="pb-post" style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:24,overflow:"hidden",transition:"border-color 0.15s",boxShadow:"0 12px 30px rgba(15,23,42,.04)"}}>
-                      {post.coverImg&&(
-                        <div style={{position:"relative",maxHeight:280,overflow:"hidden",cursor:"pointer"}} onClick={()=>setLightbox(post.coverImg)}>
-                          <Image unoptimized width={1200} height={800} src={post.coverImg} alt="" style={{width:"100%",objectFit:"cover",display:"block",maxHeight:280}}/>
-                          <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,transparent 50%,rgba(15,23,42,.6) 100%)"}}/>
-                        </div>
-                      )}
-                      <div style={{padding:"16px 18px"}}>
-                        <div style={{display:"flex",gap:10,alignItems:"flex-start",marginBottom:10}}>
-                          <div style={{width:40,height:40,borderRadius:"50%",background:post.color,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:T.anton,fontSize:15,color:"#fff"}}>{post.initials}</div>
-                          <div style={{flex:1}}>
-                            <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
-                              <span style={{fontSize:14,fontWeight:700,color:T.ink}}>{post.author}</span>
-                              {post.isOwn&&<span style={{fontFamily:T.mono,fontSize:9,color:T.faint}}>· you</span>}
-                            </div>
-                            <div style={{fontFamily:T.mono,fontSize:10,color:T.faint,marginTop:2}}>{post.role} · {post.time}</div>
-                          </div>
-                        </div>
-                        {post.title&&<div style={{fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.08em",textTransform:"uppercase",color:T.orange,marginBottom:6}}>{post.title}</div>}
-                        {post.content&&<p style={{fontSize:15,lineHeight:1.65,color:T.ink,marginBottom:14}}>{post.content}</p>}
-                        <div style={{display:"flex",gap:16,borderTop:`1px solid ${T.line}`,paddingTop:12}}>
-                          <button onClick={()=>toggleLike(post.id)} className="pb-like" style={{display:"flex",alignItems:"center",gap:6,fontFamily:T.mono,fontSize:11,fontWeight:700,background:"transparent",border:"none",color:post.liked?T.orange:T.faint,cursor:"pointer",padding:0,transition:"color 0.15s"}}>{post.liked?"♥":"♡"} {post.likes}</button>
-                          <button onClick={()=>addComment(post.id)} style={{display:"flex",alignItems:"center",gap:6,fontFamily:T.mono,fontSize:11,fontWeight:700,background:"transparent",border:"none",color:T.faint,cursor:"pointer",padding:0}}>💬 {post.comments}</button>
-                          {post.coverImg&&<button onClick={()=>setLightbox(post.coverImg)} style={{display:"flex",alignItems:"center",gap:6,fontFamily:T.mono,fontSize:11,fontWeight:700,background:"transparent",border:"none",color:T.faint,cursor:"pointer",padding:0,marginLeft:"auto"}}>🔍 View</button>}
-                        </div>
-
-                        {(commentsByPost[post.id]||[]).length>0&&(
-                          <div style={{marginTop:12,borderTop:`1px solid ${T.line}`,paddingTop:12,display:"grid",gap:8}}>
-                            {(commentsByPost[post.id]||[]).map((comment:LegacyValue)=>(
-                              <div key={comment.id} style={{background:T.surface2,borderRadius:12,padding:"10px 12px"}}>
-                                <div style={{display:"flex",justifyContent:"space-between",gap:10,marginBottom:4}}>
-                                  <strong style={{fontSize:12,color:T.ink}}>{comment.author}</strong>
-                                  <span style={{fontFamily:T.mono,fontSize:9,color:T.faint}}>
-                                    {new Date(comment.created_at).toLocaleDateString("en-US",{month:"short",day:"numeric"})}
-                                  </span>
-                                </div>
-                                <p style={{fontSize:13,lineHeight:1.5,color:T.muted}}>{comment.body}</p>
-                                {comment.user_id===userId&&(
-                                  <div style={{display:"flex",gap:10,marginTop:6}}>
-                                    <button onClick={()=>editComment(post.id,comment)} style={{fontFamily:T.mono,fontSize:9,fontWeight:700,color:T.orange,background:"transparent",border:"none",cursor:"pointer",padding:0}}>Edit</button>
-                                    <button onClick={()=>deleteComment(post.id,comment)} style={{fontFamily:T.mono,fontSize:9,fontWeight:700,color:T.faint,background:"transparent",border:"none",cursor:"pointer",padding:0}}>Delete</button>
-                                  </div>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div style={{display:"flex",flexDirection:"column",gap:14}}>
-              <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:16,padding:"16px 18px"}}>
-                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
-                  <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.12em",textTransform:"uppercase",color:T.muted}}>Photo gallery</p>
-                  <button onClick={()=>setTab("gallery")} style={{fontFamily:T.mono,fontSize:9,fontWeight:700,color:T.orange,background:"none",border:"none",cursor:"pointer",letterSpacing:"0.06em",textTransform:"uppercase"}}>See all →</button>
-                </div>
-                <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:4,marginBottom:10}}>
-                  {gallery.slice(0,6).map((img,i)=>(
-                    <div key={i} onClick={()=>setLightbox(img)} style={{aspectRatio:"1",borderRadius:8,overflow:"hidden",cursor:"pointer"}}>
-                      <Image unoptimized width={1200} height={800} src={img} alt="" className="pb-gal" style={{width:"100%",height:"100%",objectFit:"cover",display:"block",transition:"all 0.2s"}}/>
-                    </div>
-                  ))}
-                </div>
-                <label style={{display:"flex",alignItems:"center",justifyContent:"center",gap:6,fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",background:T.surface2,border:`1px solid ${T.line}`,borderRadius:10,padding:"9px",cursor:"pointer",width:"100%"}}>
-                  📷 Add to gallery
-                  <input type="file" accept="image/*" onChange={handleGalleryUpload} style={{display:"none"}}/>
-                </label>
-              </div>
-
-              <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:16,padding:"16px 18px"}}>
-                <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.12em",textTransform:"uppercase",color:T.muted,marginBottom:14}}>Top scholars</p>
-                {LEADERS.map((l,i)=>(
-                  <div key={l.name} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 0",borderBottom:i<LEADERS.length-1?`1px solid ${T.line}`:"none"}}>
-                    <span style={{fontFamily:T.mono,fontSize:11,color:l.rank<=3?T.orange:T.faint,width:18,fontWeight:700}}>{l.rank<=3?["🥇","🥈","🥉"][l.rank-1]:`#${l.rank}`}</span>
-                    <div style={{width:30,height:30,borderRadius:"50%",background:l.color,overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:700,color:"#fff",flexShrink:0}}>
-                      {l.img?<Image unoptimized width={1200} height={800} src={l.img} alt={l.name} style={{width:"100%",height:"100%",objectFit:"cover"}}/>:l.initials}
-                    </div>
-                    <div style={{flex:1}}>
-                      <div style={{fontSize:12,fontWeight:600,color:l.name==="You"?T.orange:T.ink}}>{l.name}</div>
-                      <div style={{fontFamily:T.mono,fontSize:10,color:T.faint}}>{l.xp} XP</div>
-                    </div>
-                  </div>
-                ))}
-                <button onClick={()=>router.push("/leaderboard")} style={{width:"100%",marginTop:12,fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",background:"transparent",border:`1px solid ${T.line}`,color:T.muted,borderRadius:10,padding:"9px",cursor:"pointer"}}>Full leaderboard →</button>
-              </div>
-
-              <div style={{background:T.navy,borderRadius:16,padding:"16px 18px"}}>
-                <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.12em",textTransform:"uppercase",color:T.orange,marginBottom:12}}>Quick links</p>
-                {[{l:"My dashboard",p:"/dashboard"},{l:"Course library",p:"/courses"},{l:"Mentorship",p:"/mentorship"},{l:"My profile",p:userUsername?`/u/${userUsername}`:"/profile"}].map(({l,p})=>(
-                  <button key={l} onClick={()=>router.push(p)} style={{display:"block",width:"100%",textAlign:"left",fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.04em",textTransform:"uppercase",background:"transparent",border:"none",color:"rgba(248,247,244,.45)",cursor:"pointer",padding:"8px 0",borderBottom:"1px solid rgba(255,255,255,.07)"}}>{l} →</button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {tab==="gallery"&&(
-          <div>
-            <label className="pb-upload" style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:10,background:T.surface,border:`2px dashed ${T.line}`,borderRadius:18,padding:"36px 24px",marginBottom:24,cursor:"pointer",transition:"all 0.2s",textAlign:"center"}}>
-              {uploading?<div style={{fontFamily:T.mono,fontSize:13,color:T.orange}}>Uploading...</div>:<>
-                <div style={{fontSize:40}}>📸</div>
-                <div style={{fontFamily:T.anton,fontSize:22,textTransform:"uppercase",color:T.ink}}>Add to your gallery</div>
-                <div style={{fontFamily:T.mono,fontSize:11,color:T.muted}}>Upload from your photo library · Saved permanently</div>
-                <div style={{fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:T.orange,color:"#fff",borderRadius:999,padding:"11px 24px",marginTop:4}}>Choose from library</div>
-              </>}
-              <input ref={galleryFileRef} type="file" accept="image/*" onChange={handleGalleryUpload} style={{display:"none"}}/>
-            </label>
-            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
-              <p style={{fontFamily:T.mono,fontSize:10,letterSpacing:"0.14em",textTransform:"uppercase",color:T.muted}}>{gallery.length} photos</p>
-              <button onClick={()=>setTab("feed")} style={{fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",background:"transparent",border:`1px solid ${T.line}`,color:T.muted,borderRadius:999,padding:"7px 14px",cursor:"pointer"}}>← Back to feed</button>
-            </div>
-            {gallery.length===0?(
-              <div style={{background:T.surface,border:`1px solid ${T.line}`,borderRadius:24,padding:"48px 24px",textAlign:"center"}}>
-                <div style={{fontSize:36,marginBottom:14}}>📷</div>
-                <p style={{fontFamily:T.mono,fontSize:12,color:T.faint}}>No photos yet. Upload your first one above!</p>
-              </div>
-            ):(
-              <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12}}>
-                {gallery.map((img,i)=>(
-                  <div key={i} onClick={()=>setLightbox(img)} style={{aspectRatio:"1",borderRadius:14,overflow:"hidden",cursor:"pointer",background:T.line}}>
-                    <Image unoptimized width={1200} height={800} src={img} alt={`Photo ${i+1}`} className="pb-gal" style={{width:"100%",height:"100%",objectFit:"cover",display:"block",transition:"all 0.2s"}}/>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-    </div>
+    </PlaybookPage>
   );
 }
+
+const status: React.CSSProperties = { maxWidth: 1180, margin: "0 auto 12px", color: "#334155" };
+const alert: React.CSSProperties = { maxWidth: 1180, margin: "0 auto 14px", padding: 12, border: "1px solid #FCA5A5", borderRadius: 12, background: "#FEF2F2", color: "#991B1B" };
+const tabRow: React.CSSProperties = { maxWidth: 1180, margin: "0 auto 16px", display: "flex", gap: 8 };
+const tabButton: React.CSSProperties = { border: "1px solid #CBD5E1", background: "#FFFFFF", color: "#0F172A", borderRadius: 999, padding: "10px 16px", fontWeight: 900, cursor: "pointer" };
+const activeTab: React.CSSProperties = { ...tabButton, background: "#0F172A", color: "#FFFFFF" };
+const composer: React.CSSProperties = { width: "100%", minHeight: 120, resize: "vertical", border: "1px solid #CBD5E1", borderRadius: 14, padding: 14, color: "#0F172A", background: "#F8FAFC" };
+const composerControls: React.CSSProperties = { marginTop: 12, display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" };
+const select: React.CSSProperties = { border: "1px solid #CBD5E1", borderRadius: 12, padding: "10px 12px", background: "#FFFFFF", color: "#0F172A" };
+const preview: React.CSSProperties = { position: "relative", marginTop: 14, minHeight: 220, borderRadius: 18, overflow: "hidden", background: "#E2E8F0" };
+const filterRow: React.CSSProperties = { maxWidth: 1180, margin: "18px auto", display: "flex", gap: 8, flexWrap: "wrap" };
+const filterButton: React.CSSProperties = { ...tabButton, padding: "8px 12px", fontSize: 12 };
+const activeFilter: React.CSSProperties = { ...filterButton, background: "#F97316", color: "#FFFFFF", borderColor: "#F97316" };
+const authorRow: React.CSSProperties = { display: "flex", gap: 10, alignItems: "center", marginBottom: 14 };
+const avatar: React.CSSProperties = { width: 48, height: 48, borderRadius: 16, display: "grid", placeItems: "center", overflow: "hidden", background: "#0F172A", color: "#F97316", fontWeight: 950 };
+const avatarImage: React.CSSProperties = { width: 48, height: 48, objectFit: "cover" };
+const profileLink: React.CSSProperties = { color: "#EA580C", textDecoration: "none", fontWeight: 850, fontSize: 12 };
+const meta: React.CSSProperties = { color: "#94A3B8" };
+const postBody: React.CSSProperties = { color: "#334155", lineHeight: 1.65, whiteSpace: "pre-wrap" };
+const postMedia: React.CSSProperties = { position: "relative", minHeight: 260, borderRadius: 18, overflow: "hidden", margin: "14px 0", background: "#E2E8F0" };
+const actions: React.CSSProperties = { display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginTop: 10 };
+const baseButton: React.CSSProperties = { borderRadius: 999, padding: "9px 13px", fontWeight: 900, cursor: "pointer" };
+const primaryButton: React.CSSProperties = { ...baseButton, border: 0, background: "#F97316", color: "#FFFFFF" };
+const secondaryButton: React.CSSProperties = { ...baseButton, border: "1px solid #CBD5E1", background: "#FFFFFF", color: "#0F172A" };
+const likedButton: React.CSSProperties = { ...secondaryButton, borderColor: "#FDBA74", background: "#FFF7ED", color: "#C2410C" };
+const textButton: React.CSSProperties = { border: 0, background: "transparent", color: "#EA580C", fontWeight: 850, cursor: "pointer", padding: 0 };
+const comments: React.CSSProperties = { marginTop: 16, paddingTop: 12, borderTop: "1px solid #E2E8F0" };
+const commentCard: React.CSSProperties = { marginBottom: 10, padding: 12, borderRadius: 12, background: "#F8FAFC", color: "#0F172A" };
+const commentText: React.CSSProperties = { margin: "6px 0 0", color: "#475569", lineHeight: 1.5 };
+const commentComposer: React.CSSProperties = { display: "flex", gap: 8, marginTop: 12, alignItems: "center" };
+const commentInput: React.CSSProperties = { flex: 1, minWidth: 0, border: "1px solid #CBD5E1", borderRadius: 12, padding: "10px 12px", background: "#FFFFFF", color: "#0F172A" };
+const galleryGrid: React.CSSProperties = { maxWidth: 1180, margin: "18px auto", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 12 };
+const galleryTile: React.CSSProperties = { position: "relative", minHeight: 240, borderRadius: 20, overflow: "hidden", background: "#E2E8F0" };
+const copy: React.CSSProperties = { color: "#64748B", lineHeight: 1.6 };
