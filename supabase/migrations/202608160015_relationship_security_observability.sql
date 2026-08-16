@@ -12,6 +12,7 @@ create table if not exists public.relationship_security_events (
     'relationship.activated',
     'relationship.revoked',
     'relationship.blocked',
+    'relationship.status_changed',
     'relationship.permissions_changed'
   )),
   actor_id uuid,
@@ -81,7 +82,7 @@ begin
         case
           when old.status = 'active' and new.status = 'removed' then 'relationship.revoked'
           when new.status = 'blocked' then 'relationship.blocked'
-          else 'relationship.permissions_changed'
+          else 'relationship.status_changed'
         end,
         coalesce(new.ended_by, effective_actor), old.status, new.status,
         old.permissions, new.permissions
