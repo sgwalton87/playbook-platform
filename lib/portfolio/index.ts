@@ -6,3 +6,4 @@ export * from "./services/completion";
 export * from "./services/dna";
 export * from "./services/intelligence";
 export * from "./scholar-record";
+export * from "./ai-foundation";
