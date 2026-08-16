@@ -13,7 +13,7 @@ type PublicPost = {
   createdAt: string;
   author: string;
   role: string;
-  pillar: string | null;
+  category: string | null;
 };
 
 type PublicIdentity = {
@@ -26,6 +26,8 @@ type PublicIdentity = {
   avatar_url: string | null;
 };
 
+const CANONICAL_CATEGORIES = new Set(["leadership", "finance", "civic", "sel", "college", "nil", "community"]);
+
 export default function PublicNewsFeed() {
   const [posts, setPosts] = useState<PublicPost[]>([]);
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
@@ -35,7 +37,7 @@ export default function PublicNewsFeed() {
     async function loadPublicPosts() {
       const { data: rows, error } = await supabase
         .from("feed_posts")
-        .select("id,user_id,title,body,image_url,media_url,created_at,pillar")
+        .select("id,user_id,title,body,image_url,media_url,created_at,post_type")
         .eq("visibility", "public")
         .order("created_at", { ascending: false })
         .limit(30);
@@ -62,13 +64,14 @@ export default function PublicNewsFeed() {
           identity.id,
           {
             name: identity.full_name || [identity.first_name, identity.last_name].filter(Boolean).join(" ") || identity.username || "Playbook community member",
-            role: formatRole(identity.role),
+            role: formatLabel(identity.role),
           },
         ]),
       );
 
       setPosts((rows || []).map((post) => {
         const author = authors.get(post.user_id) || { name: "Playbook community member", role: "Community" };
+        const normalizedType = String(post.post_type || "").trim().toLowerCase();
         return {
           id: post.id,
           title: post.title || null,
@@ -77,7 +80,7 @@ export default function PublicNewsFeed() {
           createdAt: post.created_at,
           author: author.name,
           role: author.role,
-          pillar: post.pillar || null,
+          category: CANONICAL_CATEGORIES.has(normalizedType) ? formatLabel(normalizedType) : null,
         };
       }));
       setState("ready");
@@ -101,7 +104,7 @@ export default function PublicNewsFeed() {
           )}
           <div style={cardBody}>
             <div style={meta}>
-              <span>{post.pillar ? `${post.pillar} · ${post.role}` : post.role}</span>
+              <span>{post.category ? `${post.category} · ${post.role}` : post.role}</span>
               <time dateTime={post.createdAt}>{formatDate(post.createdAt)}</time>
             </div>
             <h2 style={cardTitle}>{post.title || "From the Playbook community"}</h2>
@@ -137,7 +140,7 @@ function formatDate(value: string) {
     : date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
-function formatRole(value: unknown) {
+function formatLabel(value: unknown) {
   return String(value || "Community").replaceAll("_", " ").replaceAll("-", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
