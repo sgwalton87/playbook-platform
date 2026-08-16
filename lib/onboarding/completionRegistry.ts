@@ -14,6 +14,9 @@ export interface RoleOnboardingCompletionContract {
   requirement: string;
 }
 
+const publicCompletionSlug = (role: PlaybookRole) =>
+  role === "other" ? "community-partner" : role;
+
 const contract = (
   role: PlaybookRole,
   adapter: string,
@@ -21,7 +24,7 @@ const contract = (
   requirement: string
 ): RoleOnboardingCompletionContract => ({
   role,
-  endpoint: `/api/pbos/onboarding/${role}`,
+  endpoint: `/api/pbos/onboarding/${publicCompletionSlug(role)}`,
   destination: PLAYBOOK_ROLES[role].osRoute,
   adapter,
   state,
