@@ -1,5 +1,6 @@
 "use client";
 
+import RoleAuthorityGate from "@/components/role-os/RoleAuthorityGate";
 import {
   PlaybookButton,
   PlaybookCard,
@@ -20,31 +21,35 @@ export default function RoleDashboardExperience({
   const dashboard = getRoleDashboard(role);
 
   return (
-    <PlaybookPage>
-      <PlaybookHero
-        eyebrow={`${role} OS`}
-        title={dashboard.title}
-        subtitle={dashboard.description}
-      >
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 18 }}>
-          <PlaybookButton href="/role-intelligence">Open Role Intelligence</PlaybookButton>
-          <PlaybookButton href="/messages" variant="secondary">Messages</PlaybookButton>
-        </div>
-      </PlaybookHero>
+    <RoleAuthorityGate roleOS={role}>
+      <PlaybookPage>
+        <PlaybookHero
+          eyebrow={`${role} OS`}
+          title={dashboard.title}
+          subtitle={dashboard.description}
+        >
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 18 }}>
+            <PlaybookButton href="/role-intelligence">Open Role Intelligence</PlaybookButton>
+            <PlaybookButton href="/messages" variant="secondary">Messages</PlaybookButton>
+          </div>
+        </PlaybookHero>
 
-      <PlaybookMetrics>
-        {dashboard.metrics.map((metric) => <PlaybookMetric key={metric.label} label={metric.label} value={metric.value} />)}
-      </PlaybookMetrics>
+        <PlaybookMetrics>
+          {dashboard.metrics.map((metric) => (
+            <PlaybookMetric key={metric.label} label={metric.label} value={metric.value} />
+          ))}
+        </PlaybookMetrics>
 
-      <PlaybookGrid min={300}>
-        {dashboard.cards.map((card) => (
-          <PlaybookCard key={card.title} eyebrow={card.label || "Role OS"} title={card.title}>
-            <p style={body}>{card.body}</p>
-            <PlaybookButton href={card.href}>{card.action}</PlaybookButton>
-          </PlaybookCard>
-        ))}
-      </PlaybookGrid>
-    </PlaybookPage>
+        <PlaybookGrid min={300}>
+          {dashboard.cards.map((card) => (
+            <PlaybookCard key={card.title} eyebrow={card.label || "Role OS"} title={card.title}>
+              <p style={body}>{card.body}</p>
+              <PlaybookButton href={card.href}>{card.action}</PlaybookButton>
+            </PlaybookCard>
+          ))}
+        </PlaybookGrid>
+      </PlaybookPage>
+    </RoleAuthorityGate>
   );
 }
 
