@@ -1,7 +1,7 @@
 "use client";
 
-import RoleDashboardExperience from "@/components/role-os/dashboards/RoleDashboardExperience";
+import DistrictVerificationExperience from "@/components/district/DistrictVerificationExperience";
 
 export default function DistrictOSPage() {
-  return <RoleDashboardExperience role="district" />;
+  return <DistrictVerificationExperience />;
 }
