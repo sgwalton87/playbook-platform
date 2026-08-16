@@ -41,6 +41,8 @@ export const ROLE_ALIASES: Record<string, PlaybookRole> = {
   school_admin: "district",
   "athlete-abroad-enrollment": "athlete-abroad",
   international_athlete: "athlete-abroad",
+  "community-partner": "other",
+  community_partner: "other",
 };
 
 /**
