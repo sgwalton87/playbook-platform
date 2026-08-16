@@ -4,6 +4,7 @@ import { sendPlaybookEmail } from "@/lib/email";
 import {
   buildRecommenderEmail,
   buildRecommenderRequest,
+  isRecommenderRole,
   updateRecommenderRequestStatus,
 } from "@/lib/recommenders";
 import { requireUser } from "@/lib/supabase/server";
@@ -23,14 +24,25 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Recommendation requests may only be created for the authenticated learner." }, { status: 403 });
     }
 
+    if (!isRecommenderRole(body.recommenderRole)) {
+      return NextResponse.json(
+        { error: "Recommender role must be educator, mentor, coach, family, or employer." },
+        { status: 400 }
+      );
+    }
+
+    const evidence = Array.isArray(body.evidence)
+      ? body.evidence.filter((item): item is string => typeof item === "string").slice(0, 50)
+      : [];
+
     const request = buildRecommenderRequest({
       scholarId: user.id,
       scholarName: profile.data.full_name || "Playbook Scholar",
       recommenderName: String(body.recommenderName ?? ""),
       recommenderEmail: String(body.recommenderEmail ?? ""),
-      recommenderRole: String(body.recommenderRole ?? ""),
+      recommenderRole: body.recommenderRole,
       opportunityName: String(body.opportunityName ?? ""),
-      evidence: Array.isArray(body.evidence) ? body.evidence.slice(0, 50) : [],
+      evidence,
     });
 
     const sent = updateRecommenderRequestStatus(request, "sent");
