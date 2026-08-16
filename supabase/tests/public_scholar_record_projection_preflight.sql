@@ -53,27 +53,32 @@ begin
   end loop;
 end $$;
 
--- Historical unconditional feed-read policies must be gone.
+-- feed_posts is a deployed/runtime entity whose creating DDL is not present in
+-- the repository migration history. When the table exists in the database under
+-- certification, enforce its public visibility boundary. A from-zero local replay
+-- must not fabricate an unknown historical schema solely to make this test pass.
 do $$
 begin
-  if exists (
-    select 1 from pg_policies
-    where schemaname='public'
-      and tablename='feed_posts'
-      and cmd='SELECT'
-      and coalesce(qual,'') in ('true','(true)')
-  ) then
-    raise exception 'feed_posts still has an unconditional SELECT policy';
-  end if;
+  if to_regclass('public.feed_posts') is not null then
+    if exists (
+      select 1 from pg_policies
+      where schemaname='public'
+        and tablename='feed_posts'
+        and cmd='SELECT'
+        and coalesce(qual,'') in ('true','(true)')
+    ) then
+      raise exception 'feed_posts still has an unconditional SELECT policy';
+    end if;
 
-  if not exists (
-    select 1 from pg_policies
-    where schemaname='public'
-      and tablename='feed_posts'
-      and policyname='Public can view public feed posts'
-      and qual ilike '%visibility%public%'
-  ) then
-    raise exception 'feed_posts public visibility policy is missing';
+    if not exists (
+      select 1 from pg_policies
+      where schemaname='public'
+        and tablename='feed_posts'
+        and policyname='Public can view public feed posts'
+        and qual ilike '%visibility%public%'
+    ) then
+      raise exception 'feed_posts public visibility policy is missing';
+    end if;
   end if;
 end $$;
 
