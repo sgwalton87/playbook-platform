@@ -19,12 +19,15 @@ export async function POST(request: NextRequest) {
 
     const profile = await supabase
       .from("profiles")
-      .select("role,profile_mode")
+      .select("role,profile_mode,onboarding_completed,verification_status")
       .eq("id", user.id)
       .maybeSingle();
     if (profile.error) throw new Error(profile.error.message);
+    if (!profile.data) {
+      return NextResponse.json({ error: "A durable Playbook profile is required." }, { status: 409 });
+    }
 
-    const durableRole = normalizeOnboardingRole(profile.data?.profile_mode ?? profile.data?.role);
+    const durableRole = normalizeOnboardingRole(profile.data.profile_mode ?? profile.data.role);
     if (durableRole !== endpointRole) {
       return NextResponse.json(
         {
@@ -34,24 +37,42 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!profile.data.onboarding_completed) {
+      return NextResponse.json(
+        { error: `${contract.role} must finish its role-specific onboarding form before completion can be submitted.` },
+        { status: 409 }
+      );
+    }
+
     if (contract.state !== "implemented") {
+      if (profile.data.verification_status !== "approved") {
+        const pending = await supabase
+          .from("profiles")
+          .update({ verification_status: "pending" })
+          .eq("id", user.id)
+          .eq("profile_mode", endpointRole);
+        if (pending.error) throw new Error(pending.error.message);
+      }
+
       return NextResponse.json(
         {
-          error: `${contract.role} onboarding cannot be completed until its independent governed adapter is certified.`,
+          ok: true,
           role: contract.role,
           adapter: contract.adapter,
+          onboardingSubmitted: true,
+          activationState: contract.state,
           requirement: contract.requirement,
           destination: contract.destination,
-          state: contract.state,
+          message: `${contract.role} onboarding is complete. Role authority remains fail-closed until its independent activation requirement is satisfied.`,
         },
-        { status: 409 }
+        { status: 202 }
       );
     }
 
     // The three currently implemented learner roles share the canonical Scholar
     // Record service, but only after this role-bound endpoint proves that the URL
     // role and durable profile role are identical. The underlying service then
-    // enforces its own PBOS identity-role equality before persistence.
+    // enforces PBOS identity-role equality before persistence.
     return await completeScholarRecord(request);
   } catch (error) {
     return NextResponse.json(
