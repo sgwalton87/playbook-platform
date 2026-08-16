@@ -57,9 +57,6 @@ export default function AdminPage() {
   const [notes, setNotes] = useState<Record<string, string>>({});
 
   const load = useCallback(async () => {
-    setLoading(true);
-    setError("");
-
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) {
       router.replace("/login?next=/admin");
@@ -196,30 +193,9 @@ export default function AdminPage() {
               </label>
 
               <div style={actions}>
-                <button
-                  type="button"
-                  disabled={busyId === request.request_id}
-                  onClick={() => void review(request, "under_review")}
-                  style={secondaryButton}
-                >
-                  Mark reviewing
-                </button>
-                <button
-                  type="button"
-                  disabled={busyId === request.request_id}
-                  onClick={() => void review(request, "rejected")}
-                  style={dangerButton}
-                >
-                  Reject
-                </button>
-                <button
-                  type="button"
-                  disabled={busyId === request.request_id}
-                  onClick={() => void review(request, "approved")}
-                  style={primaryButton}
-                >
-                  Approve
-                </button>
+                <button type="button" disabled={busyId === request.request_id} onClick={() => void review(request, "under_review")} style={secondaryButton}>Mark reviewing</button>
+                <button type="button" disabled={busyId === request.request_id} onClick={() => void review(request, "rejected")} style={dangerButton}>Reject</button>
+                <button type="button" disabled={busyId === request.request_id} onClick={() => void review(request, "approved")} style={primaryButton}>Approve</button>
               </div>
             </PlaybookCard>
           ))}
