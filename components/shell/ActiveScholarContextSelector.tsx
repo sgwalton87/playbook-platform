@@ -21,17 +21,19 @@ export default function ActiveScholarContextSelector({ compact = false }: { comp
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
-  async function load() {
-    const response = await fetch("/api/support-context", { cache: "no-store" });
-    const body = await response.json() as ContextResponse;
-    if (!response.ok) throw new Error(body.error || "Scholar context could not be loaded.");
-    setAvailable(body.available ?? []);
-    setActive(body.active ?? null);
-  }
-
   useEffect(() => {
     let mounted = true;
-    void load().catch((cause) => { if (mounted) setError(cause instanceof Error ? cause.message : "Scholar context could not be loaded."); });
+    void fetch("/api/support-context", { cache: "no-store" })
+      .then(async (response) => {
+        const body = await response.json() as ContextResponse;
+        if (!response.ok) throw new Error(body.error || "Scholar context could not be loaded.");
+        if (!mounted) return;
+        setAvailable(body.available ?? []);
+        setActive(body.active ?? null);
+      })
+      .catch((cause) => {
+        if (mounted) setError(cause instanceof Error ? cause.message : "Scholar context could not be loaded.");
+      });
     return () => { mounted = false; };
   }, []);
 
