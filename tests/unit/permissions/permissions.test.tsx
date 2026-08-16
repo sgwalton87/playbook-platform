@@ -7,8 +7,12 @@ import {
 import PermissionsGraph from "@/components/permissions/PermissionsGraph";
 
 describe("Role OS Permissions", () => {
-  it("keeps unproven educator relationships at zero data authority", () => {
+  it("keeps unproven external relationships at zero data authority", () => {
     expect(getPermissionsForRelationship("educator")).toEqual([]);
+    expect(getPermissionsForRelationship("counselor")).toEqual([]);
+    expect(getPermissionsForRelationship("college_recruiter")).toEqual([]);
+    expect(getPermissionsForRelationship("college_admissions")).toEqual([]);
+    expect(getPermissionsForRelationship("community_partner")).toEqual([]);
   });
 
   it("checks permission access", () => {
@@ -17,9 +21,12 @@ describe("Role OS Permissions", () => {
     expect(canRelationship("educator", "verify_evidence")).toBe(false);
   });
 
-  it("returns relationship graph", () => {
-    expect(getRelationshipGraph().length).toBe(8);
-    expect(getRelationshipGraph().some((entry) => entry.relationship === "coach")).toBe(true);
+  it("returns the exact relationship graph", () => {
+    const graph = getRelationshipGraph();
+    expect(graph.length).toBe(12);
+    expect(graph.some((entry) => entry.relationship === "college_recruiter")).toBe(true);
+    expect(graph.some((entry) => entry.relationship === "college_admissions")).toBe(true);
+    expect(graph.some((entry) => entry.relationship === "community_partner")).toBe(true);
   });
 
   it("component is defined", () => {
