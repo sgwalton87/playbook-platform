@@ -32,7 +32,7 @@ with check (
     select 1
       from public.profiles as profile
      where profile.id = (select auth.uid())
-       and coalesce(profile.profile_mode, profile.role, profile.requested_role) = 'coach'
+       and coalesce(profile.profile_mode, profile.role::text, profile.requested_role) = 'coach'
        and profile.onboarding_completed = true
   )
   and exists (
@@ -154,7 +154,7 @@ begin
       select 1
         from public.profiles as profile
        where profile.id = authenticated_user_id
-         and coalesce(profile.profile_mode, profile.role, profile.requested_role) = 'coach'
+         and coalesce(profile.profile_mode, profile.role::text, profile.requested_role) = 'coach'
          and profile.onboarding_completed = true
     ) then
       raise exception 'Coach onboarding must be complete before relationship activation.' using errcode = '42501';
