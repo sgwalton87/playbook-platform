@@ -1,19 +1,13 @@
 import { ROLE_ONBOARDING } from "./config/roleConfigs";
 import { getPathway } from "./pathwayMap";
-import {
-  PLAYBOOK_ROLES,
-  ROLE_ALIASES,
-  type PlaybookRole,
-} from "@/lib/roles/registry";
+import { requirePlaybookRole, type PlaybookRole } from "@/lib/roles/registry";
 import type { OnboardingData, OnboardingStep } from "./types";
 
 function resolveExplicitOnboardingRole(role?: string | null): PlaybookRole {
-  const raw = String(role ?? "").trim().toLowerCase();
-  if (!raw) return "scholar";
-  if (raw in PLAYBOOK_ROLES) return raw as PlaybookRole;
-  const alias = ROLE_ALIASES[raw];
-  if (alias) return alias;
-  throw new Error(`Unsupported Playbook onboarding role: ${raw}`);
+  if (role === undefined || role === null || String(role).trim() === "") {
+    return "scholar";
+  }
+  return requirePlaybookRole(role);
 }
 
 export function getOnboardingSteps(role?: string | null): OnboardingStep[] {
