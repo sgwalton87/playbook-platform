@@ -46,11 +46,13 @@ export async function POST(request: NextRequest) {
 
     if (contract.state !== "implemented") {
       if (profile.data.verification_status !== "approved") {
+        // Role equality was already proven above. Bind the mutation only to the
+        // authenticated profile ID so a legacy null profile_mode cannot silently
+        // prevent the pending state from being recorded.
         const pending = await supabase
           .from("profiles")
           .update({ verification_status: "pending" })
-          .eq("id", user.id)
-          .eq("profile_mode", endpointRole);
+          .eq("id", user.id);
         if (pending.error) throw new Error(pending.error.message);
       }
 
