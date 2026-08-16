@@ -31,15 +31,21 @@ export async function GET() {
     if (conversations.error) throw new Error(conversations.error.message);
     const ids = (conversations.data ?? []).map(item => item.id as string);
     if (!ids.length) return NextResponse.json({ conversations: [] });
-    const [participants, messages] = await Promise.all([
+    const [participants, messages, attachments] = await Promise.all([
       supabase.from("pbos_conversation_participants").select("conversation_id,user_id,role,muted_at,blocked_at,last_read_at").in("conversation_id", ids),
       supabase.from("pbos_messages").select("id,conversation_id,sender_id,body,delivery_state,moderation_state,reported_at,created_at")
-        .in("conversation_id", ids).order("created_at", { ascending: true })
+        .in("conversation_id", ids).order("created_at", { ascending: true }),
+      supabase.from("pbos_message_attachments").select("id,conversation_id,message_id,original_name,mime_type,byte_size,created_at")
+        .in("conversation_id", ids).not("message_id", "is", null).order("created_at", { ascending: true })
     ]);
     if (participants.error) throw new Error(participants.error.message); if (messages.error) throw new Error(messages.error.message);
+    if (attachments.error) throw new Error(attachments.error.message);
     return NextResponse.json({ conversations: (conversations.data ?? []).map(conversation => {
       const membership = (participants.data ?? []).find(item => item.conversation_id === conversation.id && item.user_id === user.id);
-      const thread = (messages.data ?? []).filter(item => item.conversation_id === conversation.id);
+      const thread = (messages.data ?? []).filter(item => item.conversation_id === conversation.id).map(message => ({
+        ...message,
+        attachments: (attachments.data ?? []).filter(item => item.message_id === message.id),
+      }));
       const unread = thread.filter(item => item.sender_id !== user.id && (!membership?.last_read_at || item.created_at > membership.last_read_at)).length;
       return { ...conversation, relationship: relationships.find(item => item.id === conversation.relationship_id),
         participant: membership, unreadCount: unread, messages: thread };
@@ -51,8 +57,9 @@ export async function POST(request: NextRequest) {
   try {
     const { supabase, user } = await requireUser();
     if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
-    const body = await request.json() as { relationshipId?: unknown; conversationId?: unknown; body?: unknown; requestId?: unknown };
+    const body = await request.json() as { relationshipId?: unknown; conversationId?: unknown; body?: unknown; requestId?: unknown; attachmentIds?: unknown };
     const relationshipId = String(body.relationshipId ?? ""); const requestId = String(body.requestId ?? "");
+    const attachmentIds = Array.isArray(body.attachmentIds) ? [...new Set(body.attachmentIds.map(String).filter(Boolean))].slice(0, 5) : [];
     if (!relationshipId || !requestId) return NextResponse.json({ error: "Relationship and request identifiers are required." }, { status: 400 });
     const relationshipResult = await supabase.from("support_relationships")
       .select("id,scholar_id,supporter_id,supporter_email,relationship,status,permissions").eq("id", relationshipId).maybeSingle();
@@ -97,6 +104,13 @@ export async function POST(request: NextRequest) {
       if (existingMessage.error || !existingMessage.data) throw new Error(existingMessage.error?.message ?? "Message persistence failed.");
       stagedMessage = existingMessage.data;
     }
+    if (attachmentIds.length) {
+      const bound = await supabase.from("pbos_message_attachments").update({ message_id: stagedMessage.id })
+        .in("id", attachmentIds).eq("conversation_id", conversationId).eq("uploader_id", user.id).is("message_id", null)
+        .select("id");
+      if (bound.error) throw new Error(bound.error.message);
+      if ((bound.data ?? []).length !== attachmentIds.length) throw new Error("One or more attachments are missing, already sent, or no longer authorized.");
+    }
     const mapper = new PlaybookIdentityMapper(); const identity = mapper.mapSupabaseIdentity(user.id, authority.pbosRole);
     const client = new PlaybookPbosRuntimeClient(new SignedPlaybookPbosTransport(required("PBOS_API_URL"), {
       organizationId: required("PBOS_ORGANIZATION_ID"), connectorId: required("PBOS_CONNECTOR_ID"),
@@ -104,14 +118,15 @@ export async function POST(request: NextRequest) {
     const response = await client.send("PUBLISH_LIFECYCLE_EVENT", { connectorId: "PLAYBOOK-CONNECTOR-001",
       domainRegistrationId: "PLAYBOOK-SCHOLAR-REGISTRATION-001", identityMappingId: identity.mappingId,
       correlationId: idempotencyKey, purpose: "Publish an approved support message.", payload: {
-        eventType: "SUPPORT_MESSAGE_SENT", schemaVersion: "1.0.0", messageId: stagedMessage.id, conversationId
+        eventType: "SUPPORT_MESSAGE_SENT", schemaVersion: "1.0.0", messageId: stagedMessage.id, conversationId,
+        attachmentIds,
       } }, idempotencyKey, idempotencyKey);
     if (!response.success) throw new Error(response.error.message);
     const provenance = [...authority.provenance, identity.pbosIdentity.provenance, ...response.provenance];
     const delivered = await supabase.from("pbos_messages").update({ delivery_state: "DELIVERED", provenance })
       .eq("id", stagedMessage.id).eq("sender_id", user.id).select("id,conversation_id,sender_id,body,delivery_state,created_at").single();
     if (delivered.error || !delivered.data) throw new Error(delivered.error?.message ?? "Message delivery finalization failed.");
-    return NextResponse.json({ conversation, message: delivered.data }, { status: 201 });
+    return NextResponse.json({ conversation, message: { ...delivered.data, attachmentIds } }, { status: 201 });
   } catch (error) { return NextResponse.json({ error: error instanceof Error ? error.message : "Message delivery failed." }, { status: 500 }); }
 }
 
@@ -121,6 +136,13 @@ export async function PATCH(request: NextRequest) {
     if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
     const body = await request.json() as { action?: unknown; conversationId?: unknown; messageId?: unknown };
     const action = messagingAction(String(body.action ?? "")); const conversationId = String(body.conversationId ?? "");
+    const relationships = await relationshipsFor(supabase, user);
+    const relationshipIds = relationships.map(item => String(item.id));
+    if (!relationshipIds.length) return NextResponse.json({ error: "An active support relationship is required." }, { status: 403 });
+    const conversation = await supabase.from("pbos_conversations").select("id,relationship_id,status")
+      .eq("id", conversationId).eq("status", "ACTIVE").in("relationship_id", relationshipIds).maybeSingle();
+    if (conversation.error) throw new Error(conversation.error.message);
+    if (!conversation.data) return NextResponse.json({ error: "An active support relationship is required." }, { status: 403 });
     const participant = await supabase.from("pbos_conversation_participants").select("conversation_id,user_id").eq("conversation_id", conversationId)
       .eq("user_id", user.id).maybeSingle();
     if (participant.error) throw new Error(participant.error.message);
