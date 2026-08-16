@@ -43,24 +43,29 @@ select coalesce((select file_size_limit = 10485760 from storage.buckets where id
   \quit 1
 \endif
 
-select count(*) = 3 as attachment_metadata_policy_count
-from pg_policies where schemaname='public' and tablename='pbos_message_attachments';
-\gset
-\if :attachment_metadata_policy_count
+select count(*) = 4 as attachment_metadata_policy_set_complete
+from pg_policies
+where schemaname='public' and tablename='pbos_message_attachments'
+  and policyname in (
+    'Current participants view message attachments',
+    'Current participants stage message attachments',
+    'Uploaders attach staged message attachments',
+    'Uploaders delete staged message attachments'
+  ) \gset
+\if :attachment_metadata_policy_set_complete
 \else
   \echo 'message attachment metadata policy set is incomplete'
   \quit 1
 \endif
 
-select count(*) = 3 as attachment_storage_policy_count
+select count(*) = 3 as attachment_storage_policy_set_complete
 from pg_policies where schemaname='storage' and tablename='objects'
   and policyname in (
     'Current participants upload message attachments',
     'Current participants read message attachments',
     'Uploaders delete staged message attachment objects'
-  );
-\gset
-\if :attachment_storage_policy_count
+  ) \gset
+\if :attachment_storage_policy_set_complete
 \else
   \echo 'message attachment storage policy set is incomplete'
   \quit 1
@@ -69,8 +74,7 @@ from pg_policies where schemaname='storage' and tablename='objects'
 select count(*) = 1 as participant_select_active_guard
 from pg_policies where schemaname='public' and tablename='pbos_conversation_participants'
   and policyname='Participants view their state'
-  and qual ilike '%pbos_user_has_active_conversation_access%';
-\gset
+  and qual ilike '%pbos_user_has_active_conversation_access%' \gset
 \if :participant_select_active_guard
 \else
   \echo 'participant read policy does not enforce current relationship authority'
@@ -81,8 +85,7 @@ select count(*) = 1 as participant_update_active_guard
 from pg_policies where schemaname='public' and tablename='pbos_conversation_participants'
   and policyname='Participants update their state'
   and qual ilike '%pbos_user_has_active_conversation_access%'
-  and with_check ilike '%pbos_user_has_active_conversation_access%';
-\gset
+  and with_check ilike '%pbos_user_has_active_conversation_access%' \gset
 \if :participant_update_active_guard
 \else
   \echo 'participant update policy does not enforce current relationship authority'
@@ -96,8 +99,7 @@ from pg_policies where schemaname='public' and tablename='pbos_messages'
     'Governed participants send messages',
     'Governed participants update messages'
   )
-  and coalesce(qual, with_check, '') ilike '%pbos_user_has_active_conversation_access%';
-\gset
+  and coalesce(qual, with_check, '') ilike '%pbos_user_has_active_conversation_access%' \gset
 \if :message_active_guard_count
 \else
   \echo 'one or more message policies do not enforce current relationship authority'
@@ -109,8 +111,7 @@ from pg_policies
 where schemaname = 'public'
   and tablename = 'profiles'
   and cmd = 'SELECT'
-  and (qual = 'true' or qual ilike '%profile_visibility%public%');
-\gset
+  and (qual = 'true' or qual ilike '%profile_visibility%public%') \gset
 \if :broad_profile_select_policy_absent
 \else
   \echo 'public.profiles gained a broad select policy'
