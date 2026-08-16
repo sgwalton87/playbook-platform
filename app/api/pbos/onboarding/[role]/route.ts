@@ -38,20 +38,21 @@ export async function POST(request: NextRequest) {
     }
 
     if (contract.state !== "implemented") {
-      if (profile.data.verification_status !== "approved") {
-        const pending = await supabase
-          .from("profiles")
-          .update({ verification_status: "pending" })
-          .eq("id", user.id);
-        if (pending.error) throw new Error(pending.error.message);
-      }
+      const completion = await supabase.rpc("complete_playbook_onboarding", {
+        expected_role: endpointRole,
+        mark_verification_pending: true,
+      });
+      if (completion.error) throw new Error(completion.error.message);
 
-      const completedAt = new Date().toISOString();
-      const completed = await supabase
+      const completedProfile = await supabase
         .from("profiles")
-        .update({ onboarding_completed: true, onboarding_completed_at: completedAt })
-        .eq("id", user.id);
-      if (completed.error) throw new Error(completed.error.message);
+        .select("onboarding_completed_at")
+        .eq("id", user.id)
+        .single();
+      if (completedProfile.error) throw new Error(completedProfile.error.message);
+      if (!completedProfile.data.onboarding_completed_at) {
+        throw new Error("Governed onboarding completion did not persist a completion timestamp.");
+      }
 
       return NextResponse.json(
         {
@@ -59,7 +60,7 @@ export async function POST(request: NextRequest) {
           role: contract.role,
           adapter: contract.adapter,
           onboardingSubmitted: true,
-          onboardingCompletedAt: completedAt,
+          onboardingCompletedAt: completedProfile.data.onboarding_completed_at,
           activationState: contract.state,
           requirement: contract.requirement,
           destination: contract.destination,
