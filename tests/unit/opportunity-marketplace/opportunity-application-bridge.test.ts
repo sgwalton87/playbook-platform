@@ -6,10 +6,11 @@ const source = readFileSync(join(process.cwd(), "components/opportunity-marketpl
 
 describe("opportunity application bridge", () => {
   it("routes matched opportunities into the canonical application workspace", () => {
+    expect(source).toContain("new URLSearchParams({");
+    expect(source).toContain("opportunityId: match.opportunityId");
+    expect(source).toContain("opportunityName: match.title");
+    expect(source).toContain("opportunityType: workspaceType(match.type)");
     expect(source).toContain("/application-workspaces?");
-    expect(source).toContain("opportunityId=");
-    expect(source).toContain("opportunityName=");
-    expect(source).toContain("opportunityType=");
     expect(source).toContain("Start application");
   });
 
