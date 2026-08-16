@@ -9,8 +9,9 @@ describe("independent onboarding completion contracts", () => {
   it("registers every canonical role exactly once", () => {
     expect(Object.keys(ROLE_ONBOARDING_COMPLETION)).toHaveLength(15);
     for (const [role, contract] of Object.entries(ROLE_ONBOARDING_COMPLETION)) {
+      const publicSlug = role === "other" ? "community-partner" : role;
       expect(contract.role).toBe(role);
-      expect(contract.endpoint).toBe(`/api/pbos/onboarding/${role}`);
+      expect(contract.endpoint).toBe(`/api/pbos/onboarding/${publicSlug}`);
       expect(contract.destination).toBe(getRoleDestination(role));
       expect(contract.adapter.length).toBeGreaterThan(0);
       expect(contract.requirement.length).toBeGreaterThan(0);
