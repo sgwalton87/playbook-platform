@@ -59,4 +59,67 @@ where schemaname='public' and tablename='profiles' and cmd='SELECT'
   and (qual='true' or qual ilike '%profile_visibility%public%') \gset
 \if :broad_profile_select_policy_absent \else \echo 'public.profiles gained a broad select policy; projection boundary failed' \quit 1 \endif
 
+-- High-traffic social/attention policies span canonical plus reconciled legacy tables.
+-- A clean canonical replay may omit a legacy table entirely; however, whenever a target table
+-- exists, its expected policy must still exist with the expected command.
+with expected(tablename,policyname,cmd) as (
+  values
+    ('posts','Authenticated users can create posts','INSERT'),
+    ('posts','Users can update own posts','UPDATE'),
+    ('posts','Users can delete own posts','DELETE'),
+    ('notifications','Users can view own notifications','SELECT'),
+    ('notifications','Users can update own notifications','UPDATE'),
+    ('connections','Users can view own connections','SELECT'),
+    ('connections','Users can create connection requests','INSERT'),
+    ('connection_requests','Users can view own connection requests','SELECT'),
+    ('connection_requests','Users can create connection requests','INSERT'),
+    ('connection_requests','Recipients can respond to connection requests','UPDATE'),
+    ('user_connections','Users can view own connections','SELECT'),
+    ('user_connections','Users can create own connections','INSERT'),
+    ('user_connections','Users can remove own connections','DELETE')
+)
+select not exists (
+  select 1
+  from expected e
+  where to_regclass('public.' || e.tablename) is not null
+    and not exists (
+      select 1 from pg_policies p
+      where p.schemaname='public'
+        and p.tablename=e.tablename
+        and p.policyname=e.policyname
+        and p.cmd=e.cmd
+    )
+) as existing_social_attention_policy_set_intact \gset
+\if :existing_social_attention_policy_set_intact \else \echo 'an existing social/attention table lost an expected RLS policy or command' \quit 1 \endif
+
+-- Every target policy that exists in this database must cache auth.uid() once per statement.
+-- Zero target rows is valid in a canonical-only replay where all of these reconciled legacy
+-- surfaces are absent; hosted-production advisor verification proves the production set separately.
+with target as (
+  select p.*
+  from pg_policies p
+  where p.schemaname='public'
+    and (p.tablename,p.policyname) in (
+      ('posts','Authenticated users can create posts'),
+      ('posts','Users can update own posts'),
+      ('posts','Users can delete own posts'),
+      ('notifications','Users can view own notifications'),
+      ('notifications','Users can update own notifications'),
+      ('connections','Users can view own connections'),
+      ('connections','Users can create connection requests'),
+      ('connection_requests','Users can view own connection requests'),
+      ('connection_requests','Users can create connection requests'),
+      ('connection_requests','Recipients can respond to connection requests'),
+      ('user_connections','Users can view own connections'),
+      ('user_connections','Users can create own connections'),
+      ('user_connections','Users can remove own connections')
+    )
+)
+select coalesce(
+  bool_and((coalesce(qual,'') || ' ' || coalesce(with_check,'')) ilike '%select auth.uid()%'),
+  true
+) as existing_social_attention_auth_inputs_cached
+from target \gset
+\if :existing_social_attention_auth_inputs_cached \else \echo 'an existing social/attention RLS policy still evaluates auth.uid() per row' \quit 1 \endif
+
 rollback;
