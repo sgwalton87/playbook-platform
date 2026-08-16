@@ -25,10 +25,10 @@ select has_function_privilege('authenticated','public.set_active_support_scholar
 \if :rpc_access \else \echo 'authenticated users require narrow active Scholar context RPCs' \quit 1 \endif
 
 select position('supporter_id=actor_id' in pg_get_functiondef('public.set_active_support_scholar_context(uuid)'::regprocedure)) > 0
-   and position("status='active'" in pg_get_functiondef('public.set_active_support_scholar_context(uuid)'::regprocedure)) > 0 as active_relationship_required \gset
+   and position('status=''active''' in pg_get_functiondef('public.set_active_support_scholar_context(uuid)'::regprocedure)) > 0 as active_relationship_required \gset
 \if :active_relationship_required \else \echo 'setter must require active supporter relationship' \quit 1 \endif
 
-select position("r.status='active'" in pg_get_functiondef('public.get_active_support_scholar_context()'::regprocedure)) > 0 as getter_rechecks_active \gset
+select position('r.status=''active''' in pg_get_functiondef('public.get_active_support_scholar_context()'::regprocedure)) > 0 as getter_rechecks_active \gset
 \if :getter_rechecks_active \else \echo 'active context projection must re-check relationship status' \quit 1 \endif
 
 rollback;
