@@ -6,8 +6,12 @@ describe("role onboarding completion authority", () => {
     expect(assertRoleOnboardingCompletionSupported("scholar")).toBe("scholar");
   });
 
+  it("permits Scholar-Athlete only through its governed Scholar Record adapter", () => {
+    expect(assertRoleOnboardingCompletionSupported("scholar-athlete")).toBe("scholar-athlete");
+    expect(assertRoleOnboardingCompletionSupported("athlete")).toBe("scholar-athlete");
+  });
+
   it.each([
-    "scholar-athlete",
     "family",
     "educator",
     "high-school-counselor",
