@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
+import { getUserPathway } from "@/lib/auth/userPathways";
 import {
   PUBLIC_ONBOARDING_ROLES,
   getOnboardingDestination,
   getRoleDestination,
   normalizePlaybookRole,
+  requirePlaybookRole,
 } from "@/lib/roles/registry";
 import {
   getOnboardingCompletionDestination,
@@ -26,6 +28,7 @@ describe("canonical Playbook role registry", () => {
   ])("normalizes %s to %s", (input, expected) => {
     expect(normalizePlaybookRole(input)).toBe(expected);
     expect(normalizeOnboardingRole(input)).toBe(expected);
+    expect(requirePlaybookRole(input)).toBe(expected);
   });
 
   it("routes every public role through onboarding before its own OS", () => {
@@ -81,9 +84,17 @@ describe("canonical Playbook role registry", () => {
     expect(ids).toContain("scholar-goals");
   });
 
+  it("declares Mentor as a Scholar-invitation entry pathway", () => {
+    const mentor = getUserPathway("mentor");
+    expect(mentor.entryMode).toBe("scholar-invitation");
+    expect(mentor.short).toContain("Scholar invitation required");
+    expect(mentor.nextStep).toContain("Mentor OS");
+  });
+
   it("fails closed for an unknown onboarding role instead of falling back to Scholar", () => {
-    expect(() => getOnboardingSteps("totally-unknown-role")).toThrow("Unsupported Playbook onboarding role");
-    expect(() => getOnboardingCompletionDestination("totally-unknown-role")).toThrow("Unsupported Playbook onboarding role");
-    expect(() => getOnboardingCompletionEndpoint("totally-unknown-role")).toThrow("Unsupported Playbook onboarding role");
+    expect(() => requirePlaybookRole("totally-unknown-role")).toThrow("Unsupported Playbook role");
+    expect(() => getOnboardingSteps("totally-unknown-role")).toThrow("Unsupported Playbook role");
+    expect(() => getOnboardingCompletionDestination("totally-unknown-role")).toThrow("Unsupported Playbook role");
+    expect(() => getOnboardingCompletionEndpoint("totally-unknown-role")).toThrow("Unsupported Playbook role");
   });
 });
