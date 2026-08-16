@@ -24,16 +24,16 @@ export function getPermissionsForRelationship(kind: RelationshipKind): Permissio
   const map: Record<RelationshipKind, Permission[]> = {
     scholar: ["view_progress", "view_verified_record", "view_deadlines", "support_tasks"],
     parent_guardian: ["view_progress", "view_deadlines", "support_tasks"],
-    educator: ["view_progress", "verify_evidence", "recommend_actions", "view_cohort"],
+    // Relationship identity is not equivalent to role authority. Educator,
+    // Coach, District, University, and Employer capabilities remain zero-data
+    // until their independent verification/scope contracts explicitly activate
+    // permissions. This prevents shared invitation code from bypassing OS gates.
+    educator: [],
     mentor: ["view_progress", "recommend_actions", "support_tasks"],
-    // Coach relationship identity is established separately from Coach data
-    // permissions. An active verified relationship may validate Mentor identity,
-    // but grants zero Scholar-data permissions until a dedicated Coach access
-    // contract explicitly authorizes them.
     coach: [],
-    district_admin: ["view_cohort", "view_equity_metrics"],
-    university_partner: ["view_verified_record", "recommend_actions"],
-    employer_partner: ["view_verified_record", "create_opportunities", "review_candidates"],
+    district_admin: [],
+    university_partner: [],
+    employer_partner: [],
   };
 
   return map[kind];
@@ -47,11 +47,11 @@ export function getRelationshipGraph() {
   return [
     { name: "Scholar", relationship: "scholar", permissions: getPermissionsForRelationship("scholar") },
     { name: "Parent / Guardian", relationship: "parent_guardian", permissions: getPermissionsForRelationship("parent_guardian") },
-    { name: "Ms. Rivera", relationship: "educator", permissions: getPermissionsForRelationship("educator") },
+    { name: "Educator", relationship: "educator", permissions: getPermissionsForRelationship("educator") },
     { name: "Mentor", relationship: "mentor", permissions: getPermissionsForRelationship("mentor") },
     { name: "Coach", relationship: "coach", permissions: getPermissionsForRelationship("coach") },
-    { name: "District Success Team", relationship: "district_admin", permissions: getPermissionsForRelationship("district_admin") },
-    { name: "University Outreach", relationship: "university_partner", permissions: getPermissionsForRelationship("university_partner") },
-    { name: "Workforce Partner", relationship: "employer_partner", permissions: getPermissionsForRelationship("employer_partner") },
+    { name: "District Administrator", relationship: "district_admin", permissions: getPermissionsForRelationship("district_admin") },
+    { name: "University Partner", relationship: "university_partner", permissions: getPermissionsForRelationship("university_partner") },
+    { name: "Employer Partner", relationship: "employer_partner", permissions: getPermissionsForRelationship("employer_partner") },
   ];
 }
