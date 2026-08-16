@@ -1,79 +1,125 @@
 # User Journeys
 
 > Canonical owner: Playbook Product and Experience
-> Reconciled implementation baseline: `4a2d1ca90a12c0be24b9e7bede1c15e82756bd40`
-> Reconciled: 2026-08-12
+> Reconciled implementation baseline: `2f87a0732532aace3902b363d0290bd7716427f1`
+> Reconciled: 2026-08-16
 
-This document records the current role-journey truth after PR #89 materialized 17 unique Operating System destinations and PR #90 implemented the real Scholar completion adapter. Route existence is not acceptance evidence.
+This document records the current role-journey truth after the Aug. 16 authority and feature convergence stack. All 15 canonical roles now have registry identities and OS destinations; authority-sensitive roles have dedicated verification/readiness evidence and governed review. Route existence and authority foundations still do not substitute for exact-revision end-to-end browser acceptance.
 
 ## Global journey contract
 
-Every launch role must satisfy this sequence:
+Every launch role must satisfy:
 
-public discovery → authentication → role selection → role-specific onboarding → verification/consent → canonical Playbook Record projection → accepted relationship/authority → permission-scoped OS landing → meaningful role action → durable outcome → recovery/sign-out.
+public discovery → authentication → canonical role selection → role onboarding → verification/consent where required → relationship/data authority → permission-scoped OS → meaningful role action → durable outcome → recovery/sign-out.
 
-A role may save progress before its completion adapter exists. It must fail closed at completion rather than inherit another role's authority or record type.
+Role identity is not data authority. Verification is not Scholar-data permission. Active Scholar selection is not access by itself. Every downstream read/write must remain bounded by the applicable owner, relationship, role, institution, consent and permission contract.
 
 ## Evidence states
 
-- REFERENCE IMPLEMENTATION — real journey implementation exists and is the pattern to replicate; release certification still follows the full exact-revision evidence contract.
-- PARTIAL — some required steps exist, but the journey is not complete.
-- FAIL-CLOSED — entry or progress may exist, but completion/access is intentionally blocked pending accepted governance/authority.
-- MISSING — required journey components are not implemented.
+- REFERENCE IMPLEMENTATION — complete implementation pattern exists; full release certification may still be open.
+- IMPLEMENTED / CERTIFICATION OPEN — durable governed path exists; exact-revision browser/device/accessibility/recovery evidence remains incomplete.
+- PARTIAL JOURNEY — key foundations exist, but one or more meaningful downstream outcomes remain incomplete or unproven.
+- FAIL-CLOSED — intentionally unavailable until a required authority/configuration gate is satisfied.
 
-## Current role index
+## Canonical role index
 
-| Role | Entry / onboarding | OS destination | Authority / verification | Current state | Primary next connection |
-| --- | --- | --- | --- | --- | --- |
-| Scholar | Implemented; real seven-step completion adapter | `/dashboard` | Scholar authority implemented; owner-scoped assertions included in PR #90 | REFERENCE IMPLEMENTATION | Exact merge-revision browser/RLS certification and continued use as template |
-| Scholar-Athlete | Role-aware entry/onboarding exists | `/scholar-athlete-os` | Dedicated relationship/compliance lifecycle incomplete | PARTIAL | Apply Scholar adapter with athlete record, eligibility/compliance and denial tests |
-| Parent / Guardian | Entry/onboarding surface exists | `/family-os` | Parent relationship model exists; dependent invitation/consent not fully proven | PARTIAL | Durable dependent invitation → consent → Scholar relationship → recovery |
-| Mentor | Entry/onboarding surface exists | `/mentor-os` | Mentor relationship exists; eligibility/approval lifecycle incomplete | PARTIAL | Verification/approval + durable scholar assignment + revocation |
-| Educator | Entry/onboarding surface exists | `/educator-os` | Educator permissions exist; institutional/roster verification incomplete | PARTIAL | Institution verification + roster/cohort relationship |
-| High School Coach | Entry/onboarding surface exists | `/coach-os` | Accepted coach relationship contract missing; access must fail closed | FAIL-CLOSED | Define/accept least-privilege coach authority + verification + athlete roster link |
-| College Coach / Recruiter | Entry/onboarding surface exists | `/recruiting-os` | Accepted recruiter authority missing; completion/access must fail closed | FAIL-CLOSED | Institution/recruiter verification + governed Scholar-Athlete access |
-| College Admissions | Entry/onboarding surface exists | `/admissions-os` | Accepted admissions authority missing; completion/access must fail closed | FAIL-CLOSED | Institution verification + criteria-scoped scholar access |
-| Transition-Aged Youth | Entry/onboarding surface exists | `/transition-youth-os` | Currently scholar-like; explicit canonical record/authority decision remains | PARTIAL | Adopt explicit TAY record/relationship contract then apply Scholar adapter |
-| Employer | Public role exists; complete role-specific onboarding is incomplete | `/employer-os` | Employer-partner semantics exist but organization verification is incomplete | PARTIAL / MISSING | Employer onboarding + organization verification + opportunity authority |
-| Brand Partner | Entry/onboarding surface exists | `/brand-partner-os` | Brand-specific organization verification/authority incomplete | PARTIAL | Organization verification + partner authority + opportunity lifecycle |
-| Community Partner | Entry/onboarding surface exists | `/community-partner-os` | Accepted community-partner authority missing; fail closed | FAIL-CLOSED | Define/accept community partner authority + review workflow |
-| High School Counselor | Destination exists; complete public/onboarding contract incomplete | `/counselor-os` | Accepted counselor authority/verification missing | FAIL-CLOSED / MISSING | Canonical signup/onboarding + school verification + least-privilege scholar access |
-| Athlete Abroad | Destination exists; canonical enrollment incomplete | `/athlete-abroad-os` | Enrollment/consent/ownership/authority missing | MISSING | Canonical enrollment + record ownership + consent + OS entry |
-| District / School Administrator | Destination exists; canonical onboarding incomplete | `/district-os` | Institutional administrator authority/verification missing | MISSING | Institution onboarding + admin authority + roster/data scope |
+| Role | OS destination | Authority / verification truth | Current state | Primary remaining evidence |
+| --- | --- | --- | --- | --- |
+| Scholar | `/dashboard` | Owner identity/profile authority and reference onboarding are implemented. | REFERENCE IMPLEMENTATION | Exact-revision browser/device/accessibility/recovery certification. |
+| Scholar-Athlete | `/scholar-athlete-os` | Canonical role/onboarding and athlete/recruiting foundations exist. | IMPLEMENTED / PARTIAL JOURNEY | Eligibility → recruiting targets/visits/offers → durable outcome + browser E2E. |
+| Transition-Aged Youth | `/transition-youth-os` | Canonical role/onboarding exists under learner authority. | IMPLEMENTED / PARTIAL JOURNEY | Role-specific downstream outcomes + browser E2E. |
+| Parent / Guardian | `/family-os` | Governed invitation claim may create the consent-bound family relationship; support access remains permission-scoped. | IMPLEMENTED / CERTIFICATION OPEN | Invitation → active Scholar context → meaningful support action → revocation browser E2E. |
+| Mentor | `/mentor-os` | Mentor validation/relationship foundations and Mentor Circles exist. | IMPLEMENTED / CERTIFICATION OPEN | Validation/relationship → Scholar support/circle action → revocation browser E2E. |
+| Teacher / Educator | `/educator-os` | Verification request + Founder/Admin review + verified zero-data relationship identity exist. | IMPLEMENTED / CERTIFICATION OPEN | Approved identity → bounded Scholar context → meaningful intervention browser E2E. |
+| High School Counselor | `/counselor-os` | Counselor verification/review and zero-data relationship identity exist. | IMPLEMENTED / CERTIFICATION OPEN | Approved identity → academic/application support action + denial/revocation browser E2E. |
+| High School Coach | `/coach-os` | Coach verification/review and invitation-bound zero-data relationship activation exist. | IMPLEMENTED / CERTIFICATION OPEN | Verified identity → governed athlete support/recruiting action + browser E2E. |
+| College Coach / Recruiter | `/recruiting-os` | Recruiting verification/review and zero-data relationship identity exist. | IMPLEMENTED / PARTIAL JOURNEY | Permissioned athlete interaction → target/visit/offer outcome + browser E2E. |
+| College Admissions | `/admissions-os` | Admissions verification/review and zero-data relationship identity exist. `/university-os` is redirect-only compatibility. | IMPLEMENTED / CERTIFICATION OPEN | Permissioned institutional action + browser E2E. |
+| Brand Partner | `/brand-partner-os` | Verification/review plus campaign/compliance scope and governed organization/campaign-draft authority exist. | IMPLEMENTED / CERTIFICATION OPEN | Campaign/opportunity lifecycle, compliance/human release evidence, browser E2E. |
+| Employer / Workforce Partner | `/employer-os` | Employer verification/review and zero-data relationship identity exist. | IMPLEMENTED / CERTIFICATION OPEN | Opportunity/application workflow + browser E2E. |
+| District / School Administrator | `/district-os` | District verification/review and zero-data relationship identity exist. | IMPLEMENTED / CERTIFICATION OPEN | Bounded cohort/institution action + browser E2E. |
+| Athlete Abroad | `/athlete-abroad-os` | Readiness review with jurisdiction-scope review exists. | IMPLEMENTED / CERTIFICATION OPEN | Approved readiness → meaningful international-readiness action + browser E2E. |
+| Community Partner | `/community-partner-os` | Community Partner verification/review with service scope and zero-data relationship identity exist. | IMPLEMENTED / CERTIFICATION OPEN | Approved service scope → governed support action + browser E2E. |
 
-## Scholar reference contract
+## Shared authority fabric
 
-PR #90 corrected the former false-positive acceptance path. The implementation now resets a synthetic account, authenticates, traverses all seven onboarding UI steps, records consent, executes the signed PBOS transaction, verifies durable Supabase projections, and lands on the canonical dashboard. It also prevents unsupported roles from being marked complete through the Scholar adapter.
+### Profile and public identity
 
-Scholar is therefore the implementation reference for role completion. It is not permission to mark other roles complete, and branch-level tests/build are not a substitute for final exact merge-revision production/browser/RLS evidence.
+`public.profiles` remains owner-only for direct SELECT. Public Scholar profiles, shared public identities, Network identities and support-side presentation identity use bounded projection RPCs. No public/shared surface may reopen broad direct cross-user profile reads.
 
-## Required replication contract
+### Verification and review
 
-For every non-Scholar role PBOS must implement and prove:
+Authority-sensitive role evidence is independently reviewed. Founder/Admin reviewer authority covers Coach, Educator, Counselor, District, Recruiting, Admissions, Employer, Brand Partner, Community Partner and Athlete Abroad readiness. Review events are auditable and reviewers may not approve their own request.
 
-1. Canonical public/auth entry.
-2. Role-specific onboarding schema and autosave/recovery.
-3. Required consent and verification.
-4. Correct canonical Playbook Record type/projection.
-5. Correct relationship(s) to people/institutions/opportunities.
-6. Least-privilege application authorization and Supabase RLS.
-7. Unique canonical OS destination.
-8. At least one meaningful role-specific action with durable outcome.
-9. Revocation/removal/expiration semantics where relationships grant access.
-10. Desktop/mobile/accessibility/restart/recovery browser acceptance at the same governed revision.
+Verification establishes approved role/scope evidence; it does not itself grant Scholar-data access.
 
-## Cross-role relationship fabric
+### Support relationships and Active Scholar Context
 
-The Starting Five/support layer must become the reusable relationship fabric rather than a visual invitation feature. Invitations must be durable, expirable, revocable and relationship-producing. Accepted relationships must drive downstream access to applications, messaging, notifications and recommendations, while removal immediately removes downstream authority.
+Support invitations and relationships are governed and revocable. Parent/Guardian and Mentor may carry explicitly defined permissions. Verified external/support role relationships activate with zero Scholar-data permissions unless a separate authority contract grants more.
 
-## Connected journey priorities
+Active Scholar Context accepts a relationship ID rather than an arbitrary Scholar ID and remains valid only while that relationship is active. Downstream features must still enforce the relationship permission keys.
 
-- Scholar Record → readiness → Opportunity → application workspace → authorized support → messaging → outcome.
-- Course → progress/completion → evidence → certificate/badge → XP/coins → Record/Timeline/Trust refresh.
-- Transcript → A-G/readiness/FAFSA/application → Compass recommendation → human decision → outcome.
-- Scholar-Athlete Record → eligibility → coach/recruiter access → target/visit/offer → outcome.
-- Event → RSVP → reminder/calendar → attendance/check-in → community/network outcome.
+## Connected learner journeys
 
-## Route boundary
+### Opportunity → Application
 
-All 17 OS destinations may exist without all journeys being complete. No route, dashboard zero-state, or role-selection card may be used as evidence of verification, authority, persistence or end-to-end completion.
+Scholar Record/readiness → explainable Opportunity match → Start application → learner-owned Application Workspace → documents/tasks/evidence/support → submission/outcome.
+
+The direct Marketplace → Application Workspace handoff is implemented. Full document/support/submission/outcome browser E2E remains open.
+
+### Learning → Credential → Rewards → Store
+
+Course catalog → module content → acknowledgement/reflection → durable module progress → idempotent XP/coin ledger reward → course completion → credential + evidence-backed badge → Store balance/redemption.
+
+The durable core is implemented. Fulfillment/operations, recovery and browser E2E remain open.
+
+### Events / Mentorship
+
+Event discovery → capacity-safe RSVP → verified attendance → idempotent reward.
+
+Mentor Circle discovery → active membership or waitlist → leave/rejoin lifecycle.
+
+The durable cores are implemented. Calendar/reminders/networking/session outcomes and browser E2E remain open.
+
+### Notifications / Attention
+
+Trusted producer → notification outbox → owner Attention Center → acknowledgement/preferences → delivery retry/finalization.
+
+Clients cannot manufacture trusted notification events. Verification decisions and earned learning credentials are trusted producers today; additional producers must be added only after their upstream event authority is trustworthy.
+
+## Journeys still materially partial
+
+### Messaging
+
+Complete participant-scoped attachments, read state, safety/block/report, relationship-removal semantics, notification acknowledgement, recovery and exact-revision browser E2E.
+
+### Academic
+
+Complete and prove Transcript → A-G/readiness/FAFSA/application → Compass recommendation → human decision → durable outcome as one connected journey.
+
+### Recruiting
+
+Complete and prove Scholar-Athlete Record → eligibility → verified coach/recruiter interaction → targets/visits/offers → durable outcome.
+
+### Intelligence
+
+Canonical Scholar AI and Experience-derived projections exist, but the platform still needs consistent explainability, provenance, confidence, human-decision and outcome measurement across all permission-scoped intelligence domains.
+
+## Required role certification contract
+
+For every role, final release evidence must prove:
+
+1. Canonical public/auth entry and role selection.
+2. Role-specific onboarding autosave/recovery and completion.
+3. Required consent, verification and human review.
+4. Correct relationship/institution/scope lineage.
+5. Least-privilege Supabase authorization, including negative cross-user/wrong-role/revoked cases.
+6. Correct canonical OS destination.
+7. At least one meaningful role-specific action with durable outcome.
+8. Revocation/removal/expiration behavior wherever relationship or scope grants authority.
+9. Desktop/mobile keyboard/screen-reader/contrast/reduced-motion acceptance.
+10. Restart/recovery/sign-out behavior at the same governed production revision.
+
+## Current release boundary
+
+Repository CI, dependency security audit, production builds, from-zero Database Certification, hosted Supabase promotion/reconciliation and Vercel deployment evidence are now materially stronger than the Aug. 12 baseline. Browser/visual E2E is still not proven for all roles in the current execution environment and must remain a release blocker rather than being inferred from source tests or Vercel READY state.

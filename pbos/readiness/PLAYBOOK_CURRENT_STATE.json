@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 1,
-  "reconciledAt": "2026-08-12",
-  "baselineRevision": "4a2d1ca90a12c0be24b9e7bede1c15e82756bd40",
+  "schemaVersion": 2,
+  "reconciledAt": "2026-08-16",
+  "baselineRevision": "2f87a0732532aace3902b363d0290bd7716427f1",
   "authority": {
     "humanReadable": "docs/MASTER_CHECKLIST.md",
     "journeys": "docs/USER_JOURNEYS.md",
@@ -10,59 +10,98 @@
     "duplicateChecklistDeprecated": "docs/PLAYBOOK_MASTER_CHECKLIST.md"
   },
   "truthRules": [
-    "Repository implementation evidence outranks historical Drive exports and stale checklist percentages.",
+    "Repository implementation and exact-head certification evidence outrank historical Drive exports and stale checklist percentages.",
     "Route existence is not functional completion.",
-    "Unsupported role completion must fail closed rather than use the Scholar adapter.",
+    "Role identity, verification, relationship identity, Active Scholar selection, and Scholar-data authority are separate gates.",
+    "Direct public.profiles reads remain owner-only; shared identity must use bounded projections.",
     "External or human gates may be skipped only while their dependent capability remains explicitly blocked.",
-    "Historical blocker counts must not be reused after implementation changes; recompile the canonical graph."
+    "Browser/visual certification may not be inferred from source tests, CI success, or Vercel READY state."
   ],
   "lineage": {
-    "legacyLandingRemoved": {"pr": 76, "status": "merged"},
-    "canonicalUiRecovery": {"pr": 77, "mergeRevision": "9b0b5a7579fd342e3c98f5c703f33972dd5ecaa9", "status": "merged"},
-    "distinctOsDestinations": {"pr": 89, "count": 17, "status": "merged"},
-    "scholarReferenceJourney": {"pr": 90, "status": "merged", "reportedTests": 410, "reportedTestFiles": 127, "reportedBuildRoutes": 135},
-    "duplicatePasswordReset": {"pr": 79, "status": "closed-superseded", "supersededBy": 80},
-    "hostingerEmail": {"pr": 88, "status": "open-external-gate"}
+    "publicScholarProjection": {"pr": 123, "status": "merged"},
+    "experiencesAndScholarAi": {"pr": 124, "status": "merged"},
+    "verificationReviewerAuthority": {"pr": 125, "status": "merged"},
+    "dependencySecurityGate": {"pr": 126, "status": "merged"},
+    "networkAndFeed": {"pr": 127, "status": "merged"},
+    "learningCredentialsBadgesStore": {"pr": 128, "status": "merged"},
+    "opportunityApplicationBridge": {"pr": 129, "status": "merged"},
+    "eventsAndMentorship": {"pr": 130, "status": "merged"},
+    "notificationAuthority": {"pr": 133, "status": "merged"},
+    "liveShellContext": {"pr": 132, "status": "merged"},
+    "frontendQuality": {"pr": 134, "status": "merged"},
+    "activeScholarContext": {"pr": 135, "status": "merged"},
+    "hostedAuthorityReconciliation": {"pr": 136, "status": "merged"},
+    "productReviewCenter": {"pr": 137, "status": "merged", "canonicalRoleCount": 15},
+    "legacyHostingerEmail": {"pr": 88, "status": "closed-unmerged-external-gate"}
+  },
+  "hostedDatabase": {
+    "projectRef": "oexgxnybeixwadgtdtzp",
+    "canonicalFeatureMigrationFrontier": "202608160039",
+    "canonicalReconciliationFrontier": "202608160043",
+    "productionPromotion": "completed",
+    "profileDirectSelect": "owner-only",
+    "remainingConfigGates": [
+      "Supabase Auth leaked-password protection"
+    ],
+    "remainingTechnicalDebt": [
+      "legacy unindexed foreign keys",
+      "legacy RLS auth initialization-plan warnings",
+      "legacy multiple permissive policies",
+      "legacy duplicate/unused index warnings"
+    ]
   },
   "journeys": {
     "scholar": "REFERENCE_IMPLEMENTATION",
-    "scholarAthlete": "PARTIAL",
-    "parentGuardian": "PARTIAL",
-    "mentor": "PARTIAL",
-    "educator": "PARTIAL",
-    "coach": "FAIL_CLOSED",
-    "recruiter": "FAIL_CLOSED",
-    "admissions": "FAIL_CLOSED",
-    "transitionAgedYouth": "PARTIAL",
-    "employer": "PARTIAL_MISSING",
-    "brandPartner": "PARTIAL",
-    "communityPartner": "FAIL_CLOSED",
-    "counselor": "FAIL_CLOSED_MISSING",
-    "athleteAbroad": "MISSING",
-    "districtAdministrator": "MISSING"
+    "scholarAthlete": "IMPLEMENTED_PARTIAL_JOURNEY",
+    "transitionAgedYouth": "IMPLEMENTED_PARTIAL_JOURNEY",
+    "parentGuardian": "IMPLEMENTED_CERTIFICATION_OPEN",
+    "mentor": "IMPLEMENTED_CERTIFICATION_OPEN",
+    "educator": "IMPLEMENTED_CERTIFICATION_OPEN",
+    "counselor": "IMPLEMENTED_CERTIFICATION_OPEN",
+    "coach": "IMPLEMENTED_CERTIFICATION_OPEN",
+    "recruiter": "IMPLEMENTED_PARTIAL_JOURNEY",
+    "admissions": "IMPLEMENTED_CERTIFICATION_OPEN",
+    "brandPartner": "IMPLEMENTED_CERTIFICATION_OPEN",
+    "employer": "IMPLEMENTED_CERTIFICATION_OPEN",
+    "districtAdministrator": "IMPLEMENTED_CERTIFICATION_OPEN",
+    "athleteAbroad": "IMPLEMENTED_CERTIFICATION_OPEN",
+    "communityPartner": "IMPLEMENTED_CERTIFICATION_OPEN"
+  },
+  "connectedPathways": {
+    "publicProfileProjection": "IMPLEMENTED",
+    "networkFeed": "IMPLEMENTED_CERTIFICATION_OPEN",
+    "opportunityToApplication": "IMPLEMENTED_CERTIFICATION_OPEN",
+    "learningCredentialsRewardsStore": "IMPLEMENTED_CERTIFICATION_OPEN",
+    "eventsMentorship": "IMPLEMENTED_CERTIFICATION_OPEN",
+    "notificationAttention": "IMPLEMENTED_CERTIFICATION_OPEN",
+    "supportRelationshipActiveScholarContext": "IMPLEMENTED_CERTIFICATION_OPEN",
+    "messaging": "IMPLEMENTED_SECURITY_GAP",
+    "academic": "PARTIAL",
+    "recruiting": "PARTIAL",
+    "intelligenceOutcomeMeasurement": "PARTIAL"
   },
   "releaseBlockers": [
-    "fresh canonical graph and stable blocker IDs",
-    "role authority contracts",
-    "production RLS and negative authorization evidence",
-    "remaining role completion adapters",
-    "Starting Five relationship fabric",
-    "connected Opportunity/Application, Learning/Rewards, Messaging/Notifications, Feed/Network, Academic, Recruiting, Events and Store workflows",
-    "intelligence convergence on canonical permission-scoped data",
-    "remaining route/browser/accessibility convergence",
-    "monitoring and analytics",
-    "security/privacy/compliance/data-retention review",
-    "soft launch and independent human certification"
+    "exact-revision browser E2E for all 15 roles and canonical connected pathways",
+    "mobile/device/accessibility/recovery certification",
+    "Messaging attachment authority and direct-RLS relationship-revocation closure",
+    "Supabase Auth leaked-password protection configuration and verification",
+    "legacy Supabase performance-advisor debt triage",
+    "production outbound email/template/delivery certification",
+    "complete Academic outcome journey",
+    "complete Recruiting outcome journey",
+    "monitoring and privacy-respecting analytics",
+    "privacy/data-retention/compliance/legal/incident-response review",
+    "soft launch, rollback proof, release notes, feedback loop, and independent human launch approval"
   ],
   "nextExecutionOrder": [
-    "recompile_current_graph",
-    "authority_and_rls",
-    "replicate_scholar_contract",
-    "starting_five_relationship_fabric",
-    "connected_product_pathways",
-    "intelligence_convergence",
-    "ui_browser_convergence",
-    "operations_and_launch_gates"
+    "messaging_revocation_and_attachment_authority",
+    "browser_and_accessibility_certification",
+    "academic_outcome_journey",
+    "recruiting_outcome_journey",
+    "supabase_auth_and_performance_gates",
+    "outbound_email_delivery_certification",
+    "observability_analytics_and_operations",
+    "compliance_soft_launch_and_human_approval"
   ],
   "certificationReady": false
 }

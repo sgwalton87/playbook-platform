@@ -2,38 +2,53 @@
 
 ## Purpose
 
-Captures product surfaces whose visible route/UI exists but whose durable workflow is not yet fully connected. Reconciled 2026-08-12 against `main` revision `4a2d1ca90a12c0be24b9e7bede1c15e82756bd40`.
+Tracks canonical product workflows whose remaining work is functional, operational, or certification-related. Reconciled 2026-08-16 against `main` revision `2f87a0732532aace3902b363d0290bd7716427f1`, hosted Supabase reconciliation, and PRs #123–#137.
 
 ## Status rule
 
-A route or visual shell is not functionally complete until persistence, permissions/RLS, integrations, recovery, accessibility and exact-revision browser evidence are proven.
+A route or visual shell is not functionally complete until persistence, permissions/RLS, integrations, recovery, accessibility, and exact-revision browser evidence are proven. Conversely, durable governed workflows that now exist must not remain mislabeled as “unwired” simply because final browser/release certification is still open.
 
-## Reconciled backlog
+## Current backlog
 
-| Area | Status | Current truth / required connection |
+| Area | Status | Current truth / next connection |
 | --- | --- | --- |
-| Coach Dashboard routing | RESOLVED ROUTE / FUNCTIONAL JOURNEY OPEN | PR #89 materialized `/coach-os`; do not reopen the old `/mentor-os` fallback issue. Coach authority, verification, roster relationship and browser evidence remain open. |
-| Settings | FUNCTIONAL WIRING REQUIRED | `/permissions` is the current account/privacy surface; create a separate `/settings` only if canonical product authority requires distinct behavior. Do not duplicate account/privacy logic. |
-| College Search | FUNCTIONAL WIRING REQUIRED | College-search components and `/opportunities` exist. Complete the canonical Record → search/match → saved/target school → application pathway before inventing duplicate routing. |
-| Messaging | FUNCTIONAL WIRING REQUIRED | Complete durable participant-scoped messages, read state, attachments, block/report, relationship removal semantics, notification acknowledgement and recovery. Realtime is an implementation choice, not the Definition of Done. |
-| Starting Five / support invitations | FUNCTIONAL WIRING REQUIRED | Invitations must be durable, expirable, revocable and relationship-producing, then drive least-privilege access to applications, messaging, notifications and recommendations. |
-| Role completion adapters | P0 FUNCTIONAL WIRING REQUIRED | Scholar is the reference adapter. Every other role needs its own canonical record, verification/consent, authority, OS landing, meaningful durable action and denial/recovery evidence. Unsupported roles must continue to fail closed. |
-| Role authority | P0 FUNCTIONAL WIRING REQUIRED | Counselor, Coach, Recruiter, Admissions and Community Partner require accepted least-privilege contracts. Employer, TAY, Athlete Abroad and District/Admin need explicit model decisions. |
-| Production RLS | P0 FUNCTIONAL WIRING REQUIRED | Prove scholar, supporter, institution, partner and administrator access plus negative tests for cross-user, expired/revoked relationship, wrong institution and unapproved role. |
-| Opportunity → Application | FUNCTIONAL WIRING REQUIRED | Record/readiness → explainable match → application workspace → private docs → supporter collaboration → submission/outcome. |
-| Courses → Record / Rewards | FUNCTIONAL WIRING REQUIRED | Completion → durable progress/evidence → certificate/badge → XP/coins → Record/Timeline/Trust/Opportunity refresh. |
-| Feed / Network | FUNCTIONAL WIRING REQUIRED | Prove visibility semantics, author identity, media, comments/reactions/shares, moderation/reporting, pagination, connections, mutuals and messaging/notification integration. |
-| Events | FUNCTIONAL WIRING REQUIRED | Discovery → RSVP → calendar/reminder → attendance/check-in → networking/outcome. |
-| Recruiting | FUNCTIONAL WIRING REQUIRED | Scholar-Athlete Record → eligibility → governed coach/recruiter access → targets/visits/offers → durable outcome. |
-| Compass / Intelligence | FUNCTIONAL WIRING REQUIRED | Consume versioned permission-scoped canonical Record inputs and emit explainable, provenance-backed recommendations with confidence, human decision and outcome tracking. |
-| Store / Reward Ledger | FUNCTIONAL WIRING REQUIRED | Durable auditable balances, transactions, inventory, redemption authorization, abuse controls and failure recovery. |
-| Observability / Analytics | RELEASE BLOCKER | Implement monitoring, error ownership, privacy-respecting analytics taxonomy, health signals and AI outcome observability before launch. |
-| Hostinger Email | EXTERNAL GATE / ACTIVE PR #88 | Code package exists; production SMTP/template/delivery and staging evidence remain required. |
+| Canonical 15-role registry and OS destinations | IMPLEMENTED / BROWSER CERT OPEN | All 15 onboarding roles derive from the canonical registry and have distinct destinations. `/university-os` is redirect-only compatibility to `/admissions-os`. Complete exact-revision role journey browser certification. |
+| Profile identity / public disclosure | IMPLEMENTED / BROWSER CERT OPEN | `profiles` remains owner-only for direct reads; public Scholar/member identity uses bounded projections. Complete privacy/accessibility/browser acceptance. |
+| Role verification review | IMPLEMENTED / BROWSER CERT OPEN | Governed Founder/Admin review exists for Coach, Educator, Counselor, District, Recruiting, Admissions, Employer, Brand Partner, Community Partner and Athlete Abroad readiness. Prove role-by-role request/review/denial/recovery journeys in browser. |
+| Support invitations / relationships | IMPLEMENTED CORE / CERTIFICATION OPEN | Invitation creation/claim, verification-bound activation, revocation, security observability, and relationship identity are governed. Prove expiration/revocation/removal across downstream UI and complete remaining meaningful support actions. |
+| Active Scholar Context | IMPLEMENTED / BROWSER CERT OPEN | Support-side users can select only Scholars linked by an active relationship; selection does not grant authority. Prove context switching and immediate revocation behavior end-to-end. |
+| Network / Newsfeed | IMPLEMENTED CORE / CERTIFICATION OPEN | Bounded member directory/identity, durable post categories, media, reactions, comments and public news projection are wired. Complete pagination/moderation/share/safety and browser matrix. |
+| Opportunity → Application | IMPLEMENTED CORE / CERTIFICATION OPEN | Explainable matches hand directly to the learner-owned Application Workspace. Complete documents/support/submission/outcome browser E2E. |
+| Learning → Credentials / Badges / Rewards | IMPLEMENTED CORE / CERTIFICATION OPEN | Courses/modules/progress, reflection/acknowledgement completion, idempotent XP/coins, credentials, badges and transcript projection are durable. Complete browser/recovery and downstream intelligence refresh evidence. |
+| Store / Reward Ledger | IMPLEMENTED CORE / OPERATIONS OPEN | Store reuses the canonical coin ledger and atomic idempotent redemption authority. Complete fulfillment, abuse controls, operational recovery and browser acceptance. |
+| Events | IMPLEMENTED CORE / EXTENSIONS OPEN | Durable events, capacity-safe RSVP and verified attendance rewards are wired. Calendar/reminder/check-in/networking/outcome extensions remain open. |
+| Mentorship Circles | IMPLEMENTED CORE / CERTIFICATION OPEN | Durable Mentor-owned circles, active/waitlist/leave lifecycle and bounded projections are wired. Complete browser/recovery and deeper session/outcome workflow. |
+| Notifications / Attention Center | IMPLEMENTED CORE / CERTIFICATION OPEN | Trusted notification producers, outbox, acknowledgement, preferences, retry/finalization and Attention Center are wired. Complete delivery/recovery browser evidence and additional trusted producers only when upstream authority is trustworthy. |
+| Messaging | IMPLEMENTED CORE / SECURITY GAP | Durable relationship-bound conversations, idempotent PBOS-provenance send, unread/read state, mute/unmute, block/unblock, reporting and retry/error UI are implemented. Close direct Data API RLS after relationship revocation, add governed attachment metadata/storage authority, then prove recovery/browser E2E. |
+| Academic | PARTIAL / P0 CONNECTED JOURNEY | Complete and prove Transcript → A-G/readiness/FAFSA/application → Compass guidance → human decision → durable outcome as one canonical pathway. |
+| Recruiting | PARTIAL / P0 CONNECTED JOURNEY | Verified recruiting authority exists; complete and prove Scholar-Athlete Record → eligibility → targets/visits/offers → durable outcome. |
+| Brand Partner / Employer workflows | IMPLEMENTED AUTHORITY / JOURNEY CERT OPEN | Verification and partner/employer authority foundations exist; prove campaign/opportunity/application lifecycle, compliance boundaries and browser outcomes. |
+| District / Educator / Counselor / Coach workflows | IMPLEMENTED AUTHORITY / JOURNEY CERT OPEN | Verification, relationship identity and active Scholar context foundations exist. Complete role-specific meaningful actions and exact-revision browser denial/revocation evidence. |
+| Athlete Abroad / Community Partner | IMPLEMENTED AUTHORITY / JOURNEY CERT OPEN | Readiness/service-scope review and governed identity foundations exist. Complete meaningful downstream action and browser evidence. |
+| Compass / Intelligence | PARTIAL | Canonical Scholar AI/Experience projections exist. Complete measured explainability, provenance, confidence, human decision, lifecycle and outcome tracking across permission-scoped domains. |
+| Auth leaked-password protection | EXTERNAL CONFIG GATE | Supabase advisor reports leaked-password protection disabled. Enable/verify through supported Auth settings; do not emulate this in SQL. |
+| Supabase performance advisor debt | TECHNICAL DEBT / RELEASE REVIEW | Canonical-layer privilege/index/RLS issues discovered during production promotion were repaired. Older unindexed-FK, auth-initplan, duplicate-policy/index and unused-index warnings remain for deliberate triage without broadening access. |
+| Outbound email | EXTERNAL GATE | Legacy Hostinger PR #88 is closed unmerged. Production SMTP/provider/template/delivery evidence remains unresolved and needs a fresh current-main implementation/certification path if required for launch. |
+| Browser / accessibility / device certification | RELEASE BLOCKER | Exact-revision browser harness evidence for all 15 roles and connected workflows remains unproven in the current execution environment. Complete desktop/mobile/accessibility/recovery matrix before launch. |
+| Observability / Analytics | RELEASE BLOCKER | Complete monitoring, error ownership, privacy-respecting analytics taxonomy, health signals and AI outcome observability before launch. |
+| Compliance / privacy / launch operations | EXTERNAL / HUMAN RELEASE GATE | Data retention, legal/compliance, incident response, rollback, soft launch, release notes and independent human launch approval remain required. |
 
-## Resolved historical items
+## Resolved historical wiring items
 
-- Legacy deployed landing UI: resolved by PR #76.
-- Canonical public/authenticated shell convergence: merged by PR #77.
-- Duplicate Password Reset PR #79: closed as superseded by merged PR #80.
-- Six missing OS destination fallbacks: resolved at the route identity level by PR #89.
-- False multi-role completion through Scholar adapter: corrected by PR #90; unsupported roles now fail closed.
+- Legacy deployed landing UI — resolved by PR #76.
+- Canonical shell/route convergence — resolved across #77/#89 and later frontend-quality work.
+- Unsafe public/cross-user profile reads — bounded by public/member projection work in #123/#127; direct `profiles` remains owner-only.
+- Missing verification reviewer bridge — resolved by #125.
+- Network/Feed hard-coded or unsafe identity behavior — converged by #127.
+- Hard-coded Courses / fake reward minting / profile badge arrays — replaced by #128.
+- Opportunity Marketplace lacking Apply handoff — resolved by #129.
+- Static Events and Mentorship prototypes — replaced by #130.
+- Browser-authored trusted notifications — closed by #133.
+- Missing support-side selected Scholar authority model — resolved by #135 through relationship-bound Active Scholar Context.
+- Hosted Learning/foundation privilege drift — reconciled and recorded by #136.
+- 14-role/University-OS preview drift — resolved by #137; Product Review Center now derives from the 15-role registry.

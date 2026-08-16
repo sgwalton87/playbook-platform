@@ -4,9 +4,11 @@
 
 This is the authoritative human-readable engineering status board for Playbook OS.
 
-Reconciled against `main` revision `4a2d1ca90a12c0be24b9e7bede1c15e82756bd40` on 2026-08-12 after PRs #76–#90. Historical percentages and blocker counts are not carried forward unless regenerated from current evidence. `pbos/readiness/PLAYBOOK_CURRENT_STATE.json` is the machine-readable companion.
+Reconciled on 2026-08-16 against `main` revision `2f87a0732532aace3902b363d0290bd7716427f1` after PRs #123–#137 and hosted Supabase production reconciliation through the canonical Aug. 16 migration frontier.
 
-Repository implementation evidence outranks older Drive exports, archived checklists, and prior audit snapshots. Those materials remain requirement/history evidence, not present-tense implementation truth.
+Repository implementation, exact-head CI/Database Certification, hosted Supabase inspection, and exact-revision Vercel deployment evidence outrank older Drive exports, archived checklists, and prior audit snapshots. Historical percentages and blocker counts are not carried forward unless regenerated from current evidence.
+
+`pbos/readiness/PLAYBOOK_CURRENT_STATE.json` is the machine-readable companion.
 
 ## Definition of Done
 
@@ -14,128 +16,128 @@ A capability is Complete only when its interface, durable persistence, permissio
 
 Status vocabulary:
 
-- COMPLETE — satisfies the evidence contract.
-- IMPLEMENTED — code/route exists, but final functional certification is incomplete.
-- PARTIAL — some required links exist, others are missing.
-- FAIL-CLOSED — intentionally blocked until accepted authority/verification exists.
-- EXTERNAL GATE — requires production credentials, third-party configuration, compliance approval, or human launch authority.
+- COMPLETE — satisfies the full evidence contract.
+- IMPLEMENTED — durable governed code exists, but one or more release-certification gates remain.
+- PARTIAL — some required links remain incomplete.
+- FAIL-CLOSED — intentionally unavailable until a required authority/configuration gate is satisfied.
+- EXTERNAL GATE — requires provider configuration, compliance/legal approval, credentials, or human launch authority.
 
 ## Current verified lineage
 
-- PR #76 removed the deployed legacy landing experience and restored the approved Playbook landing canon.
-- PR #77 converged the canonical public/authenticated shells and merged as `9b0b5a7579fd342e3c98f5c703f33972dd5ecaa9`; the converged suite reported 394 tests and a passing production build.
-- PRs #78 and #80–#87 merged the governed authentication packages through Email Verification.
-- PR #89 materialized 17 unique Operating System destinations and removed shared destination fallbacks for Counselor, Coach, Recruiter, Admissions, Transition-Aged Youth, and Community Partner.
-- PR #90 merged the real Scholar onboarding implementation and acceptance contract. It prevents unsupported roles from completing through the Scholar adapter and keeps them fail-closed until their governed adapters exist. Its branch validation reported 127 test files / 410 tests and a passing 135-route production build.
-- PR #79 was closed as superseded by merged PR #80.
-- PR #88 remains the active Hostinger Email package and is not certified until production SMTP/template/delivery evidence exists.
+- PR #123 added privacy-safe Public Scholar Record/member projections without reopening owner-only `public.profiles` reads.
+- PR #124 converged canonical Experiences and the Scholar AI foundation as derived, permission-scoped projections.
+- PR #125 added Founder/Admin verification review authority and auditable review events for Coach, Educator, Counselor, District, Recruiting, Admissions, Employer, Brand Partner, Community Partner, and Athlete Abroad readiness.
+- PR #126 made high-severity dependency audit a permanent CI gate.
+- PR #127 converged Network and Newsfeed through bounded identity projections; direct cross-user `profiles` reads remain prohibited.
+- PR #128 replaced hard-coded Learning/credential/badge prototypes with durable Learning authority and the existing canonical Store/coin ledger.
+- PR #129 connected explainable Opportunity matches directly to the durable Application Workspace.
+- PR #130 replaced static Events/Mentorship prototypes with governed Events, RSVP, attendance rewards, Mentor Circles, memberships, and waitlisting.
+- PR #133 converged trusted Notification Authority and the Attention Center; clients cannot manufacture trusted system notifications.
+- PR #132/#135 added live authenticated shell context and relationship-bound Active Scholar Context. Selecting a Scholar never grants access independently of the active relationship and permission keys.
+- PR #134 removed recurring frontend navigation/avatar quality warnings without changing authority.
+- PR #136 recorded hosted-production privilege reconciliation and performance hardening after the full Aug. 16 migration stack was promoted.
+- PR #137 rebuilt `/preview` as a 15-role Product Review Center derived from the canonical role registry and removed `University OS` as a separately presented role.
+- Current production baseline: `main` revision `2f87a0732532aace3902b363d0290bd7716427f1`; the exact Vercel production deployment is READY. Browser/visual certification remains a separate unproven release layer.
 
-## Whole-product truth
+## Production authority truth
 
-No whole-product phase is certified complete yet. The platform has strong foundations and substantial implemented surfaces, but launch readiness remains blocked by role journeys, authorization/RLS evidence, connected workflow completion, route/browser convergence, monitoring, analytics, compliance, and soft-launch gates.
+Hosted Supabase now contains the canonical Aug. 16 authority/convergence stack through Active Scholar Context. Historical missing July foundations were reconciled from repository-defined migrations rather than recreated ad hoc.
+
+Key invariants now proven in hosted schema:
+
+- `public.profiles` direct SELECT remains owner-only; shared identity uses bounded projection RPCs.
+- role identity/onboarding state is governed rather than freely writable through broad profile mutation.
+- verification decisions are Founder/Admin reviewed and auditable.
+- external/support relationship identity does not automatically grant Scholar-data permissions.
+- Learning progress, credentials, badges, reward issuance, Store redemption, Events attendance rewards, Notifications, and Active Scholar Context use governed mutation paths.
+- closed foundation tables with no client authority remain fail-closed rather than receiving permissive policies.
+
+Remaining Supabase release items include the manual Auth setting for leaked-password protection and legacy performance-advisor debt outside the newly converged canonical layer.
 
 ## Phase status
 
 | Phase | Current state | Reconciled truth |
 | --- | --- | --- |
-| 1 Identity & Authentication | IMPLEMENTED / PARTIAL | Login, Signup, Google Login, Password Reset, Remember Me, Logout, Session Timeout, Close Browser Logout, CAPTCHA, PKCE, and Email Verification are merged. Hostinger Email, production templates/delivery, final security/mobile acceptance remain open. |
-| 2 Onboarding | PARTIAL | Scholar has the reference completion adapter. Other roles may save progress but must not claim completion without role-specific adapters, verification, persistence, authority, and evidence. |
-| 3 Public Profile | PARTIAL | Profile surfaces/fields exist; public/private visibility, durable evidence, and end-to-end permission certification remain incomplete. |
-| 4 Operating Systems | IMPLEMENTED / FAIL-CLOSED | 17 unique OS routes exist. Route existence is not journey certification. Missing accepted authority remains a blocker for several roles. |
-| 5 Network | PARTIAL / TESTING | Connection lifecycle exists; discovery, mutuals, notifications, profile links, relationship semantics, and messaging integration remain incomplete. |
-| 6 Feed | PARTIAL | Supabase-backed feed/media surfaces exist; visibility policy, moderation, reactions/sharing, disclosure boundaries, pagination, and E2E remain open. |
-| 7 Messaging | PARTIAL | Inbox/support surfaces exist; durable participant scope, attachments, read state, safety actions, notification acknowledgement, recovery, and denial tests remain open. |
-| 8 Courses | PARTIAL | Course surfaces/content exist; module completion → progress → evidence → certificate/badge → XP/coins → Playbook Record wiring is not fully certified. |
-| 9 Academic | PARTIAL / TESTING | Transcript, A-G, college search, readiness, FAFSA/application/Scholar Record integration and Compass provenance remain incomplete as one end-to-end academic pathway. |
-| 10 Recruiting | PARTIAL | Athlete/recruiting surfaces exist; eligibility, coach/recruiter authority, targets, visits, offers, NIL readiness, and durable outcomes are not fully connected/certified. |
-| 11 Events | PARTIAL | Event surfaces exist; RSVP, calendar/reminders, check-in, networking, replay, and durable outcome wiring remain incomplete. |
-| 12 Brand Partner Marketplace | PARTIAL | Organization/opportunity surfaces exist; organization verification, partner authority, applicant tracking, compliance, rewards and opportunity lifecycle remain incomplete. |
-| 13 Athletes Abroad | PARTIAL | Destination/hub surfaces exist; canonical enrollment, consent, ownership, verification, resources and role journey remain incomplete. |
-| 14 Founder / Admin | PARTIAL | Admin/studio/founder surfaces exist; operational authorization, monitoring, analytics, release management and system-health workflows remain incomplete. |
-| 15 Platform QA | PARTIAL | Repository tests/build are strong, but role-by-role browser E2E, device/accessibility/performance/security/RLS, production operations, soft launch and final certification remain open. |
+| 1 Identity & Authentication | IMPLEMENTED / EXTERNAL GATES | Core auth, role identity, onboarding authority, profile hardening, and dependency audit are merged. Leaked-password protection remains a Supabase Auth settings gate. Production outbound email/template delivery remains an external certification item; legacy PR #88 is closed unmerged. |
+| 2 Onboarding & Verification | IMPLEMENTED / CERTIFICATION OPEN | Canonical 15-role registry, governed role persistence/completion, role-specific verification evidence for authority-sensitive roles, and Founder/Admin review authority are implemented. Role-by-role browser/recovery acceptance remains open. |
+| 3 Public Profile | IMPLEMENTED / CERTIFICATION OPEN | Public Scholar/member reads use bounded projections; raw `profiles` remains owner-only. Browser/accessibility/privacy acceptance remains to be proven at the exact production revision. |
+| 4 Operating Systems | IMPLEMENTED / CERTIFICATION OPEN | All 15 canonical role destinations exist. `/university-os` is redirect-only compatibility to `/admissions-os`, not a separate role. Route existence does not certify every meaningful role action. |
+| 5 Network & Feed | IMPLEMENTED / CERTIFICATION OPEN | Bounded directory/member identity, connection lifecycle, persisted Feed categories/media/reactions/comments, and public news identity projection are wired. Full browser pagination/moderation/relationship journey acceptance remains open. |
+| 6 Messaging | PARTIAL | Governed messaging foundations exist, but complete attachment/read-state/safety/removal/recovery and browser E2E remain open. |
+| 7 Learning / Credentials / Rewards / Store | IMPLEMENTED / CERTIFICATION OPEN | Durable course/modules/progress, governed completion, credentials, badges, XP/coin ledger, and atomic Store redemption are wired. Browser/recovery/fulfillment operations remain release gates. |
+| 8 Academic | PARTIAL | Transcript and academic/readiness foundations exist, but the complete transcript → A-G/readiness/FAFSA/application → Compass → durable outcome journey remains unproven end-to-end. |
+| 9 Opportunity / Applications | IMPLEMENTED / CERTIFICATION OPEN | Explainable Opportunity matches now hand directly into learner-owned Application Workspaces. Full document/support/submission/outcome browser journey remains open. |
+| 10 Recruiting | PARTIAL | Scholar-Athlete/recruiting surfaces and verified recruiting authority exist, but eligibility → targets/visits/offers → durable outcome remains incomplete or unproven end-to-end. |
+| 11 Events / Mentorship | IMPLEMENTED / CERTIFICATION OPEN | Governed Events, capacity-safe RSVP, verified attendance rewards, Mentor Circles, membership/waitlist lifecycle, and bounded projections are durable. Calendar/reminder/networking and browser acceptance remain open. |
+| 12 Partner / Institution Authority | IMPLEMENTED / CERTIFICATION OPEN | Verification/review foundations exist for Educator, Counselor, Coach, District, Recruiter, Admissions, Employer, Brand Partner, Community Partner and Athlete Abroad readiness. Relationship/data scope remains independently permission-bound. Full meaningful-action browser journeys remain open. |
+| 13 Notifications / Attention | IMPLEMENTED / CERTIFICATION OPEN | Trusted notification producers, owner acknowledgement/preferences/retry, and Attention Center are wired. Browser delivery/recovery evidence remains open. |
+| 14 Founder / Admin | IMPLEMENTED / PARTIAL | Verification Review Center and bounded operator authority exist. Monitoring, analytics, release operations, and broader production administration remain incomplete. |
+| 15 Platform QA / Release | PARTIAL | CI, dependency audit, full production build, from-zero DB certification, hosted migration promotion, and exact-revision Vercel production deployment are strong. Exact-revision browser E2E, accessibility/device matrix, remaining Supabase/Auth configuration, legacy performance debt, monitoring/analytics, compliance, soft launch and independent human approval remain open. |
 
 ## Role journey status
 
 The governed journey is:
 
-public discovery → authentication → role selection → role onboarding → verification/consent → canonical Playbook Record projection → relationship/authority → permission-scoped OS → meaningful role action → durable outcome → recovery/sign-out.
+public discovery → authentication → role selection → role onboarding → verification/consent where required → relationship/authority → permission-scoped OS → meaningful role action → durable outcome → recovery/sign-out.
 
-- Scholar — REFERENCE IMPLEMENTATION. Real seven-step onboarding, consent, signed PBOS transaction, durable projections, dashboard landing and owner-scoped assertions are implemented. Exact merge-revision production/browser certification remains a release gate and must not be inferred from branch evidence.
-- Scholar-Athlete — PARTIAL.
-- Parent / Guardian — PARTIAL.
-- Mentor — PARTIAL.
-- Educator — PARTIAL.
-- High School Coach — FAIL-CLOSED pending accepted coach authority/verification contract.
-- College Coach / Recruiter — FAIL-CLOSED pending accepted recruiter authority/verification contract.
-- College Admissions — FAIL-CLOSED pending accepted admissions authority/verification contract.
-- Transition-Aged Youth — PARTIAL pending explicit canonical record/authority decision.
-- Employer — PARTIAL/MISSING onboarding and organization verification.
-- Brand Partner — PARTIAL pending organization verification and authority.
-- Community Partner — FAIL-CLOSED pending accepted community-partner authority contract.
-- High School Counselor — FAIL-CLOSED/MISSING complete role journey contract.
-- Athlete Abroad — MISSING complete enrollment/authority journey.
-- District / School Administrator — MISSING complete institutional onboarding/authority journey.
+All 15 roles have canonical registry identities and destinations. Authority-sensitive roles also have dedicated verification/readiness evidence and governed review where applicable. The remaining distinction is not “does a route exist?” but “has the complete role-specific meaningful-action journey been proven at the exact production revision?”
 
-## P0 — Reconciliation and authority
+| Role | Current state | Remaining release evidence |
+| --- | --- | --- |
+| Scholar | REFERENCE IMPLEMENTATION | Exact-revision browser/device/accessibility/recovery certification. |
+| Scholar-Athlete | IMPLEMENTED / PARTIAL JOURNEY | Eligibility/recruiting outcome and exact-revision browser certification. |
+| Transition-Aged Youth | IMPLEMENTED / PARTIAL JOURNEY | Role-specific downstream outcomes and browser certification. |
+| Family | IMPLEMENTED / CERTIFICATION OPEN | Invitation/relationship → active Scholar context → meaningful support action → revocation browser E2E. |
+| Mentor | IMPLEMENTED / CERTIFICATION OPEN | Validation/relationship → circle/support action → revocation browser E2E. |
+| Educator | IMPLEMENTED / CERTIFICATION OPEN | Approved verification → bounded Scholar relationship/context → meaningful intervention browser E2E. |
+| High School Counselor | IMPLEMENTED / CERTIFICATION OPEN | Approved verification → relationship/context → academic/application support browser E2E. |
+| High School Coach | IMPLEMENTED / CERTIFICATION OPEN | Approved verification → zero-data relationship identity → governed athlete support/recruiting browser E2E. |
+| College Coach / Recruiter | IMPLEMENTED / CERTIFICATION OPEN | Approved recruiting verification → permissioned athlete interaction/outcome browser E2E. |
+| College Admissions | IMPLEMENTED / CERTIFICATION OPEN | Approved admissions verification → permissioned institutional action browser E2E. |
+| Brand Partner | IMPLEMENTED / CERTIFICATION OPEN | Approved brand/compliance scope → organization/campaign workflow → human/compliance release evidence. |
+| Employer | IMPLEMENTED / CERTIFICATION OPEN | Approved employer verification → opportunity/application workflow browser E2E. |
+| District / School Administrator | IMPLEMENTED / CERTIFICATION OPEN | Approved institution verification → bounded cohort/action browser E2E. |
+| Athlete Abroad | IMPLEMENTED / CERTIFICATION OPEN | Readiness review/jurisdiction approval → international readiness action browser E2E. |
+| Community Partner | IMPLEMENTED / CERTIFICATION OPEN | Approved service scope → zero-data relationship identity → governed community support action browser E2E. |
 
-- [x] Establish current implementation baseline at `4a2d1ca90a12c0be24b9e7bede1c15e82756bd40`.
-- [x] Remove duplicate active Password Reset PR (#79) from the queue as superseded.
-- [x] Preserve PR #88 as the active Hostinger Email external-delivery package.
-- [x] Materialize 17 unique OS destinations.
-- [x] Implement Scholar as the reference completion adapter without allowing unrelated roles to complete through it.
-- [ ] Re-run the canonical product graph on the next executable PBOS environment and generate stable blocker IDs; do not reuse the historical `89 blockers` count.
-- [ ] Accept explicit least-privilege authority contracts for Counselor, Coach, Recruiter, Admissions, and Community Partner.
-- [ ] Resolve canonical role/record/verification models for Employer, Transition-Aged Youth, Athlete Abroad, and District/School Administrator.
-- [ ] Complete production RLS inventory and negative authorization tests.
+## Connected pathways: current truth
 
-## P1 — Apply the Scholar contract to every role
+### Implemented and governed
 
-For each remaining role, complete and prove: signup/entry → onboarding → consent/verification → canonical record → role relationship → least privilege → OS → durable meaningful action → recovery → denial tests.
+- Public profile/member identity projections without broad profile reads.
+- Network discovery + connection identity projection.
+- Newsfeed categories/media/reactions/comments with durable post semantics.
+- Opportunity → Application Workspace handoff.
+- Learning → module progress → reward ledger → credential/badge.
+- Reward ledger → atomic Store redemption.
+- Events → RSVP → verified attendance → idempotent rewards.
+- Mentor Circles → join/waitlist/leave.
+- Verification evidence → human review event → trusted notification.
+- Support relationship → Active Scholar Context without authority broadening.
+- Trusted Notification outbox → acknowledgement/preferences/retry/finalization.
 
-Priority order:
+### Still partial or release-unproven
 
-1. Scholar-Athlete and Transition-Aged Youth.
-2. Family and Mentor.
-3. Educator, Counselor, Coach, District/School Administrator.
-4. College Recruiter and Admissions.
-5. Brand Partner and Employer.
-6. Athlete Abroad and Community Partner.
+- Messaging full lifecycle and browser recovery/safety matrix.
+- Academic transcript/A-G/FAFSA/application/Compass as one complete outcome journey.
+- Recruiting eligibility/targets/visits/offers as one complete outcome journey.
+- Event calendar/reminders/check-in/networking beyond the durable RSVP/attendance core.
+- Store fulfillment/operational recovery beyond atomic redemption.
+- Intelligence engines as a fully measured provenance/confidence/human-decision/outcome layer across every role.
 
-## P2 — Connected product pathways
+## Remaining release blockers
 
-- Starting Five: durable, expirable, revocable invitations that produce consent-aware relationships and downstream access.
-- Opportunity: Playbook/Scholar Record → explainable match → application workspace → documents → supporter collaboration → outcome.
-- Learning: course → completion → verified evidence → certificate/badge → XP/coins → Record/Timeline/Trust/Opportunity refresh.
-- Messaging/Notifications: participant-scoped conversation → message → outbox → idempotent notification → acknowledgement, including safety and removal semantics.
-- Network/Feed: relationship-aware visibility, public disclosure boundary, author identity, moderation, reactions, sharing, reporting, pagination.
-- Academic: transcript → A-G/readiness/FAFSA/application → Compass guidance → durable outcome.
-- Recruiting: Scholar-Athlete Record → eligibility → recruiter/coach access → target/visit/offer → outcome.
-- Events: discovery → RSVP → calendar/reminder → attendance/check-in → networking/outcome.
-- Rewards/Store: durable auditable ledger, inventory, authorization, redemption, failure recovery.
-
-## P3 — Intelligence convergence
-
-All intelligence engines must consume authorized canonical data and produce derived, explainable recommendations with provenance, confidence, human decision, lifecycle and outcome tracking. Close the historically reported partial/missing traceability requirements only after recompiling the current graph.
-
-## P4 — Interface and release convergence
-
-- Complete or explicitly remove from launch scope every pending/in-progress canonical visible route.
-- Prove loading, empty, error, success and restricted states.
-- Complete keyboard, screen-reader, contrast, responsive and reduced-motion acceptance.
-- Complete role-by-role exact-revision browser E2E.
-- Complete performance, security, RLS, monitoring, analytics, privacy/data-retention, rollback and incident-response gates.
-- Execute soft launch, feedback loop, release notes and independent human certification.
-
-## External / human gates that PBOS must not fabricate
-
-- Hostinger/SMTP production credentials and delivery evidence.
-- Production Supabase/Vercel environment evidence not available to the executing environment.
-- Compliance/legal approval.
-- Third-party account approval or billing configuration.
-- Final production promotion and launch approval.
-
-These may be skipped by an implementation pass only when the dependent capability remains explicitly blocked and fail-closed; they may never be silently treated as complete.
+- [ ] Exact-revision browser E2E for all 15 roles and the canonical connected pathways.
+- [ ] Mobile/device, keyboard, screen-reader, contrast, reduced-motion and recovery acceptance.
+- [ ] Enable and verify Supabase Auth leaked-password protection if available for the current plan/configuration.
+- [ ] Triage remaining legacy Supabase performance-advisor warnings without weakening RLS.
+- [ ] Complete production outbound email/template/delivery certification; legacy PR #88 is closed and must not be treated as an active merge path.
+- [ ] Complete Messaging lifecycle gaps.
+- [ ] Complete/prove the end-to-end Academic and Recruiting outcome journeys.
+- [ ] Complete monitoring, error ownership, privacy-respecting analytics and operational health evidence.
+- [ ] Complete privacy/data-retention, compliance/legal and incident-response review.
+- [ ] Execute soft launch, feedback loop, rollback proof, release notes and independent human launch approval.
 
 ## Exit gate
 
-Playbook is complete only when the current canonical graph reports zero unresolved release blockers, every launch role satisfies the journey evidence contract, required connected pathways are durable and permission-safe, repository and production validation pass at the same governed revision, operational gates pass, and independent human launch approval is recorded.
+Playbook is complete only when the current canonical graph reports no unresolved launch blockers; all 15 launch roles satisfy the journey evidence contract; required connected pathways are durable and permission-safe; repository, hosted database and production deployment evidence align at governed revisions; browser/device/accessibility and operational gates pass; and independent human launch approval is recorded.
