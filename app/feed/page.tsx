@@ -7,7 +7,6 @@ import { supabase } from "@/lib/supabaseClient";
 const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",blue:"#3B82F6",green:"#10B981",purple:"#8B5CF6",mono:"'Space Mono', monospace",sans:"'Hanken Grotesk', system-ui, sans-serif",anton:"'Anton', sans-serif"};
 const FILTERS=["All","Leadership","Finance","Civic","SEL"];
 const LEADERS=[{name:"Jordan M.",initials:"JM",color:T.green,img:"https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&q=80",xp:890,rank:1},{name:"Aisha T.",initials:"AT",color:T.blue,img:"https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&q=80",xp:760,rank:2},{name:"Marcus D.",initials:"MD",color:T.purple,img:null,xp:640,rank:3},{name:"You",initials:"SW",color:T.orange,img:null,xp:340,rank:4}];
-const SURL="https://oexgxnybeixwadgtdtzp.supabase.co";
 
 export default function FeedPage() {
   const router=useRouter();
@@ -43,7 +42,6 @@ export default function FeedPage() {
       setUserRole(p?.role||"member");
       setUserUsername(p?.username||null);
 
-      // Load all public feed posts
       const{data:dbPosts,error}=await supabase
         .from("feed_posts")
         .select("id,user_id,post_type,title,body,image_url,media_url,created_at,visibility")
@@ -54,22 +52,42 @@ export default function FeedPage() {
       if(error)console.error("Feed error:",error.message);
 
       if(dbPosts&&dbPosts.length>0){
-        const postIds=dbPosts.map((p:LegacyValue)=>p.id);
+        const postIds=dbPosts.map((post:LegacyValue)=>post.id);
         const{data:reactionRows}=await supabase.from("feed_post_reactions").select("post_id,user_id").in("post_id",postIds);
         const{data:commentRows}=await supabase.from("feed_post_comments").select("id,post_id,user_id,body,created_at").in("post_id",postIds).order("created_at",{ascending:true});
-        const commentAuthorIds=[...new Set((commentRows||[]).map((c:LegacyValue)=>c.user_id))];
-        const{data:commentProfiles}=commentAuthorIds.length
-          ? await supabase.from("profiles").select("id,first_name,last_name,full_name,username,role,avatar_url").in("id",commentAuthorIds)
+
+        const identityIds=[...new Set([
+          ...dbPosts.map((post:LegacyValue)=>post.user_id),
+          ...(commentRows||[]).map((comment:LegacyValue)=>comment.user_id),
+        ].filter(Boolean))].slice(0,100);
+        const{data:publicIdentities}=identityIds.length
+          ? await supabase.rpc("get_public_scholar_identities",{requested_ids:identityIds})
           : {data:[] as LegacyValue[]};
-        const commentProfileMap:Record<string,LegacyValue>={};
-        (commentProfiles||[]).forEach((cp:LegacyValue)=>{commentProfileMap[cp.id]=cp;});
+        const profileMap:Record<string,{name:string;role:string;avatar_url:string|null;username:string|null}>={};
+        (publicIdentities||[]).forEach((identity:LegacyValue)=>{
+          profileMap[identity.id]={
+            name:identity.full_name||[identity.first_name,identity.last_name].filter(Boolean).join(" ")||identity.username||"Scholar",
+            role:identity.role||"Scholar",
+            avatar_url:identity.avatar_url||null,
+            username:identity.username||null,
+          };
+        });
+        if(p){
+          profileMap[u.user.id]={
+            name:p.full_name||[p.first_name,p.last_name].filter(Boolean).join(" ")||p.username||"Scholar",
+            role:p.role||"Scholar",
+            avatar_url:p.avatar_url||null,
+            username:p.username||null,
+          };
+        }
+
         const groupedComments:Record<string,LegacyValue[]>={};
-        (commentRows||[]).forEach((c:LegacyValue)=>{
-          const cp=commentProfileMap[c.user_id]||{};
-          const name=cp.full_name||[cp.first_name,cp.last_name].filter(Boolean).join(" ")||cp.username||"Playbook Member";
-          groupedComments[c.post_id]=[
-            ...(groupedComments[c.post_id]||[]),
-            {...c,author:name,role:cp.role||"member"}
+        (commentRows||[]).forEach((comment:LegacyValue)=>{
+          const cp=profileMap[comment.user_id]||{};
+          const author=cp.name||"Playbook Member";
+          groupedComments[comment.post_id]=[
+            ...(groupedComments[comment.post_id]||[]),
+            {...comment,author,role:cp.role||"member"}
           ];
         });
         setCommentsByPost(groupedComments);
@@ -77,25 +95,13 @@ export default function FeedPage() {
         const reactionCounts:Record<string,number>={};
         const commentCounts:Record<string,number>={};
         const likedByMe=new Set<string>();
-        (reactionRows||[]).forEach((r:LegacyValue)=>{reactionCounts[r.post_id]=(reactionCounts[r.post_id]||0)+1;if(r.user_id===u.user.id)likedByMe.add(r.post_id);});
-        (commentRows||[]).forEach((c:LegacyValue)=>{commentCounts[c.post_id]=(commentCounts[c.post_id]||0)+1;});
-
-        const authorIds=[...new Set(dbPosts.map((p:LegacyValue)=>p.user_id))];
-        const{data:authorProfiles}=await supabase.from("profiles").select("id,first_name,last_name,full_name,username,role,avatar_url").in("id",authorIds);
-        const profileMap:Record<string,{name:string;role:string;avatar_url:string|null;username:string|null}>={};
-        authorProfiles?.forEach((ap:LegacyValue)=>{
-          profileMap[ap.id]={
-            name: ap.full_name || [ap.first_name, ap.last_name].filter(Boolean).join(" ") || ap.username || "Scholar",
-            role: ap.role || "Scholar",
-            avatar_url: ap.avatar_url || null,
-            username: ap.username || null,
-          };
-        });
+        (reactionRows||[]).forEach((reaction:LegacyValue)=>{reactionCounts[reaction.post_id]=(reactionCounts[reaction.post_id]||0)+1;if(reaction.user_id===u.user.id)likedByMe.add(reaction.post_id);});
+        (commentRows||[]).forEach((comment:LegacyValue)=>{commentCounts[comment.post_id]=(commentCounts[comment.post_id]||0)+1;});
 
         setPosts(dbPosts.map((post:LegacyValue)=>{
           const authorProfile=profileMap[post.user_id]||{name:"Scholar",role:"Scholar",avatar_url:null,username:null};
           const authorName=authorProfile.name;
-          const initials=authorName.split(" ").map((n:string)=>n[0]).join("").toUpperCase().slice(0,2);
+          const initials=authorName.split(" ").map((part:string)=>part[0]).join("").toUpperCase().slice(0,2);
           const d=new Date(post.created_at);
           const timeStr=d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})+" · "+d.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"});
           const imgUrl=post.image_url||post.media_url||null;
@@ -112,16 +118,23 @@ export default function FeedPage() {
         }));
       }
 
-      // Load gallery from Supabase Storage
-      const{data:files}=await supabase.storage.from("photos").list("gallery",{limit:100,sortBy:{column:"created_at",order:"desc"}});
+      const galleryPrefix=`${u.user.id}/gallery`;
+      const{data:files}=await supabase.storage.from("photos").list(galleryPrefix,{limit:100,sortBy:{column:"created_at",order:"desc"}});
       if(files&&files.length>0){
-        setGallery(files.filter((f:LegacyValue)=>f.name!==".emptyFolderPlaceholder").map((f:LegacyValue)=>`${SURL}/storage/v1/object/public/photos/gallery/${f.name}`));
+        setGallery(files
+          .filter((file:LegacyValue)=>file.name!==".emptyFolderPlaceholder")
+          .map((file:LegacyValue)=>supabase.storage.from("photos").getPublicUrl(`${galleryPrefix}/${file.name}`).data.publicUrl));
       }
 
-      // Also pull feed post images into gallery
-      const{data:photoPosts}=await supabase.from("feed_posts").select("image_url,media_url").not("image_url","is",null).limit(50);
+      const{data:photoPosts}=await supabase
+        .from("feed_posts")
+        .select("image_url,media_url")
+        .eq("user_id",u.user.id)
+        .eq("visibility","public")
+        .not("image_url","is",null)
+        .limit(50);
       if(photoPosts){
-        const photoUrls=photoPosts.map((p:LegacyValue)=>p.image_url||p.media_url).filter(Boolean);
+        const photoUrls=photoPosts.map((post:LegacyValue)=>post.image_url||post.media_url).filter(Boolean);
         if(photoUrls.length>0)setGallery(prev=>[...photoUrls,...prev]);
       }
 
@@ -129,12 +142,14 @@ export default function FeedPage() {
     })();
   },[router]);
 
-  const uploadPhoto=async(photoFile:File,folder:string):Promise<string|null>=>{
-    const ext=photoFile.name.split(".").pop()||"jpg";
-    const filename=`${folder}/${Date.now()}.${ext}`;
-    const{error}=await supabase.storage.from("photos").upload(filename,photoFile,{cacheControl:"3600",upsert:true});
+  const uploadPhoto=async(photoFile:File,folder:"feed"|"gallery"):Promise<string|null>=>{
+    if(!userId)return null;
+    const ext=(photoFile.name.split(".").pop()||"jpg").replace(/[^a-zA-Z0-9]/g,"").toLowerCase()||"jpg";
+    const stem=photoFile.name.replace(/\.[^.]+$/,"").replace(/[^a-zA-Z0-9_-]/g,"-").slice(0,80)||"photo";
+    const filename=`${userId}/${folder}/${Date.now()}-${stem}.${ext}`;
+    const{error}=await supabase.storage.from("photos").upload(filename,photoFile,{cacheControl:"3600",upsert:false});
     if(error){console.error("Upload error:",error.message);return null;}
-    return`${SURL}/storage/v1/object/public/photos/${filename}`;
+    return supabase.storage.from("photos").getPublicUrl(filename).data.publicUrl;
   };
 
   const handlePostFileSelect=(e:React.ChangeEvent<HTMLInputElement>)=>{
@@ -144,16 +159,15 @@ export default function FeedPage() {
 
   const handlePost=async()=>{
     if(!newPost.trim()&&!pendingFile)return;
+    if(!userId)return;
     setUploading(true);
     let imageUrl:string|null=null;
 
     if(pendingFile){
       imageUrl=await uploadPhoto(pendingFile,"feed");
-      // Also save to gallery folder
       if(imageUrl)setGallery(prev=>[imageUrl!,...prev]);
     }
 
-    // Save to feed_posts with correct columns
     const{data:saved,error}=await supabase.from("feed_posts").insert({
       user_id:userId,
       post_type:"text",
@@ -162,7 +176,7 @@ export default function FeedPage() {
       visibility:"public",
     }).select().single();
 
-    if(error)console.error("Post error:",error.message);
+    if(error){console.error("Post error:",error.message);setUploading(false);return;}
 
     setPosts(prev=>[{
       id:saved?.id||Date.now().toString(),
@@ -179,12 +193,11 @@ export default function FeedPage() {
   };
 
   const handleGalleryUpload=async(e:React.ChangeEvent<HTMLInputElement>)=>{
-    const f=e.target.files?.[0];if(!f)return;
+    const f=e.target.files?.[0];if(!f||!userId)return;
     setUploading(true);
     const url=await uploadPhoto(f,"gallery");
     if(url){
       setGallery(prev=>[url,...prev]);
-      // Also save as a photo post to feed_posts
       await supabase.from("feed_posts").insert({
         user_id:userId,post_type:"photo",
         body:"",image_url:url,visibility:"public",
@@ -200,7 +213,7 @@ export default function FeedPage() {
     await fetch("/api/social/reactions",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({postId:id,userId,reaction:"like"})
+      body:JSON.stringify({postId:id,reaction:"like"})
     });
   };
   const addComment=async(id:string)=>{
@@ -213,7 +226,7 @@ export default function FeedPage() {
     await fetch("/api/social/comments",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({postId:id,userId,body})
+      body:JSON.stringify({postId:id,body})
     });
   };
 
@@ -230,7 +243,7 @@ export default function FeedPage() {
     await fetch("/api/social/comments",{
       method:"PATCH",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({commentId:comment.id,userId,body})
+      body:JSON.stringify({commentId:comment.id,body})
     });
   };
 
@@ -247,7 +260,7 @@ export default function FeedPage() {
     await fetch("/api/social/comments",{
       method:"DELETE",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({commentId:comment.id,userId})
+      body:JSON.stringify({commentId:comment.id})
     });
   };
 
