@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   PlaybookButton,
@@ -29,6 +29,13 @@ type EvidenceRecord = {
   outcome: Record<string, unknown> | null;
 };
 
+type ReadinessLoadResult = {
+  ownerId: string;
+  agProgress: AcademicProgressRow[];
+  applications: ApplicationWorkspaceSummary[];
+  evidenceRecord: EvidenceRecord;
+};
+
 const readinessAreas = [
   { label: "Transcript intelligence", title: "Start with the evidence", body: "Upload or review the academic record that powers A–G calculations and readiness decisions.", href: "/transcript", action: "Open transcript" },
   { label: "Application workspace", title: "Move readiness into execution", body: "Use your existing application workspaces for requirements, evidence, documents, review, and submission progress.", href: "/application-workspaces", action: "Open applications" },
@@ -37,6 +44,68 @@ const readinessAreas = [
   { label: "Support", title: "Bring the right people into the plan", body: "Coordinate counselors, educators, family, mentors, and coaches through authorized relationships.", href: "/support-network", action: "Open support network" },
   { label: "Opportunity", title: "Activate what your progress unlocks", body: "Explore opportunities after current academic blockers and active application work are understood.", href: "/opportunities", action: "Explore opportunities" },
 ] as const;
+
+async function readAcademicReadiness(): Promise<ReadinessLoadResult | null> {
+  const { data: authData, error: authError } = await supabase.auth.getUser();
+  if (authError || !authData.user) return null;
+
+  const ownerId = authData.user.id;
+  const [agResult, applicationResult] = await Promise.all([
+    supabase
+      .from("ag_progress")
+      .select("subject,years_completed,years_required,in_progress")
+      .eq("user_id", ownerId),
+    supabase
+      .from("application_workspaces")
+      .select("id,opportunity_name,opportunity_type,status,deadline")
+      .eq("scholar_id", ownerId)
+      .neq("status", "archived"),
+  ]);
+
+  if (agResult.error || applicationResult.error) {
+    throw new Error(agResult.error?.message || applicationResult.error?.message || "Academic readiness could not be loaded.");
+  }
+
+  const agProgress = (agResult.data || []) as AcademicProgressRow[];
+  const applications = (applicationResult.data || []) as ApplicationWorkspaceSummary[];
+  const snapshot = buildAcademicReadinessSnapshot({ agProgress, applications });
+  const idempotencyKey = `academic-readiness:${ownerId}:${snapshot.primaryRecommendation.key}:${snapshot.readinessScore}`;
+  const now = new Date().toISOString();
+
+  const { data: record, error: evidenceError } = await supabase
+    .from("academic_journey_evidence")
+    .upsert(
+      {
+        owner_id: ownerId,
+        readiness_score: snapshot.readinessScore,
+        ag_updates: snapshot.agSubjectsMet,
+        idempotency_key: idempotencyKey,
+        delivery_state: "DELIVERED",
+        delivered_at: now,
+        recommendation_key: snapshot.primaryRecommendation.key,
+        primary_recommendation: snapshot.primaryRecommendation,
+        provenance: [
+          { source: "ag_progress", count: agProgress.length },
+          { source: "application_workspaces", count: applications.length },
+        ],
+        updated_at: now,
+      },
+      { onConflict: "idempotency_key" }
+    )
+    .select("id,recommendation_key,decision_state,decision_note,outcome")
+    .single();
+
+  if (evidenceError || !record) {
+    throw new Error(evidenceError?.message || "Academic readiness evidence could not be persisted.");
+  }
+
+  return {
+    ownerId,
+    agProgress,
+    applications,
+    evidenceRecord: record as EvidenceRecord,
+  };
+}
 
 export default function AcademicReadinessPage() {
   const router = useRouter();
@@ -53,83 +122,51 @@ export default function AcademicReadinessPage() {
     [agProgress, applications]
   );
 
-  const loadReadiness = useCallback(async () => {
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData.user) {
-      router.replace("/login");
-      return;
-    }
-
-    const ownerId = authData.user.id;
-    setUserId(ownerId);
-
-    const [agResult, applicationResult] = await Promise.all([
-      supabase
-        .from("ag_progress")
-        .select("subject,years_completed,years_required,in_progress")
-        .eq("user_id", ownerId),
-      supabase
-        .from("application_workspaces")
-        .select("id,opportunity_name,opportunity_type,status,deadline")
-        .eq("scholar_id", ownerId)
-        .neq("status", "archived"),
-    ]);
-
-    if (agResult.error || applicationResult.error) {
-      setError(agResult.error?.message || applicationResult.error?.message || "Academic readiness could not be loaded.");
-      setLoading(false);
-      return;
-    }
-
-    const nextAgProgress = (agResult.data || []) as AcademicProgressRow[];
-    const nextApplications = (applicationResult.data || []) as ApplicationWorkspaceSummary[];
-    const nextSnapshot = buildAcademicReadinessSnapshot({ agProgress: nextAgProgress, applications: nextApplications });
-    const idempotencyKey = `academic-readiness:${ownerId}:${nextSnapshot.primaryRecommendation.key}:${nextSnapshot.readinessScore}`;
-    const now = new Date().toISOString();
-
-    const { data: record, error: evidenceError } = await supabase
-      .from("academic_journey_evidence")
-      .upsert(
-        {
-          owner_id: ownerId,
-          readiness_score: nextSnapshot.readinessScore,
-          ag_updates: nextSnapshot.agSubjectsMet,
-          idempotency_key: idempotencyKey,
-          delivery_state: "DELIVERED",
-          delivered_at: now,
-          recommendation_key: nextSnapshot.primaryRecommendation.key,
-          primary_recommendation: nextSnapshot.primaryRecommendation,
-          provenance: [
-            { source: "ag_progress", count: nextAgProgress.length },
-            { source: "application_workspaces", count: nextApplications.length },
-          ],
-          updated_at: now,
-        },
-        { onConflict: "idempotency_key" }
-      )
-      .select("id,recommendation_key,decision_state,decision_note,outcome")
-      .single();
-
-    if (evidenceError) {
-      setError(evidenceError.message);
-      setLoading(false);
-      return;
-    }
-
-    setAgProgress(nextAgProgress);
-    setApplications(nextApplications);
-    setEvidenceRecord(record as EvidenceRecord);
-    setLoading(false);
-  }, [router]);
-
   useEffect(() => {
-    void loadReadiness();
-  }, [loadReadiness]);
+    let active = true;
+
+    async function initialize() {
+      try {
+        const result = await readAcademicReadiness();
+        if (!active) return;
+        if (!result) {
+          router.replace("/login");
+          return;
+        }
+        setUserId(result.ownerId);
+        setAgProgress(result.agProgress);
+        setApplications(result.applications);
+        setEvidenceRecord(result.evidenceRecord);
+        setLoading(false);
+      } catch (loadError) {
+        if (!active) return;
+        setError(loadError instanceof Error ? loadError.message : "Academic readiness could not be loaded.");
+        setLoading(false);
+      }
+    }
+
+    void initialize();
+    return () => { active = false; };
+  }, [router]);
 
   async function retryReadiness() {
     setLoading(true);
     setError(null);
-    await loadReadiness();
+    try {
+      const result = await readAcademicReadiness();
+      if (!result) {
+        router.replace("/login");
+        return;
+      }
+      setUserId(result.ownerId);
+      setAgProgress(result.agProgress);
+      setApplications(result.applications);
+      setEvidenceRecord(result.evidenceRecord);
+    } catch (loadError) {
+      setError(loadError instanceof Error ? loadError.message : "Academic readiness could not be loaded.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function decide(decision: DecisionState, followAction = false) {
