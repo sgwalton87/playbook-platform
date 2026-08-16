@@ -88,6 +88,52 @@ grant execute on function public.get_public_network_directory(text, integer) to 
 comment on function public.get_public_network_directory(text, integer) is
   'Authenticated, bounded network discovery over public Playbook presentation fields only. Canonical profiles remain owner-scoped.';
 
+-- Legacy social-network tables are deployed runtime entities whose creating DDL
+-- is absent from the committed migration history. Do not fabricate them for
+-- local certification. Resolve their evidence only when each table actually
+-- exists in the executing database.
+create or replace function private.can_resolve_network_identity(target_user_id uuid)
+returns boolean
+language plpgsql
+stable
+security definer
+set search_path = ''
+as $$
+declare
+  caller_id uuid := auth.uid();
+  allowed boolean := false;
+begin
+  if caller_id is null or target_user_id is null then
+    return false;
+  end if;
+
+  if to_regclass('public.user_connections') is not null then
+    execute $sql$
+      select exists (
+        select 1 from public.user_connections c
+        where (c.user_id = $1 and c.connected_user_id = $2)
+           or (c.user_id = $2 and c.connected_user_id = $1)
+      )
+    $sql$ into allowed using caller_id, target_user_id;
+    if allowed then return true; end if;
+  end if;
+
+  if to_regclass('public.connection_requests') is not null then
+    execute $sql$
+      select exists (
+        select 1 from public.connection_requests r
+        where r.status = 'pending'
+          and ((r.requester_id = $1 and r.recipient_id = $2)
+            or (r.requester_id = $2 and r.recipient_id = $1))
+      )
+    $sql$ into allowed using caller_id, target_user_id;
+    if allowed then return true; end if;
+  end if;
+
+  return false;
+end;
+$$;
+
 create or replace function public.get_network_member_identities(requested_ids uuid[])
 returns table (
   id uuid,
@@ -119,29 +165,16 @@ as $$
   where auth.uid() is not null
     and cardinality(requested_ids) between 1 and 100
     and p.id = any(requested_ids)
-    and (
-      p.profile_visibility = 'public'
-      or exists (
-        select 1 from public.user_connections c
-        where (c.user_id = auth.uid() and c.connected_user_id = p.id)
-           or (c.user_id = p.id and c.connected_user_id = auth.uid())
-      )
-      or exists (
-        select 1 from public.connection_requests r
-        where r.status = 'pending'
-          and (
-            (r.requester_id = auth.uid() and r.recipient_id = p.id)
-            or (r.requester_id = p.id and r.recipient_id = auth.uid())
-          )
-      )
-    );
+    and (p.profile_visibility = 'public' or private.can_resolve_network_identity(p.id));
 $$;
 
+revoke all on function private.can_resolve_network_identity(uuid) from public, anon, authenticated;
 revoke all on function public.get_network_member_identities(uuid[]) from public, anon, authenticated;
+grant execute on function private.can_resolve_network_identity(uuid) to authenticated;
 grant execute on function public.get_network_member_identities(uuid[]) to authenticated;
 
 comment on function public.get_network_member_identities(uuid[]) is
-  'Resolves minimal presentation identity for public profiles or governed connection partners/pending requests. No broader profile authority is granted.';
+  'Resolves minimal presentation identity for public profiles or governed connection partners/pending requests when legacy network tables exist. No broader profile authority is granted.';
 
 -- Feed categories intentionally use the existing durable post_type field rather
 -- than requiring a new hosted-schema column. This keeps preview and production
