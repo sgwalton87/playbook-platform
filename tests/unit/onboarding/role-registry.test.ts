@@ -68,8 +68,8 @@ describe("canonical Playbook role registry", () => {
     expect(getRoleDestination("other")).toBe("/community-partner-os");
   });
 
-  it("exposes all fourteen canonical public onboarding pathways", () => {
-    expect(PUBLIC_ONBOARDING_ROLES).toHaveLength(14);
+  it("exposes all fifteen canonical public onboarding pathways", () => {
+    expect(PUBLIC_ONBOARDING_ROLES).toHaveLength(15);
     for (const role of PUBLIC_ONBOARDING_ROLES) {
       expect(ROLE_ONBOARDING[role], `${role} must own role-specific onboarding`).toBeDefined();
       expect(getOnboardingSteps(role).length).toBeGreaterThanOrEqual(3);
