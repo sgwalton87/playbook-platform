@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import MentorValidationQueue from "@/components/mentor/MentorValidationQueue";
 import {
   getCanonicalOnboardingRoute,
   getRoleOnboardingCompletionContract,
@@ -57,7 +58,7 @@ export function CanonicalRoleAuthorityGate({
   const router = useRouter();
   const contract = useMemo(() => getRoleOnboardingCompletionContract(role), [role]);
   const [state, setState] = useState<GateState>("loading");
-  const [relationshipReady, setRelationshipReady] = useState(false);
+  const [activeRelationshipTypes, setActiveRelationshipTypes] = useState<string[]>([]);
   const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -115,25 +116,25 @@ export function CanonicalRoleAuthorityGate({
         return;
       }
 
-      if (role === "family") {
-        const relationship = await supabase
-          .from("support_relationships")
-          .select("id")
-          .eq("supporter_id", user.id)
-          .eq("relationship", "parent_guardian")
-          .eq("status", "active")
-          .limit(1)
-          .maybeSingle();
+      // Even when a role's full OS adapter remains pending, an already-active
+      // support-system relationship is enough to review Mentor validation
+      // requests for that same Scholar. It does not unlock the rest of the OS.
+      const relationshipResult = await supabase
+        .from("support_relationships")
+        .select("relationship")
+        .eq("supporter_id", user.id)
+        .eq("status", "active");
 
-        if (!active) return;
-        if (relationship.error) {
-          setMessage(relationship.error.message);
-          setState("error");
-          return;
-        }
-        setRelationshipReady(Boolean(relationship.data));
+      if (!active) return;
+      if (relationshipResult.error) {
+        setMessage(relationshipResult.error.message);
+        setState("error");
+        return;
       }
 
+      setActiveRelationshipTypes(
+        Array.from(new Set((relationshipResult.data ?? []).map((relationship) => relationship.relationship)))
+      );
       setState("pending");
     }
 
@@ -157,8 +158,10 @@ export function CanonicalRoleAuthorityGate({
     return <RoleGateSurface role={role} title="Authority cannot be proven" body="This Operating System is fail-closed because Playbook could not verify the required role evidence." message={message} />;
   }
 
+  const hasParentGuardianRelationship = activeRelationshipTypes.includes("parent_guardian");
+  const canReviewMentors = activeRelationshipTypes.length > 0 && role !== "mentor";
   const familyDetail = role === "family"
-    ? relationshipReady
+    ? hasParentGuardianRelationship
       ? "Your Parent / Guardian relationship is active. The independent Family PBOS adapter and exact-head acceptance are still required before the full dashboard is certified."
       : "A Scholar-originated Parent / Guardian invitation must be accepted before Family access can activate."
     : null;
@@ -169,7 +172,9 @@ export function CanonicalRoleAuthorityGate({
       title={`${PLAYBOOK_ROLES[role].osLabel} is awaiting authority`}
       body={familyDetail ?? contract.requirement}
       message={`Your ${PLAYBOOK_ROLES[role].label} onboarding profile is complete. You are in the correct Operating System, but restricted capabilities remain locked until the independent ${contract.adapter} contract is certified.`}
-    />
+    >
+      {canReviewMentors && <MentorValidationQueue showEmpty />}
+    </RoleGateSurface>
   );
 }
 
@@ -178,11 +183,13 @@ function RoleGateSurface({
   title,
   body,
   message,
+  children,
 }: {
   role: PlaybookRole;
   title: string;
   body: string;
   message?: string | null;
+  children?: React.ReactNode;
 }) {
   return (
     <main
@@ -195,6 +202,7 @@ function RoleGateSurface({
         <h1 style={titleStyle}>{title}</h1>
         <p style={bodyStyle}>{body}</p>
         {message && <div style={notice}>{message}</div>}
+        {children}
         <div style={routeBadge}>
           Canonical destination: <strong>{PLAYBOOK_ROLES[role].osRoute}</strong>
         </div>
@@ -214,7 +222,7 @@ const page: React.CSSProperties = {
 
 const card: React.CSSProperties = {
   width: "100%",
-  maxWidth: 760,
+  maxWidth: 860,
   padding: "clamp(28px,5vw,52px)",
   borderRadius: 28,
   border: "1px solid rgba(255,255,255,.16)",
