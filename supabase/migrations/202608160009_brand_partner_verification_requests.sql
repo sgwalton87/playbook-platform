@@ -10,6 +10,8 @@ create table if not exists public.brand_partner_verification_requests (
   nil_acknowledgement text not null,
   campaign_types jsonb not null default '[]'::jsonb,
   approval_contact text,
+  campaign_scope_approved boolean not null default false,
+  compliance_scope_approved boolean not null default false,
   status text not null default 'pending' check (status in ('pending','under_review','approved','rejected')),
   submitted_at timestamptz not null default now(), reviewed_at timestamptz, review_notes text,
   created_at timestamptz not null default now(), updated_at timestamptz not null default now()
@@ -22,7 +24,9 @@ create policy "Brand partners can view own verification request" on public.brand
 
 drop policy if exists "Brand partners can submit own verification request" on public.brand_partner_verification_requests;
 create policy "Brand partners can submit own verification request" on public.brand_partner_verification_requests for insert to authenticated with check (
-  brand_user_id = (select auth.uid()) and status = 'pending' and exists (
+  brand_user_id = (select auth.uid()) and status = 'pending'
+  and campaign_scope_approved = false and compliance_scope_approved = false
+  and exists (
     select 1 from public.profiles p where p.id = (select auth.uid()) and coalesce(p.profile_mode,p.role,p.requested_role) = 'brand-partner' and p.onboarding_completed = true
   )
 );
@@ -30,4 +34,8 @@ create policy "Brand partners can submit own verification request" on public.bra
 drop policy if exists "Brand partners can update pending verification evidence" on public.brand_partner_verification_requests;
 create policy "Brand partners can update pending verification evidence" on public.brand_partner_verification_requests for update to authenticated
 using (brand_user_id = (select auth.uid()) and status = 'pending')
-with check (brand_user_id = (select auth.uid()) and status = 'pending' and reviewed_at is null and review_notes is null);
+with check (
+  brand_user_id = (select auth.uid()) and status = 'pending'
+  and campaign_scope_approved = false and compliance_scope_approved = false
+  and reviewed_at is null and review_notes is null
+);
