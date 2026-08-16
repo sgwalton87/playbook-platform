@@ -88,11 +88,6 @@ grant execute on function public.get_public_network_directory(text, integer) to 
 comment on function public.get_public_network_directory(text, integer) is
   'Authenticated, bounded network discovery over public Playbook presentation fields only. Canonical profiles remain owner-scoped.';
 
--- A relationship-aware identity resolver is intentionally separate from public
--- discovery. It allows a caller to resolve minimal identity for people who are
--- already connected or are in a pending connection request with the caller,
--- even when that person is not currently public. It never exposes profile data
--- beyond presentation-grade identity fields.
 create or replace function public.get_network_member_identities(requested_ids uuid[])
 returns table (
   id uuid,
@@ -148,21 +143,6 @@ grant execute on function public.get_network_member_identities(uuid[]) to authen
 comment on function public.get_network_member_identities(uuid[]) is
   'Resolves minimal presentation identity for public profiles or governed connection partners/pending requests. No broader profile authority is granted.';
 
--- The historical feed table predates the repository migration origin. Add the
--- optional canonical pillar metadata only when the deployed table exists.
-do $$
-begin
-  if to_regclass('public.feed_posts') is not null then
-    execute 'alter table public.feed_posts add column if not exists pillar text';
-    execute $check$
-      alter table public.feed_posts
-      drop constraint if exists feed_posts_pillar_check
-    $check$;
-    execute $check$
-      alter table public.feed_posts
-      add constraint feed_posts_pillar_check
-      check (pillar is null or pillar in ('Leadership','Finance','Civic','SEL','College','NIL','Community'))
-      not valid
-    $check$;
-  end if;
-end $$;
+-- Feed categories intentionally use the existing durable post_type field rather
+-- than requiring a new hosted-schema column. This keeps preview and production
+-- compatible while allowing truthful Leadership/Finance/Civic/SEL filtering.
