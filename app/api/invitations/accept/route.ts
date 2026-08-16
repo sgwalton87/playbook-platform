@@ -5,6 +5,7 @@ import { requireUser } from "@/lib/supabase/server";
 function statusForClaimError(message: string) {
   if (message.includes("Authentication required")) return 401;
   if (message.includes("different email address")) return 403;
+  if (message.includes("governed verification contract")) return 403;
   if (message.includes("Invitation not found")) return 404;
   if (message.includes("already")) return 409;
   return 400;
