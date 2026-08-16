@@ -1,6 +1,7 @@
 export * from "./engine";
 export * from "./completion";
 export * from "./completionRegistry";
+export * from "./institutionalVerification";
 export * from "./onboardingOptions";
 export * from "./progress";
 export * from "./supabaseMapping";
