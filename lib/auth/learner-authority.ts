@@ -1,21 +1,12 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { requirePlaybookRole, type PlaybookRole } from "@/lib/roles/registry";
 
 export const LEARNER_ROLES = ["scholar", "scholar-athlete", "transition-youth"] as const satisfies readonly PlaybookRole[];
 
 export type LearnerRole = (typeof LEARNER_ROLES)[number];
 
-type ProfileReader = {
-  from(table: "profiles"): {
-    select(columns: string): {
-      eq(column: "id", value: string): {
-        maybeSingle(): Promise<{ data: { role?: string | null; profile_mode?: string | null; onboarding_completed?: boolean | null } | null; error: { message: string } | null }>;
-      };
-    };
-  };
-};
-
 export async function requireLearnerAuthority(
-  supabase: ProfileReader,
+  supabase: SupabaseClient,
   userId: string,
   options: { requireOnboarding?: boolean } = {}
 ): Promise<LearnerRole> {
