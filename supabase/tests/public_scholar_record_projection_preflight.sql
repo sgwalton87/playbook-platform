@@ -23,25 +23,32 @@ begin
   end if;
 end $$;
 
--- Both RPCs must execute with an empty search_path and must not expose authority fields.
+-- Both RPCs must execute with an empty search_path and their result signatures
+-- must not expose authority/private profile fields.
 do $$
 declare
-  definition text;
+  proc regprocedure;
+  result_signature text;
+  config text[];
 begin
-  select pg_get_functiondef('public.get_public_scholar_profile(text)'::regprocedure) into definition;
-  if definition not ilike '%set search_path = %''%''%' and definition not ilike '%SET search_path TO %''%''%' then
-    raise exception 'public profile projection must use an empty search_path';
-  end if;
-
-  foreach definition in array array[
-    pg_get_functiondef('public.get_public_scholar_profile(text)'::regprocedure),
-    pg_get_functiondef('public.get_public_scholar_identities(uuid[])'::regprocedure)
+  foreach proc in array array[
+    'public.get_public_scholar_profile(text)'::regprocedure,
+    'public.get_public_scholar_identities(uuid[])'::regprocedure
   ] loop
-    if definition ~* '\m(onboarding_completed|verification_status|requested_role|profile_mode|is_admin|email|phone|household|guardian|safety)\M' then
-      -- profile_mode/requested_role are allowed internally only for role normalization, but not in RETURNS TABLE.
-      if definition ~* 'returns table[\s\S]*\m(onboarding_completed|verification_status|requested_role|profile_mode|is_admin|email|phone|household|guardian|safety)\M' then
-        raise exception 'public Scholar projection exposes an authority/private field';
-      end if;
+    select p.proconfig, pg_get_function_result(p.oid)
+      into config, result_signature
+    from pg_proc p
+    where p.oid = proc;
+
+    if config is null or not exists (
+      select 1 from unnest(config) as setting
+      where setting = 'search_path=' or setting = 'search_path=""'
+    ) then
+      raise exception '% must use an empty search_path', proc::text;
+    end if;
+
+    if result_signature ~* '\m(onboarding_completed|verification_status|requested_role|profile_mode|is_admin|email|phone|household|guardian|safety)\M' then
+      raise exception '% exposes an authority/private field in its return signature: %', proc::text, result_signature;
     end if;
   end loop;
 end $$;
