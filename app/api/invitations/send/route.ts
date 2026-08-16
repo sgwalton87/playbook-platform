@@ -13,6 +13,7 @@ const RELATIONSHIP_KINDS = new Set<RelationshipKind>([
   "parent_guardian",
   "educator",
   "mentor",
+  "coach",
   "district_admin",
   "university_partner",
   "employer_partner",
@@ -118,9 +119,6 @@ export async function POST(req: NextRequest) {
         fromType: "onboarding",
       });
     } catch (deliveryError) {
-      // The invitation remains durable and visible to its Scholar owner. Email
-      // delivery is an external transport concern and may be retried without
-      // silently deleting the consent artifact.
       return NextResponse.json(
         {
           ok: true,
