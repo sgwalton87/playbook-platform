@@ -21,16 +21,28 @@ const browserClient = createBrowserClient(
 );
 
 type BrowserClient = typeof browserClient;
+type RuntimeRpcResponse<T> = {
+  data: T | null;
+  error: { message: string } | null;
+  count: number | null;
+  status: number;
+  statusText: string;
+};
+type RuntimeRpcBuilder<T> = PromiseLike<RuntimeRpcResponse<T[]>> & {
+  maybeSingle: () => PromiseLike<RuntimeRpcResponse<T>>;
+  single: () => PromiseLike<RuntimeRpcResponse<T>>;
+};
 type RuntimeCertifiedRpcClient = Omit<BrowserClient, "rpc"> & {
   /**
-   * Browser RPC signatures are runtime-certified by the repository SQL
-   * preflights until generated Supabase function types are adopted. Table/query
-   * typing remains unchanged; only the RPC function-name boundary is widened.
+   * The browser client is not generated from database function types yet.
+   * Preserve the native RPC signature while adding a narrow runtime-certified
+   * overload for repository SQL functions. The default result stays on the
+   * existing LegacyValue compatibility boundary instead of widening to `any`.
    */
-  rpc: (
+  rpc: (<T = LegacyValue>(
     fn: string,
     args?: Record<string, unknown>
-  ) => ReturnType<BrowserClient["rpc"]>;
+  ) => RuntimeRpcBuilder<T>) & BrowserClient["rpc"];
 };
 
 export const supabase = browserClient as RuntimeCertifiedRpcClient;
