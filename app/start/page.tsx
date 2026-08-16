@@ -140,7 +140,11 @@ function StartContent() {
     await persist(false, { avatar_url: data.publicUrl });
   }
 
-  async function persist(complete = false, override: Record<string, LegacyValue> = {}) {
+  async function persist(
+    complete = false,
+    override: Record<string, LegacyValue> = {},
+    prepareRoleRecord = complete
+  ) {
     if (!user?.id) return;
 
     const nextForm = { ...form, ...override };
@@ -167,7 +171,7 @@ function StartContent() {
 
     await supabase.from("profiles").upsert(payload, { onConflict: "id" });
 
-    if (complete && role === "scholar-athlete") {
+    if (prepareRoleRecord && role === "scholar-athlete") {
       const graduationYear = Number(nextForm.graduation_year);
       const governingPath = String(nextForm.target_division || "undecided")
         .toLowerCase()
@@ -233,21 +237,30 @@ function StartContent() {
       setJourneyError(null);
       try {
         assertRoleOnboardingCompletionSupported(role);
-        await persist(true);
-        const response = await fetch("/api/pbos/scholar/onboarding", {
+        // Persist final evidence and any role-specific prerequisite record, but
+        // leave onboarding completion false until the governed server adapter succeeds.
+        await persist(false, {}, true);
+        const destination = getOnboardingCompletionDestination(role);
+        const response = await fetch(`/api/pbos/onboarding/${encodeURIComponent(role)}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ displayName: String(form.full_name || "Scholar"), goalTitle: String(form.dream_school || form.ideal_profession || "Complete my scholar journey") }),
+          body: JSON.stringify({
+            displayName: String(form.full_name || "Scholar"),
+            goalTitle: String(form.dream_school || form.ideal_profession || "Complete my scholar journey"),
+          }),
         });
-        const result = await response.json() as { error?: string };
-        if (!response.ok) throw new Error(result.error || "PBOS Scholar journey could not be completed.");
+        const result = await response.json() as { error?: string; destination?: string };
+        if (!response.ok) throw new Error(result.error || "PBOS role onboarding could not be completed.");
+        if (result.destination && result.destination !== destination) {
+          throw new Error("PBOS role onboarding destination does not match the canonical client contract.");
+        }
         setCreating(false);
         setCreated(true);
-        setTimeout(() => { window.location.href = getOnboardingCompletionDestination(role); }, 15000);
+        setTimeout(() => { window.location.href = result.destination || destination; }, 15000);
       } catch (error) {
         setCreating(false);
         setSaving(false);
-        setJourneyError(error instanceof Error ? error.message : "PBOS Scholar journey could not be completed.");
+        setJourneyError(error instanceof Error ? error.message : "PBOS role onboarding could not be completed.");
       }
       return;
     }
