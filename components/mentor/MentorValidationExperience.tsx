@@ -45,9 +45,6 @@ export default function MentorValidationExperience() {
   const thresholdMet = privilegedApproval || distinctApprovalCount >= 2;
 
   const load = useCallback(async () => {
-    setAccessState("loading");
-    setMessage(null);
-
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -138,8 +135,17 @@ export default function MentorValidationExperience() {
   }, [router]);
 
   useEffect(() => {
-    void load();
+    const timeout = window.setTimeout(() => {
+      void load();
+    }, 0);
+    return () => window.clearTimeout(timeout);
   }, [load]);
+
+  function refresh() {
+    setAccessState("loading");
+    setMessage(null);
+    void load();
+  }
 
   async function finalizeValidation() {
     if (!request?.id || !thresholdMet) return;
@@ -157,6 +163,7 @@ export default function MentorValidationExperience() {
         setMessage(result.error ?? "Mentor access could not be activated.");
         return;
       }
+      setAccessState("loading");
       await load();
     } catch {
       setMessage("Mentor access could not be activated.");
@@ -180,7 +187,7 @@ export default function MentorValidationExperience() {
         body="Playbook could not prove the required Mentor authority. No Scholar access has been granted."
         message={message}
         actionLabel="Check again"
-        onAction={() => void load()}
+        onAction={refresh}
       />
     );
   }
@@ -192,7 +199,7 @@ export default function MentorValidationExperience() {
         title="A Scholar invitation is required"
         body="Mentors cannot self-connect to a Scholar. Ask the Scholar you support to invite this account from their Playbook support network. After you accept, the validation process will begin here in Mentor OS."
         actionLabel="Check for invitation"
-        onAction={() => void load()}
+        onAction={refresh}
       />
     );
   }
@@ -218,7 +225,7 @@ export default function MentorValidationExperience() {
       </div>
 
       <div style={actions}>
-        <button type="button" onClick={() => void load()} style={secondaryButton}>
+        <button type="button" onClick={refresh} style={secondaryButton}>
           Refresh status
         </button>
         <button
