@@ -34,6 +34,19 @@ function approvalsFor(role: SupportedScholarRecordRole) {
   };
 }
 
+async function finalizeProfileCompletion(
+  supabase: Awaited<ReturnType<typeof requireUser>>["supabase"],
+  userId: string
+) {
+  const completedAt = new Date().toISOString();
+  const result = await supabase
+    .from("profiles")
+    .update({ onboarding_completed: true, onboarding_completed_at: completedAt })
+    .eq("id", userId);
+  if (result.error) throw new Error(result.error.message);
+  return completedAt;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { supabase, user } = await requireUser();
@@ -55,20 +68,10 @@ export async function POST(request: NextRequest) {
     const contract = getRoleOnboardingCompletionContract(normalizedRole);
 
     // Compatibility gateway: the existing onboarding client still posts here.
-    // Non-learner roles are never passed into the Scholar Record service; they
-    // submit their own profile and enter their own OS in a restricted state.
+    // Role equality is resolved from the authenticated durable profile. The
+    // client may persist final form data but may not mark onboarding complete.
     if (contract.state !== "implemented") {
-      if (!profileResult.data.onboarding_completed) {
-        return NextResponse.json(
-          { error: `${contract.role} must finish its role-specific onboarding form before completion can be submitted.` },
-          { status: 409 }
-        );
-      }
-
       if (profileResult.data.verification_status !== "approved") {
-        // Role equality has already been resolved from this authenticated
-        // profile. Use the owner ID alone so legacy null profile_mode rows still
-        // receive the durable pending state.
         const pending = await supabase
           .from("profiles")
           .update({ verification_status: "pending" })
@@ -76,12 +79,14 @@ export async function POST(request: NextRequest) {
         if (pending.error) throw new Error(pending.error.message);
       }
 
+      const completedAt = await finalizeProfileCompletion(supabase, user.id);
       return NextResponse.json(
         {
           ok: true,
           role: contract.role,
           adapter: contract.adapter,
           onboardingSubmitted: true,
+          onboardingCompletedAt: completedAt,
           activationState: contract.state,
           requirement: contract.requirement,
           destination: contract.destination,
@@ -246,7 +251,8 @@ export async function POST(request: NextRequest) {
       exchangeApprovalId: approvals.exchangeApprovalId,
       idempotencyKey,
     });
-    return NextResponse.json({ ok: true, dashboard: output });
+    const completedAt = await finalizeProfileCompletion(supabase, user.id);
+    return NextResponse.json({ ok: true, onboardingCompletedAt: completedAt, dashboard: output });
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Role onboarding failed." },
