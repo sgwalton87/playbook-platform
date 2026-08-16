@@ -1,19 +1,55 @@
 import { ROLE_ONBOARDING } from "./config/roleConfigs";
-import { normalizeRole, getPathway } from "./pathwayMap";
+import { getPathway } from "./pathwayMap";
+import {
+  PLAYBOOK_ROLES,
+  ROLE_ALIASES,
+  normalizePlaybookRole,
+  type PlaybookRole,
+} from "@/lib/roles/registry";
 import type { OnboardingData, OnboardingStep } from "./types";
 
+function resolveExplicitOnboardingRole(role?: string | null): PlaybookRole {
+  const raw = String(role ?? "").trim().toLowerCase();
+  if (!raw) return "scholar";
+  if (raw in PLAYBOOK_ROLES) return raw as PlaybookRole;
+  const alias = ROLE_ALIASES[raw];
+  if (alias) return alias;
+  throw new Error(`Unsupported Playbook onboarding role: ${raw}`);
+}
+
 export function getOnboardingSteps(role?: string | null): OnboardingStep[] {
-  const normalized = normalizeRole(role);
-  return ROLE_ONBOARDING[normalized] || ROLE_ONBOARDING.scholar;
+  const normalized = resolveExplicitOnboardingRole(role);
+  const configured = ROLE_ONBOARDING[normalized];
+  if (!configured) {
+    throw new Error(`No onboarding contract is registered for ${normalized}.`);
+  }
+
+  // Transition-Aged Youth is an independent pathway. It may reuse shared
+  // Scholar components, but it must never inherit Scholar-Athlete questions.
+  if (normalized === "transition-youth") {
+    return configured.filter((step) => step.id !== "athlete-profile" && step.id !== "athlete-recruiting");
+  }
+
+  return configured;
 }
 
 export function getCanonicalOnboardingRoute(role?: string | null): string {
-  const normalized = normalizeRole(role);
+  const normalized = resolveExplicitOnboardingRole(role);
   return `/start?first=1&role=${encodeURIComponent(normalized)}`;
 }
 
 export function getOnboardingCompletionDestination(role?: string | null): string {
-  return getPathway(normalizeRole(role)).osRoute;
+  const normalized = resolveExplicitOnboardingRole(role);
+  return getPathway(normalized).osRoute;
+}
+
+export function getOnboardingCompletionEndpoint(role?: string | null): string {
+  const normalized = resolveExplicitOnboardingRole(role);
+  return `/api/pbos/onboarding/${encodeURIComponent(normalized)}`;
+}
+
+export function normalizeOnboardingRole(role?: string | null): PlaybookRole {
+  return resolveExplicitOnboardingRole(role);
 }
 
 export function createInitialOnboardingData(profile: Record<string, unknown> | null | undefined): OnboardingData {
