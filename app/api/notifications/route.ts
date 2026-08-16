@@ -4,7 +4,6 @@ import {
   normalizeNotificationEvent,
   notificationAction,
   notificationMode,
-  notificationPriorityForAttempt,
   notificationType,
   type GovernedNotificationEvent,
 } from "@/lib/pbos/reliable-notifications";
@@ -29,18 +28,15 @@ async function publishPbos(userId: string, event: GovernedNotificationEvent, cor
       eventType: "NOTIFICATION_QUEUED", schemaVersion: "1.0.0", notificationType: event.type, eventKey: event.eventKey
     } }, correlationId, correlationId);
   if (!response.success) throw new Error(response.error.message);
-  return [identity.pbosIdentity.provenance, ...response.provenance, required("PBOS_NOTIFICATION_JOURNEY_APPROVAL_ID")];
 }
 
 type RequestSupabase = Awaited<ReturnType<typeof requireUser>>["supabase"];
 type Outbox = { id: string; event_key: string; event_type: string; event_payload: Record<string, unknown>; attempt_count: number };
 
-async function transitionOutbox(supabase: RequestSupabase, outboxId: string, state: "FAILED" | "SUPPRESSED" | "DIGEST_QUEUED", error: string | null = null, nextAttemptAt: string | null = null) {
+async function transitionOutbox(supabase: RequestSupabase, outboxId: string, state: "FAILED" | "SUPPRESSED" | "DIGEST_QUEUED") {
   const transition = await supabase.rpc("transition_notification_outbox", {
     requested_outbox_id: outboxId,
     requested_state: state,
-    requested_error: error,
-    requested_next_attempt_at: nextAttemptAt,
   });
   if (transition.error) throw new Error(transition.error.message);
 }
@@ -55,16 +51,12 @@ async function deliver(supabase: RequestSupabase, userId: string, outbox: Outbox
     return { notification: null, suppressed: true };
   }
   if (["daily_digest", "weekly_digest"].includes(preference.data?.mode ?? "")) {
-    const days = preference.data?.mode === "weekly_digest" ? 7 : 1;
-    await transitionOutbox(supabase, outbox.id, "DIGEST_QUEUED", null, new Date(Date.now() + days * 86_400_000).toISOString());
+    await transitionOutbox(supabase, outbox.id, "DIGEST_QUEUED");
     return { notification: null, suppressed: false, digestQueued: true, mode: preference.data?.mode };
   }
-  const provenance = await publishPbos(userId, event, userId + ":" + event.eventKey);
-  const priority = notificationPriorityForAttempt(event.priority, outbox.attempt_count);
+  await publishPbos(userId, event, userId + ":" + event.eventKey);
   const finalized = await supabase.rpc("finalize_notification_delivery", {
     requested_outbox_id: outbox.id,
-    requested_priority: priority,
-    requested_provenance: provenance,
   });
   if (finalized.error) throw new Error(finalized.error.message);
   return { notification: finalized.data, suppressed: false };
@@ -117,8 +109,7 @@ export async function PATCH(request: NextRequest) {
       if (!found.data) return NextResponse.json({ error: "Retryable outbox item not found." }, { status: 404 });
       try { return NextResponse.json(await deliver(supabase, user.id, found.data)); }
       catch (cause) {
-        const detail = cause instanceof Error ? cause.message : "Delivery failed";
-        await transitionOutbox(supabase, found.data.id, "FAILED", detail, new Date(Date.now() + Math.min(60_000 * 2 ** found.data.attempt_count, 3_600_000)).toISOString());
+        await transitionOutbox(supabase, found.data.id, "FAILED");
         throw cause;
       }
     }
