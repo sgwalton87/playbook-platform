@@ -1,7 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireLearnerAuthority } from "@/lib/auth/learner-authority";
-import { buildPortfolioShare } from "@/lib/portfolio-sharing";
+import {
+  buildPortfolioShare,
+  PORTFOLIO_SHARE_TARGET_USES,
+  type PortfolioShareTargetUse,
+} from "@/lib/portfolio-sharing";
 import { requireUser } from "@/lib/supabase/server";
+
+function isPortfolioShareTargetUse(value: string): value is PortfolioShareTargetUse {
+  return (PORTFOLIO_SHARE_TARGET_USES as readonly string[]).includes(value);
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -18,10 +26,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Portfolio shares may only be created for the authenticated learner." }, { status: 403 });
     }
 
+    const targetUse = String(body.targetUse ?? "");
+    if (!isPortfolioShareTargetUse(targetUse)) {
+      return NextResponse.json({ error: "Portfolio share target use is invalid." }, { status: 400 });
+    }
+
     const share = buildPortfolioShare({
       scholarId: user.id,
       scholarName: profile.data.full_name || "Playbook Scholar",
-      targetUse: String(body.targetUse ?? ""),
+      targetUse,
       packet: (body.packet ?? {}) as never,
       expiresAt: body.expiresAt ? String(body.expiresAt) : undefined,
     });
