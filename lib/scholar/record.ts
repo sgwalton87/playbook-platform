@@ -65,6 +65,7 @@ export function buildScholarRecord(input: ScholarRecordInput = {}): ScholarRecor
   const totalRequired = agProgress.reduce((sum, row) => sum + row.yearsRequired, 0);
   const totalCompleted = agProgress.reduce((sum, row) => sum + Math.min(row.yearsCompleted, row.yearsRequired), 0);
   const achievements = { certificates: input.certificates || [], badges: input.badges || [], activities: input.activities || [], posts: input.posts || [] };
+  const totalAchievements = achievements.certificates.length + achievements.badges.length + achievements.activities.length + achievements.posts.length;
   const rawActivities = achievements.activities as unknown as RawCommunityActivity[];
   const community = buildCommunityRecord(rawActivities);
   const experiences = buildExperienceCollection([
@@ -75,7 +76,7 @@ export function buildScholarRecord(input: ScholarRecordInput = {}): ScholarRecor
   const fullName = value(profile.full_name, [profile.first_name, profile.last_name].filter(Boolean).join(" "), profile.username, "Scholar") || "Scholar";
   const academicFields = [profile.school, profile.grade, profile.grad_year, profile.weighted_gpa || profile.gpa, profile.unweighted_gpa, profile.sat_score, profile.act_score, profile.dream_school].filter(Boolean).length;
   const portfolioCompletion = Math.min(100, Math.round((academicFields / 8) * 100));
-  const opportunityReadiness = Math.min(100, Math.round(portfolioCompletion * 0.55 + Math.min(totalRequired ? achievements.certificates.length + achievements.badges.length + experiences.all.length + achievements.posts.length : 0, 10) * 3 + Math.min(volunteerHours, 100) * 0.15));
+  const opportunityReadiness = Math.min(100, Math.round(portfolioCompletion * 0.55 + Math.min(totalAchievements, 10) * 3 + Math.min(volunteerHours, 100) * 0.15));
 
   const canonicalAIProfile = buildCanonicalAIProfile({
     rawProfile: profile as unknown as Record<string, unknown>,
@@ -160,7 +161,7 @@ export function buildScholarRecord(input: ScholarRecordInput = {}): ScholarRecor
     career: { idealProfession: profile.ideal_profession || null, desiredSalaryRange: profile.desired_salary_range || null },
     community,
     experiences,
-    achievements: { total: achievements.certificates.length + achievements.badges.length + experiences.all.length + achievements.posts.length, ...achievements, activities: community.activities },
+    achievements: { total: totalAchievements, ...achievements, activities: community.activities },
     service: { volunteerHours, activities: community.activities },
     leadership: {
       badges: achievements.badges,
