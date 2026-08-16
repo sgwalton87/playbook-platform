@@ -1,7 +1,7 @@
 "use client";
 
-import RoleDashboardExperience from "@/components/role-os/dashboards/RoleDashboardExperience";
+import AdmissionsVerificationExperience from "@/components/admissions/AdmissionsVerificationExperience";
 
 export default function AdmissionsOSPage() {
-  return <RoleDashboardExperience role="admissions" />;
+  return <AdmissionsVerificationExperience />;
 }
