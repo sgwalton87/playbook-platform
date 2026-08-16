@@ -24,7 +24,7 @@ create policy "Admissions users can view own verification request" on public.adm
 drop policy if exists "Admissions users can submit own verification request" on public.admissions_verification_requests;
 create policy "Admissions users can submit own verification request" on public.admissions_verification_requests for insert to authenticated with check (
   admissions_user_id = (select auth.uid()) and status = 'pending' and exists (
-    select 1 from public.profiles p where p.id = (select auth.uid()) and coalesce(p.profile_mode,p.role,p.requested_role) = 'college-admissions' and p.onboarding_completed = true
+    select 1 from public.profiles p where p.id = (select auth.uid()) and coalesce(p.profile_mode,p.role::text,p.requested_role) = 'college-admissions' and p.onboarding_completed = true
   )
 );
 
