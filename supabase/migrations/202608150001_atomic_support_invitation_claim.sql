@@ -9,6 +9,35 @@ create unique index if not exists support_relationships_source_invitation_unique
   on public.support_relationships (source_invitation_id)
   where source_invitation_id is not null;
 
+-- The existing scholar policy authorizes scholar-created relationships. This
+-- additional insert policy authorizes only the invited Parent/Guardian to create
+-- the exact relationship represented by a still-pending invitation. It does not
+-- authorize arbitrary supporter-created relationships.
+drop policy if exists "Family invitees can activate invited support relationships"
+  on public.support_relationships;
+create policy "Family invitees can activate invited support relationships"
+on public.support_relationships
+for insert
+to authenticated
+with check (
+  supporter_id = (select auth.uid())
+  and lower(trim(supporter_email)) = lower(trim(coalesce((select auth.jwt()) ->> 'email', '')))
+  and relationship = 'parent_guardian'
+  and source_invitation_id is not null
+  and exists (
+    select 1
+      from public.support_invitations as invitation
+     where invitation.id = source_invitation_id
+       and invitation.scholar_id = support_relationships.scholar_id
+       and invitation.status = 'pending'
+       and invitation.relationship = 'parent_guardian'
+       and lower(trim(invitation.invitee_email)) = lower(trim(coalesce((select auth.jwt()) ->> 'email', '')))
+       and invitation.permissions = support_relationships.permissions
+  )
+);
+
+grant insert on public.support_relationships to authenticated;
+
 create or replace function public.claim_support_invitation(
   invitation_token text,
   desired_status text default 'accepted'
@@ -21,8 +50,8 @@ returns table (
   status text
 )
 language plpgsql
-security definer
-set search_path = public, auth
+security invoker
+set search_path = ''
 as $$
 declare
   invitation_row public.support_invitations%rowtype;
@@ -107,4 +136,5 @@ end;
 $$;
 
 revoke all on function public.claim_support_invitation(text, text) from public;
+revoke all on function public.claim_support_invitation(text, text) from anon;
 grant execute on function public.claim_support_invitation(text, text) to authenticated;
