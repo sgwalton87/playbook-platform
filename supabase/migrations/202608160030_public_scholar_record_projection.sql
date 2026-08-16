@@ -168,23 +168,35 @@ grant execute on function public.get_public_scholar_identities(uuid[]) to anon, 
 comment on function public.get_public_scholar_identities(uuid[]) is
   'Returns a bounded set of presentation-grade public learner identities for shared platform surfaces.';
 
--- Feed rows must respect their declared visibility. Historical unconditional
--- SELECT policies accidentally made every feed row public.
-drop policy if exists "Public can read feed posts" on public.feed_posts;
-drop policy if exists "Public can view feed posts" on public.feed_posts;
-drop policy if exists "Public can view public feed posts" on public.feed_posts;
-create policy "Public can view public feed posts"
-on public.feed_posts
-for select
-to public
-using (visibility = 'public');
+-- Feed is one of the deployed/runtime entities whose original DDL predates the
+-- repository migration chain. Harden it when it is present (for example in the
+-- deployed schema) without making a from-zero local replay fabricate an unknown
+-- historical table shape. The dedicated preflight enforces the policies whenever
+-- public.feed_posts exists in the database being certified.
+do $$
+begin
+  if to_regclass('public.feed_posts') is not null then
+    execute 'drop policy if exists "Public can read feed posts" on public.feed_posts';
+    execute 'drop policy if exists "Public can view feed posts" on public.feed_posts';
+    execute 'drop policy if exists "Public can view public feed posts" on public.feed_posts';
+    execute $policy$
+      create policy "Public can view public feed posts"
+      on public.feed_posts
+      for select
+      to public
+      using (visibility = 'public')
+    $policy$;
 
-drop policy if exists "Users can view own feed posts" on public.feed_posts;
-create policy "Users can view own feed posts"
-on public.feed_posts
-for select
-to authenticated
-using ((select auth.uid()) = user_id);
+    execute 'drop policy if exists "Users can view own feed posts" on public.feed_posts';
+    execute $policy$
+      create policy "Users can view own feed posts"
+      on public.feed_posts
+      for select
+      to authenticated
+      using ((select auth.uid()) = user_id)
+    $policy$;
+  end if;
+end $$;
 
 -- The photos bucket is intentionally public-read media, but uploads must be
 -- authenticated and namespaced to the authenticated user's first path segment.
