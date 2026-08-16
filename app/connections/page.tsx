@@ -3,37 +3,16 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import ProfileAvatar from "@/components/ProfileAvatar";
 import { PlaybookCard, PlaybookGrid, PlaybookHero, PlaybookMetric, PlaybookMetrics, PlaybookPage, PlaybookPill } from "@/components/ui";
 import { supabase } from "@/lib/supabaseClient";
 
-type DirectoryPerson = {
-  id: string;
-  username: string | null;
-  full_name: string | null;
-  first_name: string | null;
-  last_name: string | null;
-  role: string | null;
-  avatar_url: string | null;
-  school: string | null;
-  sport: string | null;
-};
-
-type Person = DirectoryPerson & {
-  name: string;
-  connected: boolean;
-  requested: boolean;
-  incoming: boolean;
-};
-
+type DirectoryPerson = { id: string; username: string | null; full_name: string | null; first_name: string | null; last_name: string | null; role: string | null; avatar_url: string | null; school: string | null; sport: string | null };
+type Person = DirectoryPerson & { name: string; connected: boolean; requested: boolean; incoming: boolean };
 type Tab = "discover" | "connected" | "requests";
 
-function personName(person: DirectoryPerson) {
-  return person.full_name || [person.first_name, person.last_name].filter(Boolean).join(" ") || person.username || "Playbook member";
-}
-
-function roleLabel(role: string | null) {
-  return String(role || "member").replaceAll("_", " ").replaceAll("-", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
-}
+function personName(person: DirectoryPerson) { return person.full_name || [person.first_name, person.last_name].filter(Boolean).join(" ") || person.username || "Playbook member"; }
+function roleLabel(role: string | null) { return String(role || "member").replaceAll("_", " ").replaceAll("-", " ").replace(/\b\w/g, (letter) => letter.toUpperCase()); }
 
 export default function ConnectionsPage() {
   const router = useRouter();
@@ -50,160 +29,68 @@ export default function ConnectionsPage() {
     setError("");
     const { data: authData } = await supabase.auth.getUser();
     const user = authData.user;
-    if (!user) {
-      router.replace("/login?next=/connections");
-      return;
-    }
+    if (!user) { router.replace("/login?next=/connections"); return; }
     setMe(user.id);
-
     const [connectionsResult, sentResult, incomingResult, directoryResult] = await Promise.all([
       supabase.from("user_connections").select("connected_user_id").eq("user_id", user.id),
       supabase.from("connection_requests").select("recipient_id").eq("requester_id", user.id).eq("status", "pending"),
       supabase.from("connection_requests").select("requester_id").eq("recipient_id", user.id).eq("status", "pending"),
       supabase.rpc("get_public_network_directory", { search_text: null, result_limit: 100 }),
     ]);
-
     const firstError = connectionsResult.error || sentResult.error || incomingResult.error || directoryResult.error;
     if (firstError) throw new Error(firstError.message);
-
     const connectedIds = new Set((connectionsResult.data || []).map((row) => row.connected_user_id));
     const sentIds = new Set((sentResult.data || []).map((row) => row.recipient_id));
     const incomingIds = new Set((incomingResult.data || []).map((row) => row.requester_id));
     const relationshipIds = [...new Set([...connectedIds, ...sentIds, ...incomingIds])].slice(0, 100);
-
-    const relationshipIdentityResult = relationshipIds.length
-      ? await supabase.rpc("get_network_member_identities", { requested_ids: relationshipIds })
-      : { data: [] as DirectoryPerson[], error: null };
+    const relationshipIdentityResult = relationshipIds.length ? await supabase.rpc("get_network_member_identities", { requested_ids: relationshipIds }) : { data: [] as DirectoryPerson[], error: null };
     if (relationshipIdentityResult.error) throw new Error(relationshipIdentityResult.error.message);
-
     const byId = new Map<string, DirectoryPerson>();
     for (const person of (directoryResult.data || []) as DirectoryPerson[]) byId.set(person.id, person);
     for (const person of (relationshipIdentityResult.data || []) as DirectoryPerson[]) byId.set(person.id, person);
-
-    const next = [...byId.values()].map((person): Person => ({
-      ...person,
-      name: personName(person),
-      connected: connectedIds.has(person.id),
-      requested: sentIds.has(person.id),
-      incoming: incomingIds.has(person.id),
-    }));
-
+    const next = [...byId.values()].map((person): Person => ({ ...person, name: personName(person), connected: connectedIds.has(person.id), requested: sentIds.has(person.id), incoming: incomingIds.has(person.id) }));
     setPeople(next);
     setMessage(next.length ? "Network state is current." : "No discoverable members or connection requests yet.");
     setLoading(false);
   }, [router]);
 
   useEffect(() => {
-    const id = window.setTimeout(() => { void loadNetwork().catch((cause) => {
-      setError(cause instanceof Error ? cause.message : "Network could not be loaded.");
-      setLoading(false);
-    }); }, 0);
+    const id = window.setTimeout(() => { void loadNetwork().catch((cause) => { setError(cause instanceof Error ? cause.message : "Network could not be loaded."); setLoading(false); }); }, 0);
     return () => window.clearTimeout(id);
   }, [loadNetwork]);
 
   async function mutate(action: "connect" | "cancel" | "accept" | "decline" | "disconnect", personId: string) {
     if (!me) return;
-    setBusy(personId);
-    setError("");
+    setBusy(personId); setError("");
     try {
-      if (action === "connect") {
-        const result = await supabase.from("connection_requests").upsert({ requester_id: me, recipient_id: personId, status: "pending", responded_at: null }, { onConflict: "requester_id,recipient_id" });
-        if (result.error) throw result.error;
-      } else if (action === "cancel") {
-        const result = await supabase.from("connection_requests").update({ status: "cancelled", responded_at: new Date().toISOString() }).eq("requester_id", me).eq("recipient_id", personId).eq("status", "pending");
-        if (result.error) throw result.error;
-      } else if (action === "accept") {
-        const request = await supabase.from("connection_requests").update({ status: "accepted", responded_at: new Date().toISOString() }).eq("requester_id", personId).eq("recipient_id", me).eq("status", "pending");
-        if (request.error) throw request.error;
-        const first = await supabase.from("user_connections").upsert({ user_id: me, connected_user_id: personId }, { onConflict: "user_id,connected_user_id" });
-        if (first.error) throw first.error;
-        const reverse = await supabase.from("user_connections").upsert({ user_id: personId, connected_user_id: me }, { onConflict: "user_id,connected_user_id" });
-        if (reverse.error) throw reverse.error;
-      } else if (action === "decline") {
-        const result = await supabase.from("connection_requests").update({ status: "declined", responded_at: new Date().toISOString() }).eq("requester_id", personId).eq("recipient_id", me).eq("status", "pending");
-        if (result.error) throw result.error;
-      } else {
-        const first = await supabase.from("user_connections").delete().eq("user_id", me).eq("connected_user_id", personId);
-        if (first.error) throw first.error;
-        const reverse = await supabase.from("user_connections").delete().eq("user_id", personId).eq("connected_user_id", me);
-        if (reverse.error) throw reverse.error;
-      }
+      if (action === "connect") { const result = await supabase.from("connection_requests").upsert({ requester_id: me, recipient_id: personId, status: "pending", responded_at: null }, { onConflict: "requester_id,recipient_id" }); if (result.error) throw result.error; }
+      else if (action === "cancel") { const result = await supabase.from("connection_requests").update({ status: "cancelled", responded_at: new Date().toISOString() }).eq("requester_id", me).eq("recipient_id", personId).eq("status", "pending"); if (result.error) throw result.error; }
+      else if (action === "accept") {
+        const request = await supabase.from("connection_requests").update({ status: "accepted", responded_at: new Date().toISOString() }).eq("requester_id", personId).eq("recipient_id", me).eq("status", "pending"); if (request.error) throw request.error;
+        const first = await supabase.from("user_connections").upsert({ user_id: me, connected_user_id: personId }, { onConflict: "user_id,connected_user_id" }); if (first.error) throw first.error;
+        const reverse = await supabase.from("user_connections").upsert({ user_id: personId, connected_user_id: me }, { onConflict: "user_id,connected_user_id" }); if (reverse.error) throw reverse.error;
+      } else if (action === "decline") { const result = await supabase.from("connection_requests").update({ status: "declined", responded_at: new Date().toISOString() }).eq("requester_id", personId).eq("recipient_id", me).eq("status", "pending"); if (result.error) throw result.error; }
+      else { const first = await supabase.from("user_connections").delete().eq("user_id", me).eq("connected_user_id", personId); if (first.error) throw first.error; const reverse = await supabase.from("user_connections").delete().eq("user_id", personId).eq("connected_user_id", me); if (reverse.error) throw reverse.error; }
       await loadNetwork();
       setMessage(action === "accept" ? "Connection accepted." : action === "connect" ? "Connection request sent." : "Network updated.");
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Network action failed.");
-    } finally {
-      setBusy(null);
-    }
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "Network action failed."); }
+    finally { setBusy(null); }
   }
 
   const discovered = people.filter((person) => !person.connected && !person.incoming);
   const connected = people.filter((person) => person.connected);
   const incoming = people.filter((person) => person.incoming);
   const source = tab === "discover" ? discovered : tab === "connected" ? connected : incoming;
-  const visible = useMemo(() => {
-    const query = search.trim().toLowerCase();
-    if (!query) return source;
-    return source.filter((person) => [person.name, person.username, person.role, person.school, person.sport]
-      .some((value) => String(value || "").toLowerCase().includes(query)));
-  }, [search, source]);
+  const visible = useMemo(() => { const query = search.trim().toLowerCase(); if (!query) return source; return source.filter((person) => [person.name, person.username, person.role, person.school, person.sport].some((value) => String(value || "").toLowerCase().includes(query))); }, [search, source]);
 
-  return (
-    <PlaybookPage>
-      <PlaybookHero eyebrow="Playbook Network" title="Build the people around your next move" subtitle="Discover public Playbook members, manage connection requests, and keep relationship identity separate from private Scholar data." />
-      <PlaybookMetrics>
-        <PlaybookMetric label="Connected" value={String(connected.length)} />
-        <PlaybookMetric label="Incoming" value={String(incoming.length)} />
-        <PlaybookMetric label="Discoverable" value={String(discovered.length)} />
-      </PlaybookMetrics>
-
-      <div role="status" aria-live="polite" style={status}>{loading ? "Loading…" : message}</div>
-      {error && <div role="alert" style={alert}>{error} <button onClick={() => void loadNetwork()}>Retry</button></div>}
-
-      <section style={toolbar} aria-label="Network controls">
-        <div style={tabs}>
-          {(["discover", "connected", "requests"] as Tab[]).map((value) => (
-            <button key={value} type="button" onClick={() => setTab(value)} aria-pressed={tab === value} style={tab === value ? activeTab : tabButton}>
-              {value === "discover" ? "Discover" : value === "connected" ? "Connected" : "Requests"}
-            </button>
-          ))}
-        </div>
-        <input aria-label="Search network" placeholder="Search name, role, school, or sport" value={search} onChange={(event) => setSearch(event.target.value)} style={searchInput} />
-      </section>
-
-      {!loading && visible.length === 0 ? (
-        <PlaybookCard eyebrow="Network" title="Nothing in this view yet">
-          <p style={copy}>Public discovery respects profile visibility. Existing and pending connection partners remain resolvable through a separate relationship-aware identity boundary.</p>
-        </PlaybookCard>
-      ) : (
-        <PlaybookGrid min={280}>
-          {visible.map((person) => (
-            <PlaybookCard key={person.id} eyebrow={roleLabel(person.role)} title={person.name}>
-              <div style={identityRow}>
-                <div style={avatar}>{person.avatar_url ? <img src={person.avatar_url} alt="" style={avatarImage} /> : person.name.slice(0, 1).toUpperCase()}</div>
-                <div>
-                  <p style={copy}>{person.school || "Playbook Network"}{person.sport ? ` · ${person.sport}` : ""}</p>
-                  {person.username && <Link href={`/u/${person.username}`} style={profileLink}>@{person.username}</Link>}
-                </div>
-              </div>
-              <div style={actions}>
-                {person.connected ? <>
-                  <PlaybookPill>Connected</PlaybookPill>
-                  <button disabled={busy === person.id} onClick={() => void mutate("disconnect", person.id)} style={secondaryButton}>Disconnect</button>
-                </> : person.incoming ? <>
-                  <button disabled={busy === person.id} onClick={() => void mutate("accept", person.id)} style={primaryButton}>Accept</button>
-                  <button disabled={busy === person.id} onClick={() => void mutate("decline", person.id)} style={secondaryButton}>Decline</button>
-                </> : person.requested ? <>
-                  <PlaybookPill>Requested</PlaybookPill>
-                  <button disabled={busy === person.id} onClick={() => void mutate("cancel", person.id)} style={secondaryButton}>Cancel request</button>
-                </> : <button disabled={busy === person.id} onClick={() => void mutate("connect", person.id)} style={primaryButton}>Connect</button>}
-              </div>
-            </PlaybookCard>
-          ))}
-        </PlaybookGrid>
-      )}
-    </PlaybookPage>
-  );
+  return <PlaybookPage>
+    <PlaybookHero eyebrow="Playbook Network" title="Build the people around your next move" subtitle="Discover public Playbook members, manage connection requests, and keep relationship identity separate from private Scholar data." />
+    <PlaybookMetrics><PlaybookMetric label="Connected" value={String(connected.length)} /><PlaybookMetric label="Incoming" value={String(incoming.length)} /><PlaybookMetric label="Discoverable" value={String(discovered.length)} /></PlaybookMetrics>
+    <div role="status" aria-live="polite" style={status}>{loading ? "Loading…" : message}</div>
+    {error && <div role="alert" style={alert}>{error} <button onClick={() => void loadNetwork()}>Retry</button></div>}
+    <section style={toolbar} aria-label="Network controls"><div style={tabs}>{(["discover", "connected", "requests"] as Tab[]).map((value) => <button key={value} type="button" onClick={() => setTab(value)} aria-pressed={tab === value} style={tab === value ? activeTab : tabButton}>{value === "discover" ? "Discover" : value === "connected" ? "Connected" : "Requests"}</button>)}</div><input aria-label="Search network" placeholder="Search name, role, school, or sport" value={search} onChange={(event) => setSearch(event.target.value)} style={searchInput} /></section>
+    {!loading && visible.length === 0 ? <PlaybookCard eyebrow="Network" title="Nothing in this view yet"><p style={copy}>Public discovery respects profile visibility. Existing and pending connection partners remain resolvable through a separate relationship-aware identity boundary.</p></PlaybookCard> : <PlaybookGrid min={280}>{visible.map((person) => <PlaybookCard key={person.id} eyebrow={roleLabel(person.role)} title={person.name}><div style={identityRow}><ProfileAvatar src={person.avatar_url} name={person.name} size={54} /><div><p style={copy}>{person.school || "Playbook Network"}{person.sport ? ` · ${person.sport}` : ""}</p>{person.username && <Link href={`/u/${person.username}`} style={profileLink}>@{person.username}</Link>}</div></div><div style={actions}>{person.connected ? <><PlaybookPill>Connected</PlaybookPill><button disabled={busy === person.id} onClick={() => void mutate("disconnect", person.id)} style={secondaryButton}>Disconnect</button></> : person.incoming ? <><button disabled={busy === person.id} onClick={() => void mutate("accept", person.id)} style={primaryButton}>Accept</button><button disabled={busy === person.id} onClick={() => void mutate("decline", person.id)} style={secondaryButton}>Decline</button></> : person.requested ? <><PlaybookPill>Requested</PlaybookPill><button disabled={busy === person.id} onClick={() => void mutate("cancel", person.id)} style={secondaryButton}>Cancel request</button></> : <button disabled={busy === person.id} onClick={() => void mutate("connect", person.id)} style={primaryButton}>Connect</button>}</div></PlaybookCard>)}</PlaybookGrid>}
+  </PlaybookPage>;
 }
 
 const status: React.CSSProperties = { maxWidth: 1180, margin: "0 auto 12px", color: "#334155" };
@@ -214,8 +101,6 @@ const tabButton: React.CSSProperties = { border: "1px solid #CBD5E1", background
 const activeTab: React.CSSProperties = { ...tabButton, background: "#0F172A", color: "#FFFFFF", borderColor: "#0F172A" };
 const searchInput: React.CSSProperties = { flex: "1 1 300px", maxWidth: 460, border: "1px solid #CBD5E1", borderRadius: 14, padding: "12px 14px", background: "#FFFFFF", color: "#0F172A" };
 const identityRow: React.CSSProperties = { display: "flex", gap: 12, alignItems: "center", marginBottom: 16 };
-const avatar: React.CSSProperties = { width: 54, height: 54, borderRadius: 18, overflow: "hidden", display: "grid", placeItems: "center", background: "#0F172A", color: "#F97316", fontWeight: 950, fontSize: 22 };
-const avatarImage: React.CSSProperties = { width: "100%", height: "100%", objectFit: "cover" };
 const copy: React.CSSProperties = { color: "#64748B", lineHeight: 1.55, margin: 0 };
 const profileLink: React.CSSProperties = { display: "inline-block", marginTop: 5, color: "#EA580C", fontWeight: 850, textDecoration: "none" };
 const actions: React.CSSProperties = { display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginTop: 12 };
