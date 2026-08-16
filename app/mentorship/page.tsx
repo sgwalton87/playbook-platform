@@ -1,235 +1,203 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
-
-type Mentor = {
-  id: string;
-  name: string;
-  initials: string;
-  color: string;
-  role: string;
-  focus: string[];
-  bio: string;
-  scholars: number;
-  available: boolean;
-};
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+import { PlaybookCard, PlaybookGrid, PlaybookHero, PlaybookMetric, PlaybookMetrics, PlaybookPage, PlaybookPill } from "@/components/ui";
 
 type Circle = {
   id: string;
   name: string;
-  mentor: string;
-  mentorInitials: string;
-  mentorColor: string;
+  description: string;
   pillar: string;
-  pillarColor: string;
-  members: number;
-  maxMembers: number;
-  nextSession: string;
-  joined: boolean;
+  mentor_user_id: string;
+  mentor_name: string;
+  mentor_username: string | null;
+  mentor_avatar_url: string | null;
+  capacity: number;
+  active_count: number;
+  waitlist_count: number;
+  status: string;
+  next_session_at: string | null;
+  timezone: string;
+  location: string | null;
+  my_membership: "active" | "waitlisted" | "left" | "removed" | null;
 };
 
-const MENTORS: Mentor[] = [
-  { id: "1", name: "Coach J. Reed", initials: "JR", color: "#ff6a2c", role: "Founder & ED", focus: ["Leadership", "Career"], bio: "Former division-1 athlete turned educator. 12 years building scholar-athletes into community leaders.", scholars: 48, available: true },
-  { id: "2", name: "M. Alvarez", initials: "MA", color: "#1D9E75", role: "Head of Curriculum", focus: ["Finance", "NIL"], bio: "Financial educator specializing in athlete money management and building generational wealth.", scholars: 32, available: true },
-  { id: "3", name: "T. Okafor", initials: "TO", color: "#378ADD", role: "Community Lead", focus: ["Civic", "Advocacy"], bio: "Youth organizer and policy advocate who has worked with 200+ young leaders across the Bay Area.", scholars: 29, available: false },
-  { id: "4", name: "S. Nguyen", initials: "SN", color: "#D4537E", role: "Product & Tech", focus: ["SEL", "Wellness"], bio: "Tech professional focused on mental performance and social-emotional growth for student athletes.", scholars: 21, available: true },
-];
+type CirclesResponse = { circles?: Circle[]; error?: string };
 
-const CIRCLES: Circle[] = [
-  { id: "1", name: "Captain's Circle", mentor: "Coach J. Reed", mentorInitials: "JR", mentorColor: "#ff6a2c", pillar: "Leadership", pillarColor: "#ff6a2c", members: 8, maxMembers: 12, nextSession: "Sat, Jun 22 · 10am", joined: true },
-  { id: "2", name: "Money Moves", mentor: "M. Alvarez", mentorInitials: "MA", mentorColor: "#1D9E75", pillar: "Finance", pillarColor: "#1D9E75", members: 10, maxMembers: 12, nextSession: "Wed, Jun 25 · 5pm", joined: false },
-  { id: "3", name: "Civic Leaders Lab", mentor: "T. Okafor", mentorInitials: "TO", mentorColor: "#378ADD", pillar: "Civic", pillarColor: "#378ADD", members: 12, maxMembers: 12, nextSession: "Fri, Jun 27 · 4pm", joined: false },
-  { id: "4", name: "Mind & Body", mentor: "S. Nguyen", mentorInitials: "SN", mentorColor: "#D4537E", pillar: "SEL", pillarColor: "#D4537E", members: 6, maxMembers: 10, nextSession: "Thu, Jun 26 · 6pm", joined: false },
-];
+async function fetchCircles(): Promise<Circle[]> {
+  const response = await fetch("/api/community/mentorship", { cache: "no-store" });
+  const result = await response.json() as CirclesResponse;
+  if (!response.ok) throw new Error(result.error || "Mentorship circles could not be loaded.");
+  return result.circles || [];
+}
 
-const bg = "#100c0a";
-const surface = "#1a1512";
-const surface2 = "#241c16";
-const ink = "#f6f0e7";
-const muted = "#a89a8b";
-const faint = "#6f6151";
-const line = "#332a22";
-const accent = "#ff6a2c";
-const onaccent = "#170a04";
-const mono = "'Space Mono', monospace";
-const anton = "'Anton', sans-serif";
+function formatSession(value: string | null) {
+  if (!value) return "Next session to be scheduled";
+  return new Intl.DateTimeFormat(undefined, { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(value));
+}
 
 export default function MentorshipPage() {
-  const router = useRouter();
-  const [circles, setCircles] = useState<Circle[]>(CIRCLES);
-  const [tab, setTab] = useState<"circles" | "mentors">("circles");
-  const [authed, setAuthed] = useState(false);
+  const [circles, setCircles] = useState<Circle[]>([]);
+  const [view, setView] = useState<"all" | "mine">("all");
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("Loading governed mentorship circles…");
+
+  async function load() {
+    setLoading(true);
+    setError("");
+    try {
+      const data = await fetchCircles();
+      setCircles(data);
+      setMessage(data.length ? "Mentorship circles are current." : "No active mentorship circles yet.");
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Mentorship circles could not be loaded.");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (!data.user) router.replace("/login");
-      else setAuthed(true);
+    let active = true;
+    void fetchCircles().then((data) => {
+      if (!active) return;
+      setCircles(data);
+      setMessage(data.length ? "Mentorship circles are current." : "No active mentorship circles yet.");
+    }).catch((cause) => {
+      if (active) setError(cause instanceof Error ? cause.message : "Mentorship circles could not be loaded.");
+    }).finally(() => {
+      if (active) setLoading(false);
     });
-  }, [router]);
+    return () => { active = false; };
+  }, []);
 
-  const toggleJoin = (id: string) => {
-    setCircles((c) => c.map((circle) =>
-      circle.id === id
-        ? { ...circle, joined: !circle.joined, members: circle.joined ? circle.members - 1 : circle.members + 1 }
-        : circle
-    ));
-  };
+  async function changeMembership(circle: Circle, action: "join" | "leave") {
+    setBusy(circle.id);
+    setError("");
+    try {
+      const response = await fetch("/api/community/mentorship", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ circleId: circle.id, action }),
+      });
+      const result = await response.json() as { membership?: { membership_status?: string }; error?: string };
+      if (!response.ok) throw new Error(result.error || "Circle membership could not be updated.");
+      const status = result.membership?.membership_status;
+      setMessage(action === "leave" ? "You left the circle." : status === "waitlisted" ? "The circle is full. You’ve been added to the waitlist." : "You joined the circle.");
+      await load();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Circle membership could not be updated.");
+    } finally {
+      setBusy(null);
+    }
+  }
 
-  if (!authed) return (
-    <div style={{ minHeight: "100vh", background: bg, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: mono, fontSize: 12, letterSpacing: "0.1em", color: faint }}>
-      LOADING...
-    </div>
-  );
+  const memberships = circles.filter((circle) => circle.my_membership === "active");
+  const waitlists = circles.filter((circle) => circle.my_membership === "waitlisted");
+  const visible = useMemo(() => view === "mine" ? circles.filter((circle) => circle.my_membership === "active" || circle.my_membership === "waitlisted") : circles, [circles, view]);
+  const seats = circles.reduce((total, circle) => total + Math.max(circle.capacity - circle.active_count, 0), 0);
 
   return (
-    <div style={{ minHeight: "100vh", background: bg, color: ink, fontFamily: "'Hanken Grotesk', system-ui, sans-serif" }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        .pb-nav-btn:hover { color: ${ink} !important; }
-        .pb-card:hover { border-color: ${accent} !important; }
-      `}</style>
+    <PlaybookPage>
+      <PlaybookHero eyebrow="Playbook Mentorship" title="Small circles. Real relationships. Durable support." subtitle="Mentorship Circles are governed communities led by onboarded Playbook Mentors. Membership, capacity, waitlists, mentor identity, and session state persist beyond the browser." />
+      <PlaybookMetrics>
+        <PlaybookMetric label="Active circles" value={loading ? "…" : String(circles.length)} />
+        <PlaybookMetric label="Your circles" value={loading ? "…" : String(memberships.length)} />
+        <PlaybookMetric label="Waitlists" value={loading ? "…" : String(waitlists.length)} />
+        <PlaybookMetric label="Open seats" value={loading ? "…" : String(seats)} />
+      </PlaybookMetrics>
 
-      <header style={{ background: surface, borderBottom: `1px solid ${line}`, padding: "13px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 50 }}>
-        <div onClick={() => router.push("/")} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
-          <span style={{ fontFamily: anton, fontSize: 18, color: ink, letterSpacing: "0.02em" }}>PLAYBOOK</span>
-          <span style={{ fontFamily: mono, fontSize: 8, letterSpacing: "0.3em", color: accent }}>SERIES INC.</span>
-        </div>
-        <nav style={{ display: "flex", gap: 6 }}>
-          {[{ label: "Home", path: "/dashboard" }, { label: "Feed", path: "/feed" }, { label: "Courses", path: "/courses" }, { label: "Mentorship", path: "/mentorship" }].map(({ label, path }) => (
-            <button key={label} onClick={() => router.push(path)} className="pb-nav-btn"
-              style={{ fontFamily: mono, fontSize: 11, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", background: "transparent", border: "none", color: label === "Mentorship" ? accent : muted, cursor: "pointer", padding: "8px 12px", borderRadius: 8 }}>
-              {label}
-            </button>
-          ))}
-          <button onClick={async () => { await supabase.auth.signOut(); router.replace("/"); }}
-            style={{ fontFamily: mono, fontSize: 11, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", background: "transparent", border: `1px solid ${line}`, color: muted, cursor: "pointer", padding: "8px 12px", borderRadius: 999 }}>
-            Log out
-          </button>
-        </nav>
-      </header>
+      <div role="status" aria-live="polite" style={statusLine}>{loading ? "Loading…" : message}</div>
+      {error && <div role="alert" style={alert}>{error} <button type="button" onClick={() => void load()}>Retry</button></div>}
 
-      <main style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 24px" }}>
+      <section style={toolbar} aria-label="Mentorship views">
+        <button type="button" aria-pressed={view === "all"} onClick={() => setView("all")} style={view === "all" ? activeButton : filterButton}>Explore circles</button>
+        <button type="button" aria-pressed={view === "mine"} onClick={() => setView("mine")} style={view === "mine" ? activeButton : filterButton}>My circles ({memberships.length + waitlists.length})</button>
+        <Link href="/support-network" style={supportLink}>My Support Network →</Link>
+      </section>
 
-        {/* Header */}
-        <div style={{ marginBottom: 28 }}>
-          <p style={{ fontFamily: mono, fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase", color: accent, marginBottom: 8 }}>The community</p>
-          <h1 style={{ fontFamily: anton, fontWeight: 400, fontSize: "clamp(32px,4vw,52px)", lineHeight: 0.95, textTransform: "uppercase", color: ink, marginBottom: 16 }}>
-            Mentorship <span style={{ color: accent }}>circles</span>
-          </h1>
-          <p style={{ fontSize: 15, color: muted, maxWidth: "52ch", lineHeight: 1.6 }}>
-            Small groups led by real mentors. Join a circle, show up to sessions, and build relationships that last beyond the platform.
-          </p>
-        </div>
-
-        {/* Tabs */}
-        <div style={{ display: "flex", gap: 8, marginBottom: 28 }}>
-          {(["circles", "mentors"] as const).map((t) => (
-            <button key={t} onClick={() => setTab(t)}
-              style={{ fontFamily: mono, fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", background: tab === t ? accent : "transparent", color: tab === t ? onaccent : muted, border: `1px solid ${tab === t ? accent : line}`, borderRadius: 999, padding: "9px 18px", cursor: "pointer", transition: "all 0.15s" }}>
-              {t === "circles" ? "Circles" : "Meet the mentors"}
-            </button>
-          ))}
-        </div>
-
-        {/* CIRCLES TAB */}
-        {tab === "circles" && (
-          <div>
-            {/* My circles */}
-            {circles.filter((c) => c.joined).length > 0 && (
-              <div style={{ marginBottom: 28 }}>
-                <p style={{ fontFamily: mono, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: muted, marginBottom: 14 }}>Your circles</p>
-                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                  {circles.filter((c) => c.joined).map((c) => (
-                    <div key={c.id} style={{ display: "flex", gap: 16, alignItems: "center", background: surface, border: `1px solid ${accent}55`, borderRadius: 16, padding: "16px 20px" }}>
-                      <div style={{ width: 46, height: 46, borderRadius: "50%", background: c.mentorColor, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: anton, fontSize: 16, color: onaccent, flexShrink: 0 }}>{c.mentorInitials}</div>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                          <span style={{ fontSize: 15, fontWeight: 700, color: ink }}>{c.name}</span>
-                          <span style={{ fontFamily: mono, fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: c.pillarColor, background: surface2, padding: "2px 7px", borderRadius: 999 }}>{c.pillar}</span>
-                        </div>
-                        <div style={{ fontFamily: mono, fontSize: 11, color: faint }}>Next session: {c.nextSession} · {c.members}/{c.maxMembers} members</div>
-                      </div>
-                      <button onClick={() => toggleJoin(c.id)}
-                        style={{ fontFamily: mono, fontSize: 11, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", background: "transparent", border: `1px solid ${line}`, color: muted, borderRadius: 999, padding: "9px 16px", cursor: "pointer" }}>
-                        Leave
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* All circles */}
-            <p style={{ fontFamily: mono, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: muted, marginBottom: 14 }}>All circles</p>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px,1fr))", gap: 16 }}>
-              {circles.map((c) => {
-                const full = c.members >= c.maxMembers && !c.joined;
-                return (
-                  <div key={c.id} className="pb-card"
-                    style={{ background: surface, border: `1px solid ${c.joined ? accent + "55" : line}`, borderRadius: 18, padding: "20px 22px", transition: "border-color 0.15s", opacity: full ? 0.55 : 1 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
-                      <div style={{ width: 46, height: 46, borderRadius: "50%", background: c.mentorColor, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: anton, fontSize: 16, color: onaccent, flexShrink: 0 }}>{c.mentorInitials}</div>
-                      <div>
-                        <div style={{ fontSize: 15, fontWeight: 700, color: ink }}>{c.name}</div>
-                        <div style={{ fontSize: 12, color: muted }}>Led by {c.mentor}</div>
-                      </div>
-                    </div>
-                    <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap" }}>
-                      <span style={{ fontFamily: mono, fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: c.pillarColor, background: surface2, padding: "3px 8px", borderRadius: 999 }}>{c.pillar}</span>
-                      {full && <span style={{ fontFamily: mono, fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: faint, background: surface2, padding: "3px 8px", borderRadius: 999 }}>Full</span>}
-                    </div>
-                    <div style={{ fontFamily: mono, fontSize: 10, color: faint, marginBottom: 6 }}>Next: {c.nextSession}</div>
-                    <div style={{ background: line, borderRadius: 999, height: 4, marginBottom: 16, overflow: "hidden" }}>
-                      <div style={{ background: c.pillarColor, height: "100%", width: `${Math.round((c.members / c.maxMembers) * 100)}%`, borderRadius: 999 }} />
-                    </div>
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                      <span style={{ fontFamily: mono, fontSize: 10, color: faint }}>{c.members}/{c.maxMembers} members</span>
-                      <button onClick={() => !full && toggleJoin(c.id)}
-                        style={{ fontFamily: mono, fontSize: 11, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", background: c.joined ? "transparent" : full ? surface2 : accent, color: c.joined ? muted : full ? faint : onaccent, border: `1px solid ${c.joined ? line : full ? line : accent}`, borderRadius: 999, padding: "9px 16px", cursor: full ? "default" : "pointer", transition: "all 0.15s" }}>
-                        {c.joined ? "Joined ✓" : full ? "Full" : "Join circle"}
-                      </button>
-                    </div>
+      {!loading && visible.length === 0 ? (
+        <PlaybookCard eyebrow="Mentorship" title={view === "mine" ? "You haven’t joined a circle yet" : "No active circles yet"}>
+          <p style={copy}>{view === "mine" ? "Explore active circles and choose a community aligned with what you’re building." : "Playbook will show mentorship only when a real onboarded Mentor has an active circle."}</p>
+          {view === "mine" && <button type="button" onClick={() => setView("all")} style={primaryButton}>Explore mentorship</button>}
+        </PlaybookCard>
+      ) : (
+        <PlaybookGrid min={330}>
+          {visible.map((circle) => {
+            const full = circle.active_count >= circle.capacity;
+            const active = circle.my_membership === "active";
+            const waitlisted = circle.my_membership === "waitlisted";
+            const occupancy = Math.min(Math.round((circle.active_count / circle.capacity) * 100), 100);
+            return (
+              <PlaybookCard key={circle.id} eyebrow={circle.pillar} title={circle.name}>
+                <div style={mentorRow}>
+                  <div style={avatar}>
+                    {circle.mentor_avatar_url ? <Image unoptimized width={54} height={54} src={circle.mentor_avatar_url} alt="" style={avatarImage} /> : circle.mentor_name.slice(0, 1).toUpperCase()}
                   </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* MENTORS TAB */}
-        {tab === "mentors" && (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px,1fr))", gap: 16 }}>
-            {MENTORS.map((m) => (
-              <div key={m.id} className="pb-card"
-                style={{ background: surface, border: `1px solid ${line}`, borderRadius: 18, padding: "22px 22px", transition: "border-color 0.15s" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 14 }}>
-                  <div style={{ width: 54, height: 54, borderRadius: "50%", background: m.color, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: anton, fontSize: 20, color: onaccent, flexShrink: 0 }}>{m.initials}</div>
                   <div>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: ink, marginBottom: 3 }}>{m.name}</div>
-                    <div style={{ fontFamily: mono, fontSize: 10, letterSpacing: "0.06em", textTransform: "uppercase", color: m.color }}>{m.role}</div>
+                    <strong style={mentorName}>{circle.mentor_name}</strong>
+                    {circle.mentor_username && <div><Link href={`/u/${circle.mentor_username}`} style={profileLink}>@{circle.mentor_username}</Link></div>}
+                    <span style={mentorLabel}>Playbook Mentor</span>
                   </div>
                 </div>
-                <p style={{ fontSize: 13, lineHeight: 1.6, color: muted, marginBottom: 14 }}>{m.bio}</p>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 14 }}>
-                  {m.focus.map((f) => (
-                    <span key={f} style={{ fontSize: 11, fontWeight: 600, padding: "4px 10px", borderRadius: 999, background: surface2, border: `1px solid ${line}`, color: muted }}>{f}</span>
-                  ))}
-                </div>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderTop: `1px solid ${line}`, paddingTop: 14 }}>
-                  <span style={{ fontFamily: mono, fontSize: 10, color: faint }}>{m.scholars} scholars</span>
-                  <span style={{ fontFamily: mono, fontSize: 10, color: m.available ? "#1D9E75" : faint, fontWeight: 700 }}>
-                    {m.available ? "● Available" : "● Full"}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
 
-      </main>
-    </div>
+                <p style={copy}>{circle.description}</p>
+                <div style={sessionCard}>
+                  <span style={label}>Next session</span>
+                  <strong>{formatSession(circle.next_session_at)}</strong>
+                  <span style={locationText}>{circle.location || "Location to be announced"}</span>
+                </div>
+
+                <div style={progressTop}><span>{circle.active_count}/{circle.capacity} members</span><strong>{occupancy}%</strong></div>
+                <div style={progressTrack}><div style={{ ...progressFill, width: `${occupancy}%` }} /></div>
+
+                <div style={pillRow}>
+                  {active && <PlaybookPill>Member</PlaybookPill>}
+                  {waitlisted && <PlaybookPill>Waitlisted</PlaybookPill>}
+                  {circle.waitlist_count > 0 && <PlaybookPill>{circle.waitlist_count} waiting</PlaybookPill>}
+                  {!full && <PlaybookPill>{circle.capacity - circle.active_count} seats open</PlaybookPill>}
+                </div>
+
+                <div style={actions}>
+                  {active || waitlisted ? (
+                    <button type="button" disabled={busy === circle.id} onClick={() => void changeMembership(circle, "leave")} style={secondaryButton}>{busy === circle.id ? "Updating…" : active ? "Leave circle" : "Leave waitlist"}</button>
+                  ) : (
+                    <button type="button" disabled={busy === circle.id} onClick={() => void changeMembership(circle, "join")} style={primaryButton}>{busy === circle.id ? "Joining…" : full ? "Join waitlist" : "Join circle"}</button>
+                  )}
+                </div>
+              </PlaybookCard>
+            );
+          })}
+        </PlaybookGrid>
+      )}
+    </PlaybookPage>
   );
 }
+
+const statusLine: React.CSSProperties = { maxWidth: 1180, margin: "0 auto 12px", color: "#475569" };
+const alert: React.CSSProperties = { maxWidth: 1180, margin: "0 auto 14px", padding: 12, borderRadius: 14, background: "#FEF2F2", border: "1px solid #FCA5A5", color: "#991B1B" };
+const toolbar: React.CSSProperties = { maxWidth: 1180, margin: "0 auto 22px", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" };
+const baseButton: React.CSSProperties = { borderRadius: 999, padding: "10px 15px", fontWeight: 900, cursor: "pointer" };
+const filterButton: React.CSSProperties = { ...baseButton, background: "#FFFFFF", color: "#334155", border: "1px solid #CBD5E1" };
+const activeButton: React.CSSProperties = { ...filterButton, background: "#0F172A", color: "#FFFFFF", borderColor: "#0F172A" };
+const primaryButton: React.CSSProperties = { ...baseButton, border: 0, background: "#F97316", color: "#FFFFFF" };
+const secondaryButton: React.CSSProperties = { ...filterButton };
+const supportLink: React.CSSProperties = { marginLeft: "auto", color: "#C2410C", fontWeight: 900, textDecoration: "none" };
+const mentorRow: React.CSSProperties = { display: "flex", gap: 12, alignItems: "center", marginBottom: 14 };
+const avatar: React.CSSProperties = { width: 54, height: 54, borderRadius: 18, display: "grid", placeItems: "center", overflow: "hidden", background: "#0F172A", color: "#F97316", fontWeight: 950, fontSize: 20 };
+const avatarImage: React.CSSProperties = { width: 54, height: 54, objectFit: "cover" };
+const mentorName: React.CSSProperties = { color: "#0F172A" };
+const mentorLabel: React.CSSProperties = { color: "#64748B", fontSize: 12 };
+const profileLink: React.CSSProperties = { color: "#C2410C", fontWeight: 850, textDecoration: "none", fontSize: 12 };
+const copy: React.CSSProperties = { color: "#475569", lineHeight: 1.65 };
+const sessionCard: React.CSSProperties = { padding: 14, borderRadius: 14, background: "#F8FAFC", border: "1px solid #E2E8F0", margin: "14px 0", color: "#0F172A" };
+const label: React.CSSProperties = { display: "block", color: "#64748B", fontSize: 10, textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 4 };
+const locationText: React.CSSProperties = { display: "block", marginTop: 4, color: "#64748B", fontSize: 12 };
+const progressTop: React.CSSProperties = { display: "flex", justifyContent: "space-between", color: "#64748B", fontSize: 12, marginBottom: 6 };
+const progressTrack: React.CSSProperties = { height: 7, borderRadius: 999, overflow: "hidden", background: "#E2E8F0" };
+const progressFill: React.CSSProperties = { height: "100%", borderRadius: 999, background: "#F97316" };
+const pillRow: React.CSSProperties = { display: "flex", gap: 7, flexWrap: "wrap", margin: "14px 0" };
+const actions: React.CSSProperties = { display: "flex", gap: 8, flexWrap: "wrap" };
