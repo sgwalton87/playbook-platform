@@ -83,14 +83,6 @@ function AuthCallbackContent() {
         return;
       }
 
-      const googleRequestedRole = getGoogleRequestedRole(
-        params.get("provider"),
-        params.get("role"),
-        typeof data.user.app_metadata?.provider === "string"
-          ? data.user.app_metadata.provider
-          : null,
-        Boolean(existing)
-      );
       const verifiedSignupRole = tokenHash && emailVerificationType === "signup"
         ? data.user.user_metadata?.profile_mode ||
           data.user.user_metadata?.role ||
@@ -99,6 +91,15 @@ function AuthCallbackContent() {
 
       let role;
       try {
+        const googleRequestedRole = getGoogleRequestedRole(
+          params.get("provider"),
+          params.get("role"),
+          typeof data.user.app_metadata?.provider === "string"
+            ? data.user.app_metadata.provider
+            : null,
+          Boolean(existing)
+        );
+
         role = resolveAuthCallbackRole({
           // Durable profile identity always outranks mutable auth metadata.
           existingProfileMode: existing?.profile_mode,
@@ -112,7 +113,10 @@ function AuthCallbackContent() {
       } catch {
         console.error("Auth callback role resolution failed closed.");
         await supabase.auth.signOut();
-        window.location.replace("/login?error=role_required");
+
+        // A returning Google user with no durable Playbook profile must choose a
+        // role before an account can be created. Never substitute Scholar.
+        window.location.replace("/login?mode=signup&reason=role-required");
         return;
       }
 
