@@ -51,7 +51,13 @@ export default function RoleDashboardExperience({
     </PlaybookPage>
   );
 
-  return authorityVerified
+  // Mentor OS is always entered through MentorValidationExperience, which has
+  // already proved the active Mentor relationship before rendering this shared
+  // dashboard. All other role dashboards use the generic authority gate unless
+  // a future specialized gate explicitly marks authorityVerified.
+  const specializedAuthorityVerified = authorityVerified || role === "mentor";
+
+  return specializedAuthorityVerified
     ? content
     : <RoleAuthorityGate roleOS={role}>{content}</RoleAuthorityGate>;
 }
