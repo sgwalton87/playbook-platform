@@ -1,46 +1,47 @@
 import { NextRequest, NextResponse } from "next/server";
 
-
 import {
   buildInvitationEmail,
   buildInvitationRecord,
 } from "@/lib/invitations/server";
-
 import type { RelationshipKind } from "@/lib/permissions";
 import { buildSupportInvitationEmail, sendPlaybookEmail } from "@/lib/email";
-import { createClient } from "@supabase/supabase-js";
+import { requireUser } from "@/lib/supabase/server";
 
-function getSupabaseAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-}
+const RELATIONSHIP_KINDS = new Set<RelationshipKind>([
+  "parent_guardian",
+  "educator",
+  "mentor",
+  "district_admin",
+  "university_partner",
+  "employer_partner",
+]);
 
 export async function POST(req: NextRequest) {
-  const supabase = getSupabaseAdmin();
-
   try {
+    const { supabase, user } = await requireUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await req.json();
+    const relationship = body.relationship as RelationshipKind | undefined;
+    const inviteeName = String(body.inviteeName || "").trim();
+    const inviteeEmail = String(body.inviteeEmail || "").trim().toLowerCase();
 
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+    if (!relationship || !RELATIONSHIP_KINDS.has(relationship)) {
+      return NextResponse.json({ error: "Invalid support relationship." }, { status: 400 });
+    }
+    if (!inviteeName || !inviteeEmail) {
+      return NextResponse.json({ error: "Invitee name and email are required." }, { status: 400 });
     }
 
     const record = buildInvitationRecord({
       scholarId: user.id,
       scholarName: body.scholarName || "Scholar",
-      inviteeName: body.inviteeName,
-      inviteeEmail: body.inviteeEmail,
-      relationship: body.relationship as RelationshipKind,
+      inviteeName,
+      inviteeEmail,
+      relationship,
     });
 
     const { error } = await supabase
@@ -59,10 +60,7 @@ export async function POST(req: NextRequest) {
       });
 
     if (error) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
     const email = buildInvitationEmail({
@@ -80,13 +78,29 @@ export async function POST(req: NextRequest) {
       url: email.url,
     });
 
-    await sendPlaybookEmail({
-      to: record.inviteeEmail,
-      subject: invitationEmail.subject,
-      text: invitationEmail.text,
-      html: invitationEmail.html,
-      fromType: "onboarding",
-    });
+    try {
+      await sendPlaybookEmail({
+        to: record.inviteeEmail,
+        subject: invitationEmail.subject,
+        text: invitationEmail.text,
+        html: invitationEmail.html,
+        fromType: "onboarding",
+      });
+    } catch (deliveryError) {
+      // The invitation remains durable and visible to its scholar owner. Email
+      // delivery is an external transport concern and may be retried without
+      // silently deleting the consent artifact.
+      return NextResponse.json(
+        {
+          ok: true,
+          invitation: record,
+          email,
+          deliveryStatus: "failed",
+          deliveryError: deliveryError instanceof Error ? deliveryError.message : "Invitation delivery failed.",
+        },
+        { status: 202 }
+      );
+    }
 
     return NextResponse.json({
       ok: true,
