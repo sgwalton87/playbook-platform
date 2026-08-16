@@ -54,9 +54,6 @@ export default function AcademicReadinessPage() {
   );
 
   const loadReadiness = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError || !authData.user) {
       router.replace("/login");
@@ -129,6 +126,12 @@ export default function AcademicReadinessPage() {
     void loadReadiness();
   }, [loadReadiness]);
 
+  async function retryReadiness() {
+    setLoading(true);
+    setError(null);
+    await loadReadiness();
+  }
+
   async function decide(decision: DecisionState, followAction = false) {
     if (!evidenceRecord || !userId) return;
     setSaving(true);
@@ -199,7 +202,7 @@ export default function AcademicReadinessPage() {
           <section role="alert" style={errorState}>
             <strong>Academic readiness needs attention.</strong>
             <span>{error}</span>
-            <button type="button" onClick={() => void loadReadiness()} style={retryButton}>Try again</button>
+            <button type="button" onClick={() => void retryReadiness()} style={retryButton}>Try again</button>
           </section>
         ) : null}
 
