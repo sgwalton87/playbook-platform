@@ -1,7 +1,5 @@
-"use client";
-
-import SupportNetworkLiveCenter from "@/components/support-network-live/SupportNetworkLiveCenter";
+import { redirect } from "next/navigation";
 
 export default function SupportMessagesPage() {
-  return <SupportNetworkLiveCenter />;
+  redirect("/messages");
 }
