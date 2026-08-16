@@ -104,13 +104,12 @@ export default function EventsPage() {
 
   const myEvents = events.filter((event) => event.my_rsvp && event.my_rsvp !== "cancelled");
   const confirmed = events.filter((event) => event.my_rsvp === "going");
-  const upcoming = events.filter((event) => new Date(event.ends_at).getTime() >= Date.now());
 
   return (
     <PlaybookPage>
       <PlaybookHero eyebrow="Playbook Community" title="Events that move your record forward" subtitle="Discover workshops, labs, civic experiences, networking, and community gatherings. RSVP state, capacity, attendance, and earned rewards are governed by the platform—not by browser-only counters." />
       <PlaybookMetrics>
-        <PlaybookMetric label="Upcoming" value={loading ? "…" : String(upcoming.length)} />
+        <PlaybookMetric label="Published events" value={loading ? "…" : String(events.length)} />
         <PlaybookMetric label="Your events" value={loading ? "…" : String(myEvents.length)} />
         <PlaybookMetric label="Confirmed" value={loading ? "…" : String(confirmed.length)} />
         <PlaybookMetric label="Attendance verified" value={loading ? "…" : String(events.filter((event) => event.attended).length)} />
