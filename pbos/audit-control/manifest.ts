@@ -40,6 +40,14 @@ export const AUDIT_CONTROL_CHECKS: AuditControlCheck[] = [
     ],
   },
   {
+    id: "audit-application-learner-authority",
+    category: "security",
+    description: "Application workspaces must remain restricted to durable, onboarded learner roles and preserve the learner PBOS role.",
+    file: "app/api/application-workspaces/route.ts",
+    required: ["requireLearnerAuthority", "requireOnboarding: true", "pbosRoleForLearner"],
+    forbidden: ["registerIdentity: userId => connector.registerIdentity(userId, \"SCHOLAR\")"],
+  },
+  {
     id: "audit-brand-gate",
     category: "security",
     description: "Brand Partner operational workspace must remain behind independent authority verification.",
@@ -59,8 +67,6 @@ export const AUDIT_CONTROL_CHECKS: AuditControlCheck[] = [
     category: "routing",
     description: "Generic admin/partner aliases must fail closed instead of granting a public role.",
     file: "lib/roles/registry.ts",
-    // Match complete object-entry lines so safe aliases such as school_admin do
-    // not trigger the generic-admin prohibition by substring.
     forbidden: ["\n  admin: \"district\"", "\n  partner: \"employer\""],
   },
   {
