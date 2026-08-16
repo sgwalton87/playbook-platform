@@ -14,13 +14,16 @@ export function authorizePlaybookFoundation(request: PlaybookFoundationRequest) 
   requireOwner(request.userId, request.ownerId);
   const approvalId = requireApproval(request.approvalId);
   const identity = new PlaybookIdentityMapper().mapSupabaseIdentity(request.userId, request.role);
+  const tables = request.role === "SCHOLAR_ATHLETE"
+    ? ["scholar_profiles", "scholar_goals", "scholar_milestones", "athlete_profiles"] as const
+    : ["scholar_profiles", "scholar_goals", "scholar_milestones"] as const;
   return {
     identity,
     approvalId,
     designTokens,
     dataBoundary: {
       ownerId: request.ownerId,
-      tables: ["scholar_profiles", "scholar_goals", "scholar_milestones"] as const,
+      tables,
       policy: "OWNER_SCOPED_RLS" as const
     },
     provenance: [identity.pbosIdentity.provenance, approvalId]
