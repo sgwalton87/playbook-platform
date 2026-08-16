@@ -11,7 +11,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
-export const supabase = createBrowserClient(
+const browserClient = createBrowserClient(
   supabaseUrl || "https://placeholder.supabase.co",
   supabaseAnonKey || "placeholder-anon-key",
   {
@@ -19,3 +19,16 @@ export const supabase = createBrowserClient(
     auth: PLAYBOOK_PKCE_AUTH_OPTIONS,
   }
 );
+
+type BrowserClient = typeof browserClient;
+type RuntimeCertifiedRpcClient = Omit<BrowserClient, "rpc"> & {
+  /**
+   * Browser RPC signatures are runtime-certified by the repository SQL
+   * preflights until generated Supabase function types are adopted. Table/query
+   * typing remains unchanged; only the RPC result boundary is intentionally
+   * dynamic.
+   */
+  rpc: (fn: string, args?: Record<string, unknown>) => any;
+};
+
+export const supabase = browserClient as RuntimeCertifiedRpcClient;
