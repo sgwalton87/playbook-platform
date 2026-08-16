@@ -34,7 +34,7 @@ export const ROLE_ONBOARDING_COMPLETION: Record<PlaybookRole, RoleOnboardingComp
   "transition-youth": contract("transition-youth", "TRANSITION_YOUTH_RECORD", "implemented", "Authenticated self-owned TAY Scholar Record specialization."),
   family: contract("family", "FAMILY_RELATIONSHIP", "relationship-gated", "Accepted scholar-originated Parent/Guardian relationship plus Family PBOS runtime certification."),
   mentor: contract("mentor", "MENTOR_VALIDATION", "relationship-gated", "Scholar invitation plus Mentor validation threshold plus Mentor PBOS runtime certification."),
-  educator: contract("educator", "EDUCATOR_AUTHORITY", "authority-pending", "Verified educator identity and scholar/institution relationship authority."),
+  educator: contract("educator", "EDUCATOR_AUTHORITY", "authority-pending", "Approved Educator identity evidence plus a separately governed Scholar, cohort, or institution relationship."),
   "high-school-counselor": contract("high-school-counselor", "COUNSELOR_AUTHORITY", "authority-pending", "Verified counselor identity, school scope, and scholar relationship authority."),
   coach: contract("coach", "HIGH_SCHOOL_COACH_AUTHORITY", "authority-pending", "Approved Coach identity evidence plus a separately governed active Coach-to-Scholar/Scholar-Athlete relationship."),
   "college-coach": contract("college-coach", "RECRUITING_AUTHORITY", "authority-pending", "Verified institution/recruiting identity and approved recruiting scope."),
