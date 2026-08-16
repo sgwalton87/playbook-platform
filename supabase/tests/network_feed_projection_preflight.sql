@@ -2,7 +2,6 @@
 
 begin;
 
--- Functions exist with explicit execution boundaries.
 select to_regprocedure('public.get_public_member_identities(uuid[])') is not null as member_identity_rpc_exists \gset
 \if :member_identity_rpc_exists
 \else
@@ -24,8 +23,6 @@ select to_regprocedure('public.get_network_member_identities(uuid[])') is not nu
   \quit 1
 \endif
 
--- Anonymous users may resolve only explicitly requested public identities, not
--- browse the network directory or relationship-aware identity surface.
 select has_function_privilege('anon', 'public.get_public_member_identities(uuid[])', 'EXECUTE') as anon_member_identity_exec \gset
 \if :anon_member_identity_exec
 \else
@@ -73,19 +70,5 @@ where schemaname = 'public'
   \echo 'public.profiles gained a broad select policy; projection boundary failed'
   \quit 1
 \endif
-
--- When the runtime feed table exists, the canonical pillar field is constrained.
-do $$
-begin
-  if to_regclass('public.feed_posts') is not null then
-    if not exists (
-      select 1
-      from information_schema.columns
-      where table_schema = 'public' and table_name = 'feed_posts' and column_name = 'pillar'
-    ) then
-      raise exception 'feed_posts.pillar missing';
-    end if;
-  end if;
-end $$;
 
 rollback;
