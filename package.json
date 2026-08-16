@@ -37,6 +37,7 @@
     "founder:list": "node scripts/founder/list.mjs",
     "pbos:next": "tsx pbos/commands/next.ts",
     "pbos:status": "tsx pbos/commands/status.ts",
+    "pbos:audit": "tsx scripts/pbos/audit-control.ts",
     "pbos:acceptance:prepare": "node scripts/pbos/prepare-browser.mjs",
     "test:acceptance:pbos": "playwright test tests/acceptance/pbos-scholar.spec.ts --project=chromium",
     "test:acceptance:pbos:login": "playwright test tests/acceptance/pbos-login.spec.ts --project=chromium",

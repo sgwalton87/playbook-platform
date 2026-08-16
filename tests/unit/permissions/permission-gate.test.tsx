@@ -7,14 +7,15 @@ describe("PermissionGate", () => {
     expect(PermissionGate).toBeTruthy();
   });
 
-  it("maps role to relationship", () => {
+  it("maps role to exact relationship identity", () => {
     expect(mapRoleToRelationship("family")).toBe("parent_guardian");
+    expect(mapRoleToRelationship("educator")).toBe("educator");
+    expect(mapRoleToRelationship("counselor")).toBe("counselor");
+    expect(mapRoleToRelationship("coach")).toBe("coach");
+    expect(mapRoleToRelationship("recruiter")).toBe("college_recruiter");
+    expect(mapRoleToRelationship("admissions")).toBe("college_admissions");
+    expect(mapRoleToRelationship("community")).toBe("community_partner");
     expect(mapRoleToRelationship("employer")).toBe("employer_partner");
     expect(mapRoleToRelationship("transition-youth")).toBe("scholar");
-    expect(() => mapRoleToRelationship("counselor")).toThrow("Role authority is not configured");
-    expect(() => mapRoleToRelationship("coach")).toThrow("Role authority is not configured");
-    expect(() => mapRoleToRelationship("recruiter")).toThrow("Role authority is not configured");
-    expect(() => mapRoleToRelationship("admissions")).toThrow("Role authority is not configured");
-    expect(() => mapRoleToRelationship("community")).toThrow("Role authority is not configured");
   });
 });

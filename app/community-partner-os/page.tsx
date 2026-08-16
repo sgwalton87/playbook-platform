@@ -1,7 +1,7 @@
 "use client";
 
-import RoleDashboardExperience from "@/components/role-os/dashboards/RoleDashboardExperience";
+import CommunityPartnerVerificationExperience from "@/components/community/CommunityPartnerVerificationExperience";
 
 export default function CommunityPartnerOSPage() {
-  return <RoleDashboardExperience role="community" />;
+  return <CommunityPartnerVerificationExperience />;
 }

@@ -8,10 +8,10 @@ import {
 import InvitationCenter from "@/components/invitations/InvitationCenter";
 
 describe("Role Invitations", () => {
-  it("creates invitation with permissions and destination", () => {
+  it("preserves governed Mentor permissions and destination", () => {
     const invite = createSupportInvitation({
-      inviteeName: "Coach Taylor",
-      inviteeEmail: "coach@example.com",
+      inviteeName: "Mentor",
+      inviteeEmail: "mentor@example.com",
       relationship: "mentor",
     });
 
@@ -30,7 +30,22 @@ describe("Role Invitations", () => {
     expect(updateInvitationStatus(invite, "accepted").status).toBe("accepted");
   });
 
-  it("routes university partner correctly", () => {
+  it.each([
+    ["counselor", "/counselor-os"],
+    ["college_recruiter", "/recruiting-os"],
+    ["college_admissions", "/admissions-os"],
+    ["community_partner", "/community-partner-os"],
+  ] as const)("routes %s to its exact OS with zero data permissions", (relationship, destination) => {
+    const invite = createSupportInvitation({
+      inviteeName: "Supporter",
+      inviteeEmail: `${relationship}@example.com`,
+      relationship,
+    });
+    expect(invite.destination).toBe(destination);
+    expect(invite.permissions).toEqual([]);
+  });
+
+  it("keeps legacy university identity compatibility-only", () => {
     expect(destinationForRelationship("university_partner")).toBe("/university-os");
   });
 

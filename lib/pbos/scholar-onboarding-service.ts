@@ -1,9 +1,11 @@
-import type { PlaybookIdentityMapping } from "../../pbos/connector/contracts";
+import type { PlaybookIdentityMapping, PlaybookRole } from "../../pbos/connector/contracts";
 import { authorizePlaybookFoundation } from "./foundation";
 
+export type SupportedScholarRecordRole = Extract<PlaybookRole, "SCHOLAR" | "SCHOLAR_ATHLETE" | "TRANSITION_YOUTH">;
+
 export interface ScholarJourneyRepository {
-  persistOnboarding(input: { scholarId: string; displayName: string; goalTitle: string; approvalId: string; idempotencyKey: string; provenance: readonly string[] }): Promise<{ scholarRecordId: string; goalId: string }>;
-  persistDashboard(input: { scholarId: string; scholarRecordId: string; goalId: string; exchangeApprovalId: string; idempotencyKey: string; provenance: readonly string[] }): Promise<void>;
+  persistOnboarding(input: { scholarId: string; displayName: string; goalTitle: string; role: SupportedScholarRecordRole; approvalId: string; idempotencyKey: string; provenance: readonly string[] }): Promise<{ scholarRecordId: string; goalId: string }>;
+  persistDashboard(input: { scholarId: string; scholarRecordId: string; goalId: string; role: SupportedScholarRecordRole; sectionIds: readonly string[]; exchangeApprovalId: string; idempotencyKey: string; provenance: readonly string[] }): Promise<void>;
 }
 
 export interface ScholarPbosRuntime {
@@ -18,6 +20,7 @@ export interface CompleteScholarOnboarding {
   ownerId: string;
   displayName: string;
   goalTitle: string;
+  role?: SupportedScholarRecordRole;
   identityApprovalId: string;
   exchangeApprovalId: string;
   idempotencyKey: string;
@@ -29,19 +32,27 @@ export class ScholarOnboardingService {
   async complete(input: CompleteScholarOnboarding) {
     if (!input.exchangeApprovalId) throw new Error("PBOS dashboard exchange approval required.");
     if (!input.idempotencyKey) throw new Error("Scholar journey idempotency key required.");
-    const authority = authorizePlaybookFoundation({ userId: input.actorId, ownerId: input.ownerId, role: "SCHOLAR", approvalId: input.identityApprovalId });
+    const role = input.role ?? "SCHOLAR";
+    const authority = authorizePlaybookFoundation({ userId: input.actorId, ownerId: input.ownerId, role, approvalId: input.identityApprovalId });
     const identity = await this.runtime.registerIdentity(input.actorId);
+    if (identity.externalIdentity.role !== role || identity.pbosIdentity.role !== role) {
+      throw new Error("PBOS identity role does not match the governed Scholar Record role.");
+    }
     const readinessProvenance = await this.runtime.verifyReady(identity, input.idempotencyKey + "-health");
     const baseProvenance = [...authority.provenance, identity.pbosIdentity.provenance, ...readinessProvenance];
     const record = await this.repository.persistOnboarding({ scholarId: input.ownerId, displayName: input.displayName,
-      goalTitle: input.goalTitle, approvalId: input.identityApprovalId, idempotencyKey: input.idempotencyKey, provenance: baseProvenance });
+      goalTitle: input.goalTitle, role, approvalId: input.identityApprovalId, idempotencyKey: input.idempotencyKey, provenance: baseProvenance });
     const onboardingProvenance = await this.runtime.publishOnboarding(identity, record.scholarRecordId, input.idempotencyKey + "-onboarding");
-    const sectionIds = ["identity", "goals"] as const;
+    const sectionIds = role === "SCHOLAR_ATHLETE"
+      ? (["identity", "goals", "athletics"] as const)
+      : role === "TRANSITION_YOUTH"
+        ? (["identity", "goals", "support"] as const)
+        : (["identity", "goals"] as const);
     const dashboardProvenance = await this.runtime.projectDashboard(identity, record.scholarRecordId, sectionIds,
       input.exchangeApprovalId, input.idempotencyKey + "-dashboard");
     const provenance = [...baseProvenance, ...onboardingProvenance, ...dashboardProvenance, input.exchangeApprovalId];
     await this.repository.persistDashboard({ scholarId: input.ownerId, scholarRecordId: record.scholarRecordId,
-      goalId: record.goalId, exchangeApprovalId: input.exchangeApprovalId, idempotencyKey: input.idempotencyKey, provenance });
-    return { scholarRecordId: record.scholarRecordId, goalId: record.goalId, sectionIds, provenance };
+      goalId: record.goalId, role, sectionIds, exchangeApprovalId: input.exchangeApprovalId, idempotencyKey: input.idempotencyKey, provenance });
+    return { scholarRecordId: record.scholarRecordId, goalId: record.goalId, role, sectionIds, provenance };
   }
 }

@@ -1,92 +1,19 @@
-import { NextRequest, NextResponse } from "next/server";
-import {
-  buildPlaybookEvent,
-  convertEventToNotification,
-  resolveRecipients,
-} from "@/lib/event-notifications";
-import { createClient } from "@supabase/supabase-js";
+import { NextResponse } from "next/server";
 
-
-function getSupabaseAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+/**
+ * Public Event Bus emission is intentionally disabled.
+ *
+ * An event is security-relevant provenance: callers must not self-assert the
+ * Scholar, actor identity, actor role, event type, or notification recipients.
+ * Domain services must publish events only after their own authority contract
+ * has been proven.
+ */
+export async function POST() {
+  return NextResponse.json(
+    {
+      error: "Direct Playbook event emission is disabled. Use a governed domain publisher.",
+      activationState: "governed_event_publisher_required",
+    },
+    { status: 403 }
   );
-}
-
-export async function POST(req: NextRequest) {
-  const supabase = getSupabaseAdmin();
-
-  try {
-    const body = await req.json();
-
-    const event = buildPlaybookEvent({
-      type: body.type,
-      scholarId: body.scholarId,
-      actorId: body.actorId,
-      actorRole: body.actorRole,
-      payload: body.payload || {},
-    });
-
-    const { data: savedEvent, error: eventError } = await supabase
-      .from("playbook_events")
-      .insert(event)
-      .select()
-      .single();
-
-    if (eventError) {
-      return NextResponse.json({ error: eventError.message }, { status: 400 });
-    }
-
-    const { data: relationships } = await supabase
-      .from("support_relationships")
-      .select("*")
-      .eq("scholar_id", event.scholar_id);
-
-    const recipients = resolveRecipients({
-      scholarId: event.scholar_id,
-      relationships: relationships || [],
-      actorRole: event.actor_role,
-    });
-
-    const notifications = recipients
-      .map((recipient) =>
-        convertEventToNotification({
-          eventId: savedEvent.id,
-          event,
-          recipientUserId: recipient.userId,
-          recipientRole: recipient.role,
-        })
-      )
-      .filter(
-        (
-          notification
-        ): notification is NonNullable<typeof notification> =>
-          notification !== null
-      );
-
-    if (notifications.length) {
-      const { error: notificationError } = await supabase
-        .from("notifications")
-        .insert(notifications);
-
-      if (notificationError) {
-        return NextResponse.json(
-          { error: notificationError.message },
-          { status: 400 }
-        );
-      }
-    }
-
-    return NextResponse.json({
-      ok: true,
-      event: savedEvent,
-      notificationsCreated: notifications.length,
-    });
-  } catch {
-    return NextResponse.json(
-      { error: "Unable to emit Playbook event." },
-      { status: 500 }
-    );
-  }
 }

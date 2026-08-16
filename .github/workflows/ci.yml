@@ -27,6 +27,8 @@ jobs:
         run: npm ci
       - name: Lint
         run: npm run lint
+      - name: PBOS Audit Control
+        run: npm run pbos:audit
       - name: Test
         run: npm test
       - name: Build

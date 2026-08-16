@@ -1,46 +1,82 @@
 import { NextRequest, NextResponse } from "next/server";
 
-
 import {
   buildInvitationEmail,
   buildInvitationRecord,
 } from "@/lib/invitations/server";
-
 import type { RelationshipKind } from "@/lib/permissions";
 import { buildSupportInvitationEmail, sendPlaybookEmail } from "@/lib/email";
-import { createClient } from "@supabase/supabase-js";
+import { normalizePlaybookRole } from "@/lib/roles/registry";
+import { requireUser } from "@/lib/supabase/server";
 
-function getSupabaseAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-}
+const RELATIONSHIP_KINDS = new Set<RelationshipKind>([
+  "parent_guardian",
+  "educator",
+  "counselor",
+  "mentor",
+  "coach",
+  "district_admin",
+  "college_recruiter",
+  "college_admissions",
+  "community_partner",
+  "employer_partner",
+]);
+
+const SCHOLAR_RECORD_ROLES = new Set([
+  "scholar",
+  "scholar-athlete",
+  "transition-youth",
+]);
 
 export async function POST(req: NextRequest) {
-  const supabase = getSupabaseAdmin();
-
   try {
-    const body = await req.json();
+    const { supabase, user } = await requireUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const inviterProfile = await supabase
+      .from("profiles")
+      .select("role,profile_mode,full_name")
+      .eq("id", user.id)
+      .maybeSingle();
 
-    if (authError || !user) {
+    if (inviterProfile.error) {
+      return NextResponse.json({ error: inviterProfile.error.message }, { status: 400 });
+    }
+
+    const inviterRole = normalizePlaybookRole(
+      inviterProfile.data?.profile_mode ?? inviterProfile.data?.role
+    );
+    if (!SCHOLAR_RECORD_ROLES.has(inviterRole)) {
       return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
+        { error: "Only a self-owned Scholar Record account may invite members into its support system." },
+        { status: 403 }
       );
     }
 
+    const body = await req.json();
+    const relationship = body.relationship as RelationshipKind | undefined;
+    const inviteeName = String(body.inviteeName || "").trim();
+    const inviteeEmail = String(body.inviteeEmail || "").trim().toLowerCase();
+
+    if (!relationship || !RELATIONSHIP_KINDS.has(relationship)) {
+      return NextResponse.json({ error: "Invalid or legacy support relationship. Choose the exact role relationship." }, { status: 400 });
+    }
+    if (!inviteeName || !inviteeEmail) {
+      return NextResponse.json({ error: "Invitee name and email are required." }, { status: 400 });
+    }
+    if (user.email?.trim().toLowerCase() === inviteeEmail) {
+      return NextResponse.json({ error: "A Scholar cannot invite the same account as its own supporter." }, { status: 400 });
+    }
+
+    const scholarName = String(inviterProfile.data?.full_name || "Scholar").trim();
     const record = buildInvitationRecord({
       scholarId: user.id,
-      scholarName: body.scholarName || "Scholar",
-      inviteeName: body.inviteeName,
-      inviteeEmail: body.inviteeEmail,
-      relationship: body.relationship as RelationshipKind,
+      scholarName,
+      inviteeName,
+      inviteeEmail,
+      relationship,
     });
 
     const { error } = await supabase
@@ -59,10 +95,7 @@ export async function POST(req: NextRequest) {
       });
 
     if (error) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
     const email = buildInvitationEmail({
@@ -80,13 +113,26 @@ export async function POST(req: NextRequest) {
       url: email.url,
     });
 
-    await sendPlaybookEmail({
-      to: record.inviteeEmail,
-      subject: invitationEmail.subject,
-      text: invitationEmail.text,
-      html: invitationEmail.html,
-      fromType: "onboarding",
-    });
+    try {
+      await sendPlaybookEmail({
+        to: record.inviteeEmail,
+        subject: invitationEmail.subject,
+        text: invitationEmail.text,
+        html: invitationEmail.html,
+        fromType: "onboarding",
+      });
+    } catch (deliveryError) {
+      return NextResponse.json(
+        {
+          ok: true,
+          invitation: record,
+          email,
+          deliveryStatus: "failed",
+          deliveryError: deliveryError instanceof Error ? deliveryError.message : "Invitation delivery failed.",
+        },
+        { status: 202 }
+      );
+    }
 
     return NextResponse.json({
       ok: true,

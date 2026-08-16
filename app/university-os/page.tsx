@@ -1,7 +1,5 @@
-"use client";
-
-import RoleDashboardExperience from "@/components/role-os/dashboards/RoleDashboardExperience";
+import { redirect } from "next/navigation";
 
 export default function UniversityOSPage() {
-  return <RoleDashboardExperience role="university" />;
+  redirect("/admissions-os");
 }

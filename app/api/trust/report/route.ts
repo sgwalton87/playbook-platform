@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
   }
 
   const { data, error } = await supabase
-    .from("trust_reports")
+    .from("moderation_reports")
     .insert({
       reporter_id: user.id,
       target_type: body.targetType,

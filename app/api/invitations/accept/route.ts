@@ -1,26 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
-import { applyInvitationStatus } from "@/lib/invitations/server";
 import type { InvitationStatus } from "@/lib/invitations";
-import {
-  buildAcceptedInvitationRelationship,
-  invitationEmailMatchesUser,
-} from "@/lib/support-relationships";
-import { createClient } from "@supabase/supabase-js";
+import { requireUser } from "@/lib/supabase/server";
 
-
-function getSupabaseAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+function statusForClaimError(message: string) {
+  if (message.includes("Authentication required")) return 401;
+  if (message.includes("different email address")) return 403;
+  if (message.includes("governed verification contract")) return 403;
+  if (message.includes("Invitation not found")) return 404;
+  if (message.includes("already")) return 409;
+  return 400;
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = getSupabaseAdmin();
-
   try {
-    const body = await req.json();
+    const { supabase, user } = await requireUser();
+    if (!user) {
+      return NextResponse.json({ error: "Sign in required." }, { status: 401 });
+    }
 
+    const body = await req.json();
     const token = body.token as string | undefined;
     const status = (body.status || "accepted") as InvitationStatus;
 
@@ -32,81 +30,52 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid invitation status." }, { status: 400 });
     }
 
-    const { data: invitation, error: readError } = await supabase
-      .from("support_invitations")
-      .select("*")
-      .eq("token", token)
-      .single();
+    const { data, error } = await supabase.rpc("claim_support_invitation", {
+      invitation_token: token,
+      desired_status: status,
+    });
 
-    if (readError || !invitation) {
-      return NextResponse.json({ error: "Invitation not found." }, { status: 404 });
-    }
-
-    if (invitation.status !== "pending") {
+    if (error) {
       return NextResponse.json(
-        { error: `Invitation is already ${invitation.status}.` },
-        { status: 409 }
+        { error: error.message },
+        { status: statusForClaimError(error.message) }
       );
     }
 
-    const update = applyInvitationStatus(status);
-
-    const { error: updateError } = await supabase
-      .from("support_invitations")
-      .update(update)
-      .eq("token", token);
-
-    if (updateError) {
-      return NextResponse.json({ error: updateError.message }, { status: 400 });
+    const claim = Array.isArray(data) ? data[0] : data;
+    if (!claim) {
+      return NextResponse.json({ error: "Invitation claim returned no result." }, { status: 500 });
     }
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (status === "accepted") {
-      if (!user) {
-        return NextResponse.json({ error: "Sign in required." }, { status: 401 });
-      }
-
-      if (!invitationEmailMatchesUser(invitation.invitee_email, user.email)) {
-        return NextResponse.json(
-          { error: "This invitation belongs to a different email address." },
-          { status: 403 }
-        );
-      }
-
-      const relationship = buildAcceptedInvitationRelationship({
-        invitation,
-        supporterId: user.id,
-      });
-
-      const { error: relationshipError } = await supabase
-        .from("support_relationships")
-        .insert(relationship);
-
-      if (relationshipError) {
-        return NextResponse.json({ error: relationshipError.message }, { status: 400 });
-      }
-    }
+    const pendingMentorValidation = claim.activation_state === "pending_validation";
 
     return NextResponse.json({
       ok: true,
-      destination: invitation.destination,
+      // Every accepted role enters its own Operating System. Mentor OS is
+      // responsible for rendering the pending-validation gate without exposing
+      // Scholar data before the threshold is satisfied.
+      destination: claim.destination,
+      activationState: claim.activation_state,
+      validationRequestId: claim.validation_request_id ?? null,
       eventHint:
         status === "accepted"
           ? {
-              type: "invitation.accepted",
-              scholarId: invitation.scholar_id,
+              type: pendingMentorValidation ? "mentor.validation_requested" : "invitation.accepted",
+              scholarId: claim.scholar_id,
               payload: {
-                title: "Support invitation accepted",
-                detail: `${invitation.invitee_name} joined the support network.`,
+                title: pendingMentorValidation ? "Mentor validation requested" : "Support invitation accepted",
+                detail: pendingMentorValidation
+                  ? `${claim.invitee_name} accepted the mentor invitation and is awaiting support-system validation.`
+                  : `${claim.invitee_name} joined the support network.`,
               },
             }
           : null,
       invitation: {
-        ...invitation,
-        ...update,
+        token,
+        scholar_id: claim.scholar_id,
+        invitee_name: claim.invitee_name,
+        relationship: claim.relationship,
+        status: claim.status,
       },
     });
   } catch {

@@ -1,5 +1,5 @@
 import { getCanonicalOnboardingRoute } from "@/lib/onboarding";
-import { getRoleDestination, normalizePlaybookRole } from "@/lib/roles/registry";
+import { getRoleDestination, requirePlaybookRole } from "@/lib/roles/registry";
 
 export type LoginProfile = {
   onboarding_completed: boolean | null;
@@ -11,9 +11,12 @@ export function getLoginDestination(
   profile: LoginProfile | null,
   metadataRole?: string | null
 ): string {
-  const role = normalizePlaybookRole(profile?.onboarding_completed
-    ? profile.profile_mode || profile.role || metadataRole
-    : metadataRole || profile?.profile_mode || profile?.role);
+  // Durable profile truth always outranks mutable auth user metadata, including
+  // before onboarding is complete. Metadata is only a bootstrap source when no
+  // profile row exists yet.
+  const role = requirePlaybookRole(
+    profile?.profile_mode || profile?.role || metadataRole
+  );
 
   return profile?.onboarding_completed
     ? getRoleDestination(role)

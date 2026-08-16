@@ -43,7 +43,7 @@ export interface PlaybookIdentityMapping {
     readonly mappedAt: Date;
 }
 
-export type PlaybookRole = "SCHOLAR" | "SCHOLAR_ATHLETE" | "FAMILY" | "MENTOR" | "COACH" | "EDUCATOR";
+export type PlaybookRole = "SCHOLAR" | "SCHOLAR_ATHLETE" | "TRANSITION_YOUTH" | "FAMILY" | "MENTOR" | "COACH" | "EDUCATOR";
 
 export interface ScholarOnboardingEvent {
     readonly eventType: "SCHOLAR_ONBOARDING_COMPLETED";

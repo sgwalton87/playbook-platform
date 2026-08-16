@@ -1,5 +1,6 @@
 "use client";
 
+import RoleAuthorityGate from "@/components/role-os/RoleAuthorityGate";
 import {
   PlaybookButton,
   PlaybookCard,
@@ -14,12 +15,13 @@ import type { PlaybookRoleOS } from "@/lib/role-os";
 
 export default function RoleDashboardExperience({
   role,
+  authorityVerified = false,
 }: {
   role: PlaybookRoleOS;
+  authorityVerified?: boolean;
 }) {
   const dashboard = getRoleDashboard(role);
-
-  return (
+  const content = (
     <PlaybookPage>
       <PlaybookHero
         eyebrow={`${role} OS`}
@@ -33,7 +35,9 @@ export default function RoleDashboardExperience({
       </PlaybookHero>
 
       <PlaybookMetrics>
-        {dashboard.metrics.map((metric) => <PlaybookMetric key={metric.label} label={metric.label} value={metric.value} />)}
+        {dashboard.metrics.map((metric) => (
+          <PlaybookMetric key={metric.label} label={metric.label} value={metric.value} />
+        ))}
       </PlaybookMetrics>
 
       <PlaybookGrid min={300}>
@@ -46,6 +50,16 @@ export default function RoleDashboardExperience({
       </PlaybookGrid>
     </PlaybookPage>
   );
+
+  // Mentor OS is always entered through MentorValidationExperience, which has
+  // already proved the active Mentor relationship before rendering this shared
+  // dashboard. All other role dashboards use the generic authority gate unless
+  // a future specialized gate explicitly marks authorityVerified.
+  const specializedAuthorityVerified = authorityVerified || role === "mentor";
+
+  return specializedAuthorityVerified
+    ? content
+    : <RoleAuthorityGate roleOS={role}>{content}</RoleAuthorityGate>;
 }
 
 const body: React.CSSProperties = {

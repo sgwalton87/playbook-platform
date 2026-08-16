@@ -1,4 +1,4 @@
-import type { PlaybookIdentityMapping } from "../../pbos/connector/contracts";
+import type { PlaybookIdentityMapping, PlaybookRole } from "../../pbos/connector/contracts";
 import { authorizePlaybookFoundation } from "./foundation";
 
 export const APPLICATION_TYPES = ["college", "scholarship", "internship", "job", "recruiting", "nil", "mentor", "career",
@@ -16,13 +16,13 @@ export interface ApplicationWorkspaceRepository {
 }
 
 export interface ApplicationWorkspaceRuntime {
-  registerIdentity(userId: string): Promise<PlaybookIdentityMapping>;
+  registerIdentity(userId: string, role: PlaybookRole): Promise<PlaybookIdentityMapping>;
   publish(identity: PlaybookIdentityMapping, input: { eventType: "APPLICATION_WORKSPACE_CREATED" | "APPLICATION_WORKSPACE_PROGRESS_UPDATED";
     workspaceId: string; opportunityId?: string; action?: string; readiness?: number; status?: string; correlationId: string }): Promise<readonly string[]>;
 }
 
 export interface CreateApplicationWorkspaceInput {
-  actorId: string; ownerId: string; approvalId: string; opportunityId: string; opportunityName: string;
+  actorId: string; ownerId: string; role: PlaybookRole; approvalId: string; opportunityId: string; opportunityName: string;
   opportunityType: ApplicationType; deadline?: string | null; tasks?: readonly ApplicationTaskInput[]; idempotencyKey: string;
 }
 
@@ -50,8 +50,8 @@ export class ApplicationWorkspaceJourneyService {
     if (!(APPLICATION_TYPES as readonly string[]).includes(input.opportunityType)) throw new Error("Application opportunity type is invalid.");
     const tasks = (input.tasks?.length ? input.tasks : DEFAULT_TASKS).slice(0, 20);
     if (tasks.some(task => !task.key.trim() || !task.title.trim())) throw new Error("Application tasks require stable keys and titles.");
-    const authority = authorizePlaybookFoundation({ userId: input.actorId, ownerId: input.ownerId, role: "SCHOLAR", approvalId: input.approvalId });
-    const identity = await this.runtime.registerIdentity(input.actorId);
+    const authority = authorizePlaybookFoundation({ userId: input.actorId, ownerId: input.ownerId, role: input.role, approvalId: input.approvalId });
+    const identity = await this.runtime.registerIdentity(input.actorId, input.role);
     const baseProvenance = [...authority.provenance, identity.pbosIdentity.provenance, input.approvalId];
     const record = await this.repository.createPending({ ownerId: input.ownerId, opportunityId: input.opportunityId,
       opportunityName: input.opportunityName.trim(), opportunityType: input.opportunityType, deadline: validateDeadline(input.deadline),
@@ -63,13 +63,13 @@ export class ApplicationWorkspaceJourneyService {
     return { workspaceId: record.workspaceId, status: "building" as const, provenance };
   }
 
-  async transition(input: { actorId: string; ownerId: string; approvalId: string; workspaceId: string;
+  async transition(input: { actorId: string; ownerId: string; role: PlaybookRole; approvalId: string; workspaceId: string;
     action: "TASK_COMPLETED" | "TASK_REOPENED" | "APPLICATION_SUBMITTED"; taskId?: string; idempotencyKey: string }) {
     if (!input.idempotencyKey.trim()) throw new Error("Application transition idempotency key required.");
     if (!input.workspaceId.trim()) throw new Error("Application workspace required.");
     if (input.action !== "APPLICATION_SUBMITTED" && !input.taskId) throw new Error("Application task required.");
-    const authority = authorizePlaybookFoundation({ userId: input.actorId, ownerId: input.ownerId, role: "SCHOLAR", approvalId: input.approvalId });
-    const identity = await this.runtime.registerIdentity(input.actorId);
+    const authority = authorizePlaybookFoundation({ userId: input.actorId, ownerId: input.ownerId, role: input.role, approvalId: input.approvalId });
+    const identity = await this.runtime.registerIdentity(input.actorId, input.role);
     const baseProvenance = [...authority.provenance, identity.pbosIdentity.provenance, input.approvalId];
     const state = await this.repository.transition({ ownerId: input.ownerId, workspaceId: input.workspaceId,
       action: input.action, taskId: input.taskId, idempotencyKey: input.idempotencyKey, provenance: baseProvenance });

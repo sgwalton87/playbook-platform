@@ -3,11 +3,12 @@
 import { Suspense, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
-import { getPathway, normalizeRole } from "@/lib/onboarding/pathwayMap";
 import { getCanonicalOnboardingRoute } from "@/lib/onboarding";
+import { resolveAuthCallbackRole } from "@/lib/auth/callbackRole";
 import { getGoogleRequestedRole } from "@/lib/auth/google";
 import { PKCE_CALLBACK_ERROR_MESSAGE } from "@/lib/auth/pkce";
 import { getEmailVerificationOtpType, hasVerifiedEmail } from "@/lib/auth/emailVerification";
+import { getRoleDestination } from "@/lib/roles/registry";
 
 export default function AuthCallbackPage() {
   return (
@@ -82,40 +83,49 @@ function AuthCallbackContent() {
         return;
       }
 
-      const googleRequestedRole = getGoogleRequestedRole(
-        params.get("provider"),
-        params.get("role"),
-        typeof data.user.app_metadata?.provider === "string"
-          ? data.user.app_metadata.provider
-          : null,
-        Boolean(existing)
-      );
       const verifiedSignupRole = tokenHash && emailVerificationType === "signup"
         ? data.user.user_metadata?.profile_mode ||
           data.user.user_metadata?.role ||
           data.user.user_metadata?.requested_role
         : null;
-      const role = normalizeRole(
-        verifiedSignupRole ||
-        existing?.profile_mode ||
-        existing?.role ||
-        googleRequestedRole ||
-        data.user.user_metadata?.profile_mode ||
-        data.user.user_metadata?.role ||
-        data.user.user_metadata?.requested_role ||
-        "scholar"
-      );
 
-      const { error: profileWriteError } = await supabase.from("profiles").upsert(
-        {
-          id: data.user.id,
-          role: role,
-          profile_mode: role,
-          requested_role: role,
-          verification_status: "email_confirmed",
-          onboarding_completed: existing?.onboarding_completed || false,
-        },
-        { onConflict: "id" }
+      let role;
+      try {
+        const googleRequestedRole = getGoogleRequestedRole(
+          params.get("provider"),
+          params.get("role"),
+          typeof data.user.app_metadata?.provider === "string"
+            ? data.user.app_metadata.provider
+            : null,
+          Boolean(existing)
+        );
+
+        role = resolveAuthCallbackRole({
+          // Durable profile identity always outranks mutable auth metadata.
+          existingProfileMode: existing?.profile_mode,
+          existingProfileRole: existing?.role,
+          verifiedSignupRole,
+          googleRequestedRole,
+          metadataProfileMode: data.user.user_metadata?.profile_mode,
+          metadataRole: data.user.user_metadata?.role,
+          metadataRequestedRole: data.user.user_metadata?.requested_role,
+        });
+      } catch {
+        console.error("Auth callback role resolution failed closed.");
+        await supabase.auth.signOut();
+
+        // A returning Google user with no durable Playbook profile must choose a
+        // role before an account can be created. Never substitute Scholar.
+        window.location.replace("/login?mode=signup&reason=role-required");
+        return;
+      }
+
+      // Durable identity creation/confirmation is authority-bearing. The client
+      // may request the verified signup role, but only the governed RPC may
+      // create the profile or confirm that it matches existing durable identity.
+      const { error: profileWriteError } = await supabase.rpc(
+        "initialize_playbook_profile",
+        { desired_role: role }
       );
 
       if (profileWriteError) {
@@ -126,13 +136,13 @@ function AuthCallbackContent() {
       }
 
       if (existing?.onboarding_completed) {
-        window.location.replace(getPathway(existing.profile_mode || existing.role || role).osRoute);
+        window.location.replace(getRoleDestination(role));
       } else {
         window.location.replace(getCanonicalOnboardingRoute(role));
       }
     }
 
-    finishAuth();
+    void finishAuth();
   }, [params]);
 
   return (

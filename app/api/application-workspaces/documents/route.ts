@@ -1,5 +1,6 @@
 import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
+import { requireLearnerAuthority } from "@/lib/auth/learner-authority";
 import { requireUser } from "@/lib/supabase/server";
 
 const MAX_DOCUMENT_BYTES = 10 * 1024 * 1024;
@@ -9,6 +10,7 @@ export async function POST(request: NextRequest) {
   try {
     const { supabase, user } = await requireUser();
     if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    await requireLearnerAuthority(supabase, user.id, { requireOnboarding: true });
     const form = await request.formData(); const workspaceId = String(form.get("workspaceId") ?? ""); const file = form.get("file");
     if (!(file instanceof File) || !workspaceId) return NextResponse.json({ error: "Workspace and document are required." }, { status: 400 });
     if (file.size < 1 || file.size > MAX_DOCUMENT_BYTES) return NextResponse.json({ error: "Document must be between 1 byte and 10 MB." }, { status: 400 });
@@ -29,6 +31,7 @@ export async function DELETE(request: NextRequest) {
   try {
     const { supabase, user } = await requireUser();
     if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    await requireLearnerAuthority(supabase, user.id, { requireOnboarding: true });
     const body = await request.json() as { documentId?: unknown };
     const record = await supabase.from("application_workspace_documents").select("id,storage_path").eq("id", String(body.documentId ?? "")).eq("scholar_id", user.id).single();
     if (record.error || !record.data) return NextResponse.json({ error: "Application document was not found." }, { status: 404 });

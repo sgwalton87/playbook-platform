@@ -1,42 +1,55 @@
 import { NextRequest, NextResponse } from "next/server";
+import { requireLearnerAuthority } from "@/lib/auth/learner-authority";
 import { sendPlaybookEmail } from "@/lib/email";
 import {
   buildRecommenderEmail,
   buildRecommenderRequest,
+  isRecommenderRole,
   updateRecommenderRequestStatus,
 } from "@/lib/recommenders";
-import { createClient } from "@supabase/supabase-js";
-
-
-function getSupabaseAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-}
+import { requireUser } from "@/lib/supabase/server";
 
 export async function POST(req: NextRequest) {
-  const supabase = getSupabaseAdmin();
-
   try {
-    const body = await req.json();
+    const { supabase, user } = await requireUser();
+    if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    await requireLearnerAuthority(supabase, user.id, { requireOnboarding: true });
+
+    const profile = await supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle();
+    if (profile.error) throw new Error(profile.error.message);
+    if (!profile.data) return NextResponse.json({ error: "A durable learner profile is required." }, { status: 409 });
+
+    const body = await req.json() as Record<string, unknown>;
+    if (body.scholarId != null && String(body.scholarId) !== user.id) {
+      return NextResponse.json({ error: "Recommendation requests may only be created for the authenticated learner." }, { status: 403 });
+    }
+
+    if (!isRecommenderRole(body.recommenderRole)) {
+      return NextResponse.json(
+        { error: "Recommender role must be educator, mentor, coach, family, or employer." },
+        { status: 400 }
+      );
+    }
+
+    const evidence = Array.isArray(body.evidence)
+      ? body.evidence.filter((item): item is string => typeof item === "string").slice(0, 50)
+      : [];
 
     const request = buildRecommenderRequest({
-      scholarId: body.scholarId,
-      scholarName: body.scholarName,
-      recommenderName: body.recommenderName,
-      recommenderEmail: body.recommenderEmail,
+      scholarId: user.id,
+      scholarName: profile.data.full_name || "Playbook Scholar",
+      recommenderName: String(body.recommenderName ?? ""),
+      recommenderEmail: String(body.recommenderEmail ?? ""),
       recommenderRole: body.recommenderRole,
-      opportunityName: body.opportunityName,
-      evidence: body.evidence || [],
+      opportunityName: String(body.opportunityName ?? ""),
+      evidence,
     });
 
     const sent = updateRecommenderRequestStatus(request, "sent");
-
     const { data, error } = await supabase
       .from("recommender_requests")
       .insert({
-        scholar_id: body.scholarId,
+        scholar_id: user.id,
         scholar_name: request.scholarName,
         recommender_name: request.recommenderName,
         recommender_email: request.recommenderEmail,
@@ -45,27 +58,15 @@ export async function POST(req: NextRequest) {
         evidence: request.evidence,
         status: sent.status,
       })
-      .select()
+      .select("id,scholar_id,scholar_name,recommender_name,recommender_email,recommender_role,opportunity_name,status,created_at")
       .single();
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 });
-    }
+    if (error) throw new Error(error.message);
 
     const email = buildRecommenderEmail({
       recommenderName: request.recommenderName,
       scholarName: request.scholarName,
       opportunityName: request.opportunityName,
       requestUrl: `${req.nextUrl.origin}/recommenders/${data.id}`,
-    });
-
-    await supabase.from("playbook_events").insert({
-      type: "action.assigned",
-      scholar_id: body.scholarId,
-      payload: {
-        title: "Recommendation request sent",
-        detail: `${request.recommenderName} was asked to write a letter for ${request.opportunityName}.`,
-      },
     });
 
     await sendPlaybookEmail({
@@ -80,11 +81,12 @@ export async function POST(req: NextRequest) {
       request: data,
       email,
       deliveryStatus: "sent",
-    });
-  } catch {
+      eventState: "governed_event_publisher_pending",
+    }, { status: 201 });
+  } catch (error) {
     return NextResponse.json(
-      { error: "Unable to create recommender request." },
-      { status: 500 }
+      { error: error instanceof Error ? error.message : "Unable to create recommender request." },
+      { status: 400 }
     );
   }
 }

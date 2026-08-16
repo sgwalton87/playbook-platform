@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import BrandPartnerVerificationGate from "@/components/brand/BrandPartnerVerificationGate";
 import {
   PlaybookButton,
   PlaybookCard,
@@ -23,6 +24,14 @@ const pathways = [
 ] as const;
 
 export default function BrandPartnerOSPage() {
+  return (
+    <BrandPartnerVerificationGate>
+      <BrandPartnerWorkspace />
+    </BrandPartnerVerificationGate>
+  );
+}
+
+function BrandPartnerWorkspace() {
   const [profile, setProfile] = useState<LegacyValue>(null);
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
 
@@ -64,10 +73,10 @@ export default function BrandPartnerOSPage() {
 
         <section style={identityRail} aria-live="polite">
           <div>
-            <PlaybookPill>{state === "ready" ? "Authenticated partner context" : state === "loading" ? "Connecting partner context" : "Partner context unavailable"}</PlaybookPill>
+            <PlaybookPill>{state === "ready" ? "Verified partner context" : state === "loading" ? "Connecting partner context" : "Partner context unavailable"}</PlaybookPill>
             <h2 style={identityTitle}>{organization}</h2>
           </div>
-          <p style={identityCopy}>{state === "error" ? "Your organization record could not be loaded. No partner or scholar data is being displayed." : "Partner identity and authority must be verified before campaigns or scholar records become available."}</p>
+          <p style={identityCopy}>{state === "error" ? "Your organization record could not be loaded. No partner or scholar data is being displayed." : "Organization identity, campaign scope, and compliance scope have passed the Brand Partner authority gate for this workspace."}</p>
         </section>
 
         <PlaybookMetrics>

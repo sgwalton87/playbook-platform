@@ -1,19 +1,47 @@
 import { ROLE_ONBOARDING } from "./config/roleConfigs";
-import { normalizeRole, getPathway } from "./pathwayMap";
+import { applyRoleOnboardingIndependence } from "./config/roleIndependence";
+import { getPathway } from "./pathwayMap";
+import { requirePlaybookRole, type PlaybookRole } from "@/lib/roles/registry";
 import type { OnboardingData, OnboardingStep } from "./types";
 
+function resolveExplicitOnboardingRole(role?: string | null): PlaybookRole {
+  if (role === undefined || role === null || String(role).trim() === "") {
+    return "scholar";
+  }
+  return requirePlaybookRole(role);
+}
+
+function publicCompletionSlug(role: PlaybookRole): string {
+  return role === "other" ? "community-partner" : role;
+}
+
 export function getOnboardingSteps(role?: string | null): OnboardingStep[] {
-  const normalized = normalizeRole(role);
-  return ROLE_ONBOARDING[normalized] || ROLE_ONBOARDING.scholar;
+  const normalized = resolveExplicitOnboardingRole(role);
+  const configured = ROLE_ONBOARDING[normalized];
+  if (!configured) {
+    throw new Error(`No onboarding contract is registered for ${normalized}.`);
+  }
+
+  return applyRoleOnboardingIndependence(normalized, configured);
 }
 
 export function getCanonicalOnboardingRoute(role?: string | null): string {
-  const normalized = normalizeRole(role);
+  const normalized = resolveExplicitOnboardingRole(role);
   return `/start?first=1&role=${encodeURIComponent(normalized)}`;
 }
 
 export function getOnboardingCompletionDestination(role?: string | null): string {
-  return getPathway(normalizeRole(role)).osRoute;
+  const normalized = resolveExplicitOnboardingRole(role);
+  return getPathway(normalized).osRoute;
+}
+
+export function getOnboardingCompletionEndpoint(role?: string | null): string {
+  const normalized = resolveExplicitOnboardingRole(role);
+  return `/api/pbos/onboarding/${encodeURIComponent(publicCompletionSlug(normalized))}`;
+}
+
+export function normalizeOnboardingRole(role?: string | null): PlaybookRole {
+  return resolveExplicitOnboardingRole(role);
 }
 
 export function createInitialOnboardingData(profile: Record<string, unknown> | null | undefined): OnboardingData {

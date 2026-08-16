@@ -1,102 +1,66 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireUser } from "@/lib/supabase/server";
-import { hasExistingReward } from "@/lib/trust/rewardGuard";
+
+const SUPPORTED_REACTIONS = new Set(["like"]);
 
 export async function POST(req: NextRequest) {
   const { supabase, user } = await requireUser();
 
   if (!user) {
-    return NextResponse.json(
-      { error: "Unauthorized" },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = await req.json();
-  const reaction = body.reaction || "like";
+  const body = await req.json() as { postId?: unknown; reaction?: unknown };
+  const reaction = String(body.reaction ?? "like").trim().toLowerCase();
+  const postId = String(body.postId ?? "").trim();
 
-  if (!body.postId) {
-    return NextResponse.json(
-      { error: "Missing post." },
-      { status: 400 }
-    );
+  if (!postId) {
+    return NextResponse.json({ error: "Missing post." }, { status: 400 });
+  }
+  if (!SUPPORTED_REACTIONS.has(reaction)) {
+    return NextResponse.json({ error: "Unsupported reaction." }, { status: 400 });
   }
 
-  const { data: post } = await supabase
+  const { data: post, error: postError } = await supabase
     .from("feed_posts")
-    .select("user_id")
-    .eq("id", body.postId)
+    .select("id")
+    .eq("id", postId)
     .single();
 
-  if (!post) {
-    return NextResponse.json(
-      { error: "Post not found." },
-      { status: 404 }
-    );
+  if (postError || !post) {
+    return NextResponse.json({ error: "Post not found." }, { status: 404 });
   }
 
-  const { data: existing } = await supabase
+  const { data: existing, error: existingError } = await supabase
     .from("feed_post_reactions")
     .select("id")
-    .eq("post_id", body.postId)
+    .eq("post_id", postId)
     .eq("user_id", user.id)
     .eq("reaction", reaction)
     .maybeSingle();
+  if (existingError) {
+    return NextResponse.json({ error: existingError.message }, { status: 400 });
+  }
 
   if (existing?.id) {
-    await supabase
+    const removed = await supabase
       .from("feed_post_reactions")
       .delete()
-      .eq("id", existing.id);
-
-    return NextResponse.json({
-      ok: true,
-      liked: false,
-    });
+      .eq("id", existing.id)
+      .eq("user_id", user.id);
+    if (removed.error) return NextResponse.json({ error: removed.error.message }, { status: 400 });
+    return NextResponse.json({ ok: true, liked: false });
   }
 
   const { data, error } = await supabase
     .from("feed_post_reactions")
-    .insert({
-      post_id: body.postId,
-      user_id: user.id,
-      reaction,
-    })
+    .insert({ post_id: postId, user_id: user.id, reaction })
     .select()
     .single();
 
-  if (error) {
-    return NextResponse.json(
-      { error: error.message },
-      { status: 400 }
-    );
-  }
+  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
 
-  // No reward for reacting to your own post.
-  if (post.user_id !== user.id) {
-    const rewarded = await hasExistingReward(supabase, {
-      scholarId: user.id,
-      eventType: "reaction.created",
-      sourceId: body.postId,
-    });
-
-    if (!rewarded) {
-      await supabase
-        .from("coin_ledger")
-        .insert({
-          scholar_id: user.id,
-          event_type: "reaction.created",
-          source_id: body.postId,
-          coins: 1,
-          xp: 1,
-          reason: "Encouraged a peer",
-        });
-    }
-  }
-
-  return NextResponse.json({
-    ok: true,
-    liked: true,
-    reaction: data,
-  });
+  // Rewards are intentionally not minted from this user-facing route. The
+  // governed reward issuer remains the only future authority for coins/XP.
+  return NextResponse.json({ ok: true, liked: true, reaction: data });
 }

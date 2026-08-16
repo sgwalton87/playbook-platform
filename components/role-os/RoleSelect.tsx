@@ -13,7 +13,6 @@ import { useState } from "react";
 export default function RoleSelect() {
   const router = useRouter();
   const [saving, setSaving] = useState("");
-
   const [error, setError] = useState("");
 
   async function choose(role: string) {
@@ -24,12 +23,8 @@ export default function RoleSelect() {
     const user = data?.user;
 
     if (user) {
-      const { error: saveError } = await supabase.from("profiles").upsert({
-        id: user.id,
-        role,
-        profile_mode: role,
-        requested_role: role,
-        updated_at: new Date().toISOString(),
+      const { error: saveError } = await supabase.rpc("select_playbook_role", {
+        desired_role: role,
       });
 
       if (saveError) {

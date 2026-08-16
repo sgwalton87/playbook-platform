@@ -1,35 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
 import { calculateRewardBalance } from "@/lib/reward-events";
-import { createClient } from "@supabase/supabase-js";
-
-function getSupabaseAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-}
+import { requireUser } from "@/lib/supabase/server";
 
 export async function GET(req: NextRequest) {
-  const supabase = getSupabaseAdmin();
+  try {
+    const { supabase, user } = await requireUser();
+    if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
 
-  const scholarId = req.nextUrl.searchParams.get("scholarId");
+    const requestedScholarId = req.nextUrl.searchParams.get("scholarId");
+    if (requestedScholarId && requestedScholarId !== user.id) {
+      return NextResponse.json({ error: "Reward balance is private to the authenticated account." }, { status: 403 });
+    }
 
-  if (!scholarId) {
-    return NextResponse.json({ error: "Missing scholarId" }, { status: 400 });
+    const { data, error } = await supabase
+      .from("coin_ledger")
+      .select("id,scholar_id,event_type,source_id,coins,xp,reason,created_at")
+      .eq("scholar_id", user.id)
+      .order("created_at", { ascending: false });
+
+    if (error) throw new Error(error.message);
+
+    return NextResponse.json({
+      entries: data || [],
+      balance: calculateRewardBalance(data || []),
+    });
+  } catch (error) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Unable to load reward balance." }, { status: 400 });
   }
-
-  const { data, error } = await supabase
-    .from("coin_ledger")
-    .select("*")
-    .eq("scholar_id", scholarId)
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
-  }
-
-  return NextResponse.json({
-    entries: data || [],
-    balance: calculateRewardBalance(data || []),
-  });
 }

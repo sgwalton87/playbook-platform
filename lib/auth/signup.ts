@@ -1,4 +1,4 @@
-import { normalizePlaybookRole, type PlaybookRole } from "@/lib/roles/registry";
+import { requirePlaybookRole, type PlaybookRole } from "@/lib/roles/registry";
 
 export const SIGNUP_PASSWORD_MIN_LENGTH = 8;
 
@@ -10,7 +10,7 @@ export type SignupMetadata = {
 };
 
 export function buildSignupMetadata(role?: string | null): SignupMetadata {
-  const normalizedRole = normalizePlaybookRole(role);
+  const normalizedRole = requirePlaybookRole(role);
 
   return {
     role: normalizedRole,

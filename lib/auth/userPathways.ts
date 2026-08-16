@@ -4,6 +4,7 @@ export type UserPathway = {
   short: string;
   full: string;
   nextStep: string;
+  entryMode?: "self-service" | "scholar-invitation";
 };
 
 export const USER_PATHWAYS: UserPathway[] = [
@@ -38,9 +39,10 @@ export const USER_PATHWAYS: UserPathway[] = [
   {
     role: "mentor",
     label: "Mentor",
-    short: "Guide scholars through goals, applications, and life transitions.",
-    full: "Mentors offer guidance, expertise, recommendations, career support, and trusted adult relationships.",
-    nextStep: "After confirming your email, you will complete Mentor onboarding.",
+    short: "Scholar invitation required, followed by support-system validation.",
+    full: "Mentors offer guidance, expertise, recommendations, career support, and trusted adult relationships only after a Scholar invitation and the governed validation threshold.",
+    nextStep: "Use the Scholar invitation link to create or sign in to your account, complete Mentor onboarding, and enter Mentor OS for validation.",
+    entryMode: "scholar-invitation",
   },
   {
     role: "educator",
@@ -107,10 +109,10 @@ export const USER_PATHWAYS: UserPathway[] = [
   },
   {
     role: "other",
-    label: "Other",
-    short: "Community partner or other support role.",
-    full: "Other users may request access as community partners or support roles.",
-    nextStep: "After confirming your email, your access may be reviewed.",
+    label: "Community Partner",
+    short: "Programs, referrals, resources, events, and accountable community support.",
+    full: "Community partners connect verified programs, services, referrals, events, and local capacity to the Scholar journey through explicit relationship scope.",
+    nextStep: "After confirming your email, you will complete Community Partner onboarding and enter Community Partner OS for authority review.",
   },
 ];
 
