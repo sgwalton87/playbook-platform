@@ -2,7 +2,7 @@ import {
   PLAYBOOK_ROLES,
   PUBLIC_ONBOARDING_ROLES,
   getRoleDefinition,
-  normalizePlaybookRole,
+  requirePlaybookRole,
   type PlaybookRole,
 } from "@/lib/roles/registry";
 
@@ -14,12 +14,19 @@ export const PLAYBOOK_PATHWAYS = PUBLIC_ONBOARDING_ROLES.map((role) => ({
   osRoute: PLAYBOOK_ROLES[role].osRoute,
 }));
 
+function resolvePathwayRole(role?: string | null): PlaybookRole {
+  if (role === undefined || role === null || String(role).trim() === "") {
+    return "scholar";
+  }
+  return requirePlaybookRole(role);
+}
+
 export function normalizeRole(role?: string | null): PlaybookRole {
-  return normalizePlaybookRole(role);
+  return resolvePathwayRole(role);
 }
 
 export function getPathway(role?: string | null) {
-  const normalized = normalizePlaybookRole(role);
+  const normalized = resolvePathwayRole(role);
   const definition = getRoleDefinition(normalized);
   return { role: normalized, label: definition.label, osRoute: definition.osRoute };
 }
