@@ -43,6 +43,10 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "Invalid verification review request." }, { status: 400 });
   }
 
+  if ((decision === "approved" || decision === "rejected") && !notes) {
+    return NextResponse.json({ error: "A decision reason is required to approve or reject verification." }, { status: 400 });
+  }
+
   const { data, error } = await supabase.rpc("review_verification_request", {
     requested_type: requestType,
     requested_id: requestId,
