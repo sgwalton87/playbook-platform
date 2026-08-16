@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
 
     const profile = await supabase
       .from("profiles")
-      .select("role,profile_mode,onboarding_completed,verification_status")
+      .select("role,profile_mode,verification_status")
       .eq("id", user.id)
       .maybeSingle();
     if (profile.error) throw new Error(profile.error.message);
@@ -37,18 +37,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!profile.data.onboarding_completed) {
-      return NextResponse.json(
-        { error: `${contract.role} must finish its role-specific onboarding form before completion can be submitted.` },
-        { status: 409 }
-      );
-    }
-
     if (contract.state !== "implemented") {
       if (profile.data.verification_status !== "approved") {
-        // Role equality was already proven above. Bind the mutation only to the
-        // authenticated profile ID so a legacy null profile_mode cannot silently
-        // prevent the pending state from being recorded.
         const pending = await supabase
           .from("profiles")
           .update({ verification_status: "pending" })
@@ -56,12 +46,20 @@ export async function POST(request: NextRequest) {
         if (pending.error) throw new Error(pending.error.message);
       }
 
+      const completedAt = new Date().toISOString();
+      const completed = await supabase
+        .from("profiles")
+        .update({ onboarding_completed: true, onboarding_completed_at: completedAt })
+        .eq("id", user.id);
+      if (completed.error) throw new Error(completed.error.message);
+
       return NextResponse.json(
         {
           ok: true,
           role: contract.role,
           adapter: contract.adapter,
           onboardingSubmitted: true,
+          onboardingCompletedAt: completedAt,
           activationState: contract.state,
           requirement: contract.requirement,
           destination: contract.destination,
@@ -71,10 +69,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // The three currently implemented learner roles share the canonical Scholar
-    // Record service, but only after this role-bound endpoint proves that the URL
-    // role and durable profile role are identical. The underlying service then
-    // enforces PBOS identity-role equality before persistence.
+    // Implemented learner roles delegate only after URL-role and authenticated
+    // durable-role equality are proven. The underlying service performs PBOS
+    // role equality, persistence, and final profile completion atomically from
+    // the user's perspective: any failure leaves onboarding incomplete.
     return await completeScholarRecord(request);
   } catch (error) {
     return NextResponse.json(
