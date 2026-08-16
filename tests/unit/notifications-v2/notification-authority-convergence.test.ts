@@ -27,7 +27,10 @@ describe("canonical notification authority", () => {
     expect(migration).toContain("revoke insert, update, delete on public.pbos_notification_outbox from authenticated, anon");
     expect(migration).toContain("verification_review_notification");
     expect(migration).toContain("learning_credential_notification");
-    expect(migration).toContain("owner-writable opportunity/application rows must not be trusted notification producers yet");
+    expect(migration).toContain("drop trigger if exists opportunity_recommendation_notification on public.pbos_opportunity_recommendations");
+    expect(migration).toContain("drop trigger if exists application_event_notification on public.application_workspace_events");
+    expect(migration).not.toContain("create trigger opportunity_recommendation_notification");
+    expect(migration).not.toContain("create trigger application_event_notification");
   });
 
   it("surfaces verification, opportunity, milestone, and intervention categories", () => {
