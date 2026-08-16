@@ -17,8 +17,15 @@ select to_regprocedure('public.get_public_network_directory(text,integer)') is n
   \quit 1
 \endif
 
+select to_regprocedure('public.get_network_member_identities(uuid[])') is not null as network_identity_rpc_exists \gset
+\if :network_identity_rpc_exists
+\else
+  \echo 'missing get_network_member_identities(uuid[])'
+  \quit 1
+\endif
+
 -- Anonymous users may resolve only explicitly requested public identities, not
--- browse the network directory.
+-- browse the network directory or relationship-aware identity surface.
 select has_function_privilege('anon', 'public.get_public_member_identities(uuid[])', 'EXECUTE') as anon_member_identity_exec \gset
 \if :anon_member_identity_exec
 \else
@@ -32,10 +39,23 @@ select has_function_privilege('anon', 'public.get_public_network_directory(text,
   \quit 1
 \endif
 
+select has_function_privilege('anon', 'public.get_network_member_identities(uuid[])', 'EXECUTE') as anon_network_identity_exec \gset
+\if :anon_network_identity_exec
+  \echo 'anon must not resolve relationship-aware identities'
+  \quit 1
+\endif
+
 select has_function_privilege('authenticated', 'public.get_public_network_directory(text,integer)', 'EXECUTE') as auth_directory_exec \gset
 \if :auth_directory_exec
 \else
   \echo 'authenticated must be able to browse bounded public network identities'
+  \quit 1
+\endif
+
+select has_function_privilege('authenticated', 'public.get_network_member_identities(uuid[])', 'EXECUTE') as auth_network_identity_exec \gset
+\if :auth_network_identity_exec
+\else
+  \echo 'authenticated must be able to resolve governed connection identities'
   \quit 1
 \endif
 
