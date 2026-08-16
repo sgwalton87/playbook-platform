@@ -1,4 +1,5 @@
 import { ROLE_ONBOARDING } from "./config/roleConfigs";
+import { applyRoleOnboardingIndependence } from "./config/roleIndependence";
 import { getPathway } from "./pathwayMap";
 import { requirePlaybookRole, type PlaybookRole } from "@/lib/roles/registry";
 import type { OnboardingData, OnboardingStep } from "./types";
@@ -17,13 +18,7 @@ export function getOnboardingSteps(role?: string | null): OnboardingStep[] {
     throw new Error(`No onboarding contract is registered for ${normalized}.`);
   }
 
-  // Transition-Aged Youth is an independent pathway. It may reuse shared
-  // Scholar components, but it must never inherit Scholar-Athlete questions.
-  if (normalized === "transition-youth") {
-    return configured.filter((step) => step.id !== "athlete-profile" && step.id !== "athlete-recruiting");
-  }
-
-  return configured;
+  return applyRoleOnboardingIndependence(normalized, configured);
 }
 
 export function getCanonicalOnboardingRoute(role?: string | null): string {
