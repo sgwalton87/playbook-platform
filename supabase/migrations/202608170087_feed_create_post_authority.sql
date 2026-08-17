@@ -29,8 +29,11 @@ alter table public.feed_posts add column if not exists media_url text;
 alter table public.feed_posts add column if not exists media_type text;
 alter table public.feed_posts add column if not exists album_id uuid;
 
--- Reconcile the production foreign-key lineage without duplicating constraints.
+-- Reconcile canonical foreign-key lineage.
 do $$
+declare
+  album_fk_target text;
+  incompatible_album_rows bigint;
 begin
   if not exists (
     select 1 from pg_constraint
@@ -42,15 +45,29 @@ begin
       foreign key (user_id) references public.profiles(id) on delete cascade;
   end if;
 
-  if to_regclass('public.albums') is not null
-     and not exists (
-       select 1 from pg_constraint
-       where conrelid='public.feed_posts'::regclass
-         and conname='feed_posts_album_id_fkey'
-     ) then
-    alter table public.feed_posts
-      add constraint feed_posts_album_id_fkey
-      foreign key (album_id) references public.albums(id) on delete set null;
+  select ref.relname into album_fk_target
+  from pg_constraint c
+  join pg_class ref on ref.oid=c.confrelid
+  where c.conrelid='public.feed_posts'::regclass
+    and c.conname='feed_posts_album_id_fkey'
+    and c.contype='f';
+
+  if album_fk_target is distinct from 'profile_albums' then
+    select count(*) into incompatible_album_rows
+    from public.feed_posts fp
+    where fp.album_id is not null
+      and not exists (
+        select 1 from public.profile_albums pa where pa.id=fp.album_id
+      );
+
+    if incompatible_album_rows=0 then
+      alter table public.feed_posts drop constraint if exists feed_posts_album_id_fkey;
+      alter table public.feed_posts
+        add constraint feed_posts_album_id_fkey
+        foreign key (album_id) references public.profile_albums(id) on delete set null;
+    elsif album_fk_target is null then
+      raise exception 'Feed album lineage cannot be established: % album references do not resolve to canonical profile_albums.', incompatible_album_rows;
+    end if;
   end if;
 end;
 $$;
