@@ -8,12 +8,12 @@ const read = (file: string) => fs.readFileSync(path.join(root, file), "utf8");
 describe("Network notification convergence", () => {
   it("processes only the authenticated owner's bounded trusted pending outbox", () => {
     const source = read("app/api/notifications/route.ts");
-    expect(source).toContain('export async function POST()');
-    expect(source).toContain('.eq("owner_id", user.id)');
-    expect(source).toContain('.eq("state", "PENDING")');
-    expect(source).toContain('.limit(25)');
-    expect(source).toContain('await deliver(supabase, user.id, outbox)');
-    expect(source).not.toContain('request.json()');
+    const postSource = source.split("export async function POST()")[1]?.split("export async function PATCH")[0] ?? "";
+    expect(postSource).toContain('.eq("owner_id", user.id)');
+    expect(postSource).toContain('.eq("state", "PENDING")');
+    expect(postSource).toContain('.limit(25)');
+    expect(postSource).toContain('await deliver(supabase, user.id, outbox)');
+    expect(postSource).not.toContain('request.json()');
   });
 
   it("drains trusted pending events before reading the attention center", () => {
