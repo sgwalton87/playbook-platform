@@ -19,6 +19,22 @@ describe("canonical network and feed convergence", () => {
     expect(source).not.toContain('.from("profiles")');
   });
 
+  it("sends discovery search to the server instead of filtering a capped directory snapshot", () => {
+    const source = read("app/connections/page.tsx");
+    expect(source).toContain("const normalizedSearch = discoverySearch.trim()");
+    expect(source).toContain("search_text: normalizedSearch || null");
+    expect(source).toContain('tab === "discover" ? search : ""');
+    expect(source).toContain('if (tab === "discover") return source');
+    expect(source).not.toContain("search_text: null, result_limit: 100");
+  });
+
+  it("resolves every relationship identity in bounded RPC batches rather than dropping relationships after 100", () => {
+    const source = read("app/connections/page.tsx");
+    expect(source).toContain("chunks(relationshipIds, 100)");
+    expect(source).toContain('rpc("get_network_member_identities"');
+    expect(source).not.toContain("relationshipIds = [...new Set([...connectedIds, ...sentRequests.keys(), ...incomingRequests.keys()])].slice(0, 100)");
+  });
+
   it("routes the Network connection lifecycle through governed RPCs only", () => {
     const source = read("app/connections/page.tsx");
     expect(source).toContain('rpc("send_connection_request"');
