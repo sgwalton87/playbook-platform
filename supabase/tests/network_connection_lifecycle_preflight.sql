@@ -101,9 +101,8 @@ begin
 end;
 $$;
 
--- Seed disposable identities inside this transaction. auth.users accepts id/email
--- as the only non-default values required by the local Supabase schema. Any
--- profile trigger is reconciled by the ON CONFLICT update below.
+-- Seed disposable identities inside this transaction. Any auth-profile trigger is
+-- reconciled by the ON CONFLICT update below.
 insert into auth.users(id,email)
 values
   ('00000000-0000-0000-0000-00000000a001','network-audit-a@example.invalid'),
@@ -161,18 +160,19 @@ begin
 end;
 $$;
 
--- Requester A sends a valid request to consented recipient B.
+-- Requester A sends a valid request to consented recipient B and stores the ID
+-- in a transaction-local setting that quoted DO blocks can safely read.
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000a001',true);
-select request_id as accepted_candidate_id
+select set_config('audit.accepted_candidate_id',request_id::text,true)
 from public.send_connection_request(
   '00000000-0000-0000-0000-00000000b001'::uuid,
   'audit acceptance'
-) \gset
+);
 
 -- Requester self-accept must fail and leave both request and graph unchanged.
 do $$
 declare
-  target_id uuid := :'accepted_candidate_id';
+  target_id uuid := current_setting('audit.accepted_candidate_id')::uuid;
 begin
   perform set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000a001',true);
   begin
@@ -200,13 +200,17 @@ begin
 end;
 $$;
 
--- Recipient B accepts. Both reciprocal edges must appear in the same RPC result.
+-- Recipient B accepts. Both reciprocal edges must appear in the same database
+-- transaction as the accepted request state.
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000b001',true);
-select * from public.respond_to_connection_request(:'accepted_candidate_id'::uuid,'accepted');
+select * from public.respond_to_connection_request(
+  current_setting('audit.accepted_candidate_id')::uuid,
+  'accepted'
+);
 
 do $$
 declare
-  target_id uuid := :'accepted_candidate_id';
+  target_id uuid := current_setting('audit.accepted_candidate_id')::uuid;
   edge_count integer;
 begin
   if not exists (select 1 from public.connection_requests where id=target_id and status='accepted' and responded_at is not null) then
@@ -242,15 +246,15 @@ $$;
 
 -- Cancellation is requester-only.
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000a001',true);
-select request_id as cancel_candidate_id
+select set_config('audit.cancel_candidate_id',request_id::text,true)
 from public.send_connection_request(
   '00000000-0000-0000-0000-00000000d001'::uuid,
   'audit cancellation'
-) \gset
+);
 
 do $$
 declare
-  target_id uuid := :'cancel_candidate_id';
+  target_id uuid := current_setting('audit.cancel_candidate_id')::uuid;
 begin
   perform set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000d001',true);
   begin
@@ -267,13 +271,15 @@ end;
 $$;
 
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000a001',true);
-select * from public.cancel_connection_request(:'cancel_candidate_id'::uuid);
+select * from public.cancel_connection_request(current_setting('audit.cancel_candidate_id')::uuid);
 
 do $$
 begin
   if not exists (
     select 1 from public.connection_requests
-    where id=:'cancel_candidate_id'::uuid and status='cancelled' and responded_at is not null
+    where id=current_setting('audit.cancel_candidate_id')::uuid
+      and status='cancelled'
+      and responded_at is not null
   ) then
     raise exception 'Requester cancellation did not transition the request to cancelled.';
   end if;
