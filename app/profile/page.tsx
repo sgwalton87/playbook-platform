@@ -38,6 +38,7 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState("personal");
 
   const [firstName, setFirstName] = useState("");
@@ -129,17 +130,35 @@ export default function ProfilePage() {
   const uploadAvatar = async (file: File) => {
     if(!profile?.id)return;
     setUploading(true);
-    const ext=file.name.split(".").pop();
-    const path=`${profile.id}/avatar.${ext}`;
-    const{error}=await supabase.storage.from("avatars").upload(path,file,{upsert:true});
-    if(!error){const{data}=supabase.storage.from("avatars").getPublicUrl(path);setAvatarUrl(data.publicUrl);await supabase.from("profiles").update({avatar_url:data.publicUrl}).eq("id",profile.id);}
-    setUploading(false);
+    setSaveError(null);
+    try {
+      const ext=file.name.split(".").pop();
+      const path=`${profile.id}/avatar.${ext}`;
+      const{error}=await supabase.storage.from("avatars").upload(path,file,{upsert:true});
+      if(error) throw new Error(error.message);
+      const{data}=supabase.storage.from("avatars").getPublicUrl(path);
+      const { data: updated, error: profileError } = await supabase
+        .from("profiles")
+        .update({avatar_url:data.publicUrl})
+        .eq("id",profile.id)
+        .select("id")
+        .maybeSingle();
+      if(profileError || !updated) throw new Error(profileError?.message || "Your profile photo could not be linked to your profile.");
+      setAvatarUrl(data.publicUrl);
+      setProfile((prev: LegacyValue) => ({ ...prev, avatar_url: data.publicUrl }));
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : "Your profile photo could not be saved.");
+    } finally {
+      setUploading(false);
+    }
   };
 
   const save = async () => {
     if(!profile?.id)return;
     setSaving(true);
-    await supabase.from("profiles").update({
+    setSaved(false);
+    setSaveError(null);
+    const { data: updated, error } = await supabase.from("profiles").update({
       first_name:firstName,last_name:lastName,full_name:`${firstName} ${lastName}`.trim(),bio,gender,date_of_birth:dob||null,favorite_quote:favoriteQuote||null,
       school,grade,school_district:district,grad_year:gradYear,weighted_gpa:weightedGpa||null,unweighted_gpa:unweightedGpa||null,city,zip_code:zipCode,english_language_learner:ell,dream_school:dreamSchool||null,sat_score:satScore||null,act_score:actScore||null,intended_major:intendedMajor||null,
       college_list_2:collegeList[0]||null,college_list_3:collegeList[1]||null,college_list_4:collegeList[2]||null,college_list_5:collegeList[3]||null,college_list_6:collegeList[4]||null,college_list_7:collegeList[5]||null,college_list_8:collegeList[6]||null,college_list_9:collegeList[7]||null,college_list_10:collegeList[8]||null,
@@ -148,8 +167,13 @@ export default function ProfilePage() {
       nil_instagram:nilInstagram||null,nil_tiktok:nilTiktok||null,nil_twitter:nilTwitter||null,nil_follower_range:nilFollowerRange||null,nil_brand_interests:nilBrandInterests.length>0?nilBrandInterests:null,nil_worked_with_brands:nilWorkedWithBrands,nil_deal_types:nilDealTypes.length>0?nilDealTypes:null,
       instagram:instagram||null,tiktok:tiktok||null,twitter:twitter||null,hudl:hudl||null,youtube:youtube||null,
       pillars,race:race||null,household_income:householdIncome||null,first_generation:firstGen,free_reduced_lunch:freeLunch,migrant_student:migrant,foster_youth:fosterYouth,unhoused,has_iep:iep,
-    }).eq("id",profile.id);
-    setSaving(false);setSaved(true);setTimeout(()=>setSaved(false),3000);
+    }).eq("id",profile.id).select("id").maybeSingle();
+    setSaving(false);
+    if(error || !updated){
+      setSaveError(error?.message || "Your profile changes could not be saved.");
+      return;
+    }
+    setSaved(true);setTimeout(()=>setSaved(false),3000);
   };
 
   if(loading)return<><div style={{padding:40,fontFamily:"'Space Mono',monospace",fontSize:12,color:T.faint}}>Loading profile...</div></>;
@@ -504,8 +528,9 @@ export default function ProfilePage() {
         )}
 
         {/* Save bottom */}
-        <div style={{display:"flex",justifyContent:"flex-end",gap:10,alignItems:"center",paddingTop:16}}>
-          {saved&&<span style={{fontFamily:T.mono,fontSize:11,color:T.green,fontWeight:700}}>✓ All changes saved!</span>}
+        <div style={{display:"flex",justifyContent:"flex-end",gap:10,alignItems:"center",paddingTop:16,flexWrap:"wrap"}}>
+          {saveError&&<span role="alert" aria-live="assertive" style={{fontFamily:T.mono,fontSize:11,color:"#B91C1C",fontWeight:700,maxWidth:520}}>{saveError}</span>}
+          {saved&&<span role="status" aria-live="polite" style={{fontFamily:T.mono,fontSize:11,color:T.green,fontWeight:700}}>✓ All changes saved!</span>}
           <button onClick={save} disabled={saving} style={{fontFamily:T.mono,fontSize:11,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",background:saving?T.line:T.orange,color:saving?T.muted:"#fff",border:"none",borderRadius:12,padding:"13px 24px",cursor:saving?"default":"pointer"}}>
             {saving?"Saving...":"Save changes →"}
           </button>
