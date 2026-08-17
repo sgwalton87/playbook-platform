@@ -49,7 +49,7 @@ function ApplicantsWorkspace() {
 
   useEffect(() => {
     let active = true;
-    if (!selectedId) { setApplicants([]); return () => { active = false; }; }
+    if (!selectedId) return () => { active = false; };
     const timer = window.setTimeout(() => {
       setLoadingApplicants(true); setError("");
       void supabase.rpc("get_marketplace_applicants", { requested_opportunity_id: selectedId }).then((result) => {
@@ -81,7 +81,7 @@ function ApplicantsWorkspace() {
       {error ? <div role="alert" style={alert}>{error}</div> : null}
 
       {loading ? <div style={empty}>Loading owned Marketplace opportunities…</div> : opportunities.length === 0 ? <PlaybookCard eyebrow="Opportunity applicants" title="No published opportunities yet"><p style={copy}>Publish a Marketplace listing through human review first. Playbook does not fabricate applicants or open Scholar records just because a partner is verified.</p></PlaybookCard> : <>
-        <label style={selector}>Opportunity<select value={selectedId} onChange={(event) => setSelectedId(event.target.value)} style={select}>{opportunities.map((item) => <option key={item.id} value={item.id}>{item.title} · {item.status}</option>)}</select></label>
+        <label style={selector}>Opportunity<select value={selectedId} onChange={(event) => { setApplicants([]); setSelectedId(event.target.value); }} style={select}>{opportunities.map((item) => <option key={item.id} value={item.id}>{item.title} · {item.status}</option>)}</select></label>
         {selected ? <div style={selectedRail}><div><PlaybookPill>{selected.opportunity_type}</PlaybookPill><h2 style={selectedTitle}>{selected.title}</h2></div><p style={selectedCopy}>{selected.deadline ? `Deadline ${selected.deadline}` : "No listed deadline"} · {selected.status}</p></div> : null}
         {loadingApplicants ? <div style={empty}>Loading consented applicant roster…</div> : applicants.length === 0 ? <PlaybookCard eyebrow="Consented applicants" title="No active applicant shares"><p style={copy}>No Scholar has explicitly shared a submitted Application Workspace with this opportunity. That is a valid empty state; publication does not create applicant access.</p></PlaybookCard> : <PlaybookGrid min={320}>{applicants.map((applicant) => <PlaybookCard key={applicant.submission_id} eyebrow="Consented applicant" title={applicant.scholar_display_name}>
           <div style={pillRow}><PlaybookPill>{applicant.application_status}</PlaybookPill><PlaybookPill>Shared {new Date(applicant.submitted_at).toLocaleDateString()}</PlaybookPill></div>
