@@ -10,11 +10,12 @@ export default function ScholarAthleteOSPage() {
       <section aria-label="Recruiting command center" style={recruitingLaunch}>
         <div>
           <p style={eyebrow}>Recruiting is now actionable</p>
-          <h2 style={title}>Build the athlete record, then move real recruiting and NIL evidence forward.</h2>
-          <p style={copy}>Keep sport, position, graduation year, highlight film, targets, recruiting history, and NIL opportunity status connected to one private Scholar-Athlete journey without manufacturing performance, coach interest, or deal approval.</p>
+          <h2 style={title}>Build the athlete record, preserve the evidence, then move real opportunities forward.</h2>
+          <p style={copy}>Keep sport, position, graduation year, highlight film, measurements, statistics, targets, recruiting history, and NIL opportunity status connected to one private Scholar-Athlete journey without manufacturing performance, coach interest, or deal approval.</p>
         </div>
         <div style={actions}>
           <Link href="/recruiting/profile" style={cta}>Build Athlete Profile & Film</Link>
+          <Link href="/recruiting/evidence" style={secondaryCta}>Open Athletic Evidence Ledger</Link>
           <Link href="/recruiting" style={secondaryCta}>Open Recruiting Command Center</Link>
           <Link href="/recruiting/timeline" style={secondaryCta}>View Recruiting Timeline</Link>
           <Link href="/recruiting/nil" style={secondaryCta}>Track NIL Deal Readiness</Link>
