@@ -1,9 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PlaybookButton, PlaybookCard, PlaybookGrid, PlaybookHero, PlaybookMetric, PlaybookMetrics, PlaybookPage, PlaybookPill } from "@/components/ui";
 import { supabase } from "@/lib/supabaseClient";
+
+const EVENT_TYPES = ["community", "workshop", "lab", "civic", "social", "virtual", "course", "networking", "summit"] as const;
 
 type EventOperation = {
   id: string;
@@ -20,11 +22,43 @@ type EventOperation = {
 
 type DraftConfig = { replayUrl: string; networkingEnabled: boolean; checkInEnabled: boolean };
 type CreatedCheckIn = { eventId: string; token: string; validFrom: string; validUntil: string };
+type NewEvent = {
+  title: string;
+  description: string;
+  eventType: typeof EVENT_TYPES[number];
+  pillar: string;
+  startsAt: string;
+  endsAt: string;
+  timezone: string;
+  location: string;
+  virtualUrl: string;
+  capacity: string;
+  xpReward: string;
+  coinReward: string;
+  publishNow: boolean;
+};
+
+const EMPTY_EVENT: NewEvent = {
+  title: "",
+  description: "",
+  eventType: "community",
+  pillar: "Community",
+  startsAt: "",
+  endsAt: "",
+  timezone: "America/Los_Angeles",
+  location: "",
+  virtualUrl: "",
+  capacity: "",
+  xpReward: "0",
+  coinReward: "0",
+  publishNow: true,
+};
 
 export default function EventOperationsPage() {
   const router = useRouter();
   const [events, setEvents] = useState<EventOperation[]>([]);
   const [drafts, setDrafts] = useState<Record<string, DraftConfig>>({});
+  const [newEvent, setNewEvent] = useState<NewEvent>(EMPTY_EVENT);
   const [createdCheckIn, setCreatedCheckIn] = useState<CreatedCheckIn | null>(null);
   const [loading, setLoading] = useState(true);
   const [forbidden, setForbidden] = useState(false);
@@ -75,6 +109,49 @@ export default function EventOperationsPage() {
 
   function patchDraft(eventId: string, patch: Partial<DraftConfig>) {
     setDrafts((current) => ({ ...current, [eventId]: { ...(current[eventId] || { replayUrl: "", networkingEnabled: false, checkInEnabled: false }), ...patch } }));
+  }
+
+  function patchNewEvent(patch: Partial<NewEvent>) {
+    setNewEvent((current) => ({ ...current, ...patch }));
+  }
+
+  async function createEvent(eventSubmit: FormEvent<HTMLFormElement>) {
+    eventSubmit.preventDefault();
+    setBusy("create");
+    setError("");
+    setMessage("");
+
+    const startsAt = new Date(newEvent.startsAt);
+    const endsAt = new Date(newEvent.endsAt);
+    if (Number.isNaN(startsAt.getTime()) || Number.isNaN(endsAt.getTime()) || endsAt <= startsAt) {
+      setError("Choose a valid Event start and an end after the start.");
+      setBusy("");
+      return;
+    }
+
+    const response = await fetch("/api/admin/events", {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        ...newEvent,
+        startsAt: startsAt.toISOString(),
+        endsAt: endsAt.toISOString(),
+        capacity: newEvent.capacity || null,
+        xpReward: newEvent.xpReward || "0",
+        coinReward: newEvent.coinReward || "0",
+      }),
+    });
+    const body = await response.json().catch(() => ({})) as { eventId?: string; error?: string };
+    if (!response.ok || !body.eventId) {
+      setError(body.error || "Event could not be created.");
+      setBusy("");
+      return;
+    }
+
+    setMessage(`${label(newEvent.eventType)} Event created through the shared Event service.`);
+    setNewEvent(EMPTY_EVENT);
+    await load();
+    setBusy("");
   }
 
   async function saveExperience(event: EventOperation) {
@@ -144,13 +221,13 @@ export default function EventOperationsPage() {
   }
 
   if (forbidden) {
-    return <PlaybookPage><PlaybookHero eyebrow="Governed access" title="Event Operations" subtitle="This workspace is restricted to Playbook platform operators." /><PlaybookCard eyebrow="Default deny" title="Operator authority required"><p style={copy}>Event configuration and check-in token generation are protected by database operator authority, not by route visibility.</p></PlaybookCard></PlaybookPage>;
+    return <PlaybookPage><PlaybookHero eyebrow="Governed access" title="Event Operations" subtitle="This workspace is restricted to Playbook platform operators." /><PlaybookCard eyebrow="Default deny" title="Operator authority required"><p style={copy}>Event creation, configuration, and check-in token generation are protected by database operator authority, not by route visibility.</p></PlaybookCard></PlaybookPage>;
   }
 
   return (
     <PlaybookPage>
       <div data-testid="event-operations" data-visual-canon="PGEO-001">
-        <PlaybookHero eyebrow="Founder / Admin" title="Event Operations" subtitle="Configure the shared Event service without creating a parallel admin-only event system. Replay, networking, and check-in controls extend the canonical community event record.">
+        <PlaybookHero eyebrow="Founder / Admin" title="Event Operations" subtitle="Create and configure the shared Event service without creating parallel event systems. Summit is a canonical Event type and inherits the same governed RSVP, reminders, check-in, attendance, networking, replay, and rewards.">
           <div style={heroActions}>
             <PlaybookButton href="/admin">Admin Review Center</PlaybookButton>
             <PlaybookButton href="/events" variant="secondary">Open Events</PlaybookButton>
@@ -166,6 +243,26 @@ export default function EventOperationsPage() {
         {error ? <div role="alert" style={alert}>{error}</div> : null}
         {message ? <div role="status" aria-live="polite" style={status}>{message}</div> : null}
 
+        <PlaybookCard eyebrow="Shared Event creator" title="Create an Event or Summit">
+          <p style={copy}>Summit is a type of the canonical Community Event record—not a separate event database. Every created Summit automatically uses the shared Event lifecycle.</p>
+          <form onSubmit={createEvent} style={createGrid}>
+            <label style={field}>Title<input required minLength={3} value={newEvent.title} onChange={(e) => patchNewEvent({ title: e.target.value })} style={input} /></label>
+            <label style={field}>Event type<select value={newEvent.eventType} onChange={(e) => patchNewEvent({ eventType: e.target.value as NewEvent["eventType"] })} style={input}>{EVENT_TYPES.map((type) => <option key={type} value={type}>{label(type)}</option>)}</select></label>
+            <label style={{ ...field, gridColumn: "1 / -1" }}>Description<textarea required minLength={10} value={newEvent.description} onChange={(e) => patchNewEvent({ description: e.target.value })} style={textarea} /></label>
+            <label style={field}>Pillar<input value={newEvent.pillar} onChange={(e) => patchNewEvent({ pillar: e.target.value })} style={input} /></label>
+            <label style={field}>Timezone<input value={newEvent.timezone} onChange={(e) => patchNewEvent({ timezone: e.target.value })} style={input} /></label>
+            <label style={field}>Starts<input required type="datetime-local" value={newEvent.startsAt} onChange={(e) => patchNewEvent({ startsAt: e.target.value })} style={input} /></label>
+            <label style={field}>Ends<input required type="datetime-local" value={newEvent.endsAt} onChange={(e) => patchNewEvent({ endsAt: e.target.value })} style={input} /></label>
+            <label style={field}>Location<input value={newEvent.location} onChange={(e) => patchNewEvent({ location: e.target.value })} style={input} /></label>
+            <label style={field}>Virtual URL<input type="url" value={newEvent.virtualUrl} onChange={(e) => patchNewEvent({ virtualUrl: e.target.value })} placeholder="https://…" style={input} /></label>
+            <label style={field}>Capacity<input type="number" min={1} step={1} value={newEvent.capacity} onChange={(e) => patchNewEvent({ capacity: e.target.value })} style={input} /></label>
+            <label style={field}>XP reward<input type="number" min={0} step={1} value={newEvent.xpReward} onChange={(e) => patchNewEvent({ xpReward: e.target.value })} style={input} /></label>
+            <label style={field}>Coin reward<input type="number" min={0} step={1} value={newEvent.coinReward} onChange={(e) => patchNewEvent({ coinReward: e.target.value })} style={input} /></label>
+            <label style={checkRow}><input type="checkbox" checked={newEvent.publishNow} onChange={(e) => patchNewEvent({ publishNow: e.target.checked })} /> Publish immediately</label>
+            <div style={{ ...actions, gridColumn: "1 / -1" }}><button type="submit" disabled={busy === "create"} style={primaryButton}>{busy === "create" ? "Creating…" : newEvent.eventType === "summit" ? "Create Summit Event" : "Create Event"}</button></div>
+          </form>
+        </PlaybookCard>
+
         {createdCheckIn ? <section style={tokenPanel} aria-label="New check-in token">
           <PlaybookPill>One-time operator output</PlaybookPill>
           <h2 style={tokenTitle}>QR-ready check-in URL created</h2>
@@ -175,7 +272,7 @@ export default function EventOperationsPage() {
           <button type="button" onClick={() => void copyCheckInUrl()} style={primaryButton}>Copy QR-ready URL</button>
         </section> : null}
 
-        {loading ? <div style={empty}>Loading governed event operations…</div> : events.length === 0 ? <PlaybookCard eyebrow="Event operations" title="No event records yet"><p style={copy}>Create an event through the existing governed Event service first. This workspace never fabricates event rows.</p></PlaybookCard> : (
+        {loading ? <div style={empty}>Loading governed event operations…</div> : events.length === 0 ? <PlaybookCard eyebrow="Event operations" title="No event records yet"><p style={copy}>Create the first real Event above. This workspace never fabricates event rows.</p></PlaybookCard> : (
           <PlaybookGrid min={360}>{events.map((event) => {
             const draft = drafts[event.id] || { replayUrl: "", networkingEnabled: false, checkInEnabled: false };
             const canGenerate = event.status === "published" && draft.checkInEnabled && event.check_in_enabled;
@@ -196,6 +293,7 @@ export default function EventOperationsPage() {
   );
 }
 
+function label(value: string) { return value.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase()); }
 function formatDate(value: string) { const date = new Date(value); return Number.isNaN(date.getTime()) ? value : date.toLocaleString(); }
 
 const heroActions: React.CSSProperties = { display: "flex", gap: 10, flexWrap: "wrap" };
@@ -203,13 +301,15 @@ const copy: React.CSSProperties = { color: "#475569", lineHeight: 1.6 };
 const alert: React.CSSProperties = { maxWidth: 1180, margin: "0 auto 16px", padding: 14, borderRadius: 12, background: "#FEF2F2", color: "#991B1B" };
 const status: React.CSSProperties = { maxWidth: 1180, margin: "0 auto 16px", padding: 14, borderRadius: 12, background: "#F0FDF4", color: "#166534" };
 const empty: React.CSSProperties = { maxWidth: 1180, margin: "24px auto", padding: 28, color: "#64748B" };
+const createGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 12, marginTop: 14 };
 const field: React.CSSProperties = { display: "grid", gap: 6, marginTop: 12, color: "#334155", fontWeight: 850 };
-const input: React.CSSProperties = { minHeight: 44, border: "1px solid #CBD5E1", borderRadius: 10, padding: "0 12px", font: "inherit" };
+const input: React.CSSProperties = { minHeight: 44, border: "1px solid #CBD5E1", borderRadius: 10, padding: "0 12px", font: "inherit", background: "#FFF" };
+const textarea: React.CSSProperties = { ...input, minHeight: 100, padding: 12, resize: "vertical" };
 const checkRow: React.CSSProperties = { display: "flex", gap: 8, alignItems: "center", marginTop: 12, color: "#334155", fontWeight: 800 };
 const actions: React.CSSProperties = { display: "flex", gap: 9, flexWrap: "wrap", marginTop: 16 };
 const primaryButton: React.CSSProperties = { minHeight: 42, border: 0, borderRadius: 999, padding: "0 15px", background: "#F97316", color: "#FFF", fontWeight: 900, cursor: "pointer" };
 const secondaryButton: React.CSSProperties = { ...primaryButton, background: "#FFF", color: "#334155", border: "1px solid #CBD5E1" };
-const tokenPanel: React.CSSProperties = { maxWidth: 1180, margin: "0 auto 20px", padding: "clamp(20px,4vw,32px)", borderRadius: "8px 28px 8px 28px", background: "#081D34", color: "#FFF" };
+const tokenPanel: React.CSSProperties = { maxWidth: 1180, margin: "20px auto", padding: "clamp(20px,4vw,32px)", borderRadius: "8px 28px 8px 28px", background: "#081D34", color: "#FFF" };
 const tokenTitle: React.CSSProperties = { margin: "10px 0 8px", fontSize: "clamp(24px,4vw,34px)" };
 const tokenCopy: React.CSSProperties = { color: "#C9D8E8", lineHeight: 1.65 };
 const tokenCode: React.CSSProperties = { display: "block", overflowWrap: "anywhere", padding: 12, borderRadius: 10, background: "rgba(255,255,255,.08)", color: "#FFF" };
