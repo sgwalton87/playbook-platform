@@ -11,9 +11,12 @@ export default function ScholarAthleteOSPage() {
         <div>
           <p style={eyebrow}>Recruiting is now actionable</p>
           <h2 style={title}>Move schools, coaches, visits, and offers through one private pipeline.</h2>
-          <p style={copy}>The command center uses your verified recruiting record and never fills empty stages with demo activity.</p>
+          <p style={copy}>The command center uses your verified recruiting record and preserves the history of every target and stage change without filling empty stages with demo activity.</p>
         </div>
-        <Link href="/recruiting" style={cta}>Open Recruiting Command Center</Link>
+        <div style={actions}>
+          <Link href="/recruiting" style={cta}>Open Recruiting Command Center</Link>
+          <Link href="/recruiting/timeline" style={secondaryCta}>View Recruiting Timeline</Link>
+        </div>
       </section>
     </>
   );
@@ -35,4 +38,6 @@ const recruitingLaunch: React.CSSProperties = {
 const eyebrow: React.CSSProperties = { margin: 0, color: "#FF9D5C", fontWeight: 950, fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase" };
 const title: React.CSSProperties = { margin: "9px 0 8px", fontSize: "clamp(25px,4vw,38px)", lineHeight: 1.05 };
 const copy: React.CSSProperties = { margin: 0, color: "#C9D8E8", lineHeight: 1.65 };
+const actions: React.CSSProperties = { display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "start" };
 const cta: React.CSSProperties = { justifySelf: "start", display: "inline-flex", minHeight: 46, alignItems: "center", borderRadius: 999, padding: "0 18px", background: "#FFFFFF", color: "#102238", fontWeight: 900, textDecoration: "none" };
+const secondaryCta: React.CSSProperties = { ...cta, background: "transparent", color: "#FFFFFF", border: "1px solid rgba(255,255,255,.45)" };
