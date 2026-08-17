@@ -11,7 +11,7 @@ export default function ScholarAthleteOSPage() {
         <div>
           <p style={eyebrow}>Recruiting is now actionable</p>
           <h2 style={title}>Build the athlete record, preserve the evidence, then move real opportunities forward.</h2>
-          <p style={copy}>Keep sport, position, graduation year, highlight film, measurements, statistics, eligibility readiness, verified recruiting relationships, targets, recruiting history, NIL preparation, and Scholar-controlled media-kit sharing connected to one private Scholar-Athlete journey without manufacturing performance, eligibility, coach interest, compliance clearance, or deal approval.</p>
+          <p style={copy}>Keep sport, position, graduation year, highlight film, measurements, statistics, eligibility readiness, verified recruiting relationships, targets, visits, offer evidence, recruiting history, NIL preparation, and Scholar-controlled media-kit sharing connected to one private Scholar-Athlete journey without manufacturing performance, eligibility, coach interest, admissions outcomes, compliance clearance, or deal approval.</p>
         </div>
         <div style={actions}>
           <Link href="/recruiting/profile" style={cta}>Build Athlete Profile & Film</Link>
@@ -19,6 +19,8 @@ export default function ScholarAthleteOSPage() {
           <Link href="/recruiting/eligibility" style={secondaryCta}>Review Eligibility Readiness</Link>
           <Link href="/recruiting/connections" style={secondaryCta}>Find Verified Coaches & Recruiters</Link>
           <Link href="/recruiting" style={secondaryCta}>Open Recruiting Command Center</Link>
+          <Link href="/recruiting/visits" style={secondaryCta}>Manage Recruiting Visits</Link>
+          <Link href="/recruiting/offers" style={secondaryCta}>Record Recruiting Offers</Link>
           <Link href="/recruiting/timeline" style={secondaryCta}>View Recruiting Timeline</Link>
           <Link href="/recruiting/nil/preparation" style={secondaryCta}>Build NIL Preparation</Link>
           <Link href="/recruiting/nil/media-kit" style={secondaryCta}>Build NIL Media Kit</Link>
