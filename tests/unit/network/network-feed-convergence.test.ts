@@ -35,6 +35,14 @@ describe("canonical network and feed convergence", () => {
     expect(source).not.toContain("relationshipIds = [...new Set([...connectedIds, ...sentRequests.keys(), ...incomingRequests.keys()])].slice(0, 100)");
   });
 
+  it("links only Network identities that satisfy the public-profile publication boundary", () => {
+    const source = read("app/connections/page.tsx");
+    expect(source).toContain('rpc("get_network_public_profile_linkable_ids"');
+    expect(source).toContain("publicProfileLinkable: publicProfileIds.has(person.id)");
+    expect(source).toContain("person.publicProfileLinkable ? <Link");
+    expect(source).toContain("Private profile");
+  });
+
   it("routes the Network connection lifecycle through governed RPCs only", () => {
     const source = read("app/connections/page.tsx");
     expect(source).toContain('rpc("send_connection_request"');
