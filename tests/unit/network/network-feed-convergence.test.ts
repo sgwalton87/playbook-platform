@@ -19,6 +19,16 @@ describe("canonical network and feed convergence", () => {
     expect(source).not.toContain('.from("profiles")');
   });
 
+  it("routes the Network connection lifecycle through governed RPCs only", () => {
+    const source = read("app/connections/page.tsx");
+    expect(source).toContain('rpc("send_connection_request"');
+    expect(source).toContain('rpc("respond_to_connection_request"');
+    expect(source).toContain('rpc("cancel_connection_request"');
+    expect(source).toContain('rpc("remove_connection"');
+    expect(source).not.toMatch(/\.from\(["']connection_requests["']\)\s*\.(insert|update|delete|upsert)/s);
+    expect(source).not.toMatch(/\.from\(["']user_connections["']\)\s*\.(insert|update|delete|upsert)/s);
+  });
+
   it("uses durable post_type rather than fabricated category metadata", () => {
     const source = read("app/feed/page.tsx");
     expect(source).toContain("categoryFromPostType");
