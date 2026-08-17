@@ -25,7 +25,10 @@ begin
   end if;
 
   select pg_get_functiondef('private.pbos_user_has_active_conversation_access(uuid,uuid)'::regprocedure) into body;
-  if body !~ 'conversation_kind.*network' or body !~ 'user_connections' or body !~ 'support_relationships' then
+  if body !~ 'conversation_kind'
+     or body !~ '''network'''
+     or body !~ 'user_connections'
+     or body !~ 'support_relationships' then
     raise exception 'Conversation access helper is not context-aware for both support and Network.';
   end if;
 end;
