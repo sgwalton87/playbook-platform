@@ -14,7 +14,7 @@ import { supabase } from "@/lib/supabaseClient";
 import {
   evaluateSourceBackedEligibilityReadiness,
   flattenRequirementNodes,
-  type EligibilityRequirementNode,
+  type RequirementFinding,
   type SourceBackedEligibilityRuleset,
 } from "@/lib/scholar-athlete/sourceBackedEligibility";
 
@@ -146,6 +146,10 @@ export default function EligibilityReadinessPage() {
     [requirementNodes],
   );
 
+  const activeRequirementKey = leafRequirements.some((node) => node.key === requirementKey)
+    ? requirementKey
+    : leafRequirements[0]?.key || "";
+
   const selectedEvidenceRows = useMemo(
     () => evidenceRows.filter((row) => row.ruleset_id === selectedRulesetId),
     [evidenceRows, selectedRulesetId],
@@ -185,17 +189,11 @@ export default function EligibilityReadinessPage() {
     );
   }, [selected, selectedEvidenceRows]);
 
-  useEffect(() => {
-    if (!requirementKey || !leafRequirements.some((node) => node.key === requirementKey)) {
-      setRequirementKey(leafRequirements[0]?.key || "");
-    }
-  }, [leafRequirements, requirementKey]);
-
   async function saveRequirementEvidence(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!ownerId || !selected || !requirementKey) return;
+    if (!ownerId || !selected || !activeRequirementKey) return;
 
-    const prior = latestByRequirement.get(requirementKey);
+    const prior = latestByRequirement.get(activeRequirementKey);
     setSaving(true);
     setError("");
     setMessage("");
@@ -205,7 +203,7 @@ export default function EligibilityReadinessPage() {
       .insert({
         scholar_id: ownerId,
         ruleset_id: selected.id,
-        requirement_key: requirementKey,
+        requirement_key: activeRequirementKey,
         reported_state: reportedState,
         athlete_evidence_id: linkedEvidenceId || null,
         note: note.trim() || null,
@@ -301,7 +299,7 @@ export default function EligibilityReadinessPage() {
 
               {leafRequirements.length ? (
                 <form onSubmit={saveRequirementEvidence} style={formGrid}>
-                  <label style={field}>Requirement<select value={requirementKey} onChange={(event) => setRequirementKey(event.target.value)} style={input}>{leafRequirements.map((node) => <option key={node.key} value={node.key}>{node.label || formatLabel(node.key)}</option>)}</select></label>
+                  <label style={field}>Requirement<select value={activeRequirementKey} onChange={(event) => setRequirementKey(event.target.value)} style={input}>{leafRequirements.map((node) => <option key={node.key} value={node.key}>{node.label || formatLabel(node.key)}</option>)}</select></label>
                   <label style={field}>Your current record<select value={reportedState} onChange={(event) => setReportedState(event.target.value as "complete" | "incomplete")} style={input}><option value="complete">I have completed / satisfied this</option><option value="incomplete">Not completed / not satisfied yet</option></select></label>
                   <label style={field}>Link existing verified evidence<select value={linkedEvidenceId} onChange={(event) => setLinkedEvidenceId(event.target.value)} style={input}><option value="">No linked Athletic Evidence record</option>{athleticEvidence.map((item) => <option key={item.id} value={item.id}>{item.verification_state === "verified" ? "Verified" : formatLabel(item.verification_state)} · {item.metric_name} · {displayAthleticValue(item)}</option>)}</select><span style={helper}>A link strengthens provenance. Only evidence already independently verified counts toward verified readiness.</span></label>
                   <label style={field}>Context / note<textarea value={note} onChange={(event) => setNote(event.target.value)} rows={4} maxLength={2000} style={textarea} placeholder="What supports this report? Do not enter sensitive information that is not needed." /></label>
@@ -329,7 +327,7 @@ export default function EligibilityReadinessPage() {
   );
 }
 
-function RequirementTree({ finding, latest, depth = 0 }: { finding: { key: string; label: string; state: string; children: Array<any> }; latest: Map<string, RequirementEvidenceRow>; depth?: number }) {
+function RequirementTree({ finding, latest, depth = 0 }: { finding: RequirementFinding; latest: Map<string, RequirementEvidenceRow>; depth?: number }) {
   const row = latest.get(finding.key);
   return (
     <div style={{ ...requirementCard, marginLeft: depth ? Math.min(depth * 14, 28) : 0 }}>
@@ -340,7 +338,7 @@ function RequirementTree({ finding, latest, depth = 0 }: { finding: { key: strin
         </div>
         <span style={stateBadge(finding.state)}>{formatLabel(finding.state)}</span>
       </div>
-      {finding.children?.length ? <div style={childList}>{finding.children.map((child) => <RequirementTree key={child.key} finding={child} latest={latest} depth={depth + 1} />)}</div> : null}
+      {finding.children.length ? <div style={childList}>{finding.children.map((child) => <RequirementTree key={child.key} finding={child} latest={latest} depth={depth + 1} />)}</div> : null}
     </div>
   );
 }
