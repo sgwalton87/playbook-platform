@@ -19,6 +19,12 @@ type Partner = {
   updated_at: string;
 };
 
+function firstPartner(value: unknown): Partner | null {
+  const row = Array.isArray(value) ? value[0] : value;
+  if (!row || typeof row !== "object") return null;
+  return row as Partner;
+}
+
 export default function BrandOrganizationPage() {
   return <BrandPartnerVerificationGate><OrganizationWorkspace /></BrandPartnerVerificationGate>;
 }
@@ -39,7 +45,7 @@ function OrganizationWorkspace() {
     setLoading(true); setError("");
     const result = await supabase.rpc("ensure_brand_partner_organization");
     if (result.error) { setError(result.error.message); setLoading(false); return; }
-    const row = result.data as Partner | null;
+    const row = firstPartner(result.data);
     if (!row) { setError("Verified organization could not be resolved."); setLoading(false); return; }
     setPartner(row);
     setSummary(row.summary || "");
