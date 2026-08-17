@@ -53,8 +53,14 @@ export default function InboxV2() {
     setStatus(combined.length ? "Governed messages are current." : "No governed conversations yet.");
   }, [requestedPeerId]);
 
-  useEffect(() => { let mounted = true; void load().catch(cause => { if (mounted) { setError(cause instanceof Error ? cause.message : "Inbox could not be loaded."); setStatus(""); } })
-      .finally(() => { if (mounted) setLoading(false); }); return () => { mounted = false; }; }, [load]);
+  useEffect(() => {
+    let mounted = true;
+    const timer = window.setTimeout(() => {
+      void load().catch(cause => { if (mounted) { setError(cause instanceof Error ? cause.message : "Inbox could not be loaded."); setStatus(""); } })
+        .finally(() => { if (mounted) setLoading(false); });
+    }, 0);
+    return () => { mounted = false; window.clearTimeout(timer); };
+  }, [load]);
 
   async function reload() { setLoading(true); setError(""); try { await load(); }
     catch (cause) { setError(cause instanceof Error ? cause.message : "Inbox could not be loaded."); setStatus(""); }
