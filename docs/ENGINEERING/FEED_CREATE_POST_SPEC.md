@@ -14,7 +14,7 @@ Certify the existing Feed post-creation workflow against one canonical ownership
 
 Historical repository migrations documented `feed_posts` as a deployed/runtime entity whose original DDL predated the committed migration chain. Phase 6 closes that historical gap: a fresh database replay shall now create the production-compatible canonical Feed table, while production deployments preserve the already-existing table and rows.
 
-The reconciled baseline includes the production-compatible columns, profile ownership foreign key, optional album lineage foreign key, RLS, anonymous/authenticated read authority, and explicit table grants.
+The reconciled baseline includes the production-compatible columns, canonical profile ownership foreign key, canonical `profile_albums` lineage foreign key, RLS, anonymous/authenticated read authority, and explicit table grants. Production also contains an undocumented legacy `albums` table, but current application APIs and repository migrations use `profile_albums`; Feed lineage therefore converges to `profile_albums` when existing references are compatible. At the audited production baseline, no Feed post carries a non-null `album_id`, so this convergence does not rewrite live post data.
 
 ## Creation authority
 
@@ -62,7 +62,7 @@ Create Post is complete when:
 
 - a from-zero migration replay creates the canonical `feed_posts` baseline;
 - production data remains preserved and satisfies the integrity constraints;
-- RLS, public/owner SELECT policies, and canonical FK lineage are reproducible;
+- RLS, public/owner SELECT policies, `profiles` ownership lineage, and `profile_albums` album lineage are reproducible;
 - exactly one authenticated owner INSERT policy exists;
 - anonymous mutation privileges are absent;
 - authenticated UPDATE/DELETE privileges are absent until their dedicated tasks;
