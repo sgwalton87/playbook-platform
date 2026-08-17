@@ -8,8 +8,9 @@ import { PlaybookCard, PlaybookGrid, PlaybookHero, PlaybookMetric, PlaybookMetri
 import { supabase } from "@/lib/supabaseClient";
 
 type DirectoryPerson = { id: string; username: string | null; full_name: string | null; first_name: string | null; last_name: string | null; role: string | null; avatar_url: string | null; school: string | null; sport: string | null };
-type Person = DirectoryPerson & { name: string; connected: boolean; requested: boolean; incoming: boolean; outgoingRequestId: string | null; incomingRequestId: string | null; publicProfileLinkable: boolean; mutualCount: number };
-type Tab = "discover" | "connected" | "requests";
+type SuggestedPerson = DirectoryPerson & { mutual_count: number | string };
+type Person = DirectoryPerson & { name: string; connected: boolean; requested: boolean; incoming: boolean; outgoingRequestId: string | null; incomingRequestId: string | null; publicProfileLinkable: boolean; mutualCount: number; suggestedRank: number | null };
+type Tab = "suggested" | "discover" | "connected" | "requests";
 
 function personName(person: DirectoryPerson) { return person.full_name || [person.first_name, person.last_name].filter(Boolean).join(" ") || person.username || "Playbook member"; }
 function roleLabel(role: string | null) { return String(role || "member").replaceAll("_", " ").replaceAll("-", " ").replace(/\b\w/g, (letter) => letter.toUpperCase()); }
@@ -18,7 +19,7 @@ function chunks<T>(items: T[], size: number) { const result: T[][] = []; for (le
 export default function ConnectionsPage() {
   const router = useRouter();
   const [people, setPeople] = useState<Person[]>([]);
-  const [tab, setTab] = useState<Tab>("discover");
+  const [tab, setTab] = useState<Tab>("suggested");
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
@@ -31,13 +32,14 @@ export default function ConnectionsPage() {
     const user = authData.user;
     if (!user) { router.replace("/login?next=/connections"); return; }
     const normalizedSearch = discoverySearch.trim();
-    const [connectionsResult, sentResult, incomingResult, directoryResult] = await Promise.all([
+    const [connectionsResult, sentResult, incomingResult, directoryResult, suggestedResult] = await Promise.all([
       supabase.from("user_connections").select("connected_user_id").eq("user_id", user.id),
       supabase.from("connection_requests").select("id,recipient_id").eq("requester_id", user.id).eq("status", "pending"),
       supabase.from("connection_requests").select("id,requester_id").eq("recipient_id", user.id).eq("status", "pending"),
       supabase.rpc("get_public_network_directory", { search_text: normalizedSearch || null, result_limit: 100 }),
+      supabase.rpc("get_network_suggested_users", { result_limit: 12 }),
     ]);
-    const firstError = connectionsResult.error || sentResult.error || incomingResult.error || directoryResult.error;
+    const firstError = connectionsResult.error || sentResult.error || incomingResult.error || directoryResult.error || suggestedResult.error;
     if (firstError) throw new Error(firstError.message);
     const connectedIds = new Set((connectionsResult.data || []).map((row) => row.connected_user_id));
     const sentRequests = new Map((sentResult.data || []).map((row) => [row.recipient_id, row.id]));
@@ -51,9 +53,18 @@ export default function ConnectionsPage() {
     const identityError = relationshipIdentityResults.find((result) => result.error)?.error;
     const linkabilityError = relationshipLinkabilityResults.find((result) => result.error)?.error;
     if (identityError || linkabilityError) throw new Error((identityError || linkabilityError)?.message || "Network identity could not be resolved.");
+
     const byId = new Map<string, DirectoryPerson>();
     const publicProfileIds = new Set<string>();
+    const mutualCounts = new Map<string, number>();
+    const suggestionRanks = new Map<string, number>();
     for (const person of (directoryResult.data || []) as DirectoryPerson[]) { byId.set(person.id, person); publicProfileIds.add(person.id); }
+    ((suggestedResult.data || []) as SuggestedPerson[]).forEach((person, index) => {
+      byId.set(person.id, person);
+      publicProfileIds.add(person.id);
+      mutualCounts.set(person.id, Number(person.mutual_count || 0));
+      suggestionRanks.set(person.id, index + 1);
+    });
     for (const result of relationshipIdentityResults) {
       for (const person of (result.data || []) as DirectoryPerson[]) byId.set(person.id, person);
     }
@@ -67,7 +78,6 @@ export default function ConnectionsPage() {
     );
     const mutualError = mutualResults.find((result) => result.error)?.error;
     if (mutualError) throw new Error(mutualError.message);
-    const mutualCounts = new Map<string, number>();
     for (const result of mutualResults) {
       for (const row of (result.data || []) as Array<{ member_id: string; mutual_count: number | string }>) mutualCounts.set(row.member_id, Number(row.mutual_count || 0));
     }
@@ -82,6 +92,7 @@ export default function ConnectionsPage() {
       incomingRequestId: incomingRequests.get(person.id) || null,
       publicProfileLinkable: publicProfileIds.has(person.id),
       mutualCount: mutualCounts.get(person.id) || 0,
+      suggestedRank: suggestionRanks.get(person.id) || null,
     }));
     setPeople(next);
     setMessage(next.length ? (normalizedSearch ? `Showing Network results for “${normalizedSearch}”.` : "Network state is current.") : (normalizedSearch ? `No Network members match “${normalizedSearch}”.` : "No discoverable members or connection requests yet."));
@@ -124,10 +135,11 @@ export default function ConnectionsPage() {
     finally { setBusy(null); }
   }
 
+  const suggested = people.filter((person) => person.suggestedRank !== null).sort((a, b) => (a.suggestedRank || 0) - (b.suggestedRank || 0));
   const discovered = people.filter((person) => !person.connected && !person.incoming);
   const connected = people.filter((person) => person.connected);
   const incoming = people.filter((person) => person.incoming);
-  const source = tab === "discover" ? discovered : tab === "connected" ? connected : incoming;
+  const source = tab === "suggested" ? suggested : tab === "discover" ? discovered : tab === "connected" ? connected : incoming;
   const visible = useMemo(() => {
     if (tab === "discover") return source;
     const query = search.trim().toLowerCase();
@@ -136,12 +148,12 @@ export default function ConnectionsPage() {
   }, [search, source, tab]);
 
   return <PlaybookPage>
-    <PlaybookHero eyebrow="Playbook Network" title="Build the people around your next move" subtitle="Discover public Playbook members, manage connection requests, and keep relationship identity separate from private Scholar data." />
-    <PlaybookMetrics><PlaybookMetric label="Connected" value={String(connected.length)} /><PlaybookMetric label="Incoming" value={String(incoming.length)} /><PlaybookMetric label="Discovery results" value={String(discovered.length)} /></PlaybookMetrics>
+    <PlaybookHero eyebrow="Playbook Network" title="Build the people around your next move" subtitle="Discover public Playbook members, see explainable connection suggestions, manage requests, and keep relationship identity separate from private Scholar data." />
+    <PlaybookMetrics><PlaybookMetric label="Suggested" value={String(suggested.length)} /><PlaybookMetric label="Connected" value={String(connected.length)} /><PlaybookMetric label="Incoming" value={String(incoming.length)} /><PlaybookMetric label="Discovery results" value={String(discovered.length)} /></PlaybookMetrics>
     <div role="status" aria-live="polite" style={status}>{loading ? "Loading…" : message}</div>
     {error && <div role="alert" style={alert}>{error} <button onClick={() => void loadNetwork(tab === "discover" ? search : "")}>Retry</button></div>}
-    <section style={toolbar} aria-label="Network controls"><div style={tabs}>{(["discover", "connected", "requests"] as Tab[]).map((value) => <button key={value} type="button" onClick={() => setTab(value)} aria-pressed={tab === value} style={tab === value ? activeTab : tabButton}>{value === "discover" ? "Discover" : value === "connected" ? "Connected" : "Requests"}</button>)}</div><input aria-label="Search network" placeholder="Search name, role, school, or sport" value={search} onChange={(event) => setSearch(event.target.value)} style={searchInput} /></section>
-    {!loading && visible.length === 0 ? <PlaybookCard eyebrow="Network" title="Nothing in this view yet"><p style={copy}>Public discovery respects profile visibility and active publication consent. Existing and pending connection partners remain resolvable through a separate relationship-aware identity boundary.</p></PlaybookCard> : <PlaybookGrid min={280}>{visible.map((person) => <PlaybookCard key={person.id} eyebrow={roleLabel(person.role)} title={person.name}><div style={identityRow}><ProfileAvatar src={person.avatar_url} name={person.name} size={54} /><div><p style={copy}>{person.school || "Playbook Network"}{person.sport ? ` · ${person.sport}` : ""}</p>{person.username && (person.publicProfileLinkable ? <Link href={`/u/${person.username}`} style={profileLink}>@{person.username}</Link> : <span style={privateIdentity}>@{person.username} · Private profile</span>)}<p style={mutualCopy}>{person.mutualCount === 1 ? "1 mutual connection" : `${person.mutualCount} mutual connections`}</p></div></div><div style={actions}>{person.connected ? <><PlaybookPill>Connected</PlaybookPill><button disabled={busy === person.id} onClick={() => void mutate("disconnect", person)} style={secondaryButton}>Disconnect</button></> : person.incoming ? <><button disabled={busy === person.id} onClick={() => void mutate("accept", person)} style={primaryButton}>Accept</button><button disabled={busy === person.id} onClick={() => void mutate("decline", person)} style={secondaryButton}>Decline</button></> : person.requested ? <><PlaybookPill>Requested</PlaybookPill><button disabled={busy === person.id} onClick={() => void mutate("cancel", person)} style={secondaryButton}>Cancel request</button></> : <button disabled={busy === person.id} onClick={() => void mutate("connect", person)} style={primaryButton}>Connect</button>}</div></PlaybookCard>)}</PlaybookGrid>}
+    <section style={toolbar} aria-label="Network controls"><div style={tabs}>{(["suggested", "discover", "connected", "requests"] as Tab[]).map((value) => <button key={value} type="button" onClick={() => setTab(value)} aria-pressed={tab === value} style={tab === value ? activeTab : tabButton}>{value === "suggested" ? "Suggested" : value === "discover" ? "Discover" : value === "connected" ? "Connected" : "Requests"}</button>)}</div><input aria-label="Search network" placeholder="Search name, role, school, or sport" value={search} onChange={(event) => setSearch(event.target.value)} style={searchInput} /></section>
+    {!loading && visible.length === 0 ? <PlaybookCard eyebrow="Network" title={tab === "suggested" ? "No suggestions yet" : "Nothing in this view yet"}><p style={copy}>{tab === "suggested" ? "Suggestions appear only when you share at least one connection with a public, consented member who is not already connected to you and has no pending request with you. Use Discover to find other Playbook members." : "Public discovery respects profile visibility and active publication consent. Existing and pending connection partners remain resolvable through a separate relationship-aware identity boundary."}</p></PlaybookCard> : <PlaybookGrid min={280}>{visible.map((person) => <PlaybookCard key={person.id} eyebrow={roleLabel(person.role)} title={person.name}><div style={identityRow}><ProfileAvatar src={person.avatar_url} name={person.name} size={54} /><div><p style={copy}>{person.school || "Playbook Network"}{person.sport ? ` · ${person.sport}` : ""}</p>{person.username && (person.publicProfileLinkable ? <Link href={`/u/${person.username}`} style={profileLink}>@{person.username}</Link> : <span style={privateIdentity}>@{person.username} · Private profile</span>)}<p style={mutualCopy}>{person.mutualCount === 1 ? "1 mutual connection" : `${person.mutualCount} mutual connections`}</p></div></div><div style={actions}>{person.suggestedRank !== null && !person.connected && !person.incoming && !person.requested && <PlaybookPill>Suggested because of mutual connections</PlaybookPill>}{person.connected ? <><PlaybookPill>Connected</PlaybookPill><button disabled={busy === person.id} onClick={() => void mutate("disconnect", person)} style={secondaryButton}>Disconnect</button></> : person.incoming ? <><button disabled={busy === person.id} onClick={() => void mutate("accept", person)} style={primaryButton}>Accept</button><button disabled={busy === person.id} onClick={() => void mutate("decline", person)} style={secondaryButton}>Decline</button></> : person.requested ? <><PlaybookPill>Requested</PlaybookPill><button disabled={busy === person.id} onClick={() => void mutate("cancel", person)} style={secondaryButton}>Cancel request</button></> : <button disabled={busy === person.id} onClick={() => void mutate("connect", person)} style={primaryButton}>Connect</button>}</div></PlaybookCard>)}</PlaybookGrid>}
   </PlaybookPage>;
 }
 
