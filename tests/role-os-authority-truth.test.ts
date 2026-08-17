@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
+import { buildAthleteNextActions } from "@/lib/scholar-athlete";
 
 const read = (file: string) => fs.readFileSync(path.join(process.cwd(), file), "utf8");
 
@@ -27,5 +28,14 @@ describe("role OS authority and truth audit", () => {
     expect(dashboard).toContain('return "Unavailable"');
     expect(intelligence).toContain("financialPlanComplete: boolean | null");
     expect(intelligence).toContain("input.financialPlanComplete === false");
+  });
+
+  it("keeps unknown eligibility and financial readiness non-consequential", () => {
+    expect(buildAthleteNextActions({
+      eligibilityStatus: null,
+      recruitingTargets: 1,
+      activeDeals: 1,
+      financialPlanComplete: null,
+    })).toEqual([]);
   });
 });
