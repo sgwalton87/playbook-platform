@@ -12,13 +12,17 @@ import {
 } from "@/components/ui/PlaybookPage";
 import { supabase } from "@/lib/supabaseClient";
 
+type ShareStatus = "draft" | "active" | "expired" | "revoked";
+
 type ShareRow = {
   share_id: string;
   target_use: string;
   packet: Record<string, boolean>;
-  status: "draft" | "active" | "expired" | "revoked";
+  status: ShareStatus;
   expires_at: string | null;
   created_at: string;
+  expiredByTime: boolean;
+  viewable: boolean;
 };
 
 type SourceSnapshot = {
@@ -95,8 +99,13 @@ export default function NILMediaKitPage() {
     const profile = profileResult.data;
     const athlete = athleteResult.data;
     const socials = [profile?.nil_instagram || profile?.instagram, profile?.nil_tiktok || profile?.tiktok, profile?.nil_twitter || profile?.twitter].filter(Boolean);
+    const now = Date.now();
+    const classifiedShares = ((sharesResult.data || []) as Array<Omit<ShareRow, "expiredByTime" | "viewable">>).map((share) => {
+      const expiredByTime = Boolean(share.expires_at && new Date(share.expires_at).getTime() <= now);
+      return { ...share, expiredByTime, viewable: share.status === "active" && !expiredByTime };
+    });
 
-    setShares((sharesResult.data || []) as ShareRow[]);
+    setShares(classifiedShares);
     setSource({
       displayName: profile?.full_name?.trim() || profile?.username?.trim() || "Scholar",
       bio: Boolean(profile?.bio?.trim()),
@@ -197,7 +206,7 @@ export default function NILMediaKitPage() {
 
   if (loading) return <PlaybookPage><div style={loadingState}>Connecting your NIL media-kit workspace…</div></PlaybookPage>;
 
-  const activeShares = shares.filter((share) => share.status === "active" && (!share.expires_at || new Date(share.expires_at).getTime() > Date.now()));
+  const activeShares = shares.filter((share) => share.viewable);
 
   return (
     <PlaybookPage>
@@ -269,22 +278,18 @@ export default function NILMediaKitPage() {
             {shares.length === 0 ? (
               <div style={emptyState}><strong>No media-kit shares yet.</strong><p style={muted}>Nothing is publicly resolvable until you explicitly create a share.</p></div>
             ) : (
-              <div style={shareList}>{shares.map((share) => {
-                const expiredByTime = Boolean(share.expires_at && new Date(share.expires_at).getTime() <= Date.now());
-                const viewable = share.status === "active" && !expiredByTime;
-                return (
-                  <article key={share.share_id} style={shareCard}>
-                    <div style={shareHeader}><span style={statusBadge(viewable ? "active" : share.status)}>{viewable ? "Active" : expiredByTime && share.status === "active" ? "Expired" : formatLabel(share.status)}</span><small>{formatDate(share.created_at)}</small></div>
-                    <p style={shareId}>…{share.share_id.slice(-12)}</p>
-                    <p style={muted}>{share.expires_at ? `Expires ${formatDate(share.expires_at)}` : "No scheduled expiry"}</p>
-                    <div style={shareActions}>
-                      {viewable ? <button type="button" onClick={() => void copyShare(share.share_id)} style={secondaryButton}>Copy URL</button> : null}
-                      {viewable ? <a href={`/portfolio/${share.share_id}`} target="_blank" rel="noreferrer" style={secondaryLink}>Preview</a> : null}
-                      {viewable ? <button type="button" disabled={saving} onClick={() => void revokeShare(share.share_id)} style={dangerButton}>Revoke</button> : null}
-                    </div>
-                  </article>
-                );
-              })}</div>
+              <div style={shareList}>{shares.map((share) => (
+                <article key={share.share_id} style={shareCard}>
+                  <div style={shareHeader}><span style={statusBadge(share.viewable ? "active" : share.status)}>{share.viewable ? "Active" : share.expiredByTime && share.status === "active" ? "Expired" : formatLabel(share.status)}</span><small>{formatDate(share.created_at)}</small></div>
+                  <p style={shareId}>…{share.share_id.slice(-12)}</p>
+                  <p style={muted}>{share.expires_at ? `Expires ${formatDate(share.expires_at)}` : "No scheduled expiry"}</p>
+                  <div style={shareActions}>
+                    {share.viewable ? <button type="button" onClick={() => void copyShare(share.share_id)} style={secondaryButton}>Copy URL</button> : null}
+                    {share.viewable ? <a href={`/portfolio/${share.share_id}`} target="_blank" rel="noreferrer" style={secondaryLink}>Preview</a> : null}
+                    {share.viewable ? <button type="button" disabled={saving} onClick={() => void revokeShare(share.share_id)} style={dangerButton}>Revoke</button> : null}
+                  </div>
+                </article>
+              ))}</div>
             )}
           </section>
         </div>
