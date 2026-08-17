@@ -27,14 +27,14 @@ export function rankAthleteSignals(
 }
 
 export function buildAthleteNextActions(input: {
-  eligibilityStatus: string;
+  eligibilityStatus: string | null;
   recruitingTargets: number;
   activeDeals: number;
   financialPlanComplete: boolean | null;
 }) {
   const actions: AthleteSignal[] = [];
 
-  if (input.eligibilityStatus !== "ready") {
+  if (input.eligibilityStatus !== null && input.eligibilityStatus !== "ready") {
     actions.push({
       type: "eligibility",
       severity: "urgent",
