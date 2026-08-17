@@ -37,12 +37,10 @@ async function transitionOutbox(
   supabase: RequestSupabase,
   outboxId: string,
   state: "FAILED" | "SUPPRESSED" | "DIGEST_QUEUED",
-  error?: string,
 ) {
   const transition = await supabase.rpc("transition_notification_outbox", {
     requested_outbox_id: outboxId,
     requested_state: state,
-    requested_error: error ?? null,
   });
   if (transition.error) throw new Error(transition.error.message);
 }
@@ -86,6 +84,7 @@ export async function GET() {
   }
 }
 
+// System notification events are created by governed Playbook workflows.
 // Clients cannot author system events. POST only drains a bounded set of already
 // trusted PENDING outbox rows owned by the authenticated user through the existing
 // preference-aware, PBOS-published delivery path.
@@ -111,10 +110,9 @@ export async function POST() {
         if (result.notification) delivered += 1;
         else if (result.suppressed) suppressed += 1;
         else if (result.digestQueued) digestQueued += 1;
-      } catch (cause) {
+      } catch {
         failed += 1;
-        const message = cause instanceof Error ? cause.message : "Trusted notification delivery failed.";
-        try { await transitionOutbox(supabase, outbox.id, "FAILED", message); }
+        try { await transitionOutbox(supabase, outbox.id, "FAILED"); }
         catch { /* preserve the original delivery failure in the response */ }
       }
     }
@@ -149,7 +147,7 @@ export async function PATCH(request: NextRequest) {
       if (!found.data) return NextResponse.json({ error: "Retryable outbox item not found." }, { status: 404 });
       try { return NextResponse.json(await deliver(supabase, user.id, found.data)); }
       catch (cause) {
-        await transitionOutbox(supabase, found.data.id, "FAILED", cause instanceof Error ? cause.message : "Delivery failed.");
+        await transitionOutbox(supabase, found.data.id, "FAILED");
         throw cause;
       }
     }
