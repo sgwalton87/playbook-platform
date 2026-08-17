@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireLearnerAuthority } from "@/lib/auth/learner-authority";
 import {
-  buildPortfolioShare,
   PORTFOLIO_SHARE_TARGET_USES,
   type PortfolioShareTargetUse,
 } from "@/lib/portfolio-sharing";
@@ -17,10 +16,6 @@ export async function POST(req: NextRequest) {
     if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
     await requireLearnerAuthority(supabase, user.id, { requireOnboarding: true });
 
-    const profile = await supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle();
-    if (profile.error) throw new Error(profile.error.message);
-    if (!profile.data) return NextResponse.json({ error: "A durable learner profile is required." }, { status: 409 });
-
     const body = await req.json() as Record<string, unknown>;
     if (body.scholarId != null && String(body.scholarId) !== user.id) {
       return NextResponse.json({ error: "Portfolio shares may only be created for the authenticated learner." }, { status: 403 });
@@ -31,30 +26,31 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Portfolio share target use is invalid." }, { status: 400 });
     }
 
-    const share = buildPortfolioShare({
-      scholarId: user.id,
-      scholarName: profile.data.full_name || "Playbook Scholar",
-      targetUse,
-      packet: (body.packet ?? {}) as never,
-      expiresAt: body.expiresAt ? String(body.expiresAt) : undefined,
-    });
+    if (targetUse !== "nil") {
+      return NextResponse.json({
+        error: "This portfolio target use does not yet have a governed publication allowlist. Nothing was shared.",
+      }, { status: 409 });
+    }
 
-    const { data, error } = await supabase
-      .from("portfolio_shares")
-      .insert({
-        share_id: share.id,
-        scholar_id: user.id,
-        scholar_name: share.scholarName,
-        target_use: share.targetUse,
-        packet: share.packet,
-        status: share.status,
-        expires_at: share.expiresAt,
-      })
-      .select("id,share_id,scholar_id,scholar_name,target_use,packet,status,expires_at,view_count,created_at")
-      .single();
+    const packet = body.packet && typeof body.packet === "object" && !Array.isArray(body.packet)
+      ? body.packet as Record<string, boolean>
+      : {};
+    const expiresAt = body.expiresAt ? String(body.expiresAt) : null;
+
+    const { data, error } = await supabase.rpc("create_nil_media_kit_share", {
+      requested_packet: packet,
+      requested_expires_at: expiresAt,
+    });
     if (error) throw new Error(error.message);
 
-    return NextResponse.json({ ok: true, share: data, shareUrl: `/portfolio/${data.share_id}` }, { status: 201 });
+    const created = Array.isArray(data) ? data[0] as { share_id?: string; status?: string; expires_at?: string | null; created_at?: string } | undefined : undefined;
+    if (!created?.share_id) throw new Error("Governed portfolio share was not created.");
+
+    return NextResponse.json({
+      ok: true,
+      share: created,
+      shareUrl: `/portfolio/${created.share_id}`,
+    }, { status: 201 });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Unable to create portfolio share." }, { status: 400 });
   }
