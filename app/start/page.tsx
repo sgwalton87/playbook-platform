@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import { supabase } from "@/lib/supabaseClient";
@@ -31,6 +31,12 @@ function StartContent() {
   const [creating, setCreating] = useState(false);
   const [created, setCreated] = useState(false);
   const [journeyError, setJourneyError] = useState<string | null>(null);
+  const [autosaveStatus, setAutosaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const autosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const autosaveQueueRef = useRef<Promise<void>>(Promise.resolve());
+  const onboardingLoadedRef = useRef(false);
+  const lastSavedFormRef = useRef("");
+  const persistRef = useRef<LegacyValue>(null);
 
   const role = normalizeRole(
     params.get("first") === "1"
@@ -53,6 +59,7 @@ function StartContent() {
 
   useEffect(() => {
     async function load() {
+      onboardingLoadedRef.current = false;
       const { data: u } = await supabase.auth.getUser();
 
       if (!u.user) {
@@ -79,7 +86,10 @@ function StartContent() {
       setProfile(safeProfile);
       setStepIndex(Number(onboarding.onboarding_step_index || 0));
 
-      setForm(createInitialOnboardingData(safeProfile));
+      const initialForm = createInitialOnboardingData(safeProfile);
+      lastSavedFormRef.current = JSON.stringify(initialForm);
+      setForm(initialForm);
+      onboardingLoadedRef.current = true;
 
       const { data: options } = await supabase
         .from("onboarding_options")
@@ -143,11 +153,12 @@ function StartContent() {
   async function persist(
     complete = false,
     override: Record<string, LegacyValue> = {},
-    prepareRoleRecord = complete
+    prepareRoleRecord = complete,
+    sourceForm: Record<string, LegacyValue> | null = null
   ) {
-    if (!user?.id) return;
+    if (!user?.id) throw new Error("Your profile is not ready to save yet.");
 
-    const nextForm = { ...form, ...override };
+    const nextForm = { ...(sourceForm || form), ...override };
 
     const topSchools = Array.isArray(nextForm.top_schools)
       ? nextForm.top_schools.filter(Boolean)
@@ -169,7 +180,13 @@ function StartContent() {
       complete,
     });
 
-    await supabase.from("profiles").upsert(payload, { onConflict: "id" });
+    const { error: profileError } = await supabase
+      .from("profiles")
+      .upsert(payload, { onConflict: "id" });
+
+    if (profileError) {
+      throw new Error(`Your onboarding answers could not be saved. ${profileError.message}`);
+    }
 
     if (prepareRoleRecord && role === "scholar-athlete") {
       const graduationYear = Number(nextForm.graduation_year);
@@ -192,6 +209,38 @@ function StartContent() {
 
     setProfile((prev: LegacyValue) => ({ ...prev, ...payload }));
   }
+
+  persistRef.current = persist;
+
+  useEffect(() => {
+    if (!onboardingLoadedRef.current || !user?.id || creating || created) return;
+
+    const serialized = JSON.stringify(form);
+    if (serialized === lastSavedFormRef.current) return;
+
+    if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current);
+    const snapshot = { ...form };
+
+    autosaveTimerRef.current = setTimeout(() => {
+      autosaveQueueRef.current = autosaveQueueRef.current
+        .catch(() => undefined)
+        .then(async () => {
+          setAutosaveStatus("saving");
+          try {
+            await persistRef.current?.(false, { onboarding_step_index: stepIndex }, false, snapshot);
+            lastSavedFormRef.current = serialized;
+            setAutosaveStatus("saved");
+          } catch (error) {
+            setAutosaveStatus("error");
+            setJourneyError(error instanceof Error ? error.message : "Your onboarding answers could not be autosaved.");
+          }
+        });
+    }, 800);
+
+    return () => {
+      if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current);
+    };
+  }, [form, user?.id, stepIndex, creating, created]);
 
   async function sendInvites() {
     const emails = Array.isArray(form.invite_supporters)
@@ -216,26 +265,34 @@ function StartContent() {
 
   async function next(skip = false) {
     setSaving(true);
-    const stepIncrement = skip ? 1 : 1;
-    await persist(false, {
-      onboarding_step_index: Math.min(stepIndex + stepIncrement, steps.length - 1),
-    });
+    setJourneyError(null);
 
-    if (step.id === "network") {
-      await sendInvites();
-    }
+    try {
+      if (autosaveTimerRef.current) {
+        clearTimeout(autosaveTimerRef.current);
+        autosaveTimerRef.current = null;
+      }
+      await autosaveQueueRef.current.catch(() => undefined);
 
-    const validationErrors = validateOnboardingStep(step, form);
-    if (isLast && validationErrors.length > 0) {
-      alert(validationErrors[0]);
-      setSaving(false);
-      return;
-    }
+      const validationErrors = validateOnboardingStep(step, form);
+      if (isLast && validationErrors.length > 0) {
+        alert(validationErrors[0]);
+        return;
+      }
 
-    if (isLast) {
-      setCreating(true);
-      setJourneyError(null);
-      try {
+      const stepIncrement = skip ? 1 : 1;
+      await persist(false, {
+        onboarding_step_index: Math.min(stepIndex + stepIncrement, steps.length - 1),
+      });
+      lastSavedFormRef.current = JSON.stringify(form);
+      setAutosaveStatus("saved");
+
+      if (step.id === "network") {
+        await sendInvites();
+      }
+
+      if (isLast) {
+        setCreating(true);
         assertRoleOnboardingCompletionSupported(role);
         // Persist final evidence and any role-specific prerequisite record, but
         // leave onboarding completion false until the governed server adapter succeeds.
@@ -257,16 +314,17 @@ function StartContent() {
         setCreating(false);
         setCreated(true);
         setTimeout(() => { window.location.href = result.destination || destination; }, 15000);
-      } catch (error) {
-        setCreating(false);
-        setSaving(false);
-        setJourneyError(error instanceof Error ? error.message : "PBOS role onboarding could not be completed.");
+        return;
       }
-      return;
-    }
 
-    setStepIndex((i) => i + 1);
-    setSaving(false);
+      setStepIndex((i) => i + 1);
+    } catch (error) {
+      setCreating(false);
+      setAutosaveStatus("error");
+      setJourneyError(error instanceof Error ? error.message : "Your onboarding progress could not be saved.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   if (!profile) return <main data-visual-canon="PGDS-001" style={{ minHeight:"100vh",padding:40,background:"#06172d",color:"#fff" }}>Preparing your Playbook…</main>;
@@ -296,7 +354,12 @@ function StartContent() {
           <p style={eyebrow}>Start Here · {role}</p>
           <h1 style={heroTitle}>Build the record that opens your next door.</h1>
           <p style={heroBody}>
-            Your answers autosave and feed your dashboard, private profile, and public-facing profile.
+            Your answers autosave to your private Scholar Record. You choose separately whether to publish a public profile.
+          </p>
+          <p role="status" aria-live="polite" style={{ ...heroBody, fontSize: 13, marginTop: 8 }}>
+            {autosaveStatus === "saving" && "Saving your progress…"}
+            {autosaveStatus === "saved" && "✓ Progress saved"}
+            {autosaveStatus === "error" && "Save failed — your answers are still on this screen."}
           </p>
         </div>
 
