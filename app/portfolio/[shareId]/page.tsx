@@ -66,7 +66,6 @@ export default function SharedPortfolioPage() {
     }
 
     if (shareId) void loadShare();
-    else setLoading(false);
     return () => { active = false; };
   }, [shareId]);
 
