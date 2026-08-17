@@ -1,0 +1,53 @@
+name: Audit Explore Wording Truth
+
+on:
+  push:
+    branches:
+      - agent/ui-capability-map-convergence
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/ui-capability-map-convergence
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Apply exact Explore truth wording correction
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          page = Path('components/explore/CapabilityDirectory.tsx')
+          text = page.read_text()
+          old = 'See what works today, what is built into the platform, what is still being audited, and what is planned next. Only real available destinations are clickable.'
+          new = 'See what has a real destination today, what is built into the platform, what is still being audited, and what is planned next. Available means a real route exists for authorized users; it does not replace end-to-end functionality certification.'
+          assert old in text, 'unexpected Explore hero wording'
+          page.write_text(text.replace(old, new, 1))
+
+          test = Path('tests/unit/platform-capability-map/capability-map.test.ts')
+          source = test.read_text()
+          anchor = '''  it("renders links only for Available capabilities", () => {\n    const source = fs.readFileSync(path.join(process.cwd(), "components/explore/CapabilityDirectory.tsx"), "utf8");\n    expect(source).toContain('item.status === "available"');\n    expect(source).toContain("canOpen && item.href");\n  });\n'''
+          addition = '''\n  it("does not equate an Available route with end-to-end functionality certification", () => {\n    const source = fs.readFileSync(path.join(process.cwd(), "components/explore/CapabilityDirectory.tsx"), "utf8");\n    expect(source).not.toContain("See what works today");\n    expect(source).toContain("does not replace end-to-end functionality certification");\n  });\n'''
+          assert anchor in source, 'unexpected capability-map test source'
+          test.write_text(source.replace(anchor, anchor + addition, 1))
+          PY
+          npm test -- --run tests/unit/platform-capability-map/capability-map.test.ts
+      - name: Commit correction
+        shell: bash
+        run: |
+          git config user.name "playbook-audit-bot"
+          git config user.email "playbook-audit-bot@users.noreply.github.com"
+          git add components/explore/CapabilityDirectory.tsx tests/unit/platform-capability-map/capability-map.test.ts
+          git diff --cached --quiet && exit 0
+          git commit -m "fix: distinguish route availability from functional certification"
+          git push origin HEAD:agent/ui-capability-map-convergence
