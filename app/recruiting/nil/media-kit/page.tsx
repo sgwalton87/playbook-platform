@@ -180,7 +180,8 @@ export default function NILMediaKitPage() {
     setError("");
     setMessage("");
     const { data, error: revokeError } = await supabase.rpc("revoke_portfolio_share", { requested_share_id: shareId });
-    if (revokeError || data !== true) {
+    const revoked = data as unknown as boolean;
+    if (revokeError || !revoked) {
       setError(revokeError?.message || "This share could not be revoked.");
       setSaving(false);
       return;
