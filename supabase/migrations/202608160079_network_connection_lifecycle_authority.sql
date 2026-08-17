@@ -35,7 +35,7 @@ drop policy if exists connection_requests_update_participants on public.connecti
 drop policy if exists connection_requests_delete_participants on public.connection_requests;
 create policy connection_requests_select_participants
 on public.connection_requests for select to authenticated
-using (auth.uid() = requester_id or auth.uid() = recipient_id);
+using ((select auth.uid()) = requester_id or (select auth.uid()) = recipient_id);
 
 drop policy if exists user_connections_select_owner on public.user_connections;
 drop policy if exists user_connections_insert_owner on public.user_connections;
@@ -43,7 +43,7 @@ drop policy if exists user_connections_delete_owner on public.user_connections;
 drop policy if exists user_connections_update_owner on public.user_connections;
 create policy user_connections_select_owner
 on public.user_connections for select to authenticated
-using (auth.uid() = user_id);
+using ((select auth.uid()) = user_id);
 
 revoke insert,update,delete on public.connection_requests from anon,authenticated;
 revoke insert,update,delete on public.user_connections from anon,authenticated;
@@ -71,8 +71,17 @@ begin
     raise exception 'A different recipient is required.' using errcode='22023';
   end if;
   if not exists (
-    select 1 from public.profiles p
-    where p.id=requested_recipient_id and p.profile_visibility='public'
+    select 1
+    from public.profiles p
+    where p.id=requested_recipient_id
+      and p.profile_visibility='public'
+      and exists (
+        select 1
+        from public.public_profile_publication_consents c
+        where c.scholar_id=p.id
+          and c.consent_version='public-profile-v1'
+          and c.revoked_at is null
+      )
   ) then
     raise exception 'Recipient is not available for Network discovery.' using errcode='42501';
   end if;
@@ -284,9 +293,100 @@ grant execute on function public.respond_to_connection_request(uuid,text) to aut
 grant execute on function public.cancel_connection_request(uuid) to authenticated;
 grant execute on function public.remove_connection(uuid) to authenticated;
 
+-- Public Network discovery inherits the exact versioned publication boundary used
+-- by the public Scholar profile. Participant identity resolution may still expose
+-- the bounded identity projection for an existing connection or pending request.
+create or replace function private.get_public_network_directory(
+  search_text text default null,
+  result_limit integer default 100
+)
+returns table(
+  id uuid,
+  username text,
+  full_name text,
+  first_name text,
+  last_name text,
+  role text,
+  avatar_url text,
+  school text,
+  sport text
+)
+language sql
+stable
+security definer
+set search_path=''
+as $$
+  select
+    p.id,p.username,p.full_name,p.first_name,p.last_name,
+    private.normalize_playbook_profile_role(coalesce(p.profile_mode,p.role,p.requested_role)) as role,
+    p.avatar_url,p.school,p.sport
+  from public.profiles p
+  where auth.uid() is not null
+    and p.id<>auth.uid()
+    and p.profile_visibility='public'
+    and exists (
+      select 1
+      from public.public_profile_publication_consents c
+      where c.scholar_id=p.id
+        and c.consent_version='public-profile-v1'
+        and c.revoked_at is null
+    )
+    and (
+      nullif(trim(coalesce(search_text,'')),'') is null
+      or coalesce(p.full_name,'') ilike '%'||trim(search_text)||'%'
+      or coalesce(p.username,'') ilike '%'||trim(search_text)||'%'
+      or coalesce(p.school,'') ilike '%'||trim(search_text)||'%'
+      or coalesce(p.sport,'') ilike '%'||trim(search_text)||'%'
+    )
+  order by p.created_at desc nulls last,p.id
+  limit least(greatest(coalesce(result_limit,100),1),100);
+$$;
+
+create or replace function private.get_network_member_identities(requested_ids uuid[])
+returns table(
+  id uuid,
+  username text,
+  full_name text,
+  first_name text,
+  last_name text,
+  role text,
+  avatar_url text,
+  school text,
+  sport text
+)
+language sql
+stable
+security definer
+set search_path=''
+as $$
+  select
+    p.id,p.username,p.full_name,p.first_name,p.last_name,
+    private.normalize_playbook_profile_role(coalesce(p.profile_mode,p.role,p.requested_role)) as role,
+    p.avatar_url,p.school,p.sport
+  from public.profiles p
+  where auth.uid() is not null
+    and cardinality(requested_ids) between 1 and 100
+    and p.id=any(requested_ids)
+    and (
+      (
+        p.profile_visibility='public'
+        and exists (
+          select 1
+          from public.public_profile_publication_consents c
+          where c.scholar_id=p.id
+            and c.consent_version='public-profile-v1'
+            and c.revoked_at is null
+        )
+      )
+      or private.can_resolve_network_identity(p.id)
+    );
+$$;
+
 comment on table public.connection_requests is
   'Canonical Network request lifecycle. Relationship mutations are governed by Network RPCs; authenticated clients receive participant-scoped reads only.';
 comment on table public.user_connections is
   'Canonical reciprocal Network connection edges. Accepted requests create both directions atomically through governed Network authority.';
 comment on function public.respond_to_connection_request(uuid,text) is
   'Recipient-only Network response boundary. Accept atomically records the request decision and both reciprocal connection edges.';
+comment on function private.get_public_network_directory(text,integer) is
+  'Authenticated Network discovery projection. A profile is discoverable only when public visibility is paired with active public-profile-v1 publication consent.';
