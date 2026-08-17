@@ -12,6 +12,7 @@ const REVIEW_TYPES = new Set([
   "brand-partner",
   "community-partner",
   "athlete-abroad",
+  "athlete-evidence",
 ]);
 
 const DECISIONS = new Set(["under_review", "approved", "rejected"]);
