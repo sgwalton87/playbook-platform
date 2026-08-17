@@ -32,6 +32,12 @@ type DashboardState = {
   reviewRequested: number;
 };
 
+function firstPartner(value: unknown): Partner | null {
+  const row = Array.isArray(value) ? value[0] : value;
+  if (!row || typeof row !== "object") return null;
+  return row as Partner;
+}
+
 export default function BrandPartnerOSPage() {
   return (
     <BrandPartnerVerificationGate>
@@ -54,7 +60,8 @@ function BrandPartnerWorkspace() {
 
       const organization = await supabase.rpc("ensure_brand_partner_organization");
       if (!active) return;
-      if (organization.error || !organization.data) {
+      const partner = firstPartner(organization.data);
+      if (organization.error || !partner) {
         setError(organization.error?.message || "Verified organization could not be resolved.");
         setState("error");
         return;
@@ -81,7 +88,6 @@ function BrandPartnerWorkspace() {
         return;
       }
 
-      const partner = organization.data as Partner;
       const approvedTypes = Array.isArray(verification.data?.campaign_types) ? verification.data.campaign_types.length : 0;
       const rows = campaigns.data || [];
       setDashboard({
