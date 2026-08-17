@@ -58,6 +58,12 @@ describe("Playbook capability map", () => {
     expect(source).toContain("canOpen && item.href");
   });
 
+  it("does not equate an Available route with end-to-end functionality certification", () => {
+    const source = fs.readFileSync(path.join(process.cwd(), "components/explore/CapabilityDirectory.tsx"), "utf8");
+    expect(source).not.toContain("See what works today");
+    expect(source).toContain("does not replace end-to-end functionality certification");
+  });
+
   it("keeps shipped Event reminders and Summit experiences discoverable", () => {
     const events = getCapabilityCatalog({ includeFounder: false }).find((group) => group.id === "events");
     expect(events?.items.find((item) => item.label === "Event reminders")).toMatchObject({ status: "available", href: "/events/reminders" });

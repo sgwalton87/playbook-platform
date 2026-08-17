@@ -38,7 +38,7 @@ export default function CapabilityDirectory({ groups, currentRole }: { groups: C
       <section style={hero}>
         <p style={eyebrow}>Explore Playbook</p>
         <h1 style={title}>Every capability has a home.</h1>
-        <p style={subtitle}>See what works today, what is built into the platform, what is still being audited, and what is planned next. Only real available destinations are clickable.</p>
+        <p style={subtitle}>See what has a real destination today, what is built into the platform, what is still being audited, and what is planned next. Available means a real route exists for authorized users; it does not replace end-to-end functionality certification.</p>
         <div style={metrics} aria-label="Capability status summary">
           <Metric label="Available" value={counts.available} />
           <Metric label="Built in" value={counts.builtIn} />
