@@ -78,6 +78,12 @@ values
  ('00000000-0000-0000-0000-00000000f412','00000000-0000-0000-0000-00000000f402','community','Private social preflight','private')
 on conflict(id) do nothing;
 
+-- Seed real interactions on the other user's private post as database owner.
+insert into public.feed_post_comments(post_id,user_id,body)
+values ('00000000-0000-0000-0000-00000000f412','00000000-0000-0000-0000-00000000f402','Hidden private comment');
+insert into public.feed_post_reactions(post_id,user_id,reaction)
+values ('00000000-0000-0000-0000-00000000f412','00000000-0000-0000-0000-00000000f402','like');
+
 set local role authenticated;
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000f401',true);
 
@@ -107,6 +113,12 @@ begin
     select 1 from public.feed_post_comments where post_id='00000000-0000-0000-0000-00000000f412'
   ) then
     raise exception 'Caller could read comments for another user private post.';
+  end if;
+
+  if exists (
+    select 1 from public.feed_post_reactions where post_id='00000000-0000-0000-0000-00000000f412'
+  ) then
+    raise exception 'Caller could read reactions for another user private post.';
   end if;
 end;
 $$;
