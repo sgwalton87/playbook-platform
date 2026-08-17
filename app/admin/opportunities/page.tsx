@@ -36,7 +36,7 @@ export default function MarketplaceOpportunityReviewPage() {
     setLoading(true); setError("");
     const result = await supabase.rpc("get_marketplace_opportunities_for_review");
     if (result.error) {
-      const denied = result.error.code === "42501" || result.error.message.toLowerCase().includes("operator authority");
+      const denied = result.error.message.toLowerCase().includes("operator authority");
       if (denied) setForbidden(true); else setError(result.error.message);
       setLoading(false); return;
     }
