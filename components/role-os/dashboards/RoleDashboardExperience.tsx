@@ -39,6 +39,7 @@ export default function RoleDashboardExperience({
           <PlaybookMetric key={metric.label} label={metric.label} value={metric.value} />
         ))}
       </PlaybookMetrics>
+      <p role="status" style={metricNotice}>Live role analytics are not connected to a canonical data source yet. Workflow access remains governed by your role and relationships; metrics will not report observed counts until a certified source is connected.</p>
 
       <PlaybookGrid min={300}>
         {dashboard.cards.map((card) => (
@@ -66,3 +67,5 @@ const body: React.CSSProperties = {
   color: "#64748B",
   lineHeight: 1.6,
 };
+
+const metricNotice: React.CSSProperties = { maxWidth: 1180, margin: "-8px auto 20px", padding: "12px 14px", borderRadius: 12, background: "#F8FAFC", border: "1px solid #E2E8F0", color: "#64748B", lineHeight: 1.5, fontSize: 12 };
