@@ -27,3 +27,54 @@ create policy recruiting_target_events_owner_all
   to authenticated
   using ((select auth.uid()) = scholar_id)
   with check ((select auth.uid()) = scholar_id);
+
+create or replace function public.record_recruiting_target_event()
+returns trigger
+language plpgsql
+security invoker
+set search_path = ''
+as $$
+begin
+  if tg_op = 'INSERT' then
+    insert into public.recruiting_target_events (
+      scholar_id,
+      recruiting_target_id,
+      event_type,
+      to_stage,
+      summary
+    ) values (
+      new.scholar_id,
+      new.id,
+      'target_created',
+      new.stage,
+      'Recruiting target added'
+    );
+    return new;
+  end if;
+
+  if tg_op = 'UPDATE' and old.stage is distinct from new.stage then
+    insert into public.recruiting_target_events (
+      scholar_id,
+      recruiting_target_id,
+      event_type,
+      from_stage,
+      to_stage,
+      summary
+    ) values (
+      new.scholar_id,
+      new.id,
+      'stage_change',
+      old.stage,
+      new.stage,
+      'Recruiting stage updated'
+    );
+  end if;
+
+  return new;
+end;
+$$;
+
+drop trigger if exists recruiting_target_event_trigger on public.recruiting_targets;
+create trigger recruiting_target_event_trigger
+after insert or update of stage on public.recruiting_targets
+for each row execute function public.record_recruiting_target_event();
