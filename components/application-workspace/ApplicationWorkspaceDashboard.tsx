@@ -1,6 +1,7 @@
 "use client";
 
 import ApplicationSupportRequestPanel from "@/components/application-workspace/ApplicationSupportRequestPanel";
+import MarketplaceApplicationSharingPanel from "@/components/application-workspace/MarketplaceApplicationSharingPanel";
 
 import { FormEvent, useEffect, useState } from "react";
 import { PlaybookCard, PlaybookGrid, PlaybookHero, PlaybookMetric, PlaybookMetrics, PlaybookPage, PlaybookPill } from "@/components/ui";
@@ -51,7 +52,7 @@ export default function ApplicationWorkspaceDashboard() {
     const response = await fetch("/api/application-workspaces", { method: "PATCH", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ workspaceId, taskId, action, requestId: crypto.randomUUID() }) });
     const body = await response.json() as { error?: string }; if (!response.ok) throw new Error(body.error || "Unable to update application workspace.");
-    await refresh(); setMessage(action === "APPLICATION_SUBMITTED" ? "Application marked submitted." : "Application task updated.");
+    await refresh(); setMessage(action === "APPLICATION_SUBMITTED" ? "Application marked submitted. Marketplace sharing is still off until you explicitly consent below." : "Application task updated.");
   } catch (value) { setError(value instanceof Error ? value.message : "Unable to update application workspace."); } finally { setBusy(false); } }
 
   async function upload(workspaceId: string, file?: File) { if (!file) return; setBusy(true); setError(null); try {
@@ -83,7 +84,8 @@ export default function ApplicationWorkspaceDashboard() {
           <PlaybookCard eyebrow="Status" title="Submission readiness"><PlaybookPill>{workspace.status}</PlaybookPill><p>{workspace.delivery_state === "DELIVERED" ? "PBOS lifecycle connected" : "PBOS delivery pending"}</p>
             {workspace.status === "ready" && <button disabled={busy} onClick={() => transition(workspace.id, "APPLICATION_SUBMITTED")}>Mark application submitted</button>}</PlaybookCard></PlaybookGrid>
       </section>; })}
-  <ApplicationSupportRequestPanel />
+    <MarketplaceApplicationSharingPanel workspaces={workspaces.map((workspace) => ({ id: workspace.id, opportunity_id: workspace.opportunity_id, opportunity_name: workspace.opportunity_name, status: workspace.status }))} />
+    <ApplicationSupportRequestPanel />
   </PlaybookPage>;
 }
 
