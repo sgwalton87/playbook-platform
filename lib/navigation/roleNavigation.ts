@@ -1,302 +1,97 @@
 import { normalizePlaybookRole } from "@/lib/roles/registry";
 
-export type NavItem = {
-  label: string;
-  href: string;
-  icon: string;
-};
+export type NavItem = { label: string; href: string; icon: string };
+export type RoleNavigation = { home: string; label: string; items: NavItem[] };
 
-export type RoleNavigation = {
-  home: string;
-  label: string;
-  items: NavItem[];
-};
-
-const SHARED_PROFILE: NavItem = {
-  label: "Profile",
-  href: "/profile",
-  icon: "👤",
-};
-
-const SHARED_MESSAGES: NavItem = {
-  label: "Messages",
-  href: "/messages",
-  icon: "💬",
-};
-
-const SHARED_COURSES: NavItem = {
-  label: "Courses",
-  href: "/courses",
-  icon: "🎓",
-};
-
-const SHARED_OPPORTUNITIES: NavItem = {
-  label: "Opportunities",
-  href: "/opportunities",
-  icon: "🚀",
-};
+const SHARED_PROFILE: NavItem = { label: "Profile", href: "/profile", icon: "👤" };
+const SHARED_MESSAGES: NavItem = { label: "Messages", href: "/messages", icon: "💬" };
+const SHARED_COURSES: NavItem = { label: "Courses", href: "/courses", icon: "🎓" };
+const SHARED_OPPORTUNITIES: NavItem = { label: "Opportunities", href: "/opportunities", icon: "🚀" };
+const SHARED_EXPLORE: NavItem = { label: "Explore Playbook", href: "/explore", icon: "✦" };
 
 export const ROLE_NAVIGATION: Record<string, RoleNavigation> = {
   scholar: {
-    home: "/dashboard",
-    label: "Scholar OS",
+    home: "/dashboard", label: "Scholar OS",
     items: [
       { label: "Dashboard", href: "/dashboard", icon: "🏠" },
       { label: "Start Here", href: "/start", icon: "▶️" },
       { label: "Transcript", href: "/transcript", icon: "📄" },
-      {
-        label: "Academic Readiness",
-        href: "/academic-readiness",
-        icon: "📚",
-      },
+      { label: "Academic Readiness", href: "/academic-readiness", icon: "📚" },
       { label: "Compass", href: "/compass", icon: "🧭" },
-      SHARED_OPPORTUNITIES,
-      SHARED_COURSES,
-      SHARED_MESSAGES,
-      SHARED_PROFILE,
+      SHARED_OPPORTUNITIES, SHARED_COURSES, SHARED_MESSAGES, SHARED_PROFILE,
     ],
   },
-
   "scholar-athlete": {
-    home: "/scholar-athlete-os",
-    label: "Scholar-Athlete OS",
+    home: "/scholar-athlete-os", label: "Scholar-Athlete OS",
     items: [
-      {
-        label: "Athlete Dashboard",
-        href: "/scholar-athlete-os",
-        icon: "🏆",
-      },
+      { label: "Athlete Dashboard", href: "/scholar-athlete-os", icon: "🏆" },
       { label: "Start Here", href: "/start", icon: "▶️" },
       { label: "Transcript", href: "/transcript", icon: "📄" },
-      {
-        label: "Academic Readiness",
-        href: "/academic-readiness",
-        icon: "📚",
-      },
+      { label: "Academic Readiness", href: "/academic-readiness", icon: "📚" },
       { label: "Compass", href: "/compass", icon: "🧭" },
-      SHARED_OPPORTUNITIES,
-      SHARED_COURSES,
-      SHARED_MESSAGES,
-      SHARED_PROFILE,
+      SHARED_OPPORTUNITIES, SHARED_COURSES, SHARED_MESSAGES, SHARED_PROFILE,
     ],
   },
-
   "brand-partner": {
-    home: "/brand-partner-os",
-    label: "Brand Partner OS",
-    items: [
-      {
-        label: "Partner Dashboard",
-        href: "/brand-partner-os",
-        icon: "🤝",
-      },
-      SHARED_OPPORTUNITIES,
-      SHARED_COURSES,
-      SHARED_MESSAGES,
-      SHARED_PROFILE,
-    ],
+    home: "/brand-partner-os", label: "Brand Partner OS",
+    items: [{ label: "Partner Dashboard", href: "/brand-partner-os", icon: "🤝" }, SHARED_OPPORTUNITIES, SHARED_COURSES, SHARED_MESSAGES, SHARED_PROFILE],
   },
-
   family: {
-    home: "/family-os",
-    label: "Family OS",
-    items: [
-      {
-        label: "Family Dashboard",
-        href: "/family-os",
-        icon: "🏠",
-      },
-      SHARED_OPPORTUNITIES,
-      SHARED_COURSES,
-      SHARED_MESSAGES,
-      SHARED_PROFILE,
-    ],
+    home: "/family-os", label: "Family OS",
+    items: [{ label: "Family Dashboard", href: "/family-os", icon: "🏠" }, SHARED_OPPORTUNITIES, SHARED_COURSES, SHARED_MESSAGES, SHARED_PROFILE],
   },
-
   mentor: {
-    home: "/mentor-os",
-    label: "Mentor OS",
-    items: [
-      {
-        label: "Mentor Dashboard",
-        href: "/mentor-os",
-        icon: "🧭",
-      },
-      SHARED_OPPORTUNITIES,
-      SHARED_COURSES,
-      SHARED_MESSAGES,
-      SHARED_PROFILE,
-    ],
+    home: "/mentor-os", label: "Mentor OS",
+    items: [{ label: "Mentor Dashboard", href: "/mentor-os", icon: "🧭" }, SHARED_OPPORTUNITIES, SHARED_COURSES, SHARED_MESSAGES, SHARED_PROFILE],
   },
-
   educator: {
-    home: "/educator-os",
-    label: "Educator OS",
-    items: [
-      {
-        label: "Educator Dashboard",
-        href: "/educator-os",
-        icon: "🍎",
-      },
-      {
-        label: "Academic Readiness",
-        href: "/academic-readiness",
-        icon: "📚",
-      },
-      SHARED_OPPORTUNITIES,
-      SHARED_COURSES,
-      SHARED_MESSAGES,
-      SHARED_PROFILE,
-    ],
+    home: "/educator-os", label: "Educator OS",
+    items: [{ label: "Educator Dashboard", href: "/educator-os", icon: "🍎" }, { label: "Academic Readiness", href: "/academic-readiness", icon: "📚" }, SHARED_OPPORTUNITIES, SHARED_COURSES, SHARED_MESSAGES, SHARED_PROFILE],
   },
-
   "high-school-counselor": {
-    home: "/counselor-os",
-    label: "Counselor OS",
-    items: [
-      { label: "Counselor Dashboard", href: "/counselor-os", icon: "◎" },
-      { label: "Academic Readiness", href: "/academic-readiness", icon: "△" },
-      SHARED_OPPORTUNITIES,
-      SHARED_COURSES,
-      SHARED_MESSAGES,
-      SHARED_PROFILE,
-    ],
+    home: "/counselor-os", label: "Counselor OS",
+    items: [{ label: "Counselor Dashboard", href: "/counselor-os", icon: "◎" }, { label: "Academic Readiness", href: "/academic-readiness", icon: "△" }, SHARED_OPPORTUNITIES, SHARED_COURSES, SHARED_MESSAGES, SHARED_PROFILE],
   },
-
   coach: {
-    home: "/coach-os",
-    label: "Coach OS",
-    items: [
-      {
-        label: "Coach Dashboard",
-        href: "/coach-os",
-        icon: "📋",
-      },
-      {
-        label: "Academic Readiness",
-        href: "/academic-readiness",
-        icon: "📚",
-      },
-      SHARED_OPPORTUNITIES,
-      SHARED_COURSES,
-      SHARED_MESSAGES,
-      SHARED_PROFILE,
-    ],
+    home: "/coach-os", label: "Coach OS",
+    items: [{ label: "Coach Dashboard", href: "/coach-os", icon: "📋" }, { label: "Academic Readiness", href: "/academic-readiness", icon: "📚" }, SHARED_OPPORTUNITIES, SHARED_COURSES, SHARED_MESSAGES, SHARED_PROFILE],
   },
-
   "college-coach": {
-    home: "/recruiting-os",
-    label: "Recruiting OS",
-    items: [
-      {
-        label: "Recruiting Dashboard",
-        href: "/recruiting-os",
-        icon: "🔎",
-      },
-      SHARED_OPPORTUNITIES,
-      SHARED_MESSAGES,
-      SHARED_PROFILE,
-    ],
+    home: "/recruiting-os", label: "Recruiting OS",
+    items: [{ label: "Recruiting Dashboard", href: "/recruiting-os", icon: "🔎" }, SHARED_OPPORTUNITIES, SHARED_MESSAGES, SHARED_PROFILE],
   },
-
   "college-admissions": {
-    home: "/admissions-os",
-    label: "Admissions OS",
-    items: [
-      {
-        label: "Admissions Dashboard",
-        href: "/admissions-os",
-        icon: "🏛️",
-      },
-      SHARED_OPPORTUNITIES,
-      SHARED_MESSAGES,
-      SHARED_PROFILE,
-    ],
+    home: "/admissions-os", label: "Admissions OS",
+    items: [{ label: "Admissions Dashboard", href: "/admissions-os", icon: "🏛️" }, SHARED_OPPORTUNITIES, SHARED_MESSAGES, SHARED_PROFILE],
   },
-
   "transition-youth": {
-    home: "/transition-youth-os",
-    label: "TAY OS",
-    items: [
-      { label: "TAY Dashboard", href: "/transition-youth-os", icon: "🏠" },
-      { label: "Start Here", href: "/start", icon: "▶️" },
-      { label: "Compass", href: "/compass", icon: "🧭" },
-      SHARED_OPPORTUNITIES,
-      SHARED_COURSES,
-      SHARED_MESSAGES,
-      SHARED_PROFILE,
-    ],
+    home: "/transition-youth-os", label: "TAY OS",
+    items: [{ label: "TAY Dashboard", href: "/transition-youth-os", icon: "🏠" }, { label: "Start Here", href: "/start", icon: "▶️" }, { label: "Compass", href: "/compass", icon: "🧭" }, SHARED_OPPORTUNITIES, SHARED_COURSES, SHARED_MESSAGES, SHARED_PROFILE],
   },
-
   employer: {
-    home: "/employer-os",
-    label: "Employer OS",
-    items: [
-      {
-        label: "Employer Dashboard",
-        href: "/employer-os",
-        icon: "💼",
-      },
-      SHARED_OPPORTUNITIES,
-      SHARED_MESSAGES,
-      SHARED_PROFILE,
-    ],
+    home: "/employer-os", label: "Employer OS",
+    items: [{ label: "Employer Dashboard", href: "/employer-os", icon: "💼" }, SHARED_OPPORTUNITIES, SHARED_MESSAGES, SHARED_PROFILE],
   },
-
   district: {
-    home: "/district-os",
-    label: "District OS",
-    items: [
-      { label: "District Dashboard", href: "/district-os", icon: "▦" },
-      { label: "Academic Readiness", href: "/academic-readiness", icon: "△" },
-      SHARED_OPPORTUNITIES,
-      SHARED_MESSAGES,
-      SHARED_PROFILE,
-    ],
+    home: "/district-os", label: "District OS",
+    items: [{ label: "District Dashboard", href: "/district-os", icon: "▦" }, { label: "Academic Readiness", href: "/academic-readiness", icon: "△" }, SHARED_OPPORTUNITIES, SHARED_MESSAGES, SHARED_PROFILE],
   },
-
   "athlete-abroad": {
-    home: "/athlete-abroad-os",
-    label: "Athlete Abroad OS",
-    items: [
-      { label: "Global Dashboard", href: "/athlete-abroad-os", icon: "◉" },
-      { label: "Start Here", href: "/start", icon: "▶" },
-      { label: "Academic Readiness", href: "/academic-readiness", icon: "△" },
-      SHARED_OPPORTUNITIES,
-      SHARED_COURSES,
-      SHARED_MESSAGES,
-      SHARED_PROFILE,
-    ],
+    home: "/athlete-abroad-os", label: "Athlete Abroad OS",
+    items: [{ label: "Global Dashboard", href: "/athlete-abroad-os", icon: "◉" }, { label: "Start Here", href: "/start", icon: "▶" }, { label: "Academic Readiness", href: "/academic-readiness", icon: "△" }, SHARED_OPPORTUNITIES, SHARED_COURSES, SHARED_MESSAGES, SHARED_PROFILE],
   },
-
   other: {
-    home: "/community-partner-os",
-    label: "Community Partner OS",
-    items: [
-      { label: "Partner Dashboard", href: "/community-partner-os", icon: "🏠" },
-      SHARED_OPPORTUNITIES,
-      SHARED_COURSES,
-      SHARED_MESSAGES,
-      SHARED_PROFILE,
-    ],
+    home: "/community-partner-os", label: "Community Partner OS",
+    items: [{ label: "Partner Dashboard", href: "/community-partner-os", icon: "🏠" }, SHARED_OPPORTUNITIES, SHARED_COURSES, SHARED_MESSAGES, SHARED_PROFILE],
   },
 };
 
-export function normalizeNavigationRole(
-  profileMode?: string | null,
-  role?: string | null
-) {
+export function normalizeNavigationRole(profileMode?: string | null, role?: string | null) {
   return normalizePlaybookRole(profileMode || role);
 }
 
-export function getRoleNavigation(
-  profileMode?: string | null,
-  role?: string | null
-): RoleNavigation {
+export function getRoleNavigation(profileMode?: string | null, role?: string | null): RoleNavigation {
   const normalized = normalizeNavigationRole(profileMode, role);
-
-  return (
-    ROLE_NAVIGATION[normalized] ||
-    ROLE_NAVIGATION.other
-  );
+  const navigation = ROLE_NAVIGATION[normalized] || ROLE_NAVIGATION.other;
+  return { ...navigation, items: [...navigation.items, SHARED_EXPLORE] };
 }

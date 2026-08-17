@@ -15,8 +15,8 @@ export const ACCOUNT_CAPABILITY_GROUP: CapabilityGroup = {
     { label: "Session timeout", description: "Shared inactivity warning and secure sign-out behavior.", status: "built-in" },
     { label: "Password recovery", description: "Protected reset flow initiated from the login experience.", status: "built-in" },
     { label: "Role selection", description: "Choose the Playbook role that determines onboarding and the authorized OS destination.", href: "/role-select", status: "available" },
-    { label: "Onboarding", description: "Complete the role-aware setup that creates your private Playbook Record and routes you to the correct OS.", href: "/start", status: "available" },
-    { label: "Onboarding autosave", description: "Durably saves ordinary onboarding edits through the owner-scoped profile authority.", status: "built-in" },
+    { label: "Onboarding", description: "Complete role-aware setup, create the private Playbook Record, and route to the correct OS.", href: "/start", status: "available" },
+    { label: "Onboarding autosave", description: "Durably saves ordinary onboarding edits through owner-scoped profile authority.", status: "built-in" },
     { label: "Dynamic user agreement", description: "Role-aware agreement and consent experience tied to onboarding requirements.", status: "in-audit" },
   ],
 };
@@ -29,7 +29,7 @@ export const FOUNDER_CAPABILITY_GROUP: CapabilityGroup = {
   items: [
     { label: "Founder Command Center", description: "Restricted Founder/Admin entry point for platform inspection and stewardship.", href: "/founder", status: "available" },
     { label: "Verification Review Center", description: "Review role-verification evidence through the database-backed reviewer authority.", href: "/admin", status: "available" },
-    { label: "Playbook Studio", description: "Restricted inspection workspace. Operational health remains explicitly Not connected until backed by real observability.", href: "/studio", status: "available" },
+    { label: "Playbook Studio", description: "Restricted inspection workspace. Operational health stays Not connected until backed by real observability.", href: "/studio", status: "available" },
     { label: "Project intelligence", description: "Evidence-backed view of product capability, dependency, and delivery state.", status: "planned" },
     { label: "Analytics", description: "Privacy-respecting adoption, outcome, reliability, and experience analytics.", status: "planned" },
     { label: "User management", description: "Governed identity and account administration with least-privilege controls.", status: "planned" },
@@ -44,10 +44,28 @@ export const FOUNDER_CAPABILITY_GROUP: CapabilityGroup = {
   ],
 };
 
+const availableRouteCorrections: Record<string, string> = {
+  "recruiting:College targets": "/recruiting",
+  "recruiting:Coach & recruiter discovery": "/recruiting/connections",
+  "recruiting:NIL readiness": "/recruiting/nil/preparation",
+  "recruiting:NIL deals": "/recruiting/nil",
+};
+
+function normalizedPlatformGroups(): CapabilityGroup[] {
+  return CAPABILITY_GROUPS.map((group) => ({
+    ...group,
+    items: group.items.map((item) => {
+      if (item.status !== "available") return { ...item, href: undefined };
+      const correctedHref = availableRouteCorrections[`${group.id}:${item.label}`];
+      return correctedHref ? { ...item, href: correctedHref } : item;
+    }),
+  }));
+}
+
 export function getCapabilityCatalog({ includeFounder = false }: { includeFounder?: boolean } = {}) {
   return [
     ACCOUNT_CAPABILITY_GROUP,
-    ...CAPABILITY_GROUPS,
+    ...normalizedPlatformGroups(),
     ...(includeFounder ? [FOUNDER_CAPABILITY_GROUP] : []),
   ];
 }
