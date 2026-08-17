@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { assertCanonicalOperatingSystemRegistry, getAllRoleOS, getRoleOS,
   PLAYBOOK_OPERATING_SYSTEMS } from "@/lib/role-os";
@@ -43,7 +45,14 @@ describe("Role Dashboard Experiences", () => {
     expect(serialized).not.toContain("Maya");
     expect(serialized).not.toContain("Kaiser Permanente");
     expect(serialized).not.toContain("$6.3M");
-    expect(serialized).toContain("0 connected");
+    expect(serialized).not.toMatch(/0 (connected|authorized|open|sent|received|scheduled)/);
+    expect(serialized).toContain("Not connected");
+  });
+
+  it("tells users that generic role analytics are not yet connected", () => {
+    const source = fs.readFileSync(path.join(process.cwd(), "components/role-os/dashboards/RoleDashboardExperience.tsx"), "utf8");
+    expect(source).toContain("Live role analytics are not connected to a canonical data source yet");
+    expect(source).toContain('role="status"');
   });
 
   it("shared role dashboard component is defined", () => {
