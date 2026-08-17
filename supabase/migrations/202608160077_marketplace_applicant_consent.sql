@@ -58,7 +58,7 @@ begin
     raise exception 'A submitted Scholar-owned Application Workspace is required.' using errcode='42501';
   end if;
 
-  select * into opportunity
+  select o.* into opportunity
     from public.marketplace_opportunities o
     join public.brand_partners p on p.id=o.partner_id
    where o.id::text=workspace.opportunity_id
