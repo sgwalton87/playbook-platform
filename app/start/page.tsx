@@ -147,7 +147,14 @@ function StartContent() {
 
     const { data } = supabase.storage.from("avatars").getPublicUrl(path);
     update("avatar_url", data.publicUrl);
-    await persist(false, { avatar_url: data.publicUrl });
+    try {
+      await persist(false, { avatar_url: data.publicUrl });
+      lastSavedFormRef.current = JSON.stringify({ ...form, avatar_url: data.publicUrl });
+      setAutosaveStatus("saved");
+    } catch (saveError) {
+      setAutosaveStatus("error");
+      setJourneyError(saveError instanceof Error ? saveError.message : "Your profile photo could not be linked to your Scholar Record.");
+    }
   }
 
   async function persist(
@@ -210,7 +217,9 @@ function StartContent() {
     setProfile((prev: LegacyValue) => ({ ...prev, ...payload }));
   }
 
-  persistRef.current = persist;
+  useEffect(() => {
+    persistRef.current = persist;
+  });
 
   useEffect(() => {
     if (!onboardingLoadedRef.current || !user?.id || creating || created) return;
