@@ -76,14 +76,17 @@ declare
 begin
   select exists (
     select 1
-    from public.athlete_eligibility_rulesets r,
-         jsonb_array_elements(coalesce(r.requirements_json -> 'requirements', '[]'::jsonb)) requirement
+    from public.athlete_eligibility_rulesets r
     where r.id = new.ruleset_id
-      and requirement ->> 'key' = new.requirement_key
+      and jsonb_path_exists(
+        r.requirements_json,
+        '$.** ? (@.key == $requested_key)',
+        jsonb_build_object('requested_key', new.requirement_key)
+      )
   ) into requirement_exists;
 
   if not requirement_exists then
-    raise exception 'requirement key is not a top-level requirement in the selected eligibility ruleset' using errcode = '22023';
+    raise exception 'requirement key is not present in the selected eligibility ruleset' using errcode = '22023';
   end if;
 
   if new.athlete_evidence_id is not null then
