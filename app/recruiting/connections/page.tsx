@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   PlaybookButton,
@@ -32,8 +32,47 @@ type SupportRelationship = {
 
 type RelationshipState = "available" | "pending" | "connected";
 
+type WorkspaceData = {
+  profiles: DirectoryProfile[];
+  invitations: PendingInvitation[];
+  relationships: SupportRelationship[];
+};
+
+async function fetchWorkspace(userId: string): Promise<WorkspaceData> {
+  const [directoryResult, invitationResult, relationshipResult] = await Promise.all([
+    supabase
+      .from("support_directory_profiles")
+      .select("user_id,role,display_name,organization,expertise")
+      .eq("searchable", true)
+      .in("role", ["coach", "college_recruiter"])
+      .order("display_name", { ascending: true }),
+    supabase
+      .from("support_invitations")
+      .select("invitee_user_id,relationship,status")
+      .eq("scholar_id", userId)
+      .in("relationship", ["coach", "college_recruiter"])
+      .eq("status", "pending"),
+    supabase
+      .from("support_relationships")
+      .select("supporter_id,relationship,status")
+      .eq("scholar_id", userId)
+      .in("relationship", ["coach", "college_recruiter"])
+      .eq("status", "active"),
+  ]);
+
+  const firstError = directoryResult.error || invitationResult.error || relationshipResult.error;
+  if (firstError) throw firstError;
+
+  return {
+    profiles: (directoryResult.data || []) as DirectoryProfile[],
+    invitations: (invitationResult.data || []) as PendingInvitation[],
+    relationships: (relationshipResult.data || []) as SupportRelationship[],
+  };
+}
+
 export default function RecruitingConnectionsPage() {
   const router = useRouter();
+  const [ownerId, setOwnerId] = useState<string | null>(null);
   const [profiles, setProfiles] = useState<DirectoryProfile[]>([]);
   const [invitations, setInvitations] = useState<PendingInvitation[]>([]);
   const [relationships, setRelationships] = useState<SupportRelationship[]>([]);
@@ -44,55 +83,37 @@ export default function RecruitingConnectionsPage() {
   const [roleFilter, setRoleFilter] = useState<"all" | DirectoryProfile["role"]>("all");
   const [sendingTo, setSendingTo] = useState<string | null>(null);
 
-  const loadWorkspace = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+  useEffect(() => {
+    let active = true;
 
-    const { data: auth, error: authError } = await supabase.auth.getUser();
-    if (authError || !auth.user) {
-      router.replace("/login");
-      return;
+    async function load() {
+      const { data: auth, error: authError } = await supabase.auth.getUser();
+      if (!active) return;
+      if (authError || !auth.user) {
+        router.replace("/login?next=/recruiting/connections");
+        return;
+      }
+
+      try {
+        const workspace = await fetchWorkspace(auth.user.id);
+        if (!active) return;
+        setOwnerId(auth.user.id);
+        setProfiles(workspace.profiles);
+        setInvitations(workspace.invitations);
+        setRelationships(workspace.relationships);
+      } catch (loadError) {
+        if (!active) return;
+        setError(loadError instanceof Error ? loadError.message : "Unable to load the verified recruiting network.");
+      } finally {
+        if (active) setLoading(false);
+      }
     }
 
-    const [directoryResult, invitationResult, relationshipResult] = await Promise.all([
-      supabase
-        .from("support_directory_profiles")
-        .select("user_id,role,display_name,organization,expertise")
-        .eq("searchable", true)
-        .in("role", ["coach", "college_recruiter"])
-        .order("display_name", { ascending: true }),
-      supabase
-        .from("support_invitations")
-        .select("invitee_user_id,relationship,status")
-        .eq("scholar_id", auth.user.id)
-        .in("relationship", ["coach", "college_recruiter"])
-        .eq("status", "pending"),
-      supabase
-        .from("support_relationships")
-        .select("supporter_id,relationship,status")
-        .eq("scholar_id", auth.user.id)
-        .in("relationship", ["coach", "college_recruiter"])
-        .eq("status", "active"),
-    ]);
-
-    const firstError = directoryResult.error || invitationResult.error || relationshipResult.error;
-    if (firstError) {
-      setError(firstError.message);
-      setLoading(false);
-      return;
-    }
-
-    setProfiles((directoryResult.data || []) as DirectoryProfile[]);
-    setInvitations((invitationResult.data || []) as PendingInvitation[]);
-    setRelationships((relationshipResult.data || []) as SupportRelationship[]);
-    setLoading(false);
+    void load();
+    return () => { active = false; };
   }, [router]);
 
-  useEffect(() => {
-    void loadWorkspace();
-  }, [loadWorkspace]);
-
-  const stateFor = useCallback((profile: DirectoryProfile): RelationshipState => {
+  function stateFor(profile: DirectoryProfile): RelationshipState {
     if (relationships.some((row) => row.supporter_id === profile.user_id && row.relationship === profile.role && row.status === "active")) {
       return "connected";
     }
@@ -100,21 +121,20 @@ export default function RecruitingConnectionsPage() {
       return "pending";
     }
     return "available";
-  }, [invitations, relationships]);
+  }
 
-  const filteredProfiles = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
-    return profiles.filter((profile) => {
-      if (roleFilter !== "all" && profile.role !== roleFilter) return false;
-      if (!normalizedQuery) return true;
-      return [profile.display_name, profile.organization || "", ...(profile.expertise || [])]
-        .join(" ")
-        .toLowerCase()
-        .includes(normalizedQuery);
-    });
-  }, [profiles, query, roleFilter]);
+  const normalizedQuery = query.trim().toLowerCase();
+  const filteredProfiles = profiles.filter((profile) => {
+    if (roleFilter !== "all" && profile.role !== roleFilter) return false;
+    if (!normalizedQuery) return true;
+    return [profile.display_name, profile.organization || "", ...(profile.expertise || [])]
+      .join(" ")
+      .toLowerCase()
+      .includes(normalizedQuery);
+  });
 
   async function invite(profile: DirectoryProfile) {
+    if (!ownerId) return;
     setSendingTo(profile.user_id);
     setError(null);
     setNotice(null);
@@ -130,9 +150,17 @@ export default function RecruitingConnectionsPage() {
       return;
     }
 
-    setNotice(`Connection invitation sent to ${profile.display_name}. No Scholar-record access was granted.`);
-    setSendingTo(null);
-    await loadWorkspace();
+    try {
+      const workspace = await fetchWorkspace(ownerId);
+      setProfiles(workspace.profiles);
+      setInvitations(workspace.invitations);
+      setRelationships(workspace.relationships);
+      setNotice(`Connection invitation sent to ${profile.display_name}. No Scholar-record access was granted.`);
+    } catch (reloadError) {
+      setError(reloadError instanceof Error ? reloadError.message : "Invitation was created, but the network status could not be refreshed.");
+    } finally {
+      setSendingTo(null);
+    }
   }
 
   return (
@@ -172,13 +200,7 @@ export default function RecruitingConnectionsPage() {
           <div style={filters}>
             <label style={fieldLabel}>
               Search
-              <input
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Name, school, college, sport, position…"
-                style={input}
-                type="search"
-              />
+              <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Name, school, college, sport, position…" style={input} type="search" />
             </label>
             <label style={fieldLabel}>
               Role
