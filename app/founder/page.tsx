@@ -20,9 +20,9 @@ export default function FounderPage() {
       />
 
       <PlaybookMetrics>
-        <PlaybookMetric label="Studio" value="Active" />
-        <PlaybookMetric label="Beta 3.4" value="Audit" />
-        <PlaybookMetric label="System Health" value="Green" />
+        <PlaybookMetric label="Operator access" value="Verified" />
+        <PlaybookMetric label="System health" value="Not connected" />
+        <PlaybookMetric label="Release status" value="Not connected" />
       </PlaybookMetrics>
 
       <PlaybookGrid>

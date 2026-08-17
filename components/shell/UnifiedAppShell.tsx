@@ -11,12 +11,8 @@ import ProfileAvatar from "@/components/ProfileAvatar";
 import ActiveScholarContextSelector from "@/components/shell/ActiveScholarContextSelector";
 import { supabase } from "@/lib/supabaseClient";
 import { logout } from "@/lib/auth/logout";
+import { isPlatformOperatorRole } from "@/lib/auth/platformOperator";
 
-const ROUTE_ROLE_PREVIEWS: Array<[string, string]> = [
-  ["/scholar-athlete-os", "scholar-athlete"], ["/athlete-abroad-os", "athlete-abroad"], ["/brand-partner-os", "brand-partner"],
-  ["/family-os", "family"], ["/mentor-os", "mentor"], ["/educator-os", "educator"], ["/employer-os", "employer"],
-  ["/university-os", "college-admissions"], ["/district-os", "district"],
-];
 const AUTH_FULLSCREEN_ROUTES = ["/", "/login", "/check-email", "/start", "/auth/callback", "/pending", "/role-select", "/reset-password"];
 
 type ShellContext = { evidenceCount: number; pendingVerificationCount: number; unreadAttentionCount: number; activeSupportCount: number };
@@ -54,12 +50,11 @@ export default function UnifiedAppShell({ children }: { children: React.ReactNod
     return () => { active = false; };
   }, [pathname]);
 
-  const previewRole = ROUTE_ROLE_PREVIEWS.find(([route]) => pathname === route || pathname?.startsWith(`${route}/`))?.[1];
-  const roleNav = useMemo(() => getRoleNavigation(previewRole || profile?.profile_mode, profile?.role), [previewRole, profile?.profile_mode, profile?.role]);
+  const roleNav = useMemo(() => getRoleNavigation(profile?.profile_mode, profile?.role), [profile?.profile_mode, profile?.role]);
   const founderNav = useMemo(() => {
-    const base = getNavigationForRole(profile?.role || profile?.profile_mode || "");
-    return profile?.role === "founder" || profile?.profile_mode === "founder" ? base.founder : [];
-  }, [profile?.role, profile?.profile_mode]);
+    if (!isPlatformOperatorRole(profile?.role)) return [];
+    return getNavigationForRole(profile?.role).founder;
+  }, [profile?.role]);
 
   if (!shouldUseAppShell(pathname || "/")) return <>{children}</>;
   if (AUTH_FULLSCREEN_ROUTES.some((route) => pathname === route || pathname.startsWith(route + "/"))) return <>{children}</>;
