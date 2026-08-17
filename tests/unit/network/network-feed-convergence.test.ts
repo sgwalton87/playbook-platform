@@ -51,6 +51,17 @@ describe("canonical network and feed convergence", () => {
     expect(source).not.toContain('.from("user_connections").select("connected_user_id,user_id")');
   });
 
+  it("uses the deterministic Suggested Users authority and explains every suggestion with mutual evidence", () => {
+    const source = read("app/connections/page.tsx");
+    const spec = read("docs/ENGINEERING/NETWORK_SUGGESTED_USERS_SPEC.md");
+    expect(source).toContain('rpc("get_network_suggested_users"');
+    expect(source).toContain('type Tab = "suggested" | "discover" | "connected" | "requests"');
+    expect(source).toContain("Suggested because of mutual connections");
+    expect(source).toContain("No suggestions yet");
+    expect(spec).toContain("Mutual connection count descending");
+    expect(spec).toContain("must not substitute random members");
+  });
+
   it("routes the Network connection lifecycle through governed RPCs only", () => {
     const source = read("app/connections/page.tsx");
     expect(source).toContain('rpc("send_connection_request"');
