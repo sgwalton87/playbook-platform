@@ -51,8 +51,15 @@ with check (
     select 1
       from public.profiles p
      where p.id = (select auth.uid())
-       and coalesce(p.profile_mode, p.role::text, p.requested_role)
-         in ('scholar', 'scholar-athlete', 'transition-youth')
+       and replace(
+         lower(coalesce(
+           nullif(trim(p.profile_mode), ''),
+           nullif(trim(p.role::text), ''),
+           nullif(trim(p.requested_role), '')
+         )),
+         '_',
+         '-'
+       ) in ('scholar', 'scholar-athlete', 'transition-youth')
   )
 );
 
