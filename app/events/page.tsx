@@ -109,6 +109,7 @@ export default function EventsPage() {
     <PlaybookPage>
       <PlaybookHero eyebrow="Playbook Community" title="Events that move your record forward" subtitle="Discover workshops, labs, civic experiences, networking, and community gatherings. RSVP state, capacity, arrival evidence, verified attendance, and earned rewards remain distinct governed records.">
         <div style={heroActions}>
+          <PlaybookButton href="/events/reminders" variant="secondary">Event Reminders</PlaybookButton>
           <PlaybookButton href="/events/replays" variant="secondary">Replay Library</PlaybookButton>
         </div>
       </PlaybookHero>
