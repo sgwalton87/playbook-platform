@@ -26,7 +26,7 @@ type CommunityEvent = {
 };
 
 type EventsResponse = { events?: CommunityEvent[]; error?: string };
-const FILTERS = ["All", "Leadership", "Finance", "Civic", "SEL", "NIL", "College", "Community"];
+const FILTERS = ["All", "Summit", "Leadership", "Finance", "Civic", "SEL", "NIL", "College", "Community"];
 
 async function fetchEvents(): Promise<CommunityEvent[]> {
   const response = await fetch("/api/community/events", { cache: "no-store" });
@@ -97,9 +97,9 @@ export default function EventsPage() {
   }
 
   const visible = useMemo(() => events.filter((event) => {
-    const pillarMatch = filter === "All" || event.pillar === filter;
+    const categoryMatch = filter === "All" || (filter === "Summit" ? event.event_type === "summit" : event.pillar === filter);
     const mineMatch = !mineOnly || Boolean(event.my_rsvp && event.my_rsvp !== "cancelled");
-    return pillarMatch && mineMatch;
+    return categoryMatch && mineMatch;
   }), [events, filter, mineOnly]);
 
   const myEvents = events.filter((event) => event.my_rsvp && event.my_rsvp !== "cancelled");
@@ -107,7 +107,7 @@ export default function EventsPage() {
 
   return (
     <PlaybookPage>
-      <PlaybookHero eyebrow="Playbook Community" title="Events that move your record forward" subtitle="Discover workshops, labs, civic experiences, networking, and community gatherings. RSVP state, capacity, arrival evidence, verified attendance, and earned rewards remain distinct governed records.">
+      <PlaybookHero eyebrow="Playbook Community" title="Events that move your record forward" subtitle="Discover workshops, Summits, labs, civic experiences, networking, and community gatherings. RSVP state, capacity, arrival evidence, verified attendance, and earned rewards remain distinct governed records.">
         <div style={heroActions}>
           <PlaybookButton href="/events/reminders" variant="secondary">Event Reminders</PlaybookButton>
           <PlaybookButton href="/events/replays" variant="secondary">Replay Library</PlaybookButton>
@@ -131,7 +131,7 @@ export default function EventsPage() {
       </section>
 
       {!loading && visible.length === 0 ? (
-        <PlaybookCard eyebrow="Community calendar" title="Nothing matches this view"><p style={copy}>Try another filter. Playbook does not fabricate events to fill an empty state.</p></PlaybookCard>
+        <PlaybookCard eyebrow="Community calendar" title="Nothing matches this view"><p style={copy}>Try another filter. Playbook does not fabricate events or Summits to fill an empty state.</p></PlaybookCard>
       ) : (
         <PlaybookGrid min={340}>
           {visible.map((event) => {
@@ -148,6 +148,7 @@ export default function EventsPage() {
                   <div><span style={labelStyle}>Reward</span><strong>+{event.xp_reward} XP · +{event.coin_reward} coins</strong></div>
                 </div>
                 <div style={pillRow}>
+                  {event.event_type === "summit" && <PlaybookPill>Summit</PlaybookPill>}
                   {event.my_rsvp === "going" && <PlaybookPill>Going</PlaybookPill>}
                   {event.my_rsvp === "interested" && <PlaybookPill>Interested</PlaybookPill>}
                   {event.attended && <PlaybookPill>Attendance verified</PlaybookPill>}
