@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { PlaybookCard, PlaybookGrid, PlaybookHero, PlaybookMetric, PlaybookMetrics, PlaybookPage, PlaybookPill } from "@/components/ui";
+import { PlaybookButton, PlaybookCard, PlaybookGrid, PlaybookHero, PlaybookMetric, PlaybookMetrics, PlaybookPage, PlaybookPill } from "@/components/ui";
 
 type CommunityEvent = {
   id: string;
@@ -107,7 +107,11 @@ export default function EventsPage() {
 
   return (
     <PlaybookPage>
-      <PlaybookHero eyebrow="Playbook Community" title="Events that move your record forward" subtitle="Discover workshops, labs, civic experiences, networking, and community gatherings. RSVP state, capacity, attendance, and earned rewards are governed by the platform—not by browser-only counters." />
+      <PlaybookHero eyebrow="Playbook Community" title="Events that move your record forward" subtitle="Discover workshops, labs, civic experiences, networking, and community gatherings. RSVP state, capacity, arrival evidence, verified attendance, and earned rewards remain distinct governed records.">
+        <div style={heroActions}>
+          <PlaybookButton href="/events/replays" variant="secondary">Replay Library</PlaybookButton>
+        </div>
+      </PlaybookHero>
       <PlaybookMetrics>
         <PlaybookMetric label="Published events" value={loading ? "…" : String(events.length)} />
         <PlaybookMetric label="Your events" value={loading ? "…" : String(myEvents.length)} />
@@ -137,10 +141,10 @@ export default function EventsPage() {
                 <p style={eventDate}>{formatDate(event.starts_at)}</p>
                 <p style={copy}>{event.description}</p>
                 <div style={detailGrid}>
-                  <div><span style={label}>Location</span><strong>{event.location || (event.virtual_url ? "Virtual" : "To be announced")}</strong></div>
-                  <div><span style={label}>Capacity</span><strong>{event.capacity == null ? "Open" : `${event.going_count}/${event.capacity}`}</strong></div>
-                  <div><span style={label}>Interested</span><strong>{event.interested_count}</strong></div>
-                  <div><span style={label}>Reward</span><strong>+{event.xp_reward} XP · +{event.coin_reward} coins</strong></div>
+                  <div><span style={labelStyle}>Location</span><strong>{event.location || (event.virtual_url ? "Virtual" : "To be announced")}</strong></div>
+                  <div><span style={labelStyle}>Capacity</span><strong>{event.capacity == null ? "Open" : `${event.going_count}/${event.capacity}`}</strong></div>
+                  <div><span style={labelStyle}>Interested</span><strong>{event.interested_count}</strong></div>
+                  <div><span style={labelStyle}>Reward</span><strong>+{event.xp_reward} XP · +{event.coin_reward} coins</strong></div>
                 </div>
                 <div style={pillRow}>
                   {event.my_rsvp === "going" && <PlaybookPill>Going</PlaybookPill>}
@@ -149,6 +153,7 @@ export default function EventsPage() {
                   {seatsLeft !== null && <PlaybookPill>{seatsLeft} seats left</PlaybookPill>}
                 </div>
                 <div style={actions}>
+                  <Link href={`/events/${event.id}`} style={detailLink}>Event details</Link>
                   <button type="button" disabled={busy === event.id || full} onClick={() => void rsvp(event, "going")} style={event.my_rsvp === "going" ? selectedButton : primaryButton}>{event.my_rsvp === "going" ? "Confirmed ✓" : full ? "At capacity" : "I’m going"}</button>
                   <button type="button" disabled={busy === event.id} onClick={() => void rsvp(event, "interested")} style={event.my_rsvp === "interested" ? selectedButton : secondaryButton}>Interested</button>
                   {event.my_rsvp && event.my_rsvp !== "cancelled" && <button type="button" disabled={busy === event.id} onClick={() => void rsvp(event, "cancelled")} style={textButton}>Remove RSVP</button>}
@@ -163,6 +168,7 @@ export default function EventsPage() {
   );
 }
 
+const heroActions: React.CSSProperties = { display: "flex", gap: 10, flexWrap: "wrap" };
 const statusLine: React.CSSProperties = { maxWidth: 1180, margin: "0 auto 12px", color: "#475569" };
 const alert: React.CSSProperties = { maxWidth: 1180, margin: "0 auto 14px", padding: 12, borderRadius: 14, background: "#FEF2F2", border: "1px solid #FCA5A5", color: "#991B1B" };
 const toolbar: React.CSSProperties = { maxWidth: 1180, margin: "0 auto 22px", display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" };
@@ -174,11 +180,12 @@ const activePillar: React.CSSProperties = { ...filterButton, background: "#FFF7E
 const primaryButton: React.CSSProperties = { ...baseButton, border: 0, background: "#F97316", color: "#FFFFFF" };
 const selectedButton: React.CSSProperties = { ...primaryButton, background: "#0F172A" };
 const secondaryButton: React.CSSProperties = { ...filterButton };
+const detailLink: React.CSSProperties = { display: "inline-flex", minHeight: 38, alignItems: "center", borderRadius: 999, padding: "0 13px", background: "#0F172A", color: "#FFF", fontWeight: 900, textDecoration: "none" };
 const textButton: React.CSSProperties = { border: 0, background: "transparent", color: "#64748B", fontWeight: 800, cursor: "pointer" };
 const copy: React.CSSProperties = { color: "#475569", lineHeight: 1.65 };
 const eventDate: React.CSSProperties = { color: "#EA580C", fontWeight: 900, margin: "0 0 8px" };
 const detailGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: 12, margin: "16px 0" };
-const label: React.CSSProperties = { display: "block", color: "#64748B", fontSize: 11, textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 3 };
+const labelStyle: React.CSSProperties = { display: "block", color: "#64748B", fontSize: 11, textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 3 };
 const pillRow: React.CSSProperties = { display: "flex", gap: 7, flexWrap: "wrap", margin: "12px 0" };
 const actions: React.CSSProperties = { display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" };
 const resourceLink: React.CSSProperties = { display: "inline-block", marginTop: 14, color: "#C2410C", fontWeight: 900, textDecoration: "none" };
