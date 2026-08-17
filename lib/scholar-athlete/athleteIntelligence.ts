@@ -30,7 +30,7 @@ export function buildAthleteNextActions(input: {
   eligibilityStatus: string;
   recruitingTargets: number;
   activeDeals: number;
-  financialPlanComplete: boolean;
+  financialPlanComplete: boolean | null;
 }) {
   const actions: AthleteSignal[] = [];
 
@@ -56,7 +56,7 @@ export function buildAthleteNextActions(input: {
     });
   }
 
-  if (input.activeDeals > 0 && !input.financialPlanComplete) {
+  if (input.activeDeals > 0 && input.financialPlanComplete === false) {
     actions.push({
       type: "financial",
       severity: "high",
