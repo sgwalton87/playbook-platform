@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Attachments must be between 1 byte and 10 MB." }, { status: 413 });
     }
     if (!await requireConversationAccess(supabase, conversationId)) {
-      return NextResponse.json({ error: "An active support relationship is required." }, { status: 403 });
+      return NextResponse.json({ error: "An active authorized conversation is required." }, { status: 403 });
     }
 
     const storagePath = `${conversationId}/${user.id}/${crypto.randomUUID()}-${safeName(file.name)}`;
