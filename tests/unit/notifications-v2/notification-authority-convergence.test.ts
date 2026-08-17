@@ -10,9 +10,14 @@ const reliable = read("lib/pbos/reliable-notifications.ts");
 
 describe("canonical notification authority", () => {
   it("does not accept browser-authored system notification events", () => {
+    const post = api.split("export async function POST()")[1]?.split("export async function PATCH")[0] ?? "";
     expect(api).toContain("System notification events are created by governed Playbook workflows.");
-    expect(api).toContain("status: 405");
+    expect(post).toContain('.eq("owner_id", user.id)');
+    expect(post).toContain('.eq("state", "PENDING")');
+    expect(post).toContain('.limit(25)');
+    expect(post).not.toContain("request.json()");
     expect(api).not.toContain("normalizeNotificationEvent(await request.json");
+    expect(api).not.toContain('rpc("enqueue_notification_event"');
   });
   it("moves user actions through narrow notification RPCs", () => {
     expect(api).toContain('rpc("acknowledge_notification"');
