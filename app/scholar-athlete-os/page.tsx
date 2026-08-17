@@ -10,11 +10,12 @@ export default function ScholarAthleteOSPage() {
       <section aria-label="Recruiting command center" style={recruitingLaunch}>
         <div>
           <p style={eyebrow}>Recruiting is now actionable</p>
-          <h2 style={title}>Move schools, coaches, visits, and offers through one private pipeline.</h2>
-          <p style={copy}>The command center uses your verified recruiting record and preserves the history of every target and stage change without filling empty stages with demo activity.</p>
+          <h2 style={title}>Build the athlete record, then move real recruiting evidence forward.</h2>
+          <p style={copy}>Keep sport, position, graduation year, highlight film, targets, and recruiting history connected to one private Scholar-Athlete journey without manufacturing performance or coach interest.</p>
         </div>
         <div style={actions}>
-          <Link href="/recruiting" style={cta}>Open Recruiting Command Center</Link>
+          <Link href="/recruiting/profile" style={cta}>Build Athlete Profile & Film</Link>
+          <Link href="/recruiting" style={secondaryCta}>Open Recruiting Command Center</Link>
           <Link href="/recruiting/timeline" style={secondaryCta}>View Recruiting Timeline</Link>
         </div>
       </section>
