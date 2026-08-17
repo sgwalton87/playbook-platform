@@ -8,7 +8,8 @@ declare
   policy_roles name[];
   policy_check text;
   constraint_count integer;
-  fk_count integer;
+  profile_fk_target text;
+  album_fk_target text;
   rls_enabled boolean;
 begin
   if to_regclass('public.feed_posts') is null then
@@ -75,13 +76,20 @@ begin
     raise exception 'Feed post integrity constraints are incomplete.';
   end if;
 
-  select count(*) into fk_count
-  from pg_constraint
-  where conrelid='public.feed_posts'::regclass
-    and conname in ('feed_posts_user_id_fkey','feed_posts_album_id_fkey')
-    and contype='f';
-  if fk_count<>2 then
-    raise exception 'Feed post canonical profile/album foreign-key lineage is incomplete.';
+  select ref.relname into profile_fk_target
+  from pg_constraint c join pg_class ref on ref.oid=c.confrelid
+  where c.conrelid='public.feed_posts'::regclass
+    and c.conname='feed_posts_user_id_fkey' and c.contype='f';
+  select ref.relname into album_fk_target
+  from pg_constraint c join pg_class ref on ref.oid=c.confrelid
+  where c.conrelid='public.feed_posts'::regclass
+    and c.conname='feed_posts_album_id_fkey' and c.contype='f';
+
+  if profile_fk_target is distinct from 'profiles' then
+    raise exception 'Feed owner lineage must reference canonical profiles; got %.', profile_fk_target;
+  end if;
+  if album_fk_target is distinct from 'profile_albums' then
+    raise exception 'Feed album lineage must reference canonical profile_albums; got %.', album_fk_target;
   end if;
 end;
 $$;
