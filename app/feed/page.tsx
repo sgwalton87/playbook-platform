@@ -10,6 +10,7 @@ import { supabase } from "@/lib/supabaseClient";
 const CATEGORIES = ["All", "Leadership", "Finance", "Civic", "SEL", "College", "NIL", "Community"] as const;
 type Category = (typeof CATEGORIES)[number];
 type PendingMediaKind = "image" | "video" | null;
+type TimelineVisibility = "public" | "private";
 
 type PublicIdentity = {
   id: string;
@@ -42,6 +43,7 @@ type FeedPost = {
   imageUrl: string | null;
   mediaUrl: string | null;
   mediaType: string | null;
+  visibility: TimelineVisibility;
   createdAt: string;
   category: Category;
   likes: number;
@@ -89,6 +91,7 @@ export default function FeedPage() {
   const [filter, setFilter] = useState<Category>("All");
   const [body, setBody] = useState("");
   const [category, setCategory] = useState<Category>("Community");
+  const [visibility, setVisibility] = useState<TimelineVisibility>("public");
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [pendingPreview, setPendingPreview] = useState<string | null>(null);
   const [pendingMediaKind, setPendingMediaKind] = useState<PendingMediaKind>(null);
@@ -112,7 +115,7 @@ export default function FeedPage() {
 
     const [profileResult, postsResult] = await Promise.all([
       supabase.from("profiles").select("id,username,full_name,first_name,last_name,role,avatar_url").eq("id", user.id).single(),
-      supabase.from("feed_posts").select("id,user_id,post_type,title,body,image_url,media_url,media_type,created_at,visibility").eq("visibility", "public").order("created_at", { ascending: false }).limit(50),
+      supabase.from("feed_posts").select("id,user_id,post_type,title,body,image_url,media_url,media_type,created_at,visibility").or(`visibility.eq.public,user_id.eq.${user.id}`).order("created_at", { ascending: false }).limit(50),
     ]);
     if (profileResult.error) throw new Error(profileResult.error.message);
     if (postsResult.error) throw new Error(postsResult.error.message);
@@ -190,6 +193,7 @@ export default function FeedPage() {
         imageUrl: video ? null : (post.image_url || post.media_url || null),
         mediaUrl: video ? post.media_url : null,
         mediaType: post.media_type || (post.image_url ? "image" : null),
+        visibility: post.visibility === "private" ? "private" : "public",
         createdAt: post.created_at,
         category: categoryFromPostType(post.post_type),
         likes: reaction.count,
@@ -204,7 +208,7 @@ export default function FeedPage() {
       setGallery((galleryResult.data || []).filter((file) => file.name !== ".emptyFolderPlaceholder").map((file) => supabase.storage.from("photos").getPublicUrl(`${prefix}/${file.name}`).data.publicUrl));
     }
 
-    setMessage(rows.length ? "Published stories are current." : "No public stories yet. Publish the first one.");
+    setMessage(rows.length ? "Your timeline is current." : "No stories yet. Publish the first one.");
     setLoading(false);
   }
 
@@ -224,7 +228,21 @@ export default function FeedPage() {
     if (fileRef.current) fileRef.current.value = "";
   }
 
+  function changeVisibility(next: TimelineVisibility) {
+    if (next === "private" && pendingFile) {
+      clearPendingMedia();
+      setMessage("Only me stories are text-only until private media storage is available. Your selected media was removed.");
+    }
+    setVisibility(next);
+    setError("");
+  }
+
   function selectMedia(file: File | null) {
+    if (visibility === "private") {
+      setError("Only me stories are text-only. Switch to Public to attach an image or video.");
+      if (fileRef.current) fileRef.current.value = "";
+      return;
+    }
     if (!file) {
       clearPendingMedia();
       return;
@@ -270,11 +288,15 @@ export default function FeedPage() {
 
   async function publish() {
     if (!userId || (!body.trim() && !pendingFile)) return;
+    if (visibility === "private" && pendingFile) {
+      setError("Only me stories cannot attach public-bucket media.");
+      return;
+    }
     setBusy("publish");
     setError("");
     try {
-      const isVideo = pendingFile && pendingMediaKind === "video";
-      const imageUrl = pendingFile && pendingMediaKind === "image" ? await uploadPhoto(pendingFile, "feed") : null;
+      const isVideo = visibility === "public" && pendingFile && pendingMediaKind === "video";
+      const imageUrl = visibility === "public" && pendingFile && pendingMediaKind === "image" ? await uploadPhoto(pendingFile, "feed") : null;
       const videoUrl = isVideo && pendingFile ? await uploadVideo(pendingFile) : null;
       const result = await supabase.from("feed_posts").insert({
         user_id: userId,
@@ -283,14 +305,16 @@ export default function FeedPage() {
         image_url: imageUrl,
         media_url: videoUrl,
         media_type: isVideo ? "video" : (imageUrl ? "image" : null),
-        visibility: "public",
+        visibility,
       });
       if (result.error) throw new Error(result.error.message);
+      const publishedVisibility = visibility;
       setBody("");
       clearPendingMedia();
       setCategory("Community");
+      setVisibility("public");
       await load();
-      setMessage(isVideo ? "Video story published to the public Playbook feed." : "Story published to the public Playbook feed.");
+      setMessage(publishedVisibility === "private" ? "Story saved to your private timeline." : (isVideo ? "Video story published to the public Playbook feed." : "Story published to the public Playbook feed."));
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Story could not be published.");
     } finally {
@@ -362,9 +386,9 @@ export default function FeedPage() {
 
   return (
     <PlaybookPage>
-      <PlaybookHero eyebrow="Community Newsfeed" title="Show the work. Share the win. Build the next connection." subtitle="Public stories use presentation-grade identity only. Private records, support conversations, and unpublished progress remain outside the feed." />
+      <PlaybookHero eyebrow="Community Newsfeed" title="Show the work. Share the win. Build the next connection." subtitle="Public stories use presentation-grade identity only. Private records, support conversations, and unpublished progress remain outside the public feed." />
       <PlaybookMetrics>
-        <PlaybookMetric label="Published stories" value={String(posts.length)} />
+        <PlaybookMetric label="Timeline stories" value={String(posts.length)} />
         <PlaybookMetric label="Your gallery" value={String(gallery.length)} />
         <PlaybookMetric label="Categories" value="7" />
       </PlaybookMetrics>
@@ -392,10 +416,15 @@ export default function FeedPage() {
               <select value={category} onChange={(event) => setCategory(event.target.value as Category)} style={select} aria-label="Story category">
                 {CATEGORIES.filter((value) => value !== "All").map((value) => <option key={value}>{value}</option>)}
               </select>
-              <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp,video/mp4,video/webm,video/quicktime" aria-label="Add an image or video" onChange={(event) => selectMedia(event.target.files?.[0] || null)} />
+              <select value={visibility} onChange={(event) => changeVisibility(event.target.value as TimelineVisibility)} style={select} aria-label="Story visibility">
+                <option value="public">Public</option>
+                <option value="private">Only me</option>
+              </select>
+              <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp,video/mp4,video/webm,video/quicktime" aria-label="Add an image or video" disabled={visibility === "private"} onChange={(event) => selectMedia(event.target.files?.[0] || null)} />
               {pendingFile && <button type="button" onClick={clearPendingMedia} style={secondaryButton}>Remove media</button>}
-              <button onClick={() => void publish()} disabled={busy !== null || (!body.trim() && !pendingFile)} style={primaryButton}>{busy === "publish" ? "Publishing…" : "Publish story"}</button>
+              <button onClick={() => void publish()} disabled={busy !== null || (!body.trim() && !pendingFile)} style={primaryButton}>{busy === "publish" ? "Publishing…" : (visibility === "private" ? "Save only for me" : "Publish story")}</button>
             </div>
+            {visibility === "private" && <p style={privacyNote}>Only me stories stay off the public feed. Media is disabled because current Feed media buckets are intentionally public.</p>}
             {pendingPreview && pendingMediaKind === "image" && <div style={preview}><Image unoptimized fill src={pendingPreview} alt="Selected upload preview" style={{ objectFit: "cover" }} /></div>}
             {pendingPreview && pendingMediaKind === "video" && <video controls preload="metadata" src={pendingPreview} aria-label="Selected video preview" style={videoPreview} />}
           </PlaybookCard>
@@ -407,7 +436,7 @@ export default function FeedPage() {
           {!loading && visible.length === 0 ? <PlaybookCard eyebrow="Feed" title="No stories in this category yet"><p style={copy}>Choose another category or publish the first story here.</p></PlaybookCard> :
             <PlaybookGrid min={330}>
               {visible.map((post) => (
-                <PlaybookCard key={post.id} eyebrow={`${post.category} · ${post.role}`} title={post.title || post.author}>
+                <PlaybookCard key={post.id} eyebrow={`${post.category} · ${post.role}${post.visibility === "private" ? " · Only me" : ""}`} title={post.title || post.author}>
                   <div style={authorRow}>
                     <div style={avatar}>{post.avatarUrl ? <Image unoptimized width={48} height={48} src={post.avatarUrl} alt="" style={avatarImage} /> : post.author.slice(0, 1).toUpperCase()}</div>
                     <div><strong style={{ color: "#0F172A" }}>{post.author}</strong>{post.username && <div><Link href={`/u/${post.username}`} style={profileLink}>@{post.username}</Link></div>}<small style={meta}>{new Date(post.createdAt).toLocaleString()}</small></div>
@@ -450,6 +479,7 @@ const activeTab: React.CSSProperties = { ...tabButton, background: "#0F172A", co
 const composer: React.CSSProperties = { width: "100%", minHeight: 120, resize: "vertical", border: "1px solid #CBD5E1", borderRadius: 14, padding: 14, color: "#0F172A", background: "#F8FAFC" };
 const composerControls: React.CSSProperties = { marginTop: 12, display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" };
 const select: React.CSSProperties = { border: "1px solid #CBD5E1", borderRadius: 12, padding: "10px 12px", background: "#FFFFFF", color: "#0F172A" };
+const privacyNote: React.CSSProperties = { margin: "12px 0 0", padding: 12, borderRadius: 12, background: "#F8FAFC", color: "#475569", lineHeight: 1.5 };
 const preview: React.CSSProperties = { position: "relative", marginTop: 14, minHeight: 220, borderRadius: 18, overflow: "hidden", background: "#E2E8F0" };
 const videoPreview: React.CSSProperties = { width: "100%", maxHeight: 420, marginTop: 14, borderRadius: 18, background: "#0F172A" };
 const filterRow: React.CSSProperties = { maxWidth: 1180, margin: "18px auto", display: "flex", gap: 8, flexWrap: "wrap" };
