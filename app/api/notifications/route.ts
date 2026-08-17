@@ -33,10 +33,16 @@ async function publishPbos(userId: string, event: GovernedNotificationEvent, cor
 type RequestSupabase = Awaited<ReturnType<typeof requireUser>>["supabase"];
 type Outbox = { id: string; event_key: string; event_type: string; event_payload: Record<string, unknown>; attempt_count: number };
 
-async function transitionOutbox(supabase: RequestSupabase, outboxId: string, state: "FAILED" | "SUPPRESSED" | "DIGEST_QUEUED") {
+async function transitionOutbox(
+  supabase: RequestSupabase,
+  outboxId: string,
+  state: "FAILED" | "SUPPRESSED" | "DIGEST_QUEUED",
+  error?: string,
+) {
   const transition = await supabase.rpc("transition_notification_outbox", {
     requested_outbox_id: outboxId,
     requested_state: state,
+    requested_error: error ?? null,
   });
   if (transition.error) throw new Error(transition.error.message);
 }
@@ -80,8 +86,42 @@ export async function GET() {
   }
 }
 
+// Clients cannot author system events. POST only drains a bounded set of already
+// trusted PENDING outbox rows owned by the authenticated user through the existing
+// preference-aware, PBOS-published delivery path.
 export async function POST() {
-  return NextResponse.json({ error: "System notification events are created by governed Playbook workflows." }, { status: 405 });
+  try {
+    const { supabase, user } = await requireUser();
+    if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    const pending = await supabase.from("pbos_notification_outbox")
+      .select("id,event_key,event_type,event_payload,attempt_count")
+      .eq("owner_id", user.id)
+      .eq("state", "PENDING")
+      .order("created_at", { ascending: true })
+      .limit(25);
+    if (pending.error) throw new Error(pending.error.message);
+
+    let delivered = 0;
+    let suppressed = 0;
+    let digestQueued = 0;
+    let failed = 0;
+    for (const outbox of (pending.data ?? []) as Outbox[]) {
+      try {
+        const result = await deliver(supabase, user.id, outbox);
+        if (result.notification) delivered += 1;
+        else if (result.suppressed) suppressed += 1;
+        else if (result.digestQueued) digestQueued += 1;
+      } catch (cause) {
+        failed += 1;
+        const message = cause instanceof Error ? cause.message : "Trusted notification delivery failed.";
+        try { await transitionOutbox(supabase, outbox.id, "FAILED", message); }
+        catch { /* preserve the original delivery failure in the response */ }
+      }
+    }
+    return NextResponse.json({ processed: pending.data?.length ?? 0, delivered, suppressed, digestQueued, failed });
+  } catch (error) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Pending notifications could not be processed." }, { status: 500 });
+  }
 }
 
 export async function PATCH(request: NextRequest) {
@@ -109,7 +149,7 @@ export async function PATCH(request: NextRequest) {
       if (!found.data) return NextResponse.json({ error: "Retryable outbox item not found." }, { status: 404 });
       try { return NextResponse.json(await deliver(supabase, user.id, found.data)); }
       catch (cause) {
-        await transitionOutbox(supabase, found.data.id, "FAILED");
+        await transitionOutbox(supabase, found.data.id, "FAILED", cause instanceof Error ? cause.message : "Delivery failed.");
         throw cause;
       }
     }
