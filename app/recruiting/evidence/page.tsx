@@ -58,6 +58,7 @@ export default function AthleticEvidencePage() {
   const [rows, setRows] = useState<AthleteEvidenceRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [requestingId, setRequestingId] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -119,8 +120,8 @@ export default function AthleticEvidencePage() {
   const summary = useMemo(() => {
     const verified = rows.filter((row) => row.verification_state === "verified").length;
     const selfReported = rows.filter((row) => row.verification_state === "self_reported").length;
-    const sports = new Set(rows.map((row) => row.sport.trim()).filter(Boolean));
-    return { total: rows.length, verified, selfReported, sports: sports.size };
+    const submitted = rows.filter((row) => row.verification_state === "submitted").length;
+    return { total: rows.length, verified, selfReported, submitted };
   }, [rows]);
 
   async function submitEvidence(event: FormEvent<HTMLFormElement>) {
@@ -141,7 +142,7 @@ export default function AthleticEvidencePage() {
     if (sourceUrl.trim()) {
       try {
         const parsed = new URL(sourceUrl.trim());
-        if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error("Unsupported protocol");
+        if (!["http:", "https:"].includes(parsed.protocol)) throw new Error("Unsupported protocol");
         normalizedSourceUrl = parsed.toString();
       } catch {
         setError("Source URL must be a valid http or https URL.");
@@ -196,6 +197,27 @@ export default function AthleticEvidencePage() {
     setSaving(false);
   }
 
+  async function requestVerification(row: AthleteEvidenceRow) {
+    if (row.verification_state !== "self_reported") return;
+    setRequestingId(row.id);
+    setError(null);
+    setMessage(null);
+
+    const { error: requestError } = await supabase.rpc("request_athlete_evidence_verification", {
+      requested_evidence_id: row.id,
+    });
+
+    if (requestError) {
+      setError(requestError.message);
+      setRequestingId("");
+      return;
+    }
+
+    setRows((current) => current.map((item) => item.id === row.id ? { ...item, verification_state: "submitted" } : item));
+    setMessage(`${row.metric_name} was submitted for independent verification review.`);
+    setRequestingId("");
+  }
+
   if (loading) {
     return <PlaybookPage><div data-testid="athletic-evidence-ledger" style={loadingState}>Connecting your athletic evidence record…</div></PlaybookPage>;
   }
@@ -220,8 +242,8 @@ export default function AthleticEvidencePage() {
         <PlaybookMetrics>
           <PlaybookMetric label="Evidence records" value={String(summary.total)} />
           <PlaybookMetric label="Self reported" value={String(summary.selfReported)} />
+          <PlaybookMetric label="In review" value={String(summary.submitted)} />
           <PlaybookMetric label="Verified" value={String(summary.verified)} />
-          <PlaybookMetric label="Sports represented" value={String(summary.sports)} />
         </PlaybookMetrics>
 
         <div style={workspaceGrid}>
@@ -277,6 +299,13 @@ export default function AthleticEvidencePage() {
                       <div><span style={detailLabel}>Source</span><strong>{row.source_label || formatLabel(row.source_type)}</strong></div>
                     </div>
                     {row.source_url ? <a href={row.source_url} target="_blank" rel="noreferrer" style={sourceLink}>Open source evidence</a> : null}
+                    {row.verification_state === "self_reported" ? (
+                      <button type="button" disabled={requestingId === row.id} onClick={() => void requestVerification(row)} style={reviewButton}>
+                        {requestingId === row.id ? "Submitting for review…" : "Request independent verification"}
+                      </button>
+                    ) : null}
+                    {row.verification_state === "submitted" ? <p style={reviewNote}>Independent review requested · awaiting governed review</p> : null}
+                    {row.verification_state === "rejected" ? <p style={rejectedNote}>Verification was not approved. Add a corrected or better-sourced evidence record rather than overwriting this history.</p> : null}
                     {row.supersedes_evidence_id ? <p style={correctionNote}>Correction record · prior evidence preserved</p> : null}
                   </article>
                 ))}
@@ -288,9 +317,9 @@ export default function AthleticEvidencePage() {
         <section style={trustPanel}>
           <div>
             <p style={eyebrow}>Trust boundary</p>
-            <h2 style={trustTitle}>Self-reported is useful. Verified means something different.</h2>
+            <h2 style={trustTitle}>Self-reported is useful. Verified means independently reviewed.</h2>
           </div>
-          <p style={trustCopy}>This ledger preserves what you report and the source you provide. Verification will require an independently governed reviewer or trusted source workflow. Until then, Playbook keeps the distinction visible instead of overstating certainty.</p>
+          <p style={trustCopy}>You control what enters your athletic record. Requesting verification moves an evidence record into Playbook&apos;s governed Founder/Admin review queue. A final approval or rejection requires a recorded review reason and is preserved in the platform audit history.</p>
         </section>
       </div>
     </PlaybookPage>
@@ -345,6 +374,9 @@ const valueLine: React.CSSProperties = { margin: 0, color: "#20364E", fontSize: 
 const detailGrid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(120px,1fr))", gap: 12, marginTop: 16, paddingTop: 16, borderTop: "1px solid #E6EDF4", color: "#20364E" };
 const detailLabel: React.CSSProperties = { display: "block", marginBottom: 4, color: "#718399", fontSize: 10, fontWeight: 900, letterSpacing: ".1em", textTransform: "uppercase" };
 const sourceLink: React.CSSProperties = { display: "inline-flex", marginTop: 14, color: "#A94422", fontWeight: 900, textDecoration: "none" };
+const reviewButton: React.CSSProperties = { display: "flex", marginTop: 14, minHeight: 40, alignItems: "center", border: 0, borderRadius: 999, padding: "0 14px", background: "#102238", color: "#FFFFFF", fontWeight: 900, cursor: "pointer" };
+const reviewNote: React.CSSProperties = { margin: "12px 0 0", color: "#92400E", fontSize: 12, fontWeight: 800 };
+const rejectedNote: React.CSSProperties = { margin: "12px 0 0", color: "#991B1B", fontSize: 12, fontWeight: 700, lineHeight: 1.5 };
 const correctionNote: React.CSSProperties = { margin: "12px 0 0", color: "#6B7F94", fontSize: 12, fontWeight: 750 };
 const trustPanel: React.CSSProperties = { maxWidth: 1180, margin: "18px auto 0", padding: "clamp(24px,4vw,38px)", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 24, alignItems: "center", borderRadius: "30px 8px 30px 8px", color: "#F8FAFC", background: "linear-gradient(145deg,#06172D,#0B2648)" };
 const eyebrow: React.CSSProperties = { margin: 0, color: "#FF9D5C", fontWeight: 950, fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase" };
