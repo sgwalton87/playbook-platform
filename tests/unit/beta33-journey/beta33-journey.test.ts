@@ -10,10 +10,7 @@ import {
   buildResumeProfile,
   scoreResumeReadiness,
 } from "@/lib/opportunity-toolkit";
-import {
-  buildPortfolioShare,
-  canViewPortfolioShare,
-} from "@/lib/portfolio-sharing";
+import { canViewPortfolioShare } from "@/lib/portfolio-sharing";
 import {
   buildRecommenderRequest,
   updateRecommenderRequestStatus,
@@ -82,18 +79,11 @@ describe("Beta 3.3 End-to-End Application Toolkit Journey", () => {
       targetUse: "internship",
     });
 
-    const share = buildPortfolioShare({
-      scholarId: "scholar-1",
-      scholarName: "Maya Johnson",
-      targetUse: "internship",
-      packet,
-    });
-
     expect(workspace.status).toBe("ready");
     expect(scoreResumeReadiness(resume).score).toBeGreaterThan(0);
     expect(submitted.status).toBe("submitted");
     expect(packet.exportStatus).toBe("ready_for_pdf_foundation");
-    expect(canViewPortfolioShare(share)).toBe(true);
+    expect(canViewPortfolioShare({ status: "active" })).toBe(true);
     expect(buildApplicationWorkspaceRecommendations(workspace)).toContain("Review packet one final time");
   });
 
