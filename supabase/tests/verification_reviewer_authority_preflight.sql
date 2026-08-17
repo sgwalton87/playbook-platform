@@ -77,15 +77,44 @@ begin
   end loop;
 end $$;
 
--- Anonymous private execute must remain limited to the three intentional public profile projections.
+-- Anonymous private execute is an exact allowlist: the three existing public-profile
+-- projections plus the governed opaque NIL media-kit share resolver.
 do $$
-declare count_exec integer;
+declare
+  count_exec integer;
+  unexpected_count integer;
 begin
   select count(*) into count_exec
     from pg_proc p join pg_namespace n on n.oid=p.pronamespace
    where n.nspname='private' and has_function_privilege('anon',p.oid,'EXECUTE');
-  if count_exec <> 3 then
-    raise exception 'anonymous private EXECUTE boundary changed: expected 3 projection helpers, got %',count_exec;
+  if count_exec <> 4 then
+    raise exception 'anonymous private EXECUTE boundary changed: expected 4 allowlisted projection helpers, got %',count_exec;
+  end if;
+
+  select count(*) into unexpected_count
+    from pg_proc p join pg_namespace n on n.oid=p.pronamespace
+   where n.nspname='private'
+     and has_function_privilege('anon',p.oid,'EXECUTE')
+     and p.oid not in (
+       'private.get_public_scholar_profile(text)'::regprocedure,
+       'private.get_public_scholar_identities(uuid[])'::regprocedure,
+       'private.get_public_member_identities(uuid[])'::regprocedure,
+       'private.resolve_portfolio_share(text)'::regprocedure
+     );
+  if unexpected_count <> 0 then
+    raise exception 'anonymous private EXECUTE includes a helper outside the explicit public projection allowlist';
+  end if;
+
+  if not has_function_privilege('anon','public.resolve_portfolio_share(text)','EXECUTE')
+     or not has_function_privilege('anon','private.resolve_portfolio_share(text)','EXECUTE') then
+    raise exception 'governed NIL portfolio projection wrapper/helper path is not executable by anonymous share viewers';
+  end if;
+
+  if (select p.prosecdef from pg_proc p where p.oid='public.resolve_portfolio_share(text)'::regprocedure) then
+    raise exception 'public NIL portfolio resolver must remain SECURITY INVOKER';
+  end if;
+  if not (select p.prosecdef from pg_proc p where p.oid='private.resolve_portfolio_share(text)'::regprocedure) then
+    raise exception 'private NIL portfolio resolver must retain bounded SECURITY DEFINER authority';
   end if;
 end $$;
 
