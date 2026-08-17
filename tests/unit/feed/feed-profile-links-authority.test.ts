@@ -16,7 +16,7 @@ describe("Feed Profile Links authority", () => {
     expect(feedPage).toContain('rpc("get_public_member_identities"');
     expect(identityMigration).toContain("public_profile_publication_consents");
     expect(identityMigration).toContain("public-profile-v1");
-    expect(identityMigration).toContain("c.revoked_at is null");
+    expect(identityMigration).toContain("consent.revoked_at is null");
   });
 
   it("keeps the canonical profile route fail closed for non-owner unpublished profiles", () => {
