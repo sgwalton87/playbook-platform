@@ -26,8 +26,8 @@ export default function ApplicationWorkspaceDashboard() {
   const [type, setType] = useState("scholarship"); const [deadline, setDeadline] = useState("");
 
   useEffect(() => { const query = new URLSearchParams(window.location.search); const selectedId = query.get("opportunityId"); const selectedName = query.get("opportunityName");
-    const selectedType = query.get("opportunityType"); const initialize = window.setTimeout(() => {
-      if (selectedName) setName(selectedName); if (selectedId) setOpportunityId(selectedId);
+    const selectedType = query.get("opportunityType"); const selectedDeadline = query.get("deadline"); const initialize = window.setTimeout(() => {
+      if (selectedName) setName(selectedName); if (selectedId) setOpportunityId(selectedId); if (selectedDeadline && /^\d{4}-\d{2}-\d{2}$/.test(selectedDeadline)) setDeadline(selectedDeadline);
       if (selectedType && ["college", "scholarship", "internship", "job", "recruiting", "nil", "mentor", "career", "summer_program", "competition", "grant", "volunteer", "research"].includes(selectedType)) setType(selectedType);
     }, 0);
     let active = true;
@@ -44,7 +44,7 @@ export default function ApplicationWorkspaceDashboard() {
       opportunityId: opportunityId || "manual-" + name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""), opportunityName: name,
       opportunityType: type, deadline: deadline || null, requestId: crypto.randomUUID() }) });
     const body = await response.json() as { error?: string }; if (!response.ok) throw new Error(body.error || "Unable to create application workspace.");
-    setName(""); setDeadline(""); await refresh(); setMessage("Application workspace created and connected to PBOS.");
+    setName(""); setOpportunityId(""); setDeadline(""); await refresh(); setMessage("Application workspace created and connected to PBOS.");
   } catch (value) { setError(value instanceof Error ? value.message : "Unable to create application workspace."); } finally { setBusy(false); } }
 
   async function transition(workspaceId: string, action: string, taskId?: string) { setBusy(true); setError(null); try {
@@ -62,7 +62,7 @@ export default function ApplicationWorkspaceDashboard() {
   } catch (value) { setError(value instanceof Error ? value.message : "Unable to upload document."); } finally { setBusy(false); } }
 
   return <PlaybookPage>
-    <PlaybookHero eyebrow="Application Workspace" title="Turn opportunity into action" subtitle="Track deadlines, tasks, private documents, status, and PBOS-governed progress in one durable workspace." />
+    <PlaybookHero eyebrow="Application Workspace" title="Turn opportunity into action" subtitle="Track deadlines, tasks, private documents, status, and PBOS-governed progress in one durable workspace. Published Marketplace opportunity identity and deadline flow into this workspace without duplicate entry." />
     <div role="status" aria-live="polite" style={status}>{message}</div>{error && <div role="alert" aria-live="assertive" style={alert}>{error}</div>}
     <PlaybookCard eyebrow="New application" title="Start from an opportunity">
       <form onSubmit={create} aria-label="Create application workspace" style={form}>

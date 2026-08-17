@@ -17,9 +17,9 @@ import { supabase } from "@/lib/supabaseClient";
 const pathways = [
   { label: "Organization", title: "Maintain the verified organization", body: "Keep marketplace-facing organization context connected to the approved Brand Partner identity without rewriting verification evidence.", href: "/brand-partner-os/organization", action: "Organization Profile" },
   { label: "Campaigns", title: "Build inside approved campaign scope", body: "Create and refine campaign drafts using only campaign types already present in approved verification evidence.", href: "/brand-partner-os/campaigns", action: "Campaign Builder" },
-  { label: "Opportunity", title: "Create a responsible pathway", body: "Publish internships, scholarships, events, work-based learning, or sponsored experiences with clear eligibility and support through the shared Opportunity service.", href: "/opportunities", action: "Open opportunities" },
-  { label: "Scholar-Athlete", title: "Support NIL readiness responsibly", body: "Connect education, compliance, disclosure, deliverables, and payment readiness before activating a partnership.", href: "/scholar-athlete-os", action: "Review athlete journey" },
-  { label: "Applications", title: "Use permissioned application workflows", body: "Application workspaces remain Scholar-owned. Marketplace campaigns do not grant automatic applicant or Scholar Record access.", href: "/application-workspaces", action: "Open workspaces" },
+  { label: "Opportunity Listings", title: "Create real opportunities for human review", body: "Draft internships, jobs, sponsorships, NIL opportunities, scholarships, and mentorship listings. Publication requires independent Playbook operator review.", href: "/brand-partner-os/opportunities", action: "Manage opportunity listings" },
+  { label: "Scholar Marketplace", title: "See the Scholar-facing catalog", body: "Review the same published catalog Scholars see, separated clearly from PBOS readiness guidance.", href: "/opportunities", action: "Open Scholar Marketplace" },
+  { label: "Applications", title: "Use permissioned application workflows", body: "Application workspaces remain Scholar-owned. Publishing an opportunity does not grant automatic applicant or Scholar Record access.", href: "/application-workspaces", action: "Open workspaces" },
   { label: "Communication", title: "Coordinate with the right people", body: "Keep partner, scholar, guardian, and support-team decisions inside governed conversations.", href: "/messages", action: "Open messages" },
 ] as const;
 
@@ -28,8 +28,9 @@ type Partner = { name: string; category: string; active: boolean };
 type DashboardState = {
   partner: Partner | null;
   approvedTypes: number;
-  drafts: number;
-  reviewRequested: number;
+  campaignDrafts: number;
+  opportunityReviewRequested: number;
+  publishedOpportunities: number;
 };
 
 function firstPartner(value: unknown): Partner | null {
@@ -47,7 +48,7 @@ export default function BrandPartnerOSPage() {
 }
 
 function BrandPartnerWorkspace() {
-  const [dashboard, setDashboard] = useState<DashboardState>({ partner: null, approvedTypes: 0, drafts: 0, reviewRequested: 0 });
+  const [dashboard, setDashboard] = useState<DashboardState>({ partner: null, approvedTypes: 0, campaignDrafts: 0, opportunityReviewRequested: 0, publishedOpportunities: 0 });
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
   const [error, setError] = useState("");
 
@@ -67,7 +68,7 @@ function BrandPartnerWorkspace() {
         return;
       }
 
-      const [verification, campaigns] = await Promise.all([
+      const [verification, campaigns, opportunities] = await Promise.all([
         supabase.from("brand_partner_verification_requests")
           .select("campaign_types")
           .eq("brand_user_id", auth.user.id)
@@ -80,21 +81,24 @@ function BrandPartnerWorkspace() {
         supabase.from("brand_campaign_drafts")
           .select("status")
           .eq("brand_user_id", auth.user.id),
+        supabase.rpc("get_own_marketplace_opportunities"),
       ]);
       if (!active) return;
-      if (verification.error || campaigns.error) {
-        setError(verification.error?.message || campaigns.error?.message || "Marketplace data could not be loaded.");
+      if (verification.error || campaigns.error || opportunities.error) {
+        setError(verification.error?.message || campaigns.error?.message || opportunities.error?.message || "Marketplace data could not be loaded.");
         setState("error");
         return;
       }
 
       const approvedTypes = Array.isArray(verification.data?.campaign_types) ? verification.data.campaign_types.length : 0;
-      const rows = campaigns.data || [];
+      const campaignRows = campaigns.data || [];
+      const opportunityRows = (opportunities.data || []) as { status: string }[];
       setDashboard({
         partner,
         approvedTypes,
-        drafts: rows.filter((row) => row.status === "draft").length,
-        reviewRequested: rows.filter((row) => row.status === "review_requested").length,
+        campaignDrafts: campaignRows.filter((row) => row.status === "draft").length,
+        opportunityReviewRequested: opportunityRows.filter((row) => row.status === "review_requested").length,
+        publishedOpportunities: opportunityRows.filter((row) => row.status === "published").length,
       });
       setState("ready");
     }
@@ -110,10 +114,11 @@ function BrandPartnerWorkspace() {
         <PlaybookHero
           eyebrow="Brand Partner OS"
           title="Power opportunity. Protect the scholar."
-          subtitle="Build responsible campaigns, rewards, sponsorships, NIL education, internships, events, and learning pathways without turning student data into inventory."
+          subtitle="Build responsible campaigns and real opportunities through governed publication workflows without turning Scholar data into inventory."
         >
           <div style={heroActions}>
-            <PlaybookButton href="/brand-partner-os/campaigns">Campaign Builder</PlaybookButton>
+            <PlaybookButton href="/brand-partner-os/opportunities">Opportunity Listings</PlaybookButton>
+            <PlaybookButton href="/brand-partner-os/campaigns" variant="secondary">Campaign Builder</PlaybookButton>
             <PlaybookButton href="/brand-partner-os/organization" variant="secondary">Organization Profile</PlaybookButton>
           </div>
         </PlaybookHero>
@@ -123,14 +128,14 @@ function BrandPartnerWorkspace() {
             <PlaybookPill>{state === "ready" ? "Verified operational partner" : state === "loading" ? "Connecting marketplace record" : "Marketplace record unavailable"}</PlaybookPill>
             <h2 style={identityTitle}>{organization}</h2>
           </div>
-          <p style={identityCopy}>{state === "error" ? (error || "Your marketplace record could not be loaded. No scholar data is being displayed.") : "The operational Organization Profile is materialized from approved Brand Partner verification. Campaign and compliance approval remain separate evidence."}</p>
+          <p style={identityCopy}>{state === "error" ? (error || "Your marketplace record could not be loaded. No Scholar data is being displayed.") : "Organization verification, campaign planning, opportunity publication, applications, and consequential decisions remain separate governed records."}</p>
         </section>
 
         <PlaybookMetrics>
           <PlaybookMetric label="Partner category" value={dashboard.partner?.category || "Not resolved"} />
-          <PlaybookMetric label="Approved campaign types" value={state === "loading" ? "…" : String(dashboard.approvedTypes)} />
-          <PlaybookMetric label="Campaign drafts" value={state === "loading" ? "…" : String(dashboard.drafts)} />
-          <PlaybookMetric label="Review requested" value={state === "loading" ? "…" : String(dashboard.reviewRequested)} />
+          <PlaybookMetric label="Campaign drafts" value={state === "loading" ? "…" : String(dashboard.campaignDrafts)} />
+          <PlaybookMetric label="Listings in review" value={state === "loading" ? "…" : String(dashboard.opportunityReviewRequested)} />
+          <PlaybookMetric label="Published opportunities" value={state === "loading" ? "…" : String(dashboard.publishedOpportunities)} />
         </PlaybookMetrics>
 
         <PlaybookGrid min={300}>

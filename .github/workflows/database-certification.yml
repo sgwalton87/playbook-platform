@@ -73,6 +73,8 @@ jobs:
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/summit_event_type_preflight.sql
       - name: Certify Brand Marketplace foundation boundary
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/brand_marketplace_foundation_preflight.sql
+      - name: Certify Marketplace Opportunity Catalog boundary
+        run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/marketplace_opportunity_catalog_preflight.sql
       - name: Certify notification authority boundary
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/notification_authority_preflight.sql
       - name: Certify active Scholar support context boundary

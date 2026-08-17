@@ -5,17 +5,25 @@ import { describe, expect, it } from "vitest";
 const source = readFileSync(join(process.cwd(), "components/opportunity-marketplace/OpportunityMarketplace.tsx"), "utf8");
 
 describe("opportunity application bridge", () => {
-  it("routes matched opportunities into the canonical application workspace", () => {
+  it("routes only canonical published Marketplace listings into Application Workspace", () => {
+    expect(source).toContain("function applicationHref(opportunity: PublishedOpportunity)");
     expect(source).toContain("new URLSearchParams({");
-    expect(source).toContain("opportunityId: match.opportunityId");
-    expect(source).toContain("opportunityName: match.title");
-    expect(source).toContain("opportunityType: workspaceType(match.type)");
+    expect(source).toContain("opportunityId: opportunity.id");
+    expect(source).toContain("opportunityName: opportunity.title");
+    expect(source).toContain("opportunityType: workspaceType(opportunity.opportunity_type)");
+    expect(source).toContain('query.set("deadline", opportunity.deadline)');
     expect(source).toContain("/application-workspaces?");
-    expect(source).toContain("Start application");
+    expect(source).toContain("Start Application Workspace");
   });
 
-  it("preserves save and dismiss decisions alongside the application action", () => {
-    expect(source).toContain('decide(match, "SAVED")');
-    expect(source).toContain('decide(match, "DISMISSED")');
+  it("keeps PBOS readiness guidance advisory while preserving save and dismiss decisions", () => {
+    expect(source).toContain("Not a real listing.");
+    expect(source).toContain("Derived guidance");
+    expect(source).toContain('decide(match,"SAVED")');
+    expect(source).toContain('decide(match,"DISMISSED")');
+
+    const guidanceSection = source.slice(source.indexOf('aria-labelledby="readiness-guidance-heading"'));
+    expect(guidanceSection).not.toContain("applicationHref(match)");
+    expect(guidanceSection).not.toContain("Start Application Workspace →</Link>");
   });
 });
