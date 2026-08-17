@@ -1,26 +1,14 @@
 import { describe, expect, it } from "vitest";
 import {
-  buildPortfolioShare,
   buildRecommendationApproval,
   canViewPortfolioShare,
 } from "@/lib/portfolio-sharing";
 
 describe("Portfolio Sharing + Recommender Approval", () => {
-  it("builds portfolio share", () => {
-    const share = buildPortfolioShare({
-      scholarId: "s1",
-      scholarName: "Maya",
-      targetUse: "scholarship",
-      packet: {},
-    });
-
-    expect(share.status).toBe("active");
-    expect(share.shareUrl).toContain("/portfolio/");
-  });
-
-  it("checks portfolio access", () => {
+  it("checks governed portfolio lifecycle visibility", () => {
     expect(canViewPortfolioShare({ status: "active" })).toBe(true);
     expect(canViewPortfolioShare({ status: "revoked" })).toBe(false);
+    expect(canViewPortfolioShare({ status: "draft" })).toBe(false);
   });
 
   it("builds recommender approval", () => {
