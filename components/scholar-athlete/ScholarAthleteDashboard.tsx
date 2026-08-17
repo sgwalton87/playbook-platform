@@ -68,7 +68,8 @@ const journeyCards = [
 export default function ScholarAthleteDashboard() {
   const [targets, setTargets] = useState<RecruitingTarget[]>([]);
   const [deals, setDeals] = useState<NILDeal[]>([]);
-  const [eligibilityStatus, setEligibilityStatus] = useState("action_needed");
+  const [eligibilityStatus, setEligibilityStatus] = useState<string | null>(null);
+  const [visitCount, setVisitCount] = useState<number | null>(null);
   const [dataState, setDataState] = useState<"loading" | "ready" | "error">("loading");
 
   useEffect(() => {
@@ -80,13 +81,14 @@ export default function ScholarAthleteDashboard() {
         setDataState("error");
         return;
       }
-      const [targetResult, dealResult, eligibilityResult] = await Promise.all([
+      const [targetResult, dealResult, eligibilityResult, visitResult] = await Promise.all([
         supabase.from("recruiting_targets").select("*").eq("scholar_id", auth.user.id),
         supabase.from("nil_deals").select("*").eq("scholar_id", auth.user.id),
         supabase.from("athlete_eligibility_checks").select("status").eq("scholar_id", auth.user.id).order("checked_at", { ascending: false }).limit(1),
+        supabase.from("recruiting_visits").select("id").eq("scholar_id", auth.user.id),
       ]);
       if (!active) return;
-      if (targetResult.error || dealResult.error || eligibilityResult.error) {
+      if (targetResult.error || dealResult.error || eligibilityResult.error || visitResult.error) {
         setDataState("error");
         return;
       }
@@ -114,7 +116,8 @@ export default function ScholarAthleteDashboard() {
         disclosureStatus: deal.disclosure_status,
         paymentStatus: deal.payment_status,
       })) as NILDeal[]);
-      setEligibilityStatus(eligibilityResult.data?.[0]?.status || "action_needed");
+      setEligibilityStatus(eligibilityResult.data?.[0]?.status || null);
+      setVisitCount((visitResult.data || []).length);
       setDataState("ready");
     }
     void loadAthleteRecord();
@@ -123,12 +126,14 @@ export default function ScholarAthleteDashboard() {
 
   const recruiting = useMemo(() => getRecruitingPipelineSummary(targets), [targets]);
   const nil = useMemo(() => getNILPortfolioSummary(deals), [deals]);
-  const actions = buildAthleteNextActions({
-    eligibilityStatus,
-    recruitingTargets: recruiting.total,
-    activeDeals: nil.activeDeals,
-    financialPlanComplete: false,
-  });
+  const actions = dataState === "ready"
+    ? buildAthleteNextActions({
+        eligibilityStatus,
+        recruitingTargets: recruiting.total,
+        activeDeals: nil.activeDeals,
+        financialPlanComplete: null,
+      })
+    : [];
 
   return (
     <PlaybookPage>
@@ -157,10 +162,10 @@ export default function ScholarAthleteDashboard() {
         </section>
 
         <PlaybookMetrics>
-          <PlaybookMetric label="Eligibility" value={formatStatus(eligibilityStatus)} />
-          <PlaybookMetric label="Recruiting targets" value={`${recruiting.total} verified`} />
-          <PlaybookMetric label="Campus visits" value={`${recruiting.visits} recorded`} />
-          <PlaybookMetric label="NIL partnerships" value={`${nil.activeDeals} active`} />
+          <PlaybookMetric label="Eligibility" value={metricValue(dataState, eligibilityStatus ? formatStatus(eligibilityStatus) : "Not assessed")} />
+          <PlaybookMetric label="Recruiting targets" value={metricValue(dataState, `${recruiting.total} recorded`)} />
+          <PlaybookMetric label="Recruiting visits" value={metricValue(dataState, `${visitCount ?? 0} recorded`)} />
+          <PlaybookMetric label="NIL partnerships" value={metricValue(dataState, `${nil.activeDeals} active`)} />
         </PlaybookMetrics>
 
         <PlaybookGrid min={300}>
@@ -196,6 +201,12 @@ export default function ScholarAthleteDashboard() {
       </div>
     </PlaybookPage>
   );
+}
+
+function metricValue(state: "loading" | "ready" | "error", readyValue: string) {
+  if (state === "loading") return "…";
+  if (state === "error") return "Unavailable";
+  return readyValue;
 }
 
 function formatStatus(value: string) {

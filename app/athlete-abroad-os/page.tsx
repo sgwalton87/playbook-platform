@@ -1,5 +1,7 @@
 "use client";
 
+import AthleteAbroadReadinessGate from "@/components/athlete-abroad/AthleteAbroadReadinessGate";
+import { CanonicalRoleAuthorityGate } from "@/components/role-os/RoleAuthorityGate";
 import {
   PlaybookButton,
   PlaybookCard,
@@ -20,6 +22,16 @@ const pathway = [
 ] as const;
 
 export default function AthleteAbroadOSPage() {
+  return (
+    <CanonicalRoleAuthorityGate role="athlete-abroad">
+      <AthleteAbroadReadinessGate>
+        <AthleteAbroadWorkspace />
+      </AthleteAbroadReadinessGate>
+    </CanonicalRoleAuthorityGate>
+  );
+}
+
+function AthleteAbroadWorkspace() {
   return (
     <PlaybookPage>
       <div data-testid="athlete-abroad-os" data-visual-canon="PGAA-001">
