@@ -19,6 +19,13 @@ async function fetchNotifications(): Promise<NotificationResponse> {
   return result;
 }
 
+async function syncNotifications(): Promise<NotificationResponse> {
+  const processed = await fetch("/api/notifications", { method: "POST", cache: "no-store" });
+  const result = await processed.json() as { error?: string };
+  if (!processed.ok) throw new Error(result.error ?? "Trusted notifications could not be processed.");
+  return fetchNotifications();
+}
+
 function matchesFilter(item: Notification, filter: Filter) {
   if (filter === "all") return true;
   if (filter === "unread") return !item.read;
@@ -38,15 +45,17 @@ export default function NotificationCenter() {
   const [status, setStatus] = useState("Loading what needs your attention…");
   const [error, setError] = useState("");
 
+  function applyResult(result: NotificationResponse) {
+    setNotifications(result.notifications ?? []);
+    setPreferences(result.preferences ?? []);
+    setFailures(result.failures ?? []);
+    setStatus("Your attention center is current.");
+  }
+
   async function reload() {
     setLoading(true); setError("");
-    try {
-      const result = await fetchNotifications();
-      setNotifications(result.notifications ?? []);
-      setPreferences(result.preferences ?? []);
-      setFailures(result.failures ?? []);
-      setStatus("Your attention center is current.");
-    } catch (cause) {
+    try { applyResult(await syncNotifications()); }
+    catch (cause) {
       setError(cause instanceof Error ? cause.message : "Notifications could not be loaded.");
       setStatus("");
     } finally { setLoading(false); }
@@ -54,12 +63,9 @@ export default function NotificationCenter() {
 
   useEffect(() => {
     let active = true;
-    void fetchNotifications().then((result) => {
+    void syncNotifications().then((result) => {
       if (!active) return;
-      setNotifications(result.notifications ?? []);
-      setPreferences(result.preferences ?? []);
-      setFailures(result.failures ?? []);
-      setStatus("Your attention center is current.");
+      applyResult(result);
     }).catch((cause) => {
       if (!active) return;
       setError(cause instanceof Error ? cause.message : "Notifications could not be loaded.");
