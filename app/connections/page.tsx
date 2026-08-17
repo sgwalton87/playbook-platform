@@ -8,7 +8,7 @@ import { PlaybookCard, PlaybookGrid, PlaybookHero, PlaybookMetric, PlaybookMetri
 import { supabase } from "@/lib/supabaseClient";
 
 type DirectoryPerson = { id: string; username: string | null; full_name: string | null; first_name: string | null; last_name: string | null; role: string | null; avatar_url: string | null; school: string | null; sport: string | null };
-type Person = DirectoryPerson & { name: string; connected: boolean; requested: boolean; incoming: boolean };
+type Person = DirectoryPerson & { name: string; connected: boolean; requested: boolean; incoming: boolean; outgoingRequestId: string | null; incomingRequestId: string | null };
 type Tab = "discover" | "connected" | "requests";
 
 function personName(person: DirectoryPerson) { return person.full_name || [person.first_name, person.last_name].filter(Boolean).join(" ") || person.username || "Playbook member"; }
@@ -16,7 +16,6 @@ function roleLabel(role: string | null) { return String(role || "member").replac
 
 export default function ConnectionsPage() {
   const router = useRouter();
-  const [me, setMe] = useState<string | null>(null);
   const [people, setPeople] = useState<Person[]>([]);
   const [tab, setTab] = useState<Tab>("discover");
   const [search, setSearch] = useState("");
@@ -30,25 +29,32 @@ export default function ConnectionsPage() {
     const { data: authData } = await supabase.auth.getUser();
     const user = authData.user;
     if (!user) { router.replace("/login?next=/connections"); return; }
-    setMe(user.id);
     const [connectionsResult, sentResult, incomingResult, directoryResult] = await Promise.all([
       supabase.from("user_connections").select("connected_user_id").eq("user_id", user.id),
-      supabase.from("connection_requests").select("recipient_id").eq("requester_id", user.id).eq("status", "pending"),
-      supabase.from("connection_requests").select("requester_id").eq("recipient_id", user.id).eq("status", "pending"),
+      supabase.from("connection_requests").select("id,recipient_id").eq("requester_id", user.id).eq("status", "pending"),
+      supabase.from("connection_requests").select("id,requester_id").eq("recipient_id", user.id).eq("status", "pending"),
       supabase.rpc("get_public_network_directory", { search_text: null, result_limit: 100 }),
     ]);
     const firstError = connectionsResult.error || sentResult.error || incomingResult.error || directoryResult.error;
     if (firstError) throw new Error(firstError.message);
     const connectedIds = new Set((connectionsResult.data || []).map((row) => row.connected_user_id));
-    const sentIds = new Set((sentResult.data || []).map((row) => row.recipient_id));
-    const incomingIds = new Set((incomingResult.data || []).map((row) => row.requester_id));
-    const relationshipIds = [...new Set([...connectedIds, ...sentIds, ...incomingIds])].slice(0, 100);
+    const sentRequests = new Map((sentResult.data || []).map((row) => [row.recipient_id, row.id]));
+    const incomingRequests = new Map((incomingResult.data || []).map((row) => [row.requester_id, row.id]));
+    const relationshipIds = [...new Set([...connectedIds, ...sentRequests.keys(), ...incomingRequests.keys()])].slice(0, 100);
     const relationshipIdentityResult = relationshipIds.length ? await supabase.rpc("get_network_member_identities", { requested_ids: relationshipIds }) : { data: [] as DirectoryPerson[], error: null };
     if (relationshipIdentityResult.error) throw new Error(relationshipIdentityResult.error.message);
     const byId = new Map<string, DirectoryPerson>();
     for (const person of (directoryResult.data || []) as DirectoryPerson[]) byId.set(person.id, person);
     for (const person of (relationshipIdentityResult.data || []) as DirectoryPerson[]) byId.set(person.id, person);
-    const next = [...byId.values()].map((person): Person => ({ ...person, name: personName(person), connected: connectedIds.has(person.id), requested: sentIds.has(person.id), incoming: incomingIds.has(person.id) }));
+    const next = [...byId.values()].map((person): Person => ({
+      ...person,
+      name: personName(person),
+      connected: connectedIds.has(person.id),
+      requested: sentRequests.has(person.id),
+      incoming: incomingRequests.has(person.id),
+      outgoingRequestId: sentRequests.get(person.id) || null,
+      incomingRequestId: incomingRequests.get(person.id) || null,
+    }));
     setPeople(next);
     setMessage(next.length ? "Network state is current." : "No discoverable members or connection requests yet.");
     setLoading(false);
@@ -59,20 +65,29 @@ export default function ConnectionsPage() {
     return () => window.clearTimeout(id);
   }, [loadNetwork]);
 
-  async function mutate(action: "connect" | "cancel" | "accept" | "decline" | "disconnect", personId: string) {
-    if (!me) return;
-    setBusy(personId); setError("");
+  async function mutate(action: "connect" | "cancel" | "accept" | "decline" | "disconnect", person: Person) {
+    setBusy(person.id); setError("");
     try {
-      if (action === "connect") { const result = await supabase.from("connection_requests").upsert({ requester_id: me, recipient_id: personId, status: "pending", responded_at: null }, { onConflict: "requester_id,recipient_id" }); if (result.error) throw result.error; }
-      else if (action === "cancel") { const result = await supabase.from("connection_requests").update({ status: "cancelled", responded_at: new Date().toISOString() }).eq("requester_id", me).eq("recipient_id", personId).eq("status", "pending"); if (result.error) throw result.error; }
-      else if (action === "accept") {
-        const request = await supabase.from("connection_requests").update({ status: "accepted", responded_at: new Date().toISOString() }).eq("requester_id", personId).eq("recipient_id", me).eq("status", "pending"); if (request.error) throw request.error;
-        const first = await supabase.from("user_connections").upsert({ user_id: me, connected_user_id: personId }, { onConflict: "user_id,connected_user_id" }); if (first.error) throw first.error;
-        const reverse = await supabase.from("user_connections").upsert({ user_id: personId, connected_user_id: me }, { onConflict: "user_id,connected_user_id" }); if (reverse.error) throw reverse.error;
-      } else if (action === "decline") { const result = await supabase.from("connection_requests").update({ status: "declined", responded_at: new Date().toISOString() }).eq("requester_id", personId).eq("recipient_id", me).eq("status", "pending"); if (result.error) throw result.error; }
-      else { const first = await supabase.from("user_connections").delete().eq("user_id", me).eq("connected_user_id", personId); if (first.error) throw first.error; const reverse = await supabase.from("user_connections").delete().eq("user_id", personId).eq("connected_user_id", me); if (reverse.error) throw reverse.error; }
+      if (action === "connect") {
+        const result = await supabase.rpc("send_connection_request", { requested_recipient_id: person.id, requested_message: null });
+        if (result.error) throw result.error;
+      } else if (action === "cancel") {
+        if (!person.outgoingRequestId) throw new Error("The outgoing request is no longer available. Refresh your Network and try again.");
+        const result = await supabase.rpc("cancel_connection_request", { requested_request_id: person.outgoingRequestId });
+        if (result.error) throw result.error;
+      } else if (action === "accept" || action === "decline") {
+        if (!person.incomingRequestId) throw new Error("The incoming request is no longer available. Refresh your Network and try again.");
+        const result = await supabase.rpc("respond_to_connection_request", {
+          requested_request_id: person.incomingRequestId,
+          requested_decision: action === "accept" ? "accepted" : "declined",
+        });
+        if (result.error) throw result.error;
+      } else {
+        const result = await supabase.rpc("remove_connection", { requested_user_id: person.id });
+        if (result.error) throw result.error;
+      }
       await loadNetwork();
-      setMessage(action === "accept" ? "Connection accepted." : action === "connect" ? "Connection request sent." : "Network updated.");
+      setMessage(action === "accept" ? "Connection accepted." : action === "connect" ? "Connection request sent." : action === "decline" ? "Connection request declined." : action === "cancel" ? "Connection request cancelled." : "Connection removed.");
     } catch (cause) { setError(cause instanceof Error ? cause.message : "Network action failed."); }
     finally { setBusy(null); }
   }
@@ -89,7 +104,7 @@ export default function ConnectionsPage() {
     <div role="status" aria-live="polite" style={status}>{loading ? "Loading…" : message}</div>
     {error && <div role="alert" style={alert}>{error} <button onClick={() => void loadNetwork()}>Retry</button></div>}
     <section style={toolbar} aria-label="Network controls"><div style={tabs}>{(["discover", "connected", "requests"] as Tab[]).map((value) => <button key={value} type="button" onClick={() => setTab(value)} aria-pressed={tab === value} style={tab === value ? activeTab : tabButton}>{value === "discover" ? "Discover" : value === "connected" ? "Connected" : "Requests"}</button>)}</div><input aria-label="Search network" placeholder="Search name, role, school, or sport" value={search} onChange={(event) => setSearch(event.target.value)} style={searchInput} /></section>
-    {!loading && visible.length === 0 ? <PlaybookCard eyebrow="Network" title="Nothing in this view yet"><p style={copy}>Public discovery respects profile visibility. Existing and pending connection partners remain resolvable through a separate relationship-aware identity boundary.</p></PlaybookCard> : <PlaybookGrid min={280}>{visible.map((person) => <PlaybookCard key={person.id} eyebrow={roleLabel(person.role)} title={person.name}><div style={identityRow}><ProfileAvatar src={person.avatar_url} name={person.name} size={54} /><div><p style={copy}>{person.school || "Playbook Network"}{person.sport ? ` · ${person.sport}` : ""}</p>{person.username && <Link href={`/u/${person.username}`} style={profileLink}>@{person.username}</Link>}</div></div><div style={actions}>{person.connected ? <><PlaybookPill>Connected</PlaybookPill><button disabled={busy === person.id} onClick={() => void mutate("disconnect", person.id)} style={secondaryButton}>Disconnect</button></> : person.incoming ? <><button disabled={busy === person.id} onClick={() => void mutate("accept", person.id)} style={primaryButton}>Accept</button><button disabled={busy === person.id} onClick={() => void mutate("decline", person.id)} style={secondaryButton}>Decline</button></> : person.requested ? <><PlaybookPill>Requested</PlaybookPill><button disabled={busy === person.id} onClick={() => void mutate("cancel", person.id)} style={secondaryButton}>Cancel request</button></> : <button disabled={busy === person.id} onClick={() => void mutate("connect", person.id)} style={primaryButton}>Connect</button>}</div></PlaybookCard>)}</PlaybookGrid>}
+    {!loading && visible.length === 0 ? <PlaybookCard eyebrow="Network" title="Nothing in this view yet"><p style={copy}>Public discovery respects profile visibility. Existing and pending connection partners remain resolvable through a separate relationship-aware identity boundary.</p></PlaybookCard> : <PlaybookGrid min={280}>{visible.map((person) => <PlaybookCard key={person.id} eyebrow={roleLabel(person.role)} title={person.name}><div style={identityRow}><ProfileAvatar src={person.avatar_url} name={person.name} size={54} /><div><p style={copy}>{person.school || "Playbook Network"}{person.sport ? ` · ${person.sport}` : ""}</p>{person.username && <Link href={`/u/${person.username}`} style={profileLink}>@{person.username}</Link>}</div></div><div style={actions}>{person.connected ? <><PlaybookPill>Connected</PlaybookPill><button disabled={busy === person.id} onClick={() => void mutate("disconnect", person)} style={secondaryButton}>Disconnect</button></> : person.incoming ? <><button disabled={busy === person.id} onClick={() => void mutate("accept", person)} style={primaryButton}>Accept</button><button disabled={busy === person.id} onClick={() => void mutate("decline", person)} style={secondaryButton}>Decline</button></> : person.requested ? <><PlaybookPill>Requested</PlaybookPill><button disabled={busy === person.id} onClick={() => void mutate("cancel", person)} style={secondaryButton}>Cancel request</button></> : <button disabled={busy === person.id} onClick={() => void mutate("connect", person)} style={primaryButton}>Connect</button>}</div></PlaybookCard>)}</PlaybookGrid>}
   </PlaybookPage>;
 }
 
