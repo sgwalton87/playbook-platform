@@ -92,7 +92,7 @@ declare
   actor_id uuid := auth.uid();
   peer_a uuid;
   peer_b uuid;
-  conversation_id uuid;
+  resolved_conversation_id uuid;
 begin
   if actor_id is null then raise exception 'Authentication required.' using errcode='42501'; end if;
   if requested_peer_id is null or requested_peer_id=actor_id then raise exception 'A different connected peer is required.' using errcode='22023'; end if;
@@ -108,28 +108,28 @@ begin
   if actor_id::text < requested_peer_id::text then peer_a:=actor_id; peer_b:=requested_peer_id;
   else peer_a:=requested_peer_id; peer_b:=actor_id; end if;
 
-  select c.id into conversation_id
+  select c.id into resolved_conversation_id
   from public.pbos_conversations c
   where c.conversation_kind='network'
     and c.network_peer_a_id=peer_a and c.network_peer_b_id=peer_b;
 
-  if conversation_id is null then
+  if resolved_conversation_id is null then
     begin
       insert into public.pbos_conversations(
         conversation_kind,relationship_id,scholar_id,network_peer_a_id,network_peer_b_id,status,created_by
       ) values ('network',null,null,peer_a,peer_b,'ACTIVE',actor_id)
-      returning id into conversation_id;
+      returning id into resolved_conversation_id;
     exception when unique_violation then
-      select c.id into conversation_id from public.pbos_conversations c
+      select c.id into resolved_conversation_id from public.pbos_conversations c
       where c.conversation_kind='network' and c.network_peer_a_id=peer_a and c.network_peer_b_id=peer_b;
     end;
   end if;
 
   insert into public.pbos_conversation_participants(conversation_id,user_id,role)
-  values (conversation_id,peer_a,'network_peer'),(conversation_id,peer_b,'network_peer')
+  values (resolved_conversation_id,peer_a,'network_peer'),(resolved_conversation_id,peer_b,'network_peer')
   on conflict (conversation_id,user_id) do nothing;
 
-  return conversation_id;
+  return resolved_conversation_id;
 end;
 $$;
 
