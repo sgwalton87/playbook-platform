@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { PlaybookCard, PlaybookGrid, PlaybookHero, PlaybookMetric, PlaybookMetrics, PlaybookPage, PlaybookPill } from "@/components/ui";
 
 type Notification = { id: string; type: string; title: string; body: string; href: string; priority: string; read: boolean; created_at: string };
@@ -17,6 +17,13 @@ async function fetchNotifications(): Promise<NotificationResponse> {
   const result = await response.json() as NotificationResponse;
   if (!response.ok) throw new Error(result.error ?? "Notifications could not be loaded.");
   return result;
+}
+
+async function syncNotifications(): Promise<NotificationResponse> {
+  const processed = await fetch("/api/notifications", { method: "POST", cache: "no-store" });
+  const result = await processed.json() as { error?: string };
+  if (!processed.ok) throw new Error(result.error ?? "Trusted notifications could not be processed.");
+  return fetchNotifications();
 }
 
 function matchesFilter(item: Notification, filter: Filter) {
@@ -38,15 +45,17 @@ export default function NotificationCenter() {
   const [status, setStatus] = useState("Loading what needs your attention…");
   const [error, setError] = useState("");
 
+  const applyResult = useCallback((result: NotificationResponse) => {
+    setNotifications(result.notifications ?? []);
+    setPreferences(result.preferences ?? []);
+    setFailures(result.failures ?? []);
+    setStatus("Your attention center is current.");
+  }, []);
+
   async function reload() {
     setLoading(true); setError("");
-    try {
-      const result = await fetchNotifications();
-      setNotifications(result.notifications ?? []);
-      setPreferences(result.preferences ?? []);
-      setFailures(result.failures ?? []);
-      setStatus("Your attention center is current.");
-    } catch (cause) {
+    try { applyResult(await syncNotifications()); }
+    catch (cause) {
       setError(cause instanceof Error ? cause.message : "Notifications could not be loaded.");
       setStatus("");
     } finally { setLoading(false); }
@@ -54,19 +63,16 @@ export default function NotificationCenter() {
 
   useEffect(() => {
     let active = true;
-    void fetchNotifications().then((result) => {
+    void syncNotifications().then((result) => {
       if (!active) return;
-      setNotifications(result.notifications ?? []);
-      setPreferences(result.preferences ?? []);
-      setFailures(result.failures ?? []);
-      setStatus("Your attention center is current.");
+      applyResult(result);
     }).catch((cause) => {
       if (!active) return;
       setError(cause instanceof Error ? cause.message : "Notifications could not be loaded.");
       setStatus("");
     }).finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, []);
+  }, [applyResult]);
 
   const visible = useMemo(() => notifications.filter((item) => matchesFilter(item, filter)), [notifications, filter]);
   const unread = notifications.filter((item) => !item.read).length;
