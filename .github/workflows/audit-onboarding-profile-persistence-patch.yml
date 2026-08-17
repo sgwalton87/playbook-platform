@@ -1,0 +1,143 @@
+name: Apply onboarding persistence audit repair
+
+on:
+  push:
+    branches:
+      - agent/audit-onboarding-profile-persistence
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/audit-onboarding-profile-persistence
+          fetch-depth: 0
+
+      - name: Apply fail-closed persistence repair
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path: Path, old: str, new: str, label: str) -> None:
+              text = path.read_text()
+              if old not in text:
+                  raise SystemExit(f"Expected source not found for {label}")
+              path.write_text(text.replace(old, new, 1))
+
+          start = Path("app/start/page.tsx")
+          profile = Path("app/profile/page.tsx")
+
+          replace_once(
+              start,
+              'import { Suspense, useEffect, useMemo, useState } from "react";',
+              'import { Suspense, useEffect, useMemo, useRef, useState } from "react";',
+              "start useRef import",
+          )
+
+          replace_once(
+              start,
+              '  const [journeyError, setJourneyError] = useState<string | null>(null);\n',
+              '''  const [journeyError, setJourneyError] = useState<string | null>(null);\n  const [autosaveStatus, setAutosaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");\n  const autosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);\n  const autosaveQueueRef = useRef<Promise<void>>(Promise.resolve());\n  const onboardingLoadedRef = useRef(false);\n  const lastSavedFormRef = useRef("");\n  const persistRef = useRef<LegacyValue>(null);\n''',
+              "start autosave state",
+          )
+
+          replace_once(
+              start,
+              '    async function load() {\n      const { data: u } = await supabase.auth.getUser();',
+              '    async function load() {\n      onboardingLoadedRef.current = false;\n      const { data: u } = await supabase.auth.getUser();',
+              "start load guard",
+          )
+
+          replace_once(
+              start,
+              '      setForm(createInitialOnboardingData(safeProfile));\n',
+              '''      const initialForm = createInitialOnboardingData(safeProfile);\n      lastSavedFormRef.current = JSON.stringify(initialForm);\n      setForm(initialForm);\n      onboardingLoadedRef.current = true;\n''',
+              "start initial autosave baseline",
+          )
+
+          replace_once(
+              start,
+              '''  async function persist(\n    complete = false,\n    override: Record<string, LegacyValue> = {},\n    prepareRoleRecord = complete\n  ) {\n    if (!user?.id) return;\n\n    const nextForm = { ...form, ...override };''',
+              '''  async function persist(\n    complete = false,\n    override: Record<string, LegacyValue> = {},\n    prepareRoleRecord = complete,\n    sourceForm: Record<string, LegacyValue> | null = null\n  ) {\n    if (!user?.id) throw new Error("Your profile is not ready to save yet.");\n\n    const nextForm = { ...(sourceForm || form), ...override };''',
+              "start persist snapshot",
+          )
+
+          replace_once(
+              start,
+              '    await supabase.from("profiles").upsert(payload, { onConflict: "id" });\n',
+              '''    const { error: profileError } = await supabase\n      .from("profiles")\n      .upsert(payload, { onConflict: "id" });\n\n    if (profileError) {\n      throw new Error(`Your onboarding answers could not be saved. ${profileError.message}`);\n    }\n''',
+              "start profile upsert error",
+          )
+
+          replace_once(
+              start,
+              '    setProfile((prev: LegacyValue) => ({ ...prev, ...payload }));\n  }\n\n  async function sendInvites()',
+              '''    setProfile((prev: LegacyValue) => ({ ...prev, ...payload }));\n  }\n\n  persistRef.current = persist;\n\n  useEffect(() => {\n    if (!onboardingLoadedRef.current || !user?.id || creating || created) return;\n\n    const serialized = JSON.stringify(form);\n    if (serialized === lastSavedFormRef.current) return;\n\n    if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current);\n    const snapshot = { ...form };\n\n    autosaveTimerRef.current = setTimeout(() => {\n      autosaveQueueRef.current = autosaveQueueRef.current\n        .catch(() => undefined)\n        .then(async () => {\n          setAutosaveStatus("saving");\n          try {\n            await persistRef.current?.(false, { onboarding_step_index: stepIndex }, false, snapshot);\n            lastSavedFormRef.current = serialized;\n            setAutosaveStatus("saved");\n          } catch (error) {\n            setAutosaveStatus("error");\n            setJourneyError(error instanceof Error ? error.message : "Your onboarding answers could not be autosaved.");\n          }\n        });\n    }, 800);\n\n    return () => {\n      if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current);\n    };\n  }, [form, user?.id, stepIndex, creating, created]);\n\n  async function sendInvites()''',
+              "start autosave effect",
+          )
+
+          old_next = '''  async function next(skip = false) {\n    setSaving(true);\n    const stepIncrement = skip ? 1 : 1;\n    await persist(false, {\n      onboarding_step_index: Math.min(stepIndex + stepIncrement, steps.length - 1),\n    });\n\n    if (step.id === "network") {\n      await sendInvites();\n    }\n\n    const validationErrors = validateOnboardingStep(step, form);\n    if (isLast && validationErrors.length > 0) {\n      alert(validationErrors[0]);\n      setSaving(false);\n      return;\n    }\n\n    if (isLast) {\n      setCreating(true);\n      setJourneyError(null);\n      try {\n        assertRoleOnboardingCompletionSupported(role);\n        // Persist final evidence and any role-specific prerequisite record, but\n        // leave onboarding completion false until the governed server adapter succeeds.\n        await persist(false, {}, true);\n        const destination = getOnboardingCompletionDestination(role);\n        const response = await fetch(`/api/pbos/onboarding/${encodeURIComponent(role)}`, {\n          method: "POST",\n          headers: { "Content-Type": "application/json" },\n          body: JSON.stringify({\n            displayName: String(form.full_name || "Scholar"),\n            goalTitle: String(form.dream_school || form.ideal_profession || "Complete my scholar journey"),\n          }),\n        });\n        const result = await response.json() as { error?: string; destination?: string };\n        if (!response.ok) throw new Error(result.error || "PBOS role onboarding could not be completed.");\n        if (result.destination && result.destination !== destination) {\n          throw new Error("PBOS role onboarding destination does not match the canonical client contract.");\n        }\n        setCreating(false);\n        setCreated(true);\n        setTimeout(() => { window.location.href = result.destination || destination; }, 15000);\n      } catch (error) {\n        setCreating(false);\n        setSaving(false);\n        setJourneyError(error instanceof Error ? error.message : "PBOS role onboarding could not be completed.");\n      }\n      return;\n    }\n\n    setStepIndex((i) => i + 1);\n    setSaving(false);\n  }'''
+
+          new_next = '''  async function next(skip = false) {\n    setSaving(true);\n    setJourneyError(null);\n\n    try {\n      if (autosaveTimerRef.current) {\n        clearTimeout(autosaveTimerRef.current);\n        autosaveTimerRef.current = null;\n      }\n      await autosaveQueueRef.current.catch(() => undefined);\n\n      const validationErrors = validateOnboardingStep(step, form);\n      if (isLast && validationErrors.length > 0) {\n        alert(validationErrors[0]);\n        return;\n      }\n\n      const stepIncrement = skip ? 1 : 1;\n      await persist(false, {\n        onboarding_step_index: Math.min(stepIndex + stepIncrement, steps.length - 1),\n      });\n      lastSavedFormRef.current = JSON.stringify(form);\n      setAutosaveStatus("saved");\n\n      if (step.id === "network") {\n        await sendInvites();\n      }\n\n      if (isLast) {\n        setCreating(true);\n        assertRoleOnboardingCompletionSupported(role);\n        // Persist final evidence and any role-specific prerequisite record, but\n        // leave onboarding completion false until the governed server adapter succeeds.\n        await persist(false, {}, true);\n        const destination = getOnboardingCompletionDestination(role);\n        const response = await fetch(`/api/pbos/onboarding/${encodeURIComponent(role)}`, {\n          method: "POST",\n          headers: { "Content-Type": "application/json" },\n          body: JSON.stringify({\n            displayName: String(form.full_name || "Scholar"),\n            goalTitle: String(form.dream_school || form.ideal_profession || "Complete my scholar journey"),\n          }),\n        });\n        const result = await response.json() as { error?: string; destination?: string };\n        if (!response.ok) throw new Error(result.error || "PBOS role onboarding could not be completed.");\n        if (result.destination && result.destination !== destination) {\n          throw new Error("PBOS role onboarding destination does not match the canonical client contract.");\n        }\n        setCreating(false);\n        setCreated(true);\n        setTimeout(() => { window.location.href = result.destination || destination; }, 15000);\n        return;\n      }\n\n      setStepIndex((i) => i + 1);\n    } catch (error) {\n      setCreating(false);\n      setAutosaveStatus("error");\n      setJourneyError(error instanceof Error ? error.message : "Your onboarding progress could not be saved.");\n    } finally {\n      setSaving(false);\n    }\n  }'''
+          replace_once(start, old_next, new_next, "start next fail-closed")
+
+          replace_once(
+              start,
+              '''          <p style={heroBody}>\n            Your answers autosave and feed your dashboard, private profile, and public-facing profile.\n          </p>''',
+              '''          <p style={heroBody}>\n            Your answers autosave to your private Scholar Record. You choose separately whether to publish a public profile.\n          </p>\n          <p role="status" aria-live="polite" style={{ ...heroBody, fontSize: 13, marginTop: 8 }}>\n            {autosaveStatus === "saving" && "Saving your progress…"}\n            {autosaveStatus === "saved" && "✓ Progress saved"}\n            {autosaveStatus === "error" && "Save failed — your answers are still on this screen."}\n          </p>''',
+              "start privacy accurate autosave feedback",
+          )
+
+          replace_once(
+              profile,
+              '  const [saved, setSaved] = useState(false);\n',
+              '  const [saved, setSaved] = useState(false);\n  const [saveError, setSaveError] = useState<string | null>(null);\n',
+              "profile save error state",
+          )
+
+          old_upload = '''  const uploadAvatar = async (file: File) => {\n    if(!profile?.id)return;\n    setUploading(true);\n    const ext=file.name.split(".").pop();\n    const path=`${profile.id}/avatar.${ext}`;\n    const{error}=await supabase.storage.from("avatars").upload(path,file,{upsert:true});\n    if(!error){const{data}=supabase.storage.from("avatars").getPublicUrl(path);setAvatarUrl(data.publicUrl);await supabase.from("profiles").update({avatar_url:data.publicUrl}).eq("id",profile.id);}\n    setUploading(false);\n  };'''
+          new_upload = '''  const uploadAvatar = async (file: File) => {\n    if(!profile?.id)return;\n    setUploading(true);\n    setSaveError(null);\n    try {\n      const ext=file.name.split(".").pop();\n      const path=`${profile.id}/avatar.${ext}`;\n      const{error}=await supabase.storage.from("avatars").upload(path,file,{upsert:true});\n      if(error) throw new Error(error.message);\n      const{data}=supabase.storage.from("avatars").getPublicUrl(path);\n      const { data: updated, error: profileError } = await supabase\n        .from("profiles")\n        .update({avatar_url:data.publicUrl})\n        .eq("id",profile.id)\n        .select("id")\n        .maybeSingle();\n      if(profileError || !updated) throw new Error(profileError?.message || "Your profile photo could not be linked to your profile.");\n      setAvatarUrl(data.publicUrl);\n      setProfile((prev: LegacyValue) => ({ ...prev, avatar_url: data.publicUrl }));\n    } catch (error) {\n      setSaveError(error instanceof Error ? error.message : "Your profile photo could not be saved.");\n    } finally {\n      setUploading(false);\n    }\n  };'''
+          replace_once(profile, old_upload, new_upload, "profile avatar confirmation")
+
+          replace_once(
+              profile,
+              '''  const save = async () => {\n    if(!profile?.id)return;\n    setSaving(true);\n    await supabase.from("profiles").update({''',
+              '''  const save = async () => {\n    if(!profile?.id)return;\n    setSaving(true);\n    setSaved(false);\n    setSaveError(null);\n    const { data: updated, error } = await supabase.from("profiles").update({''',
+              "profile save response",
+          )
+
+          replace_once(
+              profile,
+              '''      pillars,race:race||null,household_income:householdIncome||null,first_generation:firstGen,free_reduced_lunch:freeLunch,migrant_student:migrant,foster_youth:fosterYouth,unhoused,has_iep:iep,\n    }).eq("id",profile.id);\n    setSaving(false);setSaved(true);setTimeout(()=>setSaved(false),3000);\n  };''',
+              '''      pillars,race:race||null,household_income:householdIncome||null,first_generation:firstGen,free_reduced_lunch:freeLunch,migrant_student:migrant,foster_youth:fosterYouth,unhoused,has_iep:iep,\n    }).eq("id",profile.id).select("id").maybeSingle();\n    setSaving(false);\n    if(error || !updated){\n      setSaveError(error?.message || "Your profile changes could not be saved.");\n      return;\n    }\n    setSaved(true);setTimeout(()=>setSaved(false),3000);\n  };''',
+              "profile confirmed update",
+          )
+
+          replace_once(
+              profile,
+              '''        <div style={{display:"flex",justifyContent:"flex-end",gap:10,alignItems:"center",paddingTop:16}}>\n          {saved&&<span style={{fontFamily:T.mono,fontSize:11,color:T.green,fontWeight:700}}>✓ All changes saved!</span>}''',
+              '''        <div style={{display:"flex",justifyContent:"flex-end",gap:10,alignItems:"center",paddingTop:16,flexWrap:"wrap"}}>\n          {saveError&&<span role="alert" aria-live="assertive" style={{fontFamily:T.mono,fontSize:11,color:"#B91C1C",fontWeight:700,maxWidth:520}}>{saveError}</span>}\n          {saved&&<span role="status" aria-live="polite" style={{fontFamily:T.mono,fontSize:11,color:T.green,fontWeight:700}}>✓ All changes saved!</span>}''',
+              "profile save feedback",
+          )
+
+          test = Path("tests/onboarding-profile-persistence-audit.test.ts")
+          test.write_text('''import { readFileSync } from "node:fs";\nimport { describe, expect, it } from "vitest";\n\nconst startSource = readFileSync("app/start/page.tsx", "utf8");\nconst profileSource = readFileSync("app/profile/page.tsx", "utf8");\n\ndescribe("onboarding and profile persistence audit contracts", () => {\n  it("debounces onboarding autosave through the existing owner-scoped profile path", () => {\n    expect(startSource).toContain("autosaveTimerRef");\n    expect(startSource).toContain("autosaveQueueRef");\n    expect(startSource).toContain("Your onboarding answers could not be saved");\n    expect(startSource).toContain("onboarding_step_index: stepIndex");\n    expect(startSource).toContain("await autosaveQueueRef.current.catch");\n  });\n\n  it("does not imply onboarding automatically publishes a public profile", () => {\n    expect(startSource).toContain("Your answers autosave to your private Scholar Record");\n    expect(startSource).toContain("You choose separately whether to publish a public profile");\n    expect(startSource).not.toContain("feed your dashboard, private profile, and public-facing profile");\n  });\n\n  it("requires a confirmed profile row before reporting save success", () => {\n    expect(profileSource).toContain('.select("id").maybeSingle()');\n    expect(profileSource).toContain("if(error || !updated)");\n    expect(profileSource).toContain('role="alert"');\n  });\n});\n''')
+          PY
+
+      - name: Commit repair
+        shell: bash
+        run: |
+          if git diff --quiet -- app/start/page.tsx app/profile/page.tsx tests/onboarding-profile-persistence-audit.test.ts; then
+            echo "No repair changes required."
+            exit 0
+          fi
+          git config user.name "playbook-audit-bot"
+          git config user.email "playbook-audit-bot@users.noreply.github.com"
+          git add app/start/page.tsx app/profile/page.tsx tests/onboarding-profile-persistence-audit.test.ts
+          git commit -m "fix: make onboarding and profile persistence fail closed"
+          git push origin HEAD:agent/audit-onboarding-profile-persistence
