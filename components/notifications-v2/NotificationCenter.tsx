@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { PlaybookCard, PlaybookGrid, PlaybookHero, PlaybookMetric, PlaybookMetrics, PlaybookPage, PlaybookPill } from "@/components/ui";
 
 type Notification = { id: string; type: string; title: string; body: string; href: string; priority: string; read: boolean; created_at: string };
@@ -45,12 +45,12 @@ export default function NotificationCenter() {
   const [status, setStatus] = useState("Loading what needs your attention…");
   const [error, setError] = useState("");
 
-  function applyResult(result: NotificationResponse) {
+  const applyResult = useCallback((result: NotificationResponse) => {
     setNotifications(result.notifications ?? []);
     setPreferences(result.preferences ?? []);
     setFailures(result.failures ?? []);
     setStatus("Your attention center is current.");
-  }
+  }, []);
 
   async function reload() {
     setLoading(true); setError("");
@@ -72,7 +72,7 @@ export default function NotificationCenter() {
       setStatus("");
     }).finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, []);
+  }, [applyResult]);
 
   const visible = useMemo(() => notifications.filter((item) => matchesFilter(item, filter)), [notifications, filter]);
   const unread = notifications.filter((item) => !item.read).length;
