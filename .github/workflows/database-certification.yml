@@ -55,6 +55,8 @@ jobs:
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/application_workspace_authority_preflight.sql
       - name: Certify public Scholar Record projection boundary
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/public_scholar_record_projection_preflight.sql
+      - name: Certify governed portfolio sharing boundary
+        run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/portfolio_share_authority_preflight.sql
       - name: Certify network and feed projection boundary
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/network_feed_projection_preflight.sql
       - name: Certify canonical learning and economy boundary
