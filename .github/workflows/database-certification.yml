@@ -69,6 +69,8 @@ jobs:
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/event_experience_preflight.sql
       - name: Certify event reminder delivery boundary
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/event_reminder_delivery_preflight.sql
+      - name: Certify Summit shared Event taxonomy
+        run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/summit_event_type_preflight.sql
       - name: Certify notification authority boundary
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/notification_authority_preflight.sql
       - name: Certify active Scholar support context boundary
