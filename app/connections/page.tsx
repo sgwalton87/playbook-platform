@@ -8,7 +8,7 @@ import { PlaybookCard, PlaybookGrid, PlaybookHero, PlaybookMetric, PlaybookMetri
 import { supabase } from "@/lib/supabaseClient";
 
 type DirectoryPerson = { id: string; username: string | null; full_name: string | null; first_name: string | null; last_name: string | null; role: string | null; avatar_url: string | null; school: string | null; sport: string | null };
-type Person = DirectoryPerson & { name: string; connected: boolean; requested: boolean; incoming: boolean; outgoingRequestId: string | null; incomingRequestId: string | null; publicProfileLinkable: boolean };
+type Person = DirectoryPerson & { name: string; connected: boolean; requested: boolean; incoming: boolean; outgoingRequestId: string | null; incomingRequestId: string | null; publicProfileLinkable: boolean; mutualCount: number };
 type Tab = "discover" | "connected" | "requests";
 
 function personName(person: DirectoryPerson) { return person.full_name || [person.first_name, person.last_name].filter(Boolean).join(" ") || person.username || "Playbook member"; }
@@ -60,6 +60,18 @@ export default function ConnectionsPage() {
     for (const result of relationshipLinkabilityResults) {
       for (const row of (result.data || []) as Array<{ id: string }>) publicProfileIds.add(row.id);
     }
+
+    const memberIds = [...byId.keys()];
+    const mutualResults = await Promise.all(
+      chunks(memberIds, 100).map((requestedIds) => supabase.rpc("get_network_mutual_connection_counts", { requested_ids: requestedIds }))
+    );
+    const mutualError = mutualResults.find((result) => result.error)?.error;
+    if (mutualError) throw new Error(mutualError.message);
+    const mutualCounts = new Map<string, number>();
+    for (const result of mutualResults) {
+      for (const row of (result.data || []) as Array<{ member_id: string; mutual_count: number | string }>) mutualCounts.set(row.member_id, Number(row.mutual_count || 0));
+    }
+
     const next = [...byId.values()].map((person): Person => ({
       ...person,
       name: personName(person),
@@ -69,6 +81,7 @@ export default function ConnectionsPage() {
       outgoingRequestId: sentRequests.get(person.id) || null,
       incomingRequestId: incomingRequests.get(person.id) || null,
       publicProfileLinkable: publicProfileIds.has(person.id),
+      mutualCount: mutualCounts.get(person.id) || 0,
     }));
     setPeople(next);
     setMessage(next.length ? (normalizedSearch ? `Showing Network results for “${normalizedSearch}”.` : "Network state is current.") : (normalizedSearch ? `No Network members match “${normalizedSearch}”.` : "No discoverable members or connection requests yet."));
@@ -128,7 +141,7 @@ export default function ConnectionsPage() {
     <div role="status" aria-live="polite" style={status}>{loading ? "Loading…" : message}</div>
     {error && <div role="alert" style={alert}>{error} <button onClick={() => void loadNetwork(tab === "discover" ? search : "")}>Retry</button></div>}
     <section style={toolbar} aria-label="Network controls"><div style={tabs}>{(["discover", "connected", "requests"] as Tab[]).map((value) => <button key={value} type="button" onClick={() => setTab(value)} aria-pressed={tab === value} style={tab === value ? activeTab : tabButton}>{value === "discover" ? "Discover" : value === "connected" ? "Connected" : "Requests"}</button>)}</div><input aria-label="Search network" placeholder="Search name, role, school, or sport" value={search} onChange={(event) => setSearch(event.target.value)} style={searchInput} /></section>
-    {!loading && visible.length === 0 ? <PlaybookCard eyebrow="Network" title="Nothing in this view yet"><p style={copy}>Public discovery respects profile visibility and active publication consent. Existing and pending connection partners remain resolvable through a separate relationship-aware identity boundary.</p></PlaybookCard> : <PlaybookGrid min={280}>{visible.map((person) => <PlaybookCard key={person.id} eyebrow={roleLabel(person.role)} title={person.name}><div style={identityRow}><ProfileAvatar src={person.avatar_url} name={person.name} size={54} /><div><p style={copy}>{person.school || "Playbook Network"}{person.sport ? ` · ${person.sport}` : ""}</p>{person.username && (person.publicProfileLinkable ? <Link href={`/u/${person.username}`} style={profileLink}>@{person.username}</Link> : <span style={privateIdentity}>@{person.username} · Private profile</span>)}</div></div><div style={actions}>{person.connected ? <><PlaybookPill>Connected</PlaybookPill><button disabled={busy === person.id} onClick={() => void mutate("disconnect", person)} style={secondaryButton}>Disconnect</button></> : person.incoming ? <><button disabled={busy === person.id} onClick={() => void mutate("accept", person)} style={primaryButton}>Accept</button><button disabled={busy === person.id} onClick={() => void mutate("decline", person)} style={secondaryButton}>Decline</button></> : person.requested ? <><PlaybookPill>Requested</PlaybookPill><button disabled={busy === person.id} onClick={() => void mutate("cancel", person)} style={secondaryButton}>Cancel request</button></> : <button disabled={busy === person.id} onClick={() => void mutate("connect", person)} style={primaryButton}>Connect</button>}</div></PlaybookCard>)}</PlaybookGrid>}
+    {!loading && visible.length === 0 ? <PlaybookCard eyebrow="Network" title="Nothing in this view yet"><p style={copy}>Public discovery respects profile visibility and active publication consent. Existing and pending connection partners remain resolvable through a separate relationship-aware identity boundary.</p></PlaybookCard> : <PlaybookGrid min={280}>{visible.map((person) => <PlaybookCard key={person.id} eyebrow={roleLabel(person.role)} title={person.name}><div style={identityRow}><ProfileAvatar src={person.avatar_url} name={person.name} size={54} /><div><p style={copy}>{person.school || "Playbook Network"}{person.sport ? ` · ${person.sport}` : ""}</p>{person.username && (person.publicProfileLinkable ? <Link href={`/u/${person.username}`} style={profileLink}>@{person.username}</Link> : <span style={privateIdentity}>@{person.username} · Private profile</span>)}<p style={mutualCopy}>{person.mutualCount === 1 ? "1 mutual connection" : `${person.mutualCount} mutual connections`}</p></div></div><div style={actions}>{person.connected ? <><PlaybookPill>Connected</PlaybookPill><button disabled={busy === person.id} onClick={() => void mutate("disconnect", person)} style={secondaryButton}>Disconnect</button></> : person.incoming ? <><button disabled={busy === person.id} onClick={() => void mutate("accept", person)} style={primaryButton}>Accept</button><button disabled={busy === person.id} onClick={() => void mutate("decline", person)} style={secondaryButton}>Decline</button></> : person.requested ? <><PlaybookPill>Requested</PlaybookPill><button disabled={busy === person.id} onClick={() => void mutate("cancel", person)} style={secondaryButton}>Cancel request</button></> : <button disabled={busy === person.id} onClick={() => void mutate("connect", person)} style={primaryButton}>Connect</button>}</div></PlaybookCard>)}</PlaybookGrid>}
   </PlaybookPage>;
 }
 
@@ -143,6 +156,7 @@ const identityRow: React.CSSProperties = { display: "flex", gap: 12, alignItems:
 const copy: React.CSSProperties = { color: "#64748B", lineHeight: 1.55, margin: 0 };
 const profileLink: React.CSSProperties = { display: "inline-block", marginTop: 5, color: "#EA580C", fontWeight: 850, textDecoration: "none" };
 const privateIdentity: React.CSSProperties = { display: "inline-block", marginTop: 5, color: "#64748B", fontWeight: 750 };
+const mutualCopy: React.CSSProperties = { color: "#64748B", fontSize: 13, fontWeight: 700, margin: "5px 0 0" };
 const actions: React.CSSProperties = { display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginTop: 12 };
 const baseButton: React.CSSProperties = { borderRadius: 999, padding: "10px 14px", fontWeight: 900, cursor: "pointer" };
 const primaryButton: React.CSSProperties = { ...baseButton, border: 0, background: "#F97316", color: "#FFFFFF" };

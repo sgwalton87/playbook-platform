@@ -43,6 +43,14 @@ describe("canonical network and feed convergence", () => {
     expect(source).toContain("Private profile");
   });
 
+  it("surfaces mutual connections through the bounded count projection without reading another member's graph directly", () => {
+    const source = read("app/connections/page.tsx");
+    expect(source).toContain('rpc("get_network_mutual_connection_counts"');
+    expect(source).toContain("mutualCount: mutualCounts.get(person.id) || 0");
+    expect(source).toContain("mutual connections");
+    expect(source).not.toContain('.from("user_connections").select("connected_user_id,user_id")');
+  });
+
   it("routes the Network connection lifecycle through governed RPCs only", () => {
     const source = read("app/connections/page.tsx");
     expect(source).toContain('rpc("send_connection_request"');
