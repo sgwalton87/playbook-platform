@@ -68,9 +68,11 @@ export default function ConnectionsPage() {
   }, [router]);
 
   useEffect(() => {
-    setLoading(true);
     const discoverySearch = tab === "discover" ? search : "";
-    const id = window.setTimeout(() => { void loadNetwork(discoverySearch).catch((cause) => { setError(cause instanceof Error ? cause.message : "Network could not be loaded."); setLoading(false); }); }, tab === "discover" && search.trim() ? 250 : 0);
+    const id = window.setTimeout(() => {
+      setLoading(true);
+      void loadNetwork(discoverySearch).catch((cause) => { setError(cause instanceof Error ? cause.message : "Network could not be loaded."); setLoading(false); });
+    }, tab === "discover" && search.trim() ? 250 : 0);
     return () => window.clearTimeout(id);
   }, [loadNetwork, search, tab]);
 
