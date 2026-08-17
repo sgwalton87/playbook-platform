@@ -87,6 +87,8 @@ jobs:
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/marketplace_opportunity_catalog_preflight.sql
       - name: Certify notification authority boundary
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/notification_authority_preflight.sql
+      - name: Certify Network notification producers
+        run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/network_notification_producer_preflight.sql
       - name: Certify active Scholar support context boundary
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/active_support_scholar_context_preflight.sql
       - name: Certify verification reviewer authority boundary
