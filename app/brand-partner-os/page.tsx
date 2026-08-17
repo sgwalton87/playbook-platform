@@ -15,13 +15,28 @@ import {
 import { supabase } from "@/lib/supabaseClient";
 
 const pathways = [
-  { label: "Opportunity", title: "Create a responsible pathway", body: "Publish internships, scholarships, events, work-based learning, or sponsored experiences with clear eligibility and support.", href: "/opportunities", action: "Open opportunities" },
+  { label: "Organization", title: "Maintain the verified organization", body: "Keep marketplace-facing organization context connected to the approved Brand Partner identity without rewriting verification evidence.", href: "/brand-partner-os/organization", action: "Organization Profile" },
+  { label: "Campaigns", title: "Build inside approved campaign scope", body: "Create and refine campaign drafts using only campaign types already present in approved verification evidence.", href: "/brand-partner-os/campaigns", action: "Campaign Builder" },
+  { label: "Opportunity", title: "Create a responsible pathway", body: "Publish internships, scholarships, events, work-based learning, or sponsored experiences with clear eligibility and support through the shared Opportunity service.", href: "/opportunities", action: "Open opportunities" },
   { label: "Scholar-Athlete", title: "Support NIL readiness responsibly", body: "Connect education, compliance, disclosure, deliverables, and payment readiness before activating a partnership.", href: "/scholar-athlete-os", action: "Review athlete journey" },
-  { label: "Learning", title: "Sponsor useful education", body: "Support financial literacy, career readiness, wellness, leadership, and global-readiness learning paths.", href: "/courses", action: "Explore courses" },
-  { label: "Applications", title: "Review permissioned participation", body: "Work with applications and verified evidence only after the scholar grants the appropriate authority.", href: "/application-workspaces", action: "Open workspaces" },
+  { label: "Applications", title: "Use permissioned application workflows", body: "Application workspaces remain Scholar-owned. Marketplace campaigns do not grant automatic applicant or Scholar Record access.", href: "/application-workspaces", action: "Open workspaces" },
   { label: "Communication", title: "Coordinate with the right people", body: "Keep partner, scholar, guardian, and support-team decisions inside governed conversations.", href: "/messages", action: "Open messages" },
-  { label: "Identity", title: "Complete the partner profile", body: "Maintain organization, category, goals, budget context, and compliance contacts before publishing activity.", href: "/profile", action: "Review profile" },
 ] as const;
+
+type Partner = { name: string; category: string; active: boolean };
+
+type DashboardState = {
+  partner: Partner | null;
+  approvedTypes: number;
+  drafts: number;
+  reviewRequested: number;
+};
+
+function firstPartner(value: unknown): Partner | null {
+  const row = Array.isArray(value) ? value[0] : value;
+  if (!row || typeof row !== "object") return null;
+  return row as Partner;
+}
 
 export default function BrandPartnerOSPage() {
   return (
@@ -32,30 +47,62 @@ export default function BrandPartnerOSPage() {
 }
 
 function BrandPartnerWorkspace() {
-  const [profile, setProfile] = useState<LegacyValue>(null);
+  const [dashboard, setDashboard] = useState<DashboardState>({ partner: null, approvedTypes: 0, drafts: 0, reviewRequested: 0 });
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     let active = true;
     async function load() {
       const { data: auth, error: authError } = await supabase.auth.getUser();
       if (!active) return;
-      if (authError || !auth.user) {
+      if (authError || !auth.user) { setError("Authentication required."); setState("error"); return; }
+
+      const organization = await supabase.rpc("ensure_brand_partner_organization");
+      if (!active) return;
+      const partner = firstPartner(organization.data);
+      if (organization.error || !partner) {
+        setError(organization.error?.message || "Verified organization could not be resolved.");
         setState("error");
         return;
       }
-      const { data, error } = await supabase.from("profiles").select("*").eq("id", auth.user.id).maybeSingle();
+
+      const [verification, campaigns] = await Promise.all([
+        supabase.from("brand_partner_verification_requests")
+          .select("campaign_types")
+          .eq("brand_user_id", auth.user.id)
+          .eq("status", "approved")
+          .eq("campaign_scope_approved", true)
+          .eq("compliance_scope_approved", true)
+          .order("reviewed_at", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+        supabase.from("brand_campaign_drafts")
+          .select("status")
+          .eq("brand_user_id", auth.user.id),
+      ]);
       if (!active) return;
-      setProfile(data);
-      setState(error ? "error" : "ready");
+      if (verification.error || campaigns.error) {
+        setError(verification.error?.message || campaigns.error?.message || "Marketplace data could not be loaded.");
+        setState("error");
+        return;
+      }
+
+      const approvedTypes = Array.isArray(verification.data?.campaign_types) ? verification.data.campaign_types.length : 0;
+      const rows = campaigns.data || [];
+      setDashboard({
+        partner,
+        approvedTypes,
+        drafts: rows.filter((row) => row.status === "draft").length,
+        reviewRequested: rows.filter((row) => row.status === "review_requested").length,
+      });
+      setState("ready");
     }
     void load();
     return () => { active = false; };
   }, []);
 
-  const data = profile?.onboarding_data || {};
-  const organization = data.organization_name || profile?.full_name || "Partner profile not completed";
-  const goals = Array.isArray(data.partnership_goals) ? data.partnership_goals.length : 0;
+  const organization = dashboard.partner?.name || "Verified organization not resolved";
 
   return (
     <PlaybookPage>
@@ -66,24 +113,24 @@ function BrandPartnerWorkspace() {
           subtitle="Build responsible campaigns, rewards, sponsorships, NIL education, internships, events, and learning pathways without turning student data into inventory."
         >
           <div style={heroActions}>
-            <PlaybookButton href="/opportunities">Create an opportunity</PlaybookButton>
-            <PlaybookButton href="/messages" variant="secondary">Open messages</PlaybookButton>
+            <PlaybookButton href="/brand-partner-os/campaigns">Campaign Builder</PlaybookButton>
+            <PlaybookButton href="/brand-partner-os/organization" variant="secondary">Organization Profile</PlaybookButton>
           </div>
         </PlaybookHero>
 
         <section style={identityRail} aria-live="polite">
           <div>
-            <PlaybookPill>{state === "ready" ? "Verified partner context" : state === "loading" ? "Connecting partner context" : "Partner context unavailable"}</PlaybookPill>
+            <PlaybookPill>{state === "ready" ? "Verified operational partner" : state === "loading" ? "Connecting marketplace record" : "Marketplace record unavailable"}</PlaybookPill>
             <h2 style={identityTitle}>{organization}</h2>
           </div>
-          <p style={identityCopy}>{state === "error" ? "Your organization record could not be loaded. No partner or scholar data is being displayed." : "Organization identity, campaign scope, and compliance scope have passed the Brand Partner authority gate for this workspace."}</p>
+          <p style={identityCopy}>{state === "error" ? (error || "Your marketplace record could not be loaded. No scholar data is being displayed.") : "The operational Organization Profile is materialized from approved Brand Partner verification. Campaign and compliance approval remain separate evidence."}</p>
         </section>
 
         <PlaybookMetrics>
-          <PlaybookMetric label="Partner category" value={data.brand_category || "Not connected"} />
-          <PlaybookMetric label="Declared goals" value={`${goals} selected`} />
-          <PlaybookMetric label="Published opportunities" value="0 connected" />
-          <PlaybookMetric label="Active campaigns" value="0 connected" />
+          <PlaybookMetric label="Partner category" value={dashboard.partner?.category || "Not resolved"} />
+          <PlaybookMetric label="Approved campaign types" value={state === "loading" ? "…" : String(dashboard.approvedTypes)} />
+          <PlaybookMetric label="Campaign drafts" value={state === "loading" ? "…" : String(dashboard.drafts)} />
+          <PlaybookMetric label="Review requested" value={state === "loading" ? "…" : String(dashboard.reviewRequested)} />
         </PlaybookMetrics>
 
         <PlaybookGrid min={300}>
