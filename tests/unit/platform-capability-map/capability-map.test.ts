@@ -57,4 +57,10 @@ describe("Playbook capability map", () => {
     expect(source).toContain('item.status === "available"');
     expect(source).toContain("canOpen && item.href");
   });
+
+  it("keeps shipped Event reminders and Summit experiences discoverable", () => {
+    const events = getCapabilityCatalog({ includeFounder: false }).find((group) => group.id === "events");
+    expect(events?.items.find((item) => item.label === "Event reminders")).toMatchObject({ status: "available", href: "/events/reminders" });
+    expect(events?.items.find((item) => item.label === "Summit events")).toMatchObject({ status: "available", href: "/events" });
+  });
 });

@@ -129,8 +129,8 @@ export const CAPABILITY_GROUPS: CapabilityGroup[] = [
       { label: "QR check-in", description: "Record arrival evidence without self-verifying attendance or rewards.", href: "/events", status: "in-audit" },
       { label: "Event networking", description: "Explicit attendee opt-in with a privacy-safe directory.", href: "/events", status: "in-audit" },
       { label: "Replay library", description: "Access event-owned replay links when available.", href: "/events/replays", status: "in-audit" },
-      { label: "Event reminders", description: "Scheduled reminders through the shared Notifications service.", status: "planned" },
-      { label: "Summit events", description: "Summit experiences represented through the shared Events service.", status: "planned" },
+      { label: "Event reminders", description: "Scheduled reminders through the shared Notifications service.", href: "/events/reminders", status: "available" },
+      { label: "Summit events", description: "Summit experiences represented through the shared Events service.", href: "/events", status: "available" },
     ],
   },
   {
