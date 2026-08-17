@@ -6,7 +6,7 @@ Phase: 6 — Feed
 
 ## Purpose
 
-Make Feed author identity truthful, complete, privacy-preserving, and derived from the canonical profile record without exposing unpublished profile data.
+Make Feed author identity truthful, complete within the current Feed query bounds, privacy-preserving, and derived from the canonical profile record without exposing unpublished profile data.
 
 ## Canonical source
 
@@ -37,7 +37,7 @@ Existing public posts whose authors do not satisfy the publication boundary rema
 
 ## Completeness
 
-Feed clients shall resolve all unique author and comment-author identifiers in bounded chunks rather than truncating the identity set with `.slice(0, 100)`.
+The authenticated Feed currently loads at most 50 posts and the public News Feed at most 30 posts. Therefore the unique post-author set is bounded below the 100-ID projection limit and can be resolved without truncation loss. Comment-author scaling beyond 100 identities is explicitly deferred to the Phase 6 Comments task, where comment pagination and identity batching are audited together.
 
 ## Experience truth
 
@@ -58,7 +58,7 @@ Real Author Identity is complete when:
 
 - the identity RPC requires the current explicit publication-consent boundary for non-owner public projection;
 - public/private SECURITY INVOKER/DEFINER separation remains intact;
-- Feed and Public News Feed resolve all author IDs in bounded chunks;
+- current Feed and Public News Feed post-author sets remain within the bounded projection contract;
 - legacy unconsented public posts fail closed to neutral author labels;
 - regression and database preflight tests prove no unpublished identity leakage;
 - CI, Database Certification, and production build are green.
