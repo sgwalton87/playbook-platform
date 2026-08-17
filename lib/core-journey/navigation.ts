@@ -1,3 +1,5 @@
+import { isPlatformOperatorRole } from "@/lib/auth/platformOperator";
+
 export const SCHOLAR_PRIMARY_NAV = [
   { label: "Start Here", href: "/start", icon: "✦" },
   { label: "Events", href: "/community-events", icon: "◍" },
@@ -25,7 +27,7 @@ export const FOUNDER_NAV = [
 export function getNavigationForRole(role?: string | null) {
   const normalized = (role || "").toLowerCase();
 
-  if (["founder", "admin", "super_admin"].includes(normalized)) {
+  if (isPlatformOperatorRole(normalized)) {
     return {
       primary: SCHOLAR_PRIMARY_NAV,
       founder: FOUNDER_NAV,
