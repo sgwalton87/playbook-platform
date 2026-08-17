@@ -1,13 +1,26 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { buildTrustReport } from "@/lib/trust";
+import { supabase } from "@/lib/supabaseClient";
 
 type Props = {
   record: LegacyValue;
 };
 
 export default function TrustScoreCard({ record }: Props) {
+  const [isOwner, setIsOwner] = useState<boolean | null>(null);
   const report = buildTrustReport(record);
+
+  useEffect(() => {
+    let active = true;
+    void supabase.auth.getUser().then(({ data }) => {
+      if (active) setIsOwner(Boolean(data.user?.id && data.user.id === record?.id));
+    });
+    return () => { active = false; };
+  }, [record?.id]);
+
+  if (isOwner !== true) return null;
 
   return (
     <section style={{background:"#fff",border:"1px solid #E2E8F0",borderRadius:20,padding:24,marginBottom:14}}>
@@ -21,7 +34,7 @@ export default function TrustScoreCard({ record }: Props) {
             Trust Score
           </h2>
           <p style={{fontSize:13,color:"#64748B",marginTop:6}}>
-            Measures evidence, verification, outcomes, and impact.
+            Measures evidence, verification, outcomes, and impact available in your private Scholar Record.
           </p>
         </div>
 

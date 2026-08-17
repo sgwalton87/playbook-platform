@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import ProfileAvatar from "@/components/ProfileAvatar";
+import { supabase } from "@/lib/supabaseClient";
 
 const T={
   navy:"#0F172A",
@@ -22,6 +24,16 @@ type Props={
 };
 
 export default function ProfileHero({profile,router}:Props){
+  const [isOwner,setIsOwner]=useState(false);
+
+  useEffect(()=>{
+    let active=true;
+    void supabase.auth.getUser().then(({data})=>{
+      if(active)setIsOwner(Boolean(data.user?.id&&data.user.id===profile?.id));
+    });
+    return()=>{active=false;};
+  },[profile?.id]);
+
   return(
     <div
       style={{
@@ -60,7 +72,7 @@ export default function ProfileHero({profile,router}:Props){
       >
         <ProfileAvatar
           src={profile?.avatar_url}
-          name={`${profile?.first_name||""} ${profile?.last_name||""}`}
+          name={profile?.full_name||profile?.username||"Scholar"}
           size={112}
         />
       </div>
@@ -77,7 +89,7 @@ export default function ProfileHero({profile,router}:Props){
             marginBottom:6
           }}
         >
-          {profile?.first_name} {profile?.last_name}
+          {profile?.full_name||profile?.username||"Scholar"}
         </h2>
 
         <p
@@ -97,28 +109,38 @@ export default function ProfileHero({profile,router}:Props){
             color:T.muted
           }}
         >
-          {profile?.school || "School not listed"} · {profile?.sport || "Sport not listed"}
+          {[profile?.school,profile?.sport].filter(Boolean).join(" · ")||"Public Scholar profile"}
         </p>
       </div>
 
-      <button
-        onClick={()=>router.push("/dashboard")}
-        style={{
-          fontFamily:T.mono,
-          fontSize:11,
-          fontWeight:700,
-          letterSpacing:"0.05em",
-          textTransform:"uppercase",
-          background:"transparent",
-          border:`1.5px solid ${T.line}`,
-          color:T.muted,
-          borderRadius:999,
-          padding:"9px 16px",
-          cursor:"pointer"
-        }}
-      >
-        ← Dashboard
-      </button>
+      <div style={{display:"flex",gap:8,flexWrap:"wrap",position:"relative",zIndex:1}}>
+        {isOwner&&<>
+          <button onClick={()=>router.push("/profile")} style={actionButton}>Edit profile</button>
+          <button onClick={()=>router.push("/profile/privacy")} style={privacyButton}>Privacy settings</button>
+        </>}
+        <button onClick={()=>router.push("/dashboard")} style={actionButton}>← Dashboard</button>
+      </div>
     </div>
   );
 }
+
+const actionButton:React.CSSProperties={
+  fontFamily:T.mono,
+  fontSize:11,
+  fontWeight:700,
+  letterSpacing:"0.05em",
+  textTransform:"uppercase",
+  background:"transparent",
+  border:`1.5px solid ${T.line}`,
+  color:T.muted,
+  borderRadius:999,
+  padding:"9px 16px",
+  cursor:"pointer"
+};
+
+const privacyButton:React.CSSProperties={
+  ...actionButton,
+  background:T.orangeL,
+  borderColor:"#FED7AA",
+  color:"#9A3412"
+};
