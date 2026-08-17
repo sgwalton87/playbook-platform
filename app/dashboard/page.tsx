@@ -2,11 +2,20 @@
 
 import { useEffect, useState } from "react";
 import ScholarDashboardExperience from "@/components/dashboard/ScholarDashboardExperience";
+import { CanonicalRoleAuthorityGate } from "@/components/role-os/RoleAuthorityGate";
 import { buildScholarRecord } from "@/lib/scholar";
 import type { ScholarRecord } from "@/lib/scholar";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function DashboardPage() {
+  return (
+    <CanonicalRoleAuthorityGate role="scholar">
+      <ScholarDashboardRecord />
+    </CanonicalRoleAuthorityGate>
+  );
+}
+
+function ScholarDashboardRecord() {
   const [record, setRecord] = useState<ScholarRecord | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
