@@ -25,8 +25,8 @@ describe("canonical network and feed convergence", () => {
     expect(source).toContain('rpc("respond_to_connection_request"');
     expect(source).toContain('rpc("cancel_connection_request"');
     expect(source).toContain('rpc("remove_connection"');
-    expect(source).not.toMatch(/\.from\(["']connection_requests["']\)\s*\.(insert|update|delete|upsert)/s);
-    expect(source).not.toMatch(/\.from\(["']user_connections["']\)\s*\.(insert|update|delete|upsert)/s);
+    expect(source).not.toMatch(/\.from\(["']connection_requests["']\)[\s\S]*?\.(insert|update|delete|upsert)/);
+    expect(source).not.toMatch(/\.from\(["']user_connections["']\)[\s\S]*?\.(insert|update|delete|upsert)/);
   });
 
   it("uses durable post_type rather than fabricated category metadata", () => {
