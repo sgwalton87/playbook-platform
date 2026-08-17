@@ -31,6 +31,7 @@ export default function EventRemindersPage() {
   const router = useRouter();
   const [events, setEvents] = useState<CommunityEvent[]>([]);
   const [reminders, setReminders] = useState<ReminderRow[]>([]);
+  const [loadedAt, setLoadedAt] = useState(0);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState("");
   const [error, setError] = useState("");
@@ -62,6 +63,7 @@ export default function EventRemindersPage() {
     }
     setEvents(eventsBody.events || []);
     setReminders((reminderResult.data || []) as ReminderRow[]);
+    setLoadedAt(Date.now());
     setLoading(false);
   }, [router]);
 
@@ -70,13 +72,10 @@ export default function EventRemindersPage() {
     return () => window.clearTimeout(timer);
   }, [load]);
 
-  const eligible = useMemo(() => {
-    const now = Date.now();
-    return events.filter((event) => {
-      const start = new Date(event.starts_at).getTime();
-      return Number.isFinite(start) && start > now && Boolean(event.my_rsvp && event.my_rsvp !== "cancelled");
-    }).sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime());
-  }, [events]);
+  const eligible = useMemo(() => events.filter((event) => {
+    const start = new Date(event.starts_at).getTime();
+    return Number.isFinite(start) && start > loadedAt && Boolean(event.my_rsvp && event.my_rsvp !== "cancelled");
+  }).sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime()), [events, loadedAt]);
 
   const activeCount = reminders.filter((row) => row.status === "active").length;
   const deliveredCount = reminders.filter((row) => Boolean(row.last_delivered_at)).length;
