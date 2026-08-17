@@ -178,7 +178,7 @@ export default function RecruitingProfilePage() {
             <p style={eyebrow}>Evidence before inference</p>
             <h2 style={truthTitle}>Film belongs in the record. Claims still need evidence.</h2>
           </div>
-          <p style={truthCopy}>This profile establishes the Scholar's declared athletic context and highlight-film reference. Measurements, verified statistics, formal eligibility findings, and recruiting outcomes should enter through their own governed evidence workflows rather than being guessed or blended into this record.</p>
+          <p style={truthCopy}>This profile establishes the Scholar&apos;s declared athletic context and highlight-film reference. Measurements, verified statistics, formal eligibility findings, and recruiting outcomes should enter through their own governed evidence workflows rather than being guessed or blended into this record.</p>
         </section>
       </div>
     </PlaybookPage>
