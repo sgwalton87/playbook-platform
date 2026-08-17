@@ -10,6 +10,8 @@ type PublicPost = {
   title: string | null;
   body: string;
   imageUrl: string | null;
+  mediaUrl: string | null;
+  mediaType: string | null;
   createdAt: string;
   author: string;
   role: string;
@@ -37,7 +39,7 @@ export default function PublicNewsFeed() {
     async function loadPublicPosts() {
       const { data: rows, error } = await supabase
         .from("feed_posts")
-        .select("id,user_id,title,body,image_url,media_url,created_at,post_type")
+        .select("id,user_id,title,body,image_url,media_url,media_type,created_at,post_type")
         .eq("visibility", "public")
         .order("created_at", { ascending: false })
         .limit(30);
@@ -72,11 +74,14 @@ export default function PublicNewsFeed() {
       setPosts((rows || []).map((post) => {
         const author = authors.get(post.user_id) || { name: "Playbook community member", role: "Community" };
         const normalizedType = String(post.post_type || "").trim().toLowerCase();
+        const video = post.media_type === "video";
         return {
           id: post.id,
           title: post.title || null,
           body: post.body || "",
-          imageUrl: post.image_url || post.media_url || null,
+          imageUrl: video ? null : (post.image_url || post.media_url || null),
+          mediaUrl: video ? post.media_url : null,
+          mediaType: post.media_type || (post.image_url ? "image" : null),
           createdAt: post.created_at,
           author: author.name,
           role: author.role,
@@ -101,6 +106,9 @@ export default function PublicNewsFeed() {
             <div style={media}>
               <Image unoptimized fill sizes="(max-width: 760px) 100vw, 50vw" src={post.imageUrl} alt="" style={{ objectFit: "cover" }} />
             </div>
+          )}
+          {post.mediaType === "video" && post.mediaUrl && (
+            <video controls preload="metadata" src={post.mediaUrl} aria-label="Published Playbook story video" style={videoMedia} />
           )}
           <div style={cardBody}>
             <div style={meta}>
@@ -147,6 +155,7 @@ function formatLabel(value: unknown) {
 const grid: React.CSSProperties = { maxWidth: 1180, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(290px,1fr))", gap: 16 };
 const card: React.CSSProperties = { overflow: "hidden", display: "flex", flexDirection: "column", minHeight: 360, background: "rgba(255,255,255,.075)", border: "1px solid rgba(255,255,255,.14)", borderRadius: "28px 8px 28px 8px" };
 const media: React.CSSProperties = { position: "relative", minHeight: 220, background: "#102A4A" };
+const videoMedia: React.CSSProperties = { width: "100%", maxHeight: 460, background: "#07172D" };
 const cardBody: React.CSSProperties = { display: "flex", flex: 1, flexDirection: "column", padding: 24 };
 const meta: React.CSSProperties = { display: "flex", justifyContent: "space-between", gap: 15, color: "#FF9D5C", fontSize: 10, fontWeight: 950, letterSpacing: ".1em", textTransform: "uppercase" };
 const cardTitle: React.CSSProperties = { margin: "20px 0 10px", color: "#FFFFFF", fontSize: 27, lineHeight: 1.05 };

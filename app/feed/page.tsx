@@ -9,6 +9,7 @@ import { supabase } from "@/lib/supabaseClient";
 
 const CATEGORIES = ["All", "Leadership", "Finance", "Civic", "SEL", "College", "NIL", "Community"] as const;
 type Category = (typeof CATEGORIES)[number];
+type PendingMediaKind = "image" | "video" | null;
 
 type PublicIdentity = {
   id: string;
@@ -39,6 +40,8 @@ type FeedPost = {
   title: string | null;
   body: string;
   imageUrl: string | null;
+  mediaUrl: string | null;
+  mediaType: string | null;
   createdAt: string;
   category: Category;
   likes: number;
@@ -68,6 +71,13 @@ function categoryFromPostType(value: unknown): Category {
   return mapping[normalized] || "Community";
 }
 
+function detectMediaKind(file: File | null): PendingMediaKind {
+  if (!file) return null;
+  if (["image/png", "image/jpeg", "image/webp"].includes(file.type)) return "image";
+  if (["video/mp4", "video/webm", "video/quicktime"].includes(file.type)) return "video";
+  return null;
+}
+
 export default function FeedPage() {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -81,6 +91,7 @@ export default function FeedPage() {
   const [category, setCategory] = useState<Category>("Community");
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [pendingPreview, setPendingPreview] = useState<string | null>(null);
+  const [pendingMediaKind, setPendingMediaKind] = useState<PendingMediaKind>(null);
   const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>({});
   const [editingComment, setEditingComment] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState("");
@@ -101,7 +112,7 @@ export default function FeedPage() {
 
     const [profileResult, postsResult] = await Promise.all([
       supabase.from("profiles").select("id,username,full_name,first_name,last_name,role,avatar_url").eq("id", user.id).single(),
-      supabase.from("feed_posts").select("id,user_id,post_type,title,body,image_url,media_url,created_at,visibility").eq("visibility", "public").order("created_at", { ascending: false }).limit(50),
+      supabase.from("feed_posts").select("id,user_id,post_type,title,body,image_url,media_url,media_type,created_at,visibility").eq("visibility", "public").order("created_at", { ascending: false }).limit(50),
     ]);
     if (profileResult.error) throw new Error(profileResult.error.message);
     if (postsResult.error) throw new Error(postsResult.error.message);
@@ -166,6 +177,7 @@ export default function FeedPage() {
     setPosts(rows.map((post): FeedPost => {
       const identity = identities.get(post.user_id);
       const reaction = reactionsByPost.get(post.id) || { count: 0, liked: false };
+      const video = post.media_type === "video";
       return {
         id: post.id,
         userId: post.user_id,
@@ -175,7 +187,9 @@ export default function FeedPage() {
         role: label(identity?.role),
         title: post.title || null,
         body: post.body || "",
-        imageUrl: post.image_url || post.media_url || null,
+        imageUrl: video ? null : (post.image_url || post.media_url || null),
+        mediaUrl: video ? post.media_url : null,
+        mediaType: post.media_type || (post.image_url ? "image" : null),
         createdAt: post.created_at,
         category: categoryFromPostType(post.post_type),
         likes: reaction.count,
@@ -202,6 +216,38 @@ export default function FeedPage() {
     return () => window.clearTimeout(id);
   }, []);
 
+  function clearPendingMedia() {
+    if (pendingPreview) URL.revokeObjectURL(pendingPreview);
+    setPendingFile(null);
+    setPendingPreview(null);
+    setPendingMediaKind(null);
+    if (fileRef.current) fileRef.current.value = "";
+  }
+
+  function selectMedia(file: File | null) {
+    if (!file) {
+      clearPendingMedia();
+      return;
+    }
+    const kind = detectMediaKind(file);
+    if (!kind) {
+      setError("Choose a JPEG, PNG, WebP, MP4, WebM, or QuickTime file.");
+      if (fileRef.current) fileRef.current.value = "";
+      return;
+    }
+    const maxBytes = kind === "video" ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
+    if (file.size > maxBytes) {
+      setError(kind === "video" ? "Video must be 50 MiB or smaller." : "Image must be 10 MiB or smaller.");
+      if (fileRef.current) fileRef.current.value = "";
+      return;
+    }
+    if (pendingPreview) URL.revokeObjectURL(pendingPreview);
+    setError("");
+    setPendingFile(file);
+    setPendingMediaKind(kind);
+    setPendingPreview(URL.createObjectURL(file));
+  }
+
   async function uploadPhoto(file: File, folder: "feed" | "gallery") {
     if (!userId) return null;
     const ext = (file.name.split(".").pop() || "jpg").replace(/[^a-zA-Z0-9]/g, "").toLowerCase() || "jpg";
@@ -212,25 +258,44 @@ export default function FeedPage() {
     return supabase.storage.from("photos").getPublicUrl(path).data.publicUrl;
   }
 
+  async function uploadVideo(file: File) {
+    if (!userId) return null;
+    const ext = (file.name.split(".").pop() || "mp4").replace(/[^a-zA-Z0-9]/g, "").toLowerCase() || "mp4";
+    const stem = file.name.replace(/\.[^.]+$/, "").replace(/[^a-zA-Z0-9_-]/g, "-").slice(0, 60) || "video";
+    const path = `${userId}/feed/${Date.now()}-${stem}.${ext}`;
+    const upload = await supabase.storage.from("feed-videos").upload(path, file, { cacheControl: "3600", upsert: false });
+    if (upload.error) throw new Error(upload.error.message);
+    return supabase.storage.from("feed-videos").getPublicUrl(path).data.publicUrl;
+  }
+
   async function publish() {
     if (!userId || (!body.trim() && !pendingFile)) return;
-    setBusy("publish"); setError("");
+    setBusy("publish");
+    setError("");
     try {
-      const imageUrl = pendingFile ? await uploadPhoto(pendingFile, "feed") : null;
+      const isVideo = pendingFile && pendingMediaKind === "video";
+      const imageUrl = pendingFile && pendingMediaKind === "image" ? await uploadPhoto(pendingFile, "feed") : null;
+      const videoUrl = isVideo && pendingFile ? await uploadVideo(pendingFile) : null;
       const result = await supabase.from("feed_posts").insert({
         user_id: userId,
         post_type: category.toLowerCase(),
         body: body.trim(),
         image_url: imageUrl,
+        media_url: videoUrl,
+        media_type: isVideo ? "video" : (imageUrl ? "image" : null),
         visibility: "public",
       });
       if (result.error) throw new Error(result.error.message);
-      setBody(""); setPendingFile(null); setPendingPreview(null); setCategory("Community");
-      if (fileRef.current) fileRef.current.value = "";
+      setBody("");
+      clearPendingMedia();
+      setCategory("Community");
       await load();
-      setMessage("Story published to the public Playbook feed.");
-    } catch (cause) { setError(cause instanceof Error ? cause.message : "Story could not be published."); }
-    finally { setBusy(null); }
+      setMessage(isVideo ? "Video story published to the public Playbook feed." : "Story published to the public Playbook feed.");
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Story could not be published.");
+    } finally {
+      setBusy(null);
+    }
   }
 
   async function uploadGallery(file?: File) {
@@ -238,7 +303,7 @@ export default function FeedPage() {
     setBusy("gallery"); setError("");
     try {
       const url = await uploadPhoto(file, "gallery");
-      const result = await supabase.from("feed_posts").insert({ user_id: userId, post_type: "community", body: "", image_url: url, visibility: "public" });
+      const result = await supabase.from("feed_posts").insert({ user_id: userId, post_type: "community", body: "", image_url: url, media_type: "image", visibility: "public" });
       if (result.error) throw new Error(result.error.message);
       await load(); setMessage("Gallery photo published.");
     } catch (cause) { setError(cause instanceof Error ? cause.message : "Gallery photo could not be published."); }
@@ -327,10 +392,12 @@ export default function FeedPage() {
               <select value={category} onChange={(event) => setCategory(event.target.value as Category)} style={select} aria-label="Story category">
                 {CATEGORIES.filter((value) => value !== "All").map((value) => <option key={value}>{value}</option>)}
               </select>
-              <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp" onChange={(event) => { const file = event.target.files?.[0] || null; setPendingFile(file); setPendingPreview(file ? URL.createObjectURL(file) : null); }} />
+              <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp,video/mp4,video/webm,video/quicktime" aria-label="Add an image or video" onChange={(event) => selectMedia(event.target.files?.[0] || null)} />
+              {pendingFile && <button type="button" onClick={clearPendingMedia} style={secondaryButton}>Remove media</button>}
               <button onClick={() => void publish()} disabled={busy !== null || (!body.trim() && !pendingFile)} style={primaryButton}>{busy === "publish" ? "Publishing…" : "Publish story"}</button>
             </div>
-            {pendingPreview && <div style={preview}><Image unoptimized fill src={pendingPreview} alt="Selected upload preview" style={{ objectFit: "cover" }} /></div>}
+            {pendingPreview && pendingMediaKind === "image" && <div style={preview}><Image unoptimized fill src={pendingPreview} alt="Selected upload preview" style={{ objectFit: "cover" }} /></div>}
+            {pendingPreview && pendingMediaKind === "video" && <video controls preload="metadata" src={pendingPreview} aria-label="Selected video preview" style={videoPreview} />}
           </PlaybookCard>
 
           <section style={filterRow} aria-label="Filter stories">
@@ -347,6 +414,7 @@ export default function FeedPage() {
                   </div>
                   <p style={postBody}>{post.body}</p>
                   {post.imageUrl && <div style={postMedia}><Image unoptimized fill src={post.imageUrl} alt="Published story media" style={{ objectFit: "cover" }} /></div>}
+                  {post.mediaType === "video" && post.mediaUrl && <video controls preload="metadata" src={post.mediaUrl} aria-label="Published Playbook story video" style={publishedVideo} />}
                   <div style={actions}>
                     <button disabled={busy === post.id} onClick={() => void toggleLike(post)} style={post.liked ? likedButton : secondaryButton}>{post.liked ? "♥" : "♡"} {post.likes}</button>
                     <PlaybookPill>{post.comments.length} comments</PlaybookPill>
@@ -383,6 +451,7 @@ const composer: React.CSSProperties = { width: "100%", minHeight: 120, resize: "
 const composerControls: React.CSSProperties = { marginTop: 12, display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" };
 const select: React.CSSProperties = { border: "1px solid #CBD5E1", borderRadius: 12, padding: "10px 12px", background: "#FFFFFF", color: "#0F172A" };
 const preview: React.CSSProperties = { position: "relative", marginTop: 14, minHeight: 220, borderRadius: 18, overflow: "hidden", background: "#E2E8F0" };
+const videoPreview: React.CSSProperties = { width: "100%", maxHeight: 420, marginTop: 14, borderRadius: 18, background: "#0F172A" };
 const filterRow: React.CSSProperties = { maxWidth: 1180, margin: "18px auto", display: "flex", gap: 8, flexWrap: "wrap" };
 const filterButton: React.CSSProperties = { ...tabButton, padding: "8px 12px", fontSize: 12 };
 const activeFilter: React.CSSProperties = { ...filterButton, background: "#F97316", color: "#FFFFFF", borderColor: "#F97316" };
@@ -393,6 +462,7 @@ const profileLink: React.CSSProperties = { color: "#EA580C", textDecoration: "no
 const meta: React.CSSProperties = { color: "#94A3B8" };
 const postBody: React.CSSProperties = { color: "#334155", lineHeight: 1.65, whiteSpace: "pre-wrap" };
 const postMedia: React.CSSProperties = { position: "relative", minHeight: 260, borderRadius: 18, overflow: "hidden", margin: "14px 0", background: "#E2E8F0" };
+const publishedVideo: React.CSSProperties = { width: "100%", maxHeight: 520, borderRadius: 18, margin: "14px 0", background: "#0F172A" };
 const actions: React.CSSProperties = { display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginTop: 10 };
 const baseButton: React.CSSProperties = { borderRadius: 999, padding: "9px 13px", fontWeight: 900, cursor: "pointer" };
 const primaryButton: React.CSSProperties = { ...baseButton, border: 0, background: "#F97316", color: "#FFFFFF" };
