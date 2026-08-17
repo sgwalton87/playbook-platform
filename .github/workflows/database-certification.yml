@@ -71,6 +71,8 @@ jobs:
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/network_public_profile_link_authority_preflight.sql
       - name: Certify Network mutual connection counts
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/network_mutual_connection_counts_preflight.sql
+      - name: Certify Network Suggested Users
+        run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/network_suggested_users_preflight.sql
       - name: Certify canonical learning and economy boundary
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/canonical_learning_economy_preflight.sql
       - name: Certify canonical community operations boundary
