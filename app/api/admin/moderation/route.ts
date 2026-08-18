@@ -15,24 +15,27 @@ export async function GET() {
   const { data, error } = await supabase
     .from("moderation_reports")
     .select("*")
-    .in("status", ["open", "reviewing"])
-    .order("created_at", { ascending: false });
+    .in("status", ["open", "reviewing", "resolved"])
+    .order("created_at", { ascending: false })
+    .limit(100);
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
 
   const reports = data || [];
   const postIds = [...new Set(reports.filter((report) => report.target_type === "post").map((report) => report.target_id))];
   const states = new Map<string, string>();
   if (postIds.length) {
-    const postsResult = await supabase.from("feed_posts").select("id,moderation_state").in("id", postIds);
+    const postsResult = await supabase.rpc("get_moderation_feed_posts", { p_post_ids: postIds });
     if (postsResult.error) return NextResponse.json({ error: postsResult.error.message }, { status: 400 });
     for (const post of postsResult.data || []) states.set(post.id, post.moderation_state || "visible");
   }
 
+  const hydrated = reports.map((report) => ({
+    ...report,
+    target_moderation_state: report.target_type === "post" ? (states.get(report.target_id) || "unavailable") : null,
+  }));
+
   return NextResponse.json({
-    reports: reports.map((report) => ({
-      ...report,
-      target_moderation_state: report.target_type === "post" ? (states.get(report.target_id) || "unavailable") : null,
-    })),
+    reports: hydrated.filter((report) => report.status !== "resolved" || report.target_moderation_state === "hidden"),
   });
 }
 
@@ -76,15 +79,17 @@ export async function PATCH(req: NextRequest) {
     .single();
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
 
-  const actionResult = await supabase.from("moderation_actions").insert({
-    report_id: data.id,
-    moderator_id: user.id,
-    action_type: body.status === "dismissed" ? "dismiss" : "resolve",
-    target_type: data.target_type,
-    target_id: data.target_id,
-    note: note || null,
-  });
-  if (actionResult.error) return NextResponse.json({ error: actionResult.error.message }, { status: 400 });
+  if (body.status !== "reviewing") {
+    const actionResult = await supabase.from("moderation_actions").insert({
+      report_id: data.id,
+      moderator_id: user.id,
+      action_type: body.status === "dismissed" ? "dismiss" : "resolve",
+      target_type: data.target_type,
+      target_id: data.target_id,
+      note: note || null,
+    });
+    if (actionResult.error) return NextResponse.json({ error: actionResult.error.message }, { status: 400 });
+  }
 
   return NextResponse.json({ ok: true, report: data });
 }
