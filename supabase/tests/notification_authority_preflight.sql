@@ -104,3 +104,6 @@ where not t.tgisinternal
 \if :untrusted_triggers_absent \else \echo 'owner-writable opportunity/application rows must not be trusted notification producers yet' \quit 1 \endif
 
 rollback;
+
+-- Messaging consumes this same trusted notification authority; certify its producer behavior here.
+\i supabase/tests/messaging_message_notifications_preflight.sql
