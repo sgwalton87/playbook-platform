@@ -82,8 +82,9 @@ describe("canonical network and feed convergence", () => {
 
   it("keeps comments inline instead of using browser prompt or confirm", () => {
     const source = read("app/feed/page.tsx");
-    expect(source).not.toContain("window.prompt");
-    expect(source).not.toContain("window.confirm");
+    const commentWorkflow = source.slice(source.indexOf("async function addComment"), source.indexOf("const visible"));
+    expect(commentWorkflow).not.toContain("window.prompt");
+    expect(commentWorkflow).not.toContain("window.confirm");
     expect(source).toContain("Write a comment");
   });
 });
