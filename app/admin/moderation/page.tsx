@@ -3,6 +3,21 @@
 import { useEffect, useState } from "react";
 import { PlaybookCard, PlaybookGrid, PlaybookHero, PlaybookPage, PlaybookPill } from "@/components/ui";
 
+type TargetProfile = {
+  id: string | null;
+  username: string | null;
+  full_name: string | null;
+};
+
+type SourceContext = {
+  conversation_id: string | null;
+  conversation_kind: string | null;
+  message_id: string | null;
+  message_body: string | null;
+  message_sender_id: string | null;
+  message_created_at: string | null;
+};
+
 type ModerationReport = {
   id: string;
   target_type: string;
@@ -12,7 +27,22 @@ type ModerationReport = {
   status: string;
   created_at: string;
   target_moderation_state: string | null;
+  target_profile: TargetProfile | null;
+  source_context: SourceContext | null;
 };
+
+function reportedUserLabel(profile: TargetProfile | null) {
+  if (!profile) return "Unavailable Playbook member";
+  const username = profile.username ? `@${profile.username}` : "";
+  return [profile.full_name, username].filter(Boolean).join(" · ") || "Playbook member";
+}
+
+function conversationKindLabel(kind: string | null | undefined) {
+  if (kind === "network") return "Network conversation";
+  if (kind === "group") return "Group conversation";
+  if (kind === "support") return "Support conversation";
+  return "Messaging conversation";
+}
 
 export default function ModerationPage() {
   const [reports, setReports] = useState<ModerationReport[]>([]);
@@ -70,7 +100,11 @@ export default function ModerationPage() {
 
   return (
     <PlaybookPage>
-      <PlaybookHero eyebrow="Trust & Safety" title="Moderation Queue" subtitle="Review community reports, document decisions, and enforce Feed publication safety through governed human review." />
+      <PlaybookHero
+        eyebrow="Trust & Safety"
+        title="Moderation Queue"
+        subtitle="Review community, Feed, and Messaging reports, preserve evidence lineage, and document governed human decisions."
+      />
       {message && <p role="status" style={success}>{message}</p>}
       {error && <p role="alert" style={failure}>{error}</p>}
 
@@ -80,11 +114,24 @@ export default function ModerationPage() {
         <PlaybookGrid>
           {reports.map((report) => (
             <PlaybookCard key={report.id} eyebrow={report.target_type} title={report.reason}>
+              {report.target_type === "profile" && <p style={body}>
+                <strong>Reported user:</strong> {reportedUserLabel(report.target_profile)}
+              </p>}
               <p style={body}>{report.detail || "No additional detail provided."}</p>
+              {report.target_type === "profile" && report.source_context && <div style={evidence}>
+                <strong>{conversationKindLabel(report.source_context.conversation_kind)}</strong>
+                {report.source_context.message_body ? <>
+                  <blockquote style={quote}>{report.source_context.message_body}</blockquote>
+                  {report.source_context.message_created_at && <small>
+                    Source message sent {new Date(report.source_context.message_created_at).toLocaleString()}.
+                  </small>}
+                </> : <p style={body}>Conversation-level user report; no specific message was attached.</p>}
+              </div>}
               <div style={pillRow}>
                 <PlaybookPill>{report.status}</PlaybookPill>
                 <PlaybookPill>{new Date(report.created_at).toLocaleDateString()}</PlaybookPill>
                 {report.target_type === "post" && <PlaybookPill>{`Feed: ${report.target_moderation_state || "unknown"}`}</PlaybookPill>}
+                {report.target_type === "profile" && <PlaybookPill>Messaging report</PlaybookPill>}
               </div>
               <div style={actions}>
                 <button disabled={busy === report.id} onClick={() => void updateStatus(report.id, "reviewing")} style={button}>Review</button>
@@ -103,6 +150,8 @@ export default function ModerationPage() {
 }
 
 const body: React.CSSProperties = { color: "#64748B", lineHeight: 1.6 };
+const evidence: React.CSSProperties = { padding: 12, marginBottom: 14, border: "1px solid #E2E8F0", borderRadius: 12, color: "#334155" };
+const quote: React.CSSProperties = { margin: "10px 0", paddingLeft: 12, borderLeft: "3px solid #94A3B8", whiteSpace: "pre-wrap", color: "#0F172A" };
 const pillRow: React.CSSProperties = { display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14 };
 const actions: React.CSSProperties = { display: "flex", gap: 8, flexWrap: "wrap" };
 const button: React.CSSProperties = { border: 0, borderRadius: 10, padding: "10px 12px", background: "#0F172A", color: "#F8F7F4", fontWeight: 800, cursor: "pointer" };
