@@ -92,11 +92,10 @@ begin
 end $$;
 reset role;
 
--- Founder/Admin can read only the narrow state projection and can atomically hide,
--- audit and resolve the matching report.
+-- Founder/Admin can read the narrow projection and execute the atomic hide.
 set local role authenticated;
 do $$
-declare ids feed_moderation_ids%rowtype; projected_state text; state text; report_status text; action_count int;
+declare ids feed_moderation_ids%rowtype; projected_state text; state text;
 begin
   select * into ids from feed_moderation_ids;
   perform set_config('request.jwt.claim.sub',ids.moderator_id::text,true);
@@ -104,14 +103,22 @@ begin
   if projected_state <> 'visible' then raise exception 'Moderator projection did not return visible Feed state'; end if;
   select moderation_state into state from public.moderate_feed_post(ids.post_id,'hide_content',ids.report_id,'Policy review complete');
   if state <> 'hidden' then raise exception 'Moderator hide did not persist hidden state'; end if;
-  select status into report_status from public.moderation_reports where id=ids.report_id;
-  if report_status <> 'resolved' then raise exception 'Hide action did not resolve linked report'; end if;
-  select count(*) into action_count from public.moderation_actions where report_id=ids.report_id and action_type='hide_content' and moderator_id=ids.moderator_id;
-  if action_count <> 1 then raise exception 'Hide action did not append exactly one moderation audit row'; end if;
   select moderation_state into projected_state from public.get_moderation_feed_posts(array[ids.post_id]) where id=ids.post_id;
   if projected_state <> 'hidden' then raise exception 'Moderator projection did not return hidden Feed state'; end if;
 end $$;
 reset role;
+
+-- Inspect audit/report persistence as the database test owner. This deliberately
+-- does not grant authenticated direct table access merely to make the test pass.
+do $$
+declare ids feed_moderation_ids%rowtype; report_status text; action_count int;
+begin
+  select * into ids from feed_moderation_ids;
+  select status into report_status from public.moderation_reports where id=ids.report_id;
+  if report_status <> 'resolved' then raise exception 'Hide action did not resolve linked report'; end if;
+  select count(*) into action_count from public.moderation_actions where report_id=ids.report_id and action_type='hide_content' and moderator_id=ids.moderator_id;
+  if action_count <> 1 then raise exception 'Hide action did not append exactly one moderation audit row'; end if;
+end $$;
 
 -- Anonymous/public Feed reads cannot see hidden content.
 set local role anon;
