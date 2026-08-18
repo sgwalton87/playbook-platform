@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, FormEvent, useCallback, useEffect, useState } from "react";
+import { ChangeEvent, FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { PlaybookHero, PlaybookPage, PlaybookPill } from "@/components/ui";
 
@@ -18,6 +18,13 @@ async function fetchSupportConversations(): Promise<Conversation[]> {
   const result = await response.json() as ConversationResponse;
   if (!response.ok) throw new Error(result.error ?? "Inbox could not be loaded.");
   return (result.conversations ?? []).map(item => ({ ...item, conversation_kind: "support" }));
+}
+
+async function fetchNetworkConversations(): Promise<Conversation[]> {
+  const response = await fetch("/api/network/messages", { cache: "no-store" });
+  const result = await response.json() as ConversationResponse;
+  if (!response.ok) throw new Error(result.error ?? "Network conversations could not be loaded.");
+  return (result.conversations ?? []).map(item => ({ ...item, conversation_kind: "network" }));
 }
 
 async function fetchGroupConversations(): Promise<Conversation[]> {
@@ -49,6 +56,11 @@ function bytesLabel(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 function peerName(peer?: Peer | null) { return peer?.full_name || [peer?.first_name, peer?.last_name].filter(Boolean).join(" ") || peer?.username || "Network connection"; }
+function conversationLabel(conversation: Conversation) {
+  if (conversation.conversation_kind === "network") return `Network ${peerName(conversation.peer)}`;
+  if (conversation.conversation_kind === "group") return `Group ${conversation.group?.name ?? "Playbook group"}`;
+  return `${conversation.relationship?.relationship ?? "Support"} ${conversation.relationship?.supporter_email ?? "Scholar"}`;
+}
 
 export default function InboxV2() {
   const searchParams = useSearchParams();
@@ -58,17 +70,29 @@ export default function InboxV2() {
   const [body, setBody] = useState(""); const [loading, setLoading] = useState(true); const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false); const [staged, setStaged] = useState<Attachment[]>([]);
   const [status, setStatus] = useState("Loading governed conversations…"); const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
   const active = conversations.find(item => item.id === activeId) ?? conversations[0];
+  const normalizedSearch = search.trim().toLocaleLowerCase();
+  const filteredConversations = useMemo(() => {
+    if (!normalizedSearch) return conversations;
+    return conversations.filter(conversation => {
+      const label = conversationLabel(conversation).toLocaleLowerCase();
+      const messageMatch = conversation.messages.some(message => message.body.toLocaleLowerCase().includes(normalizedSearch));
+      return label.includes(normalizedSearch) || messageMatch;
+    });
+  }, [conversations, normalizedSearch]);
 
   const load = useCallback(async () => {
-    const [support, existingGroups] = await Promise.all([fetchSupportConversations(), fetchGroupConversations()]);
+    const [support, existingNetwork, existingGroups] = await Promise.all([
+      fetchSupportConversations(), fetchNetworkConversations(), fetchGroupConversations(),
+    ]);
     let network: Conversation | null = null;
     let requestedGroup: Conversation | null = null;
     if (requestedPeerId) network = await openNetworkConversation(requestedPeerId);
     if (requestedGroupId) requestedGroup = await openGroupConversation(requestedGroupId);
 
     const byId = new Map<string, Conversation>();
-    for (const item of [...support, ...existingGroups]) byId.set(item.id, item);
+    for (const item of [...support, ...existingNetwork, ...existingGroups]) byId.set(item.id, item);
     if (network) byId.set(network.id, network);
     if (requestedGroup) byId.set(requestedGroup.id, requestedGroup);
     const combined = [...byId.values()];
@@ -155,12 +179,18 @@ export default function InboxV2() {
     subtitle="Support, connected-peer, and group messages share one governed service with private attachments, unread state, safety controls, and PBOS provenance." />
     <p role="status" aria-live="polite" style={{ color: "#0F172A" }}>{loading ? "Loading…" : status}</p>{error && <p role="alert">{error} <button onClick={() => void reload()}>Retry</button></p>}
     <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 16, color: "#0F172A" }}>
-      <aside aria-label="Conversations">{conversations.map(conversation => <button key={conversation.id} onClick={() => { setActiveId(conversation.id); setStaged([]); }}
-        aria-pressed={conversation.id === active?.id} style={{ display: "block", width: "100%", padding: 14, marginBottom: 8, textAlign: "left" }}>
-        {conversation.conversation_kind === "network" ? <><strong>Network</strong> · {peerName(conversation.peer)}</>
-          : conversation.conversation_kind === "group" ? <><strong>Group</strong> · {conversation.group?.name ?? "Playbook group"}</>
-            : <><strong>{conversation.relationship?.relationship ?? "Support"}</strong> · {conversation.relationship?.supporter_email ?? "Scholar"}</>}
-        {conversation.unreadCount > 0 && <PlaybookPill>{conversation.unreadCount} unread</PlaybookPill>}</button>)}</aside>
+      <aside aria-label="Conversations">
+        <label htmlFor="conversation-search" style={{ display: "block", fontWeight: 600, marginBottom: 6 }}>Search conversations</label>
+        <input id="conversation-search" type="search" value={search} onChange={event => setSearch(event.target.value)}
+          placeholder="Search people, groups, or messages" maxLength={120} style={{ width: "100%", marginBottom: 12 }} />
+        {!loading && normalizedSearch && filteredConversations.length === 0 && <p role="status">No authorized conversations match “{search.trim()}”.</p>}
+        {filteredConversations.map(conversation => <button key={conversation.id} onClick={() => { setActiveId(conversation.id); setStaged([]); }}
+          aria-pressed={conversation.id === active?.id} style={{ display: "block", width: "100%", padding: 14, marginBottom: 8, textAlign: "left" }}>
+          {conversation.conversation_kind === "network" ? <><strong>Network</strong> · {peerName(conversation.peer)}</>
+            : conversation.conversation_kind === "group" ? <><strong>Group</strong> · {conversation.group?.name ?? "Playbook group"}</>
+              : <><strong>{conversation.relationship?.relationship ?? "Support"}</strong> · {conversation.relationship?.supporter_email ?? "Scholar"}</>}
+          {conversation.unreadCount > 0 && <PlaybookPill>{conversation.unreadCount} unread</PlaybookPill>}</button>)}
+      </aside>
       <article style={{ color: "#0F172A" }}>{!loading && !active && <p style={{ color: "#0F172A" }}>No authorized conversation exists yet. Start from a connected Network member, an existing Playbook group, or an active support relationship.</p>}
         {active && <><div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <button onClick={() => void act("READ")}>Mark read</button>
