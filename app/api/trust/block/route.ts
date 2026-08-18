@@ -1,72 +1,41 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireUser } from "@/lib/supabase/server";
 
-export async function POST(req: NextRequest) {
-  const { supabase, user } = await requireUser();
+type BlockBody = { blockedUserId?: unknown };
 
-  if (!user) {
-    return NextResponse.json(
-      { error: "Unauthorized" },
-      { status: 401 }
-    );
+async function requestedUserId(request: NextRequest, actorId: string) {
+  const body = await request.json() as BlockBody;
+  const blockedUserId = String(body.blockedUserId ?? "").trim();
+  if (!blockedUserId || blockedUserId === actorId) {
+    throw new Error("A different Playbook user is required.");
   }
-
-  const body = await req.json();
-
-  if (!body.blockedUserId || body.blockedUserId === user.id) {
-    return NextResponse.json(
-      { error: "Invalid user." },
-      { status: 400 }
-    );
-  }
-
-  const { error } = await supabase
-    .from("user_blocks")
-    .upsert(
-      {
-        blocker_id: user.id,
-        blocked_user_id: body.blockedUserId,
-      },
-      {
-        onConflict: "blocker_id,blocked_user_id",
-      }
-    );
-
-  if (error) {
-    return NextResponse.json(
-      { error: error.message },
-      { status: 400 }
-    );
-  }
-
-  return NextResponse.json({ ok: true });
+  return blockedUserId;
 }
 
+async function setBlock(request: NextRequest, blocked: boolean) {
+  try {
+    const { supabase, user } = await requireUser();
+    if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
 
-export async function DELETE(req: NextRequest) {
-  const { supabase, user } = await requireUser();
+    const blockedUserId = await requestedUserId(request, user.id);
+    const result = await supabase.rpc("set_user_block", {
+      requested_user_id: blockedUserId,
+      requested_blocked: blocked,
+    });
+    if (result.error) throw new Error(result.error.message);
 
-  if (!user) {
-    return NextResponse.json(
-      { error: "Unauthorized" },
-      { status: 401 }
-    );
+    return NextResponse.json({ ok: true, blocked: Boolean(result.data), blockedUserId });
+  } catch (error) {
+    return NextResponse.json({
+      error: error instanceof Error ? error.message : "Block setting could not be updated.",
+    }, { status: 400 });
   }
+}
 
-  const body = await req.json();
+export async function POST(request: NextRequest) {
+  return setBlock(request, true);
+}
 
-  const { error } = await supabase
-    .from("user_blocks")
-    .delete()
-    .eq("blocker_id", user.id)
-    .eq("blocked_user_id", body.blockedUserId);
-
-  if (error) {
-    return NextResponse.json(
-      { error: error.message },
-      { status: 400 }
-    );
-  }
-
-  return NextResponse.json({ ok: true });
+export async function DELETE(request: NextRequest) {
+  return setBlock(request, false);
 }
