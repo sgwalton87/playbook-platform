@@ -41,8 +41,25 @@ jobs:
         run: supabase db reset --local
       - name: Verify migration history is local only
         run: supabase migration list --local
-      - name: Install PostgreSQL client
-        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+      - name: Ensure PostgreSQL client
+        shell: bash
+        run: |
+          set -euo pipefail
+          if command -v psql >/dev/null 2>&1; then
+            psql --version
+            exit 0
+          fi
+          sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list /etc/apt/sources.list.d/*.sources 2>/dev/null || true
+          for attempt in 1 2 3; do
+            if timeout 120s sudo apt-get -o Acquire::Retries=2 update && timeout 120s sudo apt-get install -y postgresql-client; then
+              psql --version
+              exit 0
+            fi
+            echo "PostgreSQL client install attempt ${attempt} failed; retrying..." >&2
+            sleep $((attempt * 5))
+          done
+          echo "Unable to provision PostgreSQL client." >&2
+          exit 1
       - name: Certify relationship authority boundary
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/relationship_authority_preflight.sql
       - name: Certify invitation authority boundary
@@ -79,6 +96,8 @@ jobs:
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/feed_timeline_visibility_preflight.sql
       - name: Certify Feed Shares authority
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/feed_shares_authority_preflight.sql
+      - name: Certify Feed Edit and Delete authority
+        run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/feed_edit_delete_authority_preflight.sql
       - name: Certify Network connection lifecycle authority
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/network_connection_lifecycle_preflight.sql
       - name: Certify canonical Network policy surface
