@@ -25,7 +25,7 @@ describe("Messaging Report User authority", () => {
     expect(migration).toContain("private.pbos_user_has_active_conversation_access");
     expect(migration).toContain("private.pbos_conversation_peer_id");
     expect(migration).toContain("A source message is required for a group user report");
-    expect(migration).toContain("m.sender_id=requested_user_id");
+    expect(migration).toContain("and m.sender_id=requested_user_id");
     expect(migration).toContain("You cannot report your own profile");
     expect(preflight).toContain("Unrelated profile was reportable through support context");
     expect(preflight).toContain("Group profile report did not require a source message");
