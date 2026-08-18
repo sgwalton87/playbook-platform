@@ -26,7 +26,8 @@ export async function GET() {
 
     const catalog = (courses.data || []).map((course) => {
       const required = (modules.data || []).filter((module) => module.course_slug === course.slug && module.required);
-      const completed = progressByCourse.get(course.slug)?.size || 0;
+      const completedKeys = progressByCourse.get(course.slug) || new Set<string>();
+      const completed = required.filter((module) => completedKeys.has(module.module_key)).length;
       return {
         ...course,
         moduleCount: required.length,
