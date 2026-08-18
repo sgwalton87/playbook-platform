@@ -7,8 +7,9 @@ import { PlaybookHero, PlaybookPage, PlaybookPill } from "@/components/ui";
 type Attachment = { id: string; original_name: string; mime_type: string; byte_size: number; message_id?: string | null };
 type Message = { id: string; sender_id: string; body: string; delivery_state: string; moderation_state: string; created_at: string; attachments?: Attachment[] };
 type Peer = { id?: string; username?: string | null; full_name?: string | null; first_name?: string | null; last_name?: string | null };
-type Conversation = { id: string; status: string; conversation_kind?: "support" | "network"; unreadCount: number; messages: Message[];
-  relationship?: { id?: string; supporter_email?: string; relationship?: string }; peer?: Peer | null;
+type Group = { id: string; name: string; description?: string | null; is_private?: boolean | null };
+type Conversation = { id: string; status: string; conversation_kind?: "support" | "network" | "group"; unreadCount: number; messages: Message[];
+  relationship?: { id?: string; supporter_email?: string; relationship?: string }; peer?: Peer | null; group?: Group | null;
   participant?: { muted_at?: string | null; blocked_at?: string | null } };
 type ConversationResponse = { conversations?: Conversation[]; error?: string };
 
@@ -19,12 +20,27 @@ async function fetchSupportConversations(): Promise<Conversation[]> {
   return (result.conversations ?? []).map(item => ({ ...item, conversation_kind: "support" }));
 }
 
+async function fetchGroupConversations(): Promise<Conversation[]> {
+  const response = await fetch("/api/groups/messages", { cache: "no-store" });
+  const result = await response.json() as ConversationResponse;
+  if (!response.ok) throw new Error(result.error ?? "Group conversations could not be loaded.");
+  return (result.conversations ?? []).map(item => ({ ...item, conversation_kind: "group" }));
+}
+
 async function openNetworkConversation(peerId: string): Promise<Conversation> {
   const response = await fetch("/api/network/messages", { method: "POST", headers: { "content-type": "application/json" },
     body: JSON.stringify({ action: "OPEN", peerId }) });
   const result = await response.json() as { conversation?: Conversation; error?: string };
   if (!response.ok || !result.conversation) throw new Error(result.error ?? "Network conversation could not be opened.");
   return { ...result.conversation, conversation_kind: "network" };
+}
+
+async function openGroupConversation(groupId: string): Promise<Conversation> {
+  const response = await fetch("/api/groups/messages", { method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({ action: "OPEN", groupId }) });
+  const result = await response.json() as { conversation?: Conversation; error?: string };
+  if (!response.ok || !result.conversation) throw new Error(result.error ?? "Group conversation could not be opened.");
+  return { ...result.conversation, conversation_kind: "group" };
 }
 
 function bytesLabel(bytes: number) {
@@ -37,6 +53,7 @@ function peerName(peer?: Peer | null) { return peer?.full_name || [peer?.first_n
 export default function InboxV2() {
   const searchParams = useSearchParams();
   const requestedPeerId = searchParams.get("peer") ?? "";
+  const requestedGroupId = searchParams.get("group") ?? "";
   const [conversations, setConversations] = useState<Conversation[]>([]); const [activeId, setActiveId] = useState("");
   const [body, setBody] = useState(""); const [loading, setLoading] = useState(true); const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false); const [staged, setStaged] = useState<Attachment[]>([]);
@@ -44,14 +61,22 @@ export default function InboxV2() {
   const active = conversations.find(item => item.id === activeId) ?? conversations[0];
 
   const load = useCallback(async () => {
-    const support = await fetchSupportConversations();
+    const [support, existingGroups] = await Promise.all([fetchSupportConversations(), fetchGroupConversations()]);
     let network: Conversation | null = null;
+    let requestedGroup: Conversation | null = null;
     if (requestedPeerId) network = await openNetworkConversation(requestedPeerId);
-    const combined = network ? [network, ...support.filter(item => item.id !== network?.id)] : support;
+    if (requestedGroupId) requestedGroup = await openGroupConversation(requestedGroupId);
+
+    const byId = new Map<string, Conversation>();
+    for (const item of [...support, ...existingGroups]) byId.set(item.id, item);
+    if (network) byId.set(network.id, network);
+    if (requestedGroup) byId.set(requestedGroup.id, requestedGroup);
+    const combined = [...byId.values()];
+
     setConversations(combined);
-    setActiveId(current => (network ? network.id : current || combined[0]?.id || ""));
+    setActiveId(current => requestedGroup?.id || network?.id || current || combined[0]?.id || "");
     setStatus(combined.length ? "Governed messages are current." : "No governed conversations yet.");
-  }, [requestedPeerId]);
+  }, [requestedGroupId, requestedPeerId]);
 
   useEffect(() => {
     let mounted = true;
@@ -97,16 +122,22 @@ export default function InboxV2() {
     window.open(result.signedUrl, "_blank", "noopener,noreferrer");
   }
 
+  function endpointFor(conversation: Conversation) {
+    return conversation.conversation_kind === "network" ? "/api/network/messages"
+      : conversation.conversation_kind === "group" ? "/api/groups/messages"
+        : "/api/support-network/messages";
+  }
+
   async function send(event: FormEvent) {
     event.preventDefault(); if (!active || !body.trim()) return; setSending(true); setError("");
     try {
-      const isNetwork = active.conversation_kind === "network";
-      const response = await fetch(isNetwork ? "/api/network/messages" : "/api/support-network/messages", {
-        method: "POST", headers: { "content-type": "application/json" },
-        body: JSON.stringify(isNetwork
+      const endpoint = endpointFor(active);
+      const payload = active.conversation_kind === "network"
+        ? { action: "SEND", conversationId: active.id, body, requestId: crypto.randomUUID(), attachmentIds: staged.map(item => item.id) }
+        : active.conversation_kind === "group"
           ? { action: "SEND", conversationId: active.id, body, requestId: crypto.randomUUID(), attachmentIds: staged.map(item => item.id) }
-          : { relationshipId: active.relationship?.id, conversationId: active.id, body, requestId: crypto.randomUUID(), attachmentIds: staged.map(item => item.id) }),
-      });
+          : { relationshipId: active.relationship?.id, conversationId: active.id, body, requestId: crypto.randomUUID(), attachmentIds: staged.map(item => item.id) };
+      const response = await fetch(endpoint, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) });
       const result = await response.json() as { error?: string }; if (!response.ok) throw new Error(result.error ?? "Message failed.");
       setBody(""); setStaged([]); setStatus("Message delivered with PBOS provenance and governed attachment lineage."); await reload();
     } catch (cause) { setError(cause instanceof Error ? cause.message : "Message failed."); } finally { setSending(false); }
@@ -114,21 +145,23 @@ export default function InboxV2() {
 
   async function act(action: string, messageId?: string) {
     if (!active) return; setError("");
-    const response = await fetch(active.conversation_kind === "network" ? "/api/network/messages" : "/api/support-network/messages", {
+    const response = await fetch(endpointFor(active), {
       method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ action, conversationId: active.id, messageId }) });
     const result = await response.json() as { error?: string }; if (!response.ok) { setError(result.error ?? "Action failed."); return; }
     setStatus(action === "READ" ? "Conversation marked read." : "Conversation safety setting updated."); await reload();
   }
 
   return <PlaybookPage><PlaybookHero eyebrow="Governed Messaging" title="Your conversations"
-    subtitle="Support and connected-peer messages share one governed service with private attachments, unread state, safety controls, and PBOS provenance." />
+    subtitle="Support, connected-peer, and group messages share one governed service with private attachments, unread state, safety controls, and PBOS provenance." />
     <p role="status" aria-live="polite" style={{ color: "#0F172A" }}>{loading ? "Loading…" : status}</p>{error && <p role="alert">{error} <button onClick={() => void reload()}>Retry</button></p>}
     <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 16, color: "#0F172A" }}>
       <aside aria-label="Conversations">{conversations.map(conversation => <button key={conversation.id} onClick={() => { setActiveId(conversation.id); setStaged([]); }}
         aria-pressed={conversation.id === active?.id} style={{ display: "block", width: "100%", padding: 14, marginBottom: 8, textAlign: "left" }}>
-        {conversation.conversation_kind === "network" ? <><strong>Network</strong> · {peerName(conversation.peer)}</> : <><strong>{conversation.relationship?.relationship ?? "Support"}</strong> · {conversation.relationship?.supporter_email ?? "Scholar"}</>}
+        {conversation.conversation_kind === "network" ? <><strong>Network</strong> · {peerName(conversation.peer)}</>
+          : conversation.conversation_kind === "group" ? <><strong>Group</strong> · {conversation.group?.name ?? "Playbook group"}</>
+            : <><strong>{conversation.relationship?.relationship ?? "Support"}</strong> · {conversation.relationship?.supporter_email ?? "Scholar"}</>}
         {conversation.unreadCount > 0 && <PlaybookPill>{conversation.unreadCount} unread</PlaybookPill>}</button>)}</aside>
-      <article style={{ color: "#0F172A" }}>{!loading && !active && <p style={{ color: "#0F172A" }}>No authorized conversation exists yet. Start from a connected Network member or an active support relationship.</p>}
+      <article style={{ color: "#0F172A" }}>{!loading && !active && <p style={{ color: "#0F172A" }}>No authorized conversation exists yet. Start from a connected Network member, an existing Playbook group, or an active support relationship.</p>}
         {active && <><div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <button onClick={() => void act("READ")}>Mark read</button>
           <button onClick={() => void act(active.participant?.muted_at ? "UNMUTE" : "MUTE")}>{active.participant?.muted_at ? "Unmute" : "Mute"}</button>
