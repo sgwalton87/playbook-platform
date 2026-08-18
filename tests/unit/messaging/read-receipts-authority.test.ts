@@ -34,7 +34,8 @@ describe("Messaging Read Receipts authority", () => {
     expect(inbox).toContain("currentUserId");
     expect(inbox).toContain("Seen by");
     expect(inbox).toContain("Seen");
-    expect(inbox).toContain('message.sender_id === currentUserId');
+    expect(inbox).toContain('message.sender_id !== currentUserId');
+    expect(inbox).toContain("return message.delivery_state");
   });
 
   it("keeps read acknowledgement an explicit user action", () => {
