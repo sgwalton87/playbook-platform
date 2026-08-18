@@ -122,6 +122,8 @@ jobs:
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/messaging_conversation_search_preflight.sql
       - name: Certify Messaging Attachments authority
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/messaging_attachments_authority_preflight.sql
+      - name: Certify Messaging Block User authority
+        run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/messaging_block_user_preflight.sql
       - name: Certify canonical learning and economy boundary
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/canonical_learning_economy_preflight.sql
       - name: Certify canonical community operations boundary
