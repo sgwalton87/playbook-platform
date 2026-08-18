@@ -48,6 +48,7 @@ begin
 end $$;
 
 create temporary table feed_scroll_ids(owner_id uuid, other_id uuid, newest_id uuid, second_id uuid, third_id uuid, private_id uuid) on commit drop;
+grant select on feed_scroll_ids to anon, authenticated;
 
 do $$
 declare
