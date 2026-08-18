@@ -8,7 +8,7 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ sl
     if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
 
     const [course, modules, progress, credential] = await Promise.all([
-      supabase.from("learning_courses").select("slug,title,description,pillar,image_url,status,xp_per_module,coins_per_module,course_xp_bonus,course_coin_bonus,certificate_name").eq("slug", slug).maybeSingle(),
+      supabase.from("learning_courses").select("slug,title,description,pillar,image_url,status,xp_per_module,coins_per_module,course_xp_bonus,course_coin_bonus,certificate_name").eq("slug", slug).eq("status", "published").maybeSingle(),
       supabase.from("learning_modules").select("module_key,position,title,duration_minutes,module_type,summary,content,completion_mode,required").eq("course_slug", slug).order("position"),
       supabase.from("learning_module_progress").select("module_key,reflection,completed_at").eq("user_id", user.id).eq("course_slug", slug),
       supabase.from("learning_credentials").select("id,credential_name,issued_at,evidence").eq("user_id", user.id).eq("course_slug", slug).maybeSingle(),
@@ -16,13 +16,13 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ sl
 
     const error = course.error || modules.error || progress.error || credential.error;
     if (error) throw new Error(error.message);
-    if (!course.data) return NextResponse.json({ error: "Course not found." }, { status: 404 });
+    if (!course.data) return NextResponse.json({ error: "Published course not found." }, { status: 404 });
 
     const progressMap = new Map((progress.data || []).map((item) => [item.module_key, item]));
     return NextResponse.json({
       ok: true,
       course: course.data,
-      modules: (modules.data || []).map((module) => ({ ...module, progress: progressMap.get(module.module_key) || null })),
+      modules: (modules.data || []).filter((module) => module.required).map((module) => ({ ...module, progress: progressMap.get(module.module_key) || null })),
       credential: credential.data || null,
     });
   } catch (error) {
