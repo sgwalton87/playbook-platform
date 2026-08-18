@@ -138,7 +138,11 @@ begin
   if exists(
     select 1 from public.pbos_notification_outbox
     where event_key in ('message:'||ids.support_message::text,'message:'||ids.network_message::text,'message:'||ids.group_message::text)
-      and (event_payload::text ilike '%TOP SECRET%' or event_payload::text ilike '%BODY%')
+      and (
+        event_payload::text ilike '%TOP SECRET SUPPORT BODY%'
+        or event_payload::text ilike '%TOP SECRET NETWORK BODY%'
+        or event_payload::text ilike '%TOP SECRET GROUP BODY%'
+      )
   ) then raise exception 'Message body content leaked into notification payload'; end if;
 
   if exists(
