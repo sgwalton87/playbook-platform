@@ -25,9 +25,22 @@ type BlockState = {
   blockedByPeer: boolean;
   messagingBlocked: boolean;
 };
+type ReportTarget = {
+  userId: string;
+  label: string;
+  sourceMessageId?: string;
+};
 type ConversationResponse = { conversations?: Conversation[]; error?: string };
 type ReceiptResponse = { currentUserId?: string; receipts?: Record<string, number>; readAt?: string; error?: string };
 type BlockStateResponse = { states?: Record<string, BlockState>; error?: string };
+
+const REPORT_REASONS = [
+  "Harassment or bullying",
+  "Spam or scam",
+  "Impersonation",
+  "Threats or unsafe behavior",
+  "Other",
+] as const;
 
 async function fetchSupportConversations(): Promise<Conversation[]> {
   const response = await fetch("/api/support-network/messages", { cache: "no-store" });
@@ -122,6 +135,10 @@ export default function InboxV2() {
   const [currentUserId, setCurrentUserId] = useState("");
   const [receiptCounts, setReceiptCounts] = useState<Record<string, number>>({});
   const [blockStates, setBlockStates] = useState<Record<string, BlockState>>({});
+  const [reportTarget, setReportTarget] = useState<ReportTarget | null>(null);
+  const [reportReason, setReportReason] = useState("");
+  const [reportDetail, setReportDetail] = useState("");
+  const [reporting, setReporting] = useState(false);
   const active = conversations.find(item => item.id === activeId) ?? conversations[0];
   const activeBlockState = active ? blockStates[active.id] : undefined;
   const messagingBlocked = active?.conversation_kind !== "group" && Boolean(activeBlockState?.messagingBlocked);
@@ -198,6 +215,19 @@ export default function InboxV2() {
       window.clearTimeout(timer);
     };
   }, [active?.id, loadReceipts]);
+
+  function closeUserReport() {
+    setReportTarget(null);
+    setReportReason("");
+    setReportDetail("");
+  }
+
+  function openUserReport(userId: string, label: string, sourceMessageId?: string) {
+    setError("");
+    setReportTarget({ userId, label, sourceMessageId });
+    setReportReason("");
+    setReportDetail("");
+  }
 
   async function reload() {
     setLoading(true);
@@ -340,6 +370,35 @@ export default function InboxV2() {
     await reload();
   }
 
+  async function submitUserReport(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!active || !reportTarget || !reportReason) return;
+    setReporting(true);
+    setError("");
+    try {
+      const response = await fetch("/api/trust/report", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          targetType: "profile",
+          targetId: reportTarget.userId,
+          conversationId: active.id,
+          sourceMessageId: reportTarget.sourceMessageId,
+          reason: reportReason,
+          detail: reportDetail,
+        }),
+      });
+      const result = await response.json() as { error?: string };
+      if (!response.ok) throw new Error(result.error ?? "User report could not be submitted.");
+      setStatus("Report submitted to Playbook Trust & Safety for human review. Reporting did not automatically block this user.");
+      closeUserReport();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "User report could not be submitted.");
+    } finally {
+      setReporting(false);
+    }
+  }
+
   async function act(action: "READ" | "MUTE" | "UNMUTE" | "REPORT", messageId?: string) {
     if (!active) return;
     if (action === "READ") {
@@ -357,7 +416,9 @@ export default function InboxV2() {
       setError(result.error ?? "Action failed.");
       return;
     }
-    setStatus("Conversation safety setting updated.");
+    setStatus(action === "REPORT"
+      ? "Message reported to Playbook Trust & Safety."
+      : "Conversation safety setting updated.");
     await reload();
   }
 
@@ -396,6 +457,7 @@ export default function InboxV2() {
           onClick={() => {
             setActiveId(conversation.id);
             setStaged([]);
+            closeUserReport();
           }}
           aria-pressed={conversation.id === active?.id}
           style={{ display: "block", width: "100%", padding: 14, marginBottom: 8, textAlign: "left" }}
@@ -416,15 +478,50 @@ export default function InboxV2() {
             <button onClick={() => void act(active.participant?.muted_at ? "UNMUTE" : "MUTE")}>
               {active.participant?.muted_at ? "Unmute" : "Mute"}
             </button>
-            {active.conversation_kind !== "group" && activeBlockState?.peerId && <button
-              onClick={() => void setUserBlock(!activeBlockState.blockedByMe)}
-            >
-              {activeBlockState.blockedByMe ? "Unblock user" : "Block user"}
-            </button>}
+            {active.conversation_kind !== "group" && activeBlockState?.peerId && <>
+              <button onClick={() => void setUserBlock(!activeBlockState.blockedByMe)}>
+                {activeBlockState.blockedByMe ? "Unblock user" : "Block user"}
+              </button>
+              <button
+                onClick={() => openUserReport(
+                  activeBlockState.peerId,
+                  active.conversation_kind === "network" ? peerName(active.peer) : "the other support participant",
+                )}
+              >
+                Report user
+              </button>
+            </>}
           </div>
           {activeBlockState?.blockedByMe && <p role="status">You blocked this user. Unblock them to resume one-to-one Messaging.</p>}
           {!activeBlockState?.blockedByMe && activeBlockState?.blockedByPeer
             && <p role="status">Messaging is unavailable for this conversation. Existing history remains visible.</p>}
+          {reportTarget && <form onSubmit={submitUserReport} style={{ padding: 14, margin: "14px 0", border: "1px solid #CBD5E1", borderRadius: 12 }}>
+            <fieldset disabled={reporting} style={{ border: 0, padding: 0, margin: 0 }}>
+              <legend style={{ fontWeight: 800 }}>Report {reportTarget.label}</legend>
+              <p style={{ margin: "6px 0 12px" }}>This creates a confidential Trust & Safety case for human review. It does not automatically block the user or decide an outcome.</p>
+              <label htmlFor="report-user-reason">Reason</label>
+              <select
+                id="report-user-reason"
+                value={reportReason}
+                onChange={event => setReportReason(event.target.value)}
+                required
+              >
+                <option value="">Select a reason</option>
+                {REPORT_REASONS.map(reason => <option key={reason} value={reason}>{reason}</option>)}
+              </select>
+              <label htmlFor="report-user-detail" style={{ display: "block", marginTop: 10 }}>Additional detail (optional)</label>
+              <textarea
+                id="report-user-detail"
+                value={reportDetail}
+                onChange={event => setReportDetail(event.target.value)}
+                maxLength={2000}
+              />
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <button type="submit" disabled={!reportReason || reporting}>{reporting ? "Submitting…" : "Submit report"}</button>
+                <button type="button" onClick={closeUserReport}>Cancel</button>
+              </div>
+            </fieldset>
+          </form>}
           <form onSubmit={send}>
             <label htmlFor="message-body" style={{ color: "#0F172A" }}>Message</label>
             <textarea
@@ -463,7 +560,14 @@ export default function InboxV2() {
               <button onClick={() => void openAttachment(item.id)}>{item.original_name} · {bytesLabel(item.byte_size)}</button>
             </li>)}</ul> : null}
             <small style={{ color: "#0F172A" }}>{deliveryLabel(message)} · {new Date(message.created_at).toLocaleString()}</small>
-            <button onClick={() => void act("REPORT", message.id)}>Report</button>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <button onClick={() => void act("REPORT", message.id)}>Report message</button>
+              {active.conversation_kind === "group" && currentUserId && message.sender_id !== currentUserId && <button
+                onClick={() => openUserReport(message.sender_id, "the sender of this message", message.id)}
+              >
+                Report user
+              </button>}
+            </div>
           </article>)}</div>
         </>}
       </article>
