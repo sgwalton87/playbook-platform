@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireUser } from "@/lib/supabase/server";
 
+type ReceiptProjectionRow = {
+  message_id: string;
+  read_count: number | string | null;
+};
+
 async function receiptPayload(
   supabase: Awaited<ReturnType<typeof requireUser>>["supabase"],
   userId: string,
@@ -12,7 +17,10 @@ async function receiptPayload(
   if (receipts.error) throw new Error(receipts.error.message);
   return {
     currentUserId: userId,
-    receipts: Object.fromEntries((receipts.data ?? []).map(item => [String(item.message_id), Number(item.read_count ?? 0)])),
+    receipts: Object.fromEntries((receipts.data ?? []).map((item: ReceiptProjectionRow) => [
+      String(item.message_id),
+      Number(item.read_count ?? 0),
+    ])),
   };
 }
 
