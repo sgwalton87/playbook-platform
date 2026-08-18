@@ -29,14 +29,32 @@ for select
 to authenticated
 using ((select auth.uid()) = user_id);
 
--- Moderators need review access to hidden Feed targets, but this does not grant
--- generic mutation authority.
+-- Never place the private moderator helper directly inside general Feed RLS.
+-- Moderator review of hidden target state flows through the narrow projection
+-- below, preserving the private helper's non-executable API boundary.
 drop policy if exists feed_posts_select_moderator on public.feed_posts;
-create policy feed_posts_select_moderator
-on public.feed_posts
-for select
-to authenticated
-using ((select private.current_user_is_platform_moderator()));
+
+create or replace function public.get_moderation_feed_posts(p_post_ids uuid[])
+returns table(id uuid, moderation_state text)
+language plpgsql
+stable
+security definer
+set search_path = public, private, pg_temp
+as $$
+begin
+  if auth.uid() is null then
+    raise exception 'Authentication required.' using errcode='42501';
+  end if;
+  if not private.current_user_is_platform_moderator() then
+    raise exception 'Moderator authority required.' using errcode='42501';
+  end if;
+
+  return query
+    select fp.id, fp.moderation_state
+    from public.feed_posts fp
+    where fp.id = any(coalesce(p_post_ids, array[]::uuid[]));
+end;
+$$;
 
 create or replace function public.moderate_feed_post(
   p_post_id uuid,
@@ -112,6 +130,8 @@ begin
 end;
 $$;
 
+revoke all on function public.get_moderation_feed_posts(uuid[]) from public, anon, authenticated;
+grant execute on function public.get_moderation_feed_posts(uuid[]) to authenticated;
 revoke all on function public.moderate_feed_post(uuid,text,uuid,text) from public, anon, authenticated;
 grant execute on function public.moderate_feed_post(uuid,text,uuid,text) to authenticated;
 
@@ -119,5 +139,7 @@ grant execute on function public.moderate_feed_post(uuid,text,uuid,text) to auth
 -- moderation state (or any Feed row) outside governed owner/moderator functions.
 revoke update on table public.feed_posts from public, anon, authenticated;
 
+comment on function public.get_moderation_feed_posts(uuid[]) is
+  'Founder/Admin-only Feed moderation-state projection for Trust & Safety review.';
 comment on function public.moderate_feed_post(uuid,text,uuid,text) is
   'Founder/Admin-only Feed hide/restore authority. Atomically updates publication enforcement and appends moderation audit evidence.';
