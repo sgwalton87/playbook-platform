@@ -94,7 +94,6 @@ export default function PublicNewsFeed() {
   const [hasMore, setHasMore] = useState(true);
 
   const loadFirstPage = useCallback(async () => {
-    setState("loading");
     try {
       const rows = await fetchPublicPage(null);
       setPosts(await hydratePublicRows(rows));
@@ -106,9 +105,8 @@ export default function PublicNewsFeed() {
   }, []);
 
   useEffect(() => {
-    let active = true;
-    void loadFirstPage().catch(() => { if (active) setState("error"); });
-    return () => { active = false; };
+    const id = window.setTimeout(() => { void loadFirstPage(); }, 0);
+    return () => window.clearTimeout(id);
   }, [loadFirstPage]);
 
   const loadMore = useCallback(async () => {
