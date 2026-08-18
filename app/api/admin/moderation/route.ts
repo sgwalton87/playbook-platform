@@ -1,6 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireUser } from "@/lib/supabase/server";
 
+type ProfileReportContext = {
+  report_id: string;
+  target_user_id: string | null;
+  username: string | null;
+  full_name: string | null;
+  source_conversation_id: string | null;
+  conversation_kind: string | null;
+  source_message_id: string | null;
+  source_message_body: string | null;
+  source_message_sender_id: string | null;
+  source_message_created_at: string | null;
+};
+
 async function requireModerator() {
   const auth = await requireUser();
   if (!auth.user) return { ...auth, allowed: false };
@@ -29,10 +42,40 @@ export async function GET() {
     for (const post of postsResult.data || []) states.set(post.id, post.moderation_state || "visible");
   }
 
-  const hydrated = reports.map((report) => ({
-    ...report,
-    target_moderation_state: report.target_type === "post" ? (states.get(report.target_id) || "unavailable") : null,
-  }));
+  const profileReportIds = reports
+    .filter((report) => report.target_type === "profile")
+    .map((report) => report.id);
+  const profileContexts = new Map<string, ProfileReportContext>();
+  if (profileReportIds.length) {
+    const contextResult = await supabase.rpc("get_moderation_profile_report_context", {
+      requested_report_ids: profileReportIds,
+    });
+    if (contextResult.error) return NextResponse.json({ error: contextResult.error.message }, { status: 400 });
+    for (const context of (contextResult.data || []) as ProfileReportContext[]) {
+      profileContexts.set(context.report_id, context);
+    }
+  }
+
+  const hydrated = reports.map((report) => {
+    const profileContext = profileContexts.get(report.id);
+    return {
+      ...report,
+      target_moderation_state: report.target_type === "post" ? (states.get(report.target_id) || "unavailable") : null,
+      target_profile: profileContext ? {
+        id: profileContext.target_user_id,
+        username: profileContext.username,
+        full_name: profileContext.full_name,
+      } : null,
+      source_context: profileContext ? {
+        conversation_id: profileContext.source_conversation_id,
+        conversation_kind: profileContext.conversation_kind,
+        message_id: profileContext.source_message_id,
+        message_body: profileContext.source_message_body,
+        message_sender_id: profileContext.source_message_sender_id,
+        message_created_at: profileContext.source_message_created_at,
+      } : null,
+    };
+  });
 
   return NextResponse.json({
     reports: hydrated.filter((report) => report.status !== "resolved" || report.target_moderation_state === "hidden"),
