@@ -38,6 +38,9 @@ describe("Phase 8 Courses 1-9",()=>{
     expect(migration).toContain("private.learning_module_checkpoint_answers");
     expect(migration).toContain("m.knowledge_checkpoint - 'correct_index'");
     expect(migration).toContain("r.checkpoint_passed=true");
+    expect(migration).toContain("alter table public.learning_module_responses enable row level security");
+    expect(migration).toContain("revoke all on table public.learning_module_responses from public,anon,authenticated");
+    expect(migration).toContain("language sql\nsecurity invoker");
     expect(route).toContain('rpc("submit_learning_module_work"');
     expect(route).toContain('rpc("complete_learning_module"');
   });
@@ -68,6 +71,14 @@ describe("Phase 8 Courses 1-9",()=>{
     expect(migration).toContain("Athletes Abroad Hub: The Global Home Court");
     expect(migration).toContain("Community Safety Check 1");
     expect(migration).toContain("Global Home Court Check 1");
+  });
+
+  it("retires legacy learner mutation and removes historical checkpoint answers",()=>{
+    const migration=read("supabase/migrations/202608180104_legacy_course_authority_retirement.sql");
+    expect(migration).toContain("knowledge_checkpoint - 'correct_index'");
+    expect(migration).toContain("set is_available=false");
+    expect(migration).toContain("revoke insert,update,delete on table public.course_progress from anon,authenticated");
+    expect(migration).toContain("Canonical learner authority is learning_module_progress");
   });
 
   it("documents the end-to-end release gate",()=>{
