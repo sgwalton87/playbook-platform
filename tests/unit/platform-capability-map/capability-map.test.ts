@@ -4,9 +4,26 @@ import { describe, expect, it } from "vitest";
 import { getCapabilityCatalog } from "@/lib/platform/capabilityCatalog";
 import { ROLE_NAVIGATION, getRoleNavigation } from "@/lib/navigation/roleNavigation";
 
-function routeFile(href: string) {
+function routeResolves(href: string) {
   const route = href.split("?")[0].replace(/^\//, "").replace(/\/$/, "");
-  return path.join(process.cwd(), "app", route, "page.tsx");
+  const segments = route ? route.split("/") : [];
+  let current = path.join(process.cwd(), "app");
+
+  for (const segment of segments) {
+    const exact = path.join(current, segment);
+    if (fs.existsSync(exact) && fs.statSync(exact).isDirectory()) {
+      current = exact;
+      continue;
+    }
+
+    if (!fs.existsSync(current)) return false;
+    const dynamic = fs.readdirSync(current, { withFileTypes: true })
+      .find((entry) => entry.isDirectory() && /^\[.*\]$/.test(entry.name));
+    if (!dynamic) return false;
+    current = path.join(current, dynamic.name);
+  }
+
+  return fs.existsSync(path.join(current, "page.tsx"));
 }
 
 describe("Playbook capability map", () => {
@@ -27,12 +44,12 @@ describe("Playbook capability map", () => {
     }
   });
 
-  it("proves every Available href resolves to a real static product page", () => {
+  it("proves every Available href resolves to a real product page, including dynamic routes", () => {
     const available = getCapabilityCatalog({ includeFounder: true })
       .flatMap((group) => group.items)
       .filter((item) => item.status === "available");
     for (const item of available) {
-      expect(fs.existsSync(routeFile(item.href!)), `${item.label} -> ${item.href}`).toBe(true);
+      expect(routeResolves(item.href!), `${item.label} -> ${item.href}`).toBe(true);
     }
   });
 

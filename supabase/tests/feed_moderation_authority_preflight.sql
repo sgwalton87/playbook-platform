@@ -28,8 +28,9 @@ begin
   if not has_function_privilege('authenticated',moderate_oid,'EXECUTE') or not has_function_privilege('authenticated',projection_oid,'EXECUTE') then
     raise exception 'authenticated API role requires function entrypoints with internal moderator authority checks';
   end if;
-  if has_function_privilege('authenticated','private.current_user_is_platform_moderator()','EXECUTE') then
-    raise exception 'authenticated must not execute the private moderator helper directly';
+  if has_function_privilege('anon','private.current_user_is_platform_moderator()','EXECUTE')
+     or not has_function_privilege('authenticated','private.current_user_is_platform_moderator()','EXECUTE') then
+    raise exception 'Moderator RLS predicate must be authenticated-only and unavailable to anonymous callers';
   end if;
 end $$;
 
