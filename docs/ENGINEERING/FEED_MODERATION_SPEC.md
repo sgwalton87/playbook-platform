@@ -21,6 +21,8 @@ The report service must verify that the target story exists and is currently vis
 
 Only authenticated Platform Founder/Admin moderators may hide or restore Feed stories.
 
+Moderator review shall not widen general Feed RLS. Hidden-target enforcement state is available only through a narrow moderator-authorized projection function. The existing private moderator-authority helper remains non-executable by API roles and is evaluated only inside governed SECURITY DEFINER functions.
+
 Moderator enforcement must be atomic:
 
 1. Validate moderator authority.
@@ -35,13 +37,14 @@ Supported Feed publication actions are:
 - `hide_content`
 - `restore_content`
 
-Dismiss/review case-management actions remain available through the existing moderation queue.
+Dismiss/review case-management actions remain available through the existing moderation queue. Resolved reports for currently hidden Feed posts remain available in the queue so an authorized moderator can restore the story; once restored, that resolved case leaves the active queue.
 
 ## Visibility contract
 
 - Public/anonymous Feed reads shall never return a post whose moderation state is `hidden`.
 - Authenticated non-owners shall never receive hidden public posts.
 - The post owner may continue to see their own hidden post through the existing owner policy for transparency.
+- Moderators do not receive blanket Feed RLS access to hidden posts; the moderation queue receives only the target IDs/current enforcement state required for review through the governed projection.
 - Hidden stories shall not be available through the public story permalink.
 - Restored stories become publicly readable again only if their normal Feed visibility is `public`.
 
@@ -49,7 +52,9 @@ Dismiss/review case-management actions remain available through the existing mod
 
 - Direct authenticated `UPDATE` on Feed moderation fields remains unavailable.
 - Enforcement occurs through a narrow SECURITY DEFINER function with a fixed search path and the existing private moderator-authority helper.
-- Anonymous callers may not execute moderator enforcement.
+- Moderator target-state review occurs through a separate narrow SECURITY DEFINER projection with the same internal authority check.
+- The private moderator-authority helper remains non-executable by `anon` and `authenticated`.
+- Anonymous callers may not execute Feed moderation functions.
 - Existing Create/Edit/Delete, media, comments, likes, shares, identity, and pagination boundaries remain unchanged.
 
 ## Experience
@@ -65,4 +70,4 @@ Each hide/restore decision is represented by an append-only `moderation_actions`
 
 ## Definition of Done
 
-Feed Moderation is complete when reporting, moderator hide/restore, public-read enforcement, owner transparency, audit logging, regression tests, Database Certification, CI, exact-head Vercel, production migration, and live production verification are green.
+Feed Moderation is complete when reporting, moderator hide/restore, public-read enforcement, owner transparency, narrow moderator review projection, audit logging, regression tests, Database Certification, CI, exact-head Vercel, production migration, and live production verification are green.
