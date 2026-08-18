@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { removeOwnedFeedMedia } from "@/lib/supabase/feed-media-admin";
 import { requireUser } from "@/lib/supabase/server";
 
 const MAX_POST_LENGTH = 4000;
@@ -63,14 +64,20 @@ export async function DELETE(req: NextRequest) {
 
     const imagePath = storagePathForOwner(deleted.image_url, "photos", user.id);
     if (imagePath) {
-      const result = await supabase.storage.from("photos").remove([imagePath]);
-      if (result.error) cleanupErrors.push(`image: ${result.error.message}`);
+      try {
+        await removeOwnedFeedMedia("photos", imagePath, user.id);
+      } catch (cause) {
+        cleanupErrors.push(`image: ${cause instanceof Error ? cause.message : "cleanup failed"}`);
+      }
     }
 
     const videoPath = storagePathForOwner(deleted.media_type === "video" ? deleted.media_url : null, "feed-videos", user.id);
     if (videoPath) {
-      const result = await supabase.storage.from("feed-videos").remove([videoPath]);
-      if (result.error) cleanupErrors.push(`video: ${result.error.message}`);
+      try {
+        await removeOwnedFeedMedia("feed-videos", videoPath, user.id);
+      } catch (cause) {
+        cleanupErrors.push(`video: ${cause instanceof Error ? cause.message : "cleanup failed"}`);
+      }
     }
 
     return NextResponse.json({
