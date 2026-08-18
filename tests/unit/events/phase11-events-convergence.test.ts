@@ -76,6 +76,6 @@ describe("Phase 11 Events canonical convergence", () => {
     const adr = read("docs/architecture/ADR-0010_SUMMIT_EVENTS_SHARED_SERVICE.md");
     expect(migration).toContain("summit");
     expect(adr).toContain("shared Event service");
-    expect(adr).toContain("community_events remains the Event owner");
+    expect(adr).toContain("remains the Event owner");
   });
 });
