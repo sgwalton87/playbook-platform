@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import { supabase } from "@/lib/supabaseClient";
 import { ALL_COLLEGE_OPTIONS, CAREER_OPTIONS, ACTIVITY_OPTIONS, CALIFORNIA_DISTRICTS, assertRoleOnboardingCompletionSupported, createInitialOnboardingData, getOnboardingCompletionDestination, getOnboardingSteps, mapOnboardingToProfilePayload, validateOnboardingStep } from "@/lib/onboarding";
@@ -18,6 +18,7 @@ export default function StartPage() {
 }
 
 function StartContent() {
+  const router = useRouter();
   const params = useSearchParams();
   const [user, setUser] = useState<LegacyValue>(null);
   const [profile, setProfile] = useState<LegacyValue>(null);
@@ -63,7 +64,7 @@ function StartContent() {
       const { data: u } = await supabase.auth.getUser();
 
       if (!u.user) {
-        window.location.href = "/login";
+        router.replace("/login");
         return;
       }
 
@@ -101,7 +102,7 @@ function StartContent() {
     }
 
     load();
-  }, [role]);
+  }, [role, router]);
 
   function update(key: string, value: LegacyValue) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -322,7 +323,7 @@ function StartContent() {
         }
         setCreating(false);
         setCreated(true);
-        setTimeout(() => { window.location.href = result.destination || destination; }, 15000);
+        setTimeout(() => { router.replace(result.destination || destination); }, 15000);
         return;
       }
 
