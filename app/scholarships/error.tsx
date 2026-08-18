@@ -1,0 +1,3 @@
+"use client";
+
+export default function ScholarshipsError({reset}:{reset:()=>void}){return <main style={{minHeight:"60vh",display:"grid",placeItems:"center",padding:32}}><section role="alert" style={{maxWidth:640,padding:24,border:"1px solid #FCA5A5",borderRadius:18,background:"#FEF2F2",color:"#991B1B"}}><h1>Scholarships need attention</h1><p>The published scholarship catalog could not be displayed. Your saved records were not changed.</p><button type="button" onClick={reset} style={{border:0,borderRadius:999,padding:"10px 14px",fontWeight:900,cursor:"pointer"}}>Try again</button></section></main>;}
