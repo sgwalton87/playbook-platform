@@ -3,13 +3,16 @@ import { describe, expect, it } from "vitest";
 
 const feedPage = readFileSync("app/feed/page.tsx", "utf8");
 const publicFeed = readFileSync("components/public/PublicNewsFeed.tsx", "utf8");
+const pagerMigration = readFileSync("supabase/migrations/202608170093_feed_infinite_scroll.sql", "utf8");
 const spec = readFileSync("docs/ENGINEERING/FEED_TIMELINE_VISIBILITY_SPEC.md", "utf8");
 
 describe("Feed Timeline Visibility", () => {
-  it("loads public stories plus the signed-in owner's private timeline", () => {
-    expect(feedPage).toContain('.or(`visibility.eq.public,user_id.eq.${user.id}`)');
+  it("preserves public plus owner-private visibility through the shared RLS-respecting pager", () => {
+    expect(feedPage).toContain('rpc("get_feed_page"');
+    expect(publicFeed).toContain('rpc("get_feed_page"');
+    expect(pagerMigration).toContain("security invoker");
+    expect(pagerMigration).toContain("from public.feed_posts fp");
     expect(feedPage).toContain('visibility: post.visibility === "private" ? "private" : "public"');
-    expect(publicFeed).toContain('.eq("visibility", "public")');
   });
 
   it("persists a clear Public / Only me audience choice", () => {
