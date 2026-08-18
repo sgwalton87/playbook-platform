@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { ReportStoryControl } from "@/components/feed/ReportStoryControl";
 import { PlaybookCard, PlaybookPage } from "@/components/ui";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -42,9 +43,10 @@ export default function PublicStoryPage() {
       if (!postId) { setState("missing"); return; }
       const { data: post, error } = await supabase
         .from("feed_posts")
-        .select("id,user_id,title,body,image_url,media_url,media_type,created_at,visibility")
+        .select("id,user_id,title,body,image_url,media_url,media_type,created_at,visibility,moderation_state")
         .eq("id", postId)
         .eq("visibility", "public")
+        .eq("moderation_state", "visible")
         .maybeSingle();
       if (!active) return;
       if (error) { setState("error"); return; }
@@ -78,7 +80,7 @@ export default function PublicStoryPage() {
       <div style={shell}>
         <Link href="/public-newsfeed" style={back}>← Public News Feed</Link>
         {state === "loading" && <PlaybookCard eyebrow="Public story" title="Loading story…"><p style={copy}>Retrieving the published Playbook story.</p></PlaybookCard>}
-        {state === "missing" && <PlaybookCard eyebrow="Public story" title="This story is not public"><p style={copy}>It may be private, removed, or unavailable. Private Playbook stories are never exposed through shared links.</p></PlaybookCard>}
+        {state === "missing" && <PlaybookCard eyebrow="Public story" title="This story is not public"><p style={copy}>It may be private, moderated, removed, or unavailable. Private and hidden Playbook stories are never exposed through shared links.</p></PlaybookCard>}
         {state === "error" && <PlaybookCard eyebrow="Public story" title="Story temporarily unavailable"><p style={copy}>The story could not be loaded. No sample content has been substituted.</p></PlaybookCard>}
         {state === "ready" && story && (
           <PlaybookCard eyebrow={`${story.role} · Published story`} title={story.title || story.author}>
@@ -90,6 +92,7 @@ export default function PublicStoryPage() {
             <p style={body}>{story.body}</p>
             {story.imageUrl && <div style={imageWrap}><Image unoptimized fill src={story.imageUrl} alt="Published Playbook story media" style={{ objectFit: "cover" }} /></div>}
             {story.mediaType === "video" && story.mediaUrl && <video controls preload="metadata" src={story.mediaUrl} aria-label="Published Playbook story video" style={video} />}
+            <ReportStoryControl postId={story.id} />
           </PlaybookCard>
         )}
         <div style={join}><Link href="/login?mode=signup" style={joinLink}>Join The Playbook →</Link></div>
