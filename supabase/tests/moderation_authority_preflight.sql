@@ -6,14 +6,9 @@ begin
     raise exception 'Missing private platform moderator authority helper.';
   end if;
 
-  if exists (
-    select 1 from information_schema.routine_privileges
-     where specific_schema = 'private'
-       and routine_name = 'current_user_is_platform_moderator'
-       and grantee in ('PUBLIC', 'anon', 'authenticated')
-       and privilege_type = 'EXECUTE'
-  ) then
-    raise exception 'Private moderator helper must not be directly executable by API roles.';
+  if has_function_privilege('anon','private.current_user_is_platform_moderator()','EXECUTE')
+     or not has_function_privilege('authenticated','private.current_user_is_platform_moderator()','EXECUTE') then
+    raise exception 'Moderator RLS helper must be executable only by authenticated API users, never anonymous callers.';
   end if;
 
   if not exists (
