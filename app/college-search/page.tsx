@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { PlaybookCard, PlaybookGrid, PlaybookHero, PlaybookMetric, PlaybookMetrics, PlaybookPage, PlaybookPill } from "@/components/ui";
@@ -13,8 +13,8 @@ const STATUSES=["considering","researching","applying","applied","accepted","wai
 export default function CollegeSearchPage(){
  const router=useRouter();
  const[catalog,setCatalog]=useState<College[]>([]);const[saved,setSaved]=useState<SavedCollege[]>([]);const[loading,setLoading]=useState(true);const[query,setQuery]=useState("");const[state,setState]=useState("all");const[manualName,setManualName]=useState("");const[message,setMessage]=useState("");const[busy,setBusy]=useState("");
- async function load(){setLoading(true);setMessage("");const auth=await supabase.auth.getUser();if(!auth.data.user){router.replace("/login");return;}const[catalogResult,savedResult]=await Promise.all([supabase.from("colleges").select("id,unit_id,name,city,state,school_url,ownership,highest_degree").order("name").limit(5000),supabase.from("college_list").select("id,college_name,college_type,status,deadline,notes,created_at").eq("user_id",auth.data.user.id).order("created_at",{ascending:false})]);if(catalogResult.error||savedResult.error)setMessage(catalogResult.error?.message||savedResult.error?.message||"College Search could not be loaded.");else{setCatalog((catalogResult.data||[]) as College[]);setSaved((savedResult.data||[]) as SavedCollege[]);}setLoading(false);}
- useEffect(()=>{let active=true;void(async()=>{if(active)await load();})();return()=>{active=false;};},[]);
+ const load=useCallback(async()=>{setLoading(true);setMessage("");const auth=await supabase.auth.getUser();if(!auth.data.user){router.replace("/login");return;}const[catalogResult,savedResult]=await Promise.all([supabase.from("colleges").select("id,unit_id,name,city,state,school_url,ownership,highest_degree").order("name").limit(5000),supabase.from("college_list").select("id,college_name,college_type,status,deadline,notes,created_at").eq("user_id",auth.data.user.id).order("created_at",{ascending:false})]);if(catalogResult.error||savedResult.error)setMessage(catalogResult.error?.message||savedResult.error?.message||"College Search could not be loaded.");else{setCatalog((catalogResult.data||[]) as College[]);setSaved((savedResult.data||[]) as SavedCollege[]);}setLoading(false);},[router]);
+ useEffect(()=>{let active=true;queueMicrotask(()=>{if(active)void load();});return()=>{active=false;};},[load]);
  const states=useMemo(()=>Array.from(new Set(catalog.map(item=>item.state).filter((value):value is string=>Boolean(value)))).sort(),[catalog]);
  const visible=useMemo(()=>{const needle=query.trim().toLowerCase();return catalog.filter(item=>(state==="all"||item.state===state)&&(!needle||`${item.name} ${item.city||""} ${item.state||""} ${item.ownership||""} ${item.highest_degree||""}`.toLowerCase().includes(needle)));},[catalog,query,state]);
  const savedNames=useMemo(()=>new Set(saved.map(item=>item.college_name.toLowerCase())),[saved]);

@@ -145,7 +145,7 @@ function LoginContent() {
           role,
         });
 
-        window.location.href = `/check-email?${query.toString()}`;
+        router.push(`/check-email?${query.toString()}`);
         return;
       }
 
