@@ -36,6 +36,10 @@ Before this package, canonical Learning already held four published courses: Col
 
 The 15-Week Leadership course is the benchmark for the canonical learner experience. Convergence preserves its learning objectives, applied activities, knowledge checkpoints, interactions, lesson content, and 15-week structure. The canonical generic experience is elevated to that standard rather than replacing Leadership with a simpler experience.
 
+## Exact-head certification
+
+Release certification must be tied to the final PR head after all migration-time assertions are present. A successful older run is not sufficient after the branch head moves.
+
 ## Release rule
 
 Do not mark Phase 8 green from route existence alone. Green requires user-visible functionality, durable persistence, least-privilege authority, server-side assessment integrity, regression coverage, full database migration replay, production build, deployment readiness, and post-merge hosted-database verification.
