@@ -18,10 +18,14 @@ describe("Feed Moderation authority", () => {
     expect(spec).toContain("No duplicate moderation table");
   });
 
-  it("keeps public reads fail-closed while preserving owner transparency", () => {
+  it("keeps public reads fail-closed and moderator review off general Feed RLS", () => {
     expect(migration).toContain("visibility = 'public' and moderation_state = 'visible'");
     expect(migration).toContain("feed_posts_select_owner");
-    expect(migration).toContain("feed_posts_select_moderator");
+    expect(migration).toContain("drop policy if exists feed_posts_select_moderator");
+    expect(migration).not.toContain("create policy feed_posts_select_moderator");
+    expect(migration).toContain("get_moderation_feed_posts");
+    expect(adminRoute).toContain('rpc("get_moderation_feed_posts"');
+    expect(spec).toContain("Moderator review shall not widen general Feed RLS");
     expect(storyPage).toContain('.eq("moderation_state", "visible")');
     expect(storyPage).toContain("private, moderated, removed, or unavailable");
   });
@@ -41,10 +45,16 @@ describe("Feed Moderation authority", () => {
     expect(migration).toContain("p_action not in ('hide_content','restore_content')");
     expect(migration).toContain("insert into public.moderation_actions");
     expect(migration).toContain("grant execute on function public.moderate_feed_post");
+    expect(migration).toContain("grant execute on function public.get_moderation_feed_posts");
     expect(adminRoute).toContain('action === "hide_content" || action === "restore_content"');
     expect(adminRoute).toContain('rpc("moderate_feed_post"');
     expect(adminPage).toContain("Hide story");
     expect(adminPage).toContain("Restore story");
+  });
+
+  it("keeps resolved hidden reports reachable for human restore", () => {
+    expect(adminRoute).toContain('.in("status", ["open", "reviewing", "resolved"])');
+    expect(adminRoute).toContain('report.status !== "resolved" || report.target_moderation_state === "hidden"');
   });
 
   it("does not reopen direct Feed UPDATE authority", () => {
