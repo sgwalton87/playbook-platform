@@ -22,7 +22,7 @@ describe("Feed Edit and Delete authority", () => {
     expect(migration).toContain("set body = btrim(coalesce(p_body,''))");
     expect(migration).toContain("post_type = btrim(p_post_type)");
     expect(migration).not.toContain("visibility = p_");
-    expect(route).toContain('method: "PATCH"').or;
+    expect(route).toContain('export async function PATCH');
     expect(feed).toContain("Edit changes story text and category only. Existing visibility and media stay unchanged.");
   });
 
