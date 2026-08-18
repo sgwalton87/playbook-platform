@@ -25,9 +25,11 @@ describe("Start onboarding canonical client cutover", () => {
     expect(startPage).toContain("leave onboarding completion false until the governed server adapter succeeds");
   });
 
-  it("cross-checks the server destination against the canonical client destination", () => {
+  it("cross-checks the server destination and navigates through the canonical Next router", () => {
+    expect(startPage).toContain("const router = useRouter()");
     expect(startPage).toContain("const destination = getOnboardingCompletionDestination(role)");
     expect(startPage).toContain("result.destination && result.destination !== destination");
-    expect(startPage).toContain("window.location.href = result.destination || destination");
+    expect(startPage).toContain("router.replace(result.destination || destination)");
+    expect(startPage).not.toContain("window.location.href");
   });
 });
