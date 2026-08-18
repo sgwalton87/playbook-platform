@@ -92,31 +92,11 @@ grant execute on function public.delete_feed_post_owner(uuid) to authenticated;
 -- feed_posts directly.
 revoke update, delete on table public.feed_posts from public, anon, authenticated;
 
--- Feed-only owner media cleanup. Existing public-read and owner-upload policies
--- remain unchanged.
-drop policy if exists feed_photos_owner_delete on storage.objects;
-create policy feed_photos_owner_delete
-on storage.objects
-for delete
-to authenticated
-using (
-  bucket_id='photos'
-  and (storage.foldername(name))[1]=((select auth.uid()))::text
-  and (storage.foldername(name))[2]='feed'
-);
-
-drop policy if exists feed_videos_owner_delete on storage.objects;
-create policy feed_videos_owner_delete
-on storage.objects
-for delete
-to authenticated
-using (
-  bucket_id='feed-videos'
-  and (storage.foldername(name))[1]=((select auth.uid()))::text
-  and (storage.foldername(name))[2]='feed'
-);
+-- Storage policy surfaces intentionally remain unchanged. Image/video publication
+-- buckets remain public-read + owner-upload only. Post-delete media cleanup is a
+-- narrow server-side privileged operation after the owner-only canonical delete.
 
 comment on function public.update_feed_post_owner(uuid,text,text) is
   'Owner-only Feed edit authority. Updates body/category while preserving visibility and media.';
 comment on function public.delete_feed_post_owner(uuid) is
-  'Owner-only Feed deletion authority. Returns canonical media references for immediate Storage cleanup.';
+  'Owner-only Feed deletion authority. Returns canonical media references for immediate server-side cleanup.';
