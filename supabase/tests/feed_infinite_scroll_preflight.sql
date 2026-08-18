@@ -3,15 +3,17 @@
 begin;
 
 -- Function must be SECURITY INVOKER, fixed-search-path, and executable only by
--- anonymous/authenticated API roles.
+-- anonymous/authenticated API roles. PostgreSQL PUBLIC is a pseudo-role, so
+-- inspect the function ACL directly instead of resolving a role named "public".
 do $$
 declare
   fn_oid oid;
+  fn_acl aclitem[];
   is_definer boolean;
   config text[];
 begin
-  select p.oid, p.prosecdef, p.proconfig
-    into fn_oid, is_definer, config
+  select p.oid, p.proacl, p.prosecdef, p.proconfig
+    into fn_oid, fn_acl, is_definer, config
   from pg_proc p
   join pg_namespace n on n.oid=p.pronamespace
   where n.nspname='public'
@@ -21,7 +23,13 @@ begin
   if fn_oid is null then raise exception 'get_feed_page function is missing'; end if;
   if is_definer then raise exception 'get_feed_page must remain SECURITY INVOKER'; end if;
   if not ('search_path=public, pg_temp'=any(config)) then raise exception 'get_feed_page fixed search_path is missing'; end if;
-  if has_function_privilege('public', fn_oid, 'EXECUTE') then raise exception 'PUBLIC must not execute get_feed_page'; end if;
+  if exists (
+    select 1
+    from aclexplode(coalesce(fn_acl, acldefault('f', (select proowner from pg_proc where oid=fn_oid)))) acl
+    where acl.grantee=0 and acl.privilege_type='EXECUTE'
+  ) then
+    raise exception 'PUBLIC must not execute get_feed_page';
+  end if;
   if not has_function_privilege('anon', fn_oid, 'EXECUTE') then raise exception 'anon must execute get_feed_page'; end if;
   if not has_function_privilege('authenticated', fn_oid, 'EXECUTE') then raise exception 'authenticated must execute get_feed_page'; end if;
 end $$;
