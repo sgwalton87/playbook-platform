@@ -36,7 +36,8 @@ create temporary table notification_ids(
   group_revoked uuid,
   group_id uuid,
   group_conversation uuid,
-  group_message uuid
+  group_message uuid,
+  legacy_notification_count bigint
 ) on commit drop;
 
 do $$
@@ -93,7 +94,10 @@ begin
   -- Revoke one group member before delivery; they must not become a notification recipient.
   delete from public.group_members where group_id=gid and profile_id=gx;
 
-  insert into notification_ids values(ss,sr,sc,sm,ns,nr,nc,nm,gs,gr,gx,gid,gc,gm);
+  insert into notification_ids values(
+    ss,sr,sc,sm,ns,nr,nc,nm,gs,gr,gx,gid,gc,gm,
+    (select count(*) from public.notifications)
+  );
 end $$;
 
 -- Only the trusted delivery transition produces notification outbox rows.
@@ -145,10 +149,9 @@ begin
       )
   ) then raise exception 'Message body content leaked into notification payload'; end if;
 
-  if exists(
-    select 1 from public.notifications
-    where reference_id in (ids.support_message,ids.network_message,ids.group_message)
-  ) then raise exception 'Legacy notifications table received a Messaging write'; end if;
+  if (select count(*) from public.notifications) <> ids.legacy_notification_count then
+    raise exception 'Legacy notifications table received a Messaging write';
+  end if;
 end $$;
 
 -- Repeating DELIVERED without a state transition must not enqueue duplicates.
