@@ -8,7 +8,7 @@ const spec = readFileSync("docs/ENGINEERING/MESSAGING_READ_RECEIPTS_SPEC.md", "u
 
 describe("Messaging Read Receipts authority", () => {
   it("keeps participant last_read_at as the canonical source instead of creating a receipt table", () => {
-    expect(spec).toContain("`pbos_conversation_participants.last_read_at` remains the canonical read-position record");
+    expect(spec).toContain("`pbos_conversation_participants.last_read_at` remains the canonical read-position state");
     expect(migration).toContain("mark_governed_conversation_read");
     expect(migration).toContain("get_governed_message_read_receipts");
     expect(migration).not.toContain("create table public.pbos_message_read_receipts");
@@ -40,6 +40,6 @@ describe("Messaging Read Receipts authority", () => {
   it("keeps read acknowledgement an explicit user action", () => {
     expect(inbox).toContain("Mark read");
     expect(inbox).toContain('method: "POST"');
-    expect(spec).toContain("explicit user action");
+    expect(spec).toContain("The existing explicit `Mark read` action remains the user-controlled receipt action");
   });
 });
