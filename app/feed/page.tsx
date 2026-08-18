@@ -345,6 +345,42 @@ export default function FeedPage() {
     finally { setBusy(null); }
   }
 
+  async function sharePost(post: FeedPost) {
+    if (post.visibility !== "public") return;
+    const busyKey = `share:${post.id}`;
+    setBusy(busyKey);
+    setError("");
+    const url = `${window.location.origin}/story/${post.id}`;
+    let channel: "native" | "copy_link" | null = null;
+    try {
+      if (typeof navigator.share === "function") {
+        try {
+          await navigator.share({ title: post.title || "Playbook story", text: post.body.slice(0, 240), url });
+          channel = "native";
+        } catch (cause) {
+          if (cause instanceof DOMException && cause.name === "AbortError") return;
+          throw cause;
+        }
+      } else {
+        await navigator.clipboard.writeText(url);
+        channel = "copy_link";
+      }
+
+      const response = await fetch("/api/social/shares", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ postId: post.id, channel }),
+      });
+      const result = await response.json() as { error?: string };
+      if (!response.ok) throw new Error(result.error || "Share completed, but Playbook could not record it.");
+      setMessage(channel === "native" ? "Story shared." : "Story link copied.");
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Story could not be shared.");
+    } finally {
+      setBusy(null);
+    }
+  }
+
   async function addComment(postId: string) {
     const draft = (commentDrafts[postId] || "").trim();
     if (!draft) return;
@@ -447,6 +483,7 @@ export default function FeedPage() {
                   <div style={actions}>
                     <button disabled={busy === post.id} onClick={() => void toggleLike(post)} style={post.liked ? likedButton : secondaryButton}>{post.liked ? "♥" : "♡"} {post.likes}</button>
                     <PlaybookPill>{post.comments.length} comments</PlaybookPill>
+                    {post.visibility === "public" && <button disabled={busy === `share:${post.id}`} onClick={() => void sharePost(post)} style={secondaryButton}>{busy === `share:${post.id}` ? "Sharing…" : "Share"}</button>}
                   </div>
                   <div style={comments}>
                     {post.comments.map((comment) => <article key={comment.id} style={commentCard}>
