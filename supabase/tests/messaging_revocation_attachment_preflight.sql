@@ -202,3 +202,6 @@ where schemaname='public'
 \endif
 
 rollback;
+
+-- Read Receipts is part of the same shared Messaging authority boundary.
+\i supabase/tests/messaging_read_receipts_preflight.sql
