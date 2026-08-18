@@ -12,6 +12,7 @@ type Conversation = { id: string; status: string; conversation_kind?: "support" 
   relationship?: { id?: string; supporter_email?: string; relationship?: string }; peer?: Peer | null; group?: Group | null;
   participant?: { muted_at?: string | null; blocked_at?: string | null } };
 type ConversationResponse = { conversations?: Conversation[]; error?: string };
+type ReceiptResponse = { currentUserId?: string; receipts?: Record<string, number>; readAt?: string; error?: string };
 
 async function fetchSupportConversations(): Promise<Conversation[]> {
   const response = await fetch("/api/support-network/messages", { cache: "no-store" });
@@ -71,6 +72,8 @@ export default function InboxV2() {
   const [uploading, setUploading] = useState(false); const [staged, setStaged] = useState<Attachment[]>([]);
   const [status, setStatus] = useState("Loading governed conversations…"); const [error, setError] = useState("");
   const [search, setSearch] = useState("");
+  const [currentUserId, setCurrentUserId] = useState("");
+  const [receiptCounts, setReceiptCounts] = useState<Record<string, number>>({});
   const active = conversations.find(item => item.id === activeId) ?? conversations[0];
   const normalizedSearch = search.trim().toLocaleLowerCase();
   const filteredConversations = useMemo(() => {
@@ -81,6 +84,14 @@ export default function InboxV2() {
       return label.includes(normalizedSearch) || messageMatch;
     });
   }, [conversations, normalizedSearch]);
+
+  const loadReceipts = useCallback(async (conversationId: string) => {
+    const response = await fetch(`/api/messages/read-receipts?conversationId=${encodeURIComponent(conversationId)}`, { cache: "no-store" });
+    const result = await response.json() as ReceiptResponse;
+    if (!response.ok) throw new Error(result.error ?? "Read receipts could not be loaded.");
+    setCurrentUserId(result.currentUserId ?? "");
+    setReceiptCounts(result.receipts ?? {});
+  }, []);
 
   const load = useCallback(async () => {
     const [support, existingNetwork, existingGroups] = await Promise.all([
@@ -111,7 +122,18 @@ export default function InboxV2() {
     return () => { mounted = false; window.clearTimeout(timer); };
   }, [load]);
 
-  async function reload() { setLoading(true); setError(""); try { await load(); }
+  useEffect(() => {
+    if (!active?.id) return;
+    let mounted = true;
+    const timer = window.setTimeout(() => {
+      void loadReceipts(active.id).catch(cause => {
+        if (mounted) setError(cause instanceof Error ? cause.message : "Read receipts could not be loaded.");
+      });
+    }, 0);
+    return () => { mounted = false; window.clearTimeout(timer); };
+  }, [active?.id, loadReceipts]);
+
+  async function reload() { setLoading(true); setError(""); try { await load(); if (active?.id) await loadReceipts(active.id); }
     catch (cause) { setError(cause instanceof Error ? cause.message : "Inbox could not be loaded."); setStatus(""); }
     finally { setLoading(false); } }
 
@@ -167,16 +189,42 @@ export default function InboxV2() {
     } catch (cause) { setError(cause instanceof Error ? cause.message : "Message failed."); } finally { setSending(false); }
   }
 
+  async function markRead() {
+    if (!active) return;
+    setError("");
+    const response = await fetch("/api/messages/read-receipts", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ conversationId: active.id }),
+    });
+    const result = await response.json() as ReceiptResponse;
+    if (!response.ok) { setError(result.error ?? "Conversation could not be marked read."); return; }
+    setCurrentUserId(result.currentUserId ?? "");
+    setReceiptCounts(result.receipts ?? {});
+    setStatus("Conversation marked read. Receipt state is current.");
+    await reload();
+  }
+
   async function act(action: string, messageId?: string) {
-    if (!active) return; setError("");
+    if (!active) return;
+    if (action === "READ") { await markRead(); return; }
+    setError("");
     const response = await fetch(endpointFor(active), {
       method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ action, conversationId: active.id, messageId }) });
     const result = await response.json() as { error?: string }; if (!response.ok) { setError(result.error ?? "Action failed."); return; }
-    setStatus(action === "READ" ? "Conversation marked read." : "Conversation safety setting updated."); await reload();
+    setStatus("Conversation safety setting updated."); await reload();
+  }
+
+  function deliveryLabel(message: Message) {
+    if (!currentUserId || message.sender_id !== currentUserId) return message.delivery_state;
+    const readCount = receiptCounts[message.id] ?? 0;
+    if (readCount === 1) return "Seen";
+    if (readCount > 1) return `Seen by ${readCount}`;
+    return message.delivery_state;
   }
 
   return <PlaybookPage><PlaybookHero eyebrow="Governed Messaging" title="Your conversations"
-    subtitle="Support, connected-peer, and group messages share one governed service with private attachments, unread state, safety controls, and PBOS provenance." />
+    subtitle="Support, connected-peer, and group messages share one governed service with private attachments, unread state, read receipts, safety controls, and PBOS provenance." />
     <p role="status" aria-live="polite" style={{ color: "#0F172A" }}>{loading ? "Loading…" : status}</p>{error && <p role="alert">{error} <button onClick={() => void reload()}>Retry</button></p>}
     <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 16, color: "#0F172A" }}>
       <aside aria-label="Conversations">
@@ -211,7 +259,7 @@ export default function InboxV2() {
             <p style={{ color: "#0F172A" }}>{message.body}</p>
             {message.attachments?.length ? <ul aria-label="Message attachments">{message.attachments.map(item => <li key={item.id}>
               <button onClick={() => void openAttachment(item.id)}>{item.original_name} · {bytesLabel(item.byte_size)}</button></li>)}</ul> : null}
-            <small style={{ color: "#0F172A" }}>{message.delivery_state} · {new Date(message.created_at).toLocaleString()}</small>
+            <small style={{ color: "#0F172A" }}>{deliveryLabel(message)} · {new Date(message.created_at).toLocaleString()}</small>
             <button onClick={() => void act("REPORT", message.id)}>Report</button></article>)}</div></>}
       </article></section></PlaybookPage>;
 }
