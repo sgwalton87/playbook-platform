@@ -79,6 +79,8 @@ jobs:
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/feed_timeline_visibility_preflight.sql
       - name: Certify Feed Shares authority
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/feed_shares_authority_preflight.sql
+      - name: Certify Feed Edit and Delete authority
+        run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/feed_edit_delete_authority_preflight.sql
       - name: Certify Network connection lifecycle authority
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/network_connection_lifecycle_preflight.sql
       - name: Certify canonical Network policy surface
