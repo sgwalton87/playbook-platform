@@ -7,6 +7,7 @@ const read = (value: string) => fs.readFileSync(path.join(root, value), "utf8");
 
 const migration = read("supabase/migrations/202608170092_feed_edit_delete_authority.sql");
 const route = read("app/api/social/posts/route.ts");
+const mediaAdmin = read("lib/supabase/feed-media-admin.ts");
 const feed = read("app/feed/page.tsx");
 const spec = read("docs/ENGINEERING/FEED_EDIT_DELETE_SPEC.md");
 
@@ -22,7 +23,7 @@ describe("Feed Edit and Delete authority", () => {
     expect(migration).toContain("set body = btrim(coalesce(p_body,''))");
     expect(migration).toContain("post_type = btrim(p_post_type)");
     expect(migration).not.toContain("visibility = p_");
-    expect(route).toContain('export async function PATCH');
+    expect(route).toContain("export async function PATCH");
     expect(feed).toContain("Edit changes story text and category only. Existing visibility and media stay unchanged.");
   });
 
@@ -36,11 +37,15 @@ describe("Feed Edit and Delete authority", () => {
     expect(feed).toContain("window.confirm");
   });
 
-  it("limits media deletion to owner Feed namespaces and surfaces cleanup failures", () => {
-    expect(migration).toContain("feed_photos_owner_delete");
-    expect(migration).toContain("feed_videos_owner_delete");
-    expect(migration).toContain("(storage.foldername(name))[2]='feed'");
+  it("preserves public media Storage policies and confines cleanup to a server-only owner namespace", () => {
+    expect(migration).not.toContain("feed_photos_owner_delete");
+    expect(migration).not.toContain("feed_videos_owner_delete");
+    expect(route).not.toContain("SUPABASE_SERVICE_ROLE_KEY");
+    expect(route).toContain("removeOwnedFeedMedia");
     expect(route).toContain('path.startsWith(`${userId}/feed/`)');
+    expect(mediaAdmin).toContain("SUPABASE_SERVICE_ROLE_KEY");
+    expect(mediaAdmin).toContain('path.startsWith(`${ownerId}/feed/`)');
+    expect(mediaAdmin).toContain('bucket: FeedMediaBucket');
     expect(route).toContain('mediaCleanup: cleanupErrors.length ? "failed" : "complete"');
     expect(feed).toContain("if (result.warning) setError(result.warning)");
   });
