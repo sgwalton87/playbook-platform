@@ -29,6 +29,15 @@ for select
 to authenticated
 using ((select auth.uid()) = user_id);
 
+-- Moderators need review access to hidden Feed targets, but this does not grant
+-- generic mutation authority.
+drop policy if exists feed_posts_select_moderator on public.feed_posts;
+create policy feed_posts_select_moderator
+on public.feed_posts
+for select
+to authenticated
+using ((select private.current_user_is_platform_moderator()));
+
 create or replace function public.moderate_feed_post(
   p_post_id uuid,
   p_action text,
