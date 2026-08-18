@@ -1,6 +1,68 @@
 -- Phase 7 Group Messages authority.
--- Groups remain canonical in public.groups/group_members; PBOS Messaging gains a
--- group conversation context without creating a parallel group-message store.
+-- Adopt the production-compatible read-only group foundation into committed history,
+-- then extend the canonical PBOS Messaging service with a group conversation context.
+
+create table if not exists public.groups (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  description text,
+  creator_id uuid not null references public.profiles(id),
+  cover_url text,
+  is_private boolean default false,
+  member_count integer default 0,
+  created_at timestamptz default now()
+);
+
+create table if not exists public.group_members (
+  group_id uuid not null references public.groups(id) on delete cascade,
+  profile_id uuid not null references public.profiles(id) on delete cascade,
+  role text default 'member',
+  joined_at timestamptz default now(),
+  primary key(group_id,profile_id)
+);
+
+alter table public.groups enable row level security;
+alter table public.group_members enable row level security;
+
+create or replace function private.is_group_member(p_group_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = pg_catalog, public
+as $$
+  select exists (
+    select 1 from public.group_members gm
+    where gm.group_id=p_group_id and gm.profile_id=auth.uid()
+  );
+$$;
+revoke all on function private.is_group_member(uuid) from public,anon,authenticated;
+grant execute on function private.is_group_member(uuid) to authenticated;
+
+drop policy if exists "Public can view public groups" on public.groups;
+create policy "Public can view public groups" on public.groups
+for select to anon using (is_private=false);
+
+drop policy if exists "Users can view accessible groups" on public.groups;
+create policy "Users can view accessible groups" on public.groups
+for select to authenticated
+using (is_private=false or creator_id=(select auth.uid()) or private.is_group_member(id));
+
+drop policy if exists "Members can view group membership" on public.group_members;
+create policy "Members can view group membership" on public.group_members
+for select to authenticated
+using (
+  private.is_group_member(group_id)
+  or exists (
+    select 1 from public.groups g
+    where g.id=group_members.group_id and g.creator_id=(select auth.uid())
+  )
+);
+
+revoke all on table public.groups from public,anon,authenticated;
+grant select on table public.groups to anon,authenticated;
+revoke all on table public.group_members from public,anon,authenticated;
+grant select on table public.group_members to authenticated;
 
 alter table public.pbos_conversations
   add column if not exists group_id uuid references public.groups(id) on delete cascade;
@@ -95,7 +157,6 @@ as $$
   );
 $$;
 
--- Existing RLS evaluation uses this helper.
 revoke all on function private.pbos_user_has_active_conversation_access(uuid,uuid) from public,anon,authenticated;
 grant execute on function private.pbos_user_has_active_conversation_access(uuid,uuid) to authenticated;
 
@@ -109,15 +170,9 @@ declare
   actor_id uuid := auth.uid();
   resolved_conversation_id uuid;
 begin
-  if actor_id is null then
-    raise exception 'Authentication required.' using errcode='42501';
-  end if;
-  if requested_group_id is null then
-    raise exception 'Group ID is required.' using errcode='22023';
-  end if;
-  if not exists (
-    select 1 from public.groups g where g.id=requested_group_id
-  ) then
+  if actor_id is null then raise exception 'Authentication required.' using errcode='42501'; end if;
+  if requested_group_id is null then raise exception 'Group ID is required.' using errcode='22023'; end if;
+  if not exists (select 1 from public.groups g where g.id=requested_group_id) then
     raise exception 'Group not found.' using errcode='P0002';
   end if;
   if not exists (
@@ -162,12 +217,9 @@ volatile
 security invoker
 set search_path=''
 as $$ select private.ensure_group_conversation(requested_group_id); $$;
-
 revoke all on function public.ensure_group_conversation(uuid) from public,anon;
 grant execute on function public.ensure_group_conversation(uuid) to authenticated;
 
--- Group messages use the same immutable message INSERT authority. Extend only the
--- conversation-context shape predicate; all other sender/blocked checks remain.
 drop policy if exists "Governed participants send messages" on public.pbos_messages;
 create policy "Governed participants send messages" on public.pbos_messages
 for insert to authenticated
@@ -189,8 +241,6 @@ with check (
   )
 );
 
--- Storage upload happens before attachment metadata exists. Add the group context
--- to the pre-metadata authority check while preserving support/network behavior.
 drop policy if exists "Current participants upload message attachments" on storage.objects;
 create policy "Current participants upload message attachments" on storage.objects
 for insert to authenticated
@@ -221,5 +271,9 @@ with check (
   )
 );
 
+comment on table public.groups is
+  'Canonical Playbook group record adopted from production-compatible legacy schema; Group Messaging consumes but does not manage membership.';
+comment on table public.group_members is
+  'Canonical Playbook group membership record used as Group Messaging access authority.';
 comment on function public.ensure_group_conversation(uuid) is
   'Returns or atomically creates the canonical PBOS Messaging conversation for an existing group member.';
