@@ -45,7 +45,18 @@ Feed media cleanup is limited to owner namespaced objects:
 - `photos/<auth.uid()>/feed/...`
 - `feed-videos/<auth.uid()>/feed/...`
 
-No broad Storage delete permission is introduced. Gallery media is not deleted by Feed post deletion unless the canonical post itself references a Feed-namespaced object.
+The already-certified public media Storage policy surface must remain unchanged: authenticated clients do not receive Storage UPDATE or DELETE policies.
+
+After the owner-only canonical delete succeeds, the authenticated API may invoke a narrow server-only privileged cleanup utility. That utility:
+
+- obtains the service-role credential only on the server
+- accepts only the `photos` or `feed-videos` bucket
+- refuses any path outside `<authenticated-owner>/feed/...`
+- removes only the returned media reference for the deleted canonical post
+
+The service-role credential must not appear in the user-facing API route itself.
+
+Gallery media is not deleted by Feed post deletion unless the canonical post itself references a Feed-namespaced object.
 
 Database deletion remains authoritative even if Storage cleanup reports a secondary failure. The API must surface that cleanup failure explicitly rather than claiming complete media cleanup.
 
@@ -93,4 +104,4 @@ The API response must distinguish canonical deletion success from media-cleanup 
 
 Edit Post is complete when an authenticated owner can update body/category through the governed lifecycle while another user cannot and direct table UPDATE remains unavailable.
 
-Delete Post is complete when an authenticated owner can delete the canonical post through the governed lifecycle, dependent rows cascade correctly, owner-scoped Feed media cleanup is authorized and attempted, another user cannot delete the post, and direct table DELETE remains unavailable.
+Delete Post is complete when an authenticated owner can delete the canonical post through the governed lifecycle, dependent rows cascade correctly, owner-scoped Feed media cleanup is attempted through the narrow server boundary without widening client Storage permissions, another user cannot delete the post, and direct table DELETE remains unavailable.
