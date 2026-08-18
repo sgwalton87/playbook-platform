@@ -26,6 +26,20 @@ describe("canonical learning and economy convergence", () => {
     expect(migration).toContain("achievement_badges");
   });
 
+  it("keeps Course Library progress scoped to required canonical modules", () => {
+    const catalogRoute = read("app/api/learning/courses/route.ts");
+    expect(catalogRoute).toContain("const completedKeys = progressByCourse.get(course.slug)");
+    expect(catalogRoute).toContain("required.filter((module) => completedKeys.has(module.module_key)).length");
+    expect(catalogRoute).not.toContain("const completed = progressByCourse.get(course.slug)?.size || 0");
+  });
+
+  it("fails closed when an unpublished course slug is requested as active learning", () => {
+    const detailRoute = read("app/api/learning/courses/[slug]/route.ts");
+    expect(detailRoute).toContain('.eq("status", "published")');
+    expect(detailRoute).toContain('"Published course not found."');
+    expect(detailRoute).toContain("filter((module) => module.required)");
+  });
+
   it("replaces editable profile badge arrays with governed achievement evidence", () => {
     const badges = read("app/badges/page.tsx");
     expect(badges).toContain('.from("achievement_badges")');
