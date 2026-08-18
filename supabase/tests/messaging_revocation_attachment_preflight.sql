@@ -95,23 +95,50 @@ where schemaname='public' and tablename='pbos_conversation_participants'
   \quit 1
 \endif
 
-select count(*) = 3 as message_active_guard_count
+-- Message rows expose only read and insert through RLS. Post-insert state transitions
+-- are handled by narrow governed RPCs so recipients cannot rewrite another sender's row.
+select count(*) = 2 as message_active_guard_count
 from pg_policies
 where schemaname='public' and tablename='pbos_messages'
   and policyname in (
     'Governed participants view messages',
-    'Governed participants send messages',
-    'Governed participants update messages'
+    'Governed participants send messages'
   )
   and coalesce(qual, with_check, '') ilike '%pbos_user_has_active_conversation_access%' \gset
 \if :message_active_guard_count
 \else
-  \echo 'one or more message policies do not enforce current relationship authority'
+  \echo 'message read/send policies do not enforce current relationship authority'
+  \quit 1
+\endif
+
+select count(*) = 0 as broad_message_update_policy_absent
+from pg_policies
+where schemaname='public' and tablename='pbos_messages' and cmd in ('UPDATE','ALL') \gset
+\if :broad_message_update_policy_absent
+\else
+  \echo 'pbos_messages must not expose generic client UPDATE RLS'
+  \quit 1
+\endif
+
+select not has_table_privilege('authenticated','public.pbos_messages','UPDATE') as auth_message_update_absent \gset
+\if :auth_message_update_absent
+\else
+  \echo 'authenticated must not have generic pbos_messages UPDATE privilege'
+  \quit 1
+\endif
+
+select not has_table_privilege('anon','public.pbos_messages','SELECT')
+   and not has_table_privilege('anon','public.pbos_messages','INSERT')
+   and not has_table_privilege('anon','public.pbos_messages','UPDATE')
+   and not has_table_privilege('anon','public.pbos_messages','DELETE') as anon_message_grants_absent \gset
+\if :anon_message_grants_absent
+\else
+  \echo 'anonymous roles must have no governed message table privileges'
   \quit 1
 \endif
 
 -- Supabase lint 0003: all governed Messaging policies cache stable auth.uid().
-select count(*) = 12 as public_messaging_uid_initplans
+select count(*) = 11 as public_messaging_uid_initplans
 from pg_policies
 where schemaname='public'
   and tablename in ('pbos_conversations','pbos_conversation_participants','pbos_messages','pbos_message_attachments')
