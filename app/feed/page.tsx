@@ -98,6 +98,9 @@ export default function FeedPage() {
   const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>({});
   const [editingComment, setEditingComment] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState("");
+  const [editingPost, setEditingPost] = useState<string | null>(null);
+  const [postEditBody, setPostEditBody] = useState("");
+  const [postEditCategory, setPostEditCategory] = useState<Category>("Community");
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
   const [message, setMessage] = useState("Loading published Playbook stories…");
@@ -134,7 +137,6 @@ export default function FeedPage() {
     const rows = postsResult.data || [];
     const postIds = rows.map((post) => post.id);
     const identityIds = [...new Set(rows.map((post) => post.user_id).filter(Boolean))].slice(0, 100);
-
     const [identityResult, reactionResult, commentResult] = await Promise.all([
       identityIds.length ? supabase.rpc("get_public_member_identities", { requested_ids: identityIds }) : Promise.resolve({ data: [] as PublicIdentity[], error: null }),
       postIds.length ? supabase.from("feed_post_reactions").select("id,post_id,user_id,reaction").in("post_id", postIds) : Promise.resolve({ data: [], error: null }),
@@ -243,10 +245,7 @@ export default function FeedPage() {
       if (fileRef.current) fileRef.current.value = "";
       return;
     }
-    if (!file) {
-      clearPendingMedia();
-      return;
-    }
+    if (!file) return clearPendingMedia();
     const kind = detectMediaKind(file);
     if (!kind) {
       setError("Choose a JPEG, PNG, WebP, MP4, WebM, or QuickTime file.");
@@ -292,8 +291,7 @@ export default function FeedPage() {
       setError("Only me stories cannot attach public-bucket media.");
       return;
     }
-    setBusy("publish");
-    setError("");
+    setBusy("publish"); setError("");
     try {
       const isVideo = visibility === "public" && pendingFile && pendingMediaKind === "video";
       const imageUrl = visibility === "public" && pendingFile && pendingMediaKind === "image" ? await uploadPhoto(pendingFile, "feed") : null;
@@ -309,17 +307,11 @@ export default function FeedPage() {
       });
       if (result.error) throw new Error(result.error.message);
       const publishedVisibility = visibility;
-      setBody("");
-      clearPendingMedia();
-      setCategory("Community");
-      setVisibility("public");
+      setBody(""); clearPendingMedia(); setCategory("Community"); setVisibility("public");
       await load();
       setMessage(publishedVisibility === "private" ? "Story saved to your private timeline." : (isVideo ? "Video story published to the public Playbook feed." : "Story published to the public Playbook feed."));
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Story could not be published.");
-    } finally {
-      setBusy(null);
-    }
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "Story could not be published."); }
+    finally { setBusy(null); }
   }
 
   async function uploadGallery(file?: File) {
@@ -348,8 +340,7 @@ export default function FeedPage() {
   async function sharePost(post: FeedPost) {
     if (post.visibility !== "public") return;
     const busyKey = `share:${post.id}`;
-    setBusy(busyKey);
-    setError("");
+    setBusy(busyKey); setError("");
     const url = `${window.location.origin}/story/${post.id}`;
     let channel: "native" | "copy_link" | null = null;
     try {
@@ -365,20 +356,62 @@ export default function FeedPage() {
         await navigator.clipboard.writeText(url);
         channel = "copy_link";
       }
-
-      const response = await fetch("/api/social/shares", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ postId: post.id, channel }),
-      });
+      const response = await fetch("/api/social/shares", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ postId: post.id, channel }) });
       const result = await response.json() as { error?: string };
       if (!response.ok) throw new Error(result.error || "Share completed, but Playbook could not record it.");
       setMessage(channel === "native" ? "Story shared." : "Story link copied.");
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Story could not be shared.");
-    } finally {
-      setBusy(null);
-    }
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "Story could not be shared."); }
+    finally { setBusy(null); }
+  }
+
+  function beginPostEdit(post: FeedPost) {
+    setEditingPost(post.id);
+    setPostEditBody(post.body);
+    setPostEditCategory(post.category);
+    setError("");
+  }
+
+  function cancelPostEdit() {
+    setEditingPost(null);
+    setPostEditBody("");
+    setPostEditCategory("Community");
+  }
+
+  async function savePostEdit(post: FeedPost) {
+    if (post.userId !== userId) return;
+    const busyKey = `edit:${post.id}`;
+    setBusy(busyKey); setError("");
+    try {
+      const response = await fetch("/api/social/posts", {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ postId: post.id, body: postEditBody, category: postEditCategory.toLowerCase() }),
+      });
+      const result = await response.json() as { error?: string };
+      if (!response.ok) throw new Error(result.error || "Story edit failed.");
+      cancelPostEdit();
+      await load();
+      setMessage("Story updated.");
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "Story edit failed."); }
+    finally { setBusy(null); }
+  }
+
+  async function deletePost(post: FeedPost) {
+    if (post.userId !== userId) return;
+    const confirmed = window.confirm("Delete this story permanently? Comments, reactions, and share records tied to it will also be removed.");
+    if (!confirmed) return;
+    const busyKey = `delete:${post.id}`;
+    setBusy(busyKey); setError("");
+    try {
+      const response = await fetch("/api/social/posts", { method: "DELETE", headers: { "content-type": "application/json" }, body: JSON.stringify({ postId: post.id }) });
+      const result = await response.json() as { error?: string; warning?: string | null };
+      if (!response.ok) throw new Error(result.error || "Story delete failed.");
+      if (editingPost === post.id) cancelPostEdit();
+      await load();
+      if (result.warning) setError(result.warning);
+      else setMessage("Story deleted.");
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "Story delete failed."); }
+    finally { setBusy(null); }
   }
 
   async function addComment(postId: string) {
@@ -477,14 +510,32 @@ export default function FeedPage() {
                     <div style={avatar}>{post.avatarUrl ? <Image unoptimized width={48} height={48} src={post.avatarUrl} alt="" style={avatarImage} /> : post.author.slice(0, 1).toUpperCase()}</div>
                     <div><strong style={{ color: "#0F172A" }}>{post.author}</strong>{post.username && <div><Link href={`/u/${post.username}`} style={profileLink}>@{post.username}</Link></div>}<small style={meta}>{new Date(post.createdAt).toLocaleString()}</small></div>
                   </div>
-                  <p style={postBody}>{post.body}</p>
+
+                  {editingPost === post.id ? (
+                    <div style={postEditBox}>
+                      <textarea value={postEditBody} onChange={(event) => setPostEditBody(event.target.value)} maxLength={4000} aria-label="Edit story text" style={composer} />
+                      <div style={actions}>
+                        <select value={postEditCategory} onChange={(event) => setPostEditCategory(event.target.value as Category)} aria-label="Edit story category" style={select}>
+                          {CATEGORIES.filter((value) => value !== "All").map((value) => <option key={value}>{value}</option>)}
+                        </select>
+                        <button onClick={() => void savePostEdit(post)} disabled={busy === `edit:${post.id}`} style={primaryButton}>{busy === `edit:${post.id}` ? "Saving…" : "Save changes"}</button>
+                        <button onClick={cancelPostEdit} disabled={busy === `edit:${post.id}`} style={secondaryButton}>Cancel</button>
+                      </div>
+                      <p style={privacyNote}>Edit changes story text and category only. Existing visibility and media stay unchanged.</p>
+                    </div>
+                  ) : <p style={postBody}>{post.body}</p>}
+
                   {post.imageUrl && <div style={postMedia}><Image unoptimized fill src={post.imageUrl} alt="Published story media" style={{ objectFit: "cover" }} /></div>}
                   {post.mediaType === "video" && post.mediaUrl && <video controls preload="metadata" src={post.mediaUrl} aria-label="Published Playbook story video" style={publishedVideo} />}
+
                   <div style={actions}>
                     <button disabled={busy === post.id} onClick={() => void toggleLike(post)} style={post.liked ? likedButton : secondaryButton}>{post.liked ? "♥" : "♡"} {post.likes}</button>
                     <PlaybookPill>{post.comments.length} comments</PlaybookPill>
                     {post.visibility === "public" && <button disabled={busy === `share:${post.id}`} onClick={() => void sharePost(post)} style={secondaryButton}>{busy === `share:${post.id}` ? "Sharing…" : "Share"}</button>}
+                    {post.userId === userId && editingPost !== post.id && <button onClick={() => beginPostEdit(post)} disabled={busy !== null} style={textButton}>Edit post</button>}
+                    {post.userId === userId && <button onClick={() => void deletePost(post)} disabled={busy === `delete:${post.id}`} style={dangerButton}>{busy === `delete:${post.id}` ? "Deleting…" : "Delete post"}</button>}
                   </div>
+
                   <div style={comments}>
                     {post.comments.map((comment) => <article key={comment.id} style={commentCard}>
                       <strong>{comment.author}</strong>
@@ -528,6 +579,7 @@ const avatarImage: React.CSSProperties = { width: 48, height: 48, objectFit: "co
 const profileLink: React.CSSProperties = { color: "#EA580C", textDecoration: "none", fontWeight: 850, fontSize: 12 };
 const meta: React.CSSProperties = { color: "#94A3B8" };
 const postBody: React.CSSProperties = { color: "#334155", lineHeight: 1.65, whiteSpace: "pre-wrap" };
+const postEditBox: React.CSSProperties = { margin: "10px 0 4px", padding: 12, borderRadius: 14, border: "1px solid #CBD5E1", background: "#F8FAFC" };
 const postMedia: React.CSSProperties = { position: "relative", minHeight: 260, borderRadius: 18, overflow: "hidden", margin: "14px 0", background: "#E2E8F0" };
 const publishedVideo: React.CSSProperties = { width: "100%", maxHeight: 520, borderRadius: 18, margin: "14px 0", background: "#0F172A" };
 const actions: React.CSSProperties = { display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginTop: 10 };
@@ -536,6 +588,7 @@ const primaryButton: React.CSSProperties = { ...baseButton, border: 0, backgroun
 const secondaryButton: React.CSSProperties = { ...baseButton, border: "1px solid #CBD5E1", background: "#FFFFFF", color: "#0F172A" };
 const likedButton: React.CSSProperties = { ...secondaryButton, borderColor: "#FDBA74", background: "#FFF7ED", color: "#C2410C" };
 const textButton: React.CSSProperties = { border: 0, background: "transparent", color: "#EA580C", fontWeight: 850, cursor: "pointer", padding: 0 };
+const dangerButton: React.CSSProperties = { ...baseButton, border: "1px solid #FCA5A5", background: "#FFF1F2", color: "#B91C1C" };
 const comments: React.CSSProperties = { marginTop: 16, paddingTop: 12, borderTop: "1px solid #E2E8F0" };
 const commentCard: React.CSSProperties = { marginBottom: 10, padding: 12, borderRadius: 12, background: "#F8FAFC", color: "#0F172A" };
 const commentText: React.CSSProperties = { margin: "6px 0 0", color: "#475569", lineHeight: 1.5 };
