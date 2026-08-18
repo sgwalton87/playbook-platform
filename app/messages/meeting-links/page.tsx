@@ -14,6 +14,9 @@ type Conversation = {
 };
 type ConversationResponse = { conversations?: Conversation[]; error?: string };
 
+const MAX_MESSAGE_BODY = 2000;
+const MAX_LINK_LABEL = 120;
+
 function peerName(peer?: Peer | null) {
   return peer?.full_name || [peer?.first_name, peer?.last_name].filter(Boolean).join(" ") || peer?.username || "Network connection";
 }
@@ -79,6 +82,7 @@ export default function MeetingLinksPage() {
       const url = normalizeMeetingUrl(meetingUrl);
       const safeLabel = label.trim() || "Join meeting";
       const body = `${safeLabel}\n${url}`;
+      if (body.length > MAX_MESSAGE_BODY) throw new Error("Meeting link is too long to send as a Playbook message.");
       const endpoint = selected.conversation_kind === "network"
         ? "/api/network/messages"
         : selected.conversation_kind === "group"
@@ -119,9 +123,9 @@ export default function MeetingLinksPage() {
           {conversations.map(conversation => <option key={conversation.id} value={conversation.id}>{conversationLabel(conversation)}</option>)}
         </select>
         <label htmlFor="meeting-label"><strong>Link label</strong></label>
-        <input id="meeting-label" value={label} onChange={event => setLabel(event.target.value)} maxLength={120} disabled={sending} />
+        <input id="meeting-label" value={label} onChange={event => setLabel(event.target.value)} maxLength={MAX_LINK_LABEL} disabled={sending} />
         <label htmlFor="meeting-url"><strong>Meeting URL</strong></label>
-        <input id="meeting-url" type="url" inputMode="url" placeholder="https://…" value={meetingUrl} onChange={event => setMeetingUrl(event.target.value)} maxLength={2048} disabled={sending} required />
+        <input id="meeting-url" type="url" inputMode="url" placeholder="https://…" value={meetingUrl} onChange={event => setMeetingUrl(event.target.value)} maxLength={MAX_MESSAGE_BODY - MAX_LINK_LABEL - 1} disabled={sending} required />
         <p style={{ margin: 0, color: "#475569" }}>Only HTTPS links are accepted. Normal conversation permissions, blocks, group membership, delivery provenance, notifications, and read receipts remain enforced by the existing Messaging service.</p>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           <button type="submit" disabled={!selected || !meetingUrl.trim() || sending}>{sending ? "Sharing…" : "Share meeting link"}</button>
