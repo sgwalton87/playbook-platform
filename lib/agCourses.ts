@@ -15,7 +15,7 @@ export const AG_SUBJECT_NAMES: Record<string, string> = {
   D: "Laboratory Science",
   E: "Language Other Than English",
   F: "Visual & Performing Arts",
-  G: "College-Prep Elective",
+  G: "College-Preparatory Elective",
 };
 
 export const AG_REQUIREMENTS: Record<string, number> = {
