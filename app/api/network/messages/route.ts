@@ -48,6 +48,23 @@ async function loadConversation(supabase: RequestSupabase, userId: string, conve
   return { ...conversation.data, peerId, peer, participant: membership, unreadCount: unread, messages: thread };
 }
 
+export async function GET() {
+  try {
+    const { supabase, user } = await requireUser();
+    if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    const visible = await supabase.from("pbos_conversations")
+      .select("id")
+      .eq("conversation_kind", "network")
+      .eq("status", "ACTIVE")
+      .order("updated_at", { ascending: false });
+    if (visible.error) throw new Error(visible.error.message);
+    const loaded = await Promise.all((visible.data ?? []).map(item => loadConversation(supabase, user.id, String(item.id))));
+    return NextResponse.json({ conversations: loaded.filter(Boolean) });
+  } catch (error) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Network inbox could not be loaded." }, { status: 500 });
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { supabase, user } = await requireUser();
