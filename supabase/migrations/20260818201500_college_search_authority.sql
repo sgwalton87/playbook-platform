@@ -33,4 +33,4 @@ revoke insert, update, delete, truncate, references, trigger on public.colleges 
 grant select on public.colleges to anon, authenticated;
 
 create unique index if not exists college_list_user_name_unique
-  on public.college_list(user_id, lower(college_name));
+  on public.college_list(user_id, college_name);
