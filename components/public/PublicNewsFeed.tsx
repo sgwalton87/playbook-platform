@@ -2,8 +2,22 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { FEED_PAGE_SIZE, appendUniqueFeedRows, chunkFeedIds, cursorFromLast, type FeedCursor } from "@/lib/feed/pagination";
 import { supabase } from "@/lib/supabaseClient";
+
+type RawPublicPost = {
+  id: string;
+  user_id: string;
+  title: string | null;
+  body: string | null;
+  image_url: string | null;
+  media_url: string | null;
+  media_type: string | null;
+  created_at: string;
+  post_type: string | null;
+  visibility: string | null;
+};
 
 type PublicPost = {
   id: string;
@@ -30,104 +44,139 @@ type PublicIdentity = {
 
 const CANONICAL_CATEGORIES = new Set(["leadership", "finance", "civic", "sel", "college", "nil", "community"]);
 
+async function fetchPublicPage(cursor: FeedCursor | null) {
+  const result = await supabase.rpc("get_feed_page", {
+    p_cursor_created_at: cursor?.createdAt || null,
+    p_cursor_id: cursor?.id || null,
+    p_page_size: FEED_PAGE_SIZE,
+  });
+  if (result.error) throw new Error(result.error.message);
+  return (result.data || []) as RawPublicPost[];
+}
+
+async function hydratePublicRows(rows: RawPublicPost[]) {
+  const authors = new Map<string, { name: string; role: string }>();
+  for (const requestedIds of chunkFeedIds(rows.map((post) => post.user_id))) {
+    const identityResult = await supabase.rpc("get_public_member_identities", { requested_ids: requestedIds });
+    if (identityResult.error) throw new Error(identityResult.error.message);
+    for (const identity of (identityResult.data || []) as PublicIdentity[]) {
+      authors.set(identity.id, {
+        name: identity.full_name || [identity.first_name, identity.last_name].filter(Boolean).join(" ") || identity.username || "Playbook community member",
+        role: formatLabel(identity.role),
+      });
+    }
+  }
+
+  return rows.map((post): PublicPost => {
+    const author = authors.get(post.user_id) || { name: "Playbook community member", role: "Community" };
+    const normalizedType = String(post.post_type || "").trim().toLowerCase();
+    const video = post.media_type === "video";
+    return {
+      id: post.id,
+      title: post.title || null,
+      body: post.body || "",
+      imageUrl: video ? null : (post.image_url || post.media_url || null),
+      mediaUrl: video ? post.media_url : null,
+      mediaType: post.media_type || (post.image_url ? "image" : null),
+      createdAt: post.created_at,
+      author: author.name,
+      role: author.role,
+      category: CANONICAL_CATEGORIES.has(normalizedType) ? formatLabel(normalizedType) : null,
+    };
+  });
+}
+
 export default function PublicNewsFeed() {
+  const sentinelRef = useRef<HTMLDivElement>(null);
   const [posts, setPosts] = useState<PublicPost[]>([]);
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
 
-  useEffect(() => {
-    let active = true;
-    async function loadPublicPosts() {
-      const { data: rows, error } = await supabase
-        .from("feed_posts")
-        .select("id,user_id,title,body,image_url,media_url,media_type,created_at,post_type")
-        .eq("visibility", "public")
-        .order("created_at", { ascending: false })
-        .limit(30);
-
-      if (!active) return;
-      if (error) {
-        setState("error");
-        return;
-      }
-
-      const authorIds = [...new Set((rows || []).map((post) => post.user_id).filter(Boolean))].slice(0, 100);
-      const identityResult = authorIds.length
-        ? await supabase.rpc("get_public_member_identities", { requested_ids: authorIds })
-        : { data: [] as PublicIdentity[], error: null };
-
-      if (!active) return;
-      if (identityResult.error) {
-        setState("error");
-        return;
-      }
-
-      const authors = new Map(
-        ((identityResult.data || []) as PublicIdentity[]).map((identity) => [
-          identity.id,
-          {
-            name: identity.full_name || [identity.first_name, identity.last_name].filter(Boolean).join(" ") || identity.username || "Playbook community member",
-            role: formatLabel(identity.role),
-          },
-        ]),
-      );
-
-      setPosts((rows || []).map((post) => {
-        const author = authors.get(post.user_id) || { name: "Playbook community member", role: "Community" };
-        const normalizedType = String(post.post_type || "").trim().toLowerCase();
-        const video = post.media_type === "video";
-        return {
-          id: post.id,
-          title: post.title || null,
-          body: post.body || "",
-          imageUrl: video ? null : (post.image_url || post.media_url || null),
-          mediaUrl: video ? post.media_url : null,
-          mediaType: post.media_type || (post.image_url ? "image" : null),
-          createdAt: post.created_at,
-          author: author.name,
-          role: author.role,
-          category: CANONICAL_CATEGORIES.has(normalizedType) ? formatLabel(normalizedType) : null,
-        };
-      }));
+  const loadFirstPage = useCallback(async () => {
+    try {
+      const rows = await fetchPublicPage(null);
+      setPosts(await hydratePublicRows(rows));
+      setHasMore(rows.length === FEED_PAGE_SIZE);
       setState("ready");
+    } catch {
+      setState("error");
     }
-    void loadPublicPosts();
-    return () => { active = false; };
   }, []);
 
+  useEffect(() => {
+    const id = window.setTimeout(() => { void loadFirstPage(); }, 0);
+    return () => window.clearTimeout(id);
+  }, [loadFirstPage]);
+
+  const loadMore = useCallback(async () => {
+    if (!hasMore || loadingMore || posts.length === 0) return;
+    setLoadingMore(true);
+    try {
+      const cursor = cursorFromLast(posts);
+      if (!cursor) return;
+      const rows = await fetchPublicPage(cursor);
+      const hydrated = await hydratePublicRows(rows);
+      setPosts((current) => appendUniqueFeedRows(current, hydrated));
+      setHasMore(rows.length === FEED_PAGE_SIZE);
+    } catch {
+      setState("error");
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [hasMore, loadingMore, posts]);
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel || !hasMore || loadingMore || state !== "ready") return;
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) void loadMore();
+    }, { rootMargin: "320px 0px" });
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasMore, loadMore, loadingMore, state]);
+
   if (state === "loading") return <FeedState label="Loading published community stories…" />;
-  if (state === "error") return <FeedState label="The public feed is temporarily unavailable. No sample stories have been substituted." error />;
+  if (state === "error" && posts.length === 0) return <FeedState label="The public feed is temporarily unavailable. No sample stories have been substituted." error />;
   if (posts.length === 0) return <FeedState label="No community stories have been published yet. Sign in to build the first verified story." />;
 
   return (
-    <section style={grid} aria-label="Published Playbook community stories">
-      {posts.map((post) => (
-        <article key={post.id} style={card} data-testid="public-news-post">
-          {post.imageUrl && (
-            <div style={media}>
-              <Image unoptimized fill sizes="(max-width: 760px) 100vw, 50vw" src={post.imageUrl} alt="" style={{ objectFit: "cover" }} />
+    <>
+      <section style={grid} aria-label="Published Playbook community stories">
+        {posts.map((post) => (
+          <article key={post.id} style={card} data-testid="public-news-post">
+            {post.imageUrl && (
+              <div style={media}>
+                <Image unoptimized fill sizes="(max-width: 760px) 100vw, 50vw" src={post.imageUrl} alt="" style={{ objectFit: "cover" }} />
+              </div>
+            )}
+            {post.mediaType === "video" && post.mediaUrl && (
+              <video controls preload="metadata" src={post.mediaUrl} aria-label="Published Playbook story video" style={videoMedia} />
+            )}
+            <div style={cardBody}>
+              <div style={meta}>
+                <span>{post.category ? `${post.category} · ${post.role}` : post.role}</span>
+                <time dateTime={post.createdAt}>{formatDate(post.createdAt)}</time>
+              </div>
+              <h2 style={cardTitle}>{post.title || "From the Playbook community"}</h2>
+              <p style={copy}>{post.body}</p>
+              <div style={author}>Published by {post.author}</div>
             </div>
-          )}
-          {post.mediaType === "video" && post.mediaUrl && (
-            <video controls preload="metadata" src={post.mediaUrl} aria-label="Published Playbook story video" style={videoMedia} />
-          )}
-          <div style={cardBody}>
-            <div style={meta}>
-              <span>{post.category ? `${post.category} · ${post.role}` : post.role}</span>
-              <time dateTime={post.createdAt}>{formatDate(post.createdAt)}</time>
-            </div>
-            <h2 style={cardTitle}>{post.title || "From the Playbook community"}</h2>
-            <p style={copy}>{post.body}</p>
-            <div style={author}>Published by {post.author}</div>
-          </div>
-        </article>
-      ))}
-      <aside style={joinCard}>
-        <p style={eyebrow}>Your story belongs here</p>
-        <h2 style={joinTitle}>Build evidence. Share progress. Open the next door.</h2>
-        <p style={joinCopy}>Join The Playbook to publish updates, celebrate milestones, and connect your journey to opportunity.</p>
-        <Link href="/login?mode=signup" style={button}>Join The Playbook →</Link>
-      </aside>
-    </section>
+          </article>
+        ))}
+        <aside style={joinCard}>
+          <p style={eyebrow}>Your story belongs here</p>
+          <h2 style={joinTitle}>Build evidence. Share progress. Open the next door.</h2>
+          <p style={joinCopy}>Join The Playbook to publish updates, celebrate milestones, and connect your journey to opportunity.</p>
+          <Link href="/login?mode=signup" style={button}>Join The Playbook →</Link>
+        </aside>
+      </section>
+      <div ref={sentinelRef} aria-hidden="true" style={sentinel} />
+      <div role="status" aria-live="polite" style={paginationStatus}>
+        {loadingMore ? "Loading more community stories…" : hasMore ? "More stories will load as you continue." : "You reached the end of the public timeline."}
+      </div>
+      {state === "error" && posts.length > 0 && <div role="alert" style={inlineError}>More stories could not be loaded. The stories already shown remain available.</div>}
+    </>
   );
 }
 
@@ -169,3 +218,6 @@ const button: React.CSSProperties = { width: "fit-content", padding: "12px 17px"
 const stateCard: React.CSSProperties = { maxWidth: 1180, margin: "0 auto", padding: "clamp(36px,7vw,74px)", textAlign: "center", background: "rgba(255,255,255,.075)", border: "1px solid rgba(255,255,255,.14)", borderRadius: "30px 8px 30px 8px" };
 const stateMark: React.CSSProperties = { display: "block", color: "#FF7A2F", fontSize: 36 };
 const stateCopy: React.CSSProperties = { maxWidth: 680, margin: "20px auto 26px", color: "#C9D8E8", fontSize: 18, lineHeight: 1.65 };
+const sentinel: React.CSSProperties = { height: 1, maxWidth: 1180, margin: "0 auto" };
+const paginationStatus: React.CSSProperties = { maxWidth: 1180, margin: "18px auto 0", textAlign: "center", color: "#8FA7C1", fontSize: 13, fontWeight: 800 };
+const inlineError: React.CSSProperties = { maxWidth: 1180, margin: "12px auto 0", padding: 12, textAlign: "center", border: "1px solid rgba(255,140,140,.35)", borderRadius: 12, color: "#FFD3D3", background: "rgba(127,29,29,.2)" };

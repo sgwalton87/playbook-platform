@@ -2,9 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PlaybookCard, PlaybookGrid, PlaybookHero, PlaybookMetric, PlaybookMetrics, PlaybookPage, PlaybookPill } from "@/components/ui";
+import { FEED_PAGE_SIZE, appendUniqueFeedRows, chunkFeedIds, cursorFromLast, type FeedCursor } from "@/lib/feed/pagination";
 import { supabase } from "@/lib/supabaseClient";
 
 const CATEGORIES = ["All", "Leadership", "Finance", "Civic", "SEL", "College", "NIL", "Community"] as const;
@@ -29,6 +30,19 @@ type Comment = {
   body: string;
   created_at: string;
   author: string;
+};
+
+type RawFeedPost = {
+  id: string;
+  user_id: string;
+  post_type: string;
+  title: string | null;
+  body: string | null;
+  image_url: string | null;
+  media_url: string | null;
+  media_type: string | null;
+  created_at: string;
+  visibility: string | null;
 };
 
 type FeedPost = {
@@ -80,9 +94,95 @@ function detectMediaKind(file: File | null): PendingMediaKind {
   return null;
 }
 
+async function fetchFeedPage(cursor: FeedCursor | null) {
+  const result = await supabase.rpc("get_feed_page", {
+    p_cursor_created_at: cursor?.createdAt || null,
+    p_cursor_id: cursor?.id || null,
+    p_page_size: FEED_PAGE_SIZE,
+  });
+  if (result.error) throw new Error(result.error.message);
+  return (result.data || []) as RawFeedPost[];
+}
+
+async function resolveIdentities(ids: Array<string | null | undefined>) {
+  const identities = new Map<string, PublicIdentity>();
+  for (const requestedIds of chunkFeedIds(ids)) {
+    const result = await supabase.rpc("get_public_member_identities", { requested_ids: requestedIds });
+    if (result.error) throw new Error(result.error.message);
+    for (const identity of (result.data || []) as PublicIdentity[]) identities.set(identity.id, identity);
+  }
+  return identities;
+}
+
+async function hydrateFeedRows(rows: RawFeedPost[], viewerId: string, ownIdentity: PublicIdentity) {
+  if (rows.length === 0) return [] as FeedPost[];
+  const postIds = rows.map((post) => post.id);
+  const [reactionResult, commentResult] = await Promise.all([
+    supabase.from("feed_post_reactions").select("id,post_id,user_id,reaction").in("post_id", postIds),
+    supabase.from("feed_post_comments").select("id,post_id,user_id,body,created_at").in("post_id", postIds).order("created_at", { ascending: true }),
+  ]);
+  if (reactionResult.error) throw new Error(reactionResult.error.message);
+  if (commentResult.error) throw new Error(commentResult.error.message);
+
+  const comments = commentResult.data || [];
+  const identities = await resolveIdentities([
+    ...rows.map((post) => post.user_id),
+    ...comments.map((comment) => comment.user_id),
+  ]);
+  identities.set(viewerId, ownIdentity);
+
+  const reactionsByPost = new Map<string, { count: number; liked: boolean }>();
+  for (const reaction of reactionResult.data || []) {
+    const current = reactionsByPost.get(reaction.post_id) || { count: 0, liked: false };
+    current.count += 1;
+    if (reaction.user_id === viewerId && reaction.reaction === "like") current.liked = true;
+    reactionsByPost.set(reaction.post_id, current);
+  }
+
+  const commentsByPost = new Map<string, Comment[]>();
+  for (const comment of comments) {
+    const identity = identities.get(comment.user_id);
+    const normalized: Comment = {
+      id: comment.id,
+      post_id: comment.post_id,
+      user_id: comment.user_id,
+      body: comment.body,
+      created_at: comment.created_at,
+      author: identity ? displayName(identity) : "Playbook member",
+    };
+    commentsByPost.set(comment.post_id, [...(commentsByPost.get(comment.post_id) || []), normalized]);
+  }
+
+  return rows.map((post): FeedPost => {
+    const identity = identities.get(post.user_id);
+    const reaction = reactionsByPost.get(post.id) || { count: 0, liked: false };
+    const video = post.media_type === "video";
+    return {
+      id: post.id,
+      userId: post.user_id,
+      author: identity ? displayName(identity) : "Playbook member",
+      username: identity?.username || null,
+      avatarUrl: identity?.avatar_url || null,
+      role: label(identity?.role),
+      title: post.title || null,
+      body: post.body || "",
+      imageUrl: video ? null : (post.image_url || post.media_url || null),
+      mediaUrl: video ? post.media_url : null,
+      mediaType: post.media_type || (post.image_url ? "image" : null),
+      visibility: post.visibility === "private" ? "private" : "public",
+      createdAt: post.created_at,
+      category: categoryFromPostType(post.post_type),
+      likes: reaction.count,
+      liked: reaction.liked,
+      comments: commentsByPost.get(post.id) || [],
+    };
+  });
+}
+
 export default function FeedPage() {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
+  const feedSentinelRef = useRef<HTMLDivElement>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [userIdentity, setUserIdentity] = useState<PublicIdentity | null>(null);
   const [posts, setPosts] = useState<FeedPost[]>([]);
@@ -102,12 +202,15 @@ export default function FeedPage() {
   const [postEditBody, setPostEditBody] = useState("");
   const [postEditCategory, setPostEditCategory] = useState<Category>("Community");
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
   const [message, setMessage] = useState("Loading published Playbook stories…");
   const [error, setError] = useState("");
 
-  async function load() {
+  const load = useCallback(async () => {
     setError("");
+    setLoading(true);
     const { data: authData } = await supabase.auth.getUser();
     const user = authData.user;
     if (!user) {
@@ -116,12 +219,11 @@ export default function FeedPage() {
     }
     setUserId(user.id);
 
-    const [profileResult, postsResult] = await Promise.all([
+    const [profileResult, rows] = await Promise.all([
       supabase.from("profiles").select("id,username,full_name,first_name,last_name,role,avatar_url").eq("id", user.id).single(),
-      supabase.from("feed_posts").select("id,user_id,post_type,title,body,image_url,media_url,media_type,created_at,visibility").or(`visibility.eq.public,user_id.eq.${user.id}`).order("created_at", { ascending: false }).limit(50),
+      fetchFeedPage(null),
     ]);
     if (profileResult.error) throw new Error(profileResult.error.message);
-    if (postsResult.error) throw new Error(postsResult.error.message);
 
     const ownIdentity: PublicIdentity = {
       id: profileResult.data.id,
@@ -134,75 +236,9 @@ export default function FeedPage() {
     };
     setUserIdentity(ownIdentity);
 
-    const rows = postsResult.data || [];
-    const postIds = rows.map((post) => post.id);
-    const identityIds = [...new Set(rows.map((post) => post.user_id).filter(Boolean))].slice(0, 100);
-    const [identityResult, reactionResult, commentResult] = await Promise.all([
-      identityIds.length ? supabase.rpc("get_public_member_identities", { requested_ids: identityIds }) : Promise.resolve({ data: [] as PublicIdentity[], error: null }),
-      postIds.length ? supabase.from("feed_post_reactions").select("id,post_id,user_id,reaction").in("post_id", postIds) : Promise.resolve({ data: [], error: null }),
-      postIds.length ? supabase.from("feed_post_comments").select("id,post_id,user_id,body,created_at").in("post_id", postIds).order("created_at", { ascending: true }) : Promise.resolve({ data: [], error: null }),
-    ]);
-    if (identityResult.error) throw new Error(identityResult.error.message);
-    if (reactionResult.error) throw new Error(reactionResult.error.message);
-    if (commentResult.error) throw new Error(commentResult.error.message);
-
-    const commentUserIds = [...new Set((commentResult.data || []).map((comment) => comment.user_id).filter(Boolean))].slice(0, 100);
-    const commentIdentityResult = commentUserIds.length
-      ? await supabase.rpc("get_public_member_identities", { requested_ids: commentUserIds })
-      : { data: [] as PublicIdentity[], error: null };
-    if (commentIdentityResult.error) throw new Error(commentIdentityResult.error.message);
-
-    const identities = new Map<string, PublicIdentity>();
-    for (const identity of (identityResult.data || []) as PublicIdentity[]) identities.set(identity.id, identity);
-    for (const identity of (commentIdentityResult.data || []) as PublicIdentity[]) identities.set(identity.id, identity);
-    identities.set(user.id, ownIdentity);
-
-    const reactionsByPost = new Map<string, { count: number; liked: boolean }>();
-    for (const reaction of reactionResult.data || []) {
-      const current = reactionsByPost.get(reaction.post_id) || { count: 0, liked: false };
-      current.count += 1;
-      if (reaction.user_id === user.id && reaction.reaction === "like") current.liked = true;
-      reactionsByPost.set(reaction.post_id, current);
-    }
-
-    const commentsByPost = new Map<string, Comment[]>();
-    for (const comment of commentResult.data || []) {
-      const identity = identities.get(comment.user_id);
-      const normalized: Comment = {
-        id: comment.id,
-        post_id: comment.post_id,
-        user_id: comment.user_id,
-        body: comment.body,
-        created_at: comment.created_at,
-        author: identity ? displayName(identity) : "Playbook member",
-      };
-      commentsByPost.set(comment.post_id, [...(commentsByPost.get(comment.post_id) || []), normalized]);
-    }
-
-    setPosts(rows.map((post): FeedPost => {
-      const identity = identities.get(post.user_id);
-      const reaction = reactionsByPost.get(post.id) || { count: 0, liked: false };
-      const video = post.media_type === "video";
-      return {
-        id: post.id,
-        userId: post.user_id,
-        author: identity ? displayName(identity) : "Playbook member",
-        username: identity?.username || null,
-        avatarUrl: identity?.avatar_url || null,
-        role: label(identity?.role),
-        title: post.title || null,
-        body: post.body || "",
-        imageUrl: video ? null : (post.image_url || post.media_url || null),
-        mediaUrl: video ? post.media_url : null,
-        mediaType: post.media_type || (post.image_url ? "image" : null),
-        visibility: post.visibility === "private" ? "private" : "public",
-        createdAt: post.created_at,
-        category: categoryFromPostType(post.post_type),
-        likes: reaction.count,
-        liked: reaction.liked,
-        comments: commentsByPost.get(post.id) || [],
-      };
-    }));
+    const hydrated = await hydrateFeedRows(rows, user.id, ownIdentity);
+    setPosts(hydrated);
+    setHasMore(rows.length === FEED_PAGE_SIZE);
 
     const prefix = `${user.id}/gallery`;
     const galleryResult = await supabase.storage.from("photos").list(prefix, { limit: 100, sortBy: { column: "created_at", order: "desc" } });
@@ -212,7 +248,7 @@ export default function FeedPage() {
 
     setMessage(rows.length ? "Your timeline is current." : "No stories yet. Publish the first one.");
     setLoading(false);
-  }
+  }, [router]);
 
   useEffect(() => {
     const id = window.setTimeout(() => { void load().catch((cause) => {
@@ -220,7 +256,36 @@ export default function FeedPage() {
       setLoading(false);
     }); }, 0);
     return () => window.clearTimeout(id);
-  }, []);
+  }, [load]);
+
+  const loadMore = useCallback(async () => {
+    if (!hasMore || loadingMore || !userId || !userIdentity || posts.length === 0) return;
+    setLoadingMore(true);
+    setError("");
+    try {
+      const cursor = cursorFromLast(posts);
+      if (!cursor) return;
+      const rows = await fetchFeedPage(cursor);
+      const hydrated = await hydrateFeedRows(rows, userId, userIdentity);
+      setPosts((current) => appendUniqueFeedRows(current, hydrated));
+      setHasMore(rows.length === FEED_PAGE_SIZE);
+      setMessage(rows.length ? "More stories loaded." : "You reached the end of the timeline.");
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "More stories could not be loaded.");
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [hasMore, loadingMore, posts, userId, userIdentity]);
+
+  useEffect(() => {
+    const sentinel = feedSentinelRef.current;
+    if (!sentinel || tab !== "feed" || !hasMore || loading || loadingMore) return;
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) void loadMore();
+    }, { rootMargin: "320px 0px" });
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasMore, loadMore, loading, loadingMore, tab]);
 
   function clearPendingMedia() {
     if (pendingPreview) URL.revokeObjectURL(pendingPreview);
@@ -553,6 +618,8 @@ export default function FeedPage() {
                 </PlaybookCard>
               ))}
             </PlaybookGrid>}
+          <div ref={feedSentinelRef} aria-hidden="true" style={sentinel} />
+          {!loading && posts.length > 0 && <div role="status" aria-live="polite" style={paginationStatus}>{loadingMore ? "Loading more stories…" : hasMore ? "More stories will load as you continue." : "You reached the end of the timeline."}</div>}
         </>
       )}
     </PlaybookPage>
@@ -596,4 +663,6 @@ const commentComposer: React.CSSProperties = { display: "flex", gap: 8, marginTo
 const commentInput: React.CSSProperties = { flex: 1, minWidth: 0, border: "1px solid #CBD5E1", borderRadius: 12, padding: "10px 12px", background: "#FFFFFF", color: "#0F172A" };
 const galleryGrid: React.CSSProperties = { maxWidth: 1180, margin: "18px auto", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 12 };
 const galleryTile: React.CSSProperties = { position: "relative", minHeight: 240, borderRadius: 20, overflow: "hidden", background: "#E2E8F0" };
+const sentinel: React.CSSProperties = { height: 1, maxWidth: 1180, margin: "0 auto" };
+const paginationStatus: React.CSSProperties = { maxWidth: 1180, margin: "18px auto 0", textAlign: "center", color: "#64748B", fontSize: 13, fontWeight: 750 };
 const copy: React.CSSProperties = { color: "#64748B", lineHeight: 1.6 };
