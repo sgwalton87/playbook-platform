@@ -26,6 +26,13 @@ describe("Messaging Meeting Links MVP", () => {
     expect(meetingPage).toContain("Meeting links must use HTTPS.");
   });
 
+  it("cannot exceed the canonical 2000-character Messaging body limit", () => {
+    expect(meetingPage).toContain("const MAX_MESSAGE_BODY = 2000");
+    expect(meetingPage).toContain("MAX_MESSAGE_BODY - MAX_LINK_LABEL - 1");
+    expect(meetingPage).toContain("if (body.length > MAX_MESSAGE_BODY)");
+    expect(meetingPage).toContain("Meeting link is too long to send as a Playbook message.");
+  });
+
   it("keeps existing governed delivery and user feedback", () => {
     expect(meetingPage).toContain("requestId: crypto.randomUUID()");
     expect(meetingPage).toContain('role="status"');
