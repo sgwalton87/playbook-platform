@@ -7,120 +7,20 @@ import { PlaybookPbosRuntimeClient } from "./pbos-runtime-client";
 class RecordingTransport implements PbosTransport {
     readonly requests: PbosRequest[] = [];
     constructor(private readonly deniedOperation?: string, private readonly legacyDuplicateIdentity = false) {}
-
     async send<T>(request: PbosRequest) {
         this.requests.push(request);
-        if (request.operation === "REGISTER_IDENTITY" && this.legacyDuplicateIdentity) return {
-            success: false as const,
-            apiVersion: "v1" as const,
-            correlationId: request.correlationId,
-            error: { code: "CONFLICT", message: `Identity mapping already registered: ${(request.payload as { mappingId: string }).mappingId}` }
-        };
-        if (request.operation === this.deniedOperation) return {
-            success: false as const,
-            apiVersion: "v1" as const,
-            correlationId: request.correlationId,
-            error: { code: "AUTHORITY_DENIED", message: "Governance approval denied." }
-        };
-        return {
-            success: true as const,
-            apiVersion: "v1" as const,
-            correlationId: request.correlationId,
-            output: {} as T,
-            provenance: ["PBOS-V1", request.operation]
-        };
+        if (request.operation === "REGISTER_IDENTITY" && this.legacyDuplicateIdentity) return { success: false as const, apiVersion: "v1" as const, correlationId: request.correlationId, error: { code: "CONFLICT", message: `Identity mapping already registered: ${(request.payload as { mappingId: string }).mappingId}` } };
+        if (request.operation === this.deniedOperation) return { success: false as const, apiVersion: "v1" as const, correlationId: request.correlationId, error: { code: "AUTHORITY_DENIED", message: "Governance approval denied." } };
+        return { success: true as const, apiVersion: "v1" as const, correlationId: request.correlationId, output: {} as T, provenance: ["PBOS-V1", request.operation] };
     }
 }
-
-const approvals = {
-    systemCertificationApprovalId: "PLAYBOOK-CERTIFICATION-APPROVAL-001",
-    certifiedBy: "PBOS-CERTIFICATION-AUTHORITY",
-    domainActivationApprovalIds: Object.fromEntries(PLAYBOOK_DOMAINS.map(domain => [domain, `${domain}-APPROVAL`]))
-};
-
+const approvals = { systemCertificationApprovalId: "PLAYBOOK-CERTIFICATION-APPROVAL-001", certifiedBy: "PBOS-CERTIFICATION-AUTHORITY", domainActivationApprovalIds: Object.fromEntries(PLAYBOOK_DOMAINS.map(domain => [domain, `${domain}-APPROVAL`])) };
 describe("PLAYBOOK-SYSTEM-001 connector", () => {
-    it("declares, registers, certifies, and activates all Playbook domains", async () => {
-        const transport = new RecordingTransport();
-        const connector = new PlaybookConnector(new PlaybookPbosRuntimeClient(transport));
-        await connector.activate(approvals);
-        expect(transport.requests[0].operation).toBe("REGISTER_SYSTEM");
-        expect(transport.requests.filter(request => request.operation === "ACTIVATE_DOMAIN")).toHaveLength(6);
-    });
-
-    it("maps Supabase identity with PBOS provenance before health communication", async () => {
-        const transport = new RecordingTransport();
-        const connector = new PlaybookConnector(new PlaybookPbosRuntimeClient(transport));
-        const identity = await connector.registerIdentity("supabase-user-001", "SCHOLAR");
-        expect(identity.pbosIdentity).toMatchObject({
-            actorId: "PLAYBOOK-ACTOR-supabase-user-001",
-            provenance: "supabase-user-001"
-        });
-        await connector.health(identity);
-        expect(transport.requests[0].idempotencyKey).toBe("playbook-map-supabase-user-001");
-        expect(transport.requests.at(-1)?.operation).toBe("HEALTH_CHECK");
-    });
-
-    it("resumes a governed identity after an exact legacy duplicate response", async () => {
-        const transport = new RecordingTransport(undefined, true);
-        const connector = new PlaybookConnector(new PlaybookPbosRuntimeClient(transport));
-        const identity = await connector.registerIdentity("supabase-user-001", "SCHOLAR");
-        expect(identity.mappingId).toBe("PLAYBOOK-IDENTITY-supabase-user-001");
-        expect(transport.requests[0].idempotencyKey).toBe("playbook-map-supabase-user-001");
-    });
-
-    it("fails closed when PBOS reports a non-legacy identity conflict", async () => {
-        const transport: PbosTransport = { async send<_T>(request: PbosRequest) {
-            return { success: false as const, apiVersion: "v1" as const, correlationId: request.correlationId,
-                error: { code: "CONFLICT", message: "Identity mapping already registered with different authority context." } };
-        } };
-        const connector = new PlaybookConnector(new PlaybookPbosRuntimeClient(transport));
-        await expect(connector.registerIdentity("supabase-user-001", "SCHOLAR"))
-            .rejects.toThrow("different authority context");
-    });
-
-    it("stops activation when PBOS denies certification", async () => {
-        const connector = new PlaybookConnector(new PlaybookPbosRuntimeClient(new RecordingTransport("CERTIFY_SYSTEM")));
-        await expect(connector.activate(approvals)).rejects.toThrow("AUTHORITY_DENIED");
-    });
-
-    it("discovers capabilities and sends the governed Scholar onboarding-to-dashboard transaction", async () => {
-        const transport = new RecordingTransport();
-        const connector = new PlaybookConnector(new PlaybookPbosRuntimeClient(transport));
-        const identity = await connector.registerIdentity("supabase-user-001", "SCHOLAR");
-
-        await connector.discoverCapabilities([
-            "READ_RUNTIME_HEALTH", "PUBLISH_LIFECYCLE_EVENT", "EXCHANGE_APPROVED_DATA"
-        ], "playbook-capabilities-001");
-        await connector.publishScholarOnboarding(identity, {
-            eventType: "SCHOLAR_ONBOARDING_COMPLETED",
-            schemaVersion: "1.0.0",
-            scholarRecordId: "scholar-record-001"
-        }, "playbook-onboarding-001");
-        await connector.projectScholarDashboard(identity, {
-            schemaVersion: "1.0.0",
-            scholarRecordId: "scholar-record-001",
-            sectionIds: ["identity", "goals"]
-        }, "PLAYBOOK-DASHBOARD-APPROVAL-001", "playbook-dashboard-001");
-
-        expect(transport.requests.slice(-3).map(request => request.operation)).toEqual([
-            "DISCOVER_CAPABILITIES", "PUBLISH_LIFECYCLE_EVENT", "EXCHANGE_APPROVED_DATA"
-        ]);
-        expect(transport.requests.at(-1)?.idempotencyKey).toBe("playbook-dashboard-001");
-        expect(transport.requests.at(-1)?.payload).toMatchObject({
-            dataClassification: "PRIVATE",
-            exchangeApprovalId: "PLAYBOOK-DASHBOARD-APPROVAL-001"
-        });
-    });
-
-    it("refuses dashboard projection without PBOS exchange approval", async () => {
-        const transport = new RecordingTransport();
-        const connector = new PlaybookConnector(new PlaybookPbosRuntimeClient(transport));
-        const identity = await connector.registerIdentity("supabase-user-001", "SCHOLAR");
-        await expect(connector.projectScholarDashboard(identity, {
-            schemaVersion: "1.0.0",
-            scholarRecordId: "scholar-record-001",
-            sectionIds: ["identity"]
-        }, "", "playbook-dashboard-denied-001")).rejects.toThrow("PBOS approval");
-        expect(transport.requests.some(request => request.operation === "EXCHANGE_APPROVED_DATA")).toBe(false);
-    });
+    it("declares, registers, certifies, and activates all Playbook domains", async () => { const transport = new RecordingTransport(); const connector = new PlaybookConnector(new PlaybookPbosRuntimeClient(transport)); await connector.activate(approvals); expect(transport.requests[0].operation).toBe("REGISTER_SYSTEM"); expect(transport.requests.filter(request => request.operation === "ACTIVATE_DOMAIN")).toHaveLength(6); });
+    it("maps Supabase identity with PBOS provenance before health communication", async () => { const transport = new RecordingTransport(); const connector = new PlaybookConnector(new PlaybookPbosRuntimeClient(transport)); const identity = await connector.registerIdentity("supabase-user-001", "SCHOLAR"); expect(identity.pbosIdentity).toMatchObject({ actorId: "PLAYBOOK-ACTOR-supabase-user-001", provenance: "supabase-user-001" }); await connector.health(identity); expect(transport.requests[0].idempotencyKey).toBe("playbook-map-supabase-user-001"); expect(transport.requests.at(-1)?.operation).toBe("HEALTH_CHECK"); });
+    it("resumes a governed identity after an exact legacy duplicate response", async () => { const transport = new RecordingTransport(undefined, true); const connector = new PlaybookConnector(new PlaybookPbosRuntimeClient(transport)); const identity = await connector.registerIdentity("supabase-user-001", "SCHOLAR"); expect(identity.mappingId).toBe("PLAYBOOK-IDENTITY-supabase-user-001"); expect(transport.requests[0].idempotencyKey).toBe("playbook-map-supabase-user-001"); });
+    it("fails closed when PBOS reports a non-legacy identity conflict", async () => { const transport: PbosTransport = { async send(request: PbosRequest) { return { success: false as const, apiVersion: "v1" as const, correlationId: request.correlationId, error: { code: "CONFLICT", message: "Identity mapping already registered with different authority context." } }; } }; const connector = new PlaybookConnector(new PlaybookPbosRuntimeClient(transport)); await expect(connector.registerIdentity("supabase-user-001", "SCHOLAR")).rejects.toThrow("different authority context"); });
+    it("stops activation when PBOS denies certification", async () => { const connector = new PlaybookConnector(new PlaybookPbosRuntimeClient(new RecordingTransport("CERTIFY_SYSTEM"))); await expect(connector.activate(approvals)).rejects.toThrow("AUTHORITY_DENIED"); });
+    it("discovers capabilities and sends the governed Scholar onboarding-to-dashboard transaction", async () => { const transport = new RecordingTransport(); const connector = new PlaybookConnector(new PlaybookPbosRuntimeClient(transport)); const identity = await connector.registerIdentity("supabase-user-001", "SCHOLAR"); await connector.discoverCapabilities(["READ_RUNTIME_HEALTH", "PUBLISH_LIFECYCLE_EVENT", "EXCHANGE_APPROVED_DATA"], "playbook-capabilities-001"); await connector.publishScholarOnboarding(identity, { eventType: "SCHOLAR_ONBOARDING_COMPLETED", schemaVersion: "1.0.0", scholarRecordId: "scholar-record-001" }, "playbook-onboarding-001"); await connector.projectScholarDashboard(identity, { schemaVersion: "1.0.0", scholarRecordId: "scholar-record-001", sectionIds: ["identity", "goals"] }, "PLAYBOOK-DASHBOARD-APPROVAL-001", "playbook-dashboard-001"); expect(transport.requests.slice(-3).map(request => request.operation)).toEqual(["DISCOVER_CAPABILITIES", "PUBLISH_LIFECYCLE_EVENT", "EXCHANGE_APPROVED_DATA"]); expect(transport.requests.at(-1)?.idempotencyKey).toBe("playbook-dashboard-001"); expect(transport.requests.at(-1)?.payload).toMatchObject({ dataClassification: "PRIVATE", exchangeApprovalId: "PLAYBOOK-DASHBOARD-APPROVAL-001" }); });
+    it("refuses dashboard projection without PBOS exchange approval", async () => { const transport = new RecordingTransport(); const connector = new PlaybookConnector(new PlaybookPbosRuntimeClient(transport)); const identity = await connector.registerIdentity("supabase-user-001", "SCHOLAR"); await expect(connector.projectScholarDashboard(identity, { schemaVersion: "1.0.0", scholarRecordId: "scholar-record-001", sectionIds: ["identity"] }, "", "playbook-dashboard-denied-001")).rejects.toThrow("PBOS approval"); expect(transport.requests.some(request => request.operation === "EXCHANGE_APPROVED_DATA")).toBe(false); });
 });
