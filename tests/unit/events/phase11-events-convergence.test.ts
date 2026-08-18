@@ -75,6 +75,7 @@ describe("Phase 11 Events canonical convergence", () => {
     const migration = read("supabase/migrations/202608160074_summit_event_type.sql");
     const adr = read("docs/architecture/ADR-0010_SUMMIT_EVENTS_SHARED_SERVICE.md");
     expect(migration).toContain("summit");
-    expect(adr).toContain("shared Events");
+    expect(adr).toContain("shared Event service");
+    expect(adr).toContain("community_events remains the Event owner");
   });
 });
