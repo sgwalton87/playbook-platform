@@ -109,19 +109,22 @@ begin
   if not denied then raise exception 'Cross-user delete was not denied'; end if;
 end $$;
 
--- Storage DELETE is limited to the authenticated owner's Feed namespace.
+-- Existing public Feed media Storage policy surfaces remain unchanged. Lifecycle
+-- cleanup is server-side and must not grant authenticated clients DELETE access.
 do $$
-declare
-  photo_policy text;
-  video_policy text;
 begin
-  select qual into photo_policy from pg_policies where schemaname='storage' and tablename='objects' and policyname='feed_photos_owner_delete' and cmd='DELETE';
-  select qual into video_policy from pg_policies where schemaname='storage' and tablename='objects' and policyname='feed_videos_owner_delete' and cmd='DELETE';
-  if photo_policy is null or position('photos' in photo_policy)=0 or position('feed' in photo_policy)=0 or position('auth.uid' in photo_policy)=0 then
-    raise exception 'Feed photo owner-delete policy is missing required boundary';
-  end if;
-  if video_policy is null or position('feed-videos' in video_policy)=0 or position('feed' in video_policy)=0 or position('auth.uid' in video_policy)=0 then
-    raise exception 'Feed video owner-delete policy is missing required boundary';
+  if exists (
+    select 1 from pg_policies
+    where schemaname='storage'
+      and tablename='objects'
+      and cmd in ('DELETE','UPDATE')
+      and (
+        coalesce(qual,'') like '%feed-videos%'
+        or coalesce(with_check,'') like '%feed-videos%'
+        or policyname like 'feed_%owner_delete%'
+      )
+  ) then
+    raise exception 'Feed Edit/Delete must not widen the existing public media Storage mutation policy surface';
   end if;
 end $$;
 
