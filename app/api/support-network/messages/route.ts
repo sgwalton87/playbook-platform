@@ -123,8 +123,10 @@ export async function POST(request: NextRequest) {
       } }, idempotencyKey, idempotencyKey);
     if (!response.success) throw new Error(response.error.message);
     const provenance = [...authority.provenance, identity.pbosIdentity.provenance, ...response.provenance];
-    const delivered = await supabase.from("pbos_messages").update({ delivery_state: "DELIVERED", provenance })
-      .eq("id", stagedMessage.id).eq("sender_id", user.id).select("id,conversation_id,sender_id,body,delivery_state,created_at").single();
+    const delivered = await supabase.rpc("finalize_governed_message_delivery", {
+      p_message_id: stagedMessage.id,
+      p_provenance: provenance,
+    });
     if (delivered.error || !delivered.data) throw new Error(delivered.error?.message ?? "Message delivery finalization failed.");
     return NextResponse.json({ conversation, message: { ...delivered.data, attachmentIds } }, { status: 201 });
   } catch (error) { return NextResponse.json({ error: error instanceof Error ? error.message : "Message delivery failed." }, { status: 500 }); }
@@ -149,9 +151,12 @@ export async function PATCH(request: NextRequest) {
     if (!participant.data) return NextResponse.json({ error: "Conversation membership required." }, { status: 403 });
     const now = new Date().toISOString();
     if (action === "REPORT") {
-      const updated = await supabase.from("pbos_messages").update({ reported_at: now, moderation_state: "REPORTED" })
-        .eq("id", String(body.messageId ?? "")).eq("conversation_id", conversationId).select("id").maybeSingle();
-      if (updated.error) throw new Error(updated.error.message); if (!updated.data) return NextResponse.json({ error: "Message not found." }, { status: 404 });
+      const reported = await supabase.rpc("report_governed_message", {
+        p_message_id: String(body.messageId ?? ""),
+        p_conversation_id: conversationId,
+      });
+      if (reported.error) throw new Error(reported.error.message);
+      if (!reported.data) return NextResponse.json({ error: "Message not found." }, { status: 404 });
     } else {
       const values = action === "READ" ? { last_read_at: now } : action === "MUTE" ? { muted_at: now } :
         action === "UNMUTE" ? { muted_at: null } : action === "BLOCK" ? { blocked_at: now } : { blocked_at: null };

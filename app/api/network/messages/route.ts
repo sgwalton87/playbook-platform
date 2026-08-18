@@ -94,8 +94,10 @@ export async function POST(request: NextRequest) {
       if ((bound.data ?? []).length !== attachmentIds.length) throw new Error("One or more attachments are missing, already sent, or no longer authorized.");
     }
     const provenance = await publishNetworkMessage(user.id, message.id, conversationId, requestId, attachmentIds);
-    const delivered = await supabase.from("pbos_messages").update({ delivery_state: "DELIVERED", provenance })
-      .eq("id", message.id).eq("sender_id", user.id).select("id").maybeSingle();
+    const delivered = await supabase.rpc("finalize_governed_message_delivery", {
+      p_message_id: message.id,
+      p_provenance: provenance,
+    });
     if (delivered.error || !delivered.data) throw new Error(delivered.error?.message ?? "Message delivery finalization failed.");
     return NextResponse.json({ conversation: await loadConversation(supabase, user.id, conversationId) }, { status: 201 });
   } catch (error) {
@@ -112,9 +114,12 @@ export async function PATCH(request: NextRequest) {
     if (!await loadConversation(supabase, user.id, conversationId)) return NextResponse.json({ error: "An active Network connection is required." }, { status: 403 });
     const now = new Date().toISOString();
     if (action === "REPORT") {
-      const updated = await supabase.from("pbos_messages").update({ reported_at: now, moderation_state: "REPORTED" })
-        .eq("id", String(body.messageId ?? "")).eq("conversation_id", conversationId).select("id").maybeSingle();
-      if (updated.error) throw new Error(updated.error.message); if (!updated.data) return NextResponse.json({ error: "Message not found." }, { status: 404 });
+      const reported = await supabase.rpc("report_governed_message", {
+        p_message_id: String(body.messageId ?? ""),
+        p_conversation_id: conversationId,
+      });
+      if (reported.error) throw new Error(reported.error.message);
+      if (!reported.data) return NextResponse.json({ error: "Message not found." }, { status: 404 });
     } else {
       const values = action === "READ" ? { last_read_at: now } : action === "MUTE" ? { muted_at: now } :
         action === "UNMUTE" ? { muted_at: null } : action === "BLOCK" ? { blocked_at: now } : { blocked_at: null };
