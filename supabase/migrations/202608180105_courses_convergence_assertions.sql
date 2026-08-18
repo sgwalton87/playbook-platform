@@ -1,6 +1,7 @@
 -- Release-blocking assertions for Phase 8 Courses convergence.
 -- Canonical authority must pass everywhere; legacy promotion assertions apply only
--- where historical course tables actually exist.
+-- where historical course tables actually exist. This file is the final exact-head
+-- database certification sentinel for the Phase 8 release.
 
 do $$
 declare
