@@ -20,27 +20,29 @@ describe("Phase 8 Courses 1-9",()=>{
   });
 
   it("preserves Leadership-quality objectives activities checkpoints and interactions on canonical Learning",()=>{
-    const migration=read("supabase/migrations/202608180102_courses_rich_curriculum_convergence.sql");
+    const authorityMigration=read("supabase/migrations/202608180102_courses_rich_curriculum_convergence.sql");
+    const legacyPromotion=read("supabase/migrations/202608180104_legacy_course_authority_retirement.sql");
     const detail=read("app/courses/[slug]/page.tsx");
-    expect(migration).toContain("learning_objectives");
-    expect(migration).toContain("activity");
-    expect(migration).toContain("knowledge_checkpoint");
-    expect(migration).toContain("interactions");
-    expect(migration).toContain("15-week-leadership-program");
+    expect(authorityMigration).toContain("learning_objectives");
+    expect(authorityMigration).toContain("activity");
+    expect(authorityMigration).toContain("knowledge_checkpoint");
+    expect(authorityMigration).toContain("interactions");
+    expect(legacyPromotion).toContain("15-week-leadership-program");
     expect(detail).toContain("Learning objectives");
     expect(detail).toContain("Interactive practice");
     expect(detail).toContain("Knowledge checkpoint");
   });
 
   it("keeps checkpoint answers private and completion server-gated",()=>{
-    const migration=read("supabase/migrations/202608180102_courses_rich_curriculum_convergence.sql");
+    const authorityMigration=read("supabase/migrations/202608180102_courses_rich_curriculum_convergence.sql");
+    const legacyPromotion=read("supabase/migrations/202608180104_legacy_course_authority_retirement.sql");
     const route=read("app/api/learning/courses/[slug]/route.ts");
-    expect(migration).toContain("private.learning_module_checkpoint_answers");
-    expect(migration).toContain("m.knowledge_checkpoint - 'correct_index'");
-    expect(migration).toContain("r.checkpoint_passed=true");
-    expect(migration).toContain("alter table public.learning_module_responses enable row level security");
-    expect(migration).toContain("revoke all on table public.learning_module_responses from public,anon,authenticated");
-    expect(migration).toContain("language sql\nsecurity invoker");
+    expect(authorityMigration).toContain("private.learning_module_checkpoint_answers");
+    expect(legacyPromotion).toContain("m.knowledge_checkpoint - 'correct_index'");
+    expect(authorityMigration).toContain("r.checkpoint_passed=true");
+    expect(authorityMigration).toContain("alter table public.learning_module_responses enable row level security");
+    expect(authorityMigration).toContain("revoke all on table public.learning_module_responses from public,anon,authenticated");
+    expect(authorityMigration).toContain("language sql\nsecurity invoker");
     expect(route).toContain('rpc("submit_learning_module_work"');
     expect(route).toContain('rpc("complete_learning_module"');
   });
