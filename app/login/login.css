@@ -50,6 +50,7 @@
 }
 
 .playbook-login-card input::placeholder { color: #8fa3b9; }
+#remember-me-help { color: #B8C8DA !important; }
 .playbook-login-card button:focus-visible,
 .playbook-login-card input:focus-visible,
 .playbook-login-card a:focus-visible { outline: 3px solid #ff8a50; outline-offset: 3px; }
