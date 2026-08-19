@@ -35,9 +35,7 @@ jobs:
           npm start > /tmp/playbook-next.log 2>&1 &
           echo $! > /tmp/playbook-next.pid
           for attempt in {1..60}; do
-            if curl --fail --silent http://127.0.0.1:3000/ > /dev/null; then
-              exit 0
-            fi
+            if curl --fail --silent http://127.0.0.1:3000/ > /dev/null; then exit 0; fi
             sleep 2
           done
           cat /tmp/playbook-next.log
@@ -64,29 +62,25 @@ jobs:
       PBOS_ACCEPTANCE_COMMIT: ${{ github.sha }}
     steps:
       - name: Publish role QA pending status
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: >-
-          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}"
-          -f state=pending
-          -f context=playbook/phase15-role-e2e
-          -f description="Trusted Scholar and Scholar-Athlete E2E is running"
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state=pending -f context=playbook/phase15-role-e2e -f description="stage:configuration"
+      - name: Require trusted acceptance configuration
+        id: configuration
+        run: |
+          missing=""
+          for name in NEXT_PUBLIC_SUPABASE_URL NEXT_PUBLIC_SUPABASE_ANON_KEY SUPABASE_SERVICE_ROLE_KEY PBOS_ACCEPTANCE_EMAIL PBOS_ACCEPTANCE_PASSWORD PBOS_ACCEPTANCE_ATHLETE_EMAIL PBOS_ACCEPTANCE_ATHLETE_PASSWORD; do
+            if [ -z "${!name}" ]; then missing="${missing} ${name}"; fi
+          done
+          if [ -n "$missing" ]; then echo "Missing required trusted acceptance configuration:$missing"; exit 1; fi
+      - name: Publish configuration-ready status
+        if: success()
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state=pending -f context=playbook/phase15-role-e2e -f description="stage:bootstrap"
       - name: Check out repository
         uses: actions/checkout@v5
       - name: Set up Node.js
         uses: actions/setup-node@v5
-        with:
-          node-version: 22
-          cache: npm
-      - name: Require trusted acceptance configuration
-        run: |
-          test -n "$NEXT_PUBLIC_SUPABASE_URL"
-          test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY"
-          test -n "$SUPABASE_SERVICE_ROLE_KEY"
-          test -n "$PBOS_ACCEPTANCE_EMAIL"
-          test -n "$PBOS_ACCEPTANCE_PASSWORD"
-          test -n "$PBOS_ACCEPTANCE_ATHLETE_EMAIL"
-          test -n "$PBOS_ACCEPTANCE_ATHLETE_PASSWORD"
+        with: { node-version: 22, cache: npm }
       - name: Install dependencies
         run: npm ci
       - name: Install Chromium
@@ -97,31 +91,29 @@ jobs:
         run: |
           npm start > /tmp/playbook-next.log 2>&1 &
           for attempt in {1..60}; do
-            if curl --fail --silent http://127.0.0.1:3000/login > /dev/null; then
-              exit 0
-            fi
+            if curl --fail --silent http://127.0.0.1:3000/login > /dev/null; then exit 0; fi
             sleep 2
           done
           cat /tmp/playbook-next.log
           exit 1
+      - name: Publish Scholar-running status
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state=pending -f context=playbook/phase15-role-e2e -f description="stage:scholar"
       - name: Run governed Scholar journey
         run: npx playwright test tests/acceptance/pbos-scholar.spec.ts --project=chromium
+      - name: Publish Scholar-Athlete-running status
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state=pending -f context=playbook/phase15-role-e2e -f description="stage:scholar-athlete"
       - name: Run governed Scholar-Athlete journey
         run: npx playwright test tests/acceptance/pbos-scholar-athlete.spec.ts --project=chromium
-      - name: Publish role QA final status
-        if: always()
-        env:
-          GH_TOKEN: ${{ github.token }}
-          JOB_STATUS: ${{ job.status }}
-        run: |
-          if [ "$JOB_STATUS" = "success" ]; then
-            STATE=success
-            DESCRIPTION="Trusted Scholar and Scholar-Athlete E2E passed"
-          else
-            STATE=failure
-            DESCRIPTION="Trusted Scholar and Scholar-Athlete E2E failed"
-          fi
-          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
-            -f state="$STATE" \
-            -f context=playbook/phase15-role-e2e \
-            -f description="$DESCRIPTION"
+      - name: Publish role QA success
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state=success -f context=playbook/phase15-role-e2e -f description="Scholar + Scholar-Athlete E2E passed"
+      - name: Publish configuration failure
+        if: failure() && steps.configuration.outcome == 'failure'
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state=failure -f context=playbook/phase15-role-e2e -f description="FAILED:trusted acceptance configuration"
+      - name: Publish non-configuration failure
+        if: failure() && steps.configuration.outcome != 'failure'
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state=failure -f context=playbook/phase15-role-e2e -f description="FAILED:bootstrap or role journey; inspect Actions"
