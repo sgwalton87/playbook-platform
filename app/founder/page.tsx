@@ -36,7 +36,8 @@ export default function FounderPage() {
           subtitle="A platform-operator workspace that composes PBOS, Studio, Analytics, Verification, Moderation, and release evidence without creating shadow sources of truth."
         >
           <div style={heroActions}>
-            <PlaybookButton href="/studio">Open Studio</PlaybookButton>
+            <PlaybookButton href="/founder/qa">Platform QA Gates</PlaybookButton>
+            <PlaybookButton href="/studio" variant="secondary">Open Studio</PlaybookButton>
             <PlaybookButton href="/studio/beta-34-audit" variant="secondary">Open Platform Audit</PlaybookButton>
             <PlaybookButton href="/admin" variant="secondary">Open Admin Center</PlaybookButton>
           </div>
