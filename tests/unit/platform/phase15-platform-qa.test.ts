@@ -50,6 +50,15 @@ describe("Phase 15 platform QA contract", () => {
     expect(workflow).toContain("PBOS_ACCEPTANCE_ATHLETE_EMAIL");
   });
 
+  it("publishes machine-readable trusted role QA status on the merge commit", () => {
+    const workflow = read(".github/workflows/platform-qa.yml");
+    expect(workflow).toContain("statuses: write");
+    expect(workflow).toContain("playbook/phase15-role-e2e");
+    expect(workflow).toContain("Publish role QA pending status");
+    expect(workflow).toContain("Publish role QA final status");
+    expect(workflow).toContain("if: always()");
+  });
+
   it("makes public browser QA a pull-request gate", () => {
     const workflow = read(".github/workflows/platform-qa.yml");
     expect(workflow).toContain("pull_request:");

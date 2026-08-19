@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: read
+  statuses: write
 
 jobs:
   public-browser-qa:
@@ -62,6 +63,14 @@ jobs:
       PBOS_ACCEPTANCE_ATHLETE_PASSWORD: ${{ secrets.PBOS_ACCEPTANCE_ATHLETE_PASSWORD }}
       PBOS_ACCEPTANCE_COMMIT: ${{ github.sha }}
     steps:
+      - name: Publish role QA pending status
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}"
+          -f state=pending
+          -f context=playbook/phase15-role-e2e
+          -f description="Trusted Scholar and Scholar-Athlete E2E is running"
       - name: Check out repository
         uses: actions/checkout@v5
       - name: Set up Node.js
@@ -99,3 +108,20 @@ jobs:
         run: npx playwright test tests/acceptance/pbos-scholar.spec.ts --project=chromium
       - name: Run governed Scholar-Athlete journey
         run: npx playwright test tests/acceptance/pbos-scholar-athlete.spec.ts --project=chromium
+      - name: Publish role QA final status
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          if [ "$JOB_STATUS" = "success" ]; then
+            STATE=success
+            DESCRIPTION="Trusted Scholar and Scholar-Athlete E2E passed"
+          else
+            STATE=failure
+            DESCRIPTION="Trusted Scholar and Scholar-Athlete E2E failed"
+          fi
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
+            -f state="$STATE" \
+            -f context=playbook/phase15-role-e2e \
+            -f description="$DESCRIPTION"
