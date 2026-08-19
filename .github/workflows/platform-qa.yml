@@ -53,13 +53,9 @@ jobs:
     timeout-minutes: 40
     env:
       PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
-      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      NEXT_PUBLIC_SUPABASE_URL: https://oexgxnybeixwadgtdtzp.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_9T3jZbZ_BNUMhkA2jeqxpA__UUAEOue
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      PBOS_ACCEPTANCE_EMAIL: ${{ secrets.PBOS_ACCEPTANCE_EMAIL }}
-      PBOS_ACCEPTANCE_PASSWORD: ${{ secrets.PBOS_ACCEPTANCE_PASSWORD }}
-      PBOS_ACCEPTANCE_ATHLETE_EMAIL: ${{ secrets.PBOS_ACCEPTANCE_ATHLETE_EMAIL }}
-      PBOS_ACCEPTANCE_ATHLETE_PASSWORD: ${{ secrets.PBOS_ACCEPTANCE_ATHLETE_PASSWORD }}
       PBOS_ACCEPTANCE_COMMIT: ${{ github.sha }}
     steps:
       - name: Publish role QA pending status
@@ -68,11 +64,10 @@ jobs:
       - name: Require trusted acceptance configuration
         id: configuration
         run: |
-          missing=""
-          for name in NEXT_PUBLIC_SUPABASE_URL NEXT_PUBLIC_SUPABASE_ANON_KEY SUPABASE_SERVICE_ROLE_KEY PBOS_ACCEPTANCE_EMAIL PBOS_ACCEPTANCE_PASSWORD PBOS_ACCEPTANCE_ATHLETE_EMAIL PBOS_ACCEPTANCE_ATHLETE_PASSWORD; do
-            if [ -z "${!name}" ]; then missing="${missing} ${name}"; fi
-          done
-          if [ -n "$missing" ]; then echo "Missing required trusted acceptance configuration:$missing"; exit 1; fi
+          if [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
+            echo "Missing required trusted acceptance configuration: SUPABASE_SERVICE_ROLE_KEY"
+            exit 1
+          fi
       - name: Publish configuration-ready status
         if: success()
         env: { GH_TOKEN: "${{ github.token }}" }
@@ -117,7 +112,7 @@ jobs:
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
           gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state=failure -f context=playbook/phase15-role-e2e -f description="FAILED:trusted acceptance configuration"
-          gh issue comment 234 --repo "$GITHUB_REPOSITORY" --body "Phase 15 trusted role E2E on ${GITHUB_SHA} FAILED at **configuration**. Required acceptance configuration is incomplete; no secret values are included in this report."
+          gh issue comment 234 --repo "$GITHUB_REPOSITORY" --body "Phase 15 trusted role E2E on ${GITHUB_SHA} FAILED at **configuration**. Missing secure repository secret: SUPABASE_SERVICE_ROLE_KEY. No secret value is included in this report."
       - name: Publish Scholar failure
         if: failure() && steps.configuration.outcome == 'success' && steps.scholar.outcome == 'failure'
         env: { GH_TOKEN: "${{ github.token }}" }
