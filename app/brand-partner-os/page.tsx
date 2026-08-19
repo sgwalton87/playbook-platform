@@ -18,6 +18,8 @@ const pathways = [
   { label: "Organization", title: "Maintain the verified organization", body: "Keep marketplace-facing organization context connected to the approved Brand Partner identity without rewriting verification evidence.", href: "/brand-partner-os/organization", action: "Organization Profile" },
   { label: "Campaigns", title: "Build inside approved campaign scope", body: "Create and refine campaign drafts using only campaign types already present in approved verification evidence.", href: "/brand-partner-os/campaigns", action: "Campaign Builder" },
   { label: "Opportunity Listings", title: "Create real opportunities for human review", body: "Draft internships, jobs, sponsorships, NIL opportunities, scholarships, and mentorship listings. Publication requires independent Playbook operator review.", href: "/brand-partner-os/opportunities", action: "Manage opportunity listings" },
+  { label: "Applicants", title: "Review only consented submissions", body: "See submitted applications only when a Scholar explicitly shares a narrow applicant projection. Consent remains revocable and does not expose the broader Scholar Record.", href: "/brand-partner-os/applicants", action: "Opportunity Applicants" },
+  { label: "Rewards", title: "Inherit the shared Rewards economy", body: "Marketplace outcomes may participate in Playbook's shared reward policy, but Brand Partners never mint XP, coins, badges, or certificates directly from campaign or applicant decisions.", href: "/reward-economy", action: "View shared Rewards" },
   { label: "Scholar Marketplace", title: "See the Scholar-facing catalog", body: "Review the same published catalog Scholars see, separated clearly from PBOS readiness guidance.", href: "/opportunities", action: "Open Scholar Marketplace" },
   { label: "Applications", title: "Use permissioned application workflows", body: "Application workspaces remain Scholar-owned. Publishing an opportunity does not grant automatic applicant or Scholar Record access.", href: "/application-workspaces", action: "Open workspaces" },
   { label: "Communication", title: "Coordinate with the right people", body: "Keep partner, scholar, guardian, and support-team decisions inside governed conversations.", href: "/messages", action: "Open messages" },
@@ -118,6 +120,7 @@ function BrandPartnerWorkspace() {
         >
           <div style={heroActions}>
             <PlaybookButton href="/brand-partner-os/opportunities">Opportunity Listings</PlaybookButton>
+            <PlaybookButton href="/brand-partner-os/applicants" variant="secondary">Applicants</PlaybookButton>
             <PlaybookButton href="/brand-partner-os/campaigns" variant="secondary">Campaign Builder</PlaybookButton>
             <PlaybookButton href="/brand-partner-os/organization" variant="secondary">Organization Profile</PlaybookButton>
           </div>
@@ -128,7 +131,7 @@ function BrandPartnerWorkspace() {
             <PlaybookPill>{state === "ready" ? "Verified operational partner" : state === "loading" ? "Connecting marketplace record" : "Marketplace record unavailable"}</PlaybookPill>
             <h2 style={identityTitle}>{organization}</h2>
           </div>
-          <p style={identityCopy}>{state === "error" ? (error || "Your marketplace record could not be loaded. No Scholar data is being displayed.") : "Organization verification, campaign planning, opportunity publication, applications, and consequential decisions remain separate governed records."}</p>
+          <p style={identityCopy}>{state === "error" ? (error || "Your marketplace record could not be loaded. No Scholar data is being displayed.") : "Organization verification, campaign planning, opportunity publication, consented applications, outcomes, rewards, and consequential decisions remain separate governed records."}</p>
         </section>
 
         <PlaybookMetrics>

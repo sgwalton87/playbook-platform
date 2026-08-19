@@ -1,7 +1,7 @@
 import type { PlaybookIdentityMapping, PlaybookRole } from "../../pbos/connector/contracts";
 import { authorizePlaybookFoundation } from "./foundation";
 
-export const APPLICATION_TYPES = ["college", "scholarship", "internship", "job", "recruiting", "nil", "mentor", "career",
+export const APPLICATION_TYPES = ["college", "scholarship", "internship", "job", "sponsorship", "recruiting", "nil", "mentor", "mentorship", "career",
   "summer_program", "competition", "grant", "volunteer", "research"] as const;
 export type ApplicationType = typeof APPLICATION_TYPES[number];
 export type ApplicationTaskInput = { key: string; title: string; dueAt?: string | null };
