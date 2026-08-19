@@ -12,5 +12,9 @@ export default defineConfig({
   expect: { timeout: 15_000 },
   reporter: "line",
   use: { baseURL: process.env.PLAYWRIGHT_BASE_URL, trace: "off" },
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"], ...(useSystemChrome ? { channel: "chrome" } : {}) } }]
+  projects: [
+    { name: "chromium", use: { ...devices["Desktop Chrome"], ...(useSystemChrome ? { channel: "chrome" } : {}) } },
+    { name: "tablet", use: { ...devices["iPad Pro 11"] } },
+    { name: "mobile", use: { ...devices["iPhone 13"] } },
+  ],
 });
