@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { randomBytes, randomUUID } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import { test, expect } from "@playwright/test";
 
@@ -8,28 +9,37 @@ const required = (name: string): string => {
   return value;
 };
 
+let cleanupSyntheticScholarAthlete: (() => Promise<void>) | undefined;
+
+test.afterEach(async () => {
+  if (cleanupSyntheticScholarAthlete) {
+    await cleanupSyntheticScholarAthlete();
+    cleanupSyntheticScholarAthlete = undefined;
+  }
+});
+
 test("Scholar-Athlete completes governed onboarding into an owner-scoped athlete record", async ({ page, request, context }) => {
   const artifacts = "artifacts/pbos-acceptance";
   await mkdir(artifacts, { recursive: true });
   await context.tracing.start({ screenshots: true, snapshots: true, sources: true });
 
-  const email = required("PBOS_ACCEPTANCE_ATHLETE_EMAIL");
-  const password = required("PBOS_ACCEPTANCE_ATHLETE_PASSWORD");
+  const email = `pbos-scholar-athlete-${randomUUID()}@example.com`;
+  const password = `${randomBytes(24).toString("base64url")}Aa1!`;
   const admin = createClient(required("NEXT_PUBLIC_SUPABASE_URL"), required("SUPABASE_SERVICE_ROLE_KEY"), {
     auth: { autoRefreshToken: false, persistSession: false }
   });
-  const users = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
-  if (users.error) throw users.error;
-  let user = users.data.users.find(candidate => candidate.email === email);
-  if (!user) {
-    const created = await admin.auth.admin.createUser({ email, password, email_confirm: true,
-      user_metadata: { role: "scholar-athlete", profile_mode: "scholar-athlete", synthetic: true } });
-    if (created.error || !created.data.user) throw created.error ?? new Error("Synthetic Scholar-Athlete creation failed.");
-    user = created.data.user;
-  } else {
-    const updated = await admin.auth.admin.updateUserById(user.id, { password, email_confirm: true });
-    if (updated.error) throw updated.error;
-  }
+  const created = await admin.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+    user_metadata: { role: "scholar-athlete", profile_mode: "scholar-athlete", synthetic: true }
+  });
+  if (created.error || !created.data.user) throw created.error ?? new Error("Synthetic Scholar-Athlete creation failed.");
+  const user = created.data.user;
+  cleanupSyntheticScholarAthlete = async () => {
+    const deleted = await admin.auth.admin.deleteUser(user.id);
+    if (deleted.error) console.warn("Synthetic Scholar-Athlete cleanup failed:", deleted.error.message);
+  };
 
   const resetProfile = await admin.from("profiles").upsert({
     id: user.id,

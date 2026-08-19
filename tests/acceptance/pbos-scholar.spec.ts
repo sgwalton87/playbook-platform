@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { createClient } from "@supabase/supabase-js";
+import { randomBytes, randomUUID } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import { test, expect } from "@playwright/test";
 
@@ -9,28 +10,37 @@ const required = (name: string): string => {
   return value;
 };
 
+let cleanupSyntheticScholar: (() => Promise<void>) | undefined;
+
+test.afterEach(async () => {
+  if (cleanupSyntheticScholar) {
+    await cleanupSyntheticScholar();
+    cleanupSyntheticScholar = undefined;
+  }
+});
+
 test("Scholar completes governed onboarding and receives a durable dashboard", async ({ page, request, context }) => {
   const artifacts = "artifacts/pbos-acceptance";
   await mkdir(artifacts, { recursive: true });
   await context.tracing.start({ screenshots: true, snapshots: true, sources: true });
 
-  const email = required("PBOS_ACCEPTANCE_EMAIL");
-  const password = required("PBOS_ACCEPTANCE_PASSWORD");
+  const email = `pbos-scholar-${randomUUID()}@example.com`;
+  const password = `${randomBytes(24).toString("base64url")}Aa1!`;
   const admin = createClient(required("NEXT_PUBLIC_SUPABASE_URL"), required("SUPABASE_SERVICE_ROLE_KEY"), {
     auth: { autoRefreshToken: false, persistSession: false }
   });
-  const users = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
-  if (users.error) throw users.error;
-  let user = users.data.users.find(candidate => candidate.email === email);
-  if (!user) {
-    const created = await admin.auth.admin.createUser({ email, password, email_confirm: true,
-      user_metadata: { role: "scholar", profile_mode: "scholar", synthetic: true } });
-    if (created.error || !created.data.user) throw created.error ?? new Error("Synthetic Scholar creation failed.");
-    user = created.data.user;
-  } else {
-    const updated = await admin.auth.admin.updateUserById(user.id, { password, email_confirm: true });
-    if (updated.error) throw updated.error;
-  }
+  const created = await admin.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+    user_metadata: { role: "scholar", profile_mode: "scholar", synthetic: true }
+  });
+  if (created.error || !created.data.user) throw created.error ?? new Error("Synthetic Scholar creation failed.");
+  const user = created.data.user;
+  cleanupSyntheticScholar = async () => {
+    const deleted = await admin.auth.admin.deleteUser(user.id);
+    if (deleted.error) console.warn("Synthetic Scholar cleanup failed:", deleted.error.message);
+  };
 
   const resetProfile = await admin.from("profiles").upsert({
     id: user.id,
@@ -120,7 +130,7 @@ test("Scholar completes governed onboarding and receives a durable dashboard", a
       { dimension: "DURABLE_DATA", passed: true, detail: "Owner-scoped dashboard projection was read from Supabase after mutation." },
       { dimension: "AUTHORITY", passed: true, detail: "Anonymous onboarding was denied before the authenticated transaction." },
       { dimension: "PBOS_INTEGRATION", passed: true, detail: "Signed PBOS transaction returned provenance-bearing dashboard evidence." },
-      { dimension: "SECURITY", passed: true, detail: "Synthetic credentials remained environment-bound and anonymous mutation failed closed." },
+      { dimension: "SECURITY", passed: true, detail: "Ephemeral synthetic credentials were generated at runtime and anonymous mutation failed closed." },
       { dimension: "VISUAL_CANON", passed: true, detail: "The runtime dashboard declared and rendered the PGSL-007 canonical experience contract." }
     ]
   }, null, 2));
