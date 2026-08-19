@@ -40,10 +40,14 @@ describe("Phase 15 platform QA contract", () => {
 
   it("keeps privileged role acceptance out of untrusted pull-request execution", () => {
     const workflow = read(".github/workflows/platform-qa.yml");
-    expect(workflow).toContain("github.event_name == 'workflow_dispatch'");
+    expect(workflow).toContain("push:");
     expect(workflow).toContain("github.ref == 'refs/heads/main'");
+    expect(workflow).toContain("github.event_name == 'push'");
+    expect(workflow).toContain("github.event_name == 'workflow_dispatch'");
     expect(workflow).toContain("SUPABASE_SERVICE_ROLE_KEY");
     expect(workflow).toContain("Run governed Scholar journey");
+    expect(workflow).toContain("Run governed Scholar-Athlete journey");
+    expect(workflow).toContain("PBOS_ACCEPTANCE_ATHLETE_EMAIL");
   });
 
   it("makes public browser QA a pull-request gate", () => {

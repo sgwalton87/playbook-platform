@@ -3,6 +3,8 @@ name: Platform QA
 on:
   pull_request:
     branches: [main]
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -45,10 +47,10 @@ jobs:
         run: npx playwright test tests/acceptance/phase15-public-platform.spec.ts
 
   scholar-e2e:
-    name: Trusted Scholar E2E
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    name: Trusted Scholar + Scholar-Athlete E2E
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     env:
       PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
@@ -56,6 +58,8 @@ jobs:
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       PBOS_ACCEPTANCE_EMAIL: ${{ secrets.PBOS_ACCEPTANCE_EMAIL }}
       PBOS_ACCEPTANCE_PASSWORD: ${{ secrets.PBOS_ACCEPTANCE_PASSWORD }}
+      PBOS_ACCEPTANCE_ATHLETE_EMAIL: ${{ secrets.PBOS_ACCEPTANCE_ATHLETE_EMAIL }}
+      PBOS_ACCEPTANCE_ATHLETE_PASSWORD: ${{ secrets.PBOS_ACCEPTANCE_ATHLETE_PASSWORD }}
       PBOS_ACCEPTANCE_COMMIT: ${{ github.sha }}
     steps:
       - name: Check out repository
@@ -72,6 +76,8 @@ jobs:
           test -n "$SUPABASE_SERVICE_ROLE_KEY"
           test -n "$PBOS_ACCEPTANCE_EMAIL"
           test -n "$PBOS_ACCEPTANCE_PASSWORD"
+          test -n "$PBOS_ACCEPTANCE_ATHLETE_EMAIL"
+          test -n "$PBOS_ACCEPTANCE_ATHLETE_PASSWORD"
       - name: Install dependencies
         run: npm ci
       - name: Install Chromium
@@ -91,3 +97,5 @@ jobs:
           exit 1
       - name: Run governed Scholar journey
         run: npx playwright test tests/acceptance/pbos-scholar.spec.ts --project=chromium
+      - name: Run governed Scholar-Athlete journey
+        run: npx playwright test tests/acceptance/pbos-scholar-athlete.spec.ts --project=chromium
