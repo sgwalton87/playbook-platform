@@ -27,7 +27,7 @@
 .lede { width: 100%; max-width: 650px; margin: 28px 0 0; color: #c7d5e5; font-size: clamp(18px, 1.7vw, 25px); font-weight: 650; line-height: 1.45; }
 .actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 34px; }
 .actions a { display: inline-flex; align-items: center; justify-content: center; min-height: 58px; padding: 0 28px; border-radius: 8px; text-decoration: none; font-size: 17px; font-weight: 900; }
-.primary { gap: 18px; color: #fff; background: #ff5b1f; box-shadow: 0 15px 40px rgba(255, 91, 31, .25); }
+.primary { gap: 18px; color: #fff; background: #C2410C; box-shadow: 0 15px 40px rgba(255, 91, 31, .25); }
 .secondary { color: #fff; border: 1px solid rgba(255,255,255,.34); background: rgba(255,255,255,.04); }
 .signals { display: grid; grid-template-columns: repeat(4, 1fr); max-width: 620px; margin: 48px 0 0; padding-top: 24px; border-top: 1px solid rgba(255,255,255,.14); }
 .signals div { padding-right: 18px; border-right: 1px solid rgba(255,255,255,.12); }
