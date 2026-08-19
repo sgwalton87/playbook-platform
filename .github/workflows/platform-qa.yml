@@ -10,6 +10,7 @@ on:
 permissions:
   contents: read
   statuses: write
+  issues: write
 
 jobs:
   public-browser-qa:
@@ -100,11 +101,13 @@ jobs:
         env: { GH_TOKEN: "${{ github.token }}" }
         run: gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state=pending -f context=playbook/phase15-role-e2e -f description="stage:scholar"
       - name: Run governed Scholar journey
+        id: scholar
         run: npx playwright test tests/acceptance/pbos-scholar.spec.ts --project=chromium
       - name: Publish Scholar-Athlete-running status
         env: { GH_TOKEN: "${{ github.token }}" }
         run: gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state=pending -f context=playbook/phase15-role-e2e -f description="stage:scholar-athlete"
       - name: Run governed Scholar-Athlete journey
+        id: scholar_athlete
         run: npx playwright test tests/acceptance/pbos-scholar-athlete.spec.ts --project=chromium
       - name: Publish role QA success
         env: { GH_TOKEN: "${{ github.token }}" }
@@ -112,8 +115,24 @@ jobs:
       - name: Publish configuration failure
         if: failure() && steps.configuration.outcome == 'failure'
         env: { GH_TOKEN: "${{ github.token }}" }
-        run: gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state=failure -f context=playbook/phase15-role-e2e -f description="FAILED:trusted acceptance configuration"
-      - name: Publish non-configuration failure
-        if: failure() && steps.configuration.outcome != 'failure'
+        run: |
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state=failure -f context=playbook/phase15-role-e2e -f description="FAILED:trusted acceptance configuration"
+          gh issue comment 234 --repo "$GITHUB_REPOSITORY" --body "Phase 15 trusted role E2E on ${GITHUB_SHA} FAILED at **configuration**. Required acceptance configuration is incomplete; no secret values are included in this report."
+      - name: Publish Scholar failure
+        if: failure() && steps.configuration.outcome == 'success' && steps.scholar.outcome == 'failure'
         env: { GH_TOKEN: "${{ github.token }}" }
-        run: gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state=failure -f context=playbook/phase15-role-e2e -f description="FAILED:bootstrap or role journey; inspect Actions"
+        run: |
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state=failure -f context=playbook/phase15-role-e2e -f description="FAILED:Scholar journey"
+          gh issue comment 234 --repo "$GITHUB_REPOSITORY" --body "Phase 15 trusted role E2E on ${GITHUB_SHA} FAILED at **Scholar journey**. Bootstrap completed and the failure occurred inside the Scholar acceptance path."
+      - name: Publish Scholar-Athlete failure
+        if: failure() && steps.configuration.outcome == 'success' && steps.scholar.outcome == 'success' && steps.scholar_athlete.outcome == 'failure'
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state=failure -f context=playbook/phase15-role-e2e -f description="FAILED:Scholar-Athlete journey"
+          gh issue comment 234 --repo "$GITHUB_REPOSITORY" --body "Phase 15 trusted role E2E on ${GITHUB_SHA} FAILED at **Scholar-Athlete journey**. Scholar passed; the failure occurred inside the Scholar-Athlete acceptance path."
+      - name: Publish bootstrap failure
+        if: failure() && steps.configuration.outcome == 'success' && steps.scholar.outcome == 'skipped'
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state=failure -f context=playbook/phase15-role-e2e -f description="FAILED:trusted QA bootstrap"
+          gh issue comment 234 --repo "$GITHUB_REPOSITORY" --body "Phase 15 trusted role E2E on ${GITHUB_SHA} FAILED during **bootstrap/build/startup** before the Scholar journey began."
