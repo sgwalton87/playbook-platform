@@ -23,11 +23,12 @@ describe("Phase 15 platform QA contract", () => {
     expect(workflow).not.toContain("PBOS_ACCEPTANCE_EMAIL");
     expect(workflow).not.toContain("PBOS_ACCEPTANCE_PASSWORD");
   });
-  it("waits for the exact production SHA before trusted role acceptance", () => {
+  it("waits for the exact production SHA through the readable production alias before trusted role acceptance", () => {
     const workflow=read(".github/workflows/platform-qa.yml");
     const trusted=workflow.split("  scholar-e2e:")[1] || "";
     const revisionRoute=read("app/api/deployment/route.ts");
-    expect(trusted).toContain("https://the-playbook-git-main-pbos-genesis.vercel.app");
+    expect(trusted).toContain("https://the-playbook-five.vercel.app");
+    expect(trusted).not.toContain("https://the-playbook-git-main-pbos-genesis.vercel.app");
     expect(trusted).toContain("Wait for exact production revision");
     expect(trusted).toContain("/api/deployment");
     expect(trusted).toContain('DEPLOYED_SHA" = "$PBOS_ACCEPTANCE_COMMIT');
