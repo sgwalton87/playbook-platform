@@ -1,24 +1,15 @@
 import { createBrowserClient } from "@supabase/ssr";
 import { rememberMeCookieMethods } from "@/lib/auth/rememberMe";
 import { PLAYBOOK_PKCE_AUTH_OPTIONS } from "@/lib/auth/pkce";
+import { getPlaybookPublicSupabaseConfig } from "@/lib/supabase/publicConfig";
 
-const PLAYBOOK_SUPABASE_URL = "https://oexgxnybeixwadgtdtzp.supabase.co";
-const PLAYBOOK_SUPABASE_PUBLISHABLE_KEY = "sb_publishable_9T3jZbZ_BNUMhkA2jeqxpA__UUAEOue";
+const { url: supabaseUrl, publishableKey: supabaseAnonKey, usingCanonicalFallback } =
+  getPlaybookPublicSupabaseConfig();
 
-const configuredUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const configuredKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-const supabaseUrl = configuredUrl || PLAYBOOK_SUPABASE_URL;
-const supabaseAnonKey = configuredKey || PLAYBOOK_SUPABASE_PUBLISHABLE_KEY;
-
-if (!configuredUrl || !configuredKey) {
+if (usingCanonicalFallback) {
   console.warn(
     "Playbook Supabase public environment variables are missing; using the canonical Playbook OS public project configuration."
   );
-}
-
-if (supabaseUrl.includes("placeholder.supabase.co") || supabaseAnonKey === "placeholder-anon-key") {
-  throw new Error("Invalid Playbook Supabase configuration: placeholder credentials are prohibited.");
 }
 
 const browserClient = createBrowserClient(supabaseUrl, supabaseAnonKey, {
