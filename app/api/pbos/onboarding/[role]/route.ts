@@ -8,14 +8,17 @@ import { requireUser } from "@/lib/supabase/server";
 
 export async function POST(request: NextRequest) {
   try {
-    const endpointRoleRaw = request.nextUrl.pathname.split("/").filter(Boolean).at(-1);
-    const endpointRole = normalizeOnboardingRole(endpointRoleRaw);
-    const contract = getRoleOnboardingCompletionContract(endpointRole);
-
+    // Authority must fail closed before route-role parsing or completion-contract
+    // validation. Anonymous callers receive the canonical 401 boundary even if
+    // their URL role or request shape is invalid.
     const { supabase, user } = await requireUser();
     if (!user) {
       return NextResponse.json({ error: "Authentication required." }, { status: 401 });
     }
+
+    const endpointRoleRaw = request.nextUrl.pathname.split("/").filter(Boolean).at(-1);
+    const endpointRole = normalizeOnboardingRole(endpointRoleRaw);
+    const contract = getRoleOnboardingCompletionContract(endpointRole);
 
     const profile = await supabase
       .from("profiles")

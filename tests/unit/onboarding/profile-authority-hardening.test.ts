@@ -27,6 +27,16 @@ describe("profile authority hardening", () => {
     expect(roleSelect).not.toContain('.from("profiles").upsert(');
   });
 
+  it("authenticates before parsing or validating onboarding role contracts", () => {
+    const requireUserIndex = roleRoute.indexOf("await requireUser()");
+    const endpointRoleIndex = roleRoute.indexOf("const endpointRoleRaw");
+    const contractIndex = roleRoute.indexOf("getRoleOnboardingCompletionContract(endpointRole)");
+    expect(requireUserIndex).toBeGreaterThan(-1);
+    expect(endpointRoleIndex).toBeGreaterThan(requireUserIndex);
+    expect(contractIndex).toBeGreaterThan(endpointRoleIndex);
+    expect(roleRoute).toContain('return NextResponse.json({ error: "Authentication required." }, { status: 401 })');
+  });
+
   it("routes every onboarding-completion mutation through the governed RPC", () => {
     expect(roleRoute).toContain('rpc("complete_playbook_onboarding"');
     expect(scholarRoute).toContain('rpc("complete_playbook_onboarding"');
