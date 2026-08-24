@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { randomBytes, randomUUID } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
-import { test, expect } from "@playwright/test";
+import { test, expect, type BrowserContext } from "@playwright/test";
 
 const required = (name: string): string => {
   const value = process.env[name];
@@ -10,6 +10,30 @@ const required = (name: string): string => {
 };
 
 let cleanupSyntheticScholarAthlete: (() => Promise<void>) | undefined;
+
+async function safeStartTracing(context: BrowserContext): Promise<boolean> {
+  try {
+    await context.tracing.start({ screenshots: true, snapshots: true, sources: true });
+    return true;
+  } catch (error) {
+    if (error instanceof Error && /Tracing has been already started/i.test(error.message)) {
+      return false;
+    }
+    throw error;
+  }
+}
+
+async function safeStopTracing(context: BrowserContext, path: string, started: boolean): Promise<void> {
+  if (!started) return;
+  try {
+    await context.tracing.stop({ path });
+  } catch (error) {
+    if (error instanceof Error && /Tracing has not been started|Tracing is already stopped/i.test(error.message)) {
+      return;
+    }
+    throw error;
+  }
+}
 
 test.afterEach(async () => {
   if (cleanupSyntheticScholarAthlete) {
@@ -21,7 +45,7 @@ test.afterEach(async () => {
 test("Scholar-Athlete completes governed onboarding into an owner-scoped athlete record", async ({ page, request, context }) => {
   const artifacts = "artifacts/pbos-acceptance";
   await mkdir(artifacts, { recursive: true });
-  await context.tracing.start({ screenshots: true, snapshots: true, sources: true });
+  const tracingStarted = await safeStartTracing(context);
 
   const email = `pbos-scholar-athlete-${randomUUID()}@example.com`;
   const password = `${randomBytes(24).toString("base64url")}Aa1!`;
@@ -114,7 +138,7 @@ test("Scholar-Athlete completes governed onboarding into an owner-scoped athlete
   expect(projection.data?.section_ids).toEqual(expect.arrayContaining(["identity", "goals", "athletics"]));
   expect((projection.data?.provenance as string[] | undefined)?.length).toBeGreaterThan(0);
 
-  await context.tracing.stop({ path: artifacts + "/scholar-athlete-trace.zip" });
+  await safeStopTracing(context, artifacts + "/scholar-athlete-trace.zip", tracingStarted);
   await writeFile(artifacts + "/scholar-athlete-acceptance.json", JSON.stringify({
     schemaVersion: 1,
     journeyId: "SCHOLAR-ATHLETE-ONBOARDING-TO-OS",

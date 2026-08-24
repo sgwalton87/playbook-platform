@@ -2,7 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { createClient } from "@supabase/supabase-js";
 import { randomBytes, randomUUID } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
-import { test, expect } from "@playwright/test";
+import { test, expect, type BrowserContext } from "@playwright/test";
 
 const required = (name: string): string => {
   const value = process.env[name];
@@ -11,6 +11,30 @@ const required = (name: string): string => {
 };
 
 let cleanupSyntheticScholar: (() => Promise<void>) | undefined;
+
+async function safeStartTracing(context: BrowserContext): Promise<boolean> {
+  try {
+    await context.tracing.start({ screenshots: true, snapshots: true, sources: true });
+    return true;
+  } catch (error) {
+    if (error instanceof Error && /Tracing has been already started/i.test(error.message)) {
+      return false;
+    }
+    throw error;
+  }
+}
+
+async function safeStopTracing(context: BrowserContext, path: string, started: boolean): Promise<void> {
+  if (!started) return;
+  try {
+    await context.tracing.stop({ path });
+  } catch (error) {
+    if (error instanceof Error && /Tracing has not been started|Tracing is already stopped/i.test(error.message)) {
+      return;
+    }
+    throw error;
+  }
+}
 
 test.afterEach(async () => {
   if (cleanupSyntheticScholar) {
@@ -22,116 +46,151 @@ test.afterEach(async () => {
 test("Scholar completes governed onboarding and receives a durable dashboard", async ({ page, request, context }) => {
   const artifacts = "artifacts/pbos-acceptance";
   await mkdir(artifacts, { recursive: true });
-  await context.tracing.start({ screenshots: true, snapshots: true, sources: true });
+  const tracingStarted = await safeStartTracing(context);
+  let stage = "synthetic-account";
 
-  const email = `pbos-scholar-${randomUUID()}@example.com`;
-  const password = `${randomBytes(24).toString("base64url")}Aa1!`;
-  const admin = createClient(required("NEXT_PUBLIC_SUPABASE_URL"), required("SUPABASE_SERVICE_ROLE_KEY"), {
-    auth: { autoRefreshToken: false, persistSession: false }
-  });
-  const created = await admin.auth.admin.createUser({
-    email,
-    password,
-    email_confirm: true,
-    user_metadata: { role: "scholar", profile_mode: "scholar", synthetic: true }
-  });
-  if (created.error || !created.data.user) throw created.error ?? new Error("Synthetic Scholar creation failed.");
-  const user = created.data.user;
-  cleanupSyntheticScholar = async () => {
-    const deleted = await admin.auth.admin.deleteUser(user.id);
-    if (deleted.error) console.warn("Synthetic Scholar cleanup failed:", deleted.error.message);
-  };
+  try {
+    const email = `pbos-scholar-${randomUUID()}@example.com`;
+    const password = `${randomBytes(24).toString("base64url")}Aa1!`;
+    const admin = createClient(required("NEXT_PUBLIC_SUPABASE_URL"), required("SUPABASE_SERVICE_ROLE_KEY"), {
+      auth: { autoRefreshToken: false, persistSession: false }
+    });
+    const created = await admin.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: { role: "scholar", profile_mode: "scholar", synthetic: true }
+    });
+    if (created.error || !created.data.user) throw created.error ?? new Error("Synthetic Scholar creation failed.");
+    const user = created.data.user;
+    cleanupSyntheticScholar = async () => {
+      const deleted = await admin.auth.admin.deleteUser(user.id);
+      if (deleted.error) console.warn("Synthetic Scholar cleanup failed:", deleted.error.message);
+    };
 
-  const resetProfile = await admin.from("profiles").upsert({
-    id: user.id,
-    role: "scholar",
-    profile_mode: "scholar",
-    onboarding_completed: false,
-    onboarding_data: {},
-    verification_status: "email_confirmed",
-  }, { onConflict: "id" });
-  if (resetProfile.error) throw resetProfile.error;
+    stage = "profile-reset";
+    const resetProfile = await admin.from("profiles").upsert({
+      id: user.id,
+      role: "scholar",
+      profile_mode: "scholar",
+      onboarding_completed: false,
+      onboarding_data: {},
+      verification_status: "email_confirmed",
+    }, { onConflict: "id" });
+    if (resetProfile.error) throw resetProfile.error;
 
-  const anonymous = await request.post("/api/pbos/scholar/onboarding", {
-    data: { displayName: "PBOS Acceptance Scholar", goalTitle: "Complete governed onboarding" }
-  });
-  expect(anonymous.status()).toBe(401);
+    stage = "anonymous-authority";
+    const anonymous = await request.post("/api/pbos/scholar/onboarding", {
+      data: { displayName: "PBOS Acceptance Scholar", goalTitle: "Complete governed onboarding" }
+    });
+    expect(anonymous.status()).toBe(401);
 
-  await page.goto("/login");
-  await page.getByRole("textbox", { name: "Email", exact: true }).fill(email);
-  await page.getByLabel("Password", { exact: true }).fill(password);
-  await page.getByRole("button", { name: "Log In", exact: true }).click();
-  await page.waitForURL(/\/start/);
-  await expect(page.getByRole("heading", { name: "Build the record that opens your next door." })).toBeVisible();
+    stage = "login";
+    await page.goto("/login");
+    await page.getByRole("textbox", { name: "Email", exact: true }).fill(email);
+    await page.getByLabel("Password", { exact: true }).fill(password);
+    await page.getByRole("button", { name: "Log In", exact: true }).click();
+    await page.waitForURL(/\/start/);
 
-  const finish = page.getByRole("button", { name: "Finish + Create Profile" });
-  for (let step = 0; step < 10 && !(await finish.isVisible()); step += 1) {
-    await page.getByRole("button", { name: "Skip for now" }).click();
+    stage = "onboarding-entry";
+    await expect(page.getByRole("heading", { name: "Build the record that opens your next door." })).toBeVisible();
+
+    stage = "onboarding-navigation";
+    const finish = page.getByRole("button", { name: "Finish + Create Profile" });
+    for (let step = 0; step < 10 && !(await finish.isVisible()); step += 1) {
+      await page.getByRole("button", { name: "Skip for now" }).click();
+    }
+    await expect(finish).toBeVisible();
+    await page.getByLabel("I have read and agree to The Playbook User Agreement.").check();
+
+    stage = "onboarding-api";
+    const [onboarding] = await Promise.all([
+      page.waitForResponse(response => response.url().includes("/api/pbos/scholar/onboarding") && response.request().method() === "POST"),
+      finish.click(),
+    ]);
+    const onboardingBody = await onboarding.text();
+    expect(onboarding.ok(), onboardingBody).toBe(true);
+    const transaction = JSON.parse(onboardingBody) as { dashboard?: { provenance?: string[] } };
+    expect(transaction.dashboard?.provenance?.length).toBeGreaterThan(0);
+    await page.waitForURL(/\/dashboard/, { timeout: 30_000 });
+
+    stage = "durable-profile";
+    const completedProfile = await admin.from("profiles")
+      .select("role,profile_mode,onboarding_completed,community_safety_agreed")
+      .eq("id", user.id).single();
+    if (completedProfile.error) throw completedProfile.error;
+    expect(completedProfile.data).toMatchObject({
+      role: "scholar",
+      profile_mode: "scholar",
+      onboarding_completed: true,
+      community_safety_agreed: true,
+    });
+
+    stage = "scholar-profile";
+    const scholarProfile = await admin.from("scholar_profiles")
+      .select("id,onboarding_status")
+      .eq("id", user.id).single();
+    if (scholarProfile.error) throw scholarProfile.error;
+    expect(scholarProfile.data).toMatchObject({ id: user.id, onboarding_status: "DASHBOARD_READY" });
+
+    stage = "dashboard-projection";
+    const projection = await admin.from("scholar_dashboard_projections")
+      .select("scholar_id,goal_id,section_ids,exchange_approval_id,provenance")
+      .eq("scholar_id", user.id).maybeSingle();
+    if (projection.error) throw projection.error;
+    expect(projection.data?.scholar_id).toBe(user.id);
+    expect(projection.data?.goal_id).toBeTruthy();
+    expect(projection.data?.section_ids).toEqual(expect.arrayContaining(["identity", "goals"]));
+    expect((projection.data?.provenance as string[] | undefined)?.length).toBeGreaterThan(0);
+
+    stage = "desktop-visual-canon";
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await expect(page.getByTestId("scholar-dashboard-canon")).toHaveAttribute("data-visual-canon", "PGSL-007");
+    await page.screenshot({ path: artifacts + "/scholar-desktop.png", fullPage: true });
+
+    stage = "mobile-render";
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.reload();
+    await expect(page.getByText("Scholar Dashboard", { exact: false }).first()).toBeVisible();
+    await page.screenshot({ path: artifacts + "/scholar-mobile.png", fullPage: true });
+
+    stage = "accessibility";
+    const accessibility = await new AxeBuilder({ page }).analyze();
+    const blocking = accessibility.violations.filter(violation => ["serious", "critical"].includes(violation.impact ?? ""));
+    await writeFile(artifacts + "/scholar-accessibility.json", JSON.stringify(accessibility, null, 2));
+    expect(blocking).toEqual([]);
+
+    stage = "evidence-write";
+    await safeStopTracing(context, artifacts + "/scholar-trace.zip", tracingStarted);
+    await writeFile(artifacts + "/scholar-acceptance.json", JSON.stringify({
+      schemaVersion: 1,
+      journeyId: "SCHOLAR-ONBOARDING-TO-DASHBOARD",
+      commit: required("PBOS_ACCEPTANCE_COMMIT"),
+      checks: [
+        { dimension: "ROUTE", passed: true, detail: "Login, the complete seven-step onboarding UI, and dashboard routes executed." },
+        { dimension: "DURABLE_DATA", passed: true, detail: "Owner-scoped dashboard projection was read from Supabase after mutation." },
+        { dimension: "AUTHORITY", passed: true, detail: "Anonymous onboarding was denied before the authenticated transaction." },
+        { dimension: "PBOS_INTEGRATION", passed: true, detail: "Signed PBOS transaction returned provenance-bearing dashboard evidence." },
+        { dimension: "SECURITY", passed: true, detail: "Ephemeral synthetic credentials were generated at runtime and anonymous mutation failed closed." },
+        { dimension: "VISUAL_CANON", passed: true, detail: "The runtime dashboard declared and rendered the PGSL-007 canonical experience contract." }
+      ]
+    }, null, 2));
+  } catch (error) {
+    const raw = error instanceof Error ? error.message : String(error);
+    const message = raw.replace(/[\r\n]+/g, " ").replace(/\s+/g, " ").slice(0, 500);
+    await writeFile(artifacts + "/scholar-failure-summary.json", JSON.stringify({
+      schemaVersion: 1,
+      journeyId: "SCHOLAR-ONBOARDING-TO-DASHBOARD",
+      commit: process.env.PBOS_ACCEPTANCE_COMMIT ?? "unknown",
+      stage,
+      message,
+    }, null, 2));
+    try {
+      await page.screenshot({ path: artifacts + "/scholar-failure.png", fullPage: true });
+    } catch {}
+    try {
+      await safeStopTracing(context, artifacts + "/scholar-failure-trace.zip", tracingStarted);
+    } catch {}
+    throw error;
   }
-  await expect(finish).toBeVisible();
-  await page.getByLabel("I have read and agree to The Playbook User Agreement.").check();
-
-  const [onboarding] = await Promise.all([
-    page.waitForResponse(response => response.url().includes("/api/pbos/scholar/onboarding") && response.request().method() === "POST"),
-    finish.click(),
-  ]);
-  const onboardingBody = await onboarding.text();
-  expect(onboarding.ok(), onboardingBody).toBe(true);
-  const transaction = JSON.parse(onboardingBody) as { dashboard?: { provenance?: string[] } };
-  expect(transaction.dashboard?.provenance?.length).toBeGreaterThan(0);
-  await page.waitForURL(/\/dashboard/, { timeout: 30_000 });
-
-  const completedProfile = await admin.from("profiles")
-    .select("role,profile_mode,onboarding_completed,community_safety_agreed")
-    .eq("id", user.id).single();
-  if (completedProfile.error) throw completedProfile.error;
-  expect(completedProfile.data).toMatchObject({
-    role: "scholar",
-    profile_mode: "scholar",
-    onboarding_completed: true,
-    community_safety_agreed: true,
-  });
-
-  const scholarProfile = await admin.from("scholar_profiles")
-    .select("id,onboarding_status")
-    .eq("id", user.id).single();
-  if (scholarProfile.error) throw scholarProfile.error;
-  expect(scholarProfile.data).toMatchObject({ id: user.id, onboarding_status: "DASHBOARD_READY" });
-
-  const projection = await admin.from("scholar_dashboard_projections")
-    .select("scholar_id,goal_id,section_ids,exchange_approval_id,provenance")
-    .eq("scholar_id", user.id).maybeSingle();
-  if (projection.error) throw projection.error;
-  expect(projection.data?.scholar_id).toBe(user.id);
-  expect(projection.data?.goal_id).toBeTruthy();
-  expect(projection.data?.section_ids).toEqual(expect.arrayContaining(["identity", "goals"]));
-  expect((projection.data?.provenance as string[] | undefined)?.length).toBeGreaterThan(0);
-
-  await page.setViewportSize({ width: 1440, height: 900 });
-  await expect(page.getByTestId("scholar-dashboard-canon")).toHaveAttribute("data-visual-canon", "PGSL-007");
-  await page.screenshot({ path: artifacts + "/scholar-desktop.png", fullPage: true });
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.reload();
-  await expect(page.getByText("Scholar Dashboard", { exact: false }).first()).toBeVisible();
-  await page.screenshot({ path: artifacts + "/scholar-mobile.png", fullPage: true });
-
-  const accessibility = await new AxeBuilder({ page }).analyze();
-  const blocking = accessibility.violations.filter(violation => ["serious", "critical"].includes(violation.impact ?? ""));
-  await writeFile(artifacts + "/scholar-accessibility.json", JSON.stringify(accessibility, null, 2));
-  expect(blocking).toEqual([]);
-
-  await context.tracing.stop({ path: artifacts + "/scholar-trace.zip" });
-  await writeFile(artifacts + "/scholar-acceptance.json", JSON.stringify({
-    schemaVersion: 1,
-    journeyId: "SCHOLAR-ONBOARDING-TO-DASHBOARD",
-    commit: required("PBOS_ACCEPTANCE_COMMIT"),
-    checks: [
-      { dimension: "ROUTE", passed: true, detail: "Login, the complete seven-step onboarding UI, and dashboard routes executed." },
-      { dimension: "DURABLE_DATA", passed: true, detail: "Owner-scoped dashboard projection was read from Supabase after mutation." },
-      { dimension: "AUTHORITY", passed: true, detail: "Anonymous onboarding was denied before the authenticated transaction." },
-      { dimension: "PBOS_INTEGRATION", passed: true, detail: "Signed PBOS transaction returned provenance-bearing dashboard evidence." },
-      { dimension: "SECURITY", passed: true, detail: "Ephemeral synthetic credentials were generated at runtime and anonymous mutation failed closed." },
-      { dimension: "VISUAL_CANON", passed: true, detail: "The runtime dashboard declared and rendered the PGSL-007 canonical experience contract." }
-    ]
-  }, null, 2));
 });
