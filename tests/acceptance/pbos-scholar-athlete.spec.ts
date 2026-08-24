@@ -76,7 +76,7 @@ test("Scholar-Athlete completes governed onboarding into an owner-scoped athlete
   if (resetProfile.error) throw resetProfile.error;
   await admin.from("athlete_profiles").delete().eq("scholar_id", user.id);
 
-  const anonymous = await request.post("/api/pbos/scholar/onboarding", {
+  const anonymous = await request.post("/api/pbos/onboarding/scholar-athlete", {
     data: { displayName: "PBOS Acceptance Athlete", goalTitle: "Complete governed athlete onboarding" }
   });
   expect(anonymous.status()).toBe(401);
@@ -96,7 +96,7 @@ test("Scholar-Athlete completes governed onboarding into an owner-scoped athlete
   await page.getByLabel("I have read and agree to The Playbook User Agreement.").check();
 
   const [onboarding] = await Promise.all([
-    page.waitForResponse(response => response.url().includes("/api/pbos/scholar/onboarding") && response.request().method() === "POST"),
+    page.waitForResponse(response => response.url().includes("/api/pbos/onboarding/scholar-athlete") && response.request().method() === "POST"),
     finish.click(),
   ]);
   const onboardingBody = await onboarding.text();
