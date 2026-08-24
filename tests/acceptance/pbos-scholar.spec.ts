@@ -80,7 +80,7 @@ test("Scholar completes governed onboarding and receives a durable dashboard", a
     if (resetProfile.error) throw resetProfile.error;
 
     stage = "anonymous-authority";
-    const anonymous = await request.post("/api/pbos/scholar/onboarding", {
+    const anonymous = await request.post("/api/pbos/onboarding/scholar", {
       data: { displayName: "PBOS Acceptance Scholar", goalTitle: "Complete governed onboarding" }
     });
     expect(anonymous.status()).toBe(401);
@@ -105,7 +105,7 @@ test("Scholar completes governed onboarding and receives a durable dashboard", a
 
     stage = "onboarding-api";
     const [onboarding] = await Promise.all([
-      page.waitForResponse(response => response.url().includes("/api/pbos/scholar/onboarding") && response.request().method() === "POST"),
+      page.waitForResponse(response => response.url().includes("/api/pbos/onboarding/scholar") && response.request().method() === "POST"),
       finish.click(),
     ]);
     const onboardingBody = await onboarding.text();
