@@ -110,6 +110,17 @@ jobs:
       - name: Run governed Family journey
         id: family
         run: npx playwright test tests/acceptance/family-consent.spec.ts --project=chromium
+      - name: Upload trusted role diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase15-trusted-role-diagnostics-${{ github.sha }}
+          path: |
+            artifacts/playwright
+            artifacts/pbos-acceptance
+            /tmp/playbook-next.log
+          if-no-files-found: warn
+          retention-days: 14
       - name: Publish role QA success
         env: { GH_TOKEN: "${{ github.token }}" }
         run: gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state=success -f context=playbook/phase15-role-e2e -f description="Scholar + Scholar-Athlete + Family E2E passed"
@@ -124,22 +135,22 @@ jobs:
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
           gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state=failure -f context=playbook/phase15-role-e2e -f description="FAILED:Scholar journey"
-          gh issue comment 234 --repo "$GITHUB_REPOSITORY" --body "Phase 15 trusted role E2E on ${GITHUB_SHA} FAILED at **Scholar journey**. Bootstrap completed and the failure occurred inside the Scholar acceptance path."
+          gh issue comment 234 --repo "$GITHUB_REPOSITORY" --body "Phase 15 trusted role E2E on ${GITHUB_SHA} FAILED at **Scholar journey**. Bootstrap completed and the failure occurred inside the Scholar acceptance path. Diagnostics artifact: phase15-trusted-role-diagnostics-${GITHUB_SHA}."
       - name: Publish Scholar-Athlete failure
         if: failure() && steps.configuration.outcome == 'success' && steps.scholar.outcome == 'success' && steps.scholar_athlete.outcome == 'failure'
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
           gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state=failure -f context=playbook/phase15-role-e2e -f description="FAILED:Scholar-Athlete journey"
-          gh issue comment 234 --repo "$GITHUB_REPOSITORY" --body "Phase 15 trusted role E2E on ${GITHUB_SHA} FAILED at **Scholar-Athlete journey**. Scholar passed; the failure occurred inside the Scholar-Athlete acceptance path."
+          gh issue comment 234 --repo "$GITHUB_REPOSITORY" --body "Phase 15 trusted role E2E on ${GITHUB_SHA} FAILED at **Scholar-Athlete journey**. Scholar passed; the failure occurred inside the Scholar-Athlete acceptance path. Diagnostics artifact: phase15-trusted-role-diagnostics-${GITHUB_SHA}."
       - name: Publish Family failure
         if: failure() && steps.configuration.outcome == 'success' && steps.scholar.outcome == 'success' && steps.scholar_athlete.outcome == 'success' && steps.family.outcome == 'failure'
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
           gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state=failure -f context=playbook/phase15-role-e2e -f description="FAILED:Family journey"
-          gh issue comment 234 --repo "$GITHUB_REPOSITORY" --body "Phase 15 trusted role E2E on ${GITHUB_SHA} FAILED at **Family journey**. Scholar and Scholar-Athlete passed; the failure occurred inside Family consent/relationship acceptance."
+          gh issue comment 234 --repo "$GITHUB_REPOSITORY" --body "Phase 15 trusted role E2E on ${GITHUB_SHA} FAILED at **Family journey**. Scholar and Scholar-Athlete passed; the failure occurred inside Family consent/relationship acceptance. Diagnostics artifact: phase15-trusted-role-diagnostics-${GITHUB_SHA}."
       - name: Publish bootstrap failure
         if: failure() && steps.configuration.outcome == 'success' && steps.scholar.outcome == 'skipped'
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
           gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" -f state=failure -f context=playbook/phase15-role-e2e -f description="FAILED:trusted QA bootstrap"
-          gh issue comment 234 --repo "$GITHUB_REPOSITORY" --body "Phase 15 trusted role E2E on ${GITHUB_SHA} FAILED during **bootstrap/build/startup** before the Scholar journey began."
+          gh issue comment 234 --repo "$GITHUB_REPOSITORY" --body "Phase 15 trusted role E2E on ${GITHUB_SHA} FAILED during **bootstrap/build/startup** before the Scholar journey began. Diagnostics artifact: phase15-trusted-role-diagnostics-${GITHUB_SHA}."
