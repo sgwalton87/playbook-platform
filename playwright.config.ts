@@ -11,8 +11,13 @@ export default defineConfig({
   retries: 0,
   timeout: 120_000,
   expect: { timeout: 15_000 },
-  reporter: "line",
-  use: { baseURL: process.env.PLAYWRIGHT_BASE_URL, trace: "off" },
+  reporter: [["line"], ["json", { outputFile: "artifacts/playwright/results.json" }]],
+  use: {
+    baseURL: process.env.PLAYWRIGHT_BASE_URL,
+    trace: "retain-on-failure",
+    screenshot: "only-on-failure",
+    video: "retain-on-failure",
+  },
   projects: [
     { name: "chromium", use: chromiumBase },
     { name: "tablet", use: { ...chromiumBase, viewport: { width: 834, height: 1194 }, hasTouch: true } },
