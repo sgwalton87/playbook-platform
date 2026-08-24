@@ -52,7 +52,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 50
     env:
-      PLAYWRIGHT_BASE_URL: https://the-playbook-git-main-pbos-genesis.vercel.app
+      PLAYWRIGHT_BASE_URL: https://the-playbook-five.vercel.app
       NEXT_PUBLIC_SUPABASE_URL: https://oexgxnybeixwadgtdtzp.supabase.co
       NEXT_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_9T3jZbZ_BNUMhkA2jeqxpA__UUAEOue
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
