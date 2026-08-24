@@ -5,7 +5,6 @@ on:
     branches: [main]
   push:
     branches: [main]
-  deployment_status:
   workflow_dispatch:
 
 permissions:
@@ -16,7 +15,6 @@ permissions:
 jobs:
   public-browser-qa:
     name: Public browser QA
-    if: github.event_name != 'deployment_status'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -50,20 +48,15 @@ jobs:
 
   scholar-e2e:
     name: Trusted Scholar + Scholar-Athlete + Family E2E
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'deployment_status' &&
-       github.event.deployment_status.state == 'success' &&
-       (github.event.deployment.ref == 'main' || github.event.deployment.ref == 'refs/heads/main') &&
-       (github.event.deployment.environment == 'Production' || github.event.deployment.environment == 'production'))
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     timeout-minutes: 50
     env:
-      PLAYWRIGHT_BASE_URL: ${{ github.event_name == 'deployment_status' && github.event.deployment_status.target_url || 'https://the-playbook-five.vercel.app' }}
+      PLAYWRIGHT_BASE_URL: https://the-playbook-git-main-pbos-genesis.vercel.app
       NEXT_PUBLIC_SUPABASE_URL: https://oexgxnybeixwadgtdtzp.supabase.co
       NEXT_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_9T3jZbZ_BNUMhkA2jeqxpA__UUAEOue
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      PBOS_ACCEPTANCE_COMMIT: ${{ github.event_name == 'deployment_status' && github.event.deployment.sha || github.sha }}
+      PBOS_ACCEPTANCE_COMMIT: ${{ github.sha }}
     steps:
       - name: Publish role QA pending status
         env: { GH_TOKEN: "${{ github.token }}" }
@@ -76,18 +69,14 @@ jobs:
             exit 1
           fi
           if [ -z "$PLAYWRIGHT_BASE_URL" ]; then
-            echo "Missing deployed Playbook target URL"
+            echo "Missing production Playbook target URL"
             exit 1
           fi
           if [ -z "$PBOS_ACCEPTANCE_COMMIT" ]; then
-            echo "Missing deployed commit identity"
+            echo "Missing acceptance commit identity"
             exit 1
           fi
-      - name: Publish configuration-ready status
-        if: success()
-        env: { GH_TOKEN: "${{ github.token }}" }
-        run: gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${PBOS_ACCEPTANCE_COMMIT}" -f state=pending -f context=playbook/phase15-role-e2e -f description="stage:deployed-target"
-      - name: Check out deployed revision
+      - name: Check out acceptance revision
         uses: actions/checkout@v5
         with:
           ref: ${{ env.PBOS_ACCEPTANCE_COMMIT }}
@@ -98,13 +87,25 @@ jobs:
         run: npm ci
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
-      - name: Verify deployed target is reachable
+      - name: Publish production-revision wait status
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${PBOS_ACCEPTANCE_COMMIT}" -f state=pending -f context=playbook/phase15-role-e2e -f description="stage:production-revision"
+      - name: Wait for exact production revision
+        id: deployed_target
         run: |
-          for attempt in {1..60}; do
-            if curl --fail --silent --location "${PLAYWRIGHT_BASE_URL%/}/login" > /dev/null; then exit 0; fi
+          set -euo pipefail
+          TARGET="${PLAYWRIGHT_BASE_URL%/}/api/deployment"
+          for attempt in {1..180}; do
+            BODY=$(curl --fail --silent --show-error --location --max-time 10 "$TARGET" 2>/dev/null || true)
+            DEPLOYED_SHA=$(printf '%s' "$BODY" | node -e 'let s=""; process.stdin.on("data",d=>s+=d).on("end",()=>{try{const x=JSON.parse(s); process.stdout.write(String(x.commit||""));}catch{}});')
+            if [ "$DEPLOYED_SHA" = "$PBOS_ACCEPTANCE_COMMIT" ]; then
+              echo "Production is serving exact revision $DEPLOYED_SHA"
+              exit 0
+            fi
+            echo "Production revision attempt ${attempt}: ${DEPLOYED_SHA:-not-ready}; expected ${PBOS_ACCEPTANCE_COMMIT}"
             sleep 2
           done
-          echo "Deployed Playbook target did not become reachable: ${PLAYWRIGHT_BASE_URL}"
+          echo "Production did not converge to ${PBOS_ACCEPTANCE_COMMIT} at ${TARGET}"
           exit 1
       - name: Publish Scholar-running status
         env: { GH_TOKEN: "${{ github.token }}" }
@@ -142,9 +143,15 @@ jobs:
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
           gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${PBOS_ACCEPTANCE_COMMIT}" -f state=failure -f context=playbook/phase15-role-e2e -f description="FAILED:trusted acceptance configuration"
-          gh issue comment 234 --repo "$GITHUB_REPOSITORY" --body "Phase 15 trusted role E2E on ${PBOS_ACCEPTANCE_COMMIT} FAILED at **configuration** before deployed-target acceptance. No secret values are included in this report."
+          gh issue comment 234 --repo "$GITHUB_REPOSITORY" --body "Phase 15 trusted role E2E on ${PBOS_ACCEPTANCE_COMMIT} FAILED at **configuration**. No secret values are included in this report."
+      - name: Publish production-revision failure
+        if: failure() && steps.configuration.outcome == 'success' && steps.deployed_target.outcome == 'failure'
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${PBOS_ACCEPTANCE_COMMIT}" -f state=failure -f context=playbook/phase15-role-e2e -f description="FAILED:production revision barrier"
+          gh issue comment 234 --repo "$GITHUB_REPOSITORY" --body "Phase 15 trusted role E2E on ${PBOS_ACCEPTANCE_COMMIT} FAILED at **production revision barrier**. The stable main deployment did not report the exact acceptance SHA before the governed role journey began."
       - name: Publish Scholar failure
-        if: failure() && steps.configuration.outcome == 'success' && steps.scholar.outcome == 'failure'
+        if: failure() && steps.configuration.outcome == 'success' && steps.deployed_target.outcome == 'success' && steps.scholar.outcome == 'failure'
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
           SUMMARY="artifacts/pbos-acceptance/scholar-failure-summary.json"
@@ -156,22 +163,22 @@ jobs:
             MESSAGE="Scholar failed but the machine-readable failure summary was not produced."
           fi
           gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${PBOS_ACCEPTANCE_COMMIT}" -f state=failure -f context=playbook/phase15-role-e2e -f description="FAILED:Scholar:${STAGE}"
-          gh issue comment 234 --repo "$GITHUB_REPOSITORY" --body "Phase 15 trusted role E2E on ${PBOS_ACCEPTANCE_COMMIT} FAILED at **Scholar / ${STAGE}** against ${PLAYWRIGHT_BASE_URL}. ${MESSAGE}"
+          gh issue comment 234 --repo "$GITHUB_REPOSITORY" --body "Phase 15 trusted role E2E on ${PBOS_ACCEPTANCE_COMMIT} FAILED at **Scholar / ${STAGE}** against exact production revision. ${MESSAGE}"
       - name: Publish Scholar-Athlete failure
-        if: failure() && steps.configuration.outcome == 'success' && steps.scholar.outcome == 'success' && steps.scholar_athlete.outcome == 'failure'
+        if: failure() && steps.configuration.outcome == 'success' && steps.deployed_target.outcome == 'success' && steps.scholar.outcome == 'success' && steps.scholar_athlete.outcome == 'failure'
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
           gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${PBOS_ACCEPTANCE_COMMIT}" -f state=failure -f context=playbook/phase15-role-e2e -f description="FAILED:Scholar-Athlete journey"
-          gh issue comment 234 --repo "$GITHUB_REPOSITORY" --body "Phase 15 trusted role E2E on ${PBOS_ACCEPTANCE_COMMIT} FAILED at **Scholar-Athlete journey** against ${PLAYWRIGHT_BASE_URL}. Scholar passed; diagnostics artifact: phase15-trusted-role-diagnostics-${PBOS_ACCEPTANCE_COMMIT}."
+          gh issue comment 234 --repo "$GITHUB_REPOSITORY" --body "Phase 15 trusted role E2E on ${PBOS_ACCEPTANCE_COMMIT} FAILED at **Scholar-Athlete journey** against exact production revision. Scholar passed; diagnostics artifact: phase15-trusted-role-diagnostics-${PBOS_ACCEPTANCE_COMMIT}."
       - name: Publish Family failure
-        if: failure() && steps.configuration.outcome == 'success' && steps.scholar.outcome == 'success' && steps.scholar_athlete.outcome == 'success' && steps.family.outcome == 'failure'
+        if: failure() && steps.configuration.outcome == 'success' && steps.deployed_target.outcome == 'success' && steps.scholar.outcome == 'success' && steps.scholar_athlete.outcome == 'success' && steps.family.outcome == 'failure'
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
           gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${PBOS_ACCEPTANCE_COMMIT}" -f state=failure -f context=playbook/phase15-role-e2e -f description="FAILED:Family journey"
-          gh issue comment 234 --repo "$GITHUB_REPOSITORY" --body "Phase 15 trusted role E2E on ${PBOS_ACCEPTANCE_COMMIT} FAILED at **Family journey** against ${PLAYWRIGHT_BASE_URL}. Scholar and Scholar-Athlete passed; diagnostics artifact: phase15-trusted-role-diagnostics-${PBOS_ACCEPTANCE_COMMIT}."
-      - name: Publish deployed-target/bootstrap failure
-        if: failure() && steps.configuration.outcome == 'success' && steps.scholar.outcome == 'skipped'
+          gh issue comment 234 --repo "$GITHUB_REPOSITORY" --body "Phase 15 trusted role E2E on ${PBOS_ACCEPTANCE_COMMIT} FAILED at **Family journey** against exact production revision. Scholar and Scholar-Athlete passed; diagnostics artifact: phase15-trusted-role-diagnostics-${PBOS_ACCEPTANCE_COMMIT}."
+      - name: Publish trusted bootstrap failure
+        if: failure() && steps.configuration.outcome == 'success' && steps.deployed_target.outcome != 'failure' && steps.scholar.outcome == 'skipped'
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
-          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${PBOS_ACCEPTANCE_COMMIT}" -f state=failure -f context=playbook/phase15-role-e2e -f description="FAILED:deployed target bootstrap"
-          gh issue comment 234 --repo "$GITHUB_REPOSITORY" --body "Phase 15 trusted role E2E on ${PBOS_ACCEPTANCE_COMMIT} FAILED during **deployed-target bootstrap** before Scholar began. Target: ${PLAYWRIGHT_BASE_URL}."
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${PBOS_ACCEPTANCE_COMMIT}" -f state=failure -f context=playbook/phase15-role-e2e -f description="FAILED:trusted QA bootstrap"
+          gh issue comment 234 --repo "$GITHUB_REPOSITORY" --body "Phase 15 trusted role E2E on ${PBOS_ACCEPTANCE_COMMIT} FAILED during **trusted QA bootstrap** before Scholar began."
