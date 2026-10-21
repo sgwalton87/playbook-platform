@@ -57,7 +57,8 @@
     "test:acceptance:pbos:application": "playwright test tests/acceptance/pbos-application.spec.ts --project=chromium",
     "test:acceptance:pbos:support": "playwright test tests/acceptance/pbos-support.spec.ts --project=chromium",
     "test:acceptance:pbos:messaging": "playwright test tests/acceptance/pbos-messaging.spec.ts --project=chromium",
-    "test:acceptance:pbos:notifications": "playwright test tests/acceptance/pbos-notifications.spec.ts --project=chromium"
+    "test:acceptance:pbos:notifications": "playwright test tests/acceptance/pbos-notifications.spec.ts --project=chromium",
+    "postinstall": "node scripts/pbos/patch-next-eslint-glob.mjs"
   },
   "dependencies": {
     "@hcaptcha/react-hcaptcha": "^2.0.2",
@@ -93,5 +94,10 @@
     "tsx": "^4.22.5",
     "typescript": "^5",
     "vitest": "^4.1.9"
+  },
+  "overrides": {
+    "@next/eslint-plugin-next": {
+      "fast-glob": "npm:tinyglobby@0.2.17"
+    }
   }
 }
