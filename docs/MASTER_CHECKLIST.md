@@ -205,3 +205,5 @@ Further production mutation/release is held while the candidate repairs all 177 
 ## Mentor identity and fixture follow-up
 
 Candidate queue reads connected Scholar names through the existing governed support-context projection, never cross-user raw profiles. Projection/network errors withhold approval controls. The fixture-mutating Mentor acceptance suite is restricted to local app plus local Supabase and cleans approvals only for its Scholar/Mentor request IDs. It has not been run against production.
+
+Public presentation follow-up: the landing-page pathway count is derived from the canonical role registry (currently 15), replacing the stale hard-coded 14. This is role enumeration, not a claim of completed acceptance for all roles.

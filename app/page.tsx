@@ -3,9 +3,10 @@ import Link from "next/link";
 import CanonicalPublicNav from "@/components/public/CanonicalPublicNav";
 import CanonicalPublicFooter from "@/components/public/CanonicalPublicFooter";
 import styles from "./home.module.css";
+import { PLAYBOOK_ROLES } from "@/lib/roles/registry";
 
 const signals = [
-  ["14", "Role pathways"],
+  [String(Object.keys(PLAYBOOK_ROLES).length), "Role pathways"],
   ["1", "Living record"],
   ["Web", "Responsive access"],
   ["You", "Own the journey"],
