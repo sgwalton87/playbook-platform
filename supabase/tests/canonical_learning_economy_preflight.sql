@@ -188,7 +188,7 @@ DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic abov
 \endif
 
 -- Public-profile private exposure must remain the only anonymous private execution surface.
-select count(*) = 3 as anon_private_execute_still_bounded
+select count(*) = 4 and bool_and(p.oid in ('private.get_public_scholar_profile(text)'::regprocedure,'private.get_public_scholar_identities(uuid[])'::regprocedure,'private.get_public_member_identities(uuid[])'::regprocedure,'private.resolve_portfolio_share(text)'::regprocedure)) as anon_private_execute_still_bounded
 from pg_proc p
 join pg_namespace n on n.oid=p.pronamespace
 where n.nspname='private'
@@ -196,7 +196,7 @@ where n.nspname='private'
 \gset
 \if :anon_private_execute_still_bounded
 \else
-  \echo 'anonymous private EXECUTE broadened beyond the three intentional public-profile projection helpers'
+  \echo 'anonymous private EXECUTE broadened beyond the explicit public-profile and revocable-token helpers'
 
 DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
 

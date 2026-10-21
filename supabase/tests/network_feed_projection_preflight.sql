@@ -85,6 +85,20 @@ where schemaname='public' and tablename='profiles' and cmd='SELECT'
 DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
  \endif
 
+-- Canonical notifications (20260704) are an unused, RLS-closed user_id/text
+-- table. Application notifications use pbos_notifications and governed commands.
+-- Hosted legacy notifications instead use profile_id and the policies checked below.
+do $$
+begin
+ if to_regclass('public.notifications') is not null and not exists(select 1 from information_schema.columns where table_schema='public' and table_name='notifications' and column_name='profile_id') then
+   if not exists(select 1 from information_schema.columns where table_schema='public' and table_name='notifications' and column_name='user_id' and data_type='text')
+      or not exists(select 1 from pg_class where oid='public.notifications'::regclass and relrowsecurity)
+      or exists(select 1 from pg_policies where schemaname='public' and tablename='notifications') then
+     raise exception 'Canonical legacy notifications must retain the known RLS-closed contract';
+   end if;
+ end if;
+end $$;
+
 -- High-traffic social/attention policies span canonical plus reconciled legacy tables.
 -- A clean canonical replay may omit a legacy table entirely; however, whenever a target table
 -- exists, its expected policy must still exist with the expected command.
@@ -104,6 +118,7 @@ select not exists (
   select 1
   from expected e
   where to_regclass('public.' || e.tablename) is not null
+    and (e.tablename<>'notifications' or exists(select 1 from information_schema.columns where table_schema='public' and table_name='notifications' and column_name='profile_id'))
     and not exists (
       select 1 from pg_policies p
       where p.schemaname='public'

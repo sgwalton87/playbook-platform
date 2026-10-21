@@ -19,6 +19,9 @@ it('caches the fresh A-G owner policies without changing read or reassignment au
   await db.exec(`create role anon;create role authenticated;create schema auth;grant usage on schema auth to authenticated;
    create function auth.uid() returns uuid language sql as $$ select nullif(current_setting('test.uid',true),'')::uuid $$;
    create table public.coin_ledger(scholar_id uuid,event_type text,source_id text);create table public.community_events(id int);
+   create table public.onboarding_options(created_by uuid,value text);alter table public.onboarding_options enable row level security;
+   grant insert on public.onboarding_options to authenticated;
+   create policy "Authenticated users can add options" on public.onboarding_options for insert to authenticated with check(auth.uid()=created_by);
    create table public.ag_progress(user_id uuid,note text);alter table public.ag_progress enable row level security;
    grant select,insert,update on public.ag_progress to authenticated;
    create policy "Students can view own ag progress" on public.ag_progress for select to authenticated using(auth.uid()=user_id);
@@ -26,6 +29,8 @@ it('caches the fresh A-G owner policies without changing read or reassignment au
    insert into public.ag_progress values('00000000-0000-0000-0000-000000000001','owner'),('00000000-0000-0000-0000-000000000002','other');`);
   await db.exec(readFileSync('supabase/migrations/20261021033355_certification_authority_boundaries.sql','utf8'));
   await db.exec("set test.uid='00000000-0000-0000-0000-000000000001';set role authenticated;");
+  await db.exec("insert into public.onboarding_options values('00000000-0000-0000-0000-000000000001','owned')");
+  await expect(db.exec("insert into public.onboarding_options values('00000000-0000-0000-0000-000000000002','forged')")).rejects.toThrow('row-level security');
   expect((await db.query('select note from public.ag_progress')).rows).toEqual([{note:'owner'}]);
   expect((await db.query("update public.ag_progress set note='forged' where user_id='00000000-0000-0000-0000-000000000002' returning note")).rows).toEqual([]);
   await expect(db.query("update public.ag_progress set user_id='00000000-0000-0000-0000-000000000002'")).rejects.toThrow('row-level security');

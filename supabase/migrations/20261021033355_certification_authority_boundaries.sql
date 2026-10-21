@@ -10,6 +10,9 @@ revoke insert,update,delete on public.community_events from public,anon,authenti
 -- without adding policies or broadening its ownership/role predicates.
 do $$
 begin
+ if exists(select 1 from pg_policies where schemaname='public' and tablename='onboarding_options' and policyname='Authenticated users can add options') then
+   alter policy "Authenticated users can add options" on public.onboarding_options with check ((select auth.uid())=created_by);
+ end if;
  if exists(select 1 from pg_policies where schemaname='public' and tablename='ag_progress' and policyname='Students can view own ag progress') then
    alter policy "Students can view own ag progress" on public.ag_progress using ((select auth.uid())=user_id);
  end if;

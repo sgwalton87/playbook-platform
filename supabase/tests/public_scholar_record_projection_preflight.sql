@@ -97,7 +97,7 @@ begin
     if exists(select 1 from pg_policies where schemaname='public' and tablename='feed_posts' and cmd='SELECT' and coalesce(qual,'') in ('true','(true)')) then
       raise exception 'feed_posts still has an unconditional SELECT policy';
     end if;
-    if not exists(select 1 from pg_policies where schemaname='public' and tablename='feed_posts' and policyname='Public can view public feed posts' and qual ilike '%visibility%public%') then
+    if not exists(select 1 from pg_policies where schemaname='public' and tablename='feed_posts' and policyname='feed_posts_select_public' and qual ilike '%visibility%public%' and qual ilike '%moderation_state%visible%') then
       raise exception 'feed_posts public visibility policy is missing';
     end if;
   end if;
@@ -108,7 +108,7 @@ begin
   if exists(select 1 from pg_policies where schemaname='storage' and tablename='objects' and cmd='INSERT' and ('anon'=any(roles) or 'public'=any(roles)) and coalesce(with_check,'') ilike '%photos%') then
     raise exception 'photos bucket still permits anonymous/public uploads';
   end if;
-  if not exists(select 1 from pg_policies where schemaname='storage' and tablename='objects' and policyname='Authenticated users upload own public photos' and 'authenticated'=any(roles) and coalesce(with_check,'') ilike '%auth.uid()%' and coalesce(with_check,'') ilike '%foldername%') then
+  if not exists(select 1 from pg_policies where schemaname='storage' and tablename='objects' and policyname='photos_owner_upload' and 'authenticated'=any(roles) and coalesce(with_check,'') ilike '%auth.uid()%' and coalesce(with_check,'') ilike '%foldername%') then
     raise exception 'owner-namespaced authenticated photo upload policy is missing';
   end if;
 end $$;

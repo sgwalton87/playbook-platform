@@ -161,6 +161,7 @@ DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic abov
 -- playbook_records remains symmetric USING/WITH CHECK, and onboarding_options remains INSERT-only.
 do $$
 begin
+ if to_regclass('public.onboarding_options') is not null and not exists(select 1 from pg_policies where schemaname='public' and tablename='onboarding_options' and policyname in ('Users add options','Authenticated users can add options') and cmd='INSERT') then raise exception 'Onboarding options lost its creator INSERT contract'; end if;
  if to_regclass('public.ag_progress') is not null and not (
    exists(select 1 from pg_policies where schemaname='public' and tablename='ag_progress' and policyname='Users manage own ag_progress' and cmd='ALL')
    or (exists(select 1 from pg_policies where schemaname='public' and tablename='ag_progress' and policyname='Students can view own ag progress' and cmd='SELECT')
@@ -179,11 +180,13 @@ with expected(tablename,policyname,cmd,owner_column,requires_check) as (
     ('college_list','Scholars delete own college list','DELETE','user_id',false),
     ('deadlines','Users manage own deadlines','ALL','user_id',false),
     ('playbook_records','Users can manage own playbook records','ALL','profile_id',true),
-    ('onboarding_options','Users add options','INSERT','created_by',true)
+    ('onboarding_options','Users add options','INSERT','created_by',true),
+    ('onboarding_options','Authenticated users can add options','INSERT','created_by',true)
 ), existing_expected as (
   select e.*
   from expected e
   where to_regclass('public.' || e.tablename) is not null
+    and (e.tablename<>'onboarding_options' or exists(select 1 from pg_policies p where p.schemaname='public' and p.tablename=e.tablename and p.policyname=e.policyname and p.cmd=e.cmd))
     and (e.tablename<>'ag_progress' or exists(select 1 from pg_policies p where p.schemaname='public' and p.tablename=e.tablename and p.policyname=e.policyname and p.cmd=e.cmd))
 ), target as (
   select e.*, p.roles, p.qual, p.with_check
