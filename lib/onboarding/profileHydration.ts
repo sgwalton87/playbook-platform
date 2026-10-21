@@ -15,6 +15,7 @@ export function hydrateProfileFromOnboarding<T extends Record<string, unknown>>(
   const mappings: Record<string, string> = {
     full_name: "full_name",
     bio: "bio",
+    race: "race",
     school: "school",
     grade: "grade",
     dream_school: "dream_school",
