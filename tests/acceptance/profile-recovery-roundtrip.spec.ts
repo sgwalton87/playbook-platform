@@ -37,6 +37,7 @@ test("synthetic profile data survives edit and reload", async ({ page }) => {
     await page.waitForURL(url => url.pathname !== "/login", { timeout: 15000 });
     await page.goto("/profile");
     await expect(page).toHaveURL(url => url.pathname === "/profile");
+    await page.getByRole("button", { name: /academic/i }).first().click();
     const school = page.locator('input[value="Recovery Academy"]').first();
     await expect(school).toBeVisible();
     await school.fill("Recovery Institute");
@@ -46,6 +47,7 @@ test("synthetic profile data survives edit and reload", async ({ page }) => {
       return row.data?.school;
     }).toBe("Recovery Institute");
     await page.reload();
+    await page.getByRole("button", { name: /academic/i }).first().click();
     await expect(page.locator('input[value="Recovery Institute"]').first()).toBeVisible();
     const check = await admin.from("profiles").select("onboarding_data").eq("id", id).single();
     expect(check.data?.onboarding_data).toMatchObject({ school: "Recovery Institute",
