@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
-  "reconciledAt": "2026-08-16",
-  "baselineRevision": "2f87a0732532aace3902b363d0290bd7716427f1",
+  "reconciledAt": "2026-10-21",
+  "baselineRevision": "0eab6d5f387c4c06d147d6559da22c09220a86a5",
   "authority": {
     "humanReadable": "docs/MASTER_CHECKLIST.md",
     "journeys": "docs/USER_JOURNEYS.md",
@@ -15,31 +15,79 @@
     "Role identity, verification, relationship identity, Active Scholar selection, and Scholar-data authority are separate gates.",
     "Direct public.profiles reads remain owner-only; shared identity must use bounded projections.",
     "External or human gates may be skipped only while their dependent capability remains explicitly blocked.",
-    "Browser/visual certification may not be inferred from source tests, CI success, or Vercel READY state."
+    "Browser/visual certification may not be inferred from source tests, CI success, or Vercel READY state.",
+    "Merged code, hosted migration application, isolated CI/database certification and verified production deployment are separate evidence layers.",
+    "A passing check applies only to its recorded revision and tested scope; review-branch fixes are not production fixes."
   ],
   "lineage": {
-    "publicScholarProjection": {"pr": 123, "status": "merged"},
-    "experiencesAndScholarAi": {"pr": 124, "status": "merged"},
-    "verificationReviewerAuthority": {"pr": 125, "status": "merged"},
-    "dependencySecurityGate": {"pr": 126, "status": "merged"},
-    "networkAndFeed": {"pr": 127, "status": "merged"},
-    "learningCredentialsBadgesStore": {"pr": 128, "status": "merged"},
-    "opportunityApplicationBridge": {"pr": 129, "status": "merged"},
-    "eventsAndMentorship": {"pr": 130, "status": "merged"},
-    "notificationAuthority": {"pr": 133, "status": "merged"},
-    "liveShellContext": {"pr": 132, "status": "merged"},
-    "frontendQuality": {"pr": 134, "status": "merged"},
-    "activeScholarContext": {"pr": 135, "status": "merged"},
-    "hostedAuthorityReconciliation": {"pr": 136, "status": "merged"},
-    "productReviewCenter": {"pr": 137, "status": "merged", "canonicalRoleCount": 15},
-    "legacyHostingerEmail": {"pr": 88, "status": "closed-unmerged-external-gate"}
+    "publicScholarProjection": {
+      "pr": 123,
+      "status": "merged"
+    },
+    "experiencesAndScholarAi": {
+      "pr": 124,
+      "status": "merged"
+    },
+    "verificationReviewerAuthority": {
+      "pr": 125,
+      "status": "merged"
+    },
+    "dependencySecurityGate": {
+      "pr": 126,
+      "status": "merged"
+    },
+    "networkAndFeed": {
+      "pr": 127,
+      "status": "merged"
+    },
+    "learningCredentialsBadgesStore": {
+      "pr": 128,
+      "status": "merged"
+    },
+    "opportunityApplicationBridge": {
+      "pr": 129,
+      "status": "merged"
+    },
+    "eventsAndMentorship": {
+      "pr": 130,
+      "status": "merged"
+    },
+    "notificationAuthority": {
+      "pr": 133,
+      "status": "merged"
+    },
+    "liveShellContext": {
+      "pr": 132,
+      "status": "merged"
+    },
+    "frontendQuality": {
+      "pr": 134,
+      "status": "merged"
+    },
+    "activeScholarContext": {
+      "pr": 135,
+      "status": "merged"
+    },
+    "hostedAuthorityReconciliation": {
+      "pr": 136,
+      "status": "merged"
+    },
+    "productReviewCenter": {
+      "pr": 137,
+      "status": "merged",
+      "canonicalRoleCount": 15
+    },
+    "legacyHostingerEmail": {
+      "pr": 88,
+      "status": "closed-unmerged-external-gate"
+    }
   },
   "hostedDatabase": {
     "projectRef": "oexgxnybeixwadgtdtzp",
     "canonicalFeatureMigrationFrontier": "202608160039",
     "canonicalReconciliationFrontier": "202608160043",
-    "productionPromotion": "completed",
-    "profileDirectSelect": "owner-only",
+    "productionPromotion": "UNVERIFIED_FOR_CURRENT_MAIN",
+    "profileDirectSelect": "HISTORICALLY_REPORTED_OWNER_ONLY_NOT_REVERIFIED",
     "remainingConfigGates": [
       "Supabase Auth leaked-password protection"
     ],
@@ -48,7 +96,16 @@
       "legacy RLS auth initialization-plan warnings",
       "legacy multiple permissive policies",
       "legacy duplicate/unused index warnings"
-    ]
+    ],
+    "confirmedMissingObjects": [
+      "public.marketplace_application_shares",
+      "public.marketplace_application_outcomes",
+      "public.mentor_validation_requests",
+      "public.mentor_validation_approvals",
+      "public.college_list.is_dream",
+      "public.college_list.is_top"
+    ],
+    "reconciliationScope": "Read-only catalog and migration-history observations. No hosted migrations applied. Historical frontiers do not prove current migration coverage."
   },
   "journeys": {
     "scholar": "REFERENCE_IMPLEMENTATION",
@@ -81,6 +138,12 @@
     "intelligenceOutcomeMeasurement": "PARTIAL"
   },
   "releaseBlockers": [
+    "approved PBOS production endpoint, protected configuration and authority reconciliation",
+    "hosted Marketplace, Mentor validation and college-list schema gaps",
+    "five high development lint-chain dependency audit findings",
+    "atomic achievement command integration with durable delivery and idempotent downstream handlers",
+    "constitutional dependency closure including PPS-2006/PPS-2007 cycle",
+    "catalog content sourcing and launch data readiness",
     "exact-revision browser E2E for all 15 roles and canonical connected pathways",
     "mobile/device/accessibility/recovery certification",
     "Messaging attachment authority and direct-RLS relationship-revocation closure",
@@ -94,6 +157,11 @@
     "soft launch, rollback proof, release notes, feedback loop, and independent human launch approval"
   ],
   "nextExecutionOrder": [
+    "exact_head_ci_and_database_certification",
+    "achievement_command_event_delivery_and_form_integration",
+    "dependency_security_remediation",
+    "pbos_configuration_and_hosted_schema_review",
+    "accepted_revision_scholar_athlete_family_journeys",
     "messaging_revocation_and_attachment_authority",
     "browser_and_accessibility_certification",
     "academic_outcome_journey",
@@ -103,5 +171,59 @@
     "observability_analytics_and_operations",
     "compliance_soft_launch_and_human_approval"
   ],
-  "certificationReady": false
+  "certificationReady": false,
+  "historicalSnapshot": {
+    "reconciledAt": "2026-08-16",
+    "baselineRevision": "2f87a0732532aace3902b363d0290bd7716427f1",
+    "productionPromotionClaim": "completed",
+    "lineageAndMigrationFrontiers": "Retained historical claims; not independently re-certified by the October reconciliation."
+  },
+  "evidenceLayers": {
+    "mergedCode": {
+      "revision": "0eab6d5f387c4c06d147d6559da22c09220a86a5",
+      "status": "LAST_VERIFIED_MAIN"
+    },
+    "reviewCode": {
+      "pr": 253,
+      "url": "https://github.com/sgwalton87/playbook-platform/pull/253",
+      "revision": "0540c295f36a7e147f8137edc139a4c6d62b31d9",
+      "status": "DRAFT_NOT_MERGED",
+      "achievementCommand": "SQL_CANDIDATE_NOT_CONNECTED_TO_FORM"
+    },
+    "isolatedCertification": {
+      "revision": "a72f4e132b339a2b3093100f004eb1e734f65164",
+      "database": {
+        "status": "PASSED",
+        "url": "https://github.com/sgwalton87/playbook-platform/actions/runs/39533003807"
+      },
+      "marketplace": {
+        "status": "PASSED",
+        "url": "https://github.com/sgwalton87/playbook-platform/actions/runs/39533003851"
+      },
+      "platformQa": {
+        "status": "PASSED",
+        "url": "https://github.com/sgwalton87/playbook-platform/actions/runs/39533003848"
+      },
+      "ci": {
+        "validation": "PASSED",
+        "dependencyAudit": "FAILED",
+        "url": "https://github.com/sgwalton87/playbook-platform/actions/runs/39533003794"
+      },
+      "laterReviewRevision": "PENDING_INDEPENDENT_RESULTS"
+    },
+    "productionDeployment": {
+      "id": "dpl_DpV59gtokEedLhjGgTXDA4MG9E9s",
+      "revision": "0eab6d5f387c4c06d147d6559da22c09220a86a5",
+      "url": "https://the-playbook-five.vercel.app",
+      "status": "LAST_VERIFIED_IDENTITY_ONLY",
+      "authenticatedJourneys": "NOT_CERTIFIED",
+      "reviewBranchGitDeployment": "DISABLED"
+    },
+    "pbosIntegration": {
+      "latestRecordedFailure": "Missing protected server configuration: PBOS_API_URL",
+      "productionEndpoint": "UNVERIFIED",
+      "googleCloudConsole": "INACCESSIBLE_IN_READ_ONLY_BROWSER_SESSION",
+      "journeysRerun": false
+    }
+  }
 }
