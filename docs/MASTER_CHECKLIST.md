@@ -2,13 +2,13 @@
 
 ## Current verified snapshot — October 20, 2026 (America/Los_Angeles)
 
-PR 255 merged as `8a4038e322794cb997ad79f52e6fa5ddf1e6d88f`. Its tree exactly matches accepted review `477d03f31db81be7b1a85bb7f745446bb5a59d90`. CI/security/build/tests, Marketplace, public Platform QA and all 48 strict Database Certification steps passed: runs 39546311728, 39546311729, 39546311796 and 39546311769. The forced-error canary proved exit code 3; no ignored-quit warnings remain in that run. Earlier broad green conclusions remain invalidated.
+PRs 255 and 256 are merged; the last reconciled deployed baseline is `9ce0a93a314ab30687f72fd3f83d3b96305fd2fa`. Its tree matches accepted PR 256 review `d53ac2ba3327c4da3d75d6f40c57ea83d943c5fe`. CI 39547592471 passed security, lint, source controls, 852 tests / 233 suites and build. Strict Database Certification 39547592466 passed all 48 gates with a forced SQL-error canary and no ignored-quit warnings. Public QA 39547592580 passed. Earlier broad database green conclusions remain invalidated.
 
-Hosted migrations `20261021045516`, `20261021045527`, `20261021045532` were applied and verified separately: Mentor RLS/tables, governed approval/finalization/revocation, direct-write closure for Mentor/relationship/Event, valid reward unique index, unchanged hardened invitation claim. Vercel `dpl_8rboxo2jDBh7CWkEUfZdXWEo6wxe` is READY; stable production reports exact main SHA, home/login 200 and unauthenticated Mentor approval/support context 401. These observations do not certify authenticated Mentor journeys.
+Hosted migrations `20261021045516`, `20261021045527`, `20261021045532` were applied and verified separately: Mentor RLS/tables, governed approval/finalization/revocation, direct-write closure for Mentor/relationship/Event, valid reward unique index, unchanged hardened invitation claim. These observations do not certify authenticated Mentor journeys.
 
-Production PBOS endpoint/configuration remains unverified/missing; the automatic trusted QA run 39546746969 reached exact production revision 8a4038e, then Scholar onboarding failed on missing PBOS_API_URL; Athlete/Family skipped. The platform remains not launch-certified. All 23 constitutional snapshot hashes are unchanged.
+Vercel `dpl_HQx7qwbRpQpYpcxXLPCuFhb2fgn4` is READY at exact `9ce0a93`. Stable production revision endpoint and home return 200; browser and HTML show the canonical 15 role pathways. Trusted QA 39547967465 reached this exact production revision then failed Scholar onboarding on missing PBOS_API_URL; Athlete/Family skipped. Production PBOS configuration remains blocked. All 23 constitutional snapshot hashes are unchanged. Playbook remains not launch-certified.
 
-The sections below retain historical evidence. Current snapshot and machine-readable evidence layers supersede earlier current-state and certification claims.
+The sections below retain historical evidence. This snapshot and machine-readable evidence layers supersede earlier current-state and certification claims.
 
 ## Authority
 
@@ -207,3 +207,7 @@ Further production mutation/release is held while the candidate repairs all 177 
 Candidate queue reads connected Scholar names through the existing governed support-context projection, never cross-user raw profiles. Projection/network errors withhold approval controls. The fixture-mutating Mentor acceptance suite is restricted to local app plus local Supabase and cleans approvals only for its Scholar/Mentor request IDs. It has not been run against production.
 
 Public presentation follow-up: the landing-page pathway count is derived from the canonical role registry (currently 15), replacing the stale hard-coded 14. This is role enumeration, not a claim of completed acceptance for all roles.
+
+## Achievement event error propagation candidate
+
+Trust reads and trust/timeline/opportunity repository writes now reject database errors instead of permitting event delivery to report success. Targeted tests exercise all five AchievementCreated derived writers and a denied canonical read. This is error propagation, not transactional rollback or durable retry: core and earlier derived writes can persist before a later failure. Do not automatically replay these non-idempotent handlers. Atomic command/form integration and durable delivery remain required.
