@@ -161,3 +161,5 @@ Follow-up local evidence: 817 tests across 224 suites passed after dependency up
 ## Achievement evidence failure handling candidate — October 20, 2026
 
 Owner: Playbook OS Engineering. Related: `lib/playbook-record/services/achievements.ts`. Existing record lookup errors and failed evidence-pack, evidence, reflection and timeline inserts now stop the workflow before AchievementCreated is published. Seven mocked regression cases cover every failure stage and ordered success. This prevents false success/provenance; it does not make the multi-request workflow atomic, idempotent or production-certified. Partial earlier writes remain possible and must be addressed in the canonical command/transaction gate. No automatic cleanup or deletion was introduced.
+
+CI evidence isolation: dependency audit now runs as its own failing security job while validation runs independently. No continue-on-error or audit suppression is introduced. This preserves the release blocker while allowing lint, PBOS control, full tests and build evidence to be collected. Constitutional sources are review snapshots, not amendment approval or proof of complete dependency closure.
