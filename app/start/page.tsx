@@ -326,7 +326,7 @@ function StartContent() {
         }
         setCreating(false);
         setCreated(true);
-        setTimeout(() => { router.replace(result.destination || destination); }, 15000);
+        setTimeout(() => { router.replace(result.destination || destination); }, 1500);
         return;
       }
 

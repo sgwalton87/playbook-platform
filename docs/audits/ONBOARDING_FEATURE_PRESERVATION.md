@@ -1,5 +1,20 @@
 # Onboarding Feature Preservation
 
+## 2026-10-21 availability boundary
+
+Scholar, Scholar-Athlete, and Transition Youth onboarding now treats the
+self-owned profile and PBOS activation as separate states. When the protected
+PBOS runtime or role approval configuration is absent, the authenticated
+governed completion RPC records onboarding completion, marks verification
+pending, returns HTTP 202 with `pending-pbos-activation`, and routes the user to
+their role dashboard. This path does not create a PBOS identity, publish an
+event, project an exchange, or grant relationship or role authority.
+
+The full PBOS activation path remains unchanged when all role-specific
+configuration exists. Production PBOS activation is still uncertified until a
+production runtime and approvals are provisioned and the authenticated journey
+is exercised end to end.
+
 ## Purpose
 Recover established profile-building behavior inside the canonical onboarding flow and prevent consolidation from silently removing it.
 
