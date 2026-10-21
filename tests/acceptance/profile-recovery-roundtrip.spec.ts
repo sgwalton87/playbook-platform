@@ -8,7 +8,12 @@ test("synthetic profile data survives edit and reload", async ({ page }) => {
   if (!(target.hostname === "localhost" || target.hostname === "127.0.0.1" || target.hostname.endsWith("-preview.vercel.app"))) {
     throw new Error("Run only against an isolated preview environment");
   }
-  const admin = createClient(need("NEXT_PUBLIC_SUPABASE_URL"), need("SUPABASE_SERVICE_ROLE_KEY"), {
+  if (need("PBOS_ALLOW_SYNTHETIC_AUTH_WRITE") !== "YES") throw new Error("Explicit QA account creation approval required");
+  const supabaseUrl = new URL(need("NEXT_PUBLIC_SUPABASE_URL"));
+  if (supabaseUrl.hostname === "oexgxnybeixwadgtdtzp.supabase.co") {
+    throw new Error("Production Supabase project is forbidden for this synthetic test");
+  }
+  const admin = createClient(supabaseUrl.toString(), need("SUPABASE_SERVICE_ROLE_KEY"), {
     auth: { autoRefreshToken: false, persistSession: false }
   });
   const email = `pbos-recovery-${randomUUID()}@example.com`;
