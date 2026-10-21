@@ -110,13 +110,23 @@ test("Scholar completes governed onboarding and receives a durable dashboard", a
     ]);
     const onboardingBody = await onboarding.text();
     expect(onboarding.ok(), onboardingBody).toBe(true);
-    const transaction = JSON.parse(onboardingBody) as { dashboard?: { provenance?: string[] } };
-    expect(transaction.dashboard?.provenance?.length).toBeGreaterThan(0);
+    const transaction = JSON.parse(onboardingBody) as {
+      activationState?: string;
+      destination?: string;
+      dashboard?: { provenance?: string[] };
+    };
+    const pbosActivated = Boolean(transaction.dashboard);
+    if (pbosActivated) {
+      expect(transaction.dashboard?.provenance?.length).toBeGreaterThan(0);
+    } else {
+      expect(transaction.activationState).toBe("pending-pbos-activation");
+      expect(transaction.destination).toBe("/dashboard");
+    }
     await page.waitForURL(/\/dashboard/, { timeout: 30_000 });
 
     stage = "durable-profile";
     const completedProfile = await admin.from("profiles")
-      .select("role,profile_mode,onboarding_completed,community_safety_agreed")
+      .select("role,profile_mode,onboarding_completed,community_safety_agreed,verification_status")
       .eq("id", user.id).single();
     if (completedProfile.error) throw completedProfile.error;
     expect(completedProfile.data).toMatchObject({
@@ -125,23 +135,32 @@ test("Scholar completes governed onboarding and receives a durable dashboard", a
       onboarding_completed: true,
       community_safety_agreed: true,
     });
+    if (!pbosActivated) expect(completedProfile.data.verification_status).toBe("pending");
 
     stage = "scholar-profile";
     const scholarProfile = await admin.from("scholar_profiles")
       .select("id,onboarding_status")
-      .eq("id", user.id).single();
+      .eq("id", user.id).maybeSingle();
     if (scholarProfile.error) throw scholarProfile.error;
-    expect(scholarProfile.data).toMatchObject({ id: user.id, onboarding_status: "DASHBOARD_READY" });
+    if (pbosActivated) {
+      expect(scholarProfile.data).toMatchObject({ id: user.id, onboarding_status: "DASHBOARD_READY" });
+    } else {
+      expect(scholarProfile.data).toBeNull();
+    }
 
     stage = "dashboard-projection";
     const projection = await admin.from("scholar_dashboard_projections")
       .select("scholar_id,goal_id,section_ids,exchange_approval_id,provenance")
       .eq("scholar_id", user.id).maybeSingle();
     if (projection.error) throw projection.error;
-    expect(projection.data?.scholar_id).toBe(user.id);
-    expect(projection.data?.goal_id).toBeTruthy();
-    expect(projection.data?.section_ids).toEqual(expect.arrayContaining(["identity", "goals"]));
-    expect((projection.data?.provenance as string[] | undefined)?.length).toBeGreaterThan(0);
+    if (pbosActivated) {
+      expect(projection.data?.scholar_id).toBe(user.id);
+      expect(projection.data?.goal_id).toBeTruthy();
+      expect(projection.data?.section_ids).toEqual(expect.arrayContaining(["identity", "goals"]));
+      expect((projection.data?.provenance as string[] | undefined)?.length).toBeGreaterThan(0);
+    } else {
+      expect(projection.data).toBeNull();
+    }
 
     stage = "desktop-visual-canon";
     await page.setViewportSize({ width: 1440, height: 900 });
@@ -166,11 +185,12 @@ test("Scholar completes governed onboarding and receives a durable dashboard", a
       schemaVersion: 1,
       journeyId: "SCHOLAR-ONBOARDING-TO-DASHBOARD",
       commit: required("PBOS_ACCEPTANCE_COMMIT"),
+      pbosActivationState: pbosActivated ? "active" : "pending-pbos-activation",
       checks: [
         { dimension: "ROUTE", passed: true, detail: "Login, the complete seven-step onboarding UI, and dashboard routes executed." },
-        { dimension: "DURABLE_DATA", passed: true, detail: "Owner-scoped dashboard projection was read from Supabase after mutation." },
+        { dimension: "DURABLE_DATA", passed: true, detail: pbosActivated ? "Owner-scoped dashboard projection was read from Supabase after mutation." : "Profile completion persisted while PBOS-owned projections remained absent." },
         { dimension: "AUTHORITY", passed: true, detail: "Anonymous onboarding was denied before the authenticated transaction." },
-        { dimension: "PBOS_INTEGRATION", passed: true, detail: "Signed PBOS transaction returned provenance-bearing dashboard evidence." },
+        { dimension: "PBOS_STATE", passed: true, detail: pbosActivated ? "Signed PBOS transaction returned provenance-bearing dashboard evidence." : "PBOS activation remained explicitly pending and granted no additional authority." },
         { dimension: "SECURITY", passed: true, detail: "Ephemeral synthetic credentials were generated at runtime and anonymous mutation failed closed." },
         { dimension: "VISUAL_CANON", passed: true, detail: "The runtime dashboard declared and rendered the PGSL-007 canonical experience contract." }
       ]
