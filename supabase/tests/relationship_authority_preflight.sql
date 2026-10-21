@@ -188,12 +188,20 @@ begin
   ) then
     missing := array_append(missing, 'Family invitation-bound INSERT policy');
   end if;
-  if not exists (
+  if exists (
     select 1 from pg_policies
      where schemaname='public' and tablename='support_relationships'
        and policyname='Validated mentors can activate invited support relationships'
   ) then
-    missing := array_append(missing, 'Mentor validation-bound INSERT policy');
+    raise exception 'Mentor activation must use the governed command, not direct INSERT';
+  end if;
+  if to_regprocedure('private.approve_mentor_validation(uuid)') is null
+     or to_regprocedure('private.finalize_mentor_validation(uuid)') is null then
+    missing := array_append(missing, 'Private Mentor validation commands');
+  end if;
+  if has_table_privilege('authenticated','public.mentor_validation_requests','INSERT,UPDATE,DELETE')
+     or has_table_privilege('authenticated','public.mentor_validation_approvals','INSERT,UPDATE,DELETE') then
+    raise exception 'Mentor validation tables must not grant direct client mutations';
   end if;
   if not exists (
     select 1 from pg_policies

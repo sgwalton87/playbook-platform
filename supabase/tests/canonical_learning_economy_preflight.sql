@@ -27,7 +27,9 @@ select not has_table_privilege('authenticated','public.learning_module_progress'
 \if :no_direct_learning_mint
 \else
   \echo 'authenticated clients must not directly mint learning progress, credentials, or badges'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 -- Completion is exposed only as an invoker wrapper; private helper retains authority.
@@ -36,21 +38,27 @@ select to_regprocedure('public.complete_learning_module(text,text,text)') is not
 \if :completion_chain_exists
 \else
   \echo 'learning completion wrapper/helper chain is incomplete'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select not (select prosecdef from pg_proc where oid='public.complete_learning_module(text,text,text)'::regprocedure) as public_completion_invoker \gset
 \if :public_completion_invoker
 \else
   \echo 'public complete_learning_module must be SECURITY INVOKER'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select (select prosecdef from pg_proc where oid='private.complete_learning_module(text,text,text)'::regprocedure) as private_completion_definer \gset
 \if :private_completion_definer
 \else
   \echo 'private complete_learning_module must retain SECURITY DEFINER authority'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select has_function_privilege('authenticated','public.complete_learning_module(text,text,text)','EXECUTE')
@@ -58,7 +66,9 @@ select has_function_privilege('authenticated','public.complete_learning_module(t
 \if :auth_completion_chain
 \else
   \echo 'authenticated learners require the narrow learning completion wrapper/helper chain'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select not has_function_privilege('anon','public.complete_learning_module(text,text,text)','EXECUTE')
@@ -66,14 +76,18 @@ select not has_function_privilege('anon','public.complete_learning_module(text,t
 \if :anon_completion_denied
 \else
   \echo 'anonymous users must not complete learning modules'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select not has_function_privilege('authenticated','private.record_learning_reward(uuid,text,text,integer,integer,text)','EXECUTE') as auth_reward_helper_private \gset
 \if :auth_reward_helper_private
 \else
   \echo 'authenticated clients must not call private reward mint helper'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 -- Completion body must preserve learner-role, published-course, required-module, reflection, and idempotency gates.
@@ -84,7 +98,9 @@ select pg_get_functiondef('private.complete_learning_module(text,text,text)'::re
 \if :learner_course_module_gates
 \else
   \echo 'learning completion must remain learner-scoped to published courses and required modules'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select pg_get_functiondef('private.complete_learning_module(text,text,text)'::regprocedure) ~ 'completion_mode\s*=\s*''reflection'''
@@ -92,7 +108,9 @@ select pg_get_functiondef('private.complete_learning_module(text,text,text)'::re
 \if :reflection_guard
 \else
   \echo 'reflection modules must retain meaningful reflection requirement'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select pg_get_functiondef('private.complete_learning_module(text,text,text)'::regprocedure) ~ 'on conflict\s*\(user_id,course_slug,module_key\)\s*do nothing'
@@ -101,7 +119,9 @@ select pg_get_functiondef('private.complete_learning_module(text,text,text)'::re
 \if :completion_reward_idempotent
 \else
   \echo 'module/course completion reward idempotency is missing'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select pg_get_functiondef('private.complete_learning_module(text,text,text)'::regprocedure) ~ 'on conflict\s*\(user_id,course_slug\)\s*do update'
@@ -109,18 +129,25 @@ select pg_get_functiondef('private.complete_learning_module(text,text,text)'::re
 \if :durable_credential_badge_upserts
 \else
   \echo 'credential/badge issuance must remain durable idempotent upserts'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 -- Course completion and module completion are idempotent at the ledger source.
-select count(*) = 1 as ledger_dedupe_index_exists
-from pg_indexes
-where schemaname='public' and tablename='coin_ledger' and indexdef ilike '%scholar_id%event_type%source_id%';
+select exists(select 1 from pg_index i
+where i.indrelid='public.coin_ledger'::regclass and i.indisunique and i.indisvalid
+  and i.indnkeyatts=3 and i.indpred is null
+  and pg_get_indexdef(i.indexrelid,1,true)='scholar_id'
+  and pg_get_indexdef(i.indexrelid,2,true)='event_type'
+  and pg_get_indexdef(i.indexrelid,3,true)='source_id') as ledger_dedupe_index_exists;
 \gset
 \if :ledger_dedupe_index_exists
 \else
   \echo 'coin ledger idempotency index missing'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select pg_get_functiondef('private.record_learning_reward(uuid,text,text,integer,integer,text)'::regprocedure) ~ 'pg_advisory_xact_lock'
@@ -128,7 +155,9 @@ select pg_get_functiondef('private.record_learning_reward(uuid,text,text,integer
 \if :reward_helper_serialized
 \else
   \echo 'private reward helper must retain transaction lock and ledger dedupe'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 -- Store remains on the existing canonical atomic authority; no parallel economy.
@@ -136,24 +165,30 @@ select to_regprocedure('public.redeem_store_product(uuid,jsonb,text)') is not nu
 \if :store_rpc_exists
 \else
   \echo 'canonical store redemption RPC missing'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 select has_function_privilege('authenticated','public.redeem_store_product(uuid,jsonb,text)','EXECUTE') as auth_store_exec \gset
 \if :auth_store_exec
 \else
   \echo 'authenticated must execute canonical store redemption'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 select to_regclass('public.reward_store_items') is null
    and to_regclass('public.reward_store_redemptions') is null as no_parallel_economy \gset
 \if :no_parallel_economy
 \else
   \echo 'parallel reward store economy must not exist'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 -- Public-profile private exposure must remain the only anonymous private execution surface.
-select count(*) = 3 as anon_private_execute_still_bounded
+select count(*) = 4 and bool_and(p.oid in ('private.get_public_scholar_profile(text)'::regprocedure,'private.get_public_scholar_identities(uuid[])'::regprocedure,'private.get_public_member_identities(uuid[])'::regprocedure,'private.resolve_portfolio_share(text)'::regprocedure)) as anon_private_execute_still_bounded
 from pg_proc p
 join pg_namespace n on n.oid=p.pronamespace
 where n.nspname='private'
@@ -161,8 +196,10 @@ where n.nspname='private'
 \gset
 \if :anon_private_execute_still_bounded
 \else
-  \echo 'anonymous private EXECUTE broadened beyond the three intentional public-profile projection helpers'
-  \quit 1
+  \echo 'anonymous private EXECUTE broadened beyond the explicit public-profile and revocable-token helpers'
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 rollback;

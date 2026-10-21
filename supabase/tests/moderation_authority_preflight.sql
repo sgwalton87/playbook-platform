@@ -54,7 +54,7 @@ with expected(tablename,policyname,cmd,owner_column) as (
   values
     ('user_mutes','Users manage own mutes','ALL','user_id'),
     ('content_mutes','Users manage own content mutes','ALL','user_id'),
-    ('user_blocks','Users manage own blocks','ALL','blocker_id'),
+    ('user_blocks','Users view own blocks','SELECT','blocker_id'),
     ('moderation_reports','Users create own reports','INSERT','reporter_id'),
     ('moderation_reports','Users view own reports','SELECT','reporter_id')
 ), target as (
@@ -72,6 +72,8 @@ select count(*)=5
    and bool_and((coalesce(qual,'') || ' ' || coalesce(with_check,'')) ilike '%' || owner_column || '%')
 as social_safety_owner_policies_cached
 from target \gset
-\if :social_safety_owner_policies_cached \else \echo 'social safety owner policies must remain authenticated, owner-scoped, and statement-cached' \quit 1 \endif
+\if :social_safety_owner_policies_cached \else \echo 'social safety owner policies must remain authenticated, owner-scoped, and statement-cached'
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+ \endif
 
 rollback;
