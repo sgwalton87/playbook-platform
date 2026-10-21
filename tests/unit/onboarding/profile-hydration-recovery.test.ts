@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { hydrateProfileFromOnboarding } from "@/lib/onboarding/profileHydration";
+import { hydrateProfileFromOnboarding, reconcileProfileSave } from "@/lib/onboarding/profileHydration";
 
 describe("recovery: profile editor hydration from onboarding", () => {
   it("prefers newly saved signup values over stale legacy profile fields", () => {
@@ -47,5 +47,39 @@ describe("recovery: profile editor hydration from onboarding", () => {
   it("returns unchanged profile when no valid onboarding snapshot exists", () => {
     const profile = { school: "Historical school", onboarding_data: null };
     expect(hydrateProfileFromOnboarding(profile)).toBe(profile);
+  });
+});
+
+describe("profile editor save reconciliation", () => {
+  it("updates overlapping signup values while preserving answers that have no editor field", () => {
+    const saved = reconcileProfileSave(
+      { primary_sport: "Basketball", activities: ["Volunteering"], invite_supporters: ["mentor"], nil_interest: ["media"], gpa: "3.4" },
+      { sport: "Soccer", unweighted_gpa: "3.8", college_list_2: "Stanford", full_name: "Test Scholar" }
+    );
+    expect(saved.primary_sport).toBe("Soccer");
+    expect(saved.gpa).toBe("3.8");
+    expect(saved.unweighted_gpa).toBe("3.8");
+    expect(saved.top_schools).toEqual(["Stanford"]);
+    expect(saved.activities).toEqual(["Volunteering"]);
+    expect(saved.invite_supporters).toEqual(["mentor"]);
+    expect(saved.nil_interest).toEqual(["media"]);
+  });
+
+  it("never copies profile authority or private attributes without an explicit mapping", () => {
+    const saved = reconcileProfileSave(
+      { onboarding_completed: true, community_safety_agreed: true },
+      { role: "admin", verification_status: "approved", school: "School" }
+    );
+    expect(saved).not.toHaveProperty("role");
+    expect(saved).not.toHaveProperty("verification_status");
+    expect(saved.onboarding_completed).toBe(true);
+    expect(saved.school).toBe("School");
+  });
+
+  it("shows a newly edited value when the reconciled profile reloads", () => {
+    const original = { sport: "Basketball", onboarding_data: { primary_sport: "Basketball" } };
+    const updates = { sport: "Track" };
+    const afterSave = { ...original, ...updates, onboarding_data: reconcileProfileSave(original.onboarding_data, updates) };
+    expect(hydrateProfileFromOnboarding(afterSave).sport).toBe("Track");
   });
 });
