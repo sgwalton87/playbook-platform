@@ -245,12 +245,12 @@
         "unauthenticatedMentorApproval": 401,
         "unauthenticatedSupportContext": 401
       },
-      "authenticatedJourneys": "NOT_RERUN_AT_THIS_REVISION_PBOS_CONFIGURATION_REMAINS_BLOCKED",
-      "trustedRoleRun": "https://github.com/sgwalton87/playbook-platform/actions/runs/39536495519",
+      "authenticatedJourneys": "FAILED_AT_SCHOLAR_ONBOARDING_API_AT_THIS_EXACT_REVISION",
+      "trustedRoleRun": "https://github.com/sgwalton87/playbook-platform/actions/runs/39546746969",
       "automaticGitDeployment": "DISABLED_FOR_MAIN_AND_ORIGINAL_REVIEW_BRANCH"
     },
     "pbosIntegration": {
-      "latestRecordedFailure": "Missing protected server configuration: PBOS_API_URL at accepted production revision 0cb6997",
+      "latestRecordedFailure": "Missing protected server configuration: PBOS_API_URL at accepted production revision 8a4038e",
       "productionEndpoint": "UNVERIFIED",
       "googleCloudConsole": "INACCESSIBLE_IN_READ_ONLY_BROWSER_SESSION",
       "journeysRerun": true,

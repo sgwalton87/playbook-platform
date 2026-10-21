@@ -6,7 +6,7 @@ PR 255 merged as `8a4038e322794cb997ad79f52e6fa5ddf1e6d88f`. Its tree exactly ma
 
 Hosted migrations `20261021045516`, `20261021045527`, `20261021045532` were applied and verified separately: Mentor RLS/tables, governed approval/finalization/revocation, direct-write closure for Mentor/relationship/Event, valid reward unique index, unchanged hardened invitation claim. Vercel `dpl_8rboxo2jDBh7CWkEUfZdXWEo6wxe` is READY; stable production reports exact main SHA, home/login 200 and unauthenticated Mentor approval/support context 401. These observations do not certify authenticated Mentor journeys.
 
-Production PBOS endpoint/configuration remains unverified/missing; latest trusted Scholar onboarding failed at prior deployed 0cb6997, Athlete/Family skipped. No authenticated journey rerun at this revision. The platform remains not launch-certified. All 23 constitutional snapshot hashes are unchanged.
+Production PBOS endpoint/configuration remains unverified/missing; the automatic trusted QA run 39546746969 reached exact production revision 8a4038e, then Scholar onboarding failed on missing PBOS_API_URL; Athlete/Family skipped. The platform remains not launch-certified. All 23 constitutional snapshot hashes are unchanged.
 
 The sections below retain historical evidence. Current snapshot and machine-readable evidence layers supersede earlier current-state and certification claims.
 
