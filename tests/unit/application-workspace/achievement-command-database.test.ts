@@ -76,3 +76,19 @@ it('creates the complete achievement atomically, enforces ownership and rejects 
     await expect(call('00000000-0000-0000-0000-000000000004')).rejects.toThrow('reconciliation');
   } finally { await db.close(); }
 }, 30000);
+
+it('executes the same transactional preflight used by full Supabase certification', async () => {
+  const db = new PGlite();
+  try {
+    await db.exec(`create role anon; create role authenticated; create schema auth;
+      grant usage on schema auth to authenticated,anon;
+      create function auth.uid() returns uuid language sql as $$ select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;
+      create table auth.users(id uuid primary key,email text);
+      create table public.profiles(id uuid primary key references auth.users(id),username text);`);
+    await db.exec(readFileSync('supabase/migrations/20260701_playbook_graph.sql', 'utf8').replace('create extension if not exists pgcrypto;', ''));
+    await db.exec(readFileSync('supabase/migrations/20261021023624_achievement_atomic_command.sql', 'utf8'));
+    const preflight = readFileSync('supabase/tests/achievement_command_preflight.sql', 'utf8').replace(/^\\set.*$/gm, '');
+    await db.exec(preflight);
+    expect((await db.query('select * from public.achievements')).rows).toEqual([]);
+  } finally { await db.close(); }
+}, 30000);
