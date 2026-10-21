@@ -63,3 +63,38 @@ export function hydrateProfileFromOnboarding<T extends Record<string, unknown>>(
   // from user-editable onboarding JSON.
   return merged as T;
 }
+
+/**
+ * Keep the overlapping legacy editor fields and the saved onboarding snapshot
+ * aligned in the SAME profile update. Preserve draft-only fields (activities,
+ * supporters, NIL interests, background, etc.) without publishing them.
+ */
+export function reconcileProfileSave(
+  onboardingData: unknown,
+  profileUpdates: Record<string, unknown>
+): Record<string, unknown> {
+  const prior = onboardingData && typeof onboardingData === "object" && !Array.isArray(onboardingData)
+    ? onboardingData as Record<string, unknown> : {};
+  const next = { ...prior };
+  const keys: Record<string, string> = {
+    full_name: "full_name", bio: "bio", school: "school", grade: "grade",
+    dream_school: "dream_school", school_district: "school_district",
+    grad_year: "graduation_year", intended_major: "intended_major",
+    sport: "primary_sport", position: "position", travel_team: "current_team",
+    highlight_reel_url: "highlight_link", city: "city", zip_code: "zip_code",
+    weighted_gpa: "weighted_gpa", unweighted_gpa: "unweighted_gpa",
+    sat_score: "sat_score", act_score: "act_score",
+  };
+  for (const [profileKey, draftKey] of Object.entries(keys)) {
+    if (Object.prototype.hasOwnProperty.call(profileUpdates, profileKey)) {
+      next[draftKey] = profileUpdates[profileKey];
+    }
+  }
+  // Prevent stale generic GPA from shadowing a newly saved unweighted GPA.
+  if (Object.prototype.hasOwnProperty.call(profileUpdates, "unweighted_gpa")) {
+    next.gpa = profileUpdates.unweighted_gpa;
+  }
+  next.top_schools = Array.from({ length: 9 }, (_, i) => profileUpdates[`college_list_${i + 2}`])
+    .filter(v => typeof v === "string" && v.trim() !== "");
+  return next;
+}
