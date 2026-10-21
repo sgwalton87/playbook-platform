@@ -38,87 +38,87 @@ export default function MentorValidationQueue({ showEmpty = false }: { showEmpty
   const [approvingId, setApprovingId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
-    if (!user) {
-      setState("unavailable");
-      setMessage("Sign in is required to review Mentor validations.");
-      return;
-    }
-
-    setCurrentUserId(user.id);
-
-    const relationshipResult = await supabase
-      .from("support_relationships")
-      .select("id,scholar_id,relationship")
-      .eq("supporter_id", user.id)
-      .eq("status", "active");
-
-    if (relationshipResult.error) {
-      setState("unavailable");
-      setMessage(relationshipResult.error.message);
-      return;
-    }
-
-    const activeRelationships = (relationshipResult.data ?? []) as ActiveSupportRelationship[];
-    setRelationships(activeRelationships);
-    const scholarIds = Array.from(new Set(activeRelationships.map((relationship) => relationship.scholar_id)));
-
-    if (scholarIds.length === 0) {
-      setRequests([]);
-      setApprovals([]);
-      setScholarNames({});
-      setState("ready");
-      return;
-    }
-
-    const requestResult = await supabase
-      .from("mentor_validation_requests")
-      .select("id,scholar_id,mentor_user_id,mentor_name,mentor_email,status,created_at")
-      .in("scholar_id", scholarIds)
-      .eq("status", "pending")
-      .order("created_at", { ascending: true });
-
-    if (requestResult.error) {
-      setState("unavailable");
-      setMessage(requestResult.error.message);
-      return;
-    }
-
-    const pendingRequests = (requestResult.data ?? []) as MentorValidationRequest[];
-    setRequests(pendingRequests);
-
-    const [approvalResult, scholarResult] = await Promise.all([
-      pendingRequests.length
-        ? supabase
-            .from("mentor_validation_approvals")
-            .select("request_id,approver_user_id,relationship_snapshot")
-            .in("request_id", pendingRequests.map((request) => request.id))
-        : Promise.resolve({ data: [], error: null }),
-      supabase
-        .from("profiles")
-        .select("id,full_name")
-        .in("id", scholarIds),
-    ]);
-
-    if (approvalResult.error) {
-      setState("unavailable");
-      setMessage(approvalResult.error.message);
-      return;
-    }
-
-    setApprovals((approvalResult.data ?? []) as MentorValidationApproval[]);
-    const nextScholarNames: Record<string, string> = {};
-    if (!scholarResult.error) {
-      for (const profile of scholarResult.data ?? []) {
-        nextScholarNames[profile.id] = profile.full_name || "Scholar";
+      if (!user) {
+        setState("unavailable");
+        setMessage("Sign in is required to review Mentor validations.");
+        return;
       }
+
+      setCurrentUserId(user.id);
+
+      const relationshipResult = await supabase
+        .from("support_relationships")
+        .select("id,scholar_id,relationship")
+        .eq("supporter_id", user.id)
+        .eq("status", "active");
+
+      if (relationshipResult.error) {
+        setState("unavailable");
+        setMessage(relationshipResult.error.message);
+        return;
+      }
+
+      const activeRelationships = (relationshipResult.data ?? []) as ActiveSupportRelationship[];
+      setRelationships(activeRelationships);
+      const scholarIds = Array.from(new Set(activeRelationships.map((relationship) => relationship.scholar_id)));
+
+      if (scholarIds.length === 0) {
+        setRequests([]);
+        setApprovals([]);
+        setScholarNames({});
+        setState("ready");
+        return;
+      }
+
+      const requestResult = await supabase
+        .from("mentor_validation_requests")
+        .select("id,scholar_id,mentor_user_id,mentor_name,mentor_email,status,created_at")
+        .in("scholar_id", scholarIds)
+        .eq("status", "pending")
+        .order("created_at", { ascending: true });
+
+      if (requestResult.error) {
+        setState("unavailable");
+        setMessage(requestResult.error.message);
+        return;
+      }
+
+      const pendingRequests = (requestResult.data ?? []) as MentorValidationRequest[];
+      setRequests(pendingRequests);
+
+      const [approvalResult, scholarResult] = await Promise.all([
+        pendingRequests.length
+          ? supabase
+              .from("mentor_validation_approvals")
+              .select("request_id,approver_user_id,relationship_snapshot")
+              .in("request_id", pendingRequests.map((request) => request.id))
+          : Promise.resolve({ data: [], error: null }),
+        supabase.rpc("get_available_support_scholar_contexts"),
+      ]);
+
+      if (approvalResult.error || scholarResult.error) {
+        setState("unavailable");
+        setMessage(approvalResult.error?.message ?? scholarResult.error?.message ?? "Scholar identity could not be verified.");
+        return;
+      }
+
+      setApprovals((approvalResult.data ?? []) as MentorValidationApproval[]);
+      const nextScholarNames: Record<string, string> = {};
+      for (const scholar of (scholarResult.data ?? []) as { scholar_id: string; display_name: string }[]) {
+        if (scholarIds.includes(scholar.scholar_id)) nextScholarNames[scholar.scholar_id] = scholar.display_name || "Scholar";
+      }
+      setScholarNames(nextScholarNames);
+      setMessage(null);
+      setState("ready");
+    } catch {
+      setState("unavailable");
+      setMessage("Mentor validation could not be loaded. Please refresh to retry.");
     }
-    setScholarNames(nextScholarNames);
-    setMessage(null);
-    setState("ready");
   }, []);
 
   useEffect(() => {

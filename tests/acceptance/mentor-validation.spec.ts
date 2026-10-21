@@ -1,3 +1,4 @@
+import { assertIsolatedMentorTargets } from "../helpers/isolated-mentor-targets";
 import { createClient } from "@supabase/supabase-js";
 import { test, expect, type BrowserContext, type Page } from "@playwright/test";
 
@@ -36,6 +37,11 @@ async function postJson(page: Page, url: string, body: unknown) {
   }, { target: url, payload: body });
 }
 
+// This suite creates fixture users and mutates authority state. Keep it isolated.
+test.beforeAll(async ({}, testInfo) => {
+  assertIsolatedMentorTargets(required("NEXT_PUBLIC_SUPABASE_URL"), String(testInfo.project.use.baseURL ?? ""));
+});
+
 test("Scholar-invited mentor requires governed support-system validation", async ({ page, context }) => {
   const admin = createClient(required("NEXT_PUBLIC_SUPABASE_URL"), required("SUPABASE_SERVICE_ROLE_KEY"), {
     auth: { autoRefreshToken: false, persistSession: false },
@@ -65,13 +71,14 @@ test("Scholar-invited mentor requires governed support-system validation", async
       const updated = await admin.auth.admin.updateUserById(user.id, { password, email_confirm: true });
       if (updated.error) throw updated.error;
     }
-    await admin.from("profiles").upsert({
+    const profile = await admin.from("profiles").upsert({
       id: user.id,
       email,
       role,
       profile_mode: role,
       onboarding_completed: true,
     }, { onConflict: "id" });
+    if (profile.error) throw profile.error;
     return user;
   }
 
@@ -80,7 +87,13 @@ test("Scholar-invited mentor requires governed support-system validation", async
   const validatorOne = await ensureUser(credentials.validatorOne[0], credentials.validatorOne[1], "educator");
   const validatorTwo = await ensureUser(credentials.validatorTwo[0], credentials.validatorTwo[1], "other");
 
-  await admin.from("mentor_validation_approvals").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+  const priorRequests = await admin.from("mentor_validation_requests").select("id").eq("scholar_id", scholar.id).eq("mentor_user_id", mentor.id);
+  if (priorRequests.error) throw priorRequests.error;
+  const priorRequestIds = (priorRequests.data ?? []).map(request => request.id);
+  if (priorRequestIds.length) {
+    const cleanup = await admin.from("mentor_validation_approvals").delete().in("request_id", priorRequestIds);
+    if (cleanup.error) throw cleanup.error;
+  }
   await admin.from("mentor_validation_requests").delete().eq("scholar_id", scholar.id).eq("mentor_user_id", mentor.id);
   await admin.from("support_relationships").delete().eq("scholar_id", scholar.id).eq("supporter_id", mentor.id);
   await admin.from("support_invitations").delete().eq("scholar_id", scholar.id).eq("invitee_email", credentials.mentor[0]);
