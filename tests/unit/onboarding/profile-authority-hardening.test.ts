@@ -10,6 +10,9 @@ const callback = read("app/auth/callback/page.tsx");
 const roleRoute = read("app/api/pbos/onboarding/[role]/route.ts");
 const scholarRoute = read("app/api/pbos/scholar/onboarding/route.ts");
 const migration = read("supabase/migrations/202608160018_profile_authority_hardening.sql");
+const completionRepair = read(
+  "supabase/migrations/20261021153000_profile_completion_rpc_disambiguation.sql",
+);
 
 describe("profile authority hardening", () => {
   it("keeps authority-bearing fields out of client onboarding autosave", () => {
@@ -63,5 +66,17 @@ describe("profile authority hardening", () => {
       const safeGrantSection = migration.split("grant update (")[1]?.split(") on public.profiles")[0] || "";
       expect(safeGrantSection).not.toMatch(new RegExp(`(^|\\W)${field}(\\W|$)`));
     }
+  });
+
+  it("disambiguates governed completion status without widening execution authority", () => {
+    expect(completionRepair).toContain("update public.profiles as profile");
+    expect(completionRepair).toContain("profile.verification_status is distinct from 'approved'");
+    expect(completionRepair).toContain("else profile.verification_status");
+    expect(completionRepair).toContain(
+      "revoke all on function private.complete_playbook_onboarding(text, boolean)",
+    );
+    expect(completionRepair).toContain(
+      "grant execute on function private.complete_playbook_onboarding(text, boolean)",
+    );
   });
 });
