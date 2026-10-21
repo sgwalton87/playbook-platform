@@ -11,7 +11,7 @@ export async function createOpportunityMatch(match: {
   status?: string;
   profileId?: string;
 }) {
-  return supabase.from("opportunity_matches").insert({
+  const result = await supabase.from("opportunity_matches").insert({
     record_id: match.recordId,
     opportunity_type: match.opportunityType,
     title: match.title,
@@ -23,4 +23,6 @@ export async function createOpportunityMatch(match: {
     created_by: match.profileId || null,
     updated_by: match.profileId || null,
   });
+  if (result.error) throw result.error;
+  return result;
 }

@@ -9,7 +9,7 @@ export async function createTimelineEvent(event: {
   source?: string;
   profileId?: string;
 }) {
-  return supabase.from("timeline_events").insert({
+  const result = await supabase.from("timeline_events").insert({
     record_id: event.recordId,
     achievement_id: event.achievementId || null,
     event_type: event.eventType,
@@ -21,4 +21,6 @@ export async function createTimelineEvent(event: {
     created_by: event.profileId || null,
     updated_by: event.profileId || null,
   });
+  if (result.error) throw result.error;
+  return result;
 }

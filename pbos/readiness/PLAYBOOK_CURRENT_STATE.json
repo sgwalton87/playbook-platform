@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "reconciledAt": "2026-10-21",
-  "baselineRevision": "8a4038e322794cb997ad79f52e6fa5ddf1e6d88f",
+  "baselineRevision": "9ce0a93a314ab30687f72fd3f83d3b96305fd2fa",
   "authority": {
     "humanReadable": "docs/MASTER_CHECKLIST.md",
     "journeys": "docs/USER_JOURNEYS.md",
@@ -174,7 +174,6 @@
     "soft launch, rollback proof, release notes, feedback loop, and independent human launch approval"
   ],
   "nextExecutionOrder": [
-    "mentor_identity_and_isolated_fixture_followup",
     "exact_head_ci_and_database_certification",
     "achievement_command_event_delivery_and_form_integration",
     "pbos_configuration_and_hosted_schema_review",
@@ -197,27 +196,28 @@
   },
   "evidenceLayers": {
     "mergedCode": {
-      "revision": "8a4038e322794cb997ad79f52e6fa5ddf1e6d88f",
+      "revision": "9ce0a93a314ab30687f72fd3f83d3b96305fd2fa",
       "status": "VERIFIED_MAIN",
       "pullRequests": [
         253,
         254,
-        255
+        255,
+        256
       ]
     },
     "reviewCode": {
-      "pr": 255,
-      "url": "https://github.com/sgwalton87/playbook-platform/pull/255",
-      "revision": "477d03f31db81be7b1a85bb7f745446bb5a59d90",
-      "status": "MERGED_AS_8a4038e",
+      "pr": 256,
+      "url": "https://github.com/sgwalton87/playbook-platform/pull/256",
+      "revision": "d53ac2ba3327c4da3d75d6f40c57ea83d943c5fe",
+      "status": "MERGED_AS_9ce0a93",
       "achievementCommand": "SQL_CANDIDATE_NOT_CONNECTED_TO_FORM_OR_APPLIED_HOSTED"
     },
     "isolatedCertification": {
-      "revision": "477d03f31db81be7b1a85bb7f745446bb5a59d90",
-      "tree": "18e170f71b1e735d30f637416edeb73332565675",
+      "revision": "d53ac2ba3327c4da3d75d6f40c57ea83d943c5fe",
+      "tree": "3efc9121eb9a775bf4ce864cecd58b8766cc637d",
       "database": {
         "status": "PASSED_WITH_FAILURE_CANARY",
-        "url": "https://github.com/sgwalton87/playbook-platform/actions/runs/39546311769",
+        "url": "https://github.com/sgwalton87/playbook-platform/actions/runs/39547592466",
         "certificationSteps": 48,
         "forcedFailureExitCode": 3,
         "ignoredQuitWarnings": 0,
@@ -225,20 +225,24 @@
       },
       "ci": {
         "status": "PASSED",
-        "url": "https://github.com/sgwalton87/playbook-platform/actions/runs/39546311728"
+        "url": "https://github.com/sgwalton87/playbook-platform/actions/runs/39547592471",
+        "tests": 852,
+        "suites": 233
       },
       "marketplace": {
         "status": "PASSED",
-        "url": "https://github.com/sgwalton87/playbook-platform/actions/runs/39546311729"
+        "url": "https://github.com/sgwalton87/playbook-platform/actions/runs/39546311729",
+        "revision": "477d03f31db81be7b1a85bb7f745446bb5a59d90",
+        "scope": "Prior repair revision; no Marketplace changes in PR 256"
       },
       "platformQa": {
         "status": "PASSED_PUBLIC_SCOPE",
-        "url": "https://github.com/sgwalton87/playbook-platform/actions/runs/39546311796"
+        "url": "https://github.com/sgwalton87/playbook-platform/actions/runs/39547592580"
       }
     },
     "productionDeployment": {
-      "id": "dpl_8rboxo2jDBh7CWkEUfZdXWEo6wxe",
-      "revision": "8a4038e322794cb997ad79f52e6fa5ddf1e6d88f",
+      "id": "dpl_HQx7qwbRpQpYpcxXLPCuFhb2fgn4",
+      "revision": "9ce0a93a314ab30687f72fd3f83d3b96305fd2fa",
       "url": "https://the-playbook-five.vercel.app",
       "status": "READY_IDENTITY_AND_PUBLIC_RESPONSES_VERIFIED",
       "publicChecks": {
@@ -246,14 +250,15 @@
         "home": 200,
         "login": 200,
         "unauthenticatedMentorApproval": 401,
-        "unauthenticatedSupportContext": 401
+        "unauthenticatedSupportContext": 401,
+        "renderedRolePathways": 15
       },
       "authenticatedJourneys": "FAILED_AT_SCHOLAR_ONBOARDING_API_AT_THIS_EXACT_REVISION",
-      "trustedRoleRun": "https://github.com/sgwalton87/playbook-platform/actions/runs/39546746969",
+      "trustedRoleRun": "https://github.com/sgwalton87/playbook-platform/actions/runs/39547967465",
       "automaticGitDeployment": "DISABLED_FOR_MAIN_AND_ORIGINAL_REVIEW_BRANCH"
     },
     "pbosIntegration": {
-      "latestRecordedFailure": "Missing protected server configuration: PBOS_API_URL at accepted production revision 8a4038e",
+      "latestRecordedFailure": "Missing protected server configuration: PBOS_API_URL at accepted production revision 9ce0a93",
       "productionEndpoint": "UNVERIFIED",
       "googleCloudConsole": "INACCESSIBLE_IN_READ_ONLY_BROWSER_SESSION",
       "journeysRerun": true,

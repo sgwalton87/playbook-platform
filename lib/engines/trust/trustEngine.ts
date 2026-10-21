@@ -4,12 +4,13 @@ import { createTrustReport } from "@/lib/repositories/trustRepository";
 export async function handleAchievementCreatedForTrust(payload: LegacyValue) {
   if (!payload?.recordId) return;
 
-  const { data: achievements } = await supabase
+  const { data: achievements, error } = await supabase
     .from("achievements")
     .select("id")
     .eq("record_id", payload.recordId)
     .is("deleted_at", null);
 
+  if (error) throw error;
   const count = achievements?.length || 0;
   const trustScore = Math.min(100, count * 10);
 

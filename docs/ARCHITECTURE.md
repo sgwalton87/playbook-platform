@@ -245,3 +245,9 @@ Deployments should follow [RELEASE_PROCESS.md](./RELEASE_PROCESS.md). Production
 
 ## Architecture Change Control
 Material architecture decisions must be recorded in [DECISIONS.md](./DECISIONS.md). Examples include changing auth providers, introducing new global state, adding third-party data processors, changing role boundaries, or adopting a new deployment architecture.
+
+## Achievement event failure boundary — October 20, 2026
+
+Owner: Playbook OS Engineering. Related: `lib/events/bus.ts`, `lib/playbook-record/services/achievements.ts`, database handbook.
+
+The synchronous event bus awaits derived writers and propagates their database failures. A failed canonical achievement read must not generate a zero-score Trust report. Repository inserts for Trust, Timeline, Portfolio, Opportunity and Compass now reject failed persistence rather than return an ignored error object. This does not roll back earlier browser/API writes and does not authorize automatic event replay. The staged atomic SQL command and durable, idempotent downstream delivery must replace the sequential form path before the whole achievement journey is certified.
