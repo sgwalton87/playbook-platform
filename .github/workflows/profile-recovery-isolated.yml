@@ -30,6 +30,19 @@ jobs:
         uses: supabase/setup-cli@v1
         with:
           version: latest
+      - name: Normalize duplicate migration version identifiers for disposable QA only
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          folder = Path("supabase/migrations")
+          scripts = sorted(p for p in folder.glob("*.sql") if re.match(r"^\\d+_", p.name))
+          for i, path in enumerate(scripts, 1):
+              suffix = path.name.split("_", 1)[1]
+              path.rename(folder / f"20260101{i:06d}_{suffix}")
+          print(f"Prepared {len(scripts)} unique local-only migration IDs")
+          PY
       - name: Start isolated local Supabase stack
         run: npx supabase start
       - name: Prepare local acceptance configuration
