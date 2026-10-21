@@ -27,7 +27,9 @@ jobs:
       - name: Install application dependencies
         run: npm ci
       - name: Install local Supabase CLI
-        run: npm install --no-save --no-package-lock supabase
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
       - name: Start isolated local Supabase stack
         run: npx supabase start
       - name: Prepare local acceptance configuration
