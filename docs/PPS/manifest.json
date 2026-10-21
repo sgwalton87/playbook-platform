@@ -1,0 +1,307 @@
+{
+  "snapshotDate": "2026-10-20",
+  "source": "Owner-supplied constitutional attachments; exact bytes preserved",
+  "scope": "Requirements authority snapshot, not implementation or production certification",
+  "documents": [
+    {
+      "id": "PPS-002",
+      "file": "PPS-002_PLATFORM_PRINCIPLES.md",
+      "sha256": "d912a7734468942cc4f80a174aae11b39c547286c5e6d29c1fde481e9acb2819",
+      "dependencies": [
+        "PPS-000",
+        "PPS-001"
+      ]
+    },
+    {
+      "id": "PPS-014",
+      "file": "PPS-014_ANALYTICS_AND_OBSERVABILITY.md",
+      "sha256": "893e6fd4e120283ec77b4cc73de18292d29ff1b07da01fc82bb35fc897da7f27",
+      "dependencies": [
+        "PPS-000",
+        "PPS-001",
+        "PPS-002",
+        "PPS-003",
+        "PPS-004",
+        "PPS-005",
+        "PPS-006",
+        "PPS-007",
+        "PPS-008",
+        "PPS-009",
+        "PPS-010",
+        "PPS-011",
+        "PPS-012",
+        "PPS-013"
+      ]
+    },
+    {
+      "id": "PPS-013",
+      "file": "PPS-013_DESIGN_LANGUAGE.md",
+      "sha256": "e7de60ea181f1c3568cb6963e48fead8a7b4a7d9eb80bd3a171e9319c5a948e3",
+      "dependencies": [
+        "PPS-000",
+        "PPS-001",
+        "PPS-002",
+        "PPS-003",
+        "PPS-004",
+        "PPS-005",
+        "PPS-006",
+        "PPS-007",
+        "PPS-008",
+        "PPS-009",
+        "PPS-010",
+        "PPS-011",
+        "PPS-012"
+      ]
+    },
+    {
+      "id": "PPS-009",
+      "file": "PPS-009_IDENTIFIER_REGISTRY.md",
+      "sha256": "10096496070501af63277f5819e98b69f12e5ca5bcd2db0a7bef026a354eb291",
+      "dependencies": [
+        "PPS-000",
+        "PPS-001",
+        "PPS-002",
+        "PPS-003",
+        "PPS-004",
+        "PPS-005",
+        "PPS-006",
+        "PPS-007",
+        "PPS-008"
+      ]
+    },
+    {
+      "id": "PPS-015",
+      "file": "PPS-015_CONSTITUTIONAL_AMENDMENT_PROCESS.md",
+      "sha256": "b526d666df105f1b0e7f8ad0dd0eb56d0a5e5511bb07cc87cc185a340c9a4b8c",
+      "dependencies": [
+        "PPS-000",
+        "PPS-001",
+        "PPS-002",
+        "PPS-003",
+        "PPS-004",
+        "PPS-005",
+        "PPS-006",
+        "PPS-007",
+        "PPS-008",
+        "PPS-009",
+        "PPS-010",
+        "PPS-011",
+        "PPS-012",
+        "PPS-013",
+        "PPS-014"
+      ]
+    },
+    {
+      "id": "PPS-000",
+      "file": "PPS-000_PLATFORM_OVERVIEW.md",
+      "sha256": "28dda2e71cf64e792b3fab5f3acf21aa594816c01c3c63da0af5115ab778158b",
+      "dependencies": []
+    },
+    {
+      "id": "PPS-001",
+      "file": "PPS-001_MISSION_AND_VISION.md",
+      "sha256": "e9c8d2a56fb6f2552a2f485cefa96e86400921769ae0e8a4787f60f01f42fe6c",
+      "dependencies": [
+        "PPS-000"
+      ]
+    },
+    {
+      "id": "PPS-006",
+      "file": "PPS-006_INTELLIGENCE_ARCHITECTURE.md",
+      "sha256": "1860113c8d5a111fb32766df45a3aa6d16917b4fb3876f6e8bfc5d77ea2777d7",
+      "dependencies": [
+        "PPS-000",
+        "PPS-001",
+        "PPS-002",
+        "PPS-003",
+        "PPS-004",
+        "PPS-005"
+      ]
+    },
+    {
+      "id": "PPS-007",
+      "file": "PPS-007_GLOSSARY.md",
+      "sha256": "304ac02bd8de7e8acd0412aa23b292a788530818486bbbd25eb91014aa9076f0",
+      "dependencies": [
+        "PPS-000",
+        "PPS-001",
+        "PPS-002",
+        "PPS-003",
+        "PPS-004",
+        "PPS-005",
+        "PPS-006"
+      ]
+    },
+    {
+      "id": "PPS-005",
+      "file": "PPS-005_INTELLIGENCE_CONSTITUTION.md",
+      "sha256": "e03324d155afe1316d5818102249dc92ef5c498cc55e8bb3f3ec8cf8c1dd1967",
+      "dependencies": [
+        "PPS-000",
+        "PPS-001",
+        "PPS-002",
+        "PPS-003",
+        "PPS-004"
+      ]
+    },
+    {
+      "id": "PPS-008",
+      "file": "PPS-008_DOCUMENT_STANDARDS.md",
+      "sha256": "019db8a2662ce2ecc4f5ec3b9f49454e1d686662c591e8eb328908d317090b94",
+      "dependencies": [
+        "PPS-000",
+        "PPS-001",
+        "PPS-002",
+        "PPS-003",
+        "PPS-004",
+        "PPS-005",
+        "PPS-006",
+        "PPS-007"
+      ]
+    },
+    {
+      "id": "PPS-010",
+      "file": "PPS-010_DEPENDENCY_STANDARDS.md",
+      "sha256": "9ffcd6f82762ac8da968e5b4a8f963483635f33c47dc3e6f0f4844a82a7385ee",
+      "dependencies": [
+        "PPS-000",
+        "PPS-001",
+        "PPS-002",
+        "PPS-003",
+        "PPS-004",
+        "PPS-005",
+        "PPS-006",
+        "PPS-007",
+        "PPS-008",
+        "PPS-009"
+      ]
+    },
+    {
+      "id": "PPS-012",
+      "file": "PPS-012_SECURITY_AND_PERMISSIONS.md",
+      "sha256": "3c1a022eea10c18d4cbbeacc38527cbd4b48a743960543e629d636740e233986",
+      "dependencies": [
+        "PPS-000",
+        "PPS-001",
+        "PPS-002",
+        "PPS-003",
+        "PPS-004",
+        "PPS-005",
+        "PPS-006",
+        "PPS-007",
+        "PPS-008",
+        "PPS-009",
+        "PPS-010",
+        "PPS-011"
+      ]
+    },
+    {
+      "id": "PPS-004",
+      "file": "PPS-004_OPERATING_SYSTEM_FRAMEWORK.md",
+      "sha256": "58c0158e8b4ba71b897b911092b91e1a1afb3534ab122f773d17375992b2d3b6",
+      "dependencies": [
+        "PPS-000",
+        "PPS-001",
+        "PPS-002",
+        "PPS-003"
+      ]
+    },
+    {
+      "id": "PPS-2000",
+      "file": "PPS-2000_CONSTITUTIONAL_EVOLUTION_AND_FUTURE_SYSTEMS.md",
+      "sha256": "c40f1469f7d33f8c22e54a56fd73bccb954cf8afed7378f7bfba30a2af968c9b",
+      "dependencies": [
+        "PPS-000",
+        "PPS-1909"
+      ]
+    },
+    {
+      "id": "PPS-2009",
+      "file": "PPS-2009_FUTURE_SYSTEMS_GOVERNANCE.md",
+      "sha256": "05ccc9200e95dfca136e2b33acb855b262d26150c436921561e84e0e4f045462",
+      "dependencies": [
+        "PPS-2008",
+        "PPS-2004"
+      ]
+    },
+    {
+      "id": "PPS-2002",
+      "file": "PPS-2002_VERSIONING_AND_HISTORICAL_PRESERVATION_ARCHITECTURE.md",
+      "sha256": "74b63ef505d71ea11a7c4c1c805d55a9a0c1a7b696683ac26dd9ae6503028434",
+      "dependencies": [
+        "PPS-2001"
+      ]
+    },
+    {
+      "id": "PPS-2003",
+      "file": "PPS-2003_FUTURE_TECHNOLOGY_INTEGRATION_ARCHITECTURE.md",
+      "sha256": "7c5c6d5ae53df55d5583dc8bffdc7d76e5f3f009e9c0e5dc9e69a26b33bb42a9",
+      "dependencies": [
+        "PPS-2000",
+        "PPS-2002"
+      ]
+    },
+    {
+      "id": "PPS-2007",
+      "file": "PPS-2007_LONG_TERM_STEWARDSHIP_ARCHITECTURE.md",
+      "sha256": "6d089cbb0d8cfb06bd72c473dbaa757ab5f64c3bcf7c1c95beb85409c6b25b35",
+      "dependencies": [
+        "PPS-2006"
+      ]
+    },
+    {
+      "id": "PPS-2004",
+      "file": "PPS-2004_ARTIFICIAL_INTELLIGENCE_EVOLUTION_ARCHITECTURE.md",
+      "sha256": "2ef1f4c154819f1758fa66eafbf53bb32b2e7b6aef584c1ea72c32c1bb0b9735",
+      "dependencies": [
+        "PPS-2003",
+        "PPS-1200"
+      ]
+    },
+    {
+      "id": "PPS-2005",
+      "file": "PPS-2005_GLOBAL_EXPANSION_ARCHITECTURE.md",
+      "sha256": "c731715525e518e17063baf94419bda17cdf76ea72167e981c7ecaf8a4d4919c",
+      "dependencies": [
+        "PPS-2003",
+        "PPS-1900"
+      ]
+    },
+    {
+      "id": "PPS-003",
+      "file": "PPS-003_EXPERIENCE_PRINCIPLES.md",
+      "sha256": "371ab7bdf89752d79cefc21b4947e09e19ed861e70fa8c1230211413bba53c61",
+      "dependencies": [
+        "PPS-000",
+        "PPS-001",
+        "PPS-002"
+      ]
+    },
+    {
+      "id": "PPS-011",
+      "file": "PPS-011_DATA_GOVERNANCE.md",
+      "sha256": "233f4f40c712eabd3f0251c2ef35cf584843b8ec40451b175b99dd0d9cc20351",
+      "dependencies": [
+        "PPS-000",
+        "PPS-001",
+        "PPS-002",
+        "PPS-003",
+        "PPS-004",
+        "PPS-005",
+        "PPS-006",
+        "PPS-007",
+        "PPS-008",
+        "PPS-009",
+        "PPS-010"
+      ]
+    }
+  ],
+  "unresolvedDependencyIds": [
+    "PPS-1200",
+    "PPS-1900",
+    "PPS-1909",
+    "PPS-2001",
+    "PPS-2006",
+    "PPS-2008"
+  ]
+}

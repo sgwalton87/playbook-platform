@@ -141,3 +141,37 @@ All 15 roles have canonical registry identities and destinations. Authority-sens
 ## Exit gate
 
 Playbook is complete only when the current canonical graph reports no unresolved launch blockers; all 15 launch roles satisfy the journey evidence contract; required connected pathways are durable and permission-safe; repository, hosted database and production deployment evidence align at governed revisions; browser/device/accessibility and operational gates pass; and independent human launch approval is recorded.
+
+## Local candidate: Marketplace sharing recovery — October 20, 2026
+
+Owner: Playbook OS Engineering. Purpose: preserve canonical Application Workspace visibility during an unavailable Marketplace sharing RPC. Related implementation: `components/application-workspace/ApplicationWorkspaceDashboard.tsx`; regression coverage: `tests/unit/application-workspace/sharing-recovery.test.tsx`.
+
+Status: LOCAL CANDIDATE, not merged, deployed or production-certified. The candidate separates sharing availability from an empty consent list, keeps workspace reads usable when sharing fails, withholds sharing mutations until status is verified, explains that existing partner access may remain active, and offers retry. It changes no consent authority, RPC contract, schema or production configuration. Local mocked component tests cover a schema-cache RPC error, network rejection and retry recovery. Hosted permission and production browser evidence remain separate gates.
+
+## Local candidate: versioned Marketplace consent — October 20, 2026
+
+Owner: Playbook OS Engineering. Status: LOCAL CANDIDATE, not merged/deployed/applied. Related: `docs/DATABASE.md` Marketplace consent hardening section. Shares/outcomes remains the canonical representation; no submissions model was added. Candidate adds server-enforced versioned consent and listing/partner checks, private audit events, serialized mutation paths, invoker wrappers and matched checkbox UI. Tests and operational limitations are documented in the database handbook. Production runtime configuration and missing baseline/schema objects remain unresolved. Release requires coordinated caller/migration review and separate explicit authorization.
+
+## Active review follow-up — October 20, 2026
+
+PR 253: Platform QA and dedicated Marketplace Applicant Certification passed at initial published head. Full Database Certification replay passed but invitation privilege preflight failed; a focused grant-closure migration and regression test are prepared. Dependency CI failed at audit (1 critical, 13 high entries). Candidate upgrades Next.js and matching lint config to 16.4.2, Nodemailer to 10.1.7, and compatible lockfile dependencies. Five remaining high audit entries trace to the unpatched braces development-tool dependency chain; do not suppress the audit or claim security certification. Full-suite/rebuild evidence and later-head remote checks must be recorded separately. No release or hosted changes authorized.
+
+Follow-up local evidence: 817 tests across 224 suites passed after dependency updates; lint and production build passed. PBOS Audit Control passed via `node --import tsx scripts/pbos/audit-control.ts`; the usual tsx launcher failed on restricted local IPC, not an audit assertion. Full dependency audit remains blocked by the unpatched braces development chain. Release must not treat local validation as hosted certification.
+
+## Achievement evidence failure handling candidate — October 20, 2026
+
+Owner: Playbook OS Engineering. Related: `lib/playbook-record/services/achievements.ts`. Existing record lookup errors and failed evidence-pack, evidence, reflection and timeline inserts now stop the workflow before AchievementCreated is published. Seven mocked regression cases cover every failure stage and ordered success. This prevents false success/provenance; it does not make the multi-request workflow atomic, idempotent or production-certified. Partial earlier writes remain possible and must be addressed in the canonical command/transaction gate. No automatic cleanup or deletion was introduced.
+
+CI evidence isolation: dependency audit now runs as its own failing security job while validation runs independently. No continue-on-error or audit suppression is introduced. This preserves the release blocker while allowing lint, PBOS control, full tests and build evidence to be collected. Constitutional sources are review snapshots, not amendment approval or proof of complete dependency closure.
+
+## Exact-head review evidence — October 21, 2026
+
+At remote head `a72f4e132b339a2b3093100f004eb1e734f65164`, [Database Certification](https://github.com/sgwalton87/playbook-platform/actions/runs/39533003807), [Marketplace Applicant Certification](https://github.com/sgwalton87/playbook-platform/actions/runs/39533003851) and [Platform QA](https://github.com/sgwalton87/playbook-platform/actions/runs/39533003848) passed. [CI](https://github.com/sgwalton87/playbook-platform/actions/runs/39533003794) passed its validation job (lint, PBOS control, tests, build) and failed its dependency-security job. Security certification remains blocked. These results concern the review revision and isolated certification environments, not production schema/configuration or authenticated production journeys.
+
+A subsequent local achievement-command candidate adds atomic SQL and owner/request-bound retry receipts against the existing graph. It is not yet wired to the form; existing event handlers perform additional writes and need a durable/idempotent delivery contract first. See the database handbook for verified behavior and retention/erasure constraints. Do not mark the existing application workflow atomic or this new migration applied.
+
+Machine-readable reconciliation: `pbos/readiness/PLAYBOOK_CURRENT_STATE.json` now separates merged code, draft review code, exact-revision isolated certification, hosted schema observations and last verified deployment identity. August promotion/frontier assertions remain labeled historical; they cannot certify current hosted coverage or production journeys. Current release blockers and execution order include the October findings.
+
+Release authorization update — October 21, 2026: the owner explicitly lifted the restrictions on merging, deployment and production configuration. Proceed through verified release gates without repeating routine permission requests. Authorization does not convert a failing security check, a staging PBOS service or a local candidate into production certification.
+
+Security remediation candidate: pinned tinyglobby replaces the Next lint plugin's vulnerable glob dependency chain, with a version/hash-guarded compatibility patch preserving directory-discovery semantics. Clean install, full audit (zero known findings), 828 tests, lint and build passed locally. See RELEASE_PROCESS.md. Wait for remote security checks before claiming release clearance. The staging PBOS health endpoint responded HTTP 200; this proves health of that service, not production PBOS readiness.

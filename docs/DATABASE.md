@@ -214,3 +214,39 @@ Future schema expansion should prioritize:
 
 ## Operational Expectations
 Database changes must pass migration review before release. Backfills need dry-run plans, rollback paths, and communication in [RELEASE_PROCESS.md](./RELEASE_PROCESS.md). Architecture implications should be recorded in [DECISIONS.md](./DECISIONS.md).
+
+## Marketplace consent hardening candidate — October 20, 2026
+
+Owner: Playbook OS Engineering. Purpose: preserve one canonical shares/outcomes consent boundary. Related: `supabase/migrations/20261021014458_marketplace_consent_hardening.sql`, `tests/unit/application-workspace/consent-database.test.ts`, `docs/MASTER_CHECKLIST.md`.
+
+Local candidate only. This migration depends on the existing Marketplace shares/outcomes baseline. Sharing now requires the exact `marketplace-applicant-share-v1` consent version, a Scholar-owned submitted workspace, a matching published listing within its deadline (inclusive), and an active partner. The obsolete single-argument share RPC is removed; the UI must be released with the new two-argument contract. Existing active shares are revoked for fresh consent, without fabricating prior acknowledgements. Revocation works even after listing closure. Workspace row locks serialize share, revoke and human outcome updates. Re-sharing resets withdrawn outcome decision metadata; prior transitions remain in a private append-only client-inaccessible audit table. Public privileged getters/outcome RPCs delegate to private implementations through invoker wrappers. No direct client data grants are added.
+
+Audit events retain before/after consent and outcome rows, including internal outcome notes; operator access, retention and deletion review remain launch requirements. This is transaction-level audit preservation, not tamper-proof storage against database administrators. Rollback must be reviewed; do not restore an old caller to bypass versioned consent or automatically reactivate revoked shares. No destructive down migration is supplied.
+
+PGlite tests execute the baseline and candidate SQL in an isolated PostgreSQL fixture with substitute auth/authority helpers. They prove the tested function boundaries but do not replace full Supabase replay, actual production authority helpers, REST schema-cache verification, concurrency stress, hosted RLS certification or live browser acceptance. Full Supabase CLI replay is blocked here by unavailable Docker. No hosted migrations were applied.
+
+## Invitation privilege closure candidate — October 20, 2026
+
+Full isolated Supabase replay on PR 253 passed, then invitation preflight found direct client UPDATE/DELETE privileges. The prior hardening revoked UPDATE only and did not close all inherited/default or explicit column grants. Candidate migration `20261021021256_support_invitation_privilege_closure.sql` revokes PUBLIC/anon/authenticated table and column privileges, then restores authenticated SELECT/INSERT only. Existing policy-constrained invitation creation and private claim/decline RPC remain the canonical path. PGlite regression verifies denial of table/column mutation after deliberately broad initial grants. Hosted application remains unauthorized and unperformed.
+
+## Achievement transaction candidate — October 21, 2026
+
+Purpose: provide one atomic, retry-safe command against the existing Playbook Record graph. Owner: Playbook OS Engineering. Related: `20261021023624_achievement_atomic_command.sql`, `tests/unit/application-workspace/achievement-command-database.test.ts`.
+
+The candidate `public.create_achievement_with_evidence(uuid,uuid,jsonb)` uses a security-invoker wrapper and a fixed-search-path private implementation. The authenticated identity must equal the requested owner. The private receipt table has RLS and no direct client privileges. Each owner/request identifier maps to normalized content and one achievement; identical retries return that achievement and conflicting content is rejected. The owner-scoped transaction lock serializes this command's record lookup and creation. Existing duplicate active records fail closed for reconciliation; this does not establish global record uniqueness across older write paths.
+
+Record creation, achievement, evidence pack, optional evidence/reflection, timeline entry and receipt share a transaction. Malformed fields, unsupported keys, non-HTTP(S) links, invalid categories, inaccessible/deleted retry targets and inactive records are rejected. Tests execute the baseline graph and candidate SQL in isolated PostgreSQL WASM, exercise authenticated/anonymous grants, cross-owner denial and idempotency, and inject a final-stage failure to prove all earlier writes roll back. This is behavioral SQL evidence, separate from full Supabase migration/RLS certification and hosted application.
+
+The RPC is deliberately not connected to the current form yet: the existing browser event bus runs further timeline, portfolio, trust and opportunity writes after achievement creation. Wiring only the RPC would leave those downstream effects outside the transaction and replay contract. That integration needs durable event delivery and per-handler idempotency review before the multi-request application path can be retired. The existing seven failure-propagation tests remain applicable. No migration has been applied to a hosted database.
+
+Receipts retain a SHA-256 fingerprint of normalized content rather than copying reflection/evidence text. Achievement deletion clears the receipt reference; the retained request identifier rejects replay instead of recreating deleted content. Profile deletion cascades to receipts. Retention review still applies to this private command metadata; receipts are not another Scholar Record or public projection.
+
+Certification follow-up: `supabase/tests/achievement_command_preflight.sql` now exercises late-write rollback, identical/conflicting retries, cross-owner denial and private receipt grants after the full migration replay in Database Certification. The same preflight was executed successfully in the local PostgreSQL fixture and rolls back all its fixtures. Full Supabase execution at the new review head remains a separate pending result.
+
+## Hosted Marketplace convergence — October 21, 2026
+
+Purpose: reconcile the confirmed missing hosted applicant schema without replaying unrelated historical migrations. Owner: Playbook OS Engineering. Related: `20261021025703_hosted_marketplace_convergence.sql` and consent database tests.
+
+The new migration embeds exact, SHA-256-identified baseline and hardening SQL from the canonical shares/outcomes packages. It creates the baseline only when both applicant tables are absent, then installs versioned consent hardening in the same migration transaction. A partially present table pair or an inconsistent already-hardened schema fails closed. On a fresh full-chain replay the earlier migrations already installed both packages, so convergence preserves them. Existing shares in a legacy unhardened installation require re-consent as specified by the hardening package.
+
+Behavioral PostgreSQL tests exercise both a missing-schema installation and an existing legacy active share, verify repeat execution against a hardened schema, require the current two-argument consent RPC and deny access to private audit history. This supplies an explicit hosted convergence candidate rather than rewriting historical migration records or inferring application from filenames. Apply only the tested candidate to the verified project, then inspect catalogs, grants and consent RPC contracts before application release. Do not replay the historical Mentor migration: it also replaces invitation functions that were hardened later. Mentor reconciliation needs a separate current-authority-safe package.

@@ -107,3 +107,17 @@ Rollback planning must account for application code and database state.
 
 ## Release Closure
 After deployment, record release evidence, update [MASTER_CHECKLIST.md](./MASTER_CHECKLIST.md), add or update release notes under `docs/releases/`, and convert any material architectural lessons into [DECISIONS.md](./DECISIONS.md).
+
+## Next lint dependency remediation — October 21, 2026
+
+Purpose: remove the vulnerable braces dependency chain while retaining Next lint enforcement. Owner: Playbook OS Engineering. Related: `scripts/pbos/patch-next-eslint-glob.mjs`, `tests/unit/next-eslint-glob.test.ts`, `package.json` and lockfile.
+
+The pinned Next 16.4.2 lint plugin uses fast-glob only in its get-root-dirs helper, through globSync(pattern, {onlyDirectories:true}). The dependency override replaces that operation's package with pinned tinyglobby 0.2.17, removing fast-glob/micromatch/braces from the installed graph. This is a library replacement, not an audit exception. Tinyglobby expands literal directory arguments by default; a narrowly scoped postinstall compatibility patch sets expandDirectories:false to preserve the existing root-discovery contract. No lint rule or severity changes.
+
+The native Node patch verifies the exact plugin version, original helper SHA-256 and replacement package identity/version. It is idempotent and fails installation if an upgrade changes those assumptions. Review and retire this override/patch together when upstream ships a suitable dependency change; do not bypass a failed patch. Only the named plugin dependency is overridden, not unrelated glob users.
+
+Verification: clean npm ci succeeded; npm ls reported the expected npm:tinyglobby alias without invalid dependencies; npm audit --audit-level=moderate reported zero known vulnerabilities. Behavioral tests cover default, literal, wildcard, brace, array and missing roots, including exclusion of nested directories for literal roots. Real ESLint execution still reports both internal-link and image violations. Full suite passed 828 tests across 227 suites; lint and production build passed. Remote exact-revision security validation is a separate release gate.
+
+Sources: https://github.com/advisories/GHSA-vfj7-8cjw-p6xm (no patched braces release recorded when checked); https://superchupu.dev/tinyglobby/documentation (globSync, onlyDirectories and expandDirectories behavior). Source inspection of the installed pinned Next plugin established the limited call surface.
+
+Coordinated release control: automatic Git deployment is disabled for main as well as the review branch in vercel.json. The owner authorized releases, but the Marketplace caller and hosted schema must move together. Merge only after checks pass, stage the intended production build, reconcile and verify required schema effects, and explicitly release the accepted revision. The previous deployment identity is retained in the evidence ledger for recovery. This setting does not waive any release gate.

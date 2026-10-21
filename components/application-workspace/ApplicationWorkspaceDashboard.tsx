@@ -21,13 +21,16 @@ async function fetchWorkspaces(): Promise<WorkspaceResponse> {
   return body;
 }
 
-async function fetchMarketplaceShares(): Promise<Record<string, ShareState>> {
-  const result = await supabase.rpc("get_own_marketplace_application_shares");
-  if (result.error) {
-    if (result.error.message.toLowerCase().includes("does not exist")) return {};
-    throw result.error;
+type SharingResult = { available: true; shares: Record<string, ShareState> } | { available: false };
+
+async function fetchMarketplaceShares(): Promise<SharingResult> {
+  try {
+    const result = await supabase.rpc("get_own_marketplace_application_shares");
+    if (result.error) return { available: false };
+    return { available: true, shares: Object.fromEntries(((result.data || []) as ShareState[]).map((row) => [row.workspace_id, row])) };
+  } catch {
+    return { available: false };
   }
-  return Object.fromEntries(((result.data || []) as ShareState[]).map((row) => [row.workspace_id, row]));
 }
 
 export default function ApplicationWorkspaceDashboard() {
@@ -36,6 +39,8 @@ export default function ApplicationWorkspaceDashboard() {
   const [opportunityId, setOpportunityId] = useState(""); const [name, setName] = useState("");
   const [type, setType] = useState("scholarship"); const [deadline, setDeadline] = useState("");
   const [shares, setShares] = useState<Record<string, ShareState>>({});
+  const [consent, setConsent] = useState<Record<string, boolean>>({});
+  const [sharingAvailable, setSharingAvailable] = useState<boolean | null>(null);
 
   useEffect(() => { const query = new URLSearchParams(window.location.search); const selectedId = query.get("opportunityId"); const selectedName = query.get("opportunityName");
     const selectedType = query.get("opportunityType"); const selectedDeadline = query.get("deadline"); const initialize = window.setTimeout(() => {
@@ -43,12 +48,12 @@ export default function ApplicationWorkspaceDashboard() {
       if (selectedType && ["college", "scholarship", "internship", "job", "recruiting", "nil", "mentor", "mentorship", "sponsorship", "career", "summer_program", "competition", "grant", "volunteer", "research"].includes(selectedType)) setType(selectedType);
     }, 0);
     let active = true;
-    void Promise.all([fetchWorkspaces(), fetchMarketplaceShares()]).then(([body, shareRows]) => { if (!active) return; setWorkspaces(body.workspaces ?? []); setShares(shareRows);
+    void Promise.all([fetchWorkspaces(), fetchMarketplaceShares()]).then(([body, shareRows]) => { if (!active) return; setWorkspaces(body.workspaces ?? []); setShares(shareRows.available ? shareRows.shares : {}); setSharingAvailable(shareRows.available);
       setMessage((body.workspaces ?? []).length ? "Application workspaces loaded." : "No application workspace yet. Start with an opportunity below.");
     }).catch(value => { if (active) setError(value instanceof Error ? value.message : "Unable to load application workspaces."); });
     return () => { active = false; window.clearTimeout(initialize); }; }, []);
 
-  async function refresh() { const [body, shareRows] = await Promise.all([fetchWorkspaces(), fetchMarketplaceShares()]); setWorkspaces(body.workspaces ?? []); setShares(shareRows);
+  async function refresh() { const [body, shareRows] = await Promise.all([fetchWorkspaces(), fetchMarketplaceShares()]); setWorkspaces(body.workspaces ?? []); setShares(shareRows.available ? shareRows.shares : {}); setSharingAvailable(shareRows.available);
     setMessage((body.workspaces ?? []).length ? "Application workspaces loaded." : "No application workspace yet. Start with an opportunity below."); }
 
   async function create(event: FormEvent) { event.preventDefault(); setBusy(true); setError(null); try {
@@ -74,19 +79,24 @@ export default function ApplicationWorkspaceDashboard() {
   } catch (value) { setError(value instanceof Error ? value.message : "Unable to upload document."); } finally { setBusy(false); } }
 
   async function setMarketplaceShare(workspace: Workspace, share: boolean) {
+    if (!sharingAvailable || (share && !consent[workspace.id])) return;
     setBusy(true); setError(null);
-    const result = await supabase.rpc(share ? "share_marketplace_application" : "revoke_marketplace_application_share", { requested_workspace_id: workspace.id });
+    try {
+    const result = await supabase.rpc(share ? "share_marketplace_application" : "revoke_marketplace_application_share", { requested_workspace_id: workspace.id, ...(share ? { requested_consent_version: "marketplace-applicant-share-v1" } : {}) });
     if (result.error) { setError(result.error.message); setBusy(false); return; }
+    setConsent(current => ({ ...current, [workspace.id]: false }));
     await refresh();
     setMessage(share
       ? "Applicant consent granted. The verified organization can now see a narrow application projection; your private documents and broader Scholar Record remain private."
       : "Applicant consent revoked. The organization can no longer see this application in its applicant workspace.");
-    setBusy(false);
+    } catch { setError("Unable to update applicant sharing. Refresh sharing status and try again."); }
+    finally { setBusy(false); }
   }
 
   return <PlaybookPage>
     <PlaybookHero eyebrow="Application Workspace" title="Turn opportunity into action" subtitle="Track deadlines, tasks, private documents, status, and PBOS-governed progress in one durable workspace. Published Marketplace opportunity identity and deadline flow into this workspace without duplicate entry." />
     <div role="status" aria-live="polite" style={status}>{message}</div>{error && <div role="alert" aria-live="assertive" style={alert}>{error}</div>}
+    {sharingAvailable === false && <div role="status" style={alert}>Applicant sharing is currently unavailable. Your application workspaces remain accessible. Sharing status could not be verified; existing access may still be active. <button disabled={busy} onClick={() => { setBusy(true); void refresh().catch(() => setError("Unable to refresh application workspaces.")).finally(() => setBusy(false)); }}>Retry sharing status</button></div>}
     <PlaybookCard eyebrow="New application" title="Start from an opportunity">
       <form onSubmit={create} aria-label="Create application workspace" style={form}>
         <label>Opportunity name<input required maxLength={160} value={name} onChange={event => setName(event.target.value)} /></label>
@@ -105,7 +115,7 @@ export default function ApplicationWorkspaceDashboard() {
             {(workspace.application_workspace_documents ?? []).map(document => <p key={document.id}>📎 {document.file_name}</p>)}</PlaybookCard>
           <PlaybookCard eyebrow="Status" title="Submission readiness"><PlaybookPill>{workspace.status}</PlaybookPill><p>{workspace.delivery_state === "DELIVERED" ? "PBOS lifecycle connected" : "PBOS delivery pending"}</p>
             {workspace.status === "ready" && <button disabled={busy} onClick={() => transition(workspace.id, "APPLICATION_SUBMITTED")}>Mark application submitted</button>}</PlaybookCard>
-          {workspace.status === "submitted" && <PlaybookCard eyebrow="Applicant Consent" title="Choose whether the organization can review this submission"><p style={privacyCopy}>Submission does not grant access by itself. If this workspace is linked to a published Marketplace listing, you may explicitly share a narrow applicant projection. Private uploaded documents and unrelated Scholar Record data stay private.</p>{share?.consent_status === "active" ? <><PlaybookPill>Shared · {share.outcome_status?.replaceAll("_"," ") || "submitted"}</PlaybookPill><button disabled={busy} onClick={() => void setMarketplaceShare(workspace,false)}>Revoke organization access</button></> : <button disabled={busy} onClick={() => void setMarketplaceShare(workspace,true)}>Share submitted application with organization</button>}</PlaybookCard>}
+          {workspace.status === "submitted" && <PlaybookCard eyebrow="Applicant Consent" title="Choose whether the organization can review this submission"><p style={privacyCopy}>Submission does not grant access by itself. If this workspace is linked to a published Marketplace listing, you may explicitly share a narrow applicant projection. Private uploaded documents and unrelated Scholar Record data stay private.</p>{!sharingAvailable ? <p>Sharing controls are unavailable until sharing status can be verified.</p> : share?.consent_status === "active" ? <><PlaybookPill>Shared · {share.outcome_status?.replaceAll("_"," ") || "submitted"}</PlaybookPill><button disabled={busy} onClick={() => void setMarketplaceShare(workspace,false)}>Revoke organization access</button></> : <><label><input type="checkbox" checked={Boolean(consent[workspace.id])} onChange={event => setConsent(current => ({ ...current, [workspace.id]: event.target.checked }))} />I consent to share my applicant identity and submission status with the organization for this opportunity. Private documents and other Scholar Record data are excluded.</label><button disabled={busy || !consent[workspace.id]} onClick={() => void setMarketplaceShare(workspace,true)}>Share submitted application with organization</button></>}</PlaybookCard>}
         </PlaybookGrid>
       </section>; })}
   <ApplicationSupportRequestPanel />

@@ -57,7 +57,8 @@
     "test:acceptance:pbos:application": "playwright test tests/acceptance/pbos-application.spec.ts --project=chromium",
     "test:acceptance:pbos:support": "playwright test tests/acceptance/pbos-support.spec.ts --project=chromium",
     "test:acceptance:pbos:messaging": "playwright test tests/acceptance/pbos-messaging.spec.ts --project=chromium",
-    "test:acceptance:pbos:notifications": "playwright test tests/acceptance/pbos-notifications.spec.ts --project=chromium"
+    "test:acceptance:pbos:notifications": "playwright test tests/acceptance/pbos-notifications.spec.ts --project=chromium",
+    "postinstall": "node scripts/pbos/patch-next-eslint-glob.mjs"
   },
   "dependencies": {
     "@hcaptcha/react-hcaptcha": "^2.0.2",
@@ -66,8 +67,8 @@
     "@supabase/ssr": "^0.12.0",
     "@supabase/supabase-js": "^2.108.2",
     "canvas-confetti": "^1.9.4",
-    "next": "16.3.1",
-    "nodemailer": "^9.0.3",
+    "next": "16.4.2",
+    "nodemailer": "10.1.7",
     "react": "19.2.4",
     "react-confetti": "^6.4.0",
     "react-dom": "19.2.4",
@@ -75,6 +76,9 @@
     "stripe": "^22.2.3"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
+    "@electric-sql/pglite": "0.5.10",
+    "@playwright/test": "^1.55.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -84,13 +88,16 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.3.1",
+    "eslint-config-next": "16.4.2",
     "jsdom": "^29.1.1",
     "tailwindcss": "^4",
     "tsx": "^4.22.5",
     "typescript": "^5",
-    "vitest": "^4.1.9",
-    "@axe-core/playwright": "^4.10.2",
-    "@playwright/test": "^1.55.0"
+    "vitest": "^4.1.9"
+  },
+  "overrides": {
+    "@next/eslint-plugin-next": {
+      "fast-glob": "npm:tinyglobby@0.2.17"
+    }
   }
 }

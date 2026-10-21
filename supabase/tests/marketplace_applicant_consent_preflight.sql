@@ -30,8 +30,8 @@ select not has_table_privilege('anon','public.marketplace_application_shares','S
   \quit 1
 \endif
 
-select to_regprocedure('public.share_marketplace_application(uuid)') is not null
-   and to_regprocedure('private.share_marketplace_application(uuid)') is not null
+select to_regprocedure('public.share_marketplace_application(uuid,text)') is not null
+   and to_regprocedure('private.share_marketplace_application(uuid,text)') is not null
    and to_regprocedure('public.revoke_marketplace_application_share(uuid)') is not null
    and to_regprocedure('private.revoke_marketplace_application_share(uuid)') is not null
    and to_regprocedure('public.get_own_marketplace_application_shares()') is not null
@@ -43,9 +43,9 @@ select to_regprocedure('public.share_marketplace_application(uuid)') is not null
   \quit 1
 \endif
 
-select not has_function_privilege('anon','public.share_marketplace_application(uuid)','EXECUTE')
+select not has_function_privilege('anon','public.share_marketplace_application(uuid,text)','EXECUTE')
    and not has_function_privilege('anon','public.get_marketplace_applicants()','EXECUTE')
-   and has_function_privilege('authenticated','public.share_marketplace_application(uuid)','EXECUTE')
+   and has_function_privilege('authenticated','public.share_marketplace_application(uuid,text)','EXECUTE')
    and has_function_privilege('authenticated','public.revoke_marketplace_application_share(uuid)','EXECUTE')
    and has_function_privilege('authenticated','public.get_marketplace_applicants()','EXECUTE')
    and has_function_privilege('authenticated','public.set_marketplace_applicant_outcome(uuid,text,text)','EXECUTE') as applicant_rpc_grants_bounded \gset
@@ -55,10 +55,10 @@ select not has_function_privilege('anon','public.share_marketplace_application(u
   \quit 1
 \endif
 
-select pg_get_functiondef('private.share_marketplace_application(uuid)'::regprocedure) ~ 'w\.scholar_id=actor_id'
-   and pg_get_functiondef('private.share_marketplace_application(uuid)'::regprocedure) ~ 'w\.status=''submitted'''
-   and pg_get_functiondef('private.share_marketplace_application(uuid)'::regprocedure) ~ 'workspace\.opportunity_id'
-   and pg_get_functiondef('private.share_marketplace_application(uuid)'::regprocedure) ~ '''active''' as scholar_consent_explicit \gset
+select pg_get_functiondef('private.share_marketplace_application(uuid,text)'::regprocedure) ~ 'w\.scholar_id=actor_id'
+   and pg_get_functiondef('private.share_marketplace_application(uuid,text)'::regprocedure) ~ 'w\.status=''submitted'''
+   and pg_get_functiondef('private.share_marketplace_application(uuid,text)'::regprocedure) ~ 'workspace\.opportunity_id'
+   and pg_get_functiondef('private.share_marketplace_application(uuid,text)'::regprocedure) ~ '''active''' as scholar_consent_explicit \gset
 \if :scholar_consent_explicit
 \else
   \echo 'Marketplace application sharing must require submitted Scholar-owned workspace and explicit active consent'
@@ -74,8 +74,8 @@ select pg_get_functiondef('private.revoke_marketplace_application_share(uuid)'::
   \quit 1
 \endif
 
-select pg_get_functiondef('public.get_marketplace_applicants()'::regprocedure) ~ 'current_user_has_brand_campaign_authority'
-   and pg_get_functiondef('public.get_marketplace_applicants()'::regprocedure) ~ 's\.consent_status=''active'''
+select pg_get_functiondef('private.get_marketplace_applicants()'::regprocedure) ~ 'current_user_has_brand_campaign_authority'
+   and pg_get_functiondef('private.get_marketplace_applicants()'::regprocedure) ~ 's\.consent_status=''active'''
    and pg_get_function_result('public.get_marketplace_applicants()'::regprocedure) not ilike '%document%'
    and pg_get_function_result('public.get_marketplace_applicants()'::regprocedure) not ilike '%transcript%'
    and pg_get_function_result('public.get_marketplace_applicants()'::regprocedure) not ilike '%email%'
@@ -86,11 +86,11 @@ select pg_get_functiondef('public.get_marketplace_applicants()'::regprocedure) ~
   \quit 1
 \endif
 
-select pg_get_functiondef('public.set_marketplace_applicant_outcome(uuid,text,text)'::regprocedure) ~ 'current_user_has_brand_campaign_authority'
-   and pg_get_functiondef('public.set_marketplace_applicant_outcome(uuid,text,text)'::regprocedure) ~ 's\.consent_status=''active'''
-   and pg_get_functiondef('public.set_marketplace_applicant_outcome(uuid,text,text)'::regprocedure) ~ '''under_review'''
-   and pg_get_functiondef('public.set_marketplace_applicant_outcome(uuid,text,text)'::regprocedure) ~ '''selected'''
-   and pg_get_functiondef('public.set_marketplace_applicant_outcome(uuid,text,text)'::regprocedure) ~ '''not_selected''' as human_outcome_tracking_bounded \gset
+select pg_get_functiondef('private.set_marketplace_applicant_outcome(uuid,text,text)'::regprocedure) ~ 'current_user_has_brand_campaign_authority'
+   and pg_get_functiondef('private.set_marketplace_applicant_outcome(uuid,text,text)'::regprocedure) ~ 's\.consent_status=''active'''
+   and pg_get_functiondef('private.set_marketplace_applicant_outcome(uuid,text,text)'::regprocedure) ~ '''under_review'''
+   and pg_get_functiondef('private.set_marketplace_applicant_outcome(uuid,text,text)'::regprocedure) ~ '''selected'''
+   and pg_get_functiondef('private.set_marketplace_applicant_outcome(uuid,text,text)'::regprocedure) ~ '''not_selected''' as human_outcome_tracking_bounded \gset
 \if :human_outcome_tracking_bounded
 \else
   \echo 'Marketplace outcome tracking must remain verified, consent-gated, and human-recorded'
