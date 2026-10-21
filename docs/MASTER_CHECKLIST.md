@@ -1,5 +1,15 @@
 # Playbook OS Master Engineering Checklist
 
+## Current verified snapshot — October 20, 2026 (America/Los_Angeles)
+
+PR 255 merged as `8a4038e322794cb997ad79f52e6fa5ddf1e6d88f`. Its tree exactly matches accepted review `477d03f31db81be7b1a85bb7f745446bb5a59d90`. CI/security/build/tests, Marketplace, public Platform QA and all 48 strict Database Certification steps passed: runs 39546311728, 39546311729, 39546311796 and 39546311769. The forced-error canary proved exit code 3; no ignored-quit warnings remain in that run. Earlier broad green conclusions remain invalidated.
+
+Hosted migrations `20261021045516`, `20261021045527`, `20261021045532` were applied and verified separately: Mentor RLS/tables, governed approval/finalization/revocation, direct-write closure for Mentor/relationship/Event, valid reward unique index, unchanged hardened invitation claim. Vercel `dpl_8rboxo2jDBh7CWkEUfZdXWEo6wxe` is READY; stable production reports exact main SHA, home/login 200 and unauthenticated Mentor approval/support context 401. These observations do not certify authenticated Mentor journeys.
+
+Production PBOS endpoint/configuration remains unverified/missing; the automatic trusted QA run 39546746969 reached exact production revision 8a4038e, then Scholar onboarding failed on missing PBOS_API_URL; Athlete/Family skipped. The platform remains not launch-certified. All 23 constitutional snapshot hashes are unchanged.
+
+The sections below retain historical evidence. Current snapshot and machine-readable evidence layers supersede earlier current-state and certification claims.
+
 ## Authority
 
 This is the authoritative human-readable engineering status board for Playbook OS.
@@ -191,3 +201,9 @@ Mentor convergence is a subsequent candidate, not applied: restore missing reque
 The raw green Database Certification conclusion was insufficient. Inspection of run 39536009957 confirms nine preflights printed an ignored `quit` exit-argument warning after a failed assertion, then exited successfully. The new Mentor full-chain test separately failed on the existing relationship revocation command, whose invoker could not lock/update through the closed RLS boundary. Earlier statements that the whole database certification passed are superseded by this correction; retain their raw run status as history, not broad certification evidence. Targeted PostgreSQL tests and explicit hosted catalog/grant/data observations retain their stated narrow scope.
 
 Further production mutation/release is held while the candidate repairs all 177 ignored-exit assertion paths, adds a real PostgreSQL failure canary, and runs every gate without converting failures into success. Each failed step keeps the job red; later gates still run to expose the complete failure set. Retired-policy checks are reconciled with current governed contracts, including the explicit four-function anonymous projection/share allowlist. Real gaps are repaired through a private participant-authorized relationship revocation command, the intended reward-ledger unique index, and closure of direct Event mutation grants. No predicate is changed merely to make an assertion green. Full re-certification and current-role runtime evidence remain required.
+
+## Mentor identity and fixture follow-up
+
+Candidate queue reads connected Scholar names through the existing governed support-context projection, never cross-user raw profiles. Projection/network errors withhold approval controls. The fixture-mutating Mentor acceptance suite is restricted to local app plus local Supabase and cleans approvals only for its Scholar/Mentor request IDs. It has not been run against production.
+
+Public presentation follow-up: the landing-page pathway count is derived from the canonical role registry (currently 15), replacing the stale hard-coded 14. This is role enumeration, not a claim of completed acceptance for all roles.

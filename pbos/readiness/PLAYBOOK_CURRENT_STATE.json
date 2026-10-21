@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "reconciledAt": "2026-10-21",
-  "baselineRevision": "bbbcc3892fc2c4f4b45a9eab16d7680945341e41",
+  "baselineRevision": "8a4038e322794cb997ad79f52e6fa5ddf1e6d88f",
   "authority": {
     "humanReadable": "docs/MASTER_CHECKLIST.md",
     "journeys": "docs/USER_JOURNEYS.md",
@@ -97,16 +97,16 @@
       "legacy multiple permissive policies",
       "legacy duplicate/unused index warnings"
     ],
-    "confirmedMissingObjects": [
-      "public.mentor_validation_requests",
-      "public.mentor_validation_approvals"
-    ],
-    "reconciliationScope": "Read-only catalog and migration-history observations. No hosted migrations applied. Historical frontiers do not prove current migration coverage.",
+    "confirmedMissingObjects": [],
+    "reconciliationScope": "Current catalog/grant checks and seven applied repair packages are verified separately. Historical frontiers do not prove complete hosted migration parity.",
     "appliedRepairPackages": [
       "hosted_marketplace_convergence",
       "support_invitation_privilege_closure",
       "dream_school_convergence",
-      "college_provenance_constraint_convergence"
+      "college_provenance_constraint_convergence",
+      "mentor_validation_authority_convergence",
+      "support_relationship_revocation_command",
+      "certification_authority_boundaries"
     ],
     "failedRolledBackPackages": [
       {
@@ -119,7 +119,11 @@
       "dreamRows": 8,
       "topRows": 0,
       "source": "Existing profile preferences; no fabricated catalog content."
-    }
+    },
+    "resolvedPreviouslyMissingObjects": [
+      "public.mentor_validation_requests",
+      "public.mentor_validation_approvals"
+    ]
   },
   "journeys": {
     "scholar": "REFERENCE_IMPLEMENTATION",
@@ -152,15 +156,14 @@
     "intelligenceOutcomeMeasurement": "PARTIAL"
   },
   "releaseBlockers": [
-    "fail-closed database certification repair and re-certification; previous broad database green jobs are insufficient",
     "approved PBOS production endpoint, protected configuration and authority reconciliation",
-    "hosted Mentor validation tables and current-authority-safe approval/finalization convergence",
+    "authenticated Mentor approval, activation and revocation browser acceptance",
     "atomic achievement command integration with durable delivery and idempotent downstream handlers",
     "constitutional dependency closure including PPS-2006/PPS-2007 cycle",
     "catalog content sourcing and launch data readiness",
     "exact-revision browser E2E for all 15 roles and canonical connected pathways",
     "mobile/device/accessibility/recovery certification",
-    "Messaging attachment authority and direct-RLS relationship-revocation closure",
+    "Messaging attachment and conversation revocation browser acceptance",
     "Supabase Auth leaked-password protection configuration and verification",
     "legacy Supabase performance-advisor debt triage",
     "production outbound email/template/delivery certification",
@@ -171,8 +174,7 @@
     "soft launch, rollback proof, release notes, feedback loop, and independent human launch approval"
   ],
   "nextExecutionOrder": [
-    "repair_database_assertion_exit_paths_and_underlying_authority_gates",
-    "certify_and_apply_current_authority_safe_mentor_convergence",
+    "mentor_identity_and_isolated_fixture_followup",
     "exact_head_ci_and_database_certification",
     "achievement_command_event_delivery_and_form_integration",
     "pbos_configuration_and_hosted_schema_review",
@@ -195,67 +197,94 @@
   },
   "evidenceLayers": {
     "mergedCode": {
-      "revision": "bbbcc3892fc2c4f4b45a9eab16d7680945341e41",
+      "revision": "8a4038e322794cb997ad79f52e6fa5ddf1e6d88f",
       "status": "VERIFIED_MAIN",
       "pullRequests": [
         253,
-        254
+        254,
+        255
       ]
     },
     "reviewCode": {
-      "pr": 253,
-      "url": "https://github.com/sgwalton87/playbook-platform/pull/253",
-      "revision": "bc95e02b7d55b800a1af598d49601c1744d030a1",
-      "status": "MERGED_AS_0cb6997",
+      "pr": 255,
+      "url": "https://github.com/sgwalton87/playbook-platform/pull/255",
+      "revision": "477d03f31db81be7b1a85bb7f745446bb5a59d90",
+      "status": "MERGED_AS_8a4038e",
       "achievementCommand": "SQL_CANDIDATE_NOT_CONNECTED_TO_FORM_OR_APPLIED_HOSTED"
     },
     "isolatedCertification": {
-      "revision": "c734e8aebc704cd027c004077032a26f540bd777",
+      "revision": "477d03f31db81be7b1a85bb7f745446bb5a59d90",
+      "tree": "18e170f71b1e735d30f637416edeb73332565675",
       "database": {
-        "status": "PRIOR_WORKFLOW_PASS_INVALIDATED",
-        "url": "https://github.com/sgwalton87/playbook-platform/actions/runs/39537050965",
-        "rawWorkflowConclusion": "success",
-        "reason": "Legacy preflight quit arguments were ignored by psql, allowing failed assertions to exit successfully.",
-        "confirmedAffectedRun": "https://github.com/sgwalton87/playbook-platform/actions/runs/39536009957",
-        "confirmedIgnoredFailureExits": 9
+        "status": "PASSED_WITH_FAILURE_CANARY",
+        "url": "https://github.com/sgwalton87/playbook-platform/actions/runs/39546311769",
+        "certificationSteps": 48,
+        "forcedFailureExitCode": 3,
+        "ignoredQuitWarnings": 0,
+        "priorBroadPasses": "INVALIDATED_NOT_REINSTATED"
+      },
+      "ci": {
+        "status": "PASSED",
+        "url": "https://github.com/sgwalton87/playbook-platform/actions/runs/39546311728"
       },
       "marketplace": {
         "status": "PASSED",
-        "url": "https://github.com/sgwalton87/playbook-platform/actions/runs/39537050929"
+        "url": "https://github.com/sgwalton87/playbook-platform/actions/runs/39546311729"
       },
       "platformQa": {
-        "status": "PASSED",
-        "url": "https://github.com/sgwalton87/playbook-platform/actions/runs/39537050861"
-      },
-      "ci": {
-        "validation": "PASSED",
-        "dependencyAudit": "PASSED",
-        "url": "https://github.com/sgwalton87/playbook-platform/actions/runs/39537051129"
+        "status": "PASSED_PUBLIC_SCOPE",
+        "url": "https://github.com/sgwalton87/playbook-platform/actions/runs/39546311796"
       }
     },
     "productionDeployment": {
-      "id": "dpl_6UezZoLjTM7QsQfdNsSsP5eUyAFc",
-      "revision": "0cb6997b4e8f4c4492e222673c7771c343d19488",
+      "id": "dpl_8rboxo2jDBh7CWkEUfZdXWEo6wxe",
+      "revision": "8a4038e322794cb997ad79f52e6fa5ddf1e6d88f",
       "url": "https://the-playbook-five.vercel.app",
       "status": "READY_IDENTITY_AND_PUBLIC_RESPONSES_VERIFIED",
       "publicChecks": {
         "deploymentEndpoint": 200,
         "home": 200,
         "login": 200,
-        "unauthenticatedWorkspaceApi": 401
+        "unauthenticatedMentorApproval": 401,
+        "unauthenticatedSupportContext": 401
       },
-      "authenticatedJourneys": "FAILED_AT_SCHOLAR_ONBOARDING_API",
-      "trustedRoleRun": "https://github.com/sgwalton87/playbook-platform/actions/runs/39536495519",
+      "authenticatedJourneys": "FAILED_AT_SCHOLAR_ONBOARDING_API_AT_THIS_EXACT_REVISION",
+      "trustedRoleRun": "https://github.com/sgwalton87/playbook-platform/actions/runs/39546746969",
       "automaticGitDeployment": "DISABLED_FOR_MAIN_AND_ORIGINAL_REVIEW_BRANCH"
     },
     "pbosIntegration": {
-      "latestRecordedFailure": "Missing protected server configuration: PBOS_API_URL at accepted production revision 0cb6997",
+      "latestRecordedFailure": "Missing protected server configuration: PBOS_API_URL at accepted production revision 8a4038e",
       "productionEndpoint": "UNVERIFIED",
       "googleCloudConsole": "INACCESSIBLE_IN_READ_ONLY_BROWSER_SESSION",
       "journeysRerun": true,
       "configuredPreviewEnvironment": "staging",
       "configuredPreviewServiceHealth": "HTTP_200_HEALTHY",
       "athleteAndFamily": "SKIPPED_AFTER_SCHOLAR_FAILURE"
+    },
+    "hostedRepair255": {
+      "project": "oexgxnybeixwadgtdtzp",
+      "migrations": [
+        {
+          "version": "20261021045516",
+          "name": "mentor_validation_authority_convergence"
+        },
+        {
+          "version": "20261021045527",
+          "name": "support_relationship_revocation_command"
+        },
+        {
+          "version": "20261021045532",
+          "name": "certification_authority_boundaries"
+        }
+      ],
+      "verification": [
+        "Mentor tables have RLS; direct writes denied",
+        "Governed authenticated commands available; anonymous commands denied",
+        "Direct Event and relationship mutation privileges closed",
+        "Reward unique index valid",
+        "Hardened invitation claim definition hash unchanged: 95c52725c9e82e3f454a782af79c2981"
+      ],
+      "runtimeAcceptance": "NOT_CERTIFIED"
     }
   },
   "securityRemediation": {
