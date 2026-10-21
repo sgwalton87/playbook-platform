@@ -43,7 +43,7 @@ test("synthetic profile data survives edit and reload", async ({ page }) => {
     await school.fill("Recovery Institute");
     await page.getByRole("button", { name: /save changes/i }).first().click();
     await page.waitForTimeout(400);
-    const saveAlerts = await page.getByRole("alert").allTextContents();
+    const saveAlerts = (await page.getByRole("alert").allTextContents()).map(text => text.trim()).filter(Boolean);
     if (saveAlerts.length) throw new Error(`Profile save reported: ${saveAlerts.join(" | ")}`);
     await expect.poll(async () => {
       const row = await admin.from("profiles").select("school").eq("id", id).single();
