@@ -51,6 +51,8 @@ export function createInitialOnboardingData(profile: Record<string, unknown> | n
     username: (profile?.username as string) || "",
     avatar_url: (profile?.avatar_url as string) || "",
     bio: (profile?.bio as string) || "",
+    primary_sport: (profile?.sport as string) || "",
+    position: (profile?.position as string) || "",
     school: (profile?.school as string) || "",
     grade: (profile?.grade as string) || "",
     dream_school: (profile?.dream_school as string) || "",

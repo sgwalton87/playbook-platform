@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import SportPositionField from "@/components/profile/SportPositionField";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import { supabase } from "@/lib/supabaseClient";
 import { ALL_COLLEGE_OPTIONS, CAREER_OPTIONS, ACTIVITY_OPTIONS, CALIFORNIA_DISTRICTS, assertRoleOnboardingCompletionSupported, createInitialOnboardingData, getOnboardingCompletionDestination, getOnboardingSteps, mapOnboardingToProfilePayload, validateOnboardingStep } from "@/lib/onboarding";
@@ -105,7 +106,7 @@ function StartContent() {
   }, [role, router]);
 
   function update(key: string, value: LegacyValue) {
-    setForm((prev) => ({ ...prev, [key]: value }));
+    setForm((prev) => ({ ...prev, [key]: value, ...(key === "primary_sport" && prev.primary_sport !== value ? { position: "" } : {}) }));
   }
 
   async function saveCustomOption(type: "college" | "career" | "activity" | "district", value?: string) {
@@ -276,6 +277,7 @@ function StartContent() {
   async function next(skip = false) {
     setSaving(true);
     setJourneyError(null);
+    let draftSaved = false;
 
     try {
       if (autosaveTimerRef.current) {
@@ -294,6 +296,7 @@ function StartContent() {
       await persist(false, {
         onboarding_step_index: Math.min(stepIndex + stepIncrement, steps.length - 1),
       });
+      draftSaved = true;
       lastSavedFormRef.current = JSON.stringify(form);
       setAutosaveStatus("saved");
 
@@ -330,8 +333,11 @@ function StartContent() {
       setStepIndex((i) => i + 1);
     } catch (error) {
       setCreating(false);
-      setAutosaveStatus("error");
-      setJourneyError(error instanceof Error ? error.message : "Your onboarding progress could not be saved.");
+      setAutosaveStatus(draftSaved ? "saved" : "error");
+      const message = error instanceof Error ? error.message : "Your onboarding progress could not be saved.";
+      setJourneyError(draftSaved && isLast
+        ? "Your profile answers are saved, but profile activation could not finish. " + (message.includes("Missing protected server configuration") ? "The activation service is temporarily unavailable. You can return to your saved answers and try again when service is restored." : message)
+        : message);
     } finally {
       setSaving(false);
     }
@@ -341,7 +347,7 @@ function StartContent() {
 
   return (
     <main style={page} data-visual-canon="PGDS-001">
-      {journeyError && <div role="alert" aria-live="assertive" style={{ margin: 16, padding: 16, border: "1px solid #B91C1C", borderRadius: 12, color: "#B91C1C" }}>{journeyError}</div>}
+      {journeyError && <div role="alert" aria-live="assertive" style={{ margin: 16, padding: 16, border: "1px solid #F87171", borderRadius: 12, color: "#FECACA", background: "#450A0A" }}>{journeyError}</div>}
       {creating && (
         <div style={overlay}>
           <div style={confetti}>✨ 🧭 📚</div>
@@ -437,6 +443,7 @@ function StartContent() {
             <FieldRenderer
               key={field.key}
               field={field}
+              primarySport={form.primary_sport}
               value={form[field.key]}
               onChange={(value: LegacyValue) => update(field.key, value)}
               onBlur={(value: string) => {
@@ -467,7 +474,7 @@ function StartContent() {
   );
 }
 
-function FieldRenderer({ field, value, onChange, onBlur }: LegacyValue) {
+function FieldRenderer({ field, value, onChange, onBlur, primarySport }: LegacyValue) {
   const [draft, setDraft] = useState({
     activity: "",
     category: "",
@@ -475,6 +482,7 @@ function FieldRenderer({ field, value, onChange, onBlur }: LegacyValue) {
     hours: "",
     supervisor: "",
   });
+  if (field.type === "sport-position") return <SportPositionField key={primarySport || "no-sport"} sport={String(primarySport || "")} value={String(value || "")} onChange={onChange} inputStyle={input} labelStyle={label} />;
   if (field.type === "textarea") {
     return (
       <label style={label}>
@@ -524,9 +532,10 @@ function FieldRenderer({ field, value, onChange, onBlur }: LegacyValue) {
           onChange={(e) => onChange(e.target.value)}
           style={input}
         >
-          <option value="">Choose one...</option>
+          <option value="" style={{ color: "#0F172A", background: "#FFFFFF" }}>Choose one...</option>
+          {value && !(field.options || []).includes(value) && <option value={value} style={{ color: "#0F172A", background: "#FFFFFF" }}>{value} (saved)</option>}
           {(field.options || []).map((option: string) => (
-            <option key={option} value={option}>{option}</option>
+            <option key={option} value={option} style={{ color: "#0F172A", background: "#FFFFFF" }}>{option}</option>
           ))}
         </select>
       </label>
@@ -744,7 +753,7 @@ const eyebrow: React.CSSProperties = { marginTop: 18, fontFamily: "'Space Mono',
 const heroTitle: React.CSSProperties = { fontFamily: "'Anton', sans-serif", fontSize: "clamp(38px,5.5vw,68px)", lineHeight: .92, color: "#F8F7F4", textTransform: "uppercase", margin: "10px 0 18px" };
 const heroBody: React.CSSProperties = { fontSize: 19, lineHeight: 1.45, color: "rgba(248,247,244,.76)", fontWeight: 700 };
 const progressWrap: React.CSSProperties = { maxWidth: 1280, margin: "0 auto 22px", display: "flex", gap: 10, overflowX: "auto" };
-const stepPill = (active: boolean): React.CSSProperties => ({ border: active ? "1px solid #F97316" : "1px solid #E2E8F0", background: active ? "#FFF7ED" : "#FFFFFF", borderRadius: 999, padding: "10px 14px", display: "flex", gap: 8, alignItems: "center", flexShrink: 0 });
+const stepPill = (active: boolean): React.CSSProperties => ({ border: active ? "1px solid #F97316" : "1px solid #E2E8F0", background: active ? "#FFF7ED" : "#FFFFFF", color: "#0F172A", borderRadius: 999, padding: "10px 14px", display: "flex", gap: 8, alignItems: "center", flexShrink: 0 });
 const card: React.CSSProperties = { maxWidth: 920, margin: "0 auto", background: "rgba(4,18,39,.92)", border: "1px solid rgba(255,255,255,.16)", borderRadius: "28px 8px 28px 8px", padding: "clamp(28px,5vw,58px)", boxShadow: "0 30px 80px rgba(0,0,0,.3)" };
 const formEyebrow: React.CSSProperties = { fontFamily: "'Space Mono', monospace", fontSize: 10, fontWeight: 900, letterSpacing: ".16em", textTransform: "uppercase", color: "#F97316", margin: 0 };
 const formTitle: React.CSSProperties = { fontSize: "clamp(34px,5vw,58px)", lineHeight: 1, margin: "8px 0" };

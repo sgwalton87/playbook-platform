@@ -1,4 +1,5 @@
 export type OnboardingFieldType =
+  | "sport-position"
   | "text"
   | "textarea"
   | "select"
