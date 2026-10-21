@@ -141,3 +141,9 @@ All 15 roles have canonical registry identities and destinations. Authority-sens
 ## Exit gate
 
 Playbook is complete only when the current canonical graph reports no unresolved launch blockers; all 15 launch roles satisfy the journey evidence contract; required connected pathways are durable and permission-safe; repository, hosted database and production deployment evidence align at governed revisions; browser/device/accessibility and operational gates pass; and independent human launch approval is recorded.
+
+## Local candidate: Marketplace sharing recovery — October 20, 2026
+
+Owner: Playbook OS Engineering. Purpose: preserve canonical Application Workspace visibility during an unavailable Marketplace sharing RPC. Related implementation: `components/application-workspace/ApplicationWorkspaceDashboard.tsx`; regression coverage: `tests/unit/application-workspace/sharing-recovery.test.tsx`.
+
+Status: LOCAL CANDIDATE, not merged, deployed or production-certified. The candidate separates sharing availability from an empty consent list, keeps workspace reads usable when sharing fails, withholds sharing mutations until status is verified, explains that existing partner access may remain active, and offers retry. It changes no consent authority, RPC contract, schema or production configuration. Local mocked component tests cover a schema-cache RPC error, network rejection and retry recovery. Hosted permission and production browser evidence remain separate gates.
