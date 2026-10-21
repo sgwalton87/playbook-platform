@@ -4,6 +4,7 @@ import {
   normalizeOnboardingRole,
 } from "@/lib/onboarding";
 import { ScholarOnboardingService, type SupportedScholarRecordRole } from "@/lib/pbos/scholar-onboarding-service";
+import { getMissingPbosActivationConfiguration } from "@/lib/pbos/activation-config";
 import { requireUser } from "@/lib/supabase/server";
 import { PlaybookConnector } from "@/pbos/connector/playbook-connector";
 import { PlaybookPbosRuntimeClient } from "@/pbos/connector/pbos-runtime-client";
@@ -132,6 +133,34 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "Display name and Scholar goal are required." },
         { status: 400 }
+      );
+    }
+
+    // A constituent's self-owned profile is durable even when the independent
+    // PBOS activation plane has not been provisioned. Complete onboarding
+    // through the governed RPC and keep role authority explicitly pending.
+    // No PBOS identity, exchange, or relationship authority is granted here.
+    const missingActivationConfiguration = getMissingPbosActivationConfiguration(pbosRole);
+    if (missingActivationConfiguration.length > 0) {
+      const completedAt = await finalizeProfileCompletion(
+        supabase,
+        user.id,
+        normalizedRole,
+        true
+      );
+      return NextResponse.json(
+        {
+          ok: true,
+          role: contract.role,
+          adapter: contract.adapter,
+          onboardingSubmitted: true,
+          onboardingCompletedAt: completedAt,
+          activationState: "pending-pbos-activation",
+          requirement: contract.requirement,
+          destination: contract.destination,
+          message: "Your Playbook profile is ready. PBOS activation remains pending and grants no additional authority.",
+        },
+        { status: 202 }
       );
     }
 

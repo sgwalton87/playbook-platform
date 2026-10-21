@@ -74,9 +74,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Implemented learner roles delegate only after URL-role and authenticated
-    // durable-role equality are proven. The underlying service performs PBOS
-    // role equality, persistence, and final profile completion atomically from
-    // the user's perspective: any failure leaves onboarding incomplete.
+    // durable-role equality are proven. The underlying service keeps PBOS
+    // authority fail-closed while allowing the self-owned profile to complete
+    // with activation pending when the activation plane is not configured.
     return await completeScholarRecord(request);
   } catch (error) {
     return NextResponse.json(
