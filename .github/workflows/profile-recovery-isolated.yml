@@ -37,7 +37,7 @@ jobs:
           from pathlib import Path
           import re
           folder = Path("supabase/migrations")
-          scripts = sorted(p for p in folder.glob("*.sql") if re.match(r"^\\d+_", p.name))
+          scripts = sorted(p for p in folder.glob("*.sql") if re.match(r"^\d+_", p.name))
           for i, path in enumerate(scripts, 1):
               suffix = path.name.split("_", 1)[1]
               path.rename(folder / f"20260101{i:06d}_{suffix}")
