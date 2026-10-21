@@ -9,6 +9,7 @@ export async function ensurePlaybookRecord(profileId: string) {
     .eq("profile_id", profileId)
     .maybeSingle();
 
+  if (existing.error) throw existing.error;
   if (existing.data) return existing.data;
 
   const created = await supabase
@@ -63,7 +64,7 @@ export async function createAchievementWithEvidence({
 
   const achievement = achievementRes.data;
 
-  await supabase.from("evidence_packs").insert({
+  const packResult = await supabase.from("evidence_packs").insert({
     achievement_id: achievement.id,
     title: `${title} Evidence Pack`,
     summary: description || null,
@@ -71,8 +72,10 @@ export async function createAchievementWithEvidence({
     updated_by: profileId,
   });
 
+  if (packResult.error) throw packResult.error;
+
   if (evidenceTitle || evidenceUrl) {
-    await supabase.from("evidence").insert({
+    const evidenceResult = await supabase.from("evidence").insert({
       achievement_id: achievement.id,
       title: evidenceTitle || title,
       evidence_type: evidenceUrl ? "link" : "other",
@@ -80,18 +83,20 @@ export async function createAchievementWithEvidence({
       created_by: profileId,
       updated_by: profileId,
     });
+    if (evidenceResult.error) throw evidenceResult.error;
   }
 
   if (reflection) {
-    await supabase.from("reflections").insert({
+    const reflectionResult = await supabase.from("reflections").insert({
       achievement_id: achievement.id,
       response: reflection,
       created_by: profileId,
       updated_by: profileId,
     });
+    if (reflectionResult.error) throw reflectionResult.error;
   }
 
-  await supabase.from("timeline_events").insert({
+  const timelineResult = await supabase.from("timeline_events").insert({
     record_id: record.id,
     achievement_id: achievement.id,
     event_type: "achievement",
@@ -103,6 +108,8 @@ export async function createAchievementWithEvidence({
     created_by: profileId,
     updated_by: profileId,
   });
+
+  if (timelineResult.error) throw timelineResult.error;
 
   await emitEvent({
     type: "AchievementCreated",
