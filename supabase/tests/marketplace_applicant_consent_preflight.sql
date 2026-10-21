@@ -6,7 +6,9 @@ select to_regclass('public.marketplace_application_shares') is not null
 \if :applicant_tables_exist
 \else
   \echo 'Marketplace applicant consent/outcome tables are missing'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select (select relrowsecurity from pg_class where oid='public.marketplace_application_shares'::regclass)
@@ -14,7 +16,9 @@ select (select relrowsecurity from pg_class where oid='public.marketplace_applic
 \if :applicant_rls_enabled
 \else
   \echo 'Marketplace applicant tables must keep RLS enabled'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select not has_table_privilege('anon','public.marketplace_application_shares','SELECT')
@@ -27,7 +31,9 @@ select not has_table_privilege('anon','public.marketplace_application_shares','S
 \if :direct_access_denied
 \else
   \echo 'Marketplace applicant authority must remain RPC-only'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select to_regprocedure('public.share_marketplace_application(uuid,text)') is not null
@@ -40,7 +46,9 @@ select to_regprocedure('public.share_marketplace_application(uuid,text)') is not
 \if :applicant_rpc_chain_exists
 \else
   \echo 'Marketplace applicant RPC chain is incomplete'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select not has_function_privilege('anon','public.share_marketplace_application(uuid,text)','EXECUTE')
@@ -52,7 +60,9 @@ select not has_function_privilege('anon','public.share_marketplace_application(u
 \if :applicant_rpc_grants_bounded
 \else
   \echo 'Marketplace applicant RPC grants are incorrect'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select pg_get_functiondef('private.share_marketplace_application(uuid,text)'::regprocedure) ~ 'w\.scholar_id=actor_id'
@@ -62,7 +72,9 @@ select pg_get_functiondef('private.share_marketplace_application(uuid,text)'::re
 \if :scholar_consent_explicit
 \else
   \echo 'Marketplace application sharing must require submitted Scholar-owned workspace and explicit active consent'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select pg_get_functiondef('private.revoke_marketplace_application_share(uuid)'::regprocedure) ~ 's\.scholar_id=actor_id'
@@ -71,7 +83,9 @@ select pg_get_functiondef('private.revoke_marketplace_application_share(uuid)'::
 \if :scholar_revocation_preserved
 \else
   \echo 'Scholar applicant consent must be revocable and withdraw the visible outcome'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select pg_get_functiondef('private.get_marketplace_applicants()'::regprocedure) ~ 'current_user_has_brand_campaign_authority'
@@ -83,7 +97,9 @@ select pg_get_functiondef('private.get_marketplace_applicants()'::regprocedure) 
 \if :partner_projection_bounded
 \else
   \echo 'Brand Partner applicant projection leaks data or bypasses verified authority'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select pg_get_functiondef('private.set_marketplace_applicant_outcome(uuid,text,text)'::regprocedure) ~ 'current_user_has_brand_campaign_authority'
@@ -94,7 +110,9 @@ select pg_get_functiondef('private.set_marketplace_applicant_outcome(uuid,text,t
 \if :human_outcome_tracking_bounded
 \else
   \echo 'Marketplace outcome tracking must remain verified, consent-gated, and human-recorded'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 rollback;

@@ -60,101 +60,166 @@ jobs:
           done
           echo "Unable to provision PostgreSQL client." >&2
           exit 1
+      - name: Prove failed database assertions stop certification
+        id: certify_fail_closed
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/pbos/check-database-preflight-exits.mjs
+          canary_status=0
+          psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/certification_failure_canary.sql > "$RUNNER_TEMP/database-canary.log" 2>&1 || canary_status=$?
+          cat "$RUNNER_TEMP/database-canary.log"
+          if [ "$canary_status" -ne 3 ]; then
+            echo "Expected PostgreSQL ON_ERROR_STOP exit 3, got $canary_status" >&2
+            exit 1
+          fi
+          if ! grep -Fq CERTIFICATION_FAILURE_CANARY "$RUNNER_TEMP/database-canary.log"; then
+            echo "Database canary failed for an unexpected reason" >&2
+            exit 1
+          fi
       - name: Certify relationship authority boundary
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/relationship_authority_preflight.sql
       - name: Certify invitation authority boundary
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/support_invitation_authority_preflight.sql
       - name: Certify profile authority boundary
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/profile_authority_preflight.sql
       - name: Certify moderation authority boundary
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/moderation_authority_preflight.sql
       - name: Certify application workspace authority boundary
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/application_workspace_authority_preflight.sql
       - name: Certify public Scholar Record projection boundary
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/public_scholar_record_projection_preflight.sql
       - name: Certify fail-closed public profile privacy
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/public_profile_privacy_fail_closed_preflight.sql
       - name: Certify governed portfolio sharing boundary
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/portfolio_share_authority_preflight.sql
       - name: Certify recruiting visits and offers boundary
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/recruiting_visits_offers_preflight.sql
       - name: Certify network and feed projection boundary
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/network_feed_projection_preflight.sql
       - name: Certify Feed author identity privacy
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/feed_author_identity_privacy_preflight.sql
       - name: Certify Feed Create Post authority
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/feed_create_post_authority_preflight.sql
       - name: Certify Feed Image Posts media authority
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/feed_image_posts_media_authority_preflight.sql
       - name: Certify Feed Video Posts media authority
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/feed_video_posts_media_authority_preflight.sql
       - name: Certify Feed Comments and Likes authority
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/feed_comments_likes_authority_preflight.sql
       - name: Certify Feed Profile Links authority
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/feed_profile_links_authority_preflight.sql
       - name: Certify Feed Timeline Visibility authority
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/feed_timeline_visibility_preflight.sql
       - name: Certify Feed Shares authority
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/feed_shares_authority_preflight.sql
       - name: Certify Feed Edit and Delete authority
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/feed_edit_delete_authority_preflight.sql
       - name: Certify Feed Infinite Scroll
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/feed_infinite_scroll_preflight.sql
       - name: Certify Feed Moderation
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/feed_moderation_authority_preflight.sql
       - name: Certify Network connection lifecycle authority
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/network_connection_lifecycle_preflight.sql
       - name: Certify canonical Network policy surface
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/network_connection_policy_surface_preflight.sql
       - name: Certify Network public-profile link authority
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/network_public_profile_link_authority_preflight.sql
       - name: Certify Network mutual connection counts
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/network_mutual_connection_counts_preflight.sql
       - name: Certify Network Suggested Users
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/network_suggested_users_preflight.sql
       - name: Certify Network messaging integration
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/network_messaging_integration_preflight.sql
       - name: Certify Direct Messages authority
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/messaging_direct_messages_preflight.sql
       - name: Certify Group Messages authority
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/messaging_group_messages_preflight.sql
       - name: Certify Conversation Search authority
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/messaging_conversation_search_preflight.sql
       - name: Certify Messaging Attachments authority
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/messaging_attachments_authority_preflight.sql
       - name: Certify Messaging Block User authority
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/messaging_block_user_preflight.sql
       - name: Certify Messaging Report User authority
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/messaging_report_user_preflight.sql
       - name: Certify canonical learning and economy boundary
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/canonical_learning_economy_preflight.sql
       - name: Certify canonical community operations boundary
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/community_operations_preflight.sql
       - name: Certify event experience authority boundary
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/event_experience_preflight.sql
       - name: Certify event reminder delivery boundary
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/event_reminder_delivery_preflight.sql
       - name: Certify Summit shared Event taxonomy
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/summit_event_type_preflight.sql
       - name: Certify Brand Marketplace foundation boundary
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/brand_marketplace_foundation_preflight.sql
       - name: Certify Marketplace Opportunity Catalog boundary
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/marketplace_opportunity_catalog_preflight.sql
       - name: Certify Marketplace applicant consent boundary
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/marketplace_applicant_consent_preflight.sql
       - name: Certify notification authority boundary
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/notification_authority_preflight.sql
       - name: Certify Network notification producers
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/network_notification_producer_preflight.sql
       - name: Certify active Scholar support context boundary
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/active_support_scholar_context_preflight.sql
       - name: Certify verification reviewer authority boundary
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/verification_reviewer_authority_preflight.sql
       - name: Certify messaging revocation and attachment boundary
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/messaging_revocation_attachment_preflight.sql
       - name: Certify atomic achievement command
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/achievement_command_preflight.sql
       - name: Certify governed Mentor validation commands
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/mentor_validation_command_preflight.sql
       - name: Stop isolated local Supabase
         if: always()

@@ -10,7 +10,9 @@ select to_regclass('public.community_events') is not null
 \if :community_tables_exist
 \else
   \echo 'community operation tables are incomplete'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select bool_and(relrowsecurity) as all_rls_enabled
@@ -25,7 +27,9 @@ where oid in (
 \if :all_rls_enabled
 \else
   \echo 'community tables must keep RLS enabled'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select count(*) = 0 as direct_mutation_policies_absent
@@ -36,7 +40,9 @@ where schemaname='public'
 \if :direct_mutation_policies_absent
 \else
   \echo 'community mutations must remain behind governed RPCs'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select to_regprocedure('public.rsvp_community_event(uuid,text)') is not null
@@ -56,7 +62,9 @@ select to_regprocedure('public.rsvp_community_event(uuid,text)') is not null
 \if :community_wrapper_helpers_exist
 \else
   \echo 'community wrapper/helper function set is incomplete'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select bool_and(not p.prosecdef) as public_invoker_only
@@ -70,7 +78,9 @@ where n.nspname='public'
 \if :public_invoker_only
 \else
   \echo 'public community RPCs must be SECURITY INVOKER wrappers only'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select bool_and(p.prosecdef) as private_definer_only
@@ -84,7 +94,9 @@ where n.nspname='private'
 \if :private_definer_only
 \else
   \echo 'private community helpers must retain SECURITY DEFINER authority'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select has_function_privilege('authenticated','public.rsvp_community_event(uuid,text)','EXECUTE')
@@ -104,7 +116,9 @@ select has_function_privilege('authenticated','public.rsvp_community_event(uuid,
 \if :authenticated_chain
 \else
   \echo 'authenticated users require the narrow community wrapper/helper chain'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select not has_function_privilege('anon','public.rsvp_community_event(uuid,text)','EXECUTE')
@@ -124,7 +138,9 @@ select not has_function_privilege('anon','public.rsvp_community_event(uuid,text)
 \if :anon_denied
 \else
   \echo 'anonymous callers must not execute community/mentorship RPCs or private helpers'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select not has_function_privilege('authenticated','private.current_user_is_platform_operator()','EXECUTE')
@@ -132,7 +148,9 @@ select not has_function_privilege('authenticated','private.current_user_is_platf
 \if :authority_helpers_private
 \else
   \echo 'community authority predicate helpers must remain non-callable to authenticated clients'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select pg_get_functiondef('private.create_community_event(text,text,text,text,timestamp with time zone,timestamp with time zone,text,text,text,integer,integer,integer,boolean)'::regprocedure) ~ 'current_user_is_platform_operator'
@@ -140,7 +158,9 @@ select pg_get_functiondef('private.create_community_event(text,text,text,text,ti
 \if :operator_mutations_guarded
 \else
   \echo 'event creation and attendance verification must require platform operator authority'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select pg_get_functiondef('private.rsvp_community_event(uuid,text)'::regprocedure) ~ 'status=''published'''
@@ -149,7 +169,9 @@ select pg_get_functiondef('private.rsvp_community_event(uuid,text)'::regprocedur
 \if :rsvp_capacity_guarded
 \else
   \echo 'RSVP authority must lock the published event and enforce capacity'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select pg_get_functiondef('private.verify_community_event_attendance(uuid,uuid,boolean,text)'::regprocedure) ~ 'reward_already_issued'
@@ -158,7 +180,9 @@ select pg_get_functiondef('private.verify_community_event_attendance(uuid,uuid,b
 \if :attendance_reward_idempotent
 \else
   \echo 'attendance reward authority must remain idempotent'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select pg_get_functiondef('private.create_mentor_circle(text,text,text,uuid,integer,timestamp with time zone,text,text)'::regprocedure) ~ 'current_user_is_platform_operator'
@@ -167,7 +191,9 @@ select pg_get_functiondef('private.create_mentor_circle(text,text,text,uuid,inte
 \if :mentor_creation_guarded
 \else
   \echo 'mentor circle creation must remain operator-or-onboarded-Mentor gated'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select pg_get_functiondef('private.join_mentor_circle(uuid,text)'::regprocedure) ~ 'status=''active'''
@@ -176,7 +202,9 @@ select pg_get_functiondef('private.join_mentor_circle(uuid,text)'::regprocedure)
 \if :circle_capacity_guarded
 \else
   \echo 'mentor circle joins must lock active circles and preserve waitlisting at capacity'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select pg_get_functiondef('private.get_community_events()'::regprocedure) ~ 'auth\.uid\(\) is not null'
@@ -184,10 +212,12 @@ select pg_get_functiondef('private.get_community_events()'::regprocedure) ~ 'aut
 \if :projections_authenticated
 \else
   \echo 'community read projections must remain authenticated-only'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
-select count(*) = 3 as anon_private_execute_still_bounded
+select count(*) = 4 and bool_and(p.oid in ('private.get_public_scholar_profile(text)'::regprocedure,'private.get_public_scholar_identities(uuid[])'::regprocedure,'private.get_public_member_identities(uuid[])'::regprocedure,'private.resolve_portfolio_share(text)'::regprocedure)) as anon_private_execute_still_bounded
 from pg_proc p
 join pg_namespace n on n.oid=p.pronamespace
 where n.nspname='private'
@@ -195,8 +225,10 @@ where n.nspname='private'
 \gset
 \if :anon_private_execute_still_bounded
 \else
-  \echo 'anonymous private EXECUTE broadened beyond the three intentional public-profile projection helpers'
-  \quit 1
+  \echo 'anonymous private EXECUTE broadened beyond the explicit identity-projection and governed portfolio-share allowlist'
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 rollback;

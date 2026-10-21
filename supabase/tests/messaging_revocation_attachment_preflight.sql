@@ -6,41 +6,53 @@ select to_regprocedure('private.pbos_user_has_active_conversation_access(uuid,uu
 \if :helper_exists
 \else
   \echo 'missing active conversation authority helper'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select has_function_privilege('anon', 'private.pbos_user_has_active_conversation_access(uuid,uuid)', 'EXECUTE') as anon_helper_exec \gset
 \if :anon_helper_exec
   \echo 'anon must not execute messaging authority helper'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select has_function_privilege('authenticated', 'private.pbos_user_has_active_conversation_access(uuid,uuid)', 'EXECUTE') as auth_helper_exec \gset
 \if :auth_helper_exec
 \else
   \echo 'authenticated RLS evaluation requires helper execute privilege'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select to_regclass('public.pbos_message_attachments') is not null as attachments_table_exists \gset
 \if :attachments_table_exists
 \else
   \echo 'missing governed message attachment metadata table'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select coalesce((select not public from storage.buckets where id='pbos-message-attachments'), false) as bucket_private \gset
 \if :bucket_private
 \else
   \echo 'message attachment bucket must remain private'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select coalesce((select file_size_limit = 10485760 from storage.buckets where id='pbos-message-attachments'), false) as bucket_size_limited \gset
 \if :bucket_size_limited
 \else
   \echo 'message attachment bucket must enforce 10 MB limit'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select count(*) = 4 as attachment_metadata_policy_set_complete
@@ -55,7 +67,9 @@ where schemaname='public' and tablename='pbos_message_attachments'
 \if :attachment_metadata_policy_set_complete
 \else
   \echo 'message attachment metadata policy set is incomplete'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select count(*) = 3 as attachment_storage_policy_set_complete
@@ -69,7 +83,9 @@ where schemaname='storage' and tablename='objects'
 \if :attachment_storage_policy_set_complete
 \else
   \echo 'message attachment storage policy set is incomplete'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select count(*) = 1 as participant_select_active_guard
@@ -80,7 +96,9 @@ where schemaname='public' and tablename='pbos_conversation_participants'
 \if :participant_select_active_guard
 \else
   \echo 'participant read policy does not enforce current relationship authority'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select count(*) = 1 as participant_update_active_guard
@@ -92,7 +110,9 @@ where schemaname='public' and tablename='pbos_conversation_participants'
 \if :participant_update_active_guard
 \else
   \echo 'participant update policy does not enforce current relationship authority'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 -- Message rows expose only read and insert through RLS. Post-insert state transitions
@@ -108,7 +128,9 @@ where schemaname='public' and tablename='pbos_messages'
 \if :message_active_guard_count
 \else
   \echo 'message read/send policies do not enforce current relationship authority'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select count(*) = 0 as broad_message_update_policy_absent
@@ -117,14 +139,18 @@ where schemaname='public' and tablename='pbos_messages' and cmd in ('UPDATE','AL
 \if :broad_message_update_policy_absent
 \else
   \echo 'pbos_messages must not expose generic client UPDATE RLS'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select not has_table_privilege('authenticated','public.pbos_messages','UPDATE') as auth_message_update_absent \gset
 \if :auth_message_update_absent
 \else
   \echo 'authenticated must not have generic pbos_messages UPDATE privilege'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select not has_table_privilege('anon','public.pbos_messages','SELECT')
@@ -134,7 +160,9 @@ select not has_table_privilege('anon','public.pbos_messages','SELECT')
 \if :anon_message_grants_absent
 \else
   \echo 'anonymous roles must have no governed message table privileges'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 -- Supabase lint 0003: all governed Messaging policies cache stable auth.uid().
@@ -146,7 +174,9 @@ where schemaname='public'
 \if :public_messaging_uid_initplans
 \else
   \echo 'one or more public Messaging policies still lacks cached auth.uid() evaluation'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select count(*) = 3 as storage_messaging_uid_initplans
@@ -161,7 +191,9 @@ where schemaname='storage' and tablename='objects'
 \if :storage_messaging_uid_initplans
 \else
   \echo 'one or more Messaging Storage policies still lacks cached auth.uid() evaluation'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 -- Conversation creation must cache the JWT object before extracting email.
@@ -175,18 +207,25 @@ where schemaname='public'
 \if :conversation_jwt_object_cached
 \else
   \echo 'conversation creation must cache auth.jwt() before email extraction'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
-select count(*) = 1 as storage_jwt_cached
+select count(*) = 1 as storage_current_authority_cached
 from pg_policies
 where schemaname='storage' and tablename='objects'
   and policyname='Current participants upload message attachments'
-  and with_check ilike '%SELECT%auth.jwt()%' \gset
-\if :storage_jwt_cached
+  and with_check ilike '%SELECT%auth.uid()%'
+  and with_check ilike '%private.pbos_user_has_active_conversation_access%'
+  and with_check ilike '%private.pbos_conversation_has_active_user_block%'
+  and (with_check not ilike '%auth.jwt()%' or with_check ilike '%SELECT%auth.jwt()%') \gset
+\if :storage_current_authority_cached
 \else
-  \echo 'message attachment upload must cache auth.jwt() evaluation'
-  \quit 1
+  \echo 'message attachment upload must cache actor identity and enforce current conversation/block authority'
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select count(*) = 0 as broad_profile_select_policy_absent
@@ -198,7 +237,9 @@ where schemaname='public'
 \if :broad_profile_select_policy_absent
 \else
   \echo 'public.profiles gained a broad select policy'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 rollback;

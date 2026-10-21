@@ -152,6 +152,7 @@
     "intelligenceOutcomeMeasurement": "PARTIAL"
   },
   "releaseBlockers": [
+    "fail-closed database certification repair and re-certification; previous broad database green jobs are insufficient",
     "approved PBOS production endpoint, protected configuration and authority reconciliation",
     "hosted Mentor validation tables and current-authority-safe approval/finalization convergence",
     "atomic achievement command integration with durable delivery and idempotent downstream handlers",
@@ -170,6 +171,7 @@
     "soft launch, rollback proof, release notes, feedback loop, and independent human launch approval"
   ],
   "nextExecutionOrder": [
+    "repair_database_assertion_exit_paths_and_underlying_authority_gates",
     "certify_and_apply_current_authority_safe_mentor_convergence",
     "exact_head_ci_and_database_certification",
     "achievement_command_event_delivery_and_form_integration",
@@ -210,8 +212,12 @@
     "isolatedCertification": {
       "revision": "c734e8aebc704cd027c004077032a26f540bd777",
       "database": {
-        "status": "PASSED",
-        "url": "https://github.com/sgwalton87/playbook-platform/actions/runs/39537050965"
+        "status": "PRIOR_WORKFLOW_PASS_INVALIDATED",
+        "url": "https://github.com/sgwalton87/playbook-platform/actions/runs/39537050965",
+        "rawWorkflowConclusion": "success",
+        "reason": "Legacy preflight quit arguments were ignored by psql, allowing failed assertions to exit successfully.",
+        "confirmedAffectedRun": "https://github.com/sgwalton87/playbook-platform/actions/runs/39536009957",
+        "confirmedIgnoredFailureExits": 9
       },
       "marketplace": {
         "status": "PASSED",

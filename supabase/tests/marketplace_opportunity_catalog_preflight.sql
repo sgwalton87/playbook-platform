@@ -5,14 +5,18 @@ select to_regclass('public.marketplace_opportunities') is not null as catalog_ex
 \if :catalog_exists
 \else
   \echo 'canonical Marketplace opportunity catalog is missing'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select relrowsecurity as catalog_rls from pg_class where oid='public.marketplace_opportunities'::regclass \gset
 \if :catalog_rls
 \else
   \echo 'Marketplace opportunity catalog must keep RLS enabled'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select not has_table_privilege('anon','public.marketplace_opportunities','SELECT')
@@ -26,7 +30,9 @@ select not has_table_privilege('anon','public.marketplace_opportunities','SELECT
 \if :direct_table_access_denied
 \else
   \echo 'Marketplace catalog direct client table access must remain denied'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select to_regprocedure('public.create_marketplace_opportunity(text,text,text,text,text,date,text,jsonb,jsonb,jsonb,uuid)') is not null
@@ -46,7 +52,9 @@ select to_regprocedure('public.create_marketplace_opportunity(text,text,text,tex
 \if :rpc_chain_exists
 \else
   \echo 'Marketplace opportunity RPC chain is incomplete'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select bool_and(not p.prosecdef) as public_invokers
@@ -58,7 +66,9 @@ where n.nspname='public' and p.proname in (
 \if :public_invokers
 \else
   \echo 'public Marketplace opportunity RPCs must remain SECURITY INVOKER wrappers'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select bool_and(p.prosecdef) as private_definers
@@ -71,7 +81,9 @@ where n.nspname='private' and p.proname in (
 \if :private_definers
 \else
   \echo 'private Marketplace opportunity helpers must retain SECURITY DEFINER authority'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select not has_function_privilege('anon','public.get_marketplace_opportunities()','EXECUTE')
@@ -83,7 +95,9 @@ select not has_function_privilege('anon','public.get_marketplace_opportunities()
 \if :wrapper_grants_bounded
 \else
   \echo 'Marketplace wrapper grants are incorrect'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select pg_get_constraintdef(oid) ~ '''internship'''
@@ -100,7 +114,9 @@ limit 1 \gset
 \if :canonical_type_taxonomy
 \else
   \echo 'Marketplace listing type taxonomy is incomplete'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select pg_get_functiondef('private.create_marketplace_opportunity(text,text,text,text,text,date,text,jsonb,jsonb,jsonb,uuid)'::regprocedure) ~ 'ensure_brand_partner_organization'
@@ -109,7 +125,9 @@ select pg_get_functiondef('private.create_marketplace_opportunity(text,text,text
 \if :partner_creation_private_draft_only
 \else
   \echo 'Brand Partner listing creation must remain verified, partner-scoped, and draft-only'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select pg_get_functiondef('private.submit_marketplace_opportunity_for_review(uuid)'::regprocedure) ~ '''review_requested'''
@@ -117,7 +135,9 @@ select pg_get_functiondef('private.submit_marketplace_opportunity_for_review(uui
 \if :submit_does_not_publish
 \else
   \echo 'Brand Partner review submission must never self-publish'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select pg_get_functiondef('private.review_marketplace_opportunity(uuid,text,text)'::regprocedure) ~ 'current_user_is_platform_operator'
@@ -127,7 +147,9 @@ select pg_get_functiondef('private.review_marketplace_opportunity(uuid,text,text
 \if :human_publication_guarded
 \else
   \echo 'Marketplace publication must remain an explicit human operator decision'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select pg_get_function_result('public.get_marketplace_opportunities()'::regprocedure) not ilike '%review_notes%'
@@ -137,7 +159,9 @@ select pg_get_function_result('public.get_marketplace_opportunities()'::regproce
 \if :scholar_projection_excludes_internal_fields
 \else
   \echo 'Scholar Marketplace projection leaks internal publication workflow fields'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select pg_get_functiondef('private.get_marketplace_opportunities()'::regprocedure) ~ 'auth\.uid\(\) is not null'
@@ -146,7 +170,9 @@ select pg_get_functiondef('private.get_marketplace_opportunities()'::regprocedur
 \if :scholar_projection_published_only
 \else
   \echo 'Scholar Marketplace projection must remain authenticated and published-only'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select to_regclass('public.marketplace_jobs') is null
@@ -158,7 +184,9 @@ select to_regclass('public.marketplace_jobs') is null
 \if :no_parallel_type_tables
 \else
   \echo 'type-specific Marketplace opportunity tables violate canonical ownership'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 rollback;

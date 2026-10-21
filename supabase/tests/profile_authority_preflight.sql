@@ -152,15 +152,31 @@ select count(*)=6
    and bool_and(with_check ilike '%' || owner_column || '%')
 as scholar_core_owner_policies_cached
 from target \gset
-\if :scholar_core_owner_policies_cached \else \echo 'canonical Scholar owner policies must remain symmetric and statement-cached' \quit 1 \endif
+\if :scholar_core_owner_policies_cached \else \echo 'canonical Scholar owner policies must remain symmetric and statement-cached'
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+ \endif
 
 -- Direct owner/creator legacy and planning policies are optimized only when present.
--- Preserve each policy's existing shape: the three planning ALL policies remain USING-only,
+-- Preserve each known historical/current policy shape; canonical College planning uses CRUD policies,
 -- playbook_records remains symmetric USING/WITH CHECK, and onboarding_options remains INSERT-only.
+do $$
+begin
+ if to_regclass('public.ag_progress') is not null and not (
+   exists(select 1 from pg_policies where schemaname='public' and tablename='ag_progress' and policyname='Users manage own ag_progress' and cmd='ALL')
+   or (exists(select 1 from pg_policies where schemaname='public' and tablename='ag_progress' and policyname='Students can view own ag progress' and cmd='SELECT')
+      and exists(select 1 from pg_policies where schemaname='public' and tablename='ag_progress' and policyname='Students can update own ag progress' and cmd='ALL'))
+ ) then raise exception 'A-G progress lost its known owner policy contract'; end if;
+end;
+$$;
 with expected(tablename,policyname,cmd,owner_column,requires_check) as (
   values
     ('ag_progress','Users manage own ag_progress','ALL','user_id',false),
-    ('college_list','Users manage own college_list','ALL','user_id',false),
+    ('ag_progress','Students can view own ag progress','SELECT','user_id',false),
+    ('ag_progress','Students can update own ag progress','ALL','user_id',true),
+    ('college_list','Scholars read own college list','SELECT','user_id',false),
+    ('college_list','Scholars create own college list','INSERT','user_id',true),
+    ('college_list','Scholars update own college list','UPDATE','user_id',true),
+    ('college_list','Scholars delete own college list','DELETE','user_id',false),
     ('deadlines','Users manage own deadlines','ALL','user_id',false),
     ('playbook_records','Users can manage own playbook records','ALL','profile_id',true),
     ('onboarding_options','Users add options','INSERT','created_by',true)
@@ -168,6 +184,7 @@ with expected(tablename,policyname,cmd,owner_column,requires_check) as (
   select e.*
   from expected e
   where to_regclass('public.' || e.tablename) is not null
+    and (e.tablename<>'ag_progress' or exists(select 1 from pg_policies p where p.schemaname='public' and p.tablename=e.tablename and p.policyname=e.policyname and p.cmd=e.cmd))
 ), target as (
   select e.*, p.roles, p.qual, p.with_check
   from existing_expected e
@@ -181,12 +198,19 @@ select (select count(*) from target) = (select count(*) from existing_expected)
    and coalesce(bool_and((coalesce(qual,'') || ' ' || coalesce(with_check,'')) ilike '%select auth.uid()%'),true)
    and coalesce(bool_and((coalesce(qual,'') || ' ' || coalesce(with_check,'')) ilike '%' || owner_column || '%'),true)
    and coalesce(bool_and(case
-       when tablename in ('ag_progress','college_list','deadlines') then with_check is null
+       when tablename='deadlines' or policyname='Users manage own ag_progress' then with_check is null
+       when tablename='ag_progress' and cmd='SELECT' then qual is not null and with_check is null
+       when tablename='ag_progress' and cmd='ALL' then qual is not null and with_check is not null
+       when tablename='college_list' and cmd in ('SELECT','DELETE') then qual is not null and with_check is null
+       when tablename='college_list' and cmd='INSERT' then qual is null and with_check is not null
+       when tablename='college_list' and cmd='UPDATE' then qual is not null and with_check is not null
        when tablename='playbook_records' then qual is not null and with_check is not null
        when tablename='onboarding_options' then qual is null and with_check is not null
        else false end),true)
 as direct_owner_policy_shapes_cached
 from target \gset
-\if :direct_owner_policy_shapes_cached \else \echo 'direct owner policies must preserve historical shape and use statement-cached auth.uid()' \quit 1 \endif
+\if :direct_owner_policy_shapes_cached \else \echo 'direct owner policies must preserve historical shape and use statement-cached auth.uid()'
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+ \endif
 
 rollback;

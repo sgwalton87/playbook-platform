@@ -5,7 +5,9 @@ select coalesce((select not public and file_size_limit=10485760 from storage.buc
 \if :bucket_ok
 \else
   \echo 'attachment bucket privacy or size limit is incorrect'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select count(*)=4 as metadata_policy_count
@@ -15,7 +17,9 @@ where schemaname='public' and tablename='pbos_message_attachments'
 \if :metadata_policy_count
 \else
   \echo 'attachment metadata policies must be authenticated-only'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select count(*)=3 as storage_policy_count
@@ -26,7 +30,9 @@ where schemaname='storage' and tablename='objects'
 \if :storage_policy_count
 \else
   \echo 'attachment storage policies must be authenticated-only'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select not has_table_privilege('anon','public.pbos_message_attachments','SELECT')
@@ -36,7 +42,9 @@ select not has_table_privilege('anon','public.pbos_message_attachments','SELECT'
 \if :anon_zero
 \else
   \echo 'anonymous attachment grants must be zero'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select has_table_privilege('authenticated','public.pbos_message_attachments','SELECT')
@@ -46,7 +54,9 @@ select has_table_privilege('authenticated','public.pbos_message_attachments','SE
 \if :auth_table_shape
 \else
   \echo 'authenticated attachment table grants are incorrect'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select count(*)=1 and min(column_name)='message_id' as auth_update_message_only
@@ -56,7 +66,9 @@ where table_schema='public' and table_name='pbos_message_attachments'
 \if :auth_update_message_only
 \else
   \echo 'authenticated attachment update must be message_id only'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 select not exists (
@@ -66,7 +78,9 @@ select not exists (
 \if :anon_columns_zero
 \else
   \echo 'anonymous attachment column grants must be zero'
-  \quit 1
+
+DO $$ BEGIN RAISE EXCEPTION 'Certification assertion failed; see diagnostic above.'; END $$;
+
 \endif
 
 rollback;
