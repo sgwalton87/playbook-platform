@@ -7,7 +7,7 @@ import SportPositionField from "@/components/profile/SportPositionField";
 import { SPORT_OPTIONS as SPORTS } from "@/lib/onboarding/sports";
 import CollegeSearch from "@/components/CollegeSearch";
 import { buildScholarRecord, scholarRecordToProfileForm } from "@/lib/scholar";
-import { hydrateProfileFromOnboarding } from "@/lib/onboarding/profileHydration";
+import { hydrateProfileFromOnboarding, reconcileProfileSave } from "@/lib/onboarding/profileHydration";
 
 const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",blue:"#3B82F6",green:"#10B981",purple:"#8B5CF6",amber:"#F59E0B",mono:"'Space Mono',monospace",sans:"'Hanken Grotesk',system-ui,sans-serif",anton:"'Anton',sans-serif"};
 
@@ -161,7 +161,7 @@ export default function ProfilePage() {
     setSaving(true);
     setSaved(false);
     setSaveError(null);
-    const { data: updated, error } = await supabase.from("profiles").update({
+    const profileUpdates = {
       first_name:firstName,last_name:lastName,full_name:`${firstName} ${lastName}`.trim(),bio,gender,date_of_birth:dob||null,favorite_quote:favoriteQuote||null,
       school,grade,school_district:district,grad_year:gradYear,weighted_gpa:weightedGpa||null,unweighted_gpa:unweightedGpa||null,city,zip_code:zipCode,english_language_learner:ell,dream_school:dreamSchool||null,sat_score:satScore||null,act_score:actScore||null,intended_major:intendedMajor||null,
       college_list_2:collegeList[0]||null,college_list_3:collegeList[1]||null,college_list_4:collegeList[2]||null,college_list_5:collegeList[3]||null,college_list_6:collegeList[4]||null,college_list_7:collegeList[5]||null,college_list_8:collegeList[6]||null,college_list_9:collegeList[7]||null,college_list_10:collegeList[8]||null,
@@ -170,12 +170,18 @@ export default function ProfilePage() {
       nil_instagram:nilInstagram||null,nil_tiktok:nilTiktok||null,nil_twitter:nilTwitter||null,nil_follower_range:nilFollowerRange||null,nil_brand_interests:nilBrandInterests.length>0?nilBrandInterests:null,nil_worked_with_brands:nilWorkedWithBrands,nil_deal_types:nilDealTypes.length>0?nilDealTypes:null,
       instagram:instagram||null,tiktok:tiktok||null,twitter:twitter||null,hudl:hudl||null,youtube:youtube||null,
       pillars,race:race||null,household_income:householdIncome||null,first_generation:firstGen,free_reduced_lunch:freeLunch,migrant_student:migrant,foster_youth:fosterYouth,unhoused,has_iep:iep,
+    };
+    const mergedOnboarding = reconcileProfileSave(profile.onboarding_data, profileUpdates);
+    const { data: updated, error } = await supabase.from("profiles").update({
+      ...profileUpdates,
+      onboarding_data: mergedOnboarding,
     }).eq("id",profile.id).select("id").maybeSingle();
     setSaving(false);
     if(error || !updated){
       setSaveError(error?.message || "Your profile changes could not be saved.");
       return;
     }
+    setProfile((prev: LegacyValue) => ({ ...prev, ...profileUpdates, onboarding_data: mergedOnboarding }));
     setSaved(true);setTimeout(()=>setSaved(false),3000);
   };
 
