@@ -214,3 +214,13 @@ Future schema expansion should prioritize:
 
 ## Operational Expectations
 Database changes must pass migration review before release. Backfills need dry-run plans, rollback paths, and communication in [RELEASE_PROCESS.md](./RELEASE_PROCESS.md). Architecture implications should be recorded in [DECISIONS.md](./DECISIONS.md).
+
+## Marketplace consent hardening candidate — October 20, 2026
+
+Owner: Playbook OS Engineering. Purpose: preserve one canonical shares/outcomes consent boundary. Related: `supabase/migrations/20261021014458_marketplace_consent_hardening.sql`, `tests/unit/application-workspace/consent-database.test.ts`, `docs/MASTER_CHECKLIST.md`.
+
+Local candidate only. This migration depends on the existing Marketplace shares/outcomes baseline. Sharing now requires the exact `marketplace-applicant-share-v1` consent version, a Scholar-owned submitted workspace, a matching published listing within its deadline (inclusive), and an active partner. The obsolete single-argument share RPC is removed; the UI must be released with the new two-argument contract. Existing active shares are revoked for fresh consent, without fabricating prior acknowledgements. Revocation works even after listing closure. Workspace row locks serialize share, revoke and human outcome updates. Re-sharing resets withdrawn outcome decision metadata; prior transitions remain in a private append-only client-inaccessible audit table. Public privileged getters/outcome RPCs delegate to private implementations through invoker wrappers. No direct client data grants are added.
+
+Audit events retain before/after consent and outcome rows, including internal outcome notes; operator access, retention and deletion review remain launch requirements. This is transaction-level audit preservation, not tamper-proof storage against database administrators. Rollback must be reviewed; do not restore an old caller to bypass versioned consent or automatically reactivate revoked shares. No destructive down migration is supplied.
+
+PGlite tests execute the baseline and candidate SQL in an isolated PostgreSQL fixture with substitute auth/authority helpers. They prove the tested function boundaries but do not replace full Supabase replay, actual production authority helpers, REST schema-cache verification, concurrency stress, hosted RLS certification or live browser acceptance. Full Supabase CLI replay is blocked here by unavailable Docker. No hosted migrations were applied.

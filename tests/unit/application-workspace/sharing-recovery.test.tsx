@@ -32,3 +32,13 @@ it("keeps workspaces visible when the sharing request rejects", async () => {
   await waitFor(() => expect(screen.getByText(/Sharing controls are unavailable/)).toBeTruthy());
   expect(screen.queryByText("Share submitted application with organization")).toBeNull();
 });
+
+it("requires explicit consent and sends the version only when sharing", async () => {
+  setup(); rpc.mockResolvedValue({ data: [], error: null });
+  render(<Dashboard />);
+  const button = await screen.findByText("Share submitted application with organization");
+  expect((button as HTMLButtonElement).disabled).toBe(true);
+  fireEvent.click(screen.getByRole("checkbox"));
+  fireEvent.click(button);
+  await waitFor(() => expect(rpc).toHaveBeenCalledWith("share_marketplace_application", { requested_workspace_id: "owned-workspace", requested_consent_version: "marketplace-applicant-share-v1" }));
+});

@@ -3,7 +3,7 @@ name: Marketplace Applicant Certification
 on:
   pull_request:
     paths:
-      - "supabase/migrations/20260818234500_marketplace_applicant_consent_tracking.sql"
+      - "supabase/migrations/**"
       - "supabase/tests/marketplace_applicant_consent_preflight.sql"
       - ".github/workflows/marketplace-applicant-certification.yml"
   workflow_dispatch:

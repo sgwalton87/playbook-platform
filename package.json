@@ -75,6 +75,9 @@
     "stripe": "^22.2.3"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
+    "@electric-sql/pglite": "0.5.10",
+    "@playwright/test": "^1.55.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -89,8 +92,6 @@
     "tailwindcss": "^4",
     "tsx": "^4.22.5",
     "typescript": "^5",
-    "vitest": "^4.1.9",
-    "@axe-core/playwright": "^4.10.2",
-    "@playwright/test": "^1.55.0"
+    "vitest": "^4.1.9"
   }
 }
