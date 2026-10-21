@@ -1,4 +1,5 @@
 import type { OnboardingStep } from "../types";
+import { SPORT_OPTIONS } from "../sports";
 
 const IDENTITY = (label: string): OnboardingStep => ({
   id: "identity",
@@ -73,9 +74,9 @@ const ATHLETE_PROFILE: OnboardingStep = {
   title: "Build your athlete card.",
   body: "Your athletic profile should tell coaches, mentors, and supporters what you play and where you are headed.",
   fields: [
-    { key: "primary_sport", label: "Primary sport", type: "select", options: ["Basketball", "Football", "Soccer", "Track & Field", "Volleyball", "Baseball", "Softball", "Cheer", "Dance", "Swimming", "Tennis", "Golf", "Wrestling", "Other"] },
-    { key: "secondary_sport", label: "Secondary sport", type: "select", options: ["None", "Basketball", "Football", "Soccer", "Track & Field", "Volleyball", "Baseball", "Softball", "Cheer", "Dance", "Swimming", "Tennis", "Golf", "Wrestling", "Other"] },
-    { key: "position", label: "Position / event", placeholder: "Guard, forward, sprinter, libero..." },
+    { key: "primary_sport", label: "Primary sport", type: "select", options: SPORT_OPTIONS },
+    { key: "secondary_sport", label: "Secondary sport", type: "select", options: ["None", ...SPORT_OPTIONS] },
+    { key: "position", label: "Position / event", type: "sport-position" },
     { key: "current_team", label: "Current team / club", placeholder: "School, AAU, club, travel team..." },
     { key: "height_weight", label: "Height / weight if applicable", placeholder: "ex: 5'11 / 150" },
     { key: "key_stats_honors", label: "Key stats / honors", type: "textarea", placeholder: "Awards, stats, honors, captain roles..." },

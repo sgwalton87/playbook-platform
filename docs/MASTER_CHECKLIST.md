@@ -211,3 +211,7 @@ Public presentation follow-up: the landing-page pathway count is derived from th
 ## Achievement event error propagation candidate
 
 Trust reads and trust/timeline/opportunity repository writes now reject database errors instead of permitting event delivery to report success. Targeted tests exercise all five AchievementCreated derived writers and a denied canonical read. This is error propagation, not transactional rollback or durable retry: core and earlier derived writes can persist before a later failure. Do not automatically replay these non-idempotent handlers. Atomic command/form integration and durable delivery remain required.
+
+## Owner-reported onboarding regression recovery
+
+History confirms that July 24 consolidation deleted the richer /onboarding page without porting its sport-specific menus. Recovery candidate reuses its original 17-sport catalog inside canonical /start and profile editing, preserves custom and legacy saved values, resets position only on explicit sport changes, and corrects saved-draft status after activation failure. See [feature preservation inventory](audits/ONBOARDING_FEATURE_PRESERVATION.md). Full historical profile-field parity and production onboarding completion remain open; missing production PBOS configuration is still a reproduced blocker.

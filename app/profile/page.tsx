@@ -3,12 +3,13 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import SportPositionField from "@/components/profile/SportPositionField";
+import { SPORT_OPTIONS as SPORTS } from "@/lib/onboarding/sports";
 import CollegeSearch from "@/components/CollegeSearch";
 import { buildScholarRecord, scholarRecordToProfileForm } from "@/lib/scholar";
 
 const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",blue:"#3B82F6",green:"#10B981",purple:"#8B5CF6",amber:"#F59E0B",mono:"'Space Mono',monospace",sans:"'Hanken Grotesk',system-ui,sans-serif",anton:"'Anton',sans-serif"};
 
-const SPORTS=["Basketball","Football","Soccer","Track & Field","Baseball","Softball","Swimming","Volleyball","Tennis","Cross Country","Wrestling","Lacrosse","Golf","Gymnastics","Cheer","Dance","Other"];
 const TEAM_LEVELS=["Middle School","Junior Varsity (JV)","Varsity","Club / AAU","Travel Team","College","Semi-Pro","Professional"];
 const GENDERS=["Male","Female","Non-binary","Prefer not to say"];
 const RACES=["Black / African American","Hispanic / Latino","White","Asian","Native American / Alaska Native","Native Hawaiian / Pacific Islander","Two or more races","Prefer not to say"];
@@ -366,10 +367,10 @@ export default function ProfilePage() {
 
             <label style={lbl}>Primary sport</label>
             <div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:14}}>
-              {SPORTS.map(s=>{const a=sport===s;return<button key={s} onClick={()=>setSport(s)} style={{fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",padding:"7px 12px",borderRadius:999,border:`1.5px solid ${a?T.orange:T.line}`,background:a?T.orangeL:"transparent",color:a?T.orange:T.muted,cursor:"pointer"}}>{s}</button>;})}
+              {SPORTS.map(s=>{const a=sport===s;return<button key={s} onClick={()=>{if(sport!==s)setPosition("");setSport(s);}} style={{fontFamily:T.mono,fontSize:10,fontWeight:700,letterSpacing:"0.05em",textTransform:"uppercase",padding:"7px 12px",borderRadius:999,border:`1.5px solid ${a?T.orange:T.line}`,background:a?T.orangeL:"transparent",color:a?T.orange:T.muted,cursor:"pointer"}}>{s}</button>;})}
             </div>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
-              <div><label style={lbl}>Position / event</label><input style={inp} value={position} onChange={e=>setPosition(e.target.value)} placeholder="Point Guard, 100m..."/></div>
+              <SportPositionField key={sport} sport={sport} value={position} onChange={setPosition} inputStyle={inp} labelStyle={lbl} />
               <div><label style={lbl}>Jersey number</label><input style={inp} value={jerseyNumber} onChange={e=>setJerseyNumber(e.target.value)} placeholder="11"/></div>
             </div>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginTop:14}}>
