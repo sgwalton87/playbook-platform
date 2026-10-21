@@ -83,3 +83,10 @@ describe("profile editor save reconciliation", () => {
     expect(hydrateProfileFromOnboarding(afterSave).sport).toBe("Track");
   });
 });
+
+describe("private background compatibility", () => {
+  it("hydrates race from the private draft without requiring a profiles table column", () => {
+    const visible = hydrateProfileFromOnboarding({ onboarding_data: { race: "Prefer not to say" } });
+    expect((visible as Record<string, unknown>).race).toBe("Prefer not to say");
+  });
+});
