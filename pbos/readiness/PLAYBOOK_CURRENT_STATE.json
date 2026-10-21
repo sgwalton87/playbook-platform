@@ -97,16 +97,16 @@
       "legacy multiple permissive policies",
       "legacy duplicate/unused index warnings"
     ],
-    "confirmedMissingObjects": [
-      "public.mentor_validation_requests",
-      "public.mentor_validation_approvals"
-    ],
-    "reconciliationScope": "Read-only catalog and migration-history observations. No hosted migrations applied. Historical frontiers do not prove current migration coverage.",
+    "confirmedMissingObjects": [],
+    "reconciliationScope": "Current catalog/grant checks and seven applied repair packages are verified separately. Historical frontiers do not prove complete hosted migration parity.",
     "appliedRepairPackages": [
       "hosted_marketplace_convergence",
       "support_invitation_privilege_closure",
       "dream_school_convergence",
-      "college_provenance_constraint_convergence"
+      "college_provenance_constraint_convergence",
+      "mentor_validation_authority_convergence",
+      "support_relationship_revocation_command",
+      "certification_authority_boundaries"
     ],
     "failedRolledBackPackages": [
       {
@@ -119,7 +119,11 @@
       "dreamRows": 8,
       "topRows": 0,
       "source": "Existing profile preferences; no fabricated catalog content."
-    }
+    },
+    "resolvedPreviouslyMissingObjects": [
+      "public.mentor_validation_requests",
+      "public.mentor_validation_approvals"
+    ]
   },
   "journeys": {
     "scholar": "REFERENCE_IMPLEMENTATION",
@@ -153,13 +157,13 @@
   },
   "releaseBlockers": [
     "approved PBOS production endpoint, protected configuration and authority reconciliation",
-    "hosted Mentor validation tables and current-authority-safe approval/finalization convergence",
+    "authenticated Mentor approval, activation and revocation browser acceptance",
     "atomic achievement command integration with durable delivery and idempotent downstream handlers",
     "constitutional dependency closure including PPS-2006/PPS-2007 cycle",
     "catalog content sourcing and launch data readiness",
     "exact-revision browser E2E for all 15 roles and canonical connected pathways",
     "mobile/device/accessibility/recovery certification",
-    "Messaging attachment authority and direct-RLS relationship-revocation closure",
+    "Messaging attachment and conversation revocation browser acceptance",
     "Supabase Auth leaked-password protection configuration and verification",
     "legacy Supabase performance-advisor debt triage",
     "production outbound email/template/delivery certification",
@@ -170,8 +174,7 @@
     "soft launch, rollback proof, release notes, feedback loop, and independent human launch approval"
   ],
   "nextExecutionOrder": [
-    "repair_database_assertion_exit_paths_and_underlying_authority_gates",
-    "certify_and_apply_current_authority_safe_mentor_convergence",
+    "mentor_identity_and_isolated_fixture_followup",
     "exact_head_ci_and_database_certification",
     "achievement_command_event_delivery_and_form_integration",
     "pbos_configuration_and_hosted_schema_review",
@@ -203,10 +206,10 @@
       ]
     },
     "reviewCode": {
-      "pr": 253,
-      "url": "https://github.com/sgwalton87/playbook-platform/pull/253",
-      "revision": "bc95e02b7d55b800a1af598d49601c1744d030a1",
-      "status": "MERGED_AS_0cb6997",
+      "pr": 255,
+      "url": "https://github.com/sgwalton87/playbook-platform/pull/255",
+      "revision": "477d03f31db81be7b1a85bb7f745446bb5a59d90",
+      "status": "MERGED_AS_8a4038e",
       "achievementCommand": "SQL_CANDIDATE_NOT_CONNECTED_TO_FORM_OR_APPLIED_HOSTED"
     },
     "isolatedCertification": {
