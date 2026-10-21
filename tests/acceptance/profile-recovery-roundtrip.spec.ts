@@ -34,9 +34,9 @@ test("synthetic profile data survives edit and reload", async ({ page }) => {
     await page.getByLabel("Email", { exact: true }).fill(email);
     await page.getByLabel("Password", { exact: true }).fill(password);
     await page.getByRole("button", { name: "Log In", exact: true }).click();
-    await expect(page).not.toHaveURL(/\\/login(?:\\?|$)/, { timeout: 15000 });
+    await page.waitForURL(url => url.pathname !== "/login", { timeout: 15000 });
     await page.goto("/profile");
-    await expect(page).toHaveURL(/\\/profile(?:\\?|$)/);
+    await expect(page).toHaveURL(url => url.pathname === "/profile");
     const school = page.locator('input[value="Recovery Academy"]').first();
     await expect(school).toBeVisible();
     await school.fill("Recovery Institute");
