@@ -1,12 +1,9 @@
 // @vitest-environment node
 import { PGlite } from '@electric-sql/pglite';
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { expect, it } from 'vitest';
 
-it('enforces consent, listing eligibility, ownership, partner isolation and withdrawal in PostgreSQL', async () => {
- const db = new PGlite();
- try {
- await db.exec(`
+const fixtureSql = `
  create role anon; create role authenticated; create schema auth; create schema private;
  grant usage on schema public,private,auth to authenticated,anon;
  create function auth.uid() returns uuid language sql as $$ select nullif(current_setting('test.uid',true),'')::uuid $$;
@@ -21,10 +18,15 @@ it('enforces consent, listing eligibility, ownership, partner isolation and with
  insert into public.brand_partners values ('00000000-0000-0000-0000-000000000003','00000000-0000-0000-0000-000000000002',true);
  insert into public.marketplace_opportunities values ('00000000-0000-0000-0000-000000000004','00000000-0000-0000-0000-000000000003','published',current_date,'Opportunity','job');
  insert into public.application_workspaces values ('00000000-0000-0000-0000-000000000005','00000000-0000-0000-0000-000000000001','submitted','00000000-0000-0000-0000-000000000004');
- `);
+ `;
+
+it('enforces consent, listing eligibility, ownership, partner isolation and withdrawal in PostgreSQL', async () => {
+ const db = new PGlite();
+ try {
+ await db.exec(fixtureSql);
  await db.exec(readFileSync('supabase/migrations/20260818234500_marketplace_applicant_consent_tracking.sql','utf8'));
  await db.exec("set test.uid='00000000-0000-0000-0000-000000000001'; select public.share_marketplace_application('00000000-0000-0000-0000-000000000005');");
- await db.exec(readFileSync('supabase/migrations/'+readdirSync('supabase/migrations').find(n=>n.endsWith('_marketplace_consent_hardening.sql')),'utf8'));
+ await db.exec(readFileSync('supabase/migrations/20261021025703_hosted_marketplace_convergence.sql','utf8'));
  expect((await db.query<{consent_status:string;consent_version:string|null}>('select consent_status,consent_version from public.marketplace_application_shares')).rows[0]).toEqual({consent_status:'revoked',consent_version:null});
  const actor = async (id:string) => { await db.exec(`reset role; set test.uid='${id}'; set role authenticated;`); };
  const owner='00000000-0000-0000-0000-000000000001',partner='00000000-0000-0000-0000-000000000002';
@@ -55,5 +57,20 @@ it('enforces consent, listing eligibility, ownership, partner isolation and with
  await db.exec("reset role; set role anon;"); await expect(db.query(share)).rejects.toThrow();
  await db.exec('reset role');
  expect((await db.query<{count:number}>('select count(*)::int as count from private.marketplace_consent_events')).rows[0].count).toBeGreaterThanOrEqual(7);
+ } finally { await db.close(); }
+},30000);
+
+it('converges missing hosted applicant schema atomically and is safe on an already-hardened replay', async () => {
+ const db = new PGlite();
+ try {
+  await db.exec(fixtureSql);
+  const migration = readFileSync('supabase/migrations/20261021025703_hosted_marketplace_convergence.sql','utf8');
+  await db.exec(migration);
+  await db.exec(migration);
+  await db.exec("set test.uid='00000000-0000-0000-0000-000000000001'; set role authenticated;");
+  const result=await db.query("select * from public.share_marketplace_application('00000000-0000-0000-0000-000000000005','marketplace-applicant-share-v1')");
+  expect(result.rows).toHaveLength(1);
+  await expect(db.query("select * from public.share_marketplace_application('00000000-0000-0000-0000-000000000005')")).rejects.toThrow();
+  await expect(db.query('select * from private.marketplace_consent_events')).rejects.toThrow();
  } finally { await db.close(); }
 },30000);
