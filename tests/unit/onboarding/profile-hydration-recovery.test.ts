@@ -3,7 +3,7 @@ import { hydrateProfileFromOnboarding } from "@/lib/onboarding/profileHydration"
 
 describe("recovery: profile editor hydration from onboarding", () => {
   it("prefers newly saved signup values over stale legacy profile fields", () => {
-    const result = hydrateProfileFromOnboarding({
+    const result = hydrateProfileFromOnboarding<Record<string, unknown>>({
       first_name: "Legacy", last_name: "Athlete",
       school: "Old school", sport: "Old sport", travel_team: "Old club",
       highlight_reel_url: "https://example.org/old",
