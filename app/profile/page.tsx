@@ -7,6 +7,7 @@ import SportPositionField from "@/components/profile/SportPositionField";
 import { SPORT_OPTIONS as SPORTS } from "@/lib/onboarding/sports";
 import CollegeSearch from "@/components/CollegeSearch";
 import { buildScholarRecord, scholarRecordToProfileForm } from "@/lib/scholar";
+import { hydrateProfileFromOnboarding } from "@/lib/onboarding/profileHydration";
 
 const T={navy:"#0F172A",cream:"#F8F7F4",surface:"#FFFFFF",surface2:"#F1F5F9",ink:"#0F172A",muted:"#64748B",faint:"#94A3B8",line:"#E2E8F0",orange:"#F97316",orangeL:"#FFF7ED",blue:"#3B82F6",green:"#10B981",purple:"#8B5CF6",amber:"#F59E0B",mono:"'Space Mono',monospace",sans:"'Hanken Grotesk',system-ui,sans-serif",anton:"'Anton',sans-serif"};
 
@@ -112,18 +113,19 @@ export default function ProfilePage() {
       if(!u.user){router.replace("/login");return;}
       const{data:p}=await supabase.from("profiles").select("*").eq("id",u.user.id).single();
       if(!p){router.replace("/start");return;}
-      setProfile(p);
-      setFirstName(p.first_name||""); setLastName(p.last_name||""); setBio(p.bio||""); setAvatarUrl(p.avatar_url||""); setGender(p.gender||""); setDob(p.date_of_birth||""); setFavoriteQuote(p.favorite_quote||"");
-      const academicForm = scholarRecordToProfileForm(buildScholarRecord({ profile: p }));
-      setSchool(academicForm.school); setGrade(academicForm.grade); setDistrict(p.school_district||""); setGradYear(academicForm.gradYear); setWeightedGpa(academicForm.weightedGpa); setUnweightedGpa(academicForm.unweightedGpa); setCity(p.city||""); setZipCode(p.zip_code||""); setEll(p.english_language_learner||false); setSatScore(academicForm.satScore); setActScore(academicForm.actScore); setIntendedMajor(academicForm.intendedMajor);
+      const visibleProfile = hydrateProfileFromOnboarding(p);
+      setProfile(visibleProfile);
+      setFirstName(visibleProfile.first_name||""); setLastName(visibleProfile.last_name||""); setBio(visibleProfile.bio||""); setAvatarUrl(visibleProfile.avatar_url||""); setGender(visibleProfile.gender||""); setDob(visibleProfile.date_of_birth||""); setFavoriteQuote(visibleProfile.favorite_quote||"");
+      const academicForm = scholarRecordToProfileForm(buildScholarRecord({ profile: visibleProfile }));
+      setSchool(academicForm.school); setGrade(academicForm.grade); setDistrict(visibleProfile.school_district||""); setGradYear(academicForm.gradYear); setWeightedGpa(academicForm.weightedGpa); setUnweightedGpa(academicForm.unweightedGpa); setCity(visibleProfile.city||""); setZipCode(visibleProfile.zip_code||""); setEll(visibleProfile.english_language_learner||false); setSatScore(academicForm.satScore); setActScore(academicForm.actScore); setIntendedMajor(academicForm.intendedMajor);
       setDreamSchool(academicForm.dreamSchool);
-      setCollegeList([p.college_list_2||"",p.college_list_3||"",p.college_list_4||"",p.college_list_5||"",p.college_list_6||"",p.college_list_7||"",p.college_list_8||"",p.college_list_9||"",p.college_list_10||""]);
-      setSport(p.sport||""); setPosition(p.position||""); setHeight(p.height||""); setWeight(p.weight||""); setJerseyNumber(p.jersey_number||""); setTeamLevel(p.team_level||""); setTravelTeam(p.travel_team||""); setCoachName(p.coach_name||""); setCoachEmail(p.coach_email||"");
-      setHighlightReelUrl(p.highlight_reel_url||""); setRecruitingStatus(p.recruiting_status||""); setDesiredCollegeLevel(p.desired_college_level||""); setAthleteEmail(p.athlete_email||""); setCampsAttended(p.camps_attended||"");
-      setNilInstagram(p.nil_instagram||""); setNilTiktok(p.nil_tiktok||""); setNilTwitter(p.nil_twitter||""); setNilFollowerRange(p.nil_follower_range||""); setNilBrandInterests(p.nil_brand_interests||[]); setNilWorkedWithBrands(p.nil_worked_with_brands||false); setNilDealTypes(p.nil_deal_types||[]);
-      setInstagram(p.instagram||""); setTiktok(p.tiktok||""); setTwitter(p.twitter||""); setHudl(p.hudl||""); setYoutube(p.youtube||"");
-      setPillars(p.pillars||[]);
-      setRace(p.race||""); setHouseholdIncome(p.household_income||""); setFirstGen(p.first_generation||false); setFreeLunch(p.free_reduced_lunch||false); setMigrant(p.migrant_student||false); setFosterYouth(p.foster_youth||false); setUnhoused(p.unhoused||false); setIep(p.has_iep||false);
+      setCollegeList([visibleProfile.college_list_2||"",visibleProfile.college_list_3||"",visibleProfile.college_list_4||"",visibleProfile.college_list_5||"",visibleProfile.college_list_6||"",visibleProfile.college_list_7||"",visibleProfile.college_list_8||"",visibleProfile.college_list_9||"",visibleProfile.college_list_10||""]);
+      setSport(visibleProfile.sport||""); setPosition(visibleProfile.position||""); setHeight(visibleProfile.height||""); setWeight(visibleProfile.weight||""); setJerseyNumber(visibleProfile.jersey_number||""); setTeamLevel(visibleProfile.team_level||""); setTravelTeam(visibleProfile.travel_team||""); setCoachName(visibleProfile.coach_name||""); setCoachEmail(visibleProfile.coach_email||"");
+      setHighlightReelUrl(visibleProfile.highlight_reel_url||""); setRecruitingStatus(visibleProfile.recruiting_status||""); setDesiredCollegeLevel(visibleProfile.desired_college_level||""); setAthleteEmail(visibleProfile.athlete_email||""); setCampsAttended(visibleProfile.camps_attended||"");
+      setNilInstagram(visibleProfile.nil_instagram||""); setNilTiktok(visibleProfile.nil_tiktok||""); setNilTwitter(visibleProfile.nil_twitter||""); setNilFollowerRange(visibleProfile.nil_follower_range||""); setNilBrandInterests(visibleProfile.nil_brand_interests||[]); setNilWorkedWithBrands(visibleProfile.nil_worked_with_brands||false); setNilDealTypes(visibleProfile.nil_deal_types||[]);
+      setInstagram(visibleProfile.instagram||""); setTiktok(visibleProfile.tiktok||""); setTwitter(visibleProfile.twitter||""); setHudl(visibleProfile.hudl||""); setYoutube(visibleProfile.youtube||"");
+      setPillars(visibleProfile.pillars||[]);
+      setRace(visibleProfile.race||""); setHouseholdIncome(visibleProfile.household_income||""); setFirstGen(visibleProfile.first_generation||false); setFreeLunch(visibleProfile.free_reduced_lunch||false); setMigrant(visibleProfile.migrant_student||false); setFosterYouth(visibleProfile.foster_youth||false); setUnhoused(visibleProfile.unhoused||false); setIep(visibleProfile.has_iep||false);
       setLoading(false);
     })();
   },[router]);
@@ -179,7 +181,7 @@ export default function ProfilePage() {
 
   if(loading)return<><div style={{padding:40,fontFamily:"'Space Mono',monospace",fontSize:12,color:T.faint}}>Loading profile...</div></>;
 
-  const isAthlete=profile?.role==="scholar-athlete";
+  const isAthlete=(profile?.profile_mode ?? profile?.role)==="scholar-athlete";
 
   const SECTIONS=[
     {key:"personal",label:"Personal",icon:"👤"},
