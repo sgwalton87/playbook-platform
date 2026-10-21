@@ -1,0 +1,101 @@
+name: Isolated Profile Recovery QA
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "app/profile/**"
+      - "lib/onboarding/**"
+      - "tests/acceptance/profile-recovery-roundtrip.spec.ts"
+      - "supabase/**"
+      - ".github/workflows/profile-recovery-isolated.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  isolated-profile-recovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Install application dependencies
+        run: npm ci
+      - name: Install local Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Normalize duplicate migration version identifiers for disposable QA only
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          folder = Path("supabase/migrations")
+          scripts = sorted(p for p in folder.glob("*.sql") if re.match(r"^\d+_", p.name))
+          for i, path in enumerate(scripts, 1):
+              suffix = path.name.split("_", 1)[1]
+              path.rename(folder / f"20260101{i:06d}_{suffix}")
+          print(f"Prepared {len(scripts)} unique local-only migration IDs")
+          PY
+      - name: Start isolated local Supabase stack
+        run: npx supabase start
+      - name: Prepare local acceptance configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx supabase status -o env > /tmp/pbos-local-supabase.env
+          node <<'NODE'
+          const fs=require('fs');
+          const input=fs.readFileSync('/tmp/pbos-local-supabase.env','utf8');
+          const pairs={};
+          for (const line of input.split('\n')) {
+            const match=line.match(/^([A-Z_]+)=(.*)$/);
+            if(match) pairs[match[1]]=match[2].replace(/^["']|["']$/g,'');
+          }
+          for(const key of ['API_URL','ANON_KEY','SERVICE_ROLE_KEY']) {
+            if(!pairs[key]) throw Error('Missing local Supabase value: '+key);
+          }
+          if (!pairs.API_URL.includes('127.0.0.1') && !pairs.API_URL.includes('localhost')) {
+            throw Error('Refusing nonlocal Supabase target');
+          }
+          fs.appendFileSync(process.env.GITHUB_ENV, [
+            'NEXT_PUBLIC_SUPABASE_URL='+pairs.API_URL,
+            'NEXT_PUBLIC_SUPABASE_ANON_KEY='+pairs.ANON_KEY,
+            'SUPABASE_SERVICE_ROLE_KEY='+pairs.SERVICE_ROLE_KEY,
+            'PLAYWRIGHT_BASE_URL=http://127.0.0.1:3000',
+            'PBOS_ALLOW_SYNTHETIC_AUTH_WRITE=YES'
+          ].join('\n')+'\n');
+          NODE
+      - name: Build app against local database
+        run: npm run build
+      - name: Start Playbook preview on runner
+        shell: bash
+        run: |
+          npm start > /tmp/pbos-profile-recovery-app.log 2>&1 &
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3000/login > /dev/null; then exit 0; fi
+            sleep 2
+          done
+          tail -n 100 /tmp/pbos-profile-recovery-app.log
+          exit 1
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run real synthetic Scholar-Athlete round-trip
+        run: npx playwright test tests/acceptance/profile-recovery-roundtrip.spec.ts --project=chromium
+      - name: Upload sanitized diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: isolated-profile-recovery-failure
+          path: |
+            artifacts/playwright/results.json
+          retention-days: 7
+      - name: Stop isolated Supabase
+        if: always()
+        run: npx supabase stop --no-backup || true
