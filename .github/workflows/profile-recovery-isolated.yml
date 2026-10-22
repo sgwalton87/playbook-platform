@@ -7,6 +7,7 @@ on:
       - "app/profile/**"
       - "lib/onboarding/**"
       - "tests/acceptance/profile-recovery-roundtrip.spec.ts"
+      - "tests/acceptance/role-onboarding-activation.spec.ts"
       - "supabase/**"
       - ".github/workflows/profile-recovery-isolated.yml"
   workflow_dispatch:
@@ -86,8 +87,8 @@ jobs:
           exit 1
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
-      - name: Run real synthetic Scholar-Athlete round-trip
-        run: npx playwright test tests/acceptance/profile-recovery-roundtrip.spec.ts --project=chromium
+      - name: Run isolated role profiles and onboarding activation journeys
+        run: npx playwright test tests/acceptance/profile-recovery-roundtrip.spec.ts tests/acceptance/role-onboarding-activation.spec.ts --project=chromium
       - name: Upload sanitized diagnostics
         if: failure()
         uses: actions/upload-artifact@v4
