@@ -135,7 +135,8 @@ const nonScholarRoles = [
   "employer", "district", "athlete-abroad", "other",
 ] as const;
 
-test.each(nonScholarRoles)("%s profile uses the role contract and persists an editable identity", async ({ page }, role) => {
+for (const role of nonScholarRoles) {
+  test(`${role} profile uses the role contract and persists an editable identity`, async ({ page }) => {
   const need = (key: string) => { const v = process.env[key]; if (!v) throw Error(`Missing ${key}`); return v; };
   const base = new URL(need("PLAYWRIGHT_BASE_URL"));
   const db = new URL(need("NEXT_PUBLIC_SUPABASE_URL"));
@@ -190,4 +191,6 @@ test.each(nonScholarRoles)("%s profile uses the role contract and persists an ed
     const cleanup = await admin.auth.admin.deleteUser(id);
     if (cleanup.error) console.warn("Synthetic role cleanup needs operator follow-up");
   }
-});
+  });
+}
+
