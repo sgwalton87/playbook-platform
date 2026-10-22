@@ -49,6 +49,20 @@ jobs:
         run: |
           grep -q "^\\[auth.email\\]$" supabase/config.toml
           grep -q "^enable_confirmations = true$" supabase/config.toml
+      - name: Reserve nondefault disposable database ports
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("supabase/config.toml")
+          contents = p.read_text()
+          if "port = 54322" not in contents or "shadow_port = 54320" not in contents:
+              raise SystemExit("Unexpected local Supabase port configuration")
+          contents = contents.replace("port = 54322", "port = 55422", 1)
+          contents = contents.replace("shadow_port = 54320", "shadow_port = 55420", 1)
+          p.write_text(contents)
+          print("Disposable isolated QA DB uses 55422, shadow 55420")
+          PY
       - name: Start isolated local Supabase stack
         run: npx supabase start
       - name: Prepare local acceptance configuration
