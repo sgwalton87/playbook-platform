@@ -8,6 +8,7 @@ import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import { supabase } from "@/lib/supabaseClient";
 import { ALL_COLLEGE_OPTIONS, CAREER_OPTIONS, ACTIVITY_OPTIONS, CALIFORNIA_DISTRICTS, assertRoleOnboardingCompletionSupported, createInitialOnboardingData, getOnboardingCompletionDestination, getOnboardingSteps, mapOnboardingToProfilePayload, validateOnboardingStep } from "@/lib/onboarding";
 import { normalizeRole } from "@/lib/onboarding/pathwayMap";
+import { resolveOnboardingRoleBinding } from "@/lib/onboarding/roleBinding";
 import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
 
 export default function StartPage() {
@@ -83,6 +84,21 @@ function StartContent() {
         role,
         profile_mode: role,
       };
+
+      const binding = resolveOnboardingRoleBinding({
+        requestedRole: params.get("role"),
+        profileMode: p?.profile_mode,
+        profileRole: p?.role,
+      });
+      if (!binding.ok) {
+        setJourneyError("This account has a different registered pathway. Your saved answers have not been changed.");
+        router.replace("/login?error=role_mismatch");
+        return;
+      }
+      if (binding.role !== role) {
+        router.replace(`/start?first=1&role=${encodeURIComponent(binding.role)}`);
+        return;
+      }
 
       const onboarding = safeProfile.onboarding_data || {};
       setProfile(safeProfile);
