@@ -24,4 +24,12 @@ describe("15 canonical role editor field parity", () => {
     const fields = getRoleEditableFields(getOnboardingSteps("brand-partner"));
     expect(fields.some(field => field.type === "safety-agreement")).toBe(false);
   });
+  it("preserves unique step identity even when sections share a phase label", () => {
+    const fields = getRoleEditableFields([
+      { id: "first", phase: "Shared", title: "First", body: "", fields: [{ key: "alpha", label: "Alpha" }] },
+      { id: "second", phase: "Shared", title: "Second", body: "", fields: [{ key: "beta", label: "Beta" }] },
+    ]);
+    expect(fields.filter(field => field.stepId === "first").map(field => field.key)).toEqual(["alpha"]);
+    expect(fields.filter(field => field.stepId === "second").map(field => field.key)).toEqual(["beta"]);
+  });
 });
