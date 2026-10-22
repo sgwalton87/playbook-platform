@@ -75,7 +75,8 @@ jobs:
             'NEXT_PUBLIC_SUPABASE_ANON_KEY='+pairs.ANON_KEY,
             'SUPABASE_SERVICE_ROLE_KEY='+pairs.SERVICE_ROLE_KEY,
             'PLAYWRIGHT_BASE_URL=http://127.0.0.1:3000',
-            'PBOS_ALLOW_SYNTHETIC_AUTH_WRITE=YES'
+            'PBOS_ALLOW_SYNTHETIC_AUTH_WRITE=YES',
+            'NEXT_PUBLIC_HCAPTCHA_SITE_KEY=10000000-ffff-ffff-ffff-000000000001'
           ].join('\n')+'\n');
           NODE
       - name: Provision and verify all 15 disposable role QA accounts
