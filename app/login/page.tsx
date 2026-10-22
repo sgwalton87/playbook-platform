@@ -108,11 +108,11 @@ function LoginContent() {
     e.preventDefault();
     setStatus("");
 
-    if (isSignup && !captchaReady) {
+    if (!captchaReady) {
       setStatus(
         captchaSiteKey
-          ? "Complete the security check before creating your account."
-          : "Account creation is temporarily unavailable because the security check is not configured."
+          ? "Complete the security check before continuing."
+          : "Authentication is temporarily unavailable because the security check is not configured."
       );
       return;
     }
@@ -154,9 +154,12 @@ function LoginContent() {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
+        options: { captchaToken: captchaToken || undefined },
       });
 
       if (error || !data.user || !data.session) {
+        setCaptchaToken(null);
+        setCaptchaKey((current) => current + 1);
         setStatus(getLoginErrorMessage());
         return;
       }
@@ -300,12 +303,12 @@ function LoginContent() {
             </Link>
           )}
 
-          {isSignup && (
+          {(
             <section aria-labelledby="signup-security-heading" style={captchaPanel}>
               <div>
                 <h3 id="signup-security-heading" style={captchaHeading}>Security check</h3>
                 <p id="signup-security-help" style={captchaHelp}>
-                  Complete this check to protect Playbook accounts from automated signups.
+                  Complete this check to protect your Playbook account.
                 </p>
               </div>
               {captchaSiteKey ? (
@@ -329,7 +332,7 @@ function LoginContent() {
                 </div>
               ) : (
                 <p role="status" style={captchaUnavailable}>
-                  Account creation is temporarily unavailable. Please try again later.
+                  Authentication is temporarily unavailable. Please try again later.
                 </p>
               )}
               <p role="status" aria-live="polite" style={captchaState}>
@@ -354,7 +357,7 @@ function LoginContent() {
 
           <button
             type="submit"
-            disabled={loading || (isSignup && !captchaReady)}
+            disabled={loading || !captchaReady}
             aria-busy={loading}
             aria-describedby={isSignup ? "signup-security-help" : undefined}
             style={primaryButton}
