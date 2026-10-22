@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "app/profile/**"
+      - "app/auth/callback/**"
       - "lib/onboarding/**"
       - "tests/acceptance/profile-recovery-roundtrip.spec.ts"
       - "tests/acceptance/role-onboarding-activation.spec.ts"
