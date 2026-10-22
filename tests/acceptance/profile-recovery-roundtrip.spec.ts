@@ -2,6 +2,7 @@ import { PLAYBOOK_ROLES } from "@/lib/roles/registry";
 import { randomBytes, randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { expect, test } from "@playwright/test";
+import { solveLocalCaptcha } from "./helpers/solveLocalCaptcha";
 
 test("synthetic profile data survives edit and reload", async ({ page }) => {
   const need = (key: string) => { const val = process.env[key]; if (!val) throw new Error(`Missing ${key}`); return val; };
@@ -34,6 +35,7 @@ test("synthetic profile data survives edit and reload", async ({ page }) => {
     await page.goto("/login");
     await page.getByLabel("Email", { exact: true }).fill(email);
     await page.getByLabel("Password", { exact: true }).fill(password);
+    await solveLocalCaptcha(page);
     await page.getByRole("button", { name: "Log In", exact: true }).click();
     await page.waitForURL(url => url.pathname !== "/login", { timeout: 15000 });
     await page.goto("/profile");
@@ -95,6 +97,7 @@ test("Family account sees Family onboarding and edits its own saved profile with
     await page.goto("/login");
     await page.getByLabel("Email", { exact: true }).fill(email);
     await page.getByLabel("Password", { exact: true }).fill(password);
+    await solveLocalCaptcha(page);
     await page.getByRole("button", { name: "Log In", exact: true }).click();
     await page.waitForURL(url => url.pathname !== "/login", { timeout: 15000 });
 
@@ -175,6 +178,7 @@ for (const role of nonScholarRoles) {
     await page.goto("/login");
     await page.getByLabel("Email", { exact: true }).fill(email);
     await page.getByLabel("Password", { exact: true }).fill(password);
+    await solveLocalCaptcha(page);
     await page.getByRole("button", { name: "Log In", exact: true }).click();
     await page.waitForURL(url => url.pathname !== "/login", { timeout: 15000 });
     await page.goto("/profile");
