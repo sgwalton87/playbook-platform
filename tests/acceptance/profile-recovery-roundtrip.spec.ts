@@ -60,3 +60,71 @@ test("synthetic profile data survives edit and reload", async ({ page }) => {
     if (cleanup.error) console.warn("Synthetic user cleanup needs operator follow-up");
   }
 });
+
+test("Family account sees Family onboarding and edits its own saved profile without losing other answers", async ({ page }) => {
+  const need = (key: string) => { const value = process.env[key]; if (!value) throw Error(`Missing ${key}`); return value; };
+  const base = new URL(need("PLAYWRIGHT_BASE_URL"));
+  const db = new URL(need("NEXT_PUBLIC_SUPABASE_URL"));
+  if (need("PBOS_ALLOW_SYNTHETIC_AUTH_WRITE") !== "YES" ||
+      !["localhost", "127.0.0.1"].includes(base.hostname) ||
+      db.hostname === "oexgxnybeixwadgtdtzp.supabase.co") {
+    throw Error("Family synthetic test requires isolated local environment");
+  }
+  const admin = createClient(db.toString(), need("SUPABASE_SERVICE_ROLE_KEY"), {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+  const email = `pbos-family-${randomUUID()}@example.com`;
+  const password = `${randomBytes(24).toString("base64url")}Aa1!`;
+  const created = await admin.auth.admin.createUser({ email, password, email_confirm: true,
+    user_metadata: { role: "family", profile_mode: "family", synthetic: true } });
+  if (created.error || !created.data.user) throw created.error || Error("No test user returned");
+  const id = created.data.user.id;
+  try {
+    const seed = await admin.from("profiles").upsert({
+      id, role: "family", profile_mode: "family", requested_role: "family",
+      onboarding_completed: true, verification_status: "email_confirmed",
+      first_name: "Test", last_name: "Parent",
+      onboarding_data: {
+        first_name: "Test", last_name: "Parent", full_name: "Test Parent",
+        relationship_to_scholar: "Parent", dependent_name: "Existing Scholar",
+        family_focus: ["Academic monitoring"], private_planning_note: "Keep unchanged"
+      }
+    }, { onConflict: "id" });
+    if (seed.error) throw seed.error;
+    await page.goto("/login");
+    await page.getByLabel("Email", { exact: true }).fill(email);
+    await page.getByLabel("Password", { exact: true }).fill(password);
+    await page.getByRole("button", { name: "Log In", exact: true }).click();
+    await page.waitForURL(url => url.pathname !== "/login", { timeout: 15000 });
+
+    await page.goto("/start?first=1&role=family");
+    await expect(page.getByText("Create your Parent / Guardian profile.", { exact: true })).toBeVisible();
+    await expect(page.getByText("Create your Scholar-Athlete profile.", { exact: true })).toHaveCount(0);
+
+    await page.goto("/profile");
+    await page.waitForURL(url => url.pathname === "/profile/role", { timeout: 15000 });
+    await expect(page.getByRole("heading", { name: "Parent / Guardian Profile" })).toBeVisible();
+    await expect(page.getByLabel("Relationship to scholar")).toHaveValue("Parent");
+    await page.getByLabel("Relationship to scholar").selectOption("Guardian");
+    await page.getByRole("button", { name: "Save Changes", exact: true }).click();
+    await expect.poll(async () => {
+      const record = await admin.from("profiles").select("onboarding_data").eq("id", id).single();
+      return record.data?.onboarding_data?.relationship_to_scholar;
+    }).toBe("Guardian");
+    await page.reload();
+    await expect(page.getByLabel("Relationship to scholar")).toHaveValue("Guardian");
+    const finalRecord = await admin.from("profiles").select("role,profile_mode,onboarding_data").eq("id", id).single();
+    expect(finalRecord.data).toMatchObject({
+      role: "family", profile_mode: "family",
+      onboarding_data: {
+        relationship_to_scholar: "Guardian",
+        dependent_name: "Existing Scholar",
+        family_focus: ["Academic monitoring"],
+        private_planning_note: "Keep unchanged",
+      },
+    });
+  } finally {
+    const cleanup = await admin.auth.admin.deleteUser(id);
+    if (cleanup.error) console.warn("Synthetic Family cleanup needs operator follow-up");
+  }
+});
