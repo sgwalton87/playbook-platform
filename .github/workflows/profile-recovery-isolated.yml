@@ -73,6 +73,8 @@ jobs:
             'PBOS_ALLOW_SYNTHETIC_AUTH_WRITE=YES'
           ].join('\n')+'\n');
           NODE
+      - name: Provision and verify all 15 disposable role QA accounts
+        run: node scripts/qa/provision-role-test-accounts.mjs
       - name: Build app against local database
         run: npm run build
       - name: Start Playbook preview on runner
