@@ -41,17 +41,23 @@ test("all 15 pathways: sign up, receive local confirmation email, verify, and en
       expect(signup.data.user.email_confirmed_at).toBeFalsy();
       let confirmationUrl: string | null = null;
       await expect.poll(async () => {
-        // Local Supabase uses Inbucket. Query the mailbox by its recipient local part.
-        const mailbox = email.split("@")[0];
-        const response = await fetch(new URL(`/api/v1/mailbox/${encodeURIComponent(mailbox)}`, mailBase));
-        if (!response.ok) return false;
-        const messages = await response.json() as Array<{ id: string }>;
-        if (!messages.length) return false;
-        const detail = await fetch(new URL(`/api/v1/mailbox/${encodeURIComponent(mailbox)}/${messages[0].id}`, mailBase));
+        // Supabase CLI now serves Mailpit; its API differs from legacy Inbucket.
+        const listing = await fetch(new URL("/api/v1/messages", mailBase));
+        if (!listing.ok) return false;
+        const inbox = await listing.json() as {
+          messages?: Array<{ ID?: string; id?: string; To?: Array<{ Address?: string }> }>;
+        };
+        const entry = (inbox.messages || []).find(item =>
+          item.To?.some(recipient => recipient.Address?.toLowerCase() === email.toLowerCase())
+        );
+        if (!entry) return false;
+        const id = entry.ID || entry.id;
+        if (!id) return false;
+        const detail = await fetch(new URL(`/api/v1/message/${encodeURIComponent(id)}`, mailBase));
         if (!detail.ok) return false;
-        const message = await detail.json() as { body?: { html?: string; text?: string }; text?: string; html?: string };
-        const body = [message.body?.html, message.body?.text, message.text, message.html].filter(Boolean).join(" ");
-        const urls = body.match(/https?:[^\s"'<>]+/g) || [];
+        const message = await detail.json() as { HTML?: string; Text?: string };
+        const body = [message.HTML, message.Text].filter(Boolean).join(" ");
+        const urls = body.match(/https?:[^\\s"'<>]+/g) || [];
         const candidate = urls.map(raw => raw.replace(/&amp;/g, "&").replace(/[),.]+$/, ""))
           .find(raw => raw.includes("/auth/v1/verify") || raw.includes("/auth/callback"));
         if (candidate) confirmationUrl = candidate;
