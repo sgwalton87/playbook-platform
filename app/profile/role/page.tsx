@@ -103,7 +103,7 @@ export default function RoleProfilePage() {
         <p style={{ lineHeight: 1.6, marginBottom: 0 }}>Update the same information you entered during onboarding. Background answers stay private; public visibility is managed separately.</p>
       </header>
       {steps.map(step => {
-        const stepFields = fields.filter(field => field.phase === step.phase);
+        const stepFields = fields.filter(field => field.stepId === step.id);
         if (!stepFields.length) return null;
         return <section key={step.id} style={{ background: "#fff", borderRadius: 20, padding: 22, marginBottom: 18 }}>
           <h2 style={{ fontSize: 21, marginTop: 0 }}>{step.title}</h2>
