@@ -7,7 +7,6 @@ const IDENTITY = (label: string): OnboardingStep => ({
   title: `Create your ${label} profile.`,
   body: "Your name, handle, photo, and story personalize your Playbook experience.",
   fields: [
-    { key: "full_name", label: "Full name", placeholder: "Your name" },
     { key: "first_name", label: "First name", placeholder: "First name" },
     { key: "last_name", label: "Last name", placeholder: "Last name" },
     { key: "date_of_birth", label: "Date of birth (private)", placeholder: "YYYY-MM-DD" },
