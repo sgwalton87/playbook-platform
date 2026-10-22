@@ -103,7 +103,7 @@ test("Family account sees Family onboarding and edits its own saved profile with
 
     await page.goto("/profile");
     await page.waitForURL(url => url.pathname === "/profile/role", { timeout: 15000 });
-    await expect(page.getByRole("heading", { name: "Parent / Guardian Profile" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Parent / Guardian Profile", exact: true })).toBeVisible();
     await expect(page.getByLabel("Relationship to scholar")).toHaveValue("Parent");
     await page.getByLabel("Relationship to scholar").selectOption("Guardian");
     await page.getByRole("button", { name: "Save Changes", exact: true }).click();
