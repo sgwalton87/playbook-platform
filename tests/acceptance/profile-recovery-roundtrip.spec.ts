@@ -1,3 +1,4 @@
+import { PLAYBOOK_ROLES } from "@/lib/roles/registry";
 import { randomBytes, randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { expect, test } from "@playwright/test";
@@ -182,6 +183,10 @@ for (const role of nonScholarRoles) {
     }).toBe("After");
     await page.reload();
     await expect(page.getByLabel("Last name", { exact: true })).toHaveValue("After");
+    // Every role must land in its own OS route after profile completion.
+    const expectedOS = PLAYBOOK_ROLES[role].osRoute;
+    await page.goto(expectedOS);
+    await expect(page).toHaveURL(new RegExp(`${expectedOS.replace(/[-/\\^$*+?.()|[\\]{}]/g, "\\    const final = await admin.from("profiles").select("role,profile_mode,onboarding_data").eq("id", id).single();")}(?:[/?#]|$)`));
     const final = await admin.from("profiles").select("role,profile_mode,onboarding_data").eq("id", id).single();
     expect(final.data).toMatchObject({
       role, profile_mode: role,
