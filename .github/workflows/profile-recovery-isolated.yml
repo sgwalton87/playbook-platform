@@ -45,6 +45,10 @@ jobs:
               path.rename(folder / f"20260101{i:06d}_{suffix}")
           print(f"Prepared {len(scripts)} unique local-only migration IDs")
           PY
+      - name: Assert isolated email verification is enabled
+        run: |
+          grep -q "^\\[auth.email\\]$" supabase/config.toml
+          grep -q "^enable_confirmations = true$" supabase/config.toml
       - name: Start isolated local Supabase stack
         run: npx supabase start
       - name: Prepare local acceptance configuration
