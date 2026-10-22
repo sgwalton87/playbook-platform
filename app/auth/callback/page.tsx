@@ -56,6 +56,31 @@ function AuthCallbackContent() {
             window.location.replace("/login?error=auth_callback");
             return;
           }
+        } else {
+          // Supabase confirmation links may return a verified implicit-flow
+          // session in the fragment. Our PKCE client deliberately disables
+          // automatic URL detection, so complete this explicit handoff here.
+          const fragment = new URLSearchParams(window.location.hash.slice(1));
+          const accessToken = fragment.get("access_token");
+          const refreshToken = fragment.get("refresh_token");
+          if (accessToken || refreshToken) {
+            // Strip sensitive one-time credentials from the address bar before
+            // performing any network calls or redirecting.
+            window.history.replaceState(null, "", window.location.pathname + window.location.search);
+            if (!accessToken || !refreshToken) {
+              window.location.replace("/login?error=auth_callback");
+              return;
+            }
+            const { error: sessionError } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken,
+            });
+            if (sessionError) {
+              console.error("Auth callback session validation failed.");
+              window.location.replace("/login?error=auth_callback");
+              return;
+            }
+          }
         }
       }
 
