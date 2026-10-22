@@ -205,3 +205,61 @@ for (const role of nonScholarRoles) {
   });
 }
 
+
+test("Family and Brand Partner cannot read or modify each other's private profile rows", async () => {
+  const need = (key: string) => { const v = process.env[key]; if (!v) throw Error(`Missing ${key}`); return v; };
+  const base = new URL(need("PLAYWRIGHT_BASE_URL"));
+  const db = new URL(need("NEXT_PUBLIC_SUPABASE_URL"));
+  if (need("PBOS_ALLOW_SYNTHETIC_AUTH_WRITE") !== "YES" ||
+      !["localhost", "127.0.0.1"].includes(base.hostname) ||
+      db.hostname === "oexgxnybeixwadgtdtzp.supabase.co") {
+    throw Error("Cross-account RLS test may run only against isolated local Supabase");
+  }
+  const admin = createClient(db.toString(), need("SUPABASE_SERVICE_ROLE_KEY"), {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+  const anon = need("NEXT_PUBLIC_SUPABASE_ANON_KEY");
+  const users: Array<{ id: string; email: string; password: string; role: string }> = [];
+  try {
+    for (const role of ["family", "brand-partner"]) {
+      const email = `pbos-rls-${role}-${randomUUID()}@example.com`;
+      const password = `${randomBytes(24).toString("base64url")}Aa1!`;
+      const created = await admin.auth.admin.createUser({ email, password, email_confirm: true,
+        user_metadata: { role, profile_mode: role, synthetic: true } });
+      if (created.error || !created.data.user) throw created.error || Error("Synthetic account creation failed");
+      const id = created.data.user.id;
+      users.push({ id, email, password, role });
+      const seed = await admin.from("profiles").upsert({ id, role, profile_mode: role,
+        onboarding_completed: true, verification_status: "email_confirmed",
+        onboarding_data: { private_test_marker: `owner-${role}` }
+      }, { onConflict: "id" });
+      if (seed.error) throw seed.error;
+    }
+    for (const actor of users) {
+      const other = users.find(u => u.id !== actor.id)!;
+      const client = createClient(db.toString(), anon, { auth: { persistSession: false, autoRefreshToken: false } });
+      const login = await client.auth.signInWithPassword({ email: actor.email, password: actor.password });
+      if (login.error) throw login.error;
+      const own = await client.from("profiles").select("id,onboarding_data").eq("id", actor.id).maybeSingle();
+      expect(own.error).toBeNull();
+      expect(own.data?.onboarding_data).toMatchObject({ private_test_marker: `owner-${actor.role}` });
+      const foreign = await client.from("profiles").select("id,onboarding_data").eq("id", other.id).maybeSingle();
+      expect(foreign.error).toBeNull();
+      expect(foreign.data).toBeNull();
+      const attempted = await client.from("profiles").update({ bio: "Unauthorised write" })
+        .eq("id", other.id).select("id");
+      expect(attempted.error).toBeNull();
+      expect(attempted.data).toEqual([]);
+      const verified = await admin.from("profiles").select("bio,onboarding_data").eq("id", other.id).single();
+      expect(verified.error).toBeNull();
+      expect(verified.data?.bio).not.toBe("Unauthorised write");
+      expect(verified.data?.onboarding_data).toMatchObject({ private_test_marker: `owner-${other.role}` });
+      await client.auth.signOut();
+    }
+  } finally {
+    for (const u of users) {
+      const cleanup = await admin.auth.admin.deleteUser(u.id);
+      if (cleanup.error) console.warn("Synthetic RLS account cleanup needs operator follow-up");
+    }
+  }
+});
