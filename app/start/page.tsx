@@ -10,6 +10,7 @@ import { ALL_COLLEGE_OPTIONS, CAREER_OPTIONS, ACTIVITY_OPTIONS, CALIFORNIA_DISTR
 import { normalizeRole } from "@/lib/onboarding/pathwayMap";
 import { resolveOnboardingRoleBinding } from "@/lib/onboarding/roleBinding";
 import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
+import { PLAYBOOK_ROLES } from "@/lib/roles/registry";
 
 export default function StartPage() {
   return (
