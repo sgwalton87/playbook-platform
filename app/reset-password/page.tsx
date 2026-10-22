@@ -14,6 +14,9 @@ import {
   validateResetPasswords,
 } from "@/lib/auth";
 import { supabase } from "@/lib/supabaseClient";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
+
+const HCAPTCHA_DEVELOPMENT_SITE_KEY = "10000000-ffff-ffff-ffff-000000000001";
 import "./reset-password.css";
 
 type RecoveryState = "request" | "verifying" | "update" | "complete";
@@ -36,6 +39,9 @@ function ResetPasswordContent() {
   const [confirmation, setConfirmation] = useState("");
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaKey, setCaptchaKey] = useState(0);
+  const sitekey = process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY || (process.env.NODE_ENV === "development" ? HCAPTCHA_DEVELOPMENT_SITE_KEY : undefined);
 
   useEffect(() => {
     let active = true;
@@ -77,14 +83,21 @@ function ResetPasswordContent() {
 
   async function requestReset(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!sitekey || !captchaToken) {
+      setStatus("Complete the security check before requesting a reset link.");
+      return;
+    }
     setLoading(true);
     setStatus("");
 
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: buildPasswordResetRedirectUrl(window.location.origin),
+        captchaToken,
       });
       setStatus(error ? PASSWORD_RESET_REQUEST_ERROR : PASSWORD_RESET_REQUEST_MESSAGE);
+      setCaptchaToken(null);
+      setCaptchaKey(k => k + 1);
     } catch {
       setStatus(PASSWORD_RESET_REQUEST_ERROR);
     } finally {
@@ -162,8 +175,11 @@ function ResetPasswordContent() {
                   placeholder="you@example.com"
                 />
               </label>
+              <div aria-label="Security check">
+                {sitekey ? <HCaptcha key={captchaKey} sitekey={sitekey} onVerify={setCaptchaToken} onExpire={() => setCaptchaToken(null)} onError={() => setCaptchaToken(null)} /> : <p role="alert">Security check unavailable.</p>}
+              </div>
               {status && <div className="password-reset-notice" role="status" aria-live="polite">{status}</div>}
-              <button type="submit" disabled={loading} aria-busy={loading}>
+              <button type="submit" disabled={loading || !sitekey || !captchaToken} aria-busy={loading}>
                 {loading ? "Sending…" : "Send reset link"}
               </button>
               <Link href="/login">Return to login</Link>
