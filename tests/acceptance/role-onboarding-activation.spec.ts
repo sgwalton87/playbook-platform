@@ -1,6 +1,7 @@
 import { randomBytes, randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { expect, test } from "@playwright/test";
+import { solveLocalCaptcha } from "./helpers/solveLocalCaptcha";
 import { PLAYBOOK_ROLES } from "@/lib/roles/registry";
 import { getOnboardingSteps } from "@/lib/onboarding/engine";
 
@@ -35,7 +36,8 @@ for (const role of ["family", "brand-partner"] as const) {
       await page.goto("/login");
       await page.getByLabel("Email", { exact: true }).fill(email);
       await page.getByLabel("Password", { exact: true }).fill(password);
-      await page.getByRole("button", { name: "Log In", exact: true }).click();
+      await solveLocalCaptcha(page);
+    await page.getByRole("button", { name: "Log In", exact: true }).click();
       await page.waitForURL(url => url.pathname !== "/login", { timeout: 15000 });
       await page.goto(`/start?first=1&role=${role}`);
       // Use the real step transitions rather than injecting a terminal step index.
