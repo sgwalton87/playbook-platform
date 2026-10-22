@@ -2,6 +2,7 @@ import { randomBytes, randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { expect, test } from "@playwright/test";
 import { PLAYBOOK_ROLES } from "@/lib/roles/registry";
+import { getOnboardingSteps } from "@/lib/onboarding/engine";
 
 for (const role of ["family", "brand-partner"] as const) {
   test(`${role} verified account completes saved onboarding and enters its own OS`, async ({ page }) => {
@@ -24,7 +25,7 @@ for (const role of ["family", "brand-partner"] as const) {
     const id = created.data.user.id;
     try {
       const answers = { first_name: "Journey", last_name: "Example", full_name: "Journey Example",
-        private_test_marker: `saved-${role}`, onboarding_step_index: role === "family" ? 3 : 4 };
+        private_test_marker: `saved-${role}`, onboarding_step_index: 0 };
       const seed = await admin.from("profiles").upsert({
         id, role, profile_mode: role, requested_role: role,
         onboarding_completed: false, verification_status: "email_confirmed",
@@ -37,6 +38,12 @@ for (const role of ["family", "brand-partner"] as const) {
       await page.getByRole("button", { name: "Log In", exact: true }).click();
       await page.waitForURL(url => url.pathname !== "/login", { timeout: 15000 });
       await page.goto(`/start?first=1&role=${role}`);
+      // Use the real step transitions rather than injecting a terminal step index.
+      // This exercises persistence and protects against auth-loading race conditions.
+      const steps = getOnboardingSteps(role);
+      for (let index = 0; index < steps.length - 1; index++) {
+        await page.getByRole("button", { name: "Skip for now" }).click();
+      }
       const checkbox = page.getByRole("checkbox", { name: /I have read and agree/i });
       await expect(checkbox).toBeVisible();
       await checkbox.check();
