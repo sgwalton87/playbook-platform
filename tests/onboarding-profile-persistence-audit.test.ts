@@ -14,8 +14,8 @@ describe("onboarding and profile persistence audit contracts", () => {
   });
 
   it("does not imply onboarding automatically publishes a public profile", () => {
-    expect(startSource).toContain("Your answers autosave to your private Scholar Record");
-    expect(startSource).toContain("You choose separately whether to publish a public profile");
+    expect(startSource).toContain("Your answers autosave to your private Playbook profile for this role");
+    expect(startSource).toContain("Any sharing or public visibility is managed separately");
     expect(startSource).not.toContain("feed your dashboard, private profile, and public-facing profile");
   });
 
