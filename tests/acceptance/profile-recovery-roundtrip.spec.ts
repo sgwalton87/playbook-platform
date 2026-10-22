@@ -186,7 +186,7 @@ for (const role of nonScholarRoles) {
     // Every role must land in its own OS route after profile completion.
     const expectedOS = PLAYBOOK_ROLES[role].osRoute;
     await page.goto(expectedOS);
-    await expect(page).toHaveURL(new RegExp(`${expectedOS.replace(/[-/\\^$*+?.()|[\\]{}]/g, "\\    const final = await admin.from("profiles").select("role,profile_mode,onboarding_data").eq("id", id).single();")}(?:[/?#]|$)`));
+    await expect(page).toHaveURL(new URL(expectedOS, base).toString());
     const final = await admin.from("profiles").select("role,profile_mode,onboarding_data").eq("id", id).single();
     expect(final.data).toMatchObject({
       role, profile_mode: role,
