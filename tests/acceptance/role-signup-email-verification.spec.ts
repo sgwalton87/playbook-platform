@@ -64,8 +64,21 @@ test("all 15 pathways: sign up, receive local confirmation email, verify, and en
         return Boolean(confirmationUrl);
       }, { timeout: 20000, intervals: [250, 500, 1000] }).toBe(true);
       if (!confirmationUrl) throw Error(`Confirmation email did not include verification URL for ${role}`);
-      await page.goto(confirmationUrl);
-      await page.waitForURL(url => url.pathname.startsWith("/start"), { timeout: 20000 });
+      await page.goto(confirmationUrl, { waitUntil: "domcontentloaded" });
+      try {
+        await page.waitForURL(url => url.pathname.startsWith("/start"), {
+          waitUntil: "domcontentloaded", timeout: 20000
+        });
+      } catch {
+        const current = new URL(page.url());
+        // Do not log callback tokens, email addresses, cookies or sensitive URL query data.
+        const status = await admin.auth.admin.getUserById(signup.data.user.id);
+        const persisted = await admin.from("profiles")
+          .select("role,profile_mode,onboarding_completed")
+          .eq("id", signup.data.user.id).maybeSingle();
+        const visibleText = (await page.locator("main").first().innerText().catch(() => "")).slice(0, 240);
+        throw new Error(`Verification redirect for ${role} did not reach /start: route=${current.pathname}; verified=${Boolean(status.data.user?.email_confirmed_at)}; profile=${persisted.error ? "lookup_error" : persisted.data ? "present" : "missing"}; visible=${visibleText}`);
+      }
       expect(page.url()).toContain(`role=${encodeURIComponent(role)}`);
       const user = await admin.auth.admin.getUserById(signup.data.user.id);
       expect(user.error).toBeNull();
