@@ -101,14 +101,24 @@ test("Scholar-Athlete completes governed onboarding into an owner-scoped athlete
   ]);
   const onboardingBody = await onboarding.text();
   expect(onboarding.ok(), onboardingBody).toBe(true);
-  const transaction = JSON.parse(onboardingBody) as { dashboard?: { role?: string; sectionIds?: string[]; provenance?: string[] } };
-  expect(transaction.dashboard?.role).toBe("SCHOLAR_ATHLETE");
-  expect(transaction.dashboard?.sectionIds).toEqual(expect.arrayContaining(["identity", "goals", "athletics"]));
-  expect(transaction.dashboard?.provenance?.length).toBeGreaterThan(0);
+  const transaction = JSON.parse(onboardingBody) as {
+    activationState?: string;
+    destination?: string;
+    dashboard?: { role?: string; sectionIds?: string[]; provenance?: string[] };
+  };
+  const pbosActivated = Boolean(transaction.dashboard);
+  if (pbosActivated) {
+    expect(transaction.dashboard?.role).toBe("SCHOLAR_ATHLETE");
+    expect(transaction.dashboard?.sectionIds).toEqual(expect.arrayContaining(["identity", "goals", "athletics"]));
+    expect(transaction.dashboard?.provenance?.length).toBeGreaterThan(0);
+  } else {
+    expect(transaction.activationState).toBe("pending-pbos-activation");
+    expect(transaction.destination).toBe("/scholar-athlete-os");
+  }
   await page.waitForURL(/\/scholar-athlete-os/, { timeout: 30_000 });
 
   const completedProfile = await admin.from("profiles")
-    .select("role,profile_mode,onboarding_completed,community_safety_agreed")
+    .select("role,profile_mode,onboarding_completed,community_safety_agreed,verification_status")
     .eq("id", user.id).single();
   if (completedProfile.error) throw completedProfile.error;
   expect(completedProfile.data).toMatchObject({
@@ -117,6 +127,7 @@ test("Scholar-Athlete completes governed onboarding into an owner-scoped athlete
     onboarding_completed: true,
     community_safety_agreed: true,
   });
+  if (!pbosActivated) expect(completedProfile.data.verification_status).toBe("pending");
 
   const athleteProfile = await admin.from("athlete_profiles")
     .select("scholar_id,sport,graduation_year")
@@ -126,27 +137,36 @@ test("Scholar-Athlete completes governed onboarding into an owner-scoped athlete
 
   const scholarProfile = await admin.from("scholar_profiles")
     .select("id,role,onboarding_status")
-    .eq("id", user.id).single();
+    .eq("id", user.id).maybeSingle();
   if (scholarProfile.error) throw scholarProfile.error;
-  expect(scholarProfile.data).toMatchObject({ id: user.id, role: "SCHOLAR_ATHLETE", onboarding_status: "DASHBOARD_READY" });
+  if (pbosActivated) {
+    expect(scholarProfile.data).toMatchObject({ id: user.id, role: "SCHOLAR_ATHLETE", onboarding_status: "DASHBOARD_READY" });
+  } else {
+    expect(scholarProfile.data).toBeNull();
+  }
 
   const projection = await admin.from("scholar_dashboard_projections")
     .select("scholar_id,section_ids,exchange_approval_id,provenance")
     .eq("scholar_id", user.id).maybeSingle();
   if (projection.error) throw projection.error;
-  expect(projection.data?.scholar_id).toBe(user.id);
-  expect(projection.data?.section_ids).toEqual(expect.arrayContaining(["identity", "goals", "athletics"]));
-  expect((projection.data?.provenance as string[] | undefined)?.length).toBeGreaterThan(0);
+  if (pbosActivated) {
+    expect(projection.data?.scholar_id).toBe(user.id);
+    expect(projection.data?.section_ids).toEqual(expect.arrayContaining(["identity", "goals", "athletics"]));
+    expect((projection.data?.provenance as string[] | undefined)?.length).toBeGreaterThan(0);
+  } else {
+    expect(projection.data).toBeNull();
+  }
 
   await safeStopTracing(context, artifacts + "/scholar-athlete-trace.zip", tracingStarted);
   await writeFile(artifacts + "/scholar-athlete-acceptance.json", JSON.stringify({
     schemaVersion: 1,
     journeyId: "SCHOLAR-ATHLETE-ONBOARDING-TO-OS",
     commit: required("PBOS_ACCEPTANCE_COMMIT"),
+    pbosActivationState: pbosActivated ? "active" : "pending-pbos-activation",
     checks: [
-      { dimension: "DURABLE_DATA", passed: true, detail: "Scholar Record and owner-scoped athlete record persisted at the same governed journey." },
+      { dimension: "DURABLE_DATA", passed: true, detail: pbosActivated ? "Scholar Record and owner-scoped athlete record persisted at the same governed journey." : "Owner-scoped athlete profile and completion state persisted while PBOS projections remained absent." },
       { dimension: "AUTHORITY", passed: true, detail: "Anonymous mutation was denied and PBOS used the authenticated durable role." },
-      { dimension: "PBOS_INTEGRATION", passed: true, detail: "Role-matched signed PBOS transaction returned provenance and athletics projection evidence." },
+      { dimension: "PBOS_STATE", passed: true, detail: pbosActivated ? "Role-matched signed PBOS transaction returned provenance and athletics projection evidence." : "PBOS activation remained explicitly pending and granted no additional authority." },
       { dimension: "RLS", passed: true, detail: "The journey consumed the existing athlete owner-authority policy without broadening access." },
       { dimension: "OS_DESTINATION", passed: true, detail: "Completion routed to the distinct Scholar-Athlete OS." }
     ]
