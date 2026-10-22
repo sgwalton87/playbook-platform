@@ -95,9 +95,11 @@ test("all 15 pathways: sign up, receive local confirmation email, verify, and en
       const profile = await admin.from("profiles").select("role,profile_mode").eq("id", signup.data.user.id).single();
       expect(profile.error).toBeNull();
       expect(profile.data).toMatchObject({ role, profile_mode: role });
-      await page.context().clearCookies();
-      await page.goto("/login");
+      // Leave the role's active page before clearing session cookies.
+      // Clearing cookies mid-navigation can race an auth redirect and abort /login.
       await page.evaluate(() => localStorage.clear());
+      await page.goto("about:blank", { waitUntil: "domcontentloaded" });
+      await page.context().clearCookies();
       console.log(`[role-confirmation] Verified ${role}`);
     }
   } finally {
