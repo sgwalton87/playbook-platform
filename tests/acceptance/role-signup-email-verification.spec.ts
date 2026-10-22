@@ -56,11 +56,20 @@ test("all 15 pathways: sign up, receive local confirmation email, verify, and en
         const detail = await fetch(new URL(`/api/v1/message/${encodeURIComponent(id)}`, mailBase));
         if (!detail.ok) return false;
         const message = await detail.json() as { HTML?: string; Text?: string };
-        const body = [message.HTML, message.Text].filter(Boolean).join(" ");
-        const urls = body.match(/https?:[^\\s"'<>]+/g) || [];
+        const body = [message.Text, message.HTML].filter(Boolean).join(" ");
+        const urls = body.match(/https?:[^\s"'<>]+/g) || [];
         const candidate = urls.map(raw => raw.replace(/&amp;/g, "&").replace(/[),.]+$/, ""))
           .find(raw => raw.includes("/auth/v1/verify") || raw.includes("/auth/callback"));
-        if (candidate) confirmationUrl = candidate;
+        if (candidate) {
+          // Reject truncated, HTML-corrupted, or cross-project verification links before navigation.
+          let parsed: URL;
+          try { parsed = new URL(candidate); } catch { return false; }
+          if (parsed.origin !== supabaseUrl.origin ||
+              parsed.pathname !== "/auth/v1/verify" ||
+              parsed.searchParams.get("type") !== "signup" ||
+              !parsed.searchParams.get("token")) return false;
+          confirmationUrl = parsed.toString();
+        }
         return Boolean(confirmationUrl);
       }, { timeout: 20000, intervals: [250, 500, 1000] }).toBe(true);
       if (!confirmationUrl) throw Error(`Confirmation email did not include verification URL for ${role}`);
