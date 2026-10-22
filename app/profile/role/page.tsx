@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { getOnboardingSteps } from "@/lib/onboarding/engine";
 import { PLAYBOOK_ROLES, requirePlaybookRole, type PlaybookRole } from "@/lib/roles/registry";
 import type { OnboardingValue } from "@/lib/onboarding/types";
+import { getRoleEditableFields, isListEditableField, parseListAnswers, formatListAnswers } from "@/lib/onboarding/editableFields";
 
 type SavedProfile = {
   id: string;
@@ -63,9 +64,7 @@ export default function RoleProfilePage() {
   }, [router]);
 
   const steps = useMemo(() => role ? getOnboardingSteps(role) : [], [role]);
-  const fields = useMemo(() => steps.flatMap(step => step.fields
-    .filter(field => field.type !== "safety-agreement" && field.type !== "invite-list")
-    .map(field => ({ ...field, phase: step.phase }))), [steps]);
+  const fields = useMemo(() => getRoleEditableFields(steps), [steps]);
 
   const update = (key: string, value: OnboardingValue) =>
     setAnswers(previous => ({ ...previous, [key]: value }));
@@ -114,7 +113,13 @@ export default function RoleProfilePage() {
             const current = Array.isArray(value) ? value : [];
             return <div key={field.key} style={{ margin: "20px 0" }}>
               <label htmlFor={field.key} style={labelStyle}>{field.label}</label>
-              {field.type === "textarea"
+              {isListEditableField(field)
+                ? <><textarea id={field.key} rows={4} style={inputStyle}
+                    value={formatListAnswers(value)}
+                    placeholder="One entry per line. Saved as private planning answers; no invitations are sent."
+                    onChange={e => update(field.key, parseListAnswers(e.target.value))} />
+                    <p style={{ color: "#64748b", fontSize: 12 }}>One entry per line. This editor does not send invitations or grant access.</p></>
+                : field.type === "textarea"
                 ? <textarea id={field.key} rows={4} style={inputStyle} value={String(value ?? "")} onChange={e => update(field.key, e.target.value)} />
                 : field.type === "multi-select"
                 ? <div style={{ display: "grid", gap: 10 }}>{(field.options || []).map(option =>
