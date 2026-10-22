@@ -309,7 +309,7 @@ function StartContent() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            displayName: String(form.full_name || "Scholar"),
+            displayName: String(form.full_name || PLAYBOOK_ROLES[role].label),
             goalTitle: String(form.dream_school || form.ideal_profession || "Complete my scholar journey"),
           }),
         });
@@ -364,7 +364,7 @@ function StartContent() {
           <p style={eyebrow}>Start Here · {role}</p>
           <h1 style={heroTitle}>Build the record that opens your next door.</h1>
           <p style={heroBody}>
-            Your answers autosave to your private Scholar Record. You choose separately whether to publish a public profile.
+            Your answers autosave to your private Playbook profile for this role. Any sharing or public visibility is managed separately.
           </p>
           <p role="status" aria-live="polite" style={{ ...heroBody, fontSize: 13, marginTop: 8 }}>
             {autosaveStatus === "saving" && "Saving your progress…"}
