@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { requirePlaybookRole } from "@/lib/roles/registry";
 import SportPositionField from "@/components/profile/SportPositionField";
 import { SPORT_OPTIONS as SPORTS } from "@/lib/onboarding/sports";
 import CollegeSearch from "@/components/CollegeSearch";
@@ -113,6 +114,18 @@ export default function ProfilePage() {
       if(!u.user){router.replace("/login");return;}
       const{data:p}=await supabase.from("profiles").select("*").eq("id",u.user.id).single();
       if(!p){router.replace("/start");return;}
+      // A Scholar-only legacy editor must never be shown to Family or
+      // institutional accounts. Route them to their own onboarding-derived form.
+      try {
+        const profileRole = requirePlaybookRole(p.profile_mode || p.role);
+        if (profileRole !== "scholar" && profileRole !== "scholar-athlete") {
+          router.replace("/profile/role");
+          return;
+        }
+      } catch {
+        router.replace("/login?error=role_mismatch");
+        return;
+      }
       const visibleProfile = hydrateProfileFromOnboarding(p);
       setProfile(visibleProfile);
       setFirstName(visibleProfile.first_name||""); setLastName(visibleProfile.last_name||""); setBio(visibleProfile.bio||""); setAvatarUrl(visibleProfile.avatar_url||""); setGender(visibleProfile.gender||""); setDob(visibleProfile.date_of_birth||""); setFavoriteQuote(visibleProfile.favorite_quote||"");
