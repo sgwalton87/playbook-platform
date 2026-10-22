@@ -92,7 +92,7 @@ function StartContent() {
       });
       if (!binding.ok) {
         setJourneyError("This account is registered for a different Playbook pathway. Your answers are safe. Please sign in with the matching account or contact Playbook support.");
-        router.replace(getOnboardingCompletionDestination(binding.durableRole));
+        router.replace("/login?error=role_mismatch");
         return;
       }
       if (binding.role !== role) {
