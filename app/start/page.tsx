@@ -92,7 +92,7 @@ function StartContent() {
         profileRole: p?.role,
       });
       if (!binding.ok) {
-        setJourneyError("This account is registered for a different Playbook pathway. Your answers are safe. Please sign in with the matching account or contact Playbook support.");
+        setJourneyError("This account has a different registered pathway. Your saved answers have not been changed.");
         router.replace("/login?error=role_mismatch");
         return;
       }
