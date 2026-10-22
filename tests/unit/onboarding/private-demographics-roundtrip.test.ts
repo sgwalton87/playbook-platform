@@ -13,10 +13,10 @@ describe("private scholar onboarding fields", () => {
       },
       stepIndex: 2, complete: false,
     });
-    expect(saved.onboarding_data.race_ethnicity).toEqual([
+    expect((saved.onboarding_data as Record<string, unknown>).race_ethnicity).toEqual([
       "Multiracial", "Black/African American"
     ]);
-    expect(saved.onboarding_data.intended_major).toBe("Biology");
+    expect((saved.onboarding_data as Record<string, unknown>).intended_major).toBe("Biology");
     expect("race_ethnicity" in saved).toBe(false);
     const edited = reconcileProfileSave(saved.onboarding_data, {
       intended_major: "Chemistry", grade: "12"
