@@ -48,6 +48,12 @@ export function createInitialOnboardingData(profile: Record<string, unknown> | n
   const onboarding = (profile?.onboarding_data || {}) as OnboardingData;
   return {
     full_name: (profile?.full_name as string) || "",
+    first_name: (profile?.first_name as string) || String(profile?.full_name || "").trim().split(" ")[0] || "",
+    last_name: (profile?.last_name as string) || String(profile?.full_name || "").trim().split(" ").slice(1).join(" ") || "",
+    date_of_birth: (profile?.date_of_birth as string) || "",
+    gender: (profile?.gender as string) || "",
+    height: (profile?.height as string) || "",
+    weight: (profile?.weight as string) || "",
     username: (profile?.username as string) || "",
     avatar_url: (profile?.avatar_url as string) || "",
     bio: (profile?.bio as string) || "",
