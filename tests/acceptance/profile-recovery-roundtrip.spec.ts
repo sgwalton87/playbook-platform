@@ -114,6 +114,10 @@ test("Family account sees Family onboarding and edits its own saved profile with
     }).toBe("Guardian");
     await page.reload();
     await expect(page.getByLabel("Relationship to scholar")).toHaveValue("Guardian");
+    // Direct URL access cannot grant this Family member Scholar-Athlete authority.
+    await page.goto("/scholar-athlete-os");
+    await page.waitForURL(url => url.pathname === "/family-os", { timeout: 15000 });
+    await expect(page.getByRole("heading", { name: /Scholar-Athlete/i })).toHaveCount(0);
     const finalRecord = await admin.from("profiles").select("role,profile_mode,onboarding_data").eq("id", id).single();
     expect(finalRecord.data).toMatchObject({
       role: "family", profile_mode: "family",
