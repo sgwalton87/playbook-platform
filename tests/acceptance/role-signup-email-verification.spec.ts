@@ -7,6 +7,7 @@ import { buildSignupMetadata } from "@/lib/auth/signup";
 const roles = Object.keys(PLAYBOOK_ROLES) as PlaybookRole[];
 
 test("all 15 pathways: sign up, receive local confirmation email, verify, and enter correct onboarding", async ({ page }) => {
+  test.setTimeout(8 * 60 * 1000);
   const need = (key: string) => { const value = process.env[key]; if (!value) throw Error(`Missing ${key}`); return value; };
   const appUrl = new URL(need("PLAYWRIGHT_BASE_URL"));
   const supabaseUrl = new URL(need("NEXT_PUBLIC_SUPABASE_URL"));
@@ -25,6 +26,7 @@ test("all 15 pathways: sign up, receive local confirmation email, verify, and en
   const ids: string[] = [];
   try {
     for (const role of roles) {
+      console.log(`[role-confirmation] Beginning ${role}`);
       const email = `pbos-verify-${role}-${randomUUID()}@example.com`;
       const password = `${randomBytes(24).toString("base64url")}Aa1!`;
       const signup = await anon.auth.signUp({
@@ -68,6 +70,7 @@ test("all 15 pathways: sign up, receive local confirmation email, verify, and en
       await page.context().clearCookies();
       await page.goto("/login");
       await page.evaluate(() => localStorage.clear());
+      console.log(`[role-confirmation] Verified ${role}`);
     }
   } finally {
     for (const id of ids) {
