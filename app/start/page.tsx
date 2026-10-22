@@ -269,27 +269,6 @@ function StartContent() {
     };
   }, [form, user?.id, stepIndex, creating, created]);
 
-  async function sendInvites() {
-    const emails = Array.isArray(form.invite_supporters)
-      ? form.invite_supporters.filter(Boolean)
-      : [];
-
-    await Promise.all(
-      emails.map((email: string) =>
-        fetch("/api/invitations/send", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email,
-            role: "supporter",
-            scholarId: user?.id,
-            message: "I’m building my Playbook and would like you to support my journey.",
-          }),
-        }).catch(() => null)
-      )
-    );
-  }
-
   async function next(skip = false) {
     setSaving(true);
     setJourneyError(null);
@@ -316,9 +295,8 @@ function StartContent() {
       lastSavedFormRef.current = JSON.stringify(form);
       setAutosaveStatus("saved");
 
-      if (step.id === "network") {
-        await sendInvites();
-      }
+      // Supporter addresses remain private planning data. Invitations require a
+      // separate explicit user action in the governed Support Network experience.
 
       if (isLast) {
         setCreating(true);
