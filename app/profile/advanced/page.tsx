@@ -203,9 +203,16 @@ export default function AdvancedScholarProfilePage() {
       ...profileUpdates,
       onboarding_data: mergedOnboarding,
     }).eq("id",profile.id).select("id").maybeSingle();
-    setSaving(false);
     if(error || !updated){
+      setSaving(false);
       setSaveError(error?.message || "Your profile changes could not be saved.");
+      return;
+    }
+    const { data: persisted, error: verifyError } = await supabase.from("profiles")
+      .select("onboarding_data").eq("id",profile.id).maybeSingle();
+    setSaving(false);
+    if(verifyError || !persisted || JSON.stringify(persisted.onboarding_data ?? {}) !== JSON.stringify(mergedOnboarding)){
+      setSaveError("The save could not be verified against your Playbook record. Please reload and check before leaving.");
       return;
     }
     setProfile((prev: LegacyValue) => ({ ...prev, ...profileUpdates, onboarding_data: mergedOnboarding }));
