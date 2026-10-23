@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { sendPlaybookEmail } from "@/lib/email/emailService";
 import { buildBrandVerificationEvidence } from "@/lib/brand-verification/policy";
 import { requirePlaybookRole } from "@/lib/roles/registry";
 import { requireUser } from "@/lib/supabase/server";
@@ -28,6 +29,9 @@ export async function POST() {
     if (!profile.data) return NextResponse.json({ error: "Brand Partner profile not found." }, { status: 404 });
     if (requirePlaybookRole(profile.data.profile_mode ?? profile.data.role) !== "brand-partner") return NextResponse.json({ error: "Brand verification is restricted to Brand Partner accounts." }, { status: 403 });
     if (!profile.data.onboarding_completed) return NextResponse.json({ error: "Complete Brand Partner onboarding before submitting verification." }, { status: 409 });
+    const existing = await supabase.from("brand_partner_verification_requests").select("id,status").eq("brand_user_id", user.id).maybeSingle();
+    if (existing.error) throw new Error(existing.error.message);
+    if (existing.data) return NextResponse.json({ ok: true, request: existing.data, activationState: "pending_verification", message: "Your Brand Partner verification request has already been received. Independent review remains pending." }, { status: 202 });
     const evidence = buildBrandVerificationEvidence((profile.data.onboarding_data ?? {}) as Record<string, unknown>);
     const result = await supabase.from("brand_partner_verification_requests").upsert({
       brand_user_id: user.id, organization_name: evidence.organizationName, partner_title: evidence.partnerTitle,
@@ -38,7 +42,19 @@ export async function POST() {
       reviewed_at: null, review_notes: null, updated_at: new Date().toISOString(),
     }, { onConflict: "brand_user_id" }).select("id,status,submitted_at,campaign_scope_approved,compliance_scope_approved").single();
     if (result.error) throw new Error(result.error.message);
-    return NextResponse.json({ ok: true, request: result.data, activationState: "pending_verification", message: "Brand Partner verification evidence was submitted. No campaign or NIL authority has been activated." }, { status: 202 });
+    // Notification only: possession of this mailbox never grants reviewer or approval authority.
+    // Do not put personal onboarding answers or a privileged approval link in the email.
+    try {
+      await sendPlaybookEmail({
+        to: "brandpartners@playbookseriesinc.org",
+        fromType: "notifications",
+        subject: "Playbook · New Brand Partner verification submitted",
+        text: `A Brand Partner verification request is awaiting independent review.\nOrganization: ${evidence.organizationName}\nRequest reference: ${result.data.id}\nStatus: pending\n\nSign in to an authorized Playbook administration workspace when one is available. This email is not an approval or an authorization to access private records.`,
+      });
+    } catch (notificationError) {
+      console.error("Brand Partner verification notification delivery failed", { requestId: result.data.id, error: notificationError instanceof Error ? notificationError.name : "unknown" });
+    }
+    return NextResponse.json({ ok: true, request: result.data, activationState: "pending_verification", message: "Brand Partner verification evidence was submitted for independent review. No campaign or NIL authority has been activated." }, { status: 202 });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Brand verification could not be submitted." }, { status: 400 });
   }
