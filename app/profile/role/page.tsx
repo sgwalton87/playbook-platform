@@ -26,7 +26,7 @@ const shell: React.CSSProperties = { minHeight: "100vh", background: "linear-gra
 const inputStyle: React.CSSProperties = { width: "100%", padding: "13px 14px", borderRadius: 12, border: "1px solid #cbd5e1", background: "#fff", color: "#0f172a", fontSize: 16, boxSizing: "border-box" };
 const labelStyle: React.CSSProperties = { display: "block", fontSize: 13, fontWeight: 700, marginBottom: 8 };
 
-export default function RoleProfilePage({ mode = "standard" }: { mode?: "standard" | "athlete" }) {
+export function RoleProfileEditor({ mode = "standard" }: { mode?: "standard" | "athlete" }) {
   const router = useRouter();
   const [profile, setProfile] = useState<SavedProfile | null>(null);
   const [role, setRole] = useState<PlaybookRole | null>(null);
@@ -240,3 +240,5 @@ export default function RoleProfilePage({ mode = "standard" }: { mode?: "standar
     </div>
   </main>;
 }
+
+export default function RoleProfilePage() { return <RoleProfileEditor />; }
