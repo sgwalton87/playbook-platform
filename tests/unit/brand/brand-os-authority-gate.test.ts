@@ -40,6 +40,13 @@ describe("Brand Partner OS authority gate", () => {
     expect(gate).toContain("campaign and compliance permissions remain restricted");
   });
 
+  it("notifies founders without granting approval authority or emailing on repeat submission", () => {
+    expect(api).toContain("brandpartners@playbookseriesinc.org");
+    expect(api).toContain("sendPlaybookEmail");
+    expect(api).toContain("if (existing.data) return NextResponse.json");
+    expect(api).toContain("No campaign or NIL authority has been activated.");
+  });
+
   it("keeps applicant submission fail-closed", () => {
     expect(api).toContain('!== "brand-partner"');
     expect(api).toContain("onboarding_completed");
