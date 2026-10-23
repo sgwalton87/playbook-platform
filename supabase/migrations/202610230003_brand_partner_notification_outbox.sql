@@ -70,4 +70,4 @@ begin
 end
 $$;
 revoke all on function public.finish_brand_partner_notification(uuid,integer,boolean,text) from PUBLIC, anon, authenticated;
-grant execute on function public.finish_brand_partner_notification(uuid,boolean,text) to service_role;
+grant execute on function public.finish_brand_partner_notification(uuid,integer,boolean,text) to service_role;
