@@ -23,7 +23,10 @@ export default function BrandPartnerAdminReview() {
     else { setError(""); setItems(data.requests || []); }
     setLoading(false);
   }
-  useEffect(() => { void reload(); }, []);
+  useEffect(() => {
+    const handle = window.setTimeout(() => { void reload(); }, 0);
+    return () => window.clearTimeout(handle);
+  }, []);
   async function decide(id: string, scope: string, decision: "approve" | "reject") {
     setBusy(true); setError("");
     try {
