@@ -5,7 +5,7 @@ import { getOnboardingSteps } from "@/lib/onboarding/engine";
 import { getRoleEditableFields } from "@/lib/onboarding/editableFields";
 
 const entry = readFileSync("app/profile/page.tsx", "utf8");
-const editor = readFileSync("app/profile/role/page.tsx", "utf8");
+const editor = readFileSync("components/profile/RoleProfileEditor.tsx", "utf8");
 const advanced = readFileSync("app/profile/advanced/page.tsx", "utf8");
 
 describe("modern profile release parity", () => {
