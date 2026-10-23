@@ -37,3 +37,6 @@ Automatic deployment of main is disabled by vercel.json; merging is NOT deployme
 - No live end-to-end founder approval run has been certified.
 
 This document authorizes neither a production migration nor creation of privileged user grants.
+
+## Isolated QA branch creation result — October 23, 2026
+The founder explicitly approved the quoted $0.01344/hour branch charge, and Supabase confirmed that rate. However, `create_branch` returned `PaymentRequiredException: Branching is supported only on the Pro plan or above`. No branch was created. Do not treat the approved price as an upgraded-plan authorization. Alternative: provision a separately approved, isolated QA project or use disposable local PostgreSQL/Supabase test infrastructure; do not run experimental migrations against production. Gates 2 and 4 remain blocked for live database acceptance until an isolated environment exists.
