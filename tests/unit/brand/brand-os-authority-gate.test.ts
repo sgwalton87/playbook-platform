@@ -10,6 +10,11 @@ const gate = fs.readFileSync(
   path.join(process.cwd(), "components/brand/BrandPartnerVerificationGate.tsx"),
   "utf8"
 );
+const worker = fs.readFileSync(path.join(process.cwd(), "app/api/internal/brand-partner-notifications/route.ts"), "utf8");
+const migrationDir = path.join(process.cwd(), "supabase/migrations");
+const outboxFile = fs.readdirSync(migrationDir).find((name) => name.endsWith("_brand_partner_notification_outbox.sql"));
+if (!outboxFile) throw new Error("Brand Partner notification outbox migration missing");
+const outbox = fs.readFileSync(path.join(migrationDir, outboxFile), "utf8");
 const api = fs.readFileSync(
   path.join(process.cwd(), "app/api/brand-verification/route.ts"),
   "utf8"
@@ -30,6 +35,35 @@ describe("Brand Partner OS authority gate", () => {
     expect(gate).toContain("hasApprovedCampaignScope: request.campaign_scope_approved");
     expect(gate).toContain("hasApprovedComplianceScope: request.compliance_scope_approved");
     expect(gate).toContain("return <>{children}</>");
+  });
+
+  it("keeps pending Brand Partners informed and able to edit their own profile", () => {
+    expect(gate).toContain("Your Brand Partner profile is complete");
+    expect(gate).toContain("Submit verification evidence");
+    expect(gate).toContain('href="/profile"');
+    expect(gate).toContain("View or edit my profile");
+    expect(gate).toContain("campaign and compliance permissions remain restricted");
+  });
+
+  it("notifies founders without granting approval authority or emailing on repeat submission", () => {
+    expect(worker).toContain("brandpartners@playbookseriesinc.org");
+    expect(worker).toContain("stephishawalton@gmail.com");
+    expect(worker).toContain("sycoywalton@playbookseriesinc.org");
+    expect(worker).toContain("sendPlaybookEmail");
+    expect(worker).toContain("BRAND_NOTIFICATION_WORKER_SECRET");
+    expect(outbox).toContain("create trigger brand_partner_request_notify");
+    expect(outbox).toContain("for update skip locked");
+    expect(outbox).toContain("and attempt_count = p_attempt_count");
+    expect(worker).toContain("p_attempt_count: item.attempt_count");
+    expect(outbox).toContain("revoke all on public.brand_partner_notification_outbox");
+    expect(api).not.toContain("sendPlaybookEmail");
+    expect(api).toContain("if (existing.data) return NextResponse.json");
+    expect(api).toContain('existing.data.status === "approved" ? "organization_approved"');
+    expect(api).toContain('existing.data.status === "rejected" ? "action_required"');
+    expect(api).toContain(".insert({");
+    expect(api).not.toContain(".upsert({");
+    expect(api).toContain('result.error.code === "23505"');
+    expect(api).toContain("No campaign or NIL authority has been activated.");
   });
 
   it("keeps applicant submission fail-closed", () => {

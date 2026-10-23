@@ -57,12 +57,12 @@ export default function BrandPartnerVerificationGate({ children }: { children: R
     return <>{children}</>;
   }
 
-  if (!request) return <Surface title="Submit Brand Partner verification" body="Verify organization identity, requested campaign types, and NIL/compliance acknowledgement before entering the Brand Partner workspace." message={message}><button onClick={() => void submit()} disabled={submitting} style={buttonStyle}>{submitting ? "Submitting…" : "Submit verification evidence"}</button></Surface>;
+  if (!request) return <Surface title="Your Brand Partner profile is complete" body="Your account is ready. Submit your organization and campaign information for independent review. You can manage your profile while the requested campaign and compliance permissions remain restricted." message={message}><button onClick={() => void submit()} disabled={submitting} style={buttonStyle}>{submitting ? "Submitting…" : "Submit verification evidence"}</button></Surface>;
 
   const rejected = request.status === "rejected";
   return <Surface
-    title={rejected ? "Brand Partner verification needs attention" : request.status === "under_review" ? "Brand Partner verification is under review" : request.status === "approved" ? "Organization verified · scopes still pending" : "Brand Partner verification is pending"}
-    body="The existing Brand Partner workspace remains preserved, but campaign creation, opportunities, scholar interactions, and NIL activity stay locked until organization identity, campaign scope, and compliance scope are all approved."
+    title={rejected ? "Your Brand Partner verification needs attention" : request.status === "under_review" ? "Your Brand Partner verification is under review" : request.status === "approved" ? "Organization verified · campaign permissions pending" : "Your Brand Partner profile is complete"}
+    body="Your submitted organization information is being reviewed. You can manage your profile now. Campaign publishing, opportunity management, participant interactions, and NIL activities will become available only after the necessary independent approvals."
     message={rejected ? request.review_notes : message}>
     <PlaybookCard eyebrow="Submitted evidence" title={request.organization_name}>
       {request.brand_category && <p style={bodyStyle}>Category: {request.brand_category}</p>}
@@ -74,7 +74,7 @@ export default function BrandPartnerVerificationGate({ children }: { children: R
 }
 
 function Surface({ title, body, message, children }: { title: string; body: string; message?: string | null; children?: React.ReactNode }) {
-  return <PlaybookPage><section style={surfaceStyle} data-testid="brand-verification-gate"><p style={eyebrowStyle}>Brand Partner OS · Independent verification</p><h1 style={titleStyle}>{title}</h1><p style={bodyStyle}>{body}</p>{message && <div style={noticeStyle}>{message}</div>}<div style={{ marginTop: 22 }}>{children}</div><div style={routeStyle}>Canonical destination: <strong>/brand-partner-os</strong></div></section></PlaybookPage>;
+  return <PlaybookPage><section style={surfaceStyle} data-testid="brand-verification-gate"><p style={eyebrowStyle}>Brand Partner OS · Independent verification</p><h1 style={titleStyle}>{title}</h1><p style={bodyStyle}>{body}</p>{message && <div style={noticeStyle}>{message}</div>}<div style={{ marginTop: 22 }}>{children}</div><div style={{ marginTop: 20 }}><PlaybookButton href="/profile">View or edit my profile</PlaybookButton></div><div style={routeStyle}>Canonical destination: <strong>/brand-partner-os</strong></div></section></PlaybookPage>;
 }
 const surfaceStyle: React.CSSProperties = { maxWidth: 900, margin: "40px auto", padding: "clamp(28px,5vw,52px)", borderRadius: 28, background: "#071A33", color: "#FFFFFF" };
 const eyebrowStyle: React.CSSProperties = { margin: 0, fontSize: 11, fontWeight: 900, letterSpacing: ".14em", textTransform: "uppercase", color: "#FF9A6C" };

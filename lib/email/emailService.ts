@@ -3,6 +3,7 @@ import { getEmailSender } from "./emailConfig";
 
 export async function sendPlaybookEmail(input: {
   to: string;
+  cc?: string;
   subject: string;
   text: string;
   html?: string;
@@ -21,6 +22,7 @@ export async function sendPlaybookEmail(input: {
   return transporter.sendMail({
     from: getEmailSender(input.fromType || "onboarding"),
     to: input.to,
+    cc: input.cc,
     subject: input.subject,
     text: input.text,
     html: input.html,

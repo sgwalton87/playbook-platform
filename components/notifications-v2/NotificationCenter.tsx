@@ -80,11 +80,13 @@ export default function NotificationCenter() {
   const verification = notifications.filter((item) => !item.read && item.type === "verification").length;
 
   async function act(payload: Record<string, unknown>) {
+    if (payload.action === "PREFERENCE") setStatus("Saving communication preference…");
     setError("");
     const response = await fetch("/api/notifications", { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) });
     const result = await response.json() as { error?: string };
-    if (!response.ok) { setError(result.error ?? "Notification action failed."); return; }
+    if (!response.ok) { setError(result.error ?? "Notification action failed."); setStatus("Preference was not saved."); return; }
     await reload();
+    if (payload.action === "PREFERENCE") setStatus("Communication preference saved.");
   }
 
   return (

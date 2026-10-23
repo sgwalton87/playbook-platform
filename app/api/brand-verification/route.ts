@@ -28,17 +28,25 @@ export async function POST() {
     if (!profile.data) return NextResponse.json({ error: "Brand Partner profile not found." }, { status: 404 });
     if (requirePlaybookRole(profile.data.profile_mode ?? profile.data.role) !== "brand-partner") return NextResponse.json({ error: "Brand verification is restricted to Brand Partner accounts." }, { status: 403 });
     if (!profile.data.onboarding_completed) return NextResponse.json({ error: "Complete Brand Partner onboarding before submitting verification." }, { status: 409 });
+    const existing = await supabase.from("brand_partner_verification_requests").select("id,status").eq("brand_user_id", user.id).maybeSingle();
+    if (existing.error) throw new Error(existing.error.message);
+    if (existing.data) return NextResponse.json({ ok: true, request: existing.data, activationState: existing.data.status === "approved" ? "organization_approved" : existing.data.status === "rejected" ? "action_required" : "pending_verification", message: existing.data.status === "approved" ? "Your organization verification has been approved. Any outstanding campaign or compliance permissions remain independently gated." : existing.data.status === "rejected" ? "Your verification request needs attention. Review the decision and available next steps." : "Your Brand Partner verification request has already been received. Independent review remains pending." }, { status: 202 });
     const evidence = buildBrandVerificationEvidence((profile.data.onboarding_data ?? {}) as Record<string, unknown>);
-    const result = await supabase.from("brand_partner_verification_requests").upsert({
+    const result = await supabase.from("brand_partner_verification_requests").insert({
       brand_user_id: user.id, organization_name: evidence.organizationName, partner_title: evidence.partnerTitle,
       brand_category: evidence.brandCategory, partnership_goals: evidence.partnershipGoals, target_audience: evidence.targetAudience,
       monthly_budget_range: evidence.monthlyBudgetRange, nil_acknowledgement: evidence.nilAcknowledgement,
       campaign_types: evidence.campaignTypes, approval_contact: evidence.approvalContact,
       campaign_scope_approved: false, compliance_scope_approved: false, status: "pending",
       reviewed_at: null, review_notes: null, updated_at: new Date().toISOString(),
-    }, { onConflict: "brand_user_id" }).select("id,status,submitted_at,campaign_scope_approved,compliance_scope_approved").single();
-    if (result.error) throw new Error(result.error.message);
-    return NextResponse.json({ ok: true, request: result.data, activationState: "pending_verification", message: "Brand Partner verification evidence was submitted. No campaign or NIL authority has been activated." }, { status: 202 });
+    }).select("id,status,submitted_at,campaign_scope_approved,compliance_scope_approved").single();
+    if (result.error) {
+      // A concurrent submission may have won the unique brand_user_id constraint.
+      // Never overwrite approval state when that happens.
+      if (result.error.code === "23505") return NextResponse.json({ ok: true, activationState: "pending_verification", message: "Your verification request has already been received." }, { status: 202 });
+      throw new Error(result.error.message);
+    }
+    // Database insert trigger atomically queues the founder notification.\n    // A separate privileged worker handles durable delivery and retry.\n    return NextResponse.json({ ok: true, request: result.data, activationState: "pending_verification", message: "Brand Partner verification evidence was submitted for independent review. No campaign or NIL authority has been activated." }, { status: 202 });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Brand verification could not be submitted." }, { status: 400 });
   }
