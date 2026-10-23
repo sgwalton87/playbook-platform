@@ -124,6 +124,16 @@ export async function POST(req: NextRequest) {
       url: email.url,
     });
 
+    // Preserve the saved private invitation even when email service is unconfigured.
+    // Never claim delivery or leak SMTP credentials to the browser.
+    if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+      return NextResponse.json({
+        ok: true, invitation: record, email,
+        deliveryStatus: "failed",
+        deliveryError: "Invitation saved, but email delivery is not configured. The invited person can sign in and open /invitations/received using the exact invited email.",
+      }, { status: 202 });
+    }
+
     try {
       await sendPlaybookEmail({
         to: record.inviteeEmail,
