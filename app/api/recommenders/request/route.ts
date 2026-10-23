@@ -9,6 +9,21 @@ import {
 } from "@/lib/recommenders";
 import { requireUser } from "@/lib/supabase/server";
 
+export async function GET() {
+  try {
+    const { supabase, user } = await requireUser();
+    if (!user) return NextResponse.json({error:"Authentication required."},{status:401});
+    await requireLearnerAuthority(supabase,user.id,{requireOnboarding:true});
+    const {data,error}=await supabase.from("recommender_requests")
+      .select("id,recommender_name,recommender_email,recommender_role,opportunity_name,status,created_at")
+      .eq("scholar_id",user.id).order("created_at",{ascending:false}).limit(100);
+    if(error) throw new Error(error.message);
+    return NextResponse.json({requests:data??[]});
+  } catch {
+    return NextResponse.json({error:"Unable to load recommendation requests."},{status:503});
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { supabase, user } = await requireUser();
@@ -45,7 +60,7 @@ export async function POST(req: NextRequest) {
       evidence,
     });
 
-    const sent = updateRecommenderRequestStatus(request, "sent");
+    const draft = updateRecommenderRequestStatus(request, "draft");
     const { data, error } = await supabase
       .from("recommender_requests")
       .insert({
@@ -56,7 +71,7 @@ export async function POST(req: NextRequest) {
         recommender_role: request.recommenderRole,
         opportunity_name: request.opportunityName,
         evidence: request.evidence,
-        status: sent.status,
+        status: draft.status,
       })
       .select("id,scholar_id,scholar_name,recommender_name,recommender_email,recommender_role,opportunity_name,status,created_at")
       .single();
@@ -76,9 +91,12 @@ export async function POST(req: NextRequest) {
       fromType: "onboarding",
     });
 
+    const marked = await supabase.from("recommender_requests").update({status:"sent"}).eq("id",data.id).eq("scholar_id",user.id);
+    if(marked.error) return NextResponse.json({error:"Email accepted but status synchronization failed; check requests before retrying."},{status:503});
+
     return NextResponse.json({
       ok: true,
-      request: data,
+      request: {...data,status:"sent"},
       email,
       deliveryStatus: "sent",
       eventState: "governed_event_publisher_pending",
