@@ -121,6 +121,7 @@ function conversationLabel(conversation: Conversation) {
 export default function InboxV2() {
   const searchParams = useSearchParams();
   const requestedPeerId = searchParams.get("peer") ?? "";
+  const requestedSupportId = searchParams.get("support") ?? "";
   const requestedGroupId = searchParams.get("group") ?? "";
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeId, setActiveId] = useState("");
@@ -180,9 +181,10 @@ export default function InboxV2() {
 
     setConversations(combined);
     setBlockStates(nextBlockStates);
-    setActiveId(current => requestedGroup?.id || network?.id || current || combined[0]?.id || "");
+    const requestedSupport = combined.find(item => item.conversation_kind === "support" && item.relationship?.id === requestedSupportId);
+    setActiveId(current => requestedGroup?.id || network?.id || requestedSupport?.id || current || combined[0]?.id || "");
     setStatus(combined.length ? "Governed messages are current." : "No governed conversations yet.");
-  }, [requestedGroupId, requestedPeerId]);
+  }, [requestedGroupId, requestedPeerId, requestedSupportId]);
 
   useEffect(() => {
     let mounted = true;

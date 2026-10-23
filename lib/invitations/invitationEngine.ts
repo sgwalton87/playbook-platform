@@ -57,6 +57,7 @@ export function destinationForRelationship(relationship: RelationshipKind) {
     college_recruiter: getRoleDestination("college-coach"),
     college_admissions: getRoleDestination("college-admissions"),
     community_partner: getRoleDestination("other"),
+    brand_partner: getRoleDestination("brand-partner"),
     // Legacy compatibility only. New invitation creation should select the
     // exact Recruiting or Admissions relationship identity instead.
     university_partner: "/university-os",

@@ -237,10 +237,11 @@
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 4px;
-    position: fixed;
-    left: 10px;
-    right: 10px;
-    bottom: max(10px, env(safe-area-inset-bottom));
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    margin: 18px 10px max(12px, env(safe-area-inset-bottom));
     z-index: 30;
     min-height: var(--pb-mobile-nav-height);
     padding: 8px;

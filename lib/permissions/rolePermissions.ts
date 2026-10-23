@@ -21,6 +21,7 @@ export type RelationshipKind =
   | "college_recruiter"
   | "college_admissions"
   | "community_partner"
+  | "brand_partner"
   | "university_partner"
   | "employer_partner";
 
@@ -39,6 +40,7 @@ export function getPermissionsForRelationship(kind: RelationshipKind): Permissio
     college_recruiter: [],
     college_admissions: [],
     community_partner: [],
+    brand_partner: [],
     // Legacy compatibility identity. New invitations must use the exact
     // Recruiting or Admissions relationship instead.
     university_partner: [],
@@ -64,6 +66,7 @@ export function getRelationshipGraph() {
     { name: "College Coach / Recruiter", relationship: "college_recruiter", permissions: getPermissionsForRelationship("college_recruiter") },
     { name: "College Admissions", relationship: "college_admissions", permissions: getPermissionsForRelationship("college_admissions") },
     { name: "Community Partner", relationship: "community_partner", permissions: getPermissionsForRelationship("community_partner") },
+    { name: "Brand Partner", relationship: "brand_partner", permissions: getPermissionsForRelationship("brand_partner") },
     { name: "Legacy University Partner", relationship: "university_partner", permissions: getPermissionsForRelationship("university_partner") },
     { name: "Employer Partner", relationship: "employer_partner", permissions: getPermissionsForRelationship("employer_partner") },
   ];

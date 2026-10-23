@@ -14,12 +14,19 @@ export async function GET() {
 
     if (result.error) throw new Error(result.error.message);
 
+    // Owner-scoped read-only projection reveals only active supporters' avatars.
+    const avatarResult = await supabase.rpc("get_active_supporter_avatars");
+    const avatars = new Map<string, string>((avatarResult.error ? [] : avatarResult.data ?? []).map(
+      (item: { supporter_id: string; avatar_url: string }) => [item.supporter_id, item.avatar_url]
+    ));
+
     return NextResponse.json({
       ok: true,
       userId: user.id,
       relationships: (result.data ?? []).map((relationship) => ({
         ...relationship,
         perspective: relationship.scholar_id === user.id ? "scholar" : "supporter",
+        avatar_url: relationship.scholar_id === user.id && relationship.status === "active" ? avatars.get(relationship.supporter_id ?? "") ?? null : null,
       })),
     });
   } catch (error) {

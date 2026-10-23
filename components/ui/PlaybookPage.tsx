@@ -19,7 +19,7 @@ export function PlaybookPage({
 const normalizedPageStyle: React.CSSProperties = {
   ...pageShellStyle,
   paddingTop: 24,
-  paddingBottom: 36,
+  paddingBottom: "calc(180px + env(safe-area-inset-bottom))",
 };
 
 export function PlaybookHero({
@@ -119,8 +119,10 @@ const hero: React.CSSProperties = {
 
 const titleStyle: React.CSSProperties = {
   margin: "12px 0",
+  overflowWrap: "anywhere",
+  maxWidth: "100%",
   fontFamily: "Anton, var(--pb-font)",
-  fontSize: "clamp(46px,7vw,86px)",
+  fontSize: "clamp(34px,7vw,86px)",
   fontWeight: 400,
   lineHeight: .92,
   letterSpacing: "-.015em",
