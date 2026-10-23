@@ -50,7 +50,7 @@ begin
   insert into public.recommendation_letter_artifacts
     (request_id,scholar_id,recommender_id,confidentiality,letter_text,sha256)
     values(p_request_id,r.scholar_id,auth.uid(),p_confidentiality,trim(p_letter),
-    encode(extensions.digest(convert_to(trim(p_letter),'UTF8'),'sha256'),'hex'))
+    encode(pg_catalog.sha256(pg_catalog.convert_to(trim(p_letter),'UTF8')),'hex'))
     returning id into v_id;
   -- Metadata only; NEVER include confidential letter text or storage URLs here.
   insert into public.scholar_vault_items
