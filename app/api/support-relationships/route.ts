@@ -14,12 +14,20 @@ export async function GET() {
 
     if (result.error) throw new Error(result.error.message);
 
+    const activeSupporterIds = [...new Set((result.data ?? []).filter((item) => item.status === "active" && item.scholar_id === user.id && item.supporter_id).map((item) => item.supporter_id as string))];
+    const avatarResult = activeSupporterIds.length
+      ? await supabase.from("profiles").select("id,avatar_url").in("id", activeSupporterIds)
+      : null;
+    // RLS determines which profile photos may be exposed. Missing or denied photos use initials.
+    const avatars = new Map((avatarResult?.error ? [] : avatarResult?.data ?? []).map((profile) => [profile.id, profile.avatar_url]));
+
     return NextResponse.json({
       ok: true,
       userId: user.id,
       relationships: (result.data ?? []).map((relationship) => ({
         ...relationship,
         perspective: relationship.scholar_id === user.id ? "scholar" : "supporter",
+        avatar_url: relationship.scholar_id === user.id && relationship.status === "active" ? avatars.get(relationship.supporter_id ?? "") ?? null : null,
       })),
     });
   } catch (error) {
