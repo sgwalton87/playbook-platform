@@ -6,7 +6,7 @@ import {
   updateInvitationStatus,
 } from "@/lib/invitations";
 import InvitationCenter from "@/components/invitations/InvitationCenter";
-import { normalizePlaybookRole } from "@/lib/roles/registry";
+import { requirePlaybookRole } from "@/lib/roles/registry";
 
 describe("Role Invitations", () => {
   it("preserves governed Mentor permissions and destination", () => {
@@ -56,9 +56,10 @@ describe("Role Invitations", () => {
 
   it("normalizes stored Scholar-Athlete identities before invitation authorization", () => {
     const permitted = new Set(["scholar", "scholar-athlete", "transition-youth"]);
-    expect(permitted.has(normalizePlaybookRole("scholar_athlete"))).toBe(true);
-    expect(permitted.has(normalizePlaybookRole("scholar-athlete"))).toBe(true);
-    expect(permitted.has(normalizePlaybookRole("family"))).toBe(false);
+    expect(permitted.has(requirePlaybookRole("scholar_athlete"))).toBe(true);
+    expect(permitted.has(requirePlaybookRole("scholar-athlete"))).toBe(true);
+    expect(permitted.has(requirePlaybookRole("family"))).toBe(false);
+    expect(() => requirePlaybookRole("unknown_role")).toThrow("Unsupported Playbook role");
   });
 
   it("component is defined", () => {
