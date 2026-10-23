@@ -816,8 +816,9 @@ const agreeRow: React.CSSProperties = {
   alignItems: "center",
   fontSize: 18,
   fontWeight: 950,
-  background: "#FFF7ED",
-  border: "1px solid #FED7AA",
+  background: "#FFFFFF",
+  color: "#10213A",
+  border: "2px solid #F97316",
   borderRadius: 18,
   padding: 16,
 };
