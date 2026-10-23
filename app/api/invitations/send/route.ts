@@ -6,7 +6,7 @@ import {
 } from "@/lib/invitations/server";
 import type { RelationshipKind } from "@/lib/permissions";
 import { buildSupportInvitationEmail, sendPlaybookEmail } from "@/lib/email";
-import { normalizePlaybookRole } from "@/lib/roles/registry";
+import { requirePlaybookRole } from "@/lib/roles/registry";
 import { requireUser } from "@/lib/supabase/server";
 
 const RELATIONSHIP_KINDS = new Set<RelationshipKind>([
@@ -52,9 +52,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: inviterProfile.error.message }, { status: 400 });
     }
 
-    const inviterRole = normalizePlaybookRole(
-      inviterProfile.data?.profile_mode ?? inviterProfile.data?.role
-    );
+    let inviterRole: string;
+    try {
+      inviterRole = requirePlaybookRole(inviterProfile.data?.profile_mode ?? inviterProfile.data?.role);
+    } catch {
+      return NextResponse.json({ error: "A valid Scholar Record role is required to send invitations." }, { status: 403 });
+    }
     if (!SCHOLAR_RECORD_ROLES.has(inviterRole)) {
       return NextResponse.json(
         { error: "Only a self-owned Scholar Record account may invite members into its support system." },
