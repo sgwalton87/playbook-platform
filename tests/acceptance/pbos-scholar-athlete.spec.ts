@@ -84,7 +84,19 @@ test("Scholar-Athlete completes governed onboarding into an owner-scoped athlete
   await page.goto("/login");
   await page.getByRole("textbox", { name: "Email", exact: true }).fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);
-  await page.getByRole("button", { name: "Log In", exact: true }).click();
+  // Production login requires a human-verifiable hCaptcha token. Do not silently
+    // bypass that security control or wait two minutes on a disabled button.
+    const loginButton = page.getByRole("button", { name: "Log In", exact: true });
+    if (await loginButton.isDisabled()) {
+      const securityState = await page.getByRole("status").allTextContents();
+      throw new Error(
+        "TRUSTED_LOGIN_CAPTCHA_REQUIRED: The production Log In button is disabled until a valid hCaptcha challenge is completed. " +
+        "This headless journey cannot certify password login. Configure an approved interactive CAPTCHA acceptance path, " +
+        "and verify the challenge with a real user; do not disable CAPTCHA. Security state: " +
+        securityState.join(" | ").slice(0, 240)
+      );
+    }
+    await loginButton.click();
   await page.waitForURL(/\/start/);
   await expect(page.getByText("Start Here · scholar-athlete", { exact: true })).toBeVisible();
 
