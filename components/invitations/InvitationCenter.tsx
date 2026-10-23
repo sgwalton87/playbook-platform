@@ -1,180 +1,82 @@
 "use client";
 
-import { useState } from "react";
-import {
-  getDemoInvitations,
-  updateInvitationStatus,
-  type SupportInvitation,
-} from "@/lib/invitations";
-import type { RelationshipKind } from "@/lib/permissions";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
 
-const relationships: { label: string; value: RelationshipKind }[] = [
-  { label: "Family / Guardian", value: "parent_guardian" },
-  { label: "Educator", value: "educator" },
-  { label: "High School Counselor", value: "counselor" },
-  { label: "Mentor", value: "mentor" },
-  { label: "Coach", value: "coach" },
-  { label: "District Administrator", value: "district_admin" },
-  { label: "College Coach / Recruiter", value: "college_recruiter" },
-  { label: "College Admissions", value: "college_admissions" },
-  { label: "Community Partner", value: "community_partner" },
-  { label: "Employer Partner", value: "employer_partner" },
-];
-
-const ZERO_DATA_RELATIONSHIPS = new Set<RelationshipKind>([
-  "educator",
-  "counselor",
-  "coach",
-  "district_admin",
-  "college_recruiter",
-  "college_admissions",
-  "community_partner",
-  "employer_partner",
-]);
+type InviteResult = {
+  invitation?: { id: string; inviteeName: string; inviteeEmail: string };
+  email?: { url?: string };
+  deliveryStatus?: string;
+  deliveryError?: string;
+  error?: string;
+};
 
 export default function InvitationCenter() {
-  const [inviteeName, setInviteeName] = useState("Coach Taylor");
-  const [inviteeEmail, setInviteeEmail] = useState("coach@example.com");
-  const [relationship, setRelationship] = useState<RelationshipKind>("coach");
-  const [invitations, setInvitations] = useState<SupportInvitation[]>(getDemoInvitations());
+  const [authorized, setAuthorized] = useState<boolean | null>(null);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [result, setResult] = useState<InviteResult | null>(null);
 
-  async function sendInvite() {
-    const res = await fetch("/api/invitations/send", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        inviteeName,
-        inviteeEmail,
-        relationship,
-        scholarName: "Scholar",
-      }),
-    });
+  useEffect(() => {
+    let mounted = true;
+    void (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { if (mounted) setAuthorized(false); return; }
+      const profile = await supabase.from("profiles").select("role,profile_mode").eq("id", user.id).maybeSingle();
+      const role = profile.data?.profile_mode ?? profile.data?.role;
+      if (mounted) setAuthorized(!profile.error && ["scholar", "scholar-athlete", "transition-youth"].includes(role ?? ""));
+    })();
+    return () => { mounted = false; };
+  }, []);
 
-    const json = await res.json();
-
-    if (!res.ok) {
-      console.error(json.error);
-      return;
-    }
-
-    setInvitations((current) => [json.invitation, ...current]);
-  }
-
-  function changeStatus(id: string, status: "accepted" | "declined") {
-    setInvitations(invitations.map(invite => invite.id === id ? updateInvitationStatus(invite, status) : invite));
+  async function sendInvitation(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setBusy(true);
+    setError("");
+    setResult(null);
+    try {
+      const response = await fetch("/api/invitations/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ inviteeName: name.trim(), inviteeEmail: email.trim(), relationship: "parent_guardian" }),
+      });
+      const payload: InviteResult = await response.json();
+      if (!response.ok) throw new Error(payload.error || "Unable to create invitation.");
+      setResult(payload);
+    } catch (failure) {
+      setError(failure instanceof Error ? failure.message : "Unable to create invitation.");
+    } finally { setBusy(false); }
   }
 
   return (
-    <main style={page}>
-      <section style={hero}>
-        <p style={eyebrow}>Role Invitations</p>
-        <h1 style={title}>Invite the scholar support network.</h1>
-        <p style={sub}>
-          Scholars choose the exact relationship they are inviting. Counselor, Recruiting, Admissions, Community, Coach, Educator, District, and Employer invitations route to distinct Operating Systems and begin with zero Scholar-data authority until their independent verification contracts are satisfied.
-        </p>
-      </section>
-
-      <section style={grid}>
-        <article style={card}>
-          <p style={eyebrow}>Create Invite</p>
-          <h2 style={cardTitle}>Add support person</h2>
-
-          <label style={label}>Name</label>
-          <input value={inviteeName} onChange={e => setInviteeName(e.target.value)} style={input} />
-
-          <label style={label}>Email</label>
-          <input value={inviteeEmail} onChange={e => setInviteeEmail(e.target.value)} style={input} />
-
-          <label style={label}>Relationship</label>
-          <select value={relationship} onChange={e => setRelationship(e.target.value as RelationshipKind)} style={input}>
-            {relationships.map(item => (
-              <option key={item.value} value={item.value}>{item.label}</option>
-            ))}
-          </select>
-
-          {ZERO_DATA_RELATIONSHIPS.has(relationship) && (
-            <p style={authorityNotice}>
-              This invitation identifies the relationship and correct OS only. It grants no Scholar-data permissions until the invited role completes its independent verification and scope requirements.
-            </p>
-          )}
-
-          <button onClick={sendInvite} style={button}>Send invite</button>
-        </article>
-
-        <article style={card}>
-          <p style={eyebrow}>Support Network Invites</p>
-          <h2 style={cardTitle}>Pending, accepted, declined</h2>
-
-          <div style={{ display: "grid", gap: 12 }}>
-            {invitations.map(invite => (
-              <div key={invite.id} style={inviteCard}>
-                <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
-                  <strong>{invite.inviteeName}</strong>
-                  <span style={statusBadge(invite.status)}>{invite.status}</span>
-                </div>
-
-                <p style={body}>{invite.inviteeEmail}</p>
-                <p style={body}>{invite.relationship.replaceAll("_", " ")} → {invite.destination}</p>
-
-                <div style={chips}>
-                  {invite.permissions.length === 0 ? (
-                    <span style={neutralChip}>relationship identity only · no Scholar data</span>
-                  ) : invite.permissions.slice(0, 4).map(permission => (
-                    <span key={permission} style={chip}>{permission.replaceAll("_", " ")}</span>
-                  ))}
-                </div>
-
-                {invite.status === "pending" && (
-                  <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
-                    <button onClick={() => changeStatus(invite.id, "accepted")} style={smallButton}>Accept</button>
-                    <button onClick={() => changeStatus(invite.id, "declined")} style={smallButtonGhost}>Decline</button>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </article>
+    <main style={{ minHeight: "100vh", padding: "clamp(20px,4vw,52px)", background: "#07182D", color: "#fff" }}>
+      <section style={{ maxWidth: 720, margin: "0 auto", padding: "clamp(24px,4vw,42px)", background: "#102540", border: "1px solid #36506E", borderRadius: 24 }}>
+        <p style={{ color: "#FF9A6C", fontWeight: 800, letterSpacing: 2, fontSize: 12 }}>SCHOLAR SUPPORT NETWORK</p>
+        <h1 style={{ fontSize: "clamp(30px,4vw,48px)", lineHeight: 1.12 }}>Invite a Parent or Guardian</h1>
+        <p style={{ lineHeight: 1.6, color: "#D2DEEF" }}>You decide who can support your journey. An invitation never gives someone ownership of your record. The invited adult must sign in using the exact invited email and accept before their Family OS access is activated.</p>
+        {authorized === null && <p role="status">Checking your Scholar account…</p>}
+        {authorized === false && <p role="alert">Only a signed-in Scholar, Scholar-Athlete, or Transition Youth account can create a Parent/Guardian invitation. Sign into the Scholar account to continue.</p>}
+        {authorized && (
+          <form onSubmit={sendInvitation} style={{ display: "grid", gap: 16, marginTop: 24 }}>
+            <label htmlFor="guardian-name">Parent/Guardian name</label>
+            <input id="guardian-name" required value={name} onChange={event => setName(event.target.value)} autoComplete="name" style={field} />
+            <label htmlFor="guardian-email">Parent/Guardian email</label>
+            <input id="guardian-email" required type="email" value={email} onChange={event => setEmail(event.target.value)} autoComplete="email" style={field} />
+            <button disabled={busy} type="submit" style={button}>{busy ? "Creating invitation…" : "Send Parent/Guardian invitation"}</button>
+          </form>
+        )}
+        {error && <p role="alert" style={{ color: "#FFC1AD" }}>{error}</p>}
+        {result && <div role="status" style={{ marginTop: 24, padding: 18, borderRadius: 14, background: "#1C3551" }}>
+          <strong>Invitation created for {result.invitation?.inviteeName}.</strong>
+          <p>{result.deliveryStatus === "sent" ? "The invitation email was sent." : "Email delivery was not confirmed. Use the secure invitation link below to share it privately with the invited person."}</p>
+          {result.email?.url && <p><a style={{ color: "#FFC28C", overflowWrap: "anywhere" }} href={result.email.url}>Open invitation link</a> — share only with the intended recipient.</p>}
+        </div>}
+        <p style={{ marginTop: 22, fontSize: 13, color: "#ABBED2" }}>The Family relationship grants only progress, deadlines and support-task permissions. Access can be revoked.</p>
       </section>
     </main>
   );
 }
-
-function statusBadge(status: string): React.CSSProperties {
-  const colors: Record<string, string> = {
-    pending: "#F97316",
-    accepted: "#10B981",
-    declined: "#64748B",
-  };
-
-  return {
-    background: colors[status] || "#64748B",
-    color: "#fff",
-    borderRadius: 999,
-    padding: "5px 8px",
-    fontSize: 11,
-    fontWeight: 950,
-    textTransform: "uppercase",
-  };
-}
-
-const page: React.CSSProperties = { minHeight:"100vh", background:"#F8F7F4", padding:32, fontFamily:"system-ui, sans-serif" };
-const hero: React.CSSProperties = { maxWidth:1120, margin:"0 auto 18px", background:"#0F172A", color:"#fff", borderRadius:30, padding:34 };
-const eyebrow: React.CSSProperties = { fontSize:11, letterSpacing:".14em", textTransform:"uppercase", fontWeight:950, color:"#F97316", margin:0 };
-const title: React.CSSProperties = { fontSize:54, lineHeight:1, margin:"12px 0" };
-const sub: React.CSSProperties = { color:"#CBD5E1", fontSize:17, lineHeight:1.6, maxWidth:820 };
-const grid: React.CSSProperties = { maxWidth:1120, margin:"0 auto", display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(340px,1fr))", gap:16 };
-const card: React.CSSProperties = { background:"#fff", border:"1px solid #E2E8F0", borderRadius:24, padding:24, boxShadow:"0 16px 40px rgba(15,23,42,.06)" };
-const cardTitle: React.CSSProperties = { color:"#0F172A", fontSize:26, margin:"8px 0 16px" };
-const label: React.CSSProperties = { display:"block", color:"#0F172A", fontWeight:850, fontSize:13, margin:"12px 0 6px" };
-const input: React.CSSProperties = { width:"100%", boxSizing:"border-box", border:"1px solid #E2E8F0", borderRadius:14, padding:12, fontSize:14 };
-const button: React.CSSProperties = { marginTop:16, background:"#F97316", color:"#fff", border:"none", borderRadius:999, padding:"11px 14px", fontWeight:950, cursor:"pointer" };
-const inviteCard: React.CSSProperties = { border:"1px solid #E2E8F0", borderRadius:18, padding:16 };
-const body: React.CSSProperties = { color:"#64748B", fontSize:13, lineHeight:1.5, margin:"6px 0" };
-const chips: React.CSSProperties = { display:"flex", flexWrap:"wrap", gap:8, marginTop:10 };
-const chip: React.CSSProperties = { background:"#FFF7ED", border:"1px solid #FED7AA", color:"#9A3412", borderRadius:999, padding:"6px 9px", fontSize:11, fontWeight:800 };
-const neutralChip: React.CSSProperties = { background:"#F8FAFC", border:"1px solid #CBD5E1", color:"#334155", borderRadius:999, padding:"6px 9px", fontSize:11, fontWeight:800 };
-const authorityNotice: React.CSSProperties = { margin:"12px 0 0", padding:12, borderRadius:12, background:"#F8FAFC", border:"1px solid #CBD5E1", color:"#475569", fontSize:12, lineHeight:1.5 };
-const smallButton: React.CSSProperties = { background:"#10B981", color:"#fff", border:"none", borderRadius:999, padding:"8px 10px", fontWeight:900, cursor:"pointer" };
-const smallButtonGhost: React.CSSProperties = { background:"#F8FAFC", color:"#0F172A", border:"1px solid #E2E8F0", borderRadius:999, padding:"8px 10px", fontWeight:900, cursor:"pointer" };
+const field: React.CSSProperties = { width: "100%", boxSizing: "border-box", borderRadius: 10, background: "#fff", color: "#07182D", padding: 13, border: "1px solid #A3B3C8", fontSize: 16 };
+const button: React.CSSProperties = { background: "#F97338", color: "#fff", padding: 14, borderRadius: 12, fontWeight: 800, border: "none", cursor: "pointer" };

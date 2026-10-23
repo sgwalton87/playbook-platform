@@ -146,6 +146,7 @@ export default function ScholarAthleteDashboard() {
           <div style={heroActions}>
             <PlaybookButton href="/academic-readiness">See my next play</PlaybookButton>
             <PlaybookButton href="/opportunities" variant="secondary">Explore opportunities</PlaybookButton>
+            <PlaybookButton href="/invitations" variant="secondary">Invite Parent/Guardian</PlaybookButton>
           </div>
         </PlaybookHero>
 
