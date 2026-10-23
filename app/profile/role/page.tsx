@@ -1,3 +1,4 @@
+import { stableProfileSnapshot } from "@/lib/onboarding/stableSnapshot";
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -121,7 +122,7 @@ export default function RoleProfilePage({ mode = "standard" }: { mode?: "standar
       setNotice("Unable to check for newer changes. Please reload before saving.");
       return;
     }
-    if (JSON.stringify(latest.onboarding_data ?? {}) !== JSON.stringify(profile.onboarding_data ?? {})) {
+    if (stableProfileSnapshot(latest.onboarding_data) !== stableProfileSnapshot(profile.onboarding_data)) {
       setSaving(false);
       setNotice("Your profile was updated elsewhere. Reload to review those changes before saving.");
       return;
@@ -142,7 +143,7 @@ export default function RoleProfilePage({ mode = "standard" }: { mode?: "standar
       .select("onboarding_data,first_name,last_name,full_name").eq("id", profile.id).maybeSingle();
     setSaving(false);
     if (verifyError || !persisted ||
-        JSON.stringify(persisted.onboarding_data ?? {}) !== JSON.stringify(updatedAnswers) ||
+        stableProfileSnapshot(persisted.onboarding_data) !== stableProfileSnapshot(updatedAnswers) ||
         (persisted.first_name ?? "") !== firstName ||
         (persisted.last_name ?? "") !== lastName) {
       setNotice("Save could not be verified. Your changes may not be stored. Please reload and confirm before leaving.");
