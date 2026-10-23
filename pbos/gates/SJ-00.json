@@ -1,0 +1,25 @@
+{
+  "id": "SJ-00",
+  "title": "Authorize one Scholar Record projection",
+  "status": "proposed",
+  "priority": 100,
+  "dependencies": [],
+  "handbook_refs": [
+    "docs/MASTER_CHECKLIST.md",
+    "docs/ENGINEERING/PBOS_SCHOLAR_JOURNEY_CANONICAL_BUILD_CONTRACT.md",
+    "docs/RELEASE_PROCESS.md"
+  ],
+  "tasks": [
+    "Record adapter joins owner-scoped identity, academics, service, awards, leadership, evidence, credentials and reflection with provenance and guardian policy",
+    "Open isolated scoped PR, record evidence in Command Center, preserve existing canonical data and role permissions"
+  ],
+  "definition_of_done": [
+    "RLS, data fidelity, minors and cross-scholar denial",
+    "Exact implementation SHA, migrations, test evidence and governed acceptance recorded; no unapproved production deploy"
+  ],
+  "validation": [
+    "RLS, data fidelity, minors and cross-scholar denial",
+    "CI, Database Certification, Platform QA and role-based isolated/browser verification before release"
+  ],
+  "next_gate": "SJ-01"
+}
