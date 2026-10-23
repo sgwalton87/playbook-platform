@@ -58,6 +58,14 @@ describe("modern profile release parity", () => {
     expect(component).toContain("entry.supervisor");
   });
 
+  it("preserves indexed college and contact lists without auto invitations", () => {
+    expect(editor).toContain('field.type === "college-list" || field.type === "invite-list"');
+    expect(editor).toContain('field.type === "college-list" ? 10 : 5');
+    expect(editor).toContain('field.type === "invite-list" ? "email" : "text"');
+    expect(editor).toContain("Saving this list never sends an invitation or creates access.");
+    expect(editor).not.toContain("sendInvitation(");
+  });
+
   it("keeps typed inputs and confirmed owner-scoped save", () => {
     expect(editor).toContain('field.type === "sport-position"');
     expect(editor).toContain('type="date"');
