@@ -14,6 +14,7 @@ const INVITABLE_RELATIONSHIPS = [
   { value: "college_admissions", label: "College Admissions" },
   { value: "district_admin", label: "District / School Administrator" },
   { value: "community_partner", label: "Community Partner" },
+  { value: "brand_partner", label: "Brand Partner (verification required)" },
   { value: "employer_partner", label: "Employer / Workforce Partner" },
 ] as const;
 
