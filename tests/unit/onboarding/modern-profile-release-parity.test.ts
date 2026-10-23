@@ -48,6 +48,16 @@ describe("modern profile release parity", () => {
     expect(editor).toContain('field.type === "college" || field.type === "career" || field.type === "district"');
   });
 
+  it("does not flatten structured activities or discard historical text entries", () => {
+    const component = readFileSync("components/profile/ActivityProfileField.tsx", "utf8");
+    expect(editor).toContain('field.type === "activity-list"');
+    expect(editor).toContain("<ActivityProfileField");
+    expect(component).toContain("entry.activity");
+    expect(component).toContain("...texts");
+    expect(component).toContain("entry.description");
+    expect(component).toContain("entry.supervisor");
+  });
+
   it("keeps typed inputs and confirmed owner-scoped save", () => {
     expect(editor).toContain('field.type === "sport-position"');
     expect(editor).toContain('type="date"');
