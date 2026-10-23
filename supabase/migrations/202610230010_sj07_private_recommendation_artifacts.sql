@@ -6,13 +6,13 @@ revoke update on public.recommender_requests from public, authenticated;
 grant update (status) on public.recommender_requests to authenticated;
 drop policy if exists "SJ07 requester status may only be draft or sent" on public.recommender_requests;
 create policy "SJ07 requester status may only be draft or sent"
-  as restrictive
+  on public.recommender_requests as restrictive
   for update to authenticated
   using (scholar_id=auth.uid())
   with check (status in ('draft','sent'));
 drop policy if exists "SJ07 requests start without submitted evidence" on public.recommender_requests;
 create policy "SJ07 requests start without submitted evidence"
-  as restrictive
+  on public.recommender_requests as restrictive
   for insert to authenticated
   with check (status='draft' and letter_text is null and approved_at is null);
 
