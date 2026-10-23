@@ -5,7 +5,7 @@ import {
   buildInvitationRecord,
 } from "@/lib/invitations/server";
 import type { RelationshipKind } from "@/lib/permissions";
-import { buildSupportInvitationEmail, sendPlaybookEmail } from "@/lib/email";
+import { buildSupportInvitationEmail, buildScholarInvitationReceipt, sendPlaybookEmail } from "@/lib/email";
 import { requirePlaybookRole } from "@/lib/roles/registry";
 import { requireUser } from "@/lib/supabase/server";
 
@@ -123,6 +123,7 @@ export async function POST(req: NextRequest) {
       scholarName: record.scholarName,
       relationship: record.relationship,
       url: email.url,
+      inviteCode: record.inviteCode,
     });
 
     // Preserve the saved private invitation even when email service is unconfigured.
@@ -156,11 +157,25 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Receipt is separate from the recipient's invitation. A receipt failure
+    // must not falsely fail or undo an invitation that was actually sent.
+    let scholarReceiptStatus: "sent" | "failed" = "failed";
+    if (user.email) {
+      try {
+        const receipt = buildScholarInvitationReceipt({
+          scholarName, inviteeName, inviteeEmail,
+          relationship, url: email.url, inviteCode: record.inviteCode,
+        });
+        await sendPlaybookEmail({
+          to: user.email, subject: receipt.subject, text: receipt.text,
+          html: receipt.html, fromType: "notifications",
+        });
+        scholarReceiptStatus = "sent";
+      } catch { /* The saved invitation and original delivery remain intact. */ }
+    }
     return NextResponse.json({
-      ok: true,
-      invitation: record,
-      email,
-      deliveryStatus: "sent",
+      ok: true, invitation: record, email,
+      deliveryStatus: "sent", scholarReceiptStatus,
     });
   } catch {
     return NextResponse.json(
