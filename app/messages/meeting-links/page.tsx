@@ -45,11 +45,21 @@ export default function MeetingLinksPage() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [conversationId, setConversationId] = useState("");
   const [meetingUrl, setMeetingUrl] = useState("");
+  const [savedMeetingUrl, setSavedMeetingUrl] = useState("");
+  const [savingRoom, setSavingRoom] = useState(false);
+  const [roomStatus, setRoomStatus] = useState("");
   const [label, setLabel] = useState("Join meeting");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [status, setStatus] = useState("Loading authorized conversations…");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    void fetch("/api/me/meeting-preference", { cache: "no-store" }).then(r => r.ok ? r.json() : null).then(result => {
+      const saved = result?.preference?.meeting_url;
+      if (typeof saved === "string") setSavedMeetingUrl(saved);
+    }).catch(() => { /* Optional saved room cannot block normal messaging. */ });
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -72,6 +82,19 @@ export default function MeetingLinksPage() {
   }, []);
 
   const selected = useMemo(() => conversations.find(item => item.id === conversationId), [conversations, conversationId]);
+
+  async function saveMyRoom() {
+    setSavingRoom(true); setRoomStatus("Saving private meeting room…");
+    try {
+      const url = normalizeMeetingUrl(meetingUrl);
+      const hostname = new URL(url).hostname.toLowerCase();
+      const provider = hostname === "zoom.us" || hostname.endsWith(".zoom.us") ? "zoom" : hostname === "meet.google.com" ? "meet" : hostname === "teams.microsoft.com" || hostname.endsWith(".teams.microsoft.com") ? "teams" : "other";
+      const response = await fetch("/api/me/meeting-preference", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ provider, meetingUrl: url, label: label.trim() || "My meeting room" }) });
+      if (!response.ok) throw new Error("The meeting room was not saved.");
+      setSavedMeetingUrl(url); setRoomStatus("Personal meeting room saved privately. Share only into authorized conversations.");
+    } catch (cause) { setRoomStatus(cause instanceof Error ? cause.message : "The meeting room was not saved."); }
+    finally { setSavingRoom(false); }
+  }
 
   async function submit(event: FormEvent) {
     event.preventDefault();
@@ -126,6 +149,11 @@ export default function MeetingLinksPage() {
         <input id="meeting-label" value={label} onChange={event => setLabel(event.target.value)} maxLength={MAX_LINK_LABEL} disabled={sending} />
         <label htmlFor="meeting-url"><strong>Meeting URL</strong></label>
         <input id="meeting-url" type="url" inputMode="url" placeholder="https://…" value={meetingUrl} onChange={event => setMeetingUrl(event.target.value)} maxLength={MAX_MESSAGE_BODY - MAX_LINK_LABEL - 1} disabled={sending} required />
+        <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
+          <button type="button" disabled={savingRoom || !meetingUrl.trim()} onClick={() => void saveMyRoom()}>{savingRoom ? "Saving…" : "Save my personal meeting link"}</button>
+          {savedMeetingUrl && <button type="button" onClick={() => { setMeetingUrl(savedMeetingUrl); setRoomStatus("Saved meeting room loaded. Choose an authorized conversation to share."); }}>Use my saved link</button>}
+        </div>
+        <p role="status" aria-live="polite">{roomStatus}</p>
         <p style={{ margin: 0, color: "#475569" }}>Only HTTPS links are accepted. Normal conversation permissions, blocks, group membership, delivery provenance, notifications, and read receipts remain enforced by the existing Messaging service.</p>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           <button type="submit" disabled={!selected || !meetingUrl.trim() || sending}>{sending ? "Sharing…" : "Share meeting link"}</button>
