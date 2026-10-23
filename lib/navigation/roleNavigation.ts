@@ -1,4 +1,4 @@
-import { normalizePlaybookRole } from "@/lib/roles/registry";
+import { requirePlaybookRole, type PlaybookRole } from "@/lib/roles/registry";
 
 export type NavItem = { label: string; href: string; icon: string };
 export type RoleNavigation = { home: string; label: string; items: NavItem[] };
@@ -86,12 +86,22 @@ export const ROLE_NAVIGATION: Record<string, RoleNavigation> = {
   },
 };
 
-export function normalizeNavigationRole(profileMode?: string | null, role?: string | null) {
-  return normalizePlaybookRole(profileMode || role);
+export function normalizeNavigationRole(profileMode?: string | null, role?: string | null): PlaybookRole | null {
+  try {
+    return requirePlaybookRole(profileMode || role);
+  } catch {
+    return null; // Unrecognized identities never inherit Scholar navigation.
+  }
 }
+
+const UNRESOLVED_NAVIGATION: RoleNavigation = {
+  home: "/start",
+  label: "Complete your Playbook setup",
+  items: [{ label: "Set up account", href: "/start", icon: "▶️" }, SHARED_PROFILE],
+};
 
 export function getRoleNavigation(profileMode?: string | null, role?: string | null): RoleNavigation {
   const normalized = normalizeNavigationRole(profileMode, role);
-  const navigation = ROLE_NAVIGATION[normalized] || ROLE_NAVIGATION.other;
+  const navigation = normalized ? ROLE_NAVIGATION[normalized] : UNRESOLVED_NAVIGATION;
   return { ...navigation, items: [...navigation.items, SHARED_EXPLORE] };
 }
