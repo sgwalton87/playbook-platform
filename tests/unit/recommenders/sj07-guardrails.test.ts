@@ -21,7 +21,7 @@ describe("SJ-07 governed recommendation boundary",()=>{
   it("keeps immutable letter contents behind RLS and server-side claims",()=>{
     expect(migration).toContain("enable row level security");
     expect(migration).toContain("revoke all on public.recommendation_letter_artifacts from public, anon, authenticated");
-    expect(migration).toContain("p_confidentiality in ('open','confidential')");
+    expect(migration).toContain("p_confidentiality not in ('open','confidential')");
     expect(migration).toContain("a.confidentiality='open'");
     expect(migration).not.toContain("'letter_text',p_letter");
     expect(migration).not.toContain("'letter_text',trim(p_letter)");
