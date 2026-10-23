@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import ScholarDashboardExperience from "@/components/dashboard/ScholarDashboardExperience";
 import { CanonicalRoleAuthorityGate } from "@/components/role-os/RoleAuthorityGate";
 import { buildScholarRecord } from "@/lib/scholar";
@@ -54,5 +55,10 @@ function ScholarDashboardRecord() {
     return () => { active = false; };
   }, []);
 
-  return <ScholarDashboardExperience record={record} loading={loading} loadError={loadError} />;
+  return <>
+    <nav aria-label="Scholar tools" style={{maxWidth:1100,margin:"12px auto",padding:"0 16px"}}>
+      <Link href="/scholar/resume" style={{display:"inline-block",padding:"12px 18px",background:"#171717",color:"#fff",borderRadius:10,textDecoration:"none"}}>Build my résumé →</Link>
+    </nav>
+    <ScholarDashboardExperience record={record} loading={loading} loadError={loadError} />
+  </>;
 }
