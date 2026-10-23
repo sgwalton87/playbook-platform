@@ -47,7 +47,7 @@ export async function POST() {
     try {
       await sendPlaybookEmail({
         to: "brandpartners@playbookseriesinc.org",
-        cc: "stephishawalton@gmail.com",
+        cc: "stephishawalton@gmail.com, sycoywalton@playbookseriesinc.org",
         fromType: "notifications",
         subject: "Playbook · New Brand Partner verification submitted",
         text: `A Brand Partner verification request is awaiting independent review.\nOrganization: ${evidence.organizationName}\nRequest reference: ${result.data.id}\nStatus: pending\n\nSign in to an authorized Playbook administration workspace when one is available. This email is not an approval or an authorization to access private records.`,
