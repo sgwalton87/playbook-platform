@@ -80,6 +80,13 @@ describe("modern profile release parity", () => {
     expect(advanced).toContain("Your profile was updated elsewhere.");
   });
 
+  it("keeps the advanced editor usable above mobile navigation", () => {
+    expect(advanced).toContain('className="playbook-advanced-profile"');
+    expect(advanced).toContain('env(safe-area-inset-bottom)');
+    expect(advanced).toContain('grid-template-columns:minmax(0,1fr)!important');
+    expect(advanced).toContain('min-width:0;max-width:100%');
+  });
+
   it("keeps typed inputs and confirmed owner-scoped save", () => {
     expect(editor).toContain('field.type === "sport-position"');
     expect(editor).toContain('type="date"');
