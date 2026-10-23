@@ -1,0 +1,83 @@
+name: Isolated Brand Partner Release QA
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "app/api/brand-verification/**"
+      - "app/api/admin/brand-partners/**"
+      - "app/api/internal/brand-partner-notifications/**"
+      - "components/brand/**"
+      - "supabase/migrations/**"
+      - "tests/unit/brand/**"
+      - ".github/workflows/brand-partner-isolated.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  disposable-brand-partner-db:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Normalize migration versions for disposable runner only
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          folder = Path("supabase/migrations")
+          scripts = sorted(p for p in folder.glob("*.sql") if re.match(r"^\d+_", p.name))
+          for i, p in enumerate(scripts, 1):
+              p.rename(folder / f"20260101{i:06d}_{p.name.split('_', 1)[1]}")
+          print(f"Prepared {len(scripts)} isolated migrations")
+          PY
+      - name: Assert local and email settings
+        run: |
+          grep -q '^enable_confirmations = true$' supabase/config.toml
+          grep -q 'port = 54322' supabase/config.toml
+          grep -q 'shadow_port = 54320' supabase/config.toml
+      - name: Reserve disposable ports
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path("supabase/config.toml")
+          s=p.read_text().replace("port = 54322","port = 55422",1).replace("shadow_port = 54320","shadow_port = 55420",1)
+          p.write_text(s)
+          PY
+      - name: Start temporary local Supabase and replay migrations
+        run: npx supabase start
+      - name: Certify queue isolation and worker functions
+        shell: bash
+        run: |
+          node <<'NODE'
+          const cp=require('child_process');
+          const fs=require('fs');
+          const env=cp.execFileSync('npx',['supabase','status','-o','env'],{encoding:'utf8'});
+          const pairs={};
+          for(const line of env.split('\n')) {
+            const m=line.match(/^([A-Z_]+)=(.*)$/); if(m) pairs[m[1]]=m[2].replace(/^["']|["']$/g,'');
+          }
+          if(!pairs.API_URL || !/127\.0\.0\.1|localhost/.test(pairs.API_URL)) throw Error('Refusing nonlocal target');
+          for(const key of ['ANON_KEY','SERVICE_ROLE_KEY']) if(!pairs[key]) throw Error('Local key missing');
+          fs.appendFileSync(process.env.GITHUB_ENV, 'NEXT_PUBLIC_SUPABASE_URL='+pairs.API_URL+'\nNEXT_PUBLIC_SUPABASE_ANON_KEY='+pairs.ANON_KEY+'\n');
+          NODE
+          node scripts/qa/verify-brand-partner-outbox.mjs
+      - name: Run Brand Partner static and authority tests
+        run: npx vitest run tests/unit/brand/brand-os-authority-gate.test.ts tests/unit/security/service-role-api-boundary.test.ts
+      - name: Always destroy disposable stack
+        if: always()
+        run: npx supabase stop --no-backup || true
