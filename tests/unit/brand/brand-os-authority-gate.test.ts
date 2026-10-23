@@ -32,6 +32,14 @@ describe("Brand Partner OS authority gate", () => {
     expect(gate).toContain("return <>{children}</>");
   });
 
+  it("keeps pending Brand Partners informed and able to edit their own profile", () => {
+    expect(gate).toContain("Your Brand Partner profile is complete");
+    expect(gate).toContain("Submit verification evidence");
+    expect(gate).toContain('href="/profile"');
+    expect(gate).toContain("View or edit my profile");
+    expect(gate).toContain("campaign and compliance permissions remain restricted");
+  });
+
   it("keeps applicant submission fail-closed", () => {
     expect(api).toContain('!== "brand-partner"');
     expect(api).toContain("onboarding_completed");
