@@ -1,3 +1,14 @@
+
+-- Existing learner-wide UPDATE permission would otherwise let a requester rewrite
+-- the recommender email after sending. Freeze recipient/owner/evidence/letter fields
+-- at the SQL grant boundary; only legacy request status may be updated by clients.
+revoke update on public.recommender_requests from public, authenticated;
+grant update (status) on public.recommender_requests to authenticated;
+drop policy if exists "SJ07 requests start without submitted evidence" on public.recommender_requests;
+create policy "SJ07 requests start without submitted evidence"
+  as restrictive for insert to authenticated
+  with check (status='draft' and letter_text is null and approved_at is null);
+
 -- SJ-07: governed recommendation submission, private Vault metadata and application attachment.
 -- NOT PRODUCTION AUTHORIZED. Test in disposable Supabase before founder approval.
 -- Existing recommender_requests remains the sole request authority.
