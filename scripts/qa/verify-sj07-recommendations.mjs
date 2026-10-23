@@ -129,6 +129,6 @@ for(const id of [openId,confidentialId,openId]){
 }
 const result=await scholar.client.from("application_workspaces")
   .select("recommendation_request_ids").eq("id",workspace.data.id).single();
-assert(!result.error&&result.data.recommendation_request_ids.length===2,
-  "Application reference attachment must be idempotent and exclude letter content");
+assert(!result.error&&Array.isArray(result.data?.recommendation_request_ids)&&result.data.recommendation_request_ids.length===2,
+  "Application reference attachment must be idempotent and exclude letter content; actual="+JSON.stringify({error:result.error?.message,ids:result.data?.recommendation_request_ids}));
 console.log("SJ-07 isolated recommendation identity, confidential Vault and packet reference gates PASS");
