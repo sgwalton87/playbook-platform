@@ -1,0 +1,27 @@
+{
+  "id": "SJ-02",
+  "title": "Scholar Record Builder and downloadable resume",
+  "status": "proposed",
+  "priority": 98,
+  "dependencies": [
+    "SJ-00"
+  ],
+  "handbook_refs": [
+    "docs/MASTER_CHECKLIST.md",
+    "docs/ENGINEERING/PBOS_SCHOLAR_JOURNEY_CANONICAL_BUILD_CONTRACT.md",
+    "docs/RELEASE_PROCESS.md"
+  ],
+  "tasks": [
+    "Capture service and awards with evidence; selectable templates and permission-scoped accessible PDF export",
+    "Open isolated scoped PR, record evidence in Command Center, preserve existing canonical data and role permissions"
+  ],
+  "definition_of_done": [
+    "PDF mirrors preview; no fabricated evidence; save/reload",
+    "Exact implementation SHA, migrations, test evidence and governed acceptance recorded; no unapproved production deploy"
+  ],
+  "validation": [
+    "PDF mirrors preview; no fabricated evidence; save/reload",
+    "CI, Database Certification, Platform QA and role-based isolated/browser verification before release"
+  ],
+  "next_gate": "SJ-03"
+}

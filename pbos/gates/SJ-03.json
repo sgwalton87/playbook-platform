@@ -1,0 +1,27 @@
+{
+  "id": "SJ-03",
+  "title": "Governed employer and institution share links",
+  "status": "proposed",
+  "priority": 97,
+  "dependencies": [
+    "SJ-02"
+  ],
+  "handbook_refs": [
+    "docs/MASTER_CHECKLIST.md",
+    "docs/ENGINEERING/PBOS_SCHOLAR_JOURNEY_CANONICAL_BUILD_CONTRACT.md",
+    "docs/RELEASE_PROCESS.md"
+  ],
+  "tasks": [
+    "Explicit audience-approved, expiring, revocable, audited read-only share token with guardian checks",
+    "Open isolated scoped PR, record evidence in Command Center, preserve existing canonical data and role permissions"
+  ],
+  "definition_of_done": [
+    "Cross-user denial, expired/revoked denial, public allowlist and minor consent",
+    "Exact implementation SHA, migrations, test evidence and governed acceptance recorded; no unapproved production deploy"
+  ],
+  "validation": [
+    "Cross-user denial, expired/revoked denial, public allowlist and minor consent",
+    "CI, Database Certification, Platform QA and role-based isolated/browser verification before release"
+  ],
+  "next_gate": "SJ-04"
+}

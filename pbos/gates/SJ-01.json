@@ -1,0 +1,27 @@
+{
+  "id": "SJ-01",
+  "title": "Wire Compass to canonical Scholar Record",
+  "status": "proposed",
+  "priority": 99,
+  "dependencies": [
+    "SJ-00"
+  ],
+  "handbook_refs": [
+    "docs/MASTER_CHECKLIST.md",
+    "docs/ENGINEERING/PBOS_SCHOLAR_JOURNEY_CANONICAL_BUILD_CONTRACT.md",
+    "docs/RELEASE_PROCESS.md"
+  ],
+  "tasks": [
+    "Record-driven recommendations with evidence explanations, freshness and durable actions",
+    "Open isolated scoped PR, record evidence in Command Center, preserve existing canonical data and role permissions"
+  ],
+  "definition_of_done": [
+    "Deterministic recommendations, no sensitive leakage and reload persistence",
+    "Exact implementation SHA, migrations, test evidence and governed acceptance recorded; no unapproved production deploy"
+  ],
+  "validation": [
+    "Deterministic recommendations, no sensitive leakage and reload persistence",
+    "CI, Database Certification, Platform QA and role-based isolated/browser verification before release"
+  ],
+  "next_gate": "SJ-02"
+}
