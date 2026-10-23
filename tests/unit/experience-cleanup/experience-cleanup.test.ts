@@ -20,5 +20,10 @@ describe("Unified Experience Cleanup", () => {
     expect(getRoleHomeRoute("founder")).toBe("/studio");
     expect(getRoleHomeRoute("scholar_athlete")).toBe("/scholar-athlete-os");
     expect(getRoleHomeRoute("family")).toBe("/family-os");
+    expect(getRoleHomeRoute("athlete-abroad")).toBe("/athlete-abroad-os");
+    expect(getRoleHomeRoute("college-coach")).toBe("/recruiting-os");
+    expect(getRoleHomeRoute("high-school-counselor")).toBe("/counselor-os");
+    expect(getRoleHomeRoute("transition-youth")).toBe("/transition-youth-os");
+    expect(getRoleHomeRoute("unexpected_partner")).toBe("/start");
   });
 });
