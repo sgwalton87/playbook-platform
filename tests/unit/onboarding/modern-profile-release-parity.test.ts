@@ -66,6 +66,12 @@ describe("modern profile release parity", () => {
     expect(editor).not.toContain("sendInvitation(");
   });
 
+  it("normalizes empty college and contact slots before persistence", () => {
+    expect(editor).toContain('field.type !== "college-list" && field.type !== "invite-list"');
+    expect(editor).toContain('entry.trim().length > 0');
+    expect(editor).toContain('.map(entry => entry.trim())');
+  });
+
   it("keeps typed inputs and confirmed owner-scoped save", () => {
     expect(editor).toContain('field.type === "sport-position"');
     expect(editor).toContain('type="date"');
