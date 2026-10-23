@@ -1,0 +1,33 @@
+{
+  "id": "SJ-07",
+  "title": "Recommendation request, Scholar Vault letter artifact and governed application attachments",
+  "status": "proposed",
+  "priority": 93,
+  "dependencies": [
+    "SJ-00",
+    "SJ-03"
+  ],
+  "handbook_refs": [
+    "docs/MASTER_CHECKLIST.md",
+    "docs/ENGINEERING/PBOS_SCHOLAR_JOURNEY_CANONICAL_BUILD_CONTRACT.md",
+    "docs/INTELLIGENCE/RECOMMENDATION_LETTERS.md",
+    "docs/RELEASE_PROCESS.md"
+  ],
+  "tasks": [
+    "Extend existing recommender_requests and relationship/evidence APIs: Inner Circle and verified external-request form, consent preview, secure delivery, deadlines and status tracking",
+    "Recommender-authored editor/upload, immutable private Scholar Vault > Applications & Career > Recommendations artifact, open vs confidential letter access rules, malware/type/size checks, audit trail",
+    "Allow policy-approved open letters in résumé/college/job application packets; confidential references can be passed only through direct permitted recommender-to-institution routes; never expose contents to Scholar/public portfolio",
+    "Create scoped PR and record exact SHA, migrations, tests, privacy decisions and QA evidence"
+  ],
+  "definition_of_done": [
+    "Inner Circle and external email journey with secure invitation, accept/decline/submit, durable artifact and optional application attach",
+    "Confidential content never visible to Scholar or unauthorized recipient; download only for permitted open letters",
+    "Exact CI, DB, QA, mobile browser acceptance, owner/guardian permission and founder controlled release evidence"
+  ],
+  "validation": [
+    "RLS cross-user denial, replay/expiry, consented evidence, delivery retries, file scan and MIME checks",
+    "Confidential letter leak checks in Scholar Vault, exports, PDF, AI contexts and share links",
+    "No invented endorsements, no automatic sending, return success only after confirmed email delivery, exact deployed SHA verification"
+  ],
+  "next_gate": "SJ-06"
+}
