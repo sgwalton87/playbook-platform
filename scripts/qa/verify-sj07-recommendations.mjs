@@ -109,7 +109,10 @@ assert(indexed.data.every(x=>!('letter_text' in x)),"Vault metadata leaked recom
 const noOther=await outsider.client.rpc("list_submitted_recommendation_vault");
 assert(!noOther.error&&noOther.data.length===0,"Cross-user Vault list leaked artifacts");
 
-// Fixture is provisioned by the isolated test administrator, not by the Scholar.\n// This tests attachment authorization only; Scholar workspace creation remains\n// a separate unresolved policy regression gate and is NOT certified here.\nconst workspace=await admin.from("application_workspaces").insert({
+// Fixture is provisioned by the isolated test administrator, not by the Scholar.
+// This tests attachment authorization only; Scholar workspace creation remains
+// a separate unresolved policy regression gate and is NOT certified here.
+const workspace=await admin.from("application_workspaces").insert({
   scholar_id:scholar.id,opportunity_name:"Synthetic Internship",opportunity_type:"internship",
   status:"building",recommendation_request_ids:[]
 }).select("id").single();
