@@ -25,7 +25,7 @@ export default function ScholarJourneyModules() {
     <p style={{ fontSize: 18, lineHeight: 1.5 }}>{current.tagline}</p>
     {showCoach && <aside aria-label="Coach guidance" style={{ display: "flex", gap: 14, alignItems: "start", background: "#EAF1FA", padding: 16, borderRadius: 18 }}>
       <div aria-hidden="true" style={{ borderRadius: "50%", width: 52, height: 52, flexShrink: 0, background: "#1C3551", display: "grid", placeItems: "center", fontSize: 26 }}>🏀</div>
-      <div style={{ flex: 1 }}><strong>Coach's tip</strong><p style={{ margin: "6px 0 0", lineHeight: 1.5 }}>{current.help}</p></div>
+      <div style={{ flex: 1 }}><strong>Coach&apos;s tip</strong><p style={{ margin: "6px 0 0", lineHeight: 1.5 }}>{current.help}</p></div>
       <button type="button" onClick={() => setShowCoach(false)} aria-label="Hide coaching tip" style={{ border: "none", background: "transparent", fontSize: 20 }}>×</button>
     </aside>}
     <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 22, alignItems: "center" }}>
