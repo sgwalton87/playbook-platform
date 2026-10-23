@@ -7,7 +7,7 @@ const empty = (): OnboardingActivity => ({ activity: "", category: "", descripti
 
 export default function ActivityProfileField({ value, onChange }: {
   value: unknown;
-  onChange: (entries: OnboardingActivity[]) => void;
+  onChange: (entries: Array<OnboardingActivity | string>) => void;
 }) {
   const [draft, setDraft] = useState<OnboardingActivity>(empty);
   const records: OnboardingActivity[] = Array.isArray(value) ? value.filter((entry): entry is OnboardingActivity =>
@@ -17,17 +17,17 @@ export default function ActivityProfileField({ value, onChange }: {
   const texts = Array.isArray(value) ? value.filter((entry): entry is string => typeof entry === "string") : [];
   const add = () => {
     if (!draft.activity.trim()) return;
-    onChange([...records, ...texts.map(activity => ({ ...empty(), activity })), { ...draft, activity: draft.activity.trim() }]);
+    onChange([...records, ...texts, { ...draft, activity: draft.activity.trim() }]);
     setDraft(empty());
   };
   return <div style={{ display: "grid", gap: 12 }}>
     {records.map((entry, index) => <div key={index} style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 12, display: "grid", gap: 8 }}>
-      <label>Activity<input style={input} value={entry.activity} onChange={e => onChange(records.map((x, i) => i === index ? { ...x, activity: e.target.value } : x))} /></label>
+      <label>Activity<input style={input} value={entry.activity} onChange={e => onChange([...records.map((x, i) => i === index ? { ...x, activity: e.target.value } : x), ...texts])} /></label>
       <label>Category<input style={input} value={entry.category} onChange={e => onChange(records.map((x, i) => i === index ? { ...x, category: e.target.value } : x))} /></label>
       <label>Hours<input style={input} value={entry.hours} onChange={e => onChange(records.map((x, i) => i === index ? { ...x, hours: e.target.value } : x))} /></label>
       <label>Mentor / Supervisor<input style={input} value={entry.supervisor} onChange={e => onChange(records.map((x, i) => i === index ? { ...x, supervisor: e.target.value } : x))} /></label>
       <label>Description<textarea style={input} value={entry.description} onChange={e => onChange(records.map((x, i) => i === index ? { ...x, description: e.target.value } : x))} /></label>
-      <button type="button" onClick={() => onChange(records.filter((_, i) => i !== index))}>Remove activity</button>
+      <button type="button" onClick={() => onChange([...records.filter((_, i) => i !== index), ...texts])}>Remove activity</button>
     </div>)}
     {texts.length > 0 && <p>Legacy entries: {texts.join(", ")}. They remain preserved until you add or edit an entry.</p>}
     <fieldset style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 12, display: "grid", gap: 10 }}>
