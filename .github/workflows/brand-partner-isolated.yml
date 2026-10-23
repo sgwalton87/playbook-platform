@@ -60,22 +60,28 @@ jobs:
           PY
       - name: Start temporary local Supabase and replay migrations
         run: npx supabase start
-      - name: Certify queue isolation and worker functions
+      - name: Prepare local-only credentials
         shell: bash
         run: |
+          npx supabase status -o env > /tmp/pbos-brand-partner-local.env
           node <<'NODE'
-          const cp=require('child_process');
           const fs=require('fs');
-          const env=cp.execFileSync('npx',['supabase','status','-o','env'],{encoding:'utf8'});
+          const input=fs.readFileSync('/tmp/pbos-brand-partner-local.env','utf8');
           const pairs={};
-          for(const line of env.split('\n')) {
-            const m=line.match(/^([A-Z_]+)=(.*)$/); if(m) pairs[m[1]]=m[2].replace(/^["']|["']$/g,'');
+          for(const line of input.split('\n')) {
+            const m=line.match(/^([A-Z_]+)=(.*)$/);
+            if(m) pairs[m[1]]=m[2].replace(/^["']|["']$/g,'');
           }
-          if(!pairs.API_URL || !/127\.0\.0\.1|localhost/.test(pairs.API_URL)) throw Error('Refusing nonlocal target');
-          for(const key of ['ANON_KEY','SERVICE_ROLE_KEY']) if(!pairs[key]) throw Error('Local key missing');
-          fs.appendFileSync(process.env.GITHUB_ENV, 'NEXT_PUBLIC_SUPABASE_URL='+pairs.API_URL+'\nNEXT_PUBLIC_SUPABASE_ANON_KEY='+pairs.ANON_KEY+'\n');
+          if(!pairs.API_URL || !/^https?:\/\/(127\.0\.0\.1|localhost)(:|\/)/.test(pairs.API_URL)) throw Error('Refusing nonlocal target');
+          for(const key of ['ANON_KEY','SERVICE_ROLE_KEY']) if(!pairs[key]) throw Error('Disposable key missing: '+key);
+          fs.appendFileSync(process.env.GITHUB_ENV, [
+            'NEXT_PUBLIC_SUPABASE_URL='+pairs.API_URL,
+            'NEXT_PUBLIC_SUPABASE_ANON_KEY='+pairs.ANON_KEY,
+            'SUPABASE_SERVICE_ROLE_KEY='+pairs.SERVICE_ROLE_KEY
+          ].join('\n')+'\n');
           NODE
-          node scripts/qa/verify-brand-partner-outbox.mjs
+      - name: Certify queue isolation and worker access boundaries
+        run: node scripts/qa/verify-brand-partner-outbox.mjs
       - name: Run Brand Partner static and authority tests
         run: npx vitest run tests/unit/brand/brand-os-authority-gate.test.ts tests/unit/security/service-role-api-boundary.test.ts
       - name: Always destroy disposable stack
