@@ -54,7 +54,7 @@ revoke all on function public.claim_brand_partner_notification() from PUBLIC, an
 grant execute on function public.claim_brand_partner_notification() to service_role;
 
 create or replace function public.finish_brand_partner_notification(
-  p_request_id uuid, p_sent boolean, p_error text default null
+  p_request_id uuid, p_attempt_count integer, p_sent boolean, p_error text default null
 ) returns void
 language plpgsql security definer set search_path = ''
 as $$
@@ -66,8 +66,8 @@ begin
       next_attempt_at = case when p_sent then next_attempt_at
         else now() + make_interval(mins => least(240, power(2,least(attempt_count,7))::integer)) end,
       claimed_at = null
-  where request_id = p_request_id and status = 'sending';
+  where request_id = p_request_id and status = 'sending' and attempt_count = p_attempt_count;
 end
 $$;
-revoke all on function public.finish_brand_partner_notification(uuid,boolean,text) from PUBLIC, anon, authenticated;
+revoke all on function public.finish_brand_partner_notification(uuid,integer,boolean,text) from PUBLIC, anon, authenticated;
 grant execute on function public.finish_brand_partner_notification(uuid,boolean,text) to service_role;
