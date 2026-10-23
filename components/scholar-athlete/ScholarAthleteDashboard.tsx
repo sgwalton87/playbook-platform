@@ -19,6 +19,7 @@ import {
 } from "@/lib/scholar-athlete";
 import type { NILDeal, RecruitingTarget } from "@/lib/scholar-athlete";
 import { supabase } from "@/lib/supabaseClient";
+import ScholarJourneyModules from "@/components/guided/ScholarJourneyModules";
 
 const journeyCards = [
   {
@@ -146,9 +147,11 @@ export default function ScholarAthleteDashboard() {
           <div style={heroActions}>
             <PlaybookButton href="/academic-readiness">See my next play</PlaybookButton>
             <PlaybookButton href="/opportunities" variant="secondary">Explore opportunities</PlaybookButton>
-            <PlaybookButton href="/invitations" variant="secondary">Invite Parent/Guardian</PlaybookButton>
+            <PlaybookButton href="/invitations" variant="secondary">Build my support team</PlaybookButton>
           </div>
         </PlaybookHero>
+
+        <ScholarJourneyModules />
 
         <section style={statusRail} aria-label="Scholar-Athlete status">
           <div>
