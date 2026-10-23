@@ -10,6 +10,8 @@ const gate = fs.readFileSync(
   path.join(process.cwd(), "components/brand/BrandPartnerVerificationGate.tsx"),
   "utf8"
 );
+const worker = fs.readFileSync(path.join(process.cwd(), "app/api/internal/brand-partner-notifications/route.ts"), "utf8");
+const outbox = fs.readFileSync(path.join(process.cwd(), "supabase/migrations/202610230003_brand_partner_notification_outbox.sql"), "utf8");
 const api = fs.readFileSync(
   path.join(process.cwd(), "app/api/brand-verification/route.ts"),
   "utf8"
@@ -41,10 +43,15 @@ describe("Brand Partner OS authority gate", () => {
   });
 
   it("notifies founders without granting approval authority or emailing on repeat submission", () => {
-    expect(api).toContain("brandpartners@playbookseriesinc.org");
-    expect(api).toContain("stephishawalton@gmail.com");
-    expect(api).toContain("sycoywalton@playbookseriesinc.org");
-    expect(api).toContain("sendPlaybookEmail");
+    expect(worker).toContain("brandpartners@playbookseriesinc.org");
+    expect(worker).toContain("stephishawalton@gmail.com");
+    expect(worker).toContain("sycoywalton@playbookseriesinc.org");
+    expect(worker).toContain("sendPlaybookEmail");
+    expect(worker).toContain("BRAND_NOTIFICATION_WORKER_SECRET");
+    expect(outbox).toContain("create trigger brand_partner_request_notify");
+    expect(outbox).toContain("for update skip locked");
+    expect(outbox).toContain("revoke all on public.brand_partner_notification_outbox");
+    expect(api).not.toContain("sendPlaybookEmail");
     expect(api).toContain("if (existing.data) return NextResponse.json");
     expect(api).toContain('existing.data.status === "approved" ? "organization_approved"');
     expect(api).toContain('existing.data.status === "rejected" ? "action_required"');
