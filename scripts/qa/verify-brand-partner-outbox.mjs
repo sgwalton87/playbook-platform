@@ -23,3 +23,77 @@ for (const rpc of ['claim_brand_partner_notification','list_brand_partner_review
 const result = await user.rpc('finish_brand_partner_notification', {p_request_id:'00000000-0000-4000-8000-000000000001',p_attempt_count:1,p_sent:true,p_error:null});
 assert(result.error, 'Anonymous role unexpectedly finished a notification');
 console.log('Isolated Brand Partner outbox tables and anonymous access boundaries PASS');
+
+const { randomUUID, randomBytes } = await import('node:crypto');
+const fixtures = [];
+async function newUser(role) {
+  const email = `qa-${role}-${randomUUID()}@example.invalid`;
+  const password = randomBytes(18).toString('hex')+'Aa!';
+  const created = await admin.auth.admin.createUser({email,password,email_confirm:true});
+  assert(!created.error && created.data.user, 'Synthetic auth account creation failed');
+  fixtures.push(created.data.user.id);
+  const profile = await admin.from('profiles').upsert({
+    id:created.data.user.id,role,profile_mode:role,requested_role:role,
+    onboarding_completed:true, verification_status:'email_confirmed',onboarding_data:{synthetic:true}
+  },{onConflict:'id'});
+  assert(!profile.error, 'Synthetic profile fixture failed: '+profile.error?.message);
+  const signed = await createClient(url,anon,{auth:{persistSession:false}}).auth.signInWithPassword({email,password});
+  assert(!signed.error && signed.data.session, 'Synthetic account login failed');
+  const client = createClient(url,anon,{global:{headers:{Authorization:'Bearer '+signed.data.session.access_token}},auth:{persistSession:false}});
+  return {id:created.data.user.id,client};
+}
+try {
+  const partner=await newUser('brand-partner');
+  const reviewer=await newUser('mentor');
+  const insert=await partner.client.from('brand_partner_verification_requests').insert({
+    brand_user_id:partner.id,organization_name:'Synthetic QA Organization',
+    nil_acknowledgement:'Synthetic QA only',status:'pending'
+  }).select('id').single();
+  assert(!insert.error && insert.data?.id,'Partner submission failed: '+insert.error?.message);
+  const requestId=insert.data.id;
+  const job=await admin.from('brand_partner_notification_outbox').select('*').eq('request_id',requestId).single();
+  assert(!job.error && job.data?.status==='pending','Atomic notification enqueue missing');
+  const unauthReview=await partner.client.rpc('decide_brand_partner_review',{p_request_id:requestId,p_scope:'organization',p_decision:'approve',p_reason:'Synthetic reviewed'});
+  assert(unauthReview.error,'Unprivileged applicant was able to approve');
+  const noGrant=await reviewer.client.rpc('list_brand_partner_review_queue');
+  assert(noGrant.error,'Unprivileged reviewer saw queue');
+  const grant=await admin.from('brand_partner_reviewer_grants').insert({reviewer_id:reviewer.id,review_scope:'organization',grant_reason:'Disposable QA only'});
+  assert(!grant.error,'Test grant failed: '+grant.error?.message);
+  const reviewerQueue=await reviewer.client.rpc('list_brand_partner_review_queue');
+  assert(!reviewerQueue.error && reviewerQueue.data.some(r=>r.request_id===requestId),'Scoped reviewer cannot view queue');
+  const premature=await reviewer.client.rpc('decide_brand_partner_review',{p_request_id:requestId,p_scope:'campaign',p_decision:'approve',p_reason:'Synthetic check'});
+  assert(premature.error,'Organization-only reviewer acquired campaign scope');
+  const approve=await reviewer.client.rpc('decide_brand_partner_review',{p_request_id:requestId,p_scope:'organization',p_decision:'approve',p_reason:'Synthetic verification passed'});
+  assert(!approve.error,'Organization review failed: '+approve.error?.message);
+  const state=await admin.from('brand_partner_verification_requests').select('status,campaign_scope_approved,compliance_scope_approved').eq('id',requestId).single();
+  assert(!state.error && state.data.status==='approved' && !state.data.campaign_scope_approved && !state.data.compliance_scope_approved,'Scope escalation detected');
+  const audit=await admin.from('brand_partner_review_audit').select('id').eq('request_id',requestId);
+  assert(!audit.error && audit.data.length===1,'Decision audit missing');
+  const claim1=await admin.rpc('claim_brand_partner_notification');
+  assert(!claim1.error && claim1.data?.[0]?.request_id===requestId,'Worker could not claim queued notification');
+  const attempt=claim1.data[0].attempt_count;
+  const failed=await admin.rpc('finish_brand_partner_notification',{p_request_id:requestId,p_attempt_count:attempt,p_sent:false,p_error:'synthetic SMTP unavailable'});
+  assert(!failed.error,'Failure acknowledgement failed');
+  const afterFailure=await admin.from('brand_partner_notification_outbox').select('status,attempt_count,next_attempt_at').eq('request_id',requestId).single();
+  assert(!afterFailure.error && afterFailure.data.status==='failed' && afterFailure.data.attempt_count===attempt,'Delivery failure was not persisted');
+  const noImmediateRetry=await admin.rpc('claim_brand_partner_notification');
+  assert(!noImmediateRetry.error && !noImmediateRetry.data.some(r=>r.request_id===requestId),'Retry ignored cooldown');
+  const advance=await admin.from('brand_partner_notification_outbox').update({next_attempt_at:new Date(Date.now()-1000).toISOString()}).eq('request_id',requestId);
+  assert(!advance.error,'Could not advance disposable retry clock');
+  const claim2=await admin.rpc('claim_brand_partner_notification');
+  assert(!claim2.error && claim2.data?.[0]?.request_id===requestId && claim2.data[0].attempt_count===attempt+1,'Retry claim failed');
+  const stale=await admin.rpc('finish_brand_partner_notification',{p_request_id:requestId,p_attempt_count:attempt,p_sent:true,p_error:null});
+  assert(!stale.error,'Stale ack RPC failed');
+  const beforeFinish=await admin.from('brand_partner_notification_outbox').select('status').eq('request_id',requestId).single();
+  assert(beforeFinish.data.status==='sending','Stale worker overwrote current attempt');
+  const delivered=await admin.rpc('finish_brand_partner_notification',{p_request_id:requestId,p_attempt_count:attempt+1,p_sent:true,p_error:null});
+  assert(!delivered.error,'Delivery recovery acknowledgement failed');
+  const finalRow=await admin.from('brand_partner_notification_outbox').select('status,sent_at').eq('request_id',requestId).single();
+  assert(finalRow.data.status==='sent' && finalRow.data.sent_at,'Recovered notification not marked delivered');
+  console.log('Synthetic Brand Partner submit, reviewer scope, audit and delivery failure/retry PASS');
+} finally {
+  for(const id of fixtures.reverse()) {
+    const deleted=await admin.auth.admin.deleteUser(id);
+    if(deleted.error) throw new Error('Synthetic user cleanup failed');
+  }
+}
