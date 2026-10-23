@@ -18,7 +18,15 @@ export async function GET() {
       .select("id,recommender_name,recommender_email,recommender_role,opportunity_name,status,created_at")
       .eq("scholar_id",user.id).order("created_at",{ascending:false}).limit(100);
     if(error) throw new Error(error.message);
-    return NextResponse.json({requests:data??[]});
+    const relationships=await supabase.from("support_relationships")
+      .select("id,supporter_name,supporter_email,relationship,permissions,status")
+      .eq("scholar_id",user.id).eq("status","active");
+    if(relationships.error) throw new Error(relationships.error.message);
+    const innerCircle=(relationships.data??[]).filter(x =>
+      Array.isArray(x.permissions) && x.permissions.includes("support_tasks")
+    ).map(x=>({id:x.id,name:x.supporter_name??"Connected supporter",
+      email:x.supporter_email,relationship:x.relationship}));
+    return NextResponse.json({requests:data??[],innerCircle});
   } catch {
     return NextResponse.json({error:"Unable to load recommendation requests."},{status:503});
   }
@@ -44,6 +52,24 @@ export async function POST(req: NextRequest) {
         { error: "Recommender role must be educator, mentor, coach, family, or employer." },
         { status: 400 }
       );
+    }
+
+    const source=body.source;
+    if(source!=="inner-circle" && source!=="outside") {
+      return NextResponse.json({error:"Choose Inner Circle or outside recommender."},{status:400});
+    }
+    if(source==="inner-circle"){
+      if(typeof body.relationshipId!=="string") {
+        return NextResponse.json({error:"Select a verified Inner Circle relationship."},{status:400});
+      }
+      const connected=await supabase.from("support_relationships")
+        .select("supporter_name,supporter_email,permissions")
+        .eq("id",body.relationshipId).eq("scholar_id",user.id).eq("status","active").maybeSingle();
+      if(connected.error||!connected.data || !Array.isArray(connected.data.permissions) ||
+          !connected.data.permissions.includes("support_tasks") ||
+          connected.data.supporter_email.toLowerCase() !== String(body.recommenderEmail??"").trim().toLowerCase()) {
+        return NextResponse.json({error:"Recommender must have an active authorized Inner Circle relationship."},{status:403});
+      }
     }
 
     const evidence = Array.isArray(body.evidence)
