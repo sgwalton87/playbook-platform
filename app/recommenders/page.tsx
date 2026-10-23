@@ -25,7 +25,13 @@ function RecommendationForm() {
     const response=await fetch("/api/recommenders/request",{credentials:"same-origin",cache:"no-store"});
     if(response.ok){const result=await response.json();setRows(result.requests??[]);setInnerCircle(result.innerCircle??[]);}
   }
-  useEffect(()=>{\n    void fetch("/api/recommenders/request",{cache:"no-store"}).then(async response=>{\n      if(!response.ok)return;\n      const data=await response.json();\n      setRows(data.requests??[]);setInnerCircle(data.innerCircle??[]);\n    }).catch(()=>{});\n  },[]);
+  useEffect(()=>{
+    void fetch("/api/recommenders/request",{cache:"no-store"}).then(async response=>{
+      if(!response.ok)return;
+      const data=await response.json();
+      setRows(data.requests??[]);setInnerCircle(data.innerCircle??[]);
+    }).catch(()=>{});
+  },[]);
   async function submit(e:FormEvent<HTMLFormElement>) {
     e.preventDefault();setBusy(true);setNotice("");
     try{
