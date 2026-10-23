@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import {
   createSupportInvitation,
   destinationForRelationship,
@@ -60,6 +62,15 @@ describe("Role Invitations", () => {
     expect(permitted.has(requirePlaybookRole("scholar-athlete"))).toBe(true);
     expect(permitted.has(requirePlaybookRole("family"))).toBe(false);
     expect(() => requirePlaybookRole("unknown_role")).toThrow("Unsupported Playbook role");
+  });
+
+  it("uses strict canonical roles on both invitation authorization boundaries", () => {
+    const ui = readFileSync(resolve(process.cwd(), "components/invitations/InvitationCenter.tsx"), "utf8");
+    const api = readFileSync(resolve(process.cwd(), "app/api/invitations/send/route.ts"), "utf8");
+    expect(ui).toContain("requirePlaybookRole(");
+    expect(api).toContain("requirePlaybookRole(");
+    expect(ui).not.toContain("normalizePlaybookRole(");
+    expect(api).not.toContain("normalizePlaybookRole(");
   });
 
   it("component is defined", () => {
