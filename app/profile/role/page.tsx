@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import SportPositionField from "@/components/profile/SportPositionField";
+import ActivityProfileField from "@/components/profile/ActivityProfileField";
 import { getOnboardingSteps } from "@/lib/onboarding/engine";
 import { ALL_COLLEGE_OPTIONS, CAREER_OPTIONS, CALIFORNIA_DISTRICTS } from "@/lib/onboarding";
 import { PLAYBOOK_ROLES, requirePlaybookRole, type PlaybookRole } from "@/lib/roles/registry";
@@ -141,7 +142,9 @@ export default function RoleProfilePage() {
             const current = Array.isArray(value) ? value : [];
             return <div key={field.key} style={{ margin: "20px 0" }}>
               <label htmlFor={field.key} style={labelStyle}>{field.label}</label>
-              {isListEditableField(field)
+              {field.type === "activity-list"
+                ? <ActivityProfileField value={value} onChange={entries => update(field.key, entries)} />
+                : isListEditableField(field)
                 ? <><textarea id={field.key} rows={4} style={inputStyle}
                     value={formatListAnswers(value)}
                     placeholder="One entry per line. Saved as private planning answers; no invitations are sent."
