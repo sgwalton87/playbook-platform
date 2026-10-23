@@ -12,7 +12,7 @@ describe("Durable owner profile and invitation contracts",()=>{
    expect(stableProfileSnapshot({bio:"hello"})).not.toBe(stableProfileSnapshot({bio:""}));
  });
  it("both editors only confirm save after owner-scoped readback",()=>{
-  for(const path of ["app/profile/role/page.tsx","app/profile/advanced/page.tsx"]){
+  for(const path of ["components/profile/RoleProfileEditor.tsx","app/profile/advanced/page.tsx"]){
    const source=read(path);
    expect(source).toContain('stableProfileSnapshot(persisted.onboarding_data)');
    expect(source).toContain('stableProfileSnapshot(latest.onboarding_data)');
@@ -20,7 +20,7 @@ describe("Durable owner profile and invitation contracts",()=>{
   }
  });
  it("Athlete fields appear only in the modern dedicated module",()=>{
-  const main=read("app/profile/role/page.tsx");
+  const main=read("components/profile/RoleProfileEditor.tsx");
   const route=read("app/profile/athlete/page.tsx");
   expect(main).toContain('athlete-profile');
   expect(main).toContain('athlete-recruiting');
