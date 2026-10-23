@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 const startSource = readFileSync("app/start/page.tsx", "utf8");
 const profileEntrySource = readFileSync("app/profile/page.tsx", "utf8");
-const profileSource = readFileSync("app/profile/role/page.tsx", "utf8");
+const profileSource = readFileSync("components/profile/RoleProfileEditor.tsx", "utf8");
 
 describe("onboarding and profile persistence audit contracts", () => {
   it("debounces onboarding autosave through the existing owner-scoped profile path", () => {
