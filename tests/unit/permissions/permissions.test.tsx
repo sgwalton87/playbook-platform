@@ -23,7 +23,8 @@ describe("Role OS Permissions", () => {
 
   it("returns the exact relationship graph", () => {
     const graph = getRelationshipGraph();
-    expect(graph.length).toBe(12);
+    expect(graph.length).toBe(13);
+    expect(graph.some((entry) => entry.relationship === "brand_partner" && entry.permissions.length === 0)).toBe(true);
     expect(graph.some((entry) => entry.relationship === "college_recruiter")).toBe(true);
     expect(graph.some((entry) => entry.relationship === "college_admissions")).toBe(true);
     expect(graph.some((entry) => entry.relationship === "community_partner")).toBe(true);
