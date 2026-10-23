@@ -16,7 +16,7 @@ const EXPECTED_ROLE: Record<string, string> = {
   parent_guardian: "family", mentor: "mentor", educator: "educator",
   counselor: "high-school-counselor", coach: "coach", district_admin: "district",
   college_recruiter: "college-coach", college_admissions: "college-admissions",
-  community_partner: "other", employer_partner: "employer",
+  community_partner: "other", brand_partner: "brand-partner", employer_partner: "employer",
 };
 
 export async function POST(req: NextRequest) {
