@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import SportPositionField from "@/components/profile/SportPositionField";
 import { getOnboardingSteps } from "@/lib/onboarding/engine";
+import { ALL_COLLEGE_OPTIONS, CAREER_OPTIONS, CALIFORNIA_DISTRICTS } from "@/lib/onboarding";
 import { PLAYBOOK_ROLES, requirePlaybookRole, type PlaybookRole } from "@/lib/roles/registry";
 import type { OnboardingValue } from "@/lib/onboarding/types";
 import { getRoleEditableFields, isListEditableField, parseListAnswers, formatListAnswers } from "@/lib/onboarding/editableFields";
@@ -126,9 +127,9 @@ export default function RoleProfilePage() {
           <button type="button" onClick={() => router.push("/profile/advanced")} style={{ border: 0, borderRadius: 10, padding: "12px 16px", background: "#0f2c4b", color: "#fff", fontWeight: 800, cursor: "pointer" }}>Open advanced profile tools →</button>
         </aside>
       )}
-      <datalist id="profile-college-options"><option value="University of California, Berkeley" /><option value="University of California, Los Angeles" /><option value="Stanford University" /></datalist>
-      <datalist id="profile-career-options"><option value="Education" /><option value="Engineering" /><option value="Healthcare" /><option value="Entrepreneurship" /></datalist>
-      <datalist id="profile-district-options"><option value="Oakland Unified School District" /><option value="Los Angeles Unified School District" /></datalist>
+      <datalist id="profile-college-options">{ALL_COLLEGE_OPTIONS.map(name => <option key={name} value={name} />)}</datalist>
+      <datalist id="profile-career-options">{CAREER_OPTIONS.map(name => <option key={name} value={name} />)}</datalist>
+      <datalist id="profile-district-options">{CALIFORNIA_DISTRICTS.map(name => <option key={name} value={name} />)}</datalist>
       {steps.map(step => {
         const stepFields = fields.filter(field => field.stepId === step.id);
         if (!stepFields.length) return null;
