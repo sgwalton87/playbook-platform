@@ -2,7 +2,8 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 const startSource = readFileSync("app/start/page.tsx", "utf8");
-const profileSource = readFileSync("app/profile/page.tsx", "utf8");
+const profileEntrySource = readFileSync("app/profile/page.tsx", "utf8");
+const profileSource = readFileSync("app/profile/role/page.tsx", "utf8");
 
 describe("onboarding and profile persistence audit contracts", () => {
   it("debounces onboarding autosave through the existing owner-scoped profile path", () => {
@@ -21,7 +22,8 @@ describe("onboarding and profile persistence audit contracts", () => {
 
   it("requires a confirmed profile row before reporting save success", () => {
     expect(profileSource).toContain('.select("id").maybeSingle()');
-    expect(profileSource).toContain("if(error || !updated)");
+    expect(profileEntrySource).toContain('export { default } from "./role/page"');
+    expect(profileSource).toContain("if (error || !data)");
     expect(profileSource).toContain('role="alert"');
   });
 });
