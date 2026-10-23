@@ -7,7 +7,10 @@ const IDENTITY = (label: string): OnboardingStep => ({
   title: `Create your ${label} profile.`,
   body: "Your name, handle, photo, and story personalize your Playbook experience.",
   fields: [
-    { key: "full_name", label: "Full name", placeholder: "Your name" },
+    { key: "first_name", label: "First name", placeholder: "First name" },
+    { key: "last_name", label: "Last name", placeholder: "Last name" },
+    { key: "date_of_birth", label: "Date of birth (private)", placeholder: "YYYY-MM-DD" },
+    { key: "gender", label: "Gender (private, optional)", type: "select", options: ["Woman", "Man", "Nonbinary", "Self-describe", "Prefer not to say"] },
     { key: "username", label: "Username / handle", placeholder: "ex: futureleader" },
     { key: "bio", label: "Short bio", type: "textarea", placeholder: "Tell the community who you are becoming." },
   ],
@@ -78,7 +81,8 @@ const ATHLETE_PROFILE: OnboardingStep = {
     { key: "secondary_sport", label: "Secondary sport", type: "select", options: ["None", ...SPORT_OPTIONS] },
     { key: "position", label: "Position / event", type: "sport-position" },
     { key: "current_team", label: "Current team / club", placeholder: "School, AAU, club, travel team..." },
-    { key: "height_weight", label: "Height / weight if applicable", placeholder: "ex: 5'11 / 150" },
+    { key: "height", label: "Height (optional)", placeholder: "feet and inches" },
+    { key: "weight", label: "Weight (optional)", placeholder: "lbs" },
     { key: "key_stats_honors", label: "Key stats / honors", type: "textarea", placeholder: "Awards, stats, honors, captain roles..." },
   ],
 };

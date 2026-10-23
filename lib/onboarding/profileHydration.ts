@@ -15,6 +15,10 @@ export function hydrateProfileFromOnboarding<T extends Record<string, unknown>>(
   const mappings: Record<string, string> = {
     full_name: "full_name",
     bio: "bio",
+    gender: "gender",
+    date_of_birth: "date_of_birth",
+    height: "height",
+    weight: "weight",
     race: "race",
     school: "school",
     grade: "grade",
@@ -48,12 +52,16 @@ export function hydrateProfileFromOnboarding<T extends Record<string, unknown>>(
   }
 
   const names = typeof source.full_name === "string" ? source.full_name.trim() : "";
-  if (names) {
+  if (names && !source.first_name && !source.last_name) {
     const space = names.indexOf(" ");
     merged.first_name = space < 0 ? names : names.slice(0, space);
     merged.last_name = space < 0 ? "" : names.slice(space + 1);
   }
 
+  if (typeof source.first_name === "string" && source.first_name.trim()) merged.first_name = source.first_name.trim();
+  if (typeof source.last_name === "string" && source.last_name.trim()) merged.last_name = source.last_name.trim();
+  // Race/ethnicity answers can contain multiple selections. Keep them private
+  // in the onboarding snapshot and never coerce them into a public profile field.
   const schools = source.top_schools;
   if (Array.isArray(schools)) {
     schools.filter((x): x is string => typeof x === "string" && x.trim().length > 0)
@@ -79,6 +87,8 @@ export function reconcileProfileSave(
   const next = { ...prior };
   const keys: Record<string, string> = {
     full_name: "full_name", bio: "bio", school: "school", grade: "grade",
+    first_name: "first_name", last_name: "last_name", gender: "gender",
+    date_of_birth: "date_of_birth", height: "height", weight: "weight",
     dream_school: "dream_school", school_district: "school_district",
     grad_year: "graduation_year", intended_major: "intended_major",
     sport: "primary_sport", position: "position", travel_team: "current_team",

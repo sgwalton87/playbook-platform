@@ -5,8 +5,11 @@ on:
     branches: [main]
     paths:
       - "app/profile/**"
+      - "app/auth/callback/**"
       - "lib/onboarding/**"
       - "tests/acceptance/profile-recovery-roundtrip.spec.ts"
+      - "tests/acceptance/role-onboarding-activation.spec.ts"
+      - "tests/acceptance/role-signup-email-verification.spec.ts"
       - "supabase/**"
       - ".github/workflows/profile-recovery-isolated.yml"
   workflow_dispatch:
@@ -43,6 +46,24 @@ jobs:
               path.rename(folder / f"20260101{i:06d}_{suffix}")
           print(f"Prepared {len(scripts)} unique local-only migration IDs")
           PY
+      - name: Assert isolated email verification is enabled
+        run: |
+          grep -q "^\\[auth.email\\]$" supabase/config.toml
+          grep -q "^enable_confirmations = true$" supabase/config.toml
+      - name: Reserve nondefault disposable database ports
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("supabase/config.toml")
+          contents = p.read_text()
+          if "port = 54322" not in contents or "shadow_port = 54320" not in contents:
+              raise SystemExit("Unexpected local Supabase port configuration")
+          contents = contents.replace("port = 54322", "port = 55422", 1)
+          contents = contents.replace("shadow_port = 54320", "shadow_port = 55420", 1)
+          p.write_text(contents)
+          print("Disposable isolated QA DB uses 55422, shadow 55420")
+          PY
       - name: Start isolated local Supabase stack
         run: npx supabase start
       - name: Prepare local acceptance configuration
@@ -69,9 +90,12 @@ jobs:
             'NEXT_PUBLIC_SUPABASE_ANON_KEY='+pairs.ANON_KEY,
             'SUPABASE_SERVICE_ROLE_KEY='+pairs.SERVICE_ROLE_KEY,
             'PLAYWRIGHT_BASE_URL=http://127.0.0.1:3000',
-            'PBOS_ALLOW_SYNTHETIC_AUTH_WRITE=YES'
+            'PBOS_ALLOW_SYNTHETIC_AUTH_WRITE=YES',
+            'NEXT_PUBLIC_HCAPTCHA_SITE_KEY=10000000-ffff-ffff-ffff-000000000001'
           ].join('\n')+'\n');
           NODE
+      - name: Provision and verify all 15 disposable role QA accounts
+        run: node scripts/qa/provision-role-test-accounts.mjs
       - name: Build app against local database
         run: npm run build
       - name: Start Playbook preview on runner
@@ -86,8 +110,12 @@ jobs:
           exit 1
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
-      - name: Run real synthetic Scholar-Athlete round-trip
-        run: npx playwright test tests/acceptance/profile-recovery-roundtrip.spec.ts --project=chromium
+      - name: Certify Family onboarding profile save and reload first
+        timeout-minutes: 6
+        run: npx playwright test tests/acceptance/profile-recovery-roundtrip.spec.ts --project=chromium --grep "Family account sees Family onboarding"
+      - name: Run complete isolated role profiles and onboarding activation journeys
+        timeout-minutes: 12
+        run: npx playwright test tests/acceptance/profile-recovery-roundtrip.spec.ts tests/acceptance/role-onboarding-activation.spec.ts tests/acceptance/role-signup-email-verification.spec.ts --project=chromium
       - name: Upload sanitized diagnostics
         if: failure()
         uses: actions/upload-artifact@v4

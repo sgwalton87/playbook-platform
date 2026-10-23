@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import BrandPartnerVerificationGate from "@/components/brand/BrandPartnerVerificationGate";
+import CanonicalRoleIdentityBoundary from "@/components/role-os/CanonicalRoleIdentityBoundary";
 import {
   PlaybookButton,
   PlaybookCard,
@@ -43,9 +44,11 @@ function firstPartner(value: unknown): Partner | null {
 
 export default function BrandPartnerOSPage() {
   return (
-    <BrandPartnerVerificationGate>
-      <BrandPartnerWorkspace />
-    </BrandPartnerVerificationGate>
+    <CanonicalRoleIdentityBoundary role="brand-partner">
+      <BrandPartnerVerificationGate>
+        <BrandPartnerWorkspace />
+      </BrandPartnerVerificationGate>
+    </CanonicalRoleIdentityBoundary>
   );
 }
 

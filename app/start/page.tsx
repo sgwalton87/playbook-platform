@@ -10,6 +10,7 @@ import { ALL_COLLEGE_OPTIONS, CAREER_OPTIONS, ACTIVITY_OPTIONS, CALIFORNIA_DISTR
 import { normalizeRole } from "@/lib/onboarding/pathwayMap";
 import { resolveOnboardingRoleBinding } from "@/lib/onboarding/roleBinding";
 import { PLAYBOOK_HERO_VISUALS } from "@/lib/brand-story";
+import { PLAYBOOK_ROLES } from "@/lib/roles/registry";
 
 export default function StartPage() {
   return (
@@ -269,27 +270,6 @@ function StartContent() {
     };
   }, [form, user?.id, stepIndex, creating, created]);
 
-  async function sendInvites() {
-    const emails = Array.isArray(form.invite_supporters)
-      ? form.invite_supporters.filter(Boolean)
-      : [];
-
-    await Promise.all(
-      emails.map((email: string) =>
-        fetch("/api/invitations/send", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email,
-            role: "supporter",
-            scholarId: user?.id,
-            message: "I’m building my Playbook and would like you to support my journey.",
-          }),
-        }).catch(() => null)
-      )
-    );
-  }
-
   async function next(skip = false) {
     setSaving(true);
     setJourneyError(null);
@@ -316,9 +296,8 @@ function StartContent() {
       lastSavedFormRef.current = JSON.stringify(form);
       setAutosaveStatus("saved");
 
-      if (step.id === "network") {
-        await sendInvites();
-      }
+      // Supporter addresses remain private planning data. Invitations require a
+      // separate explicit user action in the governed Support Network experience.
 
       if (isLast) {
         setCreating(true);
@@ -331,7 +310,7 @@ function StartContent() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            displayName: String(form.full_name || "Scholar"),
+            displayName: String(form.full_name || PLAYBOOK_ROLES[role].label),
             goalTitle: String(form.dream_school || form.ideal_profession || "Complete my scholar journey"),
           }),
         });
@@ -384,9 +363,9 @@ function StartContent() {
         <div style={heroText}>
           <PlaybookLogo size={108} priority />
           <p style={eyebrow}>Start Here · {role}</p>
-          <h1 style={heroTitle}>Build the record that opens your next door.</h1>
+          <h1 style={heroTitle}>Welcome to {PLAYBOOK_ROLES[role].osLabel}.</h1>
           <p style={heroBody}>
-            Your answers autosave to your private Scholar Record. You choose separately whether to publish a public profile.
+            Your answers autosave to your private Playbook profile for this role. Any sharing or public visibility is managed separately.
           </p>
           <p role="status" aria-live="polite" style={{ ...heroBody, fontSize: 13, marginTop: 8 }}>
             {autosaveStatus === "saving" && "Saving your progress…"}
