@@ -71,6 +71,7 @@ export default function UnifiedAppShell({ children }: { children: React.ReactNod
   const mobileItems = roleNav.items.slice(0, 4);
   const profileItem: NavItem = { label: "Profile", href: "/profile", icon: "👤" };
   const attentionTotal = context.unreadAttentionCount + context.pendingVerificationCount;
+  const canInviteSupport = ["scholar", "scholar-athlete", "transition-youth"].includes(String(profile?.profile_mode || profile?.role || "").replaceAll("_", "-"));
 
   return <div className="playbook-app-shell" data-visual-canon="PGDS-001" data-playbook-surface="authenticated-product-shell" style={{ gridTemplateColumns: open ? "var(--pb-sidebar-width) 1fr" : "var(--pb-sidebar-compact) 1fr" }}>
     <aside className="playbook-sidebar" data-playbook-sidebar="true">
@@ -111,6 +112,7 @@ export default function UnifiedAppShell({ children }: { children: React.ReactNod
         </div>
         <Link href={roleNav.home} className="playbook-topbar__mode">{roleNav.label}</Link>
       </header>
+      {canInviteSupport && <div style={{ padding: "12px 16px", display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", background: "#102540", color: "#FFFFFF" }}><span>Build your support network</span><Link href="/invitations" style={{ background: "#F97316", color: "white", borderRadius: 10, padding: "10px 14px", fontWeight: 800, textDecoration: "none" }}>Invite supporter</Link></div>}
       {children}
       <nav className="playbook-mobile-bottom-nav" aria-label="Primary mobile navigation">{[...mobileItems, profileItem].map((item) => {
         const active = pathname === item.href || pathname?.startsWith(item.href + "/");
