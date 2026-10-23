@@ -33,7 +33,10 @@ export default function RoleJourneyDashboard({role}:{role:PlaybookRole}) {
   useEffect(() => {
     try {
       const saved = Number(window.sessionStorage.getItem("playbook-journey-screen:" + role));
-      if (Number.isInteger(saved) && saved >= 0 && saved < 5) setIndex(saved);
+      if (Number.isInteger(saved) && saved >= 0 && saved < 5) {
+        const timer = window.setTimeout(() => setIndex(saved), 0);
+        return () => window.clearTimeout(timer);
+      }
     } catch { /* Browsers may disable session storage. */ }
   }, [role]);
   useEffect(() => {
