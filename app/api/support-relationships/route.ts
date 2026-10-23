@@ -14,12 +14,11 @@ export async function GET() {
 
     if (result.error) throw new Error(result.error.message);
 
-    const activeSupporterIds = [...new Set((result.data ?? []).filter((item) => item.status === "active" && item.scholar_id === user.id && item.supporter_id).map((item) => item.supporter_id as string))];
-    const avatarResult = activeSupporterIds.length
-      ? await supabase.from("profiles").select("id,avatar_url").in("id", activeSupporterIds)
-      : null;
-    // RLS determines which profile photos may be exposed. Missing or denied photos use initials.
-    const avatars = new Map((avatarResult?.error ? [] : avatarResult?.data ?? []).map((profile) => [profile.id, profile.avatar_url]));
+    // Owner-scoped read-only projection reveals only active supporters' avatars.
+    const avatarResult = await supabase.rpc("get_active_supporter_avatars");
+    const avatars = new Map<string, string>((avatarResult.error ? [] : avatarResult.data ?? []).map(
+      (item: { supporter_id: string; avatar_url: string }) => [item.supporter_id, item.avatar_url]
+    ));
 
     return NextResponse.json({
       ok: true,
