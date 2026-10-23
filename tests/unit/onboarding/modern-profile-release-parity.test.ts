@@ -41,6 +41,13 @@ describe("modern profile release parity", () => {
     expect(editor).not.toContain("onboarding_completed:");
   });
 
+  it("uses the same approved autocomplete sources as onboarding", () => {
+    expect(editor).toContain("ALL_COLLEGE_OPTIONS.map");
+    expect(editor).toContain("CAREER_OPTIONS.map");
+    expect(editor).toContain("CALIFORNIA_DISTRICTS.map");
+    expect(editor).toContain('field.type === "college" || field.type === "career" || field.type === "district"');
+  });
+
   it("keeps typed inputs and confirmed owner-scoped save", () => {
     expect(editor).toContain('field.type === "sport-position"');
     expect(editor).toContain('type="date"');
