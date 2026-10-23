@@ -1,5 +1,5 @@
-import { stableProfileSnapshot } from "@/lib/onboarding/stableSnapshot";
 "use client";
+import { stableProfileSnapshot } from "@/lib/onboarding/stableSnapshot";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
