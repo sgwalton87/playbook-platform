@@ -69,6 +69,28 @@ try {
   assert(!state.error && state.data.status==='approved' && !state.data.campaign_scope_approved && !state.data.compliance_scope_approved,'Scope escalation detected');
   const audit=await admin.from('brand_partner_review_audit').select('id').eq('request_id',requestId);
   assert(!audit.error && audit.data.length===1,'Decision audit missing');
+  // Scope escalation is explicit and independently audited.
+  const campaignGrant=await admin.from('brand_partner_reviewer_grants').insert({reviewer_id:reviewer.id,review_scope:'campaign',grant_reason:'Disposable campaign QA'});
+  assert(!campaignGrant.error,'Synthetic campaign grant failed');
+  const campaignDecision=await reviewer.client.rpc('decide_brand_partner_review',{p_request_id:requestId,p_scope:'campaign',p_decision:'approve',p_reason:'Synthetic campaign review'});
+  assert(!campaignDecision.error,'Authorized campaign review failed: '+campaignDecision.error?.message);
+  const campaignState=await admin.from('brand_partner_verification_requests').select('campaign_scope_approved,compliance_scope_approved').eq('id',requestId).single();
+  assert(campaignState.data?.campaign_scope_approved && !campaignState.data?.compliance_scope_approved,'Campaign approval improperly granted compliance scope');
+  const complianceDenied=await reviewer.client.rpc('decide_brand_partner_review',{p_request_id:requestId,p_scope:'compliance',p_decision:'approve',p_reason:'Synthetic compliance review'});
+  assert(complianceDenied.error,'Campaign reviewer unexpectedly approved compliance scope');
+  const complianceGrant=await admin.from('brand_partner_reviewer_grants').insert({reviewer_id:reviewer.id,review_scope:'compliance',grant_reason:'Disposable compliance QA'});
+  assert(!complianceGrant.error,'Synthetic compliance grant failed');
+  const complianceDecision=await reviewer.client.rpc('decide_brand_partner_review',{p_request_id:requestId,p_scope:'compliance',p_decision:'approve',p_reason:'Synthetic compliance accepted'});
+  assert(!complianceDecision.error,'Authorized compliance review failed: '+complianceDecision.error?.message);
+  const fullyApproved=await admin.from('brand_partner_verification_requests').select('status,campaign_scope_approved,compliance_scope_approved').eq('id',requestId).single();
+  assert(fullyApproved.data?.status==='approved' && fullyApproved.data?.campaign_scope_approved && fullyApproved.data?.compliance_scope_approved,'Full authorized approval sequence failed');
+  const reviewerAudit=await admin.from('brand_partner_review_audit').select('review_scope').eq('request_id',requestId);
+  assert(!reviewerAudit.error && reviewerAudit.data?.length===3,'Expected three separate scope audit events');
+  const revoke=await admin.from('brand_partner_reviewer_grants').update({active:false,revoked_at:new Date().toISOString()}).eq('reviewer_id',reviewer.id).eq('review_scope','compliance');
+  assert(!revoke.error,'Could not revoke synthetic reviewer compliance grant');
+  const afterRevoke=await reviewer.client.rpc('decide_brand_partner_review',{p_request_id:requestId,p_scope:'compliance',p_decision:'approve',p_reason:'Revoked reviewer should fail'});
+  assert(afterRevoke.error,'Revoked reviewer retained compliance approval authority');
+  console.log('Synthetic organization, campaign, compliance and revocation boundaries PASS');
   const claim1=await admin.rpc('claim_brand_partner_notification');
   assert(!claim1.error && claim1.data?.[0]?.request_id===requestId,'Worker could not claim queued notification');
   const attempt=claim1.data[0].attempt_count;
