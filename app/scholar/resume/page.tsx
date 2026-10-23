@@ -110,7 +110,7 @@ function ScholarResumeWorkspace() {
         </section>
         <div className="sj-panel">
           <div className="sj-actions"><label className="sj-consent"><input type="checkbox" checked={privacyConfirmed} onChange={e => setPrivacyConfirmed(e.target.checked)} /><span>I have reviewed the selected entries. I understand that downloaded files are stored on my device and cannot be revoked or updated by Playbook after export. I will protect this file and review whom I share it with.</span></label><button className="sj-action" type="button" disabled={selected.length===0 || !privacyConfirmed} onClick={() => window.print()}>Print / Save as PDF</button></div>
-          <p className="sj-note">PDF is saved through your browser's Print → Save as PDF option. External links are not enabled yet.</p>
+          <p className="sj-note">PDF is saved through your browser&apos;s Print → Save as PDF option. External links are not enabled yet.</p>
           <article className="sj-draft" aria-label="Private résumé preview"><header className="sj-print-brand"><div className="sj-brand">PLAYBOOK SERIES · SCHOLAR RECORD™</div><div className="sj-brand-rule" aria-hidden="true" /></header>
             <h2>{draft.name}</h2>
             {draft.school && <p>{draft.school}</p>}
