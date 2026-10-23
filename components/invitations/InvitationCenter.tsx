@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { normalizePlaybookRole } from "@/lib/roles/registry";
+import { requirePlaybookRole } from "@/lib/roles/registry";
 
 type InviteResult = {
   invitation?: { id: string; inviteeName: string; inviteeEmail: string };
@@ -26,8 +26,16 @@ export default function InvitationCenter() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { if (mounted) setAuthorized(false); return; }
       const profile = await supabase.from("profiles").select("role,profile_mode").eq("id", user.id).maybeSingle();
-      const role = normalizePlaybookRole(profile.data?.profile_mode ?? profile.data?.role);
-      if (mounted) setAuthorized(!profile.error && ["scholar", "scholar-athlete", "transition-youth"].includes(role ?? ""));
+      let authorized = false;
+      if (!profile.error) {
+        try {
+          const role = requirePlaybookRole(profile.data?.profile_mode ?? profile.data?.role);
+          authorized = ["scholar", "scholar-athlete", "transition-youth"].includes(role);
+        } catch {
+          authorized = false; // Unknown role must never inherit Scholar invitation authority.
+        }
+      }
+      if (mounted) setAuthorized(authorized);
     })();
     return () => { mounted = false; };
   }, []);
