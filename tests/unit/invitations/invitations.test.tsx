@@ -67,7 +67,9 @@ describe("Role Invitations", () => {
   it("uses strict canonical roles on both invitation authorization boundaries", () => {
     const ui = readFileSync(resolve(process.cwd(), "components/invitations/InvitationCenter.tsx"), "utf8");
     const api = readFileSync(resolve(process.cwd(), "app/api/invitations/send/route.ts"), "utf8");
-    expect(ui).toContain("requirePlaybookRole(");
+    expect(ui).toContain('fetch("/api/invitations/manage"');
+    const manageApi = readFileSync(resolve(process.cwd(), "app/api/invitations/manage/route.ts"), "utf8");
+    expect(manageApi).toContain("requirePlaybookRole(");
     expect(api).toContain("requirePlaybookRole(");
     expect(ui).not.toContain("normalizePlaybookRole(");
     expect(api).not.toContain("normalizePlaybookRole(");
