@@ -175,23 +175,3 @@ end; $$;
 revoke all on function public.list_submitted_recommendation_vault() from public, anon;
 grant execute on function public.list_submitted_recommendation_vault() to authenticated;
 
--- Application packet creation must obey the same owner/onboarded learner gate.
--- The older application-workspaces-own policy invokes a globally revoked helper,
--- which denies a legitimate Scholar in the isolated end-to-end journey.
-drop policy if exists "application-workspaces-own" on public.application_workspaces;
-create policy "application-workspaces-own"
-on public.application_workspaces for all to authenticated
-using (
-  scholar_id = (select auth.uid())
-  and exists (select 1 from public.profiles p
-    where p.id=(select auth.uid())
-      and coalesce(p.profile_mode,p.role) in ('scholar','scholar-athlete','transition-youth')
-      and p.onboarding_completed is true)
-)
-with check (
-  scholar_id = (select auth.uid())
-  and exists (select 1 from public.profiles p
-    where p.id=(select auth.uid())
-      and coalesce(p.profile_mode,p.role) in ('scholar','scholar-athlete','transition-youth')
-      and p.onboarding_completed is true)
-);
