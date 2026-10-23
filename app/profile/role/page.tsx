@@ -133,11 +133,22 @@ export default function RoleProfilePage() {
       bio: String(answers.bio ?? "") || null,
       onboarding_data: updatedAnswers,
     }).eq("id", profile.id).select("id").maybeSingle();
+    if (error || !data) { setSaving(false); setNotice("Changes could not be saved. Please try again."); return; }
+    // A successful UPDATE request alone does not certify durable persistence.
+    // Read the owner-scoped row back before showing the green saved message.
+    const { data: persisted, error: verifyError } = await supabase.from("profiles")
+      .select("onboarding_data,first_name,last_name,full_name").eq("id", profile.id).maybeSingle();
     setSaving(false);
-    if (error || !data) { setNotice("Changes could not be saved. Please try again."); return; }
+    if (verifyError || !persisted ||
+        JSON.stringify(persisted.onboarding_data ?? {}) !== JSON.stringify(updatedAnswers) ||
+        (persisted.first_name ?? "") !== firstName ||
+        (persisted.last_name ?? "") !== lastName) {
+      setNotice("Save could not be verified. Your changes may not be stored. Please reload and confirm before leaving.");
+      return;
+    }
     setAnswers(updatedAnswers);
     setProfile(previous => previous ? { ...previous, onboarding_data: updatedAnswers } : previous);
-    setNotice("Saved. Your onboarding answers and profile are synchronized.");
+    setNotice("Saved and verified. Your answers were read back from your private Playbook profile.");
   }
 
   if (pending) return <main style={shell} role="status">Loading your profile…</main>;
