@@ -40,8 +40,8 @@ test("synthetic profile data survives edit and reload", async ({ page }) => {
     await page.waitForURL(url => url.pathname !== "/login", { timeout: 15000 });
     await page.goto("/profile");
     await expect(page).toHaveURL(url => url.pathname === "/profile");
-    await page.getByRole("button", { name: /academic/i }).first().click();
-    const school = page.locator('input[value="Recovery Academy"]').first();
+    await expect(page.getByRole("heading", { name: "Map your academic path." })).toBeVisible();
+    const school = page.getByLabel("Current high school / institution", { exact: true });
     await expect(school).toBeVisible();
     await school.fill("Recovery Institute");
     await page.getByRole("button", { name: /save changes/i }).first().click();
@@ -53,8 +53,8 @@ test("synthetic profile data survives edit and reload", async ({ page }) => {
       return row.data?.school;
     }).toBe("Recovery Institute");
     await page.reload();
-    await page.getByRole("button", { name: /academic/i }).first().click();
-    await expect(page.locator('input[value="Recovery Institute"]').first()).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Map your academic path." })).toBeVisible();
+    await expect(page.getByLabel("Current high school / institution", { exact: true })).toHaveValue("Recovery Institute");
     const check = await admin.from("profiles").select("onboarding_data").eq("id", id).single();
     expect(check.data?.onboarding_data).toMatchObject({ school: "Recovery Institute",
       activities: ["Service learning"], primary_sport: "Basketball", current_team: "Recovery Club" });
@@ -106,8 +106,8 @@ test("Family account sees Family onboarding and edits its own saved profile with
     await expect(page.getByText("Create your Scholar-Athlete profile.", { exact: true })).toHaveCount(0);
 
     await page.goto("/profile");
-    await page.waitForURL(url => url.pathname === "/profile/role", { timeout: 15000 });
-    await expect(page.getByRole("heading", { name: "Parent / Guardian Profile", exact: true })).toBeVisible();
+    await expect(page).toHaveURL(url => url.pathname === "/profile");
+    await expect(page.getByRole("heading", { name: "Family OS · My Profile", exact: true })).toBeVisible();
     await expect(page.getByLabel("Relationship to scholar")).toHaveValue("Parent");
     await page.getByLabel("Relationship to scholar").selectOption("Guardian");
     await page.getByRole("button", { name: "Save Changes", exact: true }).click();
@@ -182,7 +182,7 @@ for (const role of nonScholarRoles) {
     await page.getByRole("button", { name: "Log In", exact: true }).click();
     await page.waitForURL(url => url.pathname !== "/login", { timeout: 15000 });
     await page.goto("/profile");
-    await page.waitForURL(url => url.pathname === "/profile/role", { timeout: 15000 });
+    await expect(page).toHaveURL(url => url.pathname === "/profile");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     await expect(page.getByLabel("Last name", { exact: true })).toHaveValue("Before");
     await page.getByLabel("Last name", { exact: true }).fill("After");
