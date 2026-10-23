@@ -101,6 +101,13 @@ export default function RoleProfilePage() {
         <h1 style={{ marginBottom: 8, fontSize: "clamp(30px, 5vw, 48px)", lineHeight: 1.1 }}>{PLAYBOOK_ROLES[role].osLabel} · My Profile</h1>
         <p style={{ lineHeight: 1.6, marginBottom: 0 }}>Update the same information you entered during onboarding. Background answers stay private; public visibility is managed separately.</p>
       </header>
+      {(role === "scholar" || role === "scholar-athlete") && (
+        <aside style={{ border: "1px solid #fed7aa", background: "#fff7ed", borderRadius: 16, padding: 18, marginBottom: 20 }}>
+          <strong>Additional Scholar profile tools</strong>
+          <p style={{ margin: "8px 0 12px", lineHeight: 1.6 }}>Existing avatar, academic records, recruiting, sports, NIL, social, and pillars tools are preserved in your advanced editor while we integrate them into the updated experience.</p>
+          <button type="button" onClick={() => router.push("/profile/advanced")} style={{ border: 0, borderRadius: 10, padding: "12px 16px", background: "#0f2c4b", color: "#fff", fontWeight: 800, cursor: "pointer" }}>Open advanced profile tools →</button>
+        </aside>
+      )}
       {steps.map(step => {
         const stepFields = fields.filter(field => field.stepId === step.id);
         if (!stepFields.length) return null;
