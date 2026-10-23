@@ -53,7 +53,7 @@ export default function RoleProfilePage() {
       setProfile(record);
       setRole(canonical);
       const fullName = String(saved.full_name ?? record.full_name ?? "").trim();
-      const nameParts = fullName.split(/\\s+/).filter(Boolean);
+      const nameParts = fullName.split(/\s+/).filter(Boolean);
       const fallbackFirst = nameParts[0] ?? "";
       const fallbackLast = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
       // Never overwrite an explicitly saved name, but fill sparse legacy profiles
