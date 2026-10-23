@@ -6,6 +6,7 @@ type Relationship = {
   id: string;
   scholar_id: string;
   supporter_id: string | null;
+  avatar_url?: string | null;
   supporter_name: string | null;
   supporter_email: string;
   relationship: string;
@@ -43,11 +44,12 @@ export default function SupportNetworkMap() {
           <div style={{ width: 118, height: 118, borderRadius: "50%", background: "#0F172A", color: "white", display: "grid", placeItems: "center", textAlign: "center", fontWeight: 800 }}>Scholar Record</div>
           {network.map((person) => (
             <div key={person.id} style={{ width: 128, display: "grid", justifyItems: "center", gap: 6, textAlign: "center" }}>
-              <div role="img" aria-label={person.supporter_name || "Supporter"} style={{ width: 72, height: 72, borderRadius: "50%", background: "#F97316", color: "white", display: "grid", placeItems: "center", fontWeight: 800, fontSize: 24 }}>
-                {(person.supporter_name || person.supporter_email).trim().slice(0, 1).toUpperCase()}
+              <div role="img" aria-label={person.supporter_name || "Supporter"} style={{ width: 72, height: 72, borderRadius: "50%", overflow: "hidden", background: "#F97316", color: "white", display: "grid", placeItems: "center", fontWeight: 800, fontSize: 24 }}>
+                {person.avatar_url ? <img src={person.avatar_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : (person.supporter_name || person.supporter_email).trim().slice(0, 1).toUpperCase()}
               </div>
               <strong style={{ fontSize: 13, overflowWrap: "anywhere" }}>{person.supporter_name || person.supporter_email}</strong>
               <small>{person.relationship.replaceAll("_", " ")}</small>
+              <a href="/messages" style={{ fontSize: 12 }}>Open messages</a>
             </div>
           ))}
           {!error && userId && network.length === 0 && <p>No active supporters yet. Start by inviting someone to your network.</p>}
