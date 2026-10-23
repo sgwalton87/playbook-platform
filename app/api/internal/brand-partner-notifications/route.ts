@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { sendPlaybookEmail } from "@/lib/email/emailService";
@@ -12,7 +13,11 @@ export async function POST(request: NextRequest) {
   if (!secret || !url || !key || !process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
     return NextResponse.json({ error: "Delivery worker configuration incomplete." }, { status: 503 });
   }
-  if (request.headers.get("authorization") !== `Bearer ${secret}`) {
+  const supplied = request.headers.get("authorization") ?? "";
+  const expected = `Bearer ${secret}`;
+  const authorized = Buffer.byteLength(supplied) === Buffer.byteLength(expected)
+    && timingSafeEqual(Buffer.from(supplied), Buffer.from(expected));
+  if (!authorized) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
