@@ -5,7 +5,6 @@ import type { PlaybookRoleOS } from "@/lib/role-os";
 import {
   buildRoleRecommendations,
   buildRoleScenarios,
-  explainRoleIntelligence,
 } from "@/lib/role-intelligence";
 
 const roles: PlaybookRoleOS[] = [
@@ -29,7 +28,7 @@ export default function RoleIntelligenceCenter() {
 
   const rec = buildRoleRecommendations(role);
   const scenario = buildRoleScenarios(role);
-  const explanation = explainRoleIntelligence(role);
+  const explanation = rec.signal + " This scenario is illustrative, not a verified benefit or financial projection.";
 
   return (
     <main style={page}>
@@ -75,11 +74,7 @@ export default function RoleIntelligenceCenter() {
           <p style={eyebrow}>Scenario</p>
           <h2 style={cardTitle}>{scenario.scenario}</h2>
 
-          <div style={metrics}>
-            <Metric label="Trust" value={`+${scenario.impact.trust}`} />
-            <Metric label="Opportunity" value={`+${scenario.impact.opportunity}`} />
-            <Metric label="Scholarship" value={`+$${scenario.impact.scholarship.toLocaleString()}`} />
-          </div>
+          <p style={body}>Illustrative planning scenario only. No verified outcome, scholarship award, or numeric impact is predicted here. Connect authorized Scholar Record evidence to receive personalized, explainable guidance.</p>
         </article>
       </section>
 
@@ -89,15 +84,6 @@ export default function RoleIntelligenceCenter() {
         <p style={body}>{explanation}</p>
       </section>
     </main>
-  );
-}
-
-function Metric({ label, value }: { label: string; value: string }) {
-  return (
-    <div style={metric}>
-      <span>{label}</span>
-      <strong>{value}</strong>
-    </div>
   );
 }
 
@@ -203,22 +189,6 @@ const check: React.CSSProperties = {
   placeItems: "center",
   fontSize: 12,
   fontWeight: 900,
-};
-
-const metrics: React.CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit,minmax(120px,1fr))",
-  gap: 10,
-};
-
-const metric: React.CSSProperties = {
-  background: "#F8FAFC",
-  border: "1px solid #E2E8F0",
-  borderRadius: 16,
-  padding: 14,
-  display: "grid",
-  gap: 6,
-  color: "#0F172A",
 };
 
 const explain: React.CSSProperties = {

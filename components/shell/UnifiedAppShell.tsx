@@ -70,7 +70,7 @@ export default function UnifiedAppShell({ children }: { children: React.ReactNod
   }
 
   const displayName = profile?.full_name || `${profile?.first_name || ""} ${profile?.last_name || ""}`.trim() || profile?.username || "Playbook User";
-  const mobileItems = roleNav.items.slice(0, 4);
+  const mobileItems = roleNav.items.filter((item) => item.href !== "/profile").slice(0, 4);
   const profileItem: NavItem = { label: "Profile", href: "/profile", icon: "👤" };
   const attentionTotal = context.unreadAttentionCount + context.pendingVerificationCount;
   let journeyRole: PlaybookRole | null = null;
