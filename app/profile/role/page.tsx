@@ -8,7 +8,7 @@ import { getOnboardingSteps } from "@/lib/onboarding/engine";
 import { ALL_COLLEGE_OPTIONS, CAREER_OPTIONS, CALIFORNIA_DISTRICTS } from "@/lib/onboarding";
 import { PLAYBOOK_ROLES, requirePlaybookRole, type PlaybookRole } from "@/lib/roles/registry";
 import type { OnboardingValue } from "@/lib/onboarding/types";
-import { getRoleEditableFields, isListEditableField, parseListAnswers, formatListAnswers } from "@/lib/onboarding/editableFields";
+import { getRoleEditableFields } from "@/lib/onboarding/editableFields";
 
 type SavedProfile = {
   id: string;
@@ -144,12 +144,26 @@ export default function RoleProfilePage() {
               <label htmlFor={field.key} style={labelStyle}>{field.label}</label>
               {field.type === "activity-list"
                 ? <ActivityProfileField value={value} onChange={entries => update(field.key, entries)} />
-                : isListEditableField(field)
-                ? <><textarea id={field.key} rows={4} style={inputStyle}
-                    value={formatListAnswers(value)}
-                    placeholder="One entry per line. Saved as private planning answers; no invitations are sent."
-                    onChange={e => update(field.key, parseListAnswers(e.target.value))} />
-                    <p style={{ color: "#64748b", fontSize: 12 }}>One entry per line. This editor does not send invitations or grant access.</p></>
+                : field.type === "college-list" || field.type === "invite-list"
+                ? <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 260px), 1fr))", gap: 12 }}>
+                    {Array.from({ length: field.type === "college-list" ? 10 : 5 }, (_, index) =>
+                      <label key={index} style={labelStyle}>
+                        {index + 1}. {field.type === "college-list" ? "College" : "Contact email"}
+                        <input type={field.type === "invite-list" ? "email" : "text"}
+                          list={field.type === "college-list" ? "profile-college-options" : undefined}
+                          style={inputStyle} value={typeof current[index] === "string" ? current[index] : ""}
+                          onChange={e => {
+                            const next = Array.from({ length: field.type === "college-list" ? 10 : 5 }, (_, i) =>
+                              typeof current[i] === "string" ? current[i] : "");
+                            next[index] = e.target.value;
+                            update(field.key, next);
+                          }}
+                          placeholder={field.placeholder || ""} />
+                      </label>)}
+                    <p style={{ gridColumn: "1 / -1", color: "#64748b", fontSize: 12 }}>
+                      {field.type === "invite-list" ? "Contacts stay private. Saving this list never sends an invitation or creates access." : "Your college preferences are saved privately."}
+                    </p>
+                  </div>
                 : field.type === "sport-position"
                 ? <SportPositionField sport={String(answers.primary_sport ?? "")} value={String(value ?? "")} onChange={next => update(field.key, next)} inputStyle={inputStyle} labelStyle={labelStyle} />
                 : field.key === "date_of_birth"
