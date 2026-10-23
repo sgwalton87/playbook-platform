@@ -114,7 +114,7 @@ export async function POST(req: NextRequest) {
       to: request.recommenderEmail,
       subject: email.subject,
       text: email.text,
-      fromType: "onboarding",
+      fromType: "lor",
     });
 
     const marked = await supabase.from("recommender_requests").update({status:"sent"}).eq("id",data.id).eq("scholar_id",user.id);
