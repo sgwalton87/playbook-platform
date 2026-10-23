@@ -1,3 +1,5 @@
+import { requirePlaybookRole, PLAYBOOK_ROLES } from "@/lib/roles/registry";
+
 export type ExperienceMode = "active" | "foundation" | "demo" | "studio";
 
 export function getExperienceMode(pathname: string): ExperienceMode {
@@ -26,8 +28,6 @@ export function getExperienceModeLabel(mode: ExperienceMode) {
   if (mode === "demo") return "Demo Mode";
   return "Founder / Studio";
 }
-
-import { requirePlaybookRole, PLAYBOOK_ROLES } from "@/lib/roles/registry";
 
 export function getRoleHomeRoute(role?: string | null) {
   if (!role) return "/dashboard"; // Compatibility-only anonymous route; never authorization.
