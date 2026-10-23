@@ -79,6 +79,16 @@ export default function RoleProfilePage() {
     const lastName = String(answers.last_name ?? "").trim();
     const fullName = [firstName, lastName].filter(Boolean).join(" ") || String(answers.full_name ?? "").trim();
     const updatedAnswers: Record<string, OnboardingValue> = { ...answers, first_name: firstName, last_name: lastName, full_name: fullName };
+    // Empty UI slots are not meaningful saved answers. Preserve order of entered values.
+    for (const field of fields) {
+      if (field.type !== "college-list" && field.type !== "invite-list") continue;
+      const list = updatedAnswers[field.key];
+      if (Array.isArray(list)) {
+        updatedAnswers[field.key] = list.filter((entry): entry is string =>
+          typeof entry === "string" && entry.trim().length > 0
+        ).map(entry => entry.trim());
+      }
+    }
     // Keep compatible persisted profile columns in sync with the private draft.
     // Only fields submitted by the member are written; never write authorization state.
     const writableLegacyFields: Record<string, string> = {
