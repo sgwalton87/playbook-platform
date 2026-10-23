@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
 
 type Relationship = {
   id: string;
@@ -45,16 +47,16 @@ export default function SupportNetworkMap() {
           {network.map((person) => (
             <div key={person.id} style={{ width: 128, display: "grid", justifyItems: "center", gap: 6, textAlign: "center" }}>
               <div role="img" aria-label={person.supporter_name || "Supporter"} style={{ width: 72, height: 72, borderRadius: "50%", overflow: "hidden", background: "#F97316", color: "white", display: "grid", placeItems: "center", fontWeight: 800, fontSize: 24 }}>
-                {person.avatar_url ? <img src={person.avatar_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : (person.supporter_name || person.supporter_email).trim().slice(0, 1).toUpperCase()}
+                {person.avatar_url ? <Image src={person.avatar_url} width={72} height={72} unoptimized alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : (person.supporter_name || person.supporter_email).trim().slice(0, 1).toUpperCase()}
               </div>
               <strong style={{ fontSize: 13, overflowWrap: "anywhere" }}>{person.supporter_name || person.supporter_email}</strong>
               <small>{person.relationship.replaceAll("_", " ")}</small>
-              <a href="/messages" style={{ fontSize: 12 }}>Open messages</a>
+              <Link href="/messages" style={{ fontSize: 12 }}>Open messages</Link>
             </div>
           ))}
           {!error && userId && network.length === 0 && <p>No active supporters yet. Start by inviting someone to your network.</p>}
         </div>
-        <a href="/invitations" style={{ display: "inline-block", marginTop: 18, padding: 12, background: "#F97316", color: "white", borderRadius: 10, textDecoration: "none", fontWeight: 800 }}>Invite a supporter</a>
+        <Link href="/invitations" style={{ display: "inline-block", marginTop: 18, padding: 12, background: "#F97316", color: "white", borderRadius: 10, textDecoration: "none", fontWeight: 800 }}>Invite a supporter</Link>
         <p style={{ fontSize: 13 }}>A connection becomes available for direct messaging only when its relationship is active and the messaging authority contract permits it.</p>
       </div>
     </section>
