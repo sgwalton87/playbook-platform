@@ -46,6 +46,8 @@ describe("Brand Partner OS authority gate", () => {
     expect(api).toContain("sycoywalton@playbookseriesinc.org");
     expect(api).toContain("sendPlaybookEmail");
     expect(api).toContain("if (existing.data) return NextResponse.json");
+    expect(api).toContain('existing.data.status === "approved" ? "organization_approved"');
+    expect(api).toContain('existing.data.status === "rejected" ? "action_required"');
     expect(api).toContain(".insert({");
     expect(api).not.toContain(".upsert({");
     expect(api).toContain('result.error.code === "23505"');
