@@ -31,6 +31,16 @@ describe("modern profile release parity", () => {
     expect(editor).toContain('role === "scholar" || role === "scholar-athlete"');
   });
 
+  it("syncs only known non-authority legacy fields alongside private onboarding answers", () => {
+    expect(editor).toContain('primary_sport: "sport"');
+    expect(editor).toContain('school_district: "school_district"');
+    expect(editor).toContain('date_of_birth: "date_of_birth"');
+    expect(editor).toContain("...compatibleUpdates");
+    expect(editor).toContain("onboarding_data: updatedAnswers");
+    expect(editor).not.toContain("verification_status:");
+    expect(editor).not.toContain("onboarding_completed:");
+  });
+
   it("keeps typed inputs and confirmed owner-scoped save", () => {
     expect(editor).toContain('field.type === "sport-position"');
     expect(editor).toContain('type="date"');
