@@ -1,3 +1,3 @@
 "use client";
-import { RoleProfileEditor } from "@/app/profile/role/page";
+import { RoleProfileEditor } from "@/components/profile/RoleProfileEditor";
 export default function AthleteAndRecruitingProfilePage(){return <RoleProfileEditor mode="athlete"/>;}
