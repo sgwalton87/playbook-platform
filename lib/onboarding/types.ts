@@ -28,5 +28,6 @@ export type OnboardingStep = {
   fields: OnboardingField[];
 };
 
-export type OnboardingValue = string | string[] | boolean | number | null | undefined;
+export type OnboardingActivity = { activity: string; category: string; description: string; hours: string; supervisor: string };
+export type OnboardingValue = string | string[] | Array<string | OnboardingActivity> | boolean | number | null | undefined;
 export type OnboardingData = Record<string, OnboardingValue>;

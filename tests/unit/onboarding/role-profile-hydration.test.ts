@@ -23,6 +23,15 @@ describe("canonical onboarding to editable profile parity", () => {
     expect(saved).toMatchObject({ first_name: "Updated", last_name: "Scholar", height: "5 ft 10 in", grade: "12", intended_major: "Biology" });
   });
 
+  it("does not erase college preferences when saving unrelated profile fields", () => {
+    const prior = { top_schools: ["Stanford", "UCLA"], intended_major: "Biology" };
+    const updated = reconcileProfileSave(prior, { bio: "Updated bio" });
+    expect(updated.top_schools).toEqual(["Stanford", "UCLA"]);
+    expect(updated.bio).toBe("Updated bio");
+    const explicit = reconcileProfileSave(prior, { college_list_2: "Berkeley", college_list_3: null });
+    expect(explicit.top_schools).toEqual(["Berkeley"]);
+  });
+
   it("Family onboarding never asks for scholar athlete measurements", () => {
     const familyKeys = getOnboardingSteps("family").flatMap(step => step.fields.map(field => field.key));
     expect(familyKeys).toContain("relationship_to_scholar");

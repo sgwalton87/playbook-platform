@@ -30,7 +30,7 @@ test("synthetic profile data survives edit and reload", async ({ page }) => {
       first_name: "Historical", last_name: "Profile", school: "Old Academy",
       onboarding_data: { full_name: "Recovery Scholar", school: "Recovery Academy",
         primary_sport: "Basketball", current_team: "Recovery Club",
-        activities: ["Service learning"], top_schools: ["Princeton"] } }, { onConflict: "id" });
+        activities: [{ activity: "Service learning", category: "Service", hours: "15", supervisor: "Advisor", description: "Community tutoring" }], top_schools: ["Princeton"] } }, { onConflict: "id" });
     if (seed.error) throw seed.error;
     await page.goto("/login");
     await page.getByLabel("Email", { exact: true }).fill(email);
@@ -40,10 +40,16 @@ test("synthetic profile data survives edit and reload", async ({ page }) => {
     await page.waitForURL(url => url.pathname !== "/login", { timeout: 15000 });
     await page.goto("/profile");
     await expect(page).toHaveURL(url => url.pathname === "/profile");
-    await page.getByRole("button", { name: /academic/i }).first().click();
-    const school = page.locator('input[value="Recovery Academy"]').first();
+    await expect(page.getByRole("heading", { name: "Map your academic path." })).toBeVisible();
+    const stalePage = await page.context().newPage();
+    await stalePage.goto("/profile");
+    await expect(stalePage.getByLabel("Current high school / institution", { exact: true })).toBeVisible();
+    const school = page.getByLabel("Current high school / institution", { exact: true });
     await expect(school).toBeVisible();
     await school.fill("Recovery Institute");
+    const firstCollege = page.getByLabel("1. College", { exact: true });
+    await expect(firstCollege).toHaveValue("Princeton");
+    await firstCollege.fill("Stanford University");
     await page.getByRole("button", { name: /save changes/i }).first().click();
     await page.waitForTimeout(400);
     const saveAlerts = (await page.getByRole("alert").allTextContents()).map(text => text.trim()).filter(Boolean);
@@ -53,11 +59,23 @@ test("synthetic profile data survives edit and reload", async ({ page }) => {
       return row.data?.school;
     }).toBe("Recovery Institute");
     await page.reload();
-    await page.getByRole("button", { name: /academic/i }).first().click();
-    await expect(page.locator('input[value="Recovery Institute"]').first()).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Map your academic path." })).toBeVisible();
+    await expect(page.getByLabel("Activity").first()).toHaveValue("Service learning");
+    await expect(page.getByLabel("Mentor / Supervisor").first()).toHaveValue("Advisor");
+    await expect(page.getByLabel("Description").first()).toHaveValue("Community tutoring");
+    await expect(page.getByLabel("Current high school / institution", { exact: true })).toHaveValue("Recovery Institute");
+    await expect(page.getByLabel("1. College", { exact: true })).toHaveValue("Stanford University");
+    await stalePage.getByLabel("Current high school / institution", { exact: true }).fill("Stale Academy");
+    await stalePage.getByRole("button", { name: /save changes/i }).first().click();
+    await expect(stalePage.getByText("Your profile was updated elsewhere. Reload to review those changes before saving.")).toBeVisible();
+    const stillSaved = await admin.from("profiles").select("school,onboarding_data").eq("id", id).single();
+    expect(stillSaved.error).toBeNull();
+    expect(stillSaved.data?.school).toBe("Recovery Institute");
+    expect(stillSaved.data?.onboarding_data).toMatchObject({ school: "Recovery Institute", top_schools: ["Stanford University"] });
+    await stalePage.close();
     const check = await admin.from("profiles").select("onboarding_data").eq("id", id).single();
     expect(check.data?.onboarding_data).toMatchObject({ school: "Recovery Institute",
-      activities: ["Service learning"], primary_sport: "Basketball", current_team: "Recovery Club" });
+      activities: [{ activity: "Service learning", category: "Service", hours: "15", supervisor: "Advisor", description: "Community tutoring" }], top_schools: ["Stanford University"], primary_sport: "Basketball", current_team: "Recovery Club" });
   } finally {
     const cleanup = await admin.auth.admin.deleteUser(id);
     if (cleanup.error) console.warn("Synthetic user cleanup needs operator follow-up");
@@ -106,8 +124,8 @@ test("Family account sees Family onboarding and edits its own saved profile with
     await expect(page.getByText("Create your Scholar-Athlete profile.", { exact: true })).toHaveCount(0);
 
     await page.goto("/profile");
-    await page.waitForURL(url => url.pathname === "/profile/role", { timeout: 15000 });
-    await expect(page.getByRole("heading", { name: "Parent / Guardian Profile", exact: true })).toBeVisible();
+    await expect(page).toHaveURL(url => url.pathname === "/profile");
+    await expect(page.getByRole("heading", { name: "Family OS · My Profile", exact: true })).toBeVisible();
     await expect(page.getByLabel("Relationship to scholar")).toHaveValue("Parent");
     await page.getByLabel("Relationship to scholar").selectOption("Guardian");
     await page.getByRole("button", { name: "Save Changes", exact: true }).click();
@@ -182,7 +200,7 @@ for (const role of nonScholarRoles) {
     await page.getByRole("button", { name: "Log In", exact: true }).click();
     await page.waitForURL(url => url.pathname !== "/login", { timeout: 15000 });
     await page.goto("/profile");
-    await page.waitForURL(url => url.pathname === "/profile/role", { timeout: 15000 });
+    await expect(page).toHaveURL(url => url.pathname === "/profile");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     await expect(page.getByLabel("Last name", { exact: true })).toHaveValue("Before");
     await page.getByLabel("Last name", { exact: true }).fill("After");
