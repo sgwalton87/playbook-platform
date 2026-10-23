@@ -7,7 +7,7 @@ import InboxV2 from "@/components/messages/InboxV2";
 export default function MessagesPage() {
   return <>
     <div style={{ maxWidth: 1180, margin: "12px auto 0", padding: "0 16px" }}>
-      <Link href="/messages/meeting-links" style={{ fontWeight: 800 }}>Share meeting link →</Link>
+      <Link href="/messages/meeting-links" style={{ display: "inline-block", background: "#C2410C", color: "#FFFFFF", padding: "13px 18px", borderRadius: 12, fontWeight: 900, textDecoration: "none", border: "2px solid #FFFFFF" }}>Share meeting link →</Link>
     </div>
     <Suspense fallback={<p role="status" aria-live="polite">Loading governed conversations…</p>}><InboxV2 /></Suspense>
   </>;
