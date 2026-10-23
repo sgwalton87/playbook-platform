@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import ConfidentialPlaybookSeal from "@/components/recommenders/ConfidentialPlaybookSeal";
 import { CanonicalRoleAuthorityGate } from "@/components/role-os/RoleAuthorityGate";
 
 type Letter={vaultId:string;title:string;requestId:string;artifactId:string;confidentiality:"open"|"confidential";createdAt:string};
@@ -48,7 +49,10 @@ function RecommendationsVault(){
     {letters.length===0&&!status&&<p>No submitted recommendation letters yet. <Link href="/recommenders">Request your first letter.</Link></p>}
     <div style={{display:"grid",gap:16}}>
       {letters.map(letter=><article key={letter.vaultId} style={{border:"1px solid #ddd",borderRadius:14,padding:18}}>
-        <h2 style={{fontSize:20}}>{letter.title}</h2>
+        <div style={{display:"flex",gap:18,alignItems:"center",flexWrap:"wrap"}}>
+          {letter.confidentiality==="confidential" && <ConfidentialPlaybookSeal />}
+          <div><h2 style={{fontSize:20}}>{letter.title}</h2><small>{letter.confidentiality==="confidential" ? "Sealed · Recommender-controlled confidentiality" : "Open recommendation · Scholar-viewable"}</small></div>
+        </div>
         <p>{letter.confidentiality==="confidential"?"Confidential — content hidden, submission tracked":"Open letter — available to read in your account"}</p>
         {letter.confidentiality==="open"&&<button type="button" onClick={()=>void open(letter)}>View open letter</button>}
         {opened[letter.artifactId]&&<section aria-label="Open recommendation content" style={{whiteSpace:"pre-wrap",background:"#f9fafb",padding:16,marginTop:12}}>{opened[letter.artifactId]}</section>}
