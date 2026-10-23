@@ -17,6 +17,7 @@ const INVITABLE_RELATIONSHIPS = [
   { value: "employer_partner", label: "Employer / Workforce Partner" },
 ] as const;
 
+type ManagedInvitation = { id: string; invitee_name: string; invitee_email: string; relationship: string; status: string };
 type InviteResult = {
   invitation?: { id: string; inviteeName: string; inviteeEmail: string };
   email?: { url?: string };
@@ -33,6 +34,7 @@ export default function InvitationCenter() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<InviteResult | null>(null);
+  const [invitations, setInvitations] = useState<ManagedInvitation[]>([]);
 
   useEffect(() => {
     let mounted = true;
@@ -50,9 +52,35 @@ export default function InvitationCenter() {
         }
       }
       if (mounted) setAuthorized(authorized);
+      if (authorized) void reloadInvitations();
     })();
     return () => { mounted = false; };
   }, []);
+
+  async function reloadInvitations() {
+    try {
+      const response = await fetch("/api/invitations/manage", { cache: "no-store" });
+      if (!response.ok) return;
+      const payload = await response.json();
+      setInvitations(payload.invitations || []);
+    } catch { /* Invite form remains usable even when list is unavailable. */ }
+  }
+
+  async function withdrawInvitation(invitationId: string) {
+    if (!window.confirm("Withdraw this pending invitation? To select a different role, send a new one.")) return;
+    setError("");
+    try {
+      const response = await fetch("/api/invitations/manage", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "withdraw", invitationId }),
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || "Unable to withdraw invitation.");
+      await reloadInvitations();
+    } catch (failure) {
+      setError(failure instanceof Error ? failure.message : "Unable to withdraw invitation.");
+    }
+  }
 
   async function sendInvitation(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -68,6 +96,7 @@ export default function InvitationCenter() {
       const payload: InviteResult = await response.json();
       if (!response.ok) throw new Error(payload.error || "Unable to create invitation.");
       setResult(payload);
+      await reloadInvitations();
     } catch (failure) {
       setError(failure instanceof Error ? failure.message : "Unable to create invitation.");
     } finally { setBusy(false); }
@@ -95,6 +124,17 @@ export default function InvitationCenter() {
             <button disabled={busy} type="submit" style={button}>{busy ? "Creating invitation…" : "Send Support Network invitation"}</button>
           </form>
         )}
+        {authorized && <section style={{ marginTop: 26 }}>
+          <h2 style={{ fontSize: 23 }}>Your invitations</h2>
+          <p>Pending invitations are tied to the email and relationship you selected. Withdraw a pending request and resend to change its proposed type.</p>
+          {invitations.map((invitation) => (
+            <div key={invitation.id} style={{ padding: 14, border: "1px solid #36506E", borderRadius: 12, marginTop: 10 }}>
+              <strong>{invitation.invitee_name}</strong>
+              <p style={{ overflowWrap: "anywhere" }}>{invitation.invitee_email} · {invitation.relationship.replaceAll("_", " ")} · {invitation.status}</p>
+              {invitation.status === "pending" && <button type="button" style={button} onClick={() => void withdrawInvitation(invitation.id)}>Withdraw pending request</button>}
+            </div>
+          ))}
+        </section>}
         {error && <p role="alert" style={{ color: "#FFC1AD" }}>{error}</p>}
         {result && <div role="status" style={{ marginTop: 24, padding: 18, borderRadius: 14, background: "#1C3551" }}>
           <strong>Invitation created for {result.invitation?.inviteeName}.</strong>
