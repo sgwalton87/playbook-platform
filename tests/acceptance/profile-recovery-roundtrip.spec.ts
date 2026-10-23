@@ -41,6 +41,9 @@ test("synthetic profile data survives edit and reload", async ({ page }) => {
     await page.goto("/profile");
     await expect(page).toHaveURL(url => url.pathname === "/profile");
     await expect(page.getByRole("heading", { name: "Map your academic path." })).toBeVisible();
+    const stalePage = await page.context().newPage();
+    await stalePage.goto("/profile");
+    await expect(stalePage.getByLabel("Current high school / institution", { exact: true })).toBeVisible();
     const school = page.getByLabel("Current high school / institution", { exact: true });
     await expect(school).toBeVisible();
     await school.fill("Recovery Institute");
@@ -62,6 +65,14 @@ test("synthetic profile data survives edit and reload", async ({ page }) => {
     await expect(page.getByLabel("Description").first()).toHaveValue("Community tutoring");
     await expect(page.getByLabel("Current high school / institution", { exact: true })).toHaveValue("Recovery Institute");
     await expect(page.getByLabel("1. College", { exact: true })).toHaveValue("Stanford University");
+    await stalePage.getByLabel("Current high school / institution", { exact: true }).fill("Stale Academy");
+    await stalePage.getByRole("button", { name: /save changes/i }).first().click();
+    await expect(stalePage.getByText("Your profile was updated elsewhere. Reload to review those changes before saving.")).toBeVisible();
+    const stillSaved = await admin.from("profiles").select("school,onboarding_data").eq("id", id).single();
+    expect(stillSaved.error).toBeNull();
+    expect(stillSaved.data?.school).toBe("Recovery Institute");
+    expect(stillSaved.data?.onboarding_data).toMatchObject({ school: "Recovery Institute", top_schools: ["Stanford University"] });
+    await stalePage.close();
     const check = await admin.from("profiles").select("onboarding_data").eq("id", id).single();
     expect(check.data?.onboarding_data).toMatchObject({ school: "Recovery Institute",
       activities: [{ activity: "Service learning", category: "Service", hours: "15", supervisor: "Advisor", description: "Community tutoring" }], top_schools: ["Stanford University"], primary_sport: "Basketball", current_team: "Recovery Club" });
