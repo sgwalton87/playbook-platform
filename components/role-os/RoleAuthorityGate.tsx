@@ -154,6 +154,12 @@ export function CanonicalRoleAuthorityGate({ role, children }: { role: PlaybookR
       body={familyDetail ?? contract.requirement}
       message={`Your ${PLAYBOOK_ROLES[role].label} onboarding profile is complete. You are in the correct Operating System, but restricted capabilities remain locked until the independent ${contract.adapter} contract is certified.`}
     >
+      {role === "family" && <div style={{ marginTop: 22, lineHeight: 1.6, color: "#E4EEFA" }}>
+        <p><strong>How to activate Family access</strong></p>
+        <p>Ask the Scholar or Scholar-Athlete you support to sign in and select <strong>Invite Parent/Guardian</strong> from their dashboard. They must invite the exact email address you use to log into Playbook.</p>
+        <p>Open the invitation link sent to that email and accept while signed in with your own Family account. Your permitted Family dashboard activates after the relationship is confirmed.</p>
+        <p>Already received an invitation? Open its private link to accept it. No new account is needed.</p>
+      </div>}
       {canReviewMentors && <MentorValidationQueue showEmpty />}
     </RoleGateSurface>
   );
