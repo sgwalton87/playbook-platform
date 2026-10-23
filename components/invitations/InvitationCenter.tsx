@@ -19,7 +19,7 @@ const INVITABLE_RELATIONSHIPS = [
 
 type ManagedInvitation = { id: string; invitee_name: string; invitee_email: string; relationship: string; status: string; invite_code?: string | null };
 type InviteResult = {
-  invitation?: { id: string; inviteeName: string; inviteeEmail: string };
+  invitation?: { id: string; inviteeName: string; inviteeEmail: string; inviteCode?: string };
   email?: { url?: string };
   deliveryStatus?: string;
   deliveryError?: string;
