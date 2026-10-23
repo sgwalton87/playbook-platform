@@ -42,7 +42,8 @@ export async function POST(req: NextRequest) {
       const { data: invite, error: inviteError } = await supabase.from("support_invitations")
         .select("relationship").eq("token", token).maybeSingle();
       if (inviteError) return NextResponse.json({ error: "Invitation validation unavailable." }, { status: 400 });
-      if (invite) {
+      if (!invite) return NextResponse.json({ error: "Invitation not found for this account and email." }, { status: 404 });
+      {
         const expected = EXPECTED_ROLE[invite.relationship];
         if (!expected) return NextResponse.json({ error: "This relationship requires separate verification." }, { status: 403 });
         const { data: profile, error: profileError } = await supabase.from("profiles")
