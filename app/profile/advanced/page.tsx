@@ -232,8 +232,8 @@ export default function AdvancedScholarProfilePage() {
 
   return(
     <>
-      <div style={{padding:"28px 32px",boxSizing:"border-box"}}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}input:focus,select:focus,textarea:focus{border-color:${T.orange}!important;outline:none;}input::placeholder,textarea::placeholder{color:${T.faint};}select{appearance:none;}.tog:hover{border-color:${T.orange}!important;}`}</style>
+      <div className="playbook-advanced-profile" style={{padding:"28px 32px",boxSizing:"border-box"}}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}input:focus,select:focus,textarea:focus{border-color:${T.orange}!important;outline:none;}input::placeholder,textarea::placeholder{color:${T.faint};}select{appearance:none;}.tog:hover{border-color:${T.orange}!important;} .playbook-advanced-profile input,.playbook-advanced-profile select,.playbook-advanced-profile textarea{min-width:0;max-width:100%;} @media(max-width:640px){.playbook-advanced-profile{padding:16px 16px calc(180px + env(safe-area-inset-bottom))!important;}.playbook-advanced-profile [style*="grid-template-columns: 1fr 1fr"]{grid-template-columns:minmax(0,1fr)!important;}.playbook-advanced-profile [style*="grid-template-columns:1fr 1fr"]{grid-template-columns:minmax(0,1fr)!important;}.playbook-advanced-profile [style*="padding: 22px"]{padding:16px!important;}.playbook-advanced-profile input,.playbook-advanced-profile select,.playbook-advanced-profile textarea{font-size:16px!important;}}`}</style>
       <div style={{}}>
 
         {/* Header */}
