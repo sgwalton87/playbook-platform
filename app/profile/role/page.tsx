@@ -33,6 +33,7 @@ export function RoleProfileEditor({ mode = "standard" }: { mode?: "standard" | "
   const [answers, setAnswers] = useState<Record<string, OnboardingValue>>({});
   const [pending, setPending] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [dirty, setDirty] = useState(false);
   const [notice, setNotice] = useState("");
 
   useEffect(() => {
@@ -59,6 +60,7 @@ export function RoleProfileEditor({ mode = "standard" }: { mode?: "standard" | "
       const fallbackLast = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
       // Never overwrite an explicitly saved name, but fill sparse legacy profiles
       // from their existing full_name value rather than presenting blank inputs.
+      setDirty(false);
       setAnswers({
         ...saved,
         first_name: saved.first_name || record.first_name || fallbackFirst,
@@ -77,8 +79,10 @@ export function RoleProfileEditor({ mode = "standard" }: { mode?: "standard" | "
   const visibleSteps = useMemo(() => steps.filter(step => role === "scholar-athlete" && mode === "athlete" ? athleteSteps.has(step.id) : !athleteSteps.has(step.id)), [steps, role, mode]);
   const fields = useMemo(() => getRoleEditableFields(visibleSteps), [visibleSteps]);
 
-  const update = (key: string, value: OnboardingValue) =>
+  const update = (key: string, value: OnboardingValue) => {
+    setDirty(true);
     setAnswers(previous => ({ ...previous, [key]: value }));
+  };
 
   async function save() {
     if (!profile || !role || saving) return;
@@ -150,6 +154,7 @@ export function RoleProfileEditor({ mode = "standard" }: { mode?: "standard" | "
       return;
     }
     setAnswers(updatedAnswers);
+    setDirty(false);
     setProfile(previous => previous ? { ...previous, onboarding_data: updatedAnswers } : previous);
     setNotice("Saved and verified. Your answers were read back from your private Playbook profile.");
   }
@@ -175,6 +180,10 @@ export function RoleProfileEditor({ mode = "standard" }: { mode?: "standard" | "
       <datalist id="profile-college-options">{ALL_COLLEGE_OPTIONS.map(name => <option key={name} value={name} />)}</datalist>
       <datalist id="profile-career-options">{CAREER_OPTIONS.map(name => <option key={name} value={name} />)}</datalist>
       <datalist id="profile-district-options">{CALIFORNIA_DISTRICTS.map(name => <option key={name} value={name} />)}</datalist>
+      <div style={{ display:"flex", justifyContent:"space-between", flexWrap:"wrap", alignItems:"center", gap:12, background:"#fff", padding:16, borderRadius:16, marginBottom:18 }}>
+        <strong>{dirty ? "You have unsaved changes" : "Profile loaded from your saved answers"}</strong>
+        <button type="button" onClick={() => void save()} disabled={saving || !dirty} style={{ background:"#ea580c", color:"#fff", border:0, padding:"12px 18px", fontWeight:800, borderRadius:10 }}>{saving?"Saving…":"Save & verify now"}</button>
+      </div>
       {visibleSteps.map(step => {
         const stepFields = fields.filter(field => field.stepId === step.id);
         if (!stepFields.length) return null;
