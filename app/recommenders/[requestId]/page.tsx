@@ -40,7 +40,7 @@ export default function RecommenderLetterPage({params}:{params:Promise<{requestI
   return <main style={{maxWidth:760,margin:"auto",padding:24,fontFamily:"system-ui"}}>
     <p style={{fontSize:12,letterSpacing:2,color:"#98763c"}}>PLAYBOOK SERIES · RECOMMENDATION LETTER</p>
     <h1>Write a recommendation</h1>
-    <p>To protect Scholars, sign in with the verified email address that received the request. This invitation does not disclose the Scholar's private records.</p>
+    <p>To protect Scholars, sign in with the verified email address that received the request. This invitation does not disclose the Scholar&apos;s private records.</p>
     {state==="loading"&&<p role="status">Checking your invitation…</p>}
     {state==="error"&&<p role="alert">{message} <Link href="/login">Sign in</Link></p>}
     {item&&<section style={{border:"1px solid #ccc",borderRadius:12,padding:18}}>
