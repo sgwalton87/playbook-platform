@@ -6,6 +6,7 @@ import {
   updateInvitationStatus,
 } from "@/lib/invitations";
 import InvitationCenter from "@/components/invitations/InvitationCenter";
+import { normalizePlaybookRole } from "@/lib/roles/registry";
 
 describe("Role Invitations", () => {
   it("preserves governed Mentor permissions and destination", () => {
@@ -51,6 +52,13 @@ describe("Role Invitations", () => {
 
   it("returns demo invitations", () => {
     expect(getDemoInvitations().length).toBeGreaterThan(0);
+  });
+
+  it("normalizes stored Scholar-Athlete identities before invitation authorization", () => {
+    const permitted = new Set(["scholar", "scholar-athlete", "transition-youth"]);
+    expect(permitted.has(normalizePlaybookRole("scholar_athlete"))).toBe(true);
+    expect(permitted.has(normalizePlaybookRole("scholar-athlete"))).toBe(true);
+    expect(permitted.has(normalizePlaybookRole("family"))).toBe(false);
   });
 
   it("component is defined", () => {
