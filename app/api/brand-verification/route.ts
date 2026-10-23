@@ -31,7 +31,7 @@ export async function POST() {
     if (!profile.data.onboarding_completed) return NextResponse.json({ error: "Complete Brand Partner onboarding before submitting verification." }, { status: 409 });
     const existing = await supabase.from("brand_partner_verification_requests").select("id,status").eq("brand_user_id", user.id).maybeSingle();
     if (existing.error) throw new Error(existing.error.message);
-    if (existing.data) return NextResponse.json({ ok: true, request: existing.data, activationState: "pending_verification", message: "Your Brand Partner verification request has already been received. Independent review remains pending." }, { status: 202 });
+    if (existing.data) return NextResponse.json({ ok: true, request: existing.data, activationState: existing.data.status === "approved" ? "organization_approved" : existing.data.status === "rejected" ? "action_required" : "pending_verification", message: existing.data.status === "approved" ? "Your organization verification has been approved. Any outstanding campaign or compliance permissions remain independently gated." : existing.data.status === "rejected" ? "Your verification request needs attention. Review the decision and available next steps." : "Your Brand Partner verification request has already been received. Independent review remains pending." }, { status: 202 });
     const evidence = buildBrandVerificationEvidence((profile.data.onboarding_data ?? {}) as Record<string, unknown>);
     const result = await supabase.from("brand_partner_verification_requests").insert({
       brand_user_id: user.id, organization_name: evidence.organizationName, partner_title: evidence.partnerTitle,
