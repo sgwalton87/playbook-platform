@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PLAYBOOK_ROLES, type PlaybookRole } from "@/lib/roles/registry";
 
 type Step = { title: string; subtitle: string; href: string; action: string; tip: string };
@@ -30,6 +30,16 @@ const guided: Record<PlaybookRole, [Step,Step,Step,Step,Step]> = {
 export default function RoleJourneyDashboard({role}:{role:PlaybookRole}) {
   const [index,setIndex] = useState(0);
   const [showTip,setShowTip] = useState(true);
+  useEffect(() => {
+    try {
+      const saved = Number(window.sessionStorage.getItem("playbook-journey-screen:" + role));
+      if (Number.isInteger(saved) && saved >= 0 && saved < 5) setIndex(saved);
+    } catch { /* Browsers may disable session storage. */ }
+  }, [role]);
+  useEffect(() => {
+    try { window.sessionStorage.setItem("playbook-journey-screen:" + role, String(index)); }
+    catch { /* Journey remains usable without storage. */ }
+  }, [role,index]);
   const item = guided[role][index];
   return <section data-testid="role-guided-journey" aria-label="Your five next plays" style={{background:"#fff",color:"#0F172A",borderRadius:22,padding:"clamp(16px,4vw,32px)",margin:"18px clamp(12px,3vw,28px)",maxWidth:1050,boxSizing:"border-box"}}>
     <p style={{fontWeight:900,color:"#B45309",letterSpacing:".12em",textTransform:"uppercase"}}>{PLAYBOOK_ROLES[role].label} · Your next play</p>
