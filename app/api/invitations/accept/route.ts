@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { InvitationStatus } from "@/lib/invitations";
 import { requireUser } from "@/lib/supabase/server";
+import { requirePlaybookRole } from "@/lib/roles/registry";
 
 function statusForClaimError(message: string) {
   if (message.includes("Authentication required")) return 401;
@@ -10,6 +11,13 @@ function statusForClaimError(message: string) {
   if (message.includes("already")) return 409;
   return 400;
 }
+
+const EXPECTED_ROLE: Record<string, string> = {
+  parent_guardian: "family", mentor: "mentor", educator: "educator",
+  counselor: "high-school-counselor", coach: "coach", district_admin: "district",
+  college_recruiter: "college-coach", college_admissions: "college-admissions",
+  community_partner: "other", employer_partner: "employer",
+};
 
 export async function POST(req: NextRequest) {
   try {
@@ -28,6 +36,27 @@ export async function POST(req: NextRequest) {
 
     if (status !== "accepted" && status !== "declined") {
       return NextResponse.json({ error: "Invalid invitation status." }, { status: 400 });
+    }
+
+    if (status === "accepted") {
+      const { data: invite, error: inviteError } = await supabase.from("support_invitations")
+        .select("relationship").eq("token", token).maybeSingle();
+      if (inviteError) return NextResponse.json({ error: "Invitation validation unavailable." }, { status: 400 });
+      if (invite) {
+        const expected = EXPECTED_ROLE[invite.relationship];
+        if (!expected) return NextResponse.json({ error: "This relationship requires separate verification." }, { status: 403 });
+        const { data: profile, error: profileError } = await supabase.from("profiles")
+          .select("role,profile_mode").eq("id", user.id).maybeSingle();
+        if (profileError) return NextResponse.json({ error: "Cannot verify account type." }, { status: 400 });
+        let actual: string;
+        try { actual = requirePlaybookRole(profile?.profile_mode ?? profile?.role); }
+        catch { return NextResponse.json({ error: "Complete the correct Playbook account type before accepting." }, { status: 409 }); }
+        if (actual !== expected) {
+          return NextResponse.json({
+            error: `This invitation is for a ${expected} account, but your account is ${actual}. The Scholar must withdraw the pending invitation and invite you with your correct relationship type. Existing account roles are never changed automatically.`
+          }, { status: 409 });
+        }
+      }
     }
 
     const { data, error } = await supabase.rpc("claim_support_invitation", {
