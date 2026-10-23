@@ -42,6 +42,7 @@ describe("Brand Partner OS authority gate", () => {
 
   it("notifies founders without granting approval authority or emailing on repeat submission", () => {
     expect(api).toContain("brandpartners@playbookseriesinc.org");
+    expect(api).toContain("stephishawalton@gmail.com");
     expect(api).toContain("sendPlaybookEmail");
     expect(api).toContain("if (existing.data) return NextResponse.json");
     expect(api).toContain("No campaign or NIL authority has been activated.");
