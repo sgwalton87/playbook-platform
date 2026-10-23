@@ -1,0 +1,28 @@
+{
+  "id": "SJ-05",
+  "title": "Courses end-to-end integration",
+  "status": "proposed",
+  "priority": 95,
+  "dependencies": [
+    "SJ-00",
+    "SJ-01"
+  ],
+  "handbook_refs": [
+    "docs/MASTER_CHECKLIST.md",
+    "docs/ENGINEERING/PBOS_SCHOLAR_JOURNEY_CANONICAL_BUILD_CONTRACT.md",
+    "docs/RELEASE_PROCESS.md"
+  ],
+  "tasks": [
+    "Canonical catalog, lessons, checkpoints, progress, rewards, credentials and Scholar Record sync",
+    "Open isolated scoped PR, record evidence in Command Center, preserve existing canonical data and role permissions"
+  ],
+  "definition_of_done": [
+    "Retry-safe module completion, private answer protection, browser/mobile end-to-end",
+    "Exact implementation SHA, migrations, test evidence and governed acceptance recorded; no unapproved production deploy"
+  ],
+  "validation": [
+    "Retry-safe module completion, private answer protection, browser/mobile end-to-end",
+    "CI, Database Certification, Platform QA and role-based isolated/browser verification before release"
+  ],
+  "next_gate": "SJ-06"
+}
