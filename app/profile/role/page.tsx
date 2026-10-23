@@ -25,7 +25,7 @@ const shell: React.CSSProperties = { minHeight: "100vh", background: "linear-gra
 const inputStyle: React.CSSProperties = { width: "100%", padding: "13px 14px", borderRadius: 12, border: "1px solid #cbd5e1", background: "#fff", color: "#0f172a", fontSize: 16, boxSizing: "border-box" };
 const labelStyle: React.CSSProperties = { display: "block", fontSize: 13, fontWeight: 700, marginBottom: 8 };
 
-export default function RoleProfilePage() {
+export default function RoleProfilePage({ mode = "standard" }: { mode?: "standard" | "athlete" }) {
   const router = useRouter();
   const [profile, setProfile] = useState<SavedProfile | null>(null);
   const [role, setRole] = useState<PlaybookRole | null>(null);
@@ -72,7 +72,9 @@ export default function RoleProfilePage() {
   }, [router]);
 
   const steps = useMemo(() => role ? getOnboardingSteps(role) : [], [role]);
-  const fields = useMemo(() => getRoleEditableFields(steps), [steps]);
+  const athleteSteps = new Set(["athlete-profile", "athlete-recruiting"]);
+  const visibleSteps = useMemo(() => steps.filter(step => role === "scholar-athlete" && mode === "athlete" ? athleteSteps.has(step.id) : !athleteSteps.has(step.id)), [steps, role, mode]);
+  const fields = useMemo(() => getRoleEditableFields(visibleSteps), [visibleSteps]);
 
   const update = (key: string, value: OnboardingValue) =>
     setAnswers(previous => ({ ...previous, [key]: value }));
@@ -159,20 +161,20 @@ export default function RoleProfilePage() {
       <button onClick={() => router.push(PLAYBOOK_ROLES[role].osRoute)} style={{ ...inputStyle, width: "auto", marginBottom: 16 }}>← Back to {PLAYBOOK_ROLES[role].osLabel}</button>
       <header style={{ background: "linear-gradient(135deg, #07182e, #183c62)", color: "#fff", borderRadius: 24, padding: "clamp(22px, 4vw, 40px)", marginBottom: 22, boxShadow: "0 20px 54px rgba(4, 18, 39, .20)" }}>
         <p style={{ color: "#fd923d", margin: 0, fontWeight: 800, letterSpacing: 2, fontSize: 12 }}>YOUR PRIVATE PLAYBOOK ACCOUNT</p>
-        <h1 style={{ marginBottom: 8, fontSize: "clamp(30px, 5vw, 48px)", lineHeight: 1.1 }}>{PLAYBOOK_ROLES[role].osLabel} · My Profile</h1>
+        <h1 style={{ marginBottom: 8, fontSize: "clamp(30px, 5vw, 48px)", lineHeight: 1.1 }}>{PLAYBOOK_ROLES[role].osLabel} · {mode === "athlete" ? "Athlete & Recruiting Profile" : "My Profile"}</h1>
         <p style={{ lineHeight: 1.6, marginBottom: 0 }}>Update the same information you entered during onboarding. Background answers stay private; public visibility is managed separately.</p>
       </header>
-      {(role === "scholar" || role === "scholar-athlete") && (
+      {mode === "standard" && (role === "scholar" || role === "scholar-athlete") && (
         <aside style={{ border: "1px solid #fed7aa", background: "#fff7ed", borderRadius: 16, padding: 18, marginBottom: 20 }}>
-          <strong>Additional Scholar profile tools</strong>
-          <p style={{ margin: "8px 0 12px", lineHeight: 1.6 }}>Existing avatar, academic records, recruiting, sports, NIL, social, and pillars tools are preserved in your advanced editor while we integrate them into the updated experience.</p>
-          <button type="button" onClick={() => router.push("/profile/advanced")} style={{ border: 0, borderRadius: 10, padding: "12px 16px", background: "#0f2c4b", color: "#fff", fontWeight: 800, cursor: "pointer" }}>Open advanced profile tools →</button>
+          <strong>{role === "scholar-athlete" ? "Your Athlete & Recruiting Profile" : "Additional Scholar profile tools"}</strong>
+          <p style={{ margin: "8px 0 12px", lineHeight: 1.6 }}>{role === "scholar-athlete" ? "Build your athlete card and recruiting readiness in a focused, modern module. Your entries share the same saved Scholar-Athlete onboarding record." : "Additional Scholar tools are preserved in the existing editor."}</p>
+          <button type="button" onClick={() => router.push(role === "scholar-athlete" ? "/profile/athlete" : "/profile/advanced")} style={{ border: 0, borderRadius: 10, padding: "12px 16px", background: "#0f2c4b", color: "#fff", fontWeight: 800, cursor: "pointer" }}>{role === "scholar-athlete" ? "Build my athlete profile →" : "Open advanced profile tools →"}</button>
         </aside>
       )}
       <datalist id="profile-college-options">{ALL_COLLEGE_OPTIONS.map(name => <option key={name} value={name} />)}</datalist>
       <datalist id="profile-career-options">{CAREER_OPTIONS.map(name => <option key={name} value={name} />)}</datalist>
       <datalist id="profile-district-options">{CALIFORNIA_DISTRICTS.map(name => <option key={name} value={name} />)}</datalist>
-      {steps.map(step => {
+      {visibleSteps.map(step => {
         const stepFields = fields.filter(field => field.stepId === step.id);
         if (!stepFields.length) return null;
         return <section key={step.id} style={{ background: "#fff", borderRadius: 20, padding: "clamp(18px, 3vw, 28px)", marginBottom: 18, border: "1px solid #e2e8f0", boxShadow: "0 8px 24px rgba(15, 23, 42, .05)" }}>
