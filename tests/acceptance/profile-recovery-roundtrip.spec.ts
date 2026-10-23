@@ -87,7 +87,7 @@ test("synthetic profile data survives edit and reload", async ({ page }) => {
     await stalePage.close();
     const check = await admin.from("profiles").select("onboarding_data").eq("id", id).single();
     expect(check.data?.onboarding_data).toMatchObject({ school: "Recovery Institute",
-      activities: [{ activity: "Service learning", category: "Service", hours: "15", supervisor: "Advisor", description: "Community tutoring" }], top_schools: ["Stanford University"], primary_sport: "Basketball", current_team: "Recovery Club" });
+      activities: [{ activity: "Service learning", category: "Service", hours: "15", supervisor: "Advisor", description: "Community tutoring" }], top_schools: ["Stanford University"], primary_sport: "Basketball", current_team: "Recovery Club Updated" });
   } finally {
     const cleanup = await admin.auth.admin.deleteUser(id);
     if (cleanup.error) console.warn("Synthetic user cleanup needs operator follow-up");
