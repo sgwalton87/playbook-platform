@@ -44,6 +44,9 @@ test("synthetic profile data survives edit and reload", async ({ page }) => {
     const school = page.getByLabel("Current high school / institution", { exact: true });
     await expect(school).toBeVisible();
     await school.fill("Recovery Institute");
+    const firstCollege = page.getByLabel("1. College", { exact: true });
+    await expect(firstCollege).toHaveValue("Princeton");
+    await firstCollege.fill("Stanford University");
     await page.getByRole("button", { name: /save changes/i }).first().click();
     await page.waitForTimeout(400);
     const saveAlerts = (await page.getByRole("alert").allTextContents()).map(text => text.trim()).filter(Boolean);
@@ -58,9 +61,10 @@ test("synthetic profile data survives edit and reload", async ({ page }) => {
     await expect(page.getByLabel("Mentor / Supervisor").first()).toHaveValue("Advisor");
     await expect(page.getByLabel("Description").first()).toHaveValue("Community tutoring");
     await expect(page.getByLabel("Current high school / institution", { exact: true })).toHaveValue("Recovery Institute");
+    await expect(page.getByLabel("1. College", { exact: true })).toHaveValue("Stanford University");
     const check = await admin.from("profiles").select("onboarding_data").eq("id", id).single();
     expect(check.data?.onboarding_data).toMatchObject({ school: "Recovery Institute",
-      activities: [{ activity: "Service learning", category: "Service", hours: "15", supervisor: "Advisor", description: "Community tutoring" }], primary_sport: "Basketball", current_team: "Recovery Club" });
+      activities: [{ activity: "Service learning", category: "Service", hours: "15", supervisor: "Advisor", description: "Community tutoring" }], top_schools: ["Stanford University"], primary_sport: "Basketball", current_team: "Recovery Club" });
   } finally {
     const cleanup = await admin.auth.admin.deleteUser(id);
     if (cleanup.error) console.warn("Synthetic user cleanup needs operator follow-up");
