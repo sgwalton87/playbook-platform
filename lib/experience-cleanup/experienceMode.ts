@@ -27,19 +27,16 @@ export function getExperienceModeLabel(mode: ExperienceMode) {
   return "Founder / Studio";
 }
 
+import { requirePlaybookRole, PLAYBOOK_ROLES } from "@/lib/roles/registry";
+
 export function getRoleHomeRoute(role?: string | null) {
-  if (!role) return "/dashboard";
-
-  const normalized = role.toLowerCase();
-
-  if (["founder", "admin", "super_admin"].includes(normalized)) return "/studio";
-  if (normalized.includes("athlete")) return "/scholar-athlete-os";
-  if (normalized.includes("family") || normalized.includes("guardian")) return "/family-os";
-  if (normalized.includes("educator")) return "/educator-os";
-  if (normalized.includes("mentor")) return "/mentor-os";
-  if (normalized.includes("district")) return "/district-os";
-  if (normalized.includes("university")) return "/university-os";
-  if (normalized.includes("employer")) return "/employer-os";
-
-  return "/dashboard";
+  if (!role) return "/dashboard"; // Compatibility-only anonymous route; never authorization.
+  const identity = role.trim().toLowerCase();
+  if (["founder", "admin", "super_admin"].includes(identity)) return "/studio";
+  try {
+    const canonical = requirePlaybookRole(identity);
+    return PLAYBOOK_ROLES[canonical].osRoute;
+  } catch {
+    return "/start"; // Unknown roles do not silently inherit Scholar OS.
+  }
 }
