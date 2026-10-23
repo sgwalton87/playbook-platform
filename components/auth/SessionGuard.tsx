@@ -16,6 +16,8 @@ const PUBLIC_ROUTES = [
   "/check-email",
   "/auth/callback",
   "/reset-password",
+  "/privacy-policy",
+  "/terms-of-service",
 ];
 
 export default function SessionGuard() {

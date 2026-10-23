@@ -5,6 +5,8 @@ export const publicRoutes = [
   "/news",
   "/login",
   "/reset-password",
+  "/privacy-policy",
+  "/terms-of-service",
   "/auth/callback",
 ];
 
