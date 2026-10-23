@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { sendPlaybookEmail } from "@/lib/email/emailService";
 import { buildBrandVerificationEvidence } from "@/lib/brand-verification/policy";
 import { requirePlaybookRole } from "@/lib/roles/registry";
 import { requireUser } from "@/lib/supabase/server";
@@ -47,20 +46,7 @@ export async function POST() {
       if (result.error.code === "23505") return NextResponse.json({ ok: true, activationState: "pending_verification", message: "Your verification request has already been received." }, { status: 202 });
       throw new Error(result.error.message);
     }
-    // Notification only: possession of this mailbox never grants reviewer or approval authority.
-    // Do not put personal onboarding answers or a privileged approval link in the email.
-    try {
-      await sendPlaybookEmail({
-        to: "brandpartners@playbookseriesinc.org",
-        cc: "stephishawalton@gmail.com, sycoywalton@playbookseriesinc.org",
-        fromType: "notifications",
-        subject: "Playbook · New Brand Partner verification submitted",
-        text: `A Brand Partner verification request is awaiting independent review.\nOrganization: ${evidence.organizationName}\nRequest reference: ${result.data.id}\nStatus: pending\n\nSign in to an authorized Playbook administration workspace when one is available. This email is not an approval or an authorization to access private records.`,
-      });
-    } catch (notificationError) {
-      console.error("Brand Partner verification notification delivery failed", { requestId: result.data.id, error: notificationError instanceof Error ? notificationError.name : "unknown" });
-    }
-    return NextResponse.json({ ok: true, request: result.data, activationState: "pending_verification", message: "Brand Partner verification evidence was submitted for independent review. No campaign or NIL authority has been activated." }, { status: 202 });
+    // Database insert trigger atomically queues the founder notification.\n    // A separate privileged worker handles durable delivery and retry.\n    return NextResponse.json({ ok: true, request: result.data, activationState: "pending_verification", message: "Brand Partner verification evidence was submitted for independent review. No campaign or NIL authority has been activated." }, { status: 202 });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Brand verification could not be submitted." }, { status: 400 });
   }
