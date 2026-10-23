@@ -30,7 +30,7 @@ test("synthetic profile data survives edit and reload", async ({ page }) => {
       first_name: "Historical", last_name: "Profile", school: "Old Academy",
       onboarding_data: { full_name: "Recovery Scholar", school: "Recovery Academy",
         primary_sport: "Basketball", current_team: "Recovery Club",
-        activities: ["Service learning"], top_schools: ["Princeton"] } }, { onConflict: "id" });
+        activities: [{ activity: "Service learning", category: "Service", hours: "15", supervisor: "Advisor", description: "Community tutoring" }], top_schools: ["Princeton"] } }, { onConflict: "id" });
     if (seed.error) throw seed.error;
     await page.goto("/login");
     await page.getByLabel("Email", { exact: true }).fill(email);
@@ -54,10 +54,13 @@ test("synthetic profile data survives edit and reload", async ({ page }) => {
     }).toBe("Recovery Institute");
     await page.reload();
     await expect(page.getByRole("heading", { name: "Map your academic path." })).toBeVisible();
+    await expect(page.getByLabel("Activity").first()).toHaveValue("Service learning");
+    await expect(page.getByLabel("Mentor / Supervisor").first()).toHaveValue("Advisor");
+    await expect(page.getByLabel("Description").first()).toHaveValue("Community tutoring");
     await expect(page.getByLabel("Current high school / institution", { exact: true })).toHaveValue("Recovery Institute");
     const check = await admin.from("profiles").select("onboarding_data").eq("id", id).single();
     expect(check.data?.onboarding_data).toMatchObject({ school: "Recovery Institute",
-      activities: ["Service learning"], primary_sport: "Basketball", current_team: "Recovery Club" });
+      activities: [{ activity: "Service learning", category: "Service", hours: "15", supervisor: "Advisor", description: "Community tutoring" }], primary_sport: "Basketball", current_team: "Recovery Club" });
   } finally {
     const cleanup = await admin.auth.admin.deleteUser(id);
     if (cleanup.error) console.warn("Synthetic user cleanup needs operator follow-up");
