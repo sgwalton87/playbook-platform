@@ -20,6 +20,9 @@ PPS-009 requires stable canonical identifiers and preserved deprecated aliases. 
 5. **P1 — Incomplete authority certification.** Production `7053951` deployed and READY; role E2E failed at Scholar login. Family OS intentionally awaits independent `FAMILY_RELATIONSHIP` acceptance. No proof of complete PBOS activation or 15-role journey success.
 6. **P1 — Parallel identity formats are in source.** Canonical slug `scholar-athlete`, compatibility alias `scholar_athlete`, and `parent_guardian` as a **relationship** type (not a role) are all used. Distinguish role identities from relationship kinds, PBOS adapter keys, and OS identifiers rather than blanket string replacement.
 
+7. **P0 — Incorrect route substring matching (corrected in this branch).** `getRoleHomeRoute` previously used `normalized.includes("athlete")`, misrouting `athlete-abroad` to Scholar-Athlete OS, and sent College Coach and Counselor to Scholar fallback. Now resolves registered role to exact OS route, routes unknown identity to `/start`, and retains explicit platform operator route compatibility.
+8. **P1 — PBOS connector coverage.** PBOS connector identity contract lists seven internal roles while the public registry has fifteen onboarding roles and two provisioned Operating Systems. This may represent an intentional bounded integration; require a documented mapping and a per-role activation audit before claiming all fifteen roles are fully PBOS integrated.
+
 ## Guardrails
 - Use `requirePlaybookRole` whenever persisted role affects permissions, activation, routing or invitations; handle invalid/missing role explicitly.
 - Keep `normalizePlaybookRole` confined to intentionally non-authoritative legacy/display compatibility.
