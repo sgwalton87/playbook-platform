@@ -52,11 +52,17 @@ export default function RoleProfilePage() {
         ? record.onboarding_data : {};
       setProfile(record);
       setRole(canonical);
+      const fullName = String(saved.full_name ?? record.full_name ?? "").trim();
+      const nameParts = fullName.split(/\\s+/).filter(Boolean);
+      const fallbackFirst = nameParts[0] ?? "";
+      const fallbackLast = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
+      // Never overwrite an explicitly saved name, but fill sparse legacy profiles
+      // from their existing full_name value rather than presenting blank inputs.
       setAnswers({
         ...saved,
-        first_name: saved.first_name ?? record.first_name ?? "",
-        last_name: saved.last_name ?? record.last_name ?? "",
-        full_name: saved.full_name ?? record.full_name ?? "",
+        first_name: saved.first_name || record.first_name || fallbackFirst,
+        last_name: saved.last_name || record.last_name || fallbackLast,
+        full_name: fullName,
         bio: saved.bio ?? record.bio ?? ""
       });
       setPending(false);
