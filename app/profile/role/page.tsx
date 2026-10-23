@@ -76,9 +76,26 @@ export default function RoleProfilePage() {
     const firstName = String(answers.first_name ?? "").trim();
     const lastName = String(answers.last_name ?? "").trim();
     const fullName = [firstName, lastName].filter(Boolean).join(" ") || String(answers.full_name ?? "").trim();
-    const updatedAnswers = { ...answers, full_name: fullName };
+    const updatedAnswers = { ...answers, first_name: firstName, last_name: lastName, full_name: fullName };
+    // Keep compatible persisted profile columns in sync with the private draft.
+    // Only fields submitted by the member are written; never write authorization state.
+    const writableLegacyFields: Record<string, string> = {
+      date_of_birth: "date_of_birth", gender: "gender", school: "school",
+      school_district: "school_district", grade: "grade",
+      dream_school: "dream_school", intended_major: "intended_major",
+      primary_sport: "sport", position: "position",
+      height: "height", weight: "weight", city: "city", zip_code: "zip_code",
+    };
+    const compatibleUpdates: Record<string, string | null> = {};
+    for (const [answerKey, column] of Object.entries(writableLegacyFields)) {
+      if (Object.prototype.hasOwnProperty.call(updatedAnswers, answerKey)) {
+        const value = updatedAnswers[answerKey];
+        if (typeof value === "string") compatibleUpdates[column] = value.trim() || null;
+      }
+    }
     // Never update role, verification, consent, or authorization from this editor.
     const { data, error } = await supabase.from("profiles").update({
+      ...compatibleUpdates,
       first_name: firstName || null,
       last_name: lastName || null,
       full_name: fullName || null,
