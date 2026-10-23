@@ -1,3 +1,4 @@
+import { stableProfileSnapshot } from "@/lib/onboarding/stableSnapshot";
 "use client";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -194,7 +195,7 @@ export default function AdvancedScholarProfilePage() {
       setSaveError("Unable to check for newer changes. Reload before saving.");
       return;
     }
-    if (JSON.stringify(latest.onboarding_data ?? {}) !== JSON.stringify(profile.onboarding_data ?? {})) {
+    if (stableProfileSnapshot(latest.onboarding_data) !== stableProfileSnapshot(profile.onboarding_data)) {
       setSaving(false);
       setSaveError("Your profile was updated elsewhere. Reload to review those changes before saving.");
       return;
@@ -211,7 +212,7 @@ export default function AdvancedScholarProfilePage() {
     const { data: persisted, error: verifyError } = await supabase.from("profiles")
       .select("onboarding_data").eq("id",profile.id).maybeSingle();
     setSaving(false);
-    if(verifyError || !persisted || JSON.stringify(persisted.onboarding_data ?? {}) !== JSON.stringify(mergedOnboarding)){
+    if(verifyError || !persisted || stableProfileSnapshot(persisted.onboarding_data) !== stableProfileSnapshot(mergedOnboarding)){
       setSaveError("The save could not be verified against your Playbook record. Please reload and check before leaving.");
       return;
     }
