@@ -35,13 +35,13 @@ export async function POST(request: NextRequest) {
       text: `A new Brand Partner application awaits independent review.\nOrganization: ${item.organization_name}\nReference: ${item.request_id}\nStatus: pending\n\nReview through an authorized Playbook administrator account. This message is not approval authority.`,
     });
     const completed = await supabase.rpc("finish_brand_partner_notification", {
-      p_request_id: item.request_id, p_sent: true, p_error: null
+      p_request_id: item.request_id, p_attempt_count: item.attempt_count, p_sent: true, p_error: null
     });
     if (completed.error) throw new Error("Delivery acknowledgement failed");
     return NextResponse.json({ processed: 1, delivered: true });
   } catch (err) {
     await supabase.rpc("finish_brand_partner_notification", {
-      p_request_id: item.request_id, p_sent: false,
+      p_request_id: item.request_id, p_attempt_count: item.attempt_count, p_sent: false,
       p_error: err instanceof Error ? err.name : "unknown delivery error",
     });
     return NextResponse.json({ processed: 1, delivered: false }, { status: 503 });
