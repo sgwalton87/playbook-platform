@@ -72,6 +72,14 @@ describe("modern profile release parity", () => {
     expect(editor).toContain('entry => typeof entry === "string" ? entry.trim() : ""');
   });
 
+  it("blocks stale modern and advanced editor saves before replacing private answers", () => {
+    expect(editor).toContain('JSON.stringify(latest.onboarding_data ?? {})');
+    expect(editor).toContain('JSON.stringify(profile.onboarding_data ?? {})');
+    expect(editor).toContain("Your profile was updated elsewhere.");
+    expect(advanced).toContain('JSON.stringify(latest.onboarding_data ?? {})');
+    expect(advanced).toContain("Your profile was updated elsewhere.");
+  });
+
   it("keeps typed inputs and confirmed owner-scoped save", () => {
     expect(editor).toContain('field.type === "sport-position"');
     expect(editor).toContain('type="date"');
