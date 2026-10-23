@@ -29,7 +29,7 @@ test("synthetic profile data survives edit and reload", async ({ page }) => {
       onboarding_completed: true, verification_status: "email_confirmed",
       first_name: "Historical", last_name: "Profile", school: "Old Academy",
       onboarding_data: { full_name: "Recovery Scholar", school: "Recovery Academy",
-        primary_sport: "Basketball", current_team: "Recovery Club Updated",
+        primary_sport: "Basketball", current_team: "Recovery Club",
         activities: [{ activity: "Service learning", category: "Service", hours: "15", supervisor: "Advisor", description: "Community tutoring" }], top_schools: ["Princeton"] } }, { onConflict: "id" });
     if (seed.error) throw seed.error;
     await page.goto("/login");
