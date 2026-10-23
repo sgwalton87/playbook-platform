@@ -105,6 +105,19 @@ export default function RoleProfilePage() {
         if (typeof value === "string") compatibleUpdates[column] = value.trim() || null;
       }
     }
+    // Detect stale editor state before replacing the private onboarding snapshot.
+    const { data: latest, error: freshnessError } = await supabase.from("profiles")
+      .select("onboarding_data").eq("id", profile.id).maybeSingle();
+    if (freshnessError || !latest) {
+      setSaving(false);
+      setNotice("Unable to check for newer changes. Please reload before saving.");
+      return;
+    }
+    if (JSON.stringify(latest.onboarding_data ?? {}) !== JSON.stringify(profile.onboarding_data ?? {})) {
+      setSaving(false);
+      setNotice("Your profile was updated elsewhere. Reload to review those changes before saving.");
+      return;
+    }
     // Never update role, verification, consent, or authorization from this editor.
     const { data, error } = await supabase.from("profiles").update({
       ...compatibleUpdates,
@@ -117,6 +130,7 @@ export default function RoleProfilePage() {
     setSaving(false);
     if (error || !data) { setNotice("Changes could not be saved. Please try again."); return; }
     setAnswers(updatedAnswers);
+    setProfile(previous => previous ? { ...previous, onboarding_data: updatedAnswers } : previous);
     setNotice("Saved. Your onboarding answers and profile are synchronized.");
   }
 
