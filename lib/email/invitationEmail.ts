@@ -3,7 +3,7 @@ import type { RelationshipKind } from "@/lib/permissions";
 // Escape member-entered strings before including them in HTML emails.
 const safe = (value: string) => value.replace(/&/g, "&amp;").replace(/</g, "&lt;")
   .replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
-const nameOf = (kind: RelationshipKind) => kind.replaceAll("_", " ").replace(/\\b\\w/g, c => c.toUpperCase());
+const nameOf = (kind: RelationshipKind) => kind.replaceAll("_", " ").replace(/\b\w/g, c => c.toUpperCase());
 const frame = (eyebrow: string, title: string, body: string, buttonLabel: string, url: string) => `
 <div style="margin:0;padding:36px 12px;background:#f1f5f9;font-family:Arial,Helvetica,sans-serif;color:#11213c">
  <div style="max-width:610px;margin:auto;background:white;border-radius:22px;overflow:hidden;border:1px solid #dce4ef">
