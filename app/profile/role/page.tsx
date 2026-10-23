@@ -86,7 +86,7 @@ export default function RoleProfilePage() {
       if (Array.isArray(list)) {
         updatedAnswers[field.key] = list.filter((entry): entry is string =>
           typeof entry === "string" && entry.trim().length > 0
-        ).map(entry => entry.trim());
+        ).map((entry: string) => entry.trim());
       }
     }
     // Keep compatible persisted profile columns in sync with the private draft.
