@@ -1,4 +1,25 @@
 
+-- Replace the older recommender policy that calls a globally revoked private
+-- helper. Verify the onboarded learner against the caller's own profile without
+-- granting execution of that helper to all authenticated users.
+drop policy if exists "Learners can manage own recommender requests" on public.recommender_requests;
+create policy "Learners can manage own recommender requests"
+on public.recommender_requests for all to authenticated
+using (
+  scholar_id = (select auth.uid())
+  and exists (select 1 from public.profiles p
+    where p.id = (select auth.uid())
+      and coalesce(p.profile_mode,p.role) in ('scholar','scholar-athlete','transition-youth')
+      and p.onboarding_completed is true)
+)
+with check (
+  scholar_id = (select auth.uid())
+  and exists (select 1 from public.profiles p
+    where p.id = (select auth.uid())
+      and coalesce(p.profile_mode,p.role) in ('scholar','scholar-athlete','transition-youth')
+      and p.onboarding_completed is true)
+);
+
 -- Existing learner-wide UPDATE permission would otherwise let a requester rewrite
 -- the recommender email after sending. Freeze recipient/owner/evidence/letter fields
 -- at the SQL grant boundary; only legacy request status may be updated by clients.
