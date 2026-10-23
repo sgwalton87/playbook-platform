@@ -11,7 +11,10 @@ const gate = fs.readFileSync(
   "utf8"
 );
 const worker = fs.readFileSync(path.join(process.cwd(), "app/api/internal/brand-partner-notifications/route.ts"), "utf8");
-const outbox = fs.readFileSync(path.join(process.cwd(), "supabase/migrations/202610230003_brand_partner_notification_outbox.sql"), "utf8");
+const migrationDir = path.join(process.cwd(), "supabase/migrations");
+const outboxFile = fs.readdirSync(migrationDir).find((name) => name.endsWith("_brand_partner_notification_outbox.sql"));
+if (!outboxFile) throw new Error("Brand Partner notification outbox migration missing");
+const outbox = fs.readFileSync(path.join(migrationDir, outboxFile), "utf8");
 const api = fs.readFileSync(
   path.join(process.cwd(), "app/api/brand-verification/route.ts"),
   "utf8"
