@@ -18,7 +18,7 @@ function RecommendationsVault(){
     const data=await response.json();
     setLetters(data.letters??[]);setWorkspaces(data.workspaces??[]);setStatus("");
   }
-  useEffect(()=>{void refresh();},[]);
+  useEffect(()=>{\n    void fetch("/api/recommendations/vault",{cache:"no-store"}).then(async response=>{\n      if(!response.ok)return;\n      const data=await response.json();\n      setLetters(data.letters??[]);setWorkspaces(data.workspaces??[]);setStatus("");\n    }).catch(()=>{});\n  },[]);
   async function open(letter:Letter){
     const response=await fetch("/api/recommendations/vault/"+encodeURIComponent(letter.artifactId),{cache:"no-store"});
     if(!response.ok){setStatus("Letter content is confidential or unavailable.");return;}
