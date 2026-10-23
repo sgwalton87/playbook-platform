@@ -69,7 +69,7 @@ describe("modern profile release parity", () => {
   it("normalizes empty college and contact slots before persistence", () => {
     expect(editor).toContain('field.type !== "college-list" && field.type !== "invite-list"');
     expect(editor).toContain('entry.trim().length > 0');
-    expect(editor).toContain('.map(entry => entry.trim())');
+    expect(editor).toContain('entry => typeof entry === "string" ? entry.trim() : ""');
   });
 
   it("keeps typed inputs and confirmed owner-scoped save", () => {
