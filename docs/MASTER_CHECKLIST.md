@@ -1,5 +1,10 @@
 # Playbook OS Master Engineering Checklist
 
+## Canonical Scholar Journey — PBOS-SCHOLAR-001 (proposed; not released)
+
+Authority: [PBOS Scholar Journey Canonical Build Contract](./ENGINEERING/PBOS_SCHOLAR_JOURNEY_CANONICAL_BUILD_CONTRACT.md). Gate order: SJ-00 canonical authorized Record projection and RLS; SJ-01 Compass wiring; SJ-02 service/awards resume builder + PDF; SJ-03 governed employer/institution shares; SJ-04 Personal Statement Coach; SJ-05 full course journey; SJ-06 cross-feature certification and founder-approved release. PBOS owns one-gate-at-a-time orchestration and evidence, never production auth/grant/deploy autonomy. This must not be represented as already built or deployed.
+
+
 ## Current verified snapshot — October 20, 2026 (America/Los_Angeles)
 
 PRs 255 and 256 are merged; the last reconciled deployed baseline is `9ce0a93a314ab30687f72fd3f83d3b96305fd2fa`. Its tree matches accepted PR 256 review `d53ac2ba3327c4da3d75d6f40c57ea83d943c5fe`. CI 39547592471 passed security, lint, source controls, 852 tests / 233 suites and build. Strict Database Certification 39547592466 passed all 48 gates with a forced SQL-error canary and no ignored-quit warnings. Public QA 39547592580 passed. Earlier broad database green conclusions remain invalidated.
