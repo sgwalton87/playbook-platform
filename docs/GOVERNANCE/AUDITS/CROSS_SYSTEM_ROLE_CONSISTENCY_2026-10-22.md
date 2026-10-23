@@ -6,6 +6,12 @@ Source inspection of role registry, signup/onboarding, invitation client and API
 ## Constitutional criteria
 PPS-009 requires stable canonical identifiers and preserved deprecated aliases. Authority-bearing paths must resolve to one registered canonical role and fail closed on unknown identities. Do not convert missing/unknown identities to Scholar authority.
 
+## Live production database (read-only inspection)
+- Supabase project `Playbook OS` (`oexgxnybeixwadgtdtzp`) is ACTIVE_HEALTHY.
+- `public.profiles` has 42 records; 34 have NULL `profile_mode`, 11 have legacy `role=scholar_athlete`. There are 8 canonical `role=scholar-athlete` records (4 with NULL profile_mode and 4 explicitly canonical). No explicit nonnull role/profile_mode mismatch was found.
+- No CHECK constraints exist on the `public.profiles` table in the inspected schema. This does **not** establish that canonicalization is safe as a bulk update; downstream tables, policies, and triggers still need a compatibility review.
+- Supabase security advisors report 10 RLS-enabled tables lacking policies (INFO), 8 authenticated-callable SECURITY DEFINER functions (WARN), and leaked-password protection warning. They require separate authorization/security evaluation; do not automatically grant access or revoke RPC functionality without reviewing contracts.
+
 ## Confirmed findings
 1. **P0 — Invitation role mismatch (corrected in this branch).** `InvitationCenter` compared raw `profile_mode` against canonical `scholar-athlete`; stored `scholar_athlete` could be denied. Server had canonicalization, but used a compatibility normalizer with Scholar fallback. Both sides now use strict `requirePlaybookRole`, reject unknown roles, and preserve intentional legacy aliases.
 2. **P0 — Discoverability.** Family OS tells users to select Invite Parent/Guardian from Scholar dashboard. The actual form exists at `/invitations`, but screenshots show an instructional screen without an action. Verify Scholar/Transition Youth dashboard links for every eligible role and add mobile entry action where absent.
