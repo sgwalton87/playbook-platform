@@ -1,0 +1,31 @@
+{
+  "id": "SJ-06",
+  "title": "Certified Scholar Journey release",
+  "status": "proposed",
+  "priority": 94,
+  "dependencies": [
+    "SJ-01",
+    "SJ-02",
+    "SJ-03",
+    "SJ-04",
+    "SJ-05"
+  ],
+  "handbook_refs": [
+    "docs/MASTER_CHECKLIST.md",
+    "docs/ENGINEERING/PBOS_SCHOLAR_JOURNEY_CANONICAL_BUILD_CONTRACT.md",
+    "docs/RELEASE_PROCESS.md"
+  ],
+  "tasks": [
+    "Integration and rollout only with founder authorization, exact SHA and rollback",
+    "Open isolated scoped PR, record evidence in Command Center, preserve existing canonical data and role permissions"
+  ],
+  "definition_of_done": [
+    "Exact-head CI/DB/QA, browser acceptance, signed share, accessible PDF and approved deployment",
+    "Exact implementation SHA, migrations, test evidence and governed acceptance recorded; no unapproved production deploy"
+  ],
+  "validation": [
+    "Exact-head CI/DB/QA, browser acceptance, signed share, accessible PDF and approved deployment",
+    "CI, Database Certification, Platform QA and role-based isolated/browser verification before release"
+  ],
+  "next_gate": null
+}
