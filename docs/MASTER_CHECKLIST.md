@@ -2,7 +2,7 @@
 
 ## Canonical Scholar Journey — PBOS-SCHOLAR-001 (proposed; not released)
 
-Authority: [PBOS Scholar Journey Canonical Build Contract](./ENGINEERING/PBOS_SCHOLAR_JOURNEY_CANONICAL_BUILD_CONTRACT.md). Gate order: SJ-00 canonical authorized Record projection and RLS; SJ-01 Compass wiring; SJ-02 service/awards resume builder + PDF; SJ-03 governed employer/institution shares; SJ-04 Personal Statement Coach; SJ-05 full course journey; SJ-06 cross-feature certification and founder-approved release. PBOS owns one-gate-at-a-time orchestration and evidence, never production auth/grant/deploy autonomy. This must not be represented as already built or deployed.
+Authority: [PBOS Scholar Journey Canonical Build Contract](./ENGINEERING/PBOS_SCHOLAR_JOURNEY_CANONICAL_BUILD_CONTRACT.md). Gate order: SJ-00 canonical authorized Record projection and RLS; SJ-01 Compass wiring; SJ-02 service/awards resume builder + PDF; SJ-03 governed employer/institution shares; SJ-04 Personal Statement Coach; SJ-05 full course journey; SJ-07 governed recommendation request/letter Vault and attachment; SJ-06 cross-feature certification and founder-approved release. PBOS owns one-gate-at-a-time orchestration and evidence, never production auth/grant/deploy autonomy. This must not be represented as already built or deployed.
 
 
 ## Current verified snapshot — October 20, 2026 (America/Los_Angeles)
