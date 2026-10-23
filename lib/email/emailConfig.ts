@@ -3,6 +3,7 @@ export const playbookEmails = {
   support: process.env.PLAYBOOK_EMAIL_SUPPORT || "support@playbookseriesinc.org",
   notifications: process.env.PLAYBOOK_EMAIL_NOTIFICATIONS || "notifications@playbookseriesinc.org",
   hello: process.env.PLAYBOOK_EMAIL_HELLO || "hello@playbookseriesinc.org",
+  lor: process.env.PLAYBOOK_EMAIL_LOR || "LOR@playbookseriesinc.org",
   noreply: process.env.PLAYBOOK_EMAIL_NOREPLY || "noreply@playbookseriesinc.org",
 };
 
@@ -14,6 +15,7 @@ export function getEmailSender(type: keyof typeof playbookEmails) {
     support: "Playbook Support",
     notifications: "Playbook Notifications",
     hello: "Playbook",
+    lor: "Playbook Letters of Recommendation",
     noreply: "Playbook",
   };
 
