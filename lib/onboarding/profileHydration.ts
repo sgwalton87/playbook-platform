@@ -105,7 +105,12 @@ export function reconcileProfileSave(
   if (Object.prototype.hasOwnProperty.call(profileUpdates, "unweighted_gpa")) {
     next.gpa = profileUpdates.unweighted_gpa;
   }
-  next.top_schools = Array.from({ length: 9 }, (_, i) => profileUpdates[`college_list_${i + 2}`])
-    .filter(v => typeof v === "string" && v.trim() !== "");
+  // An editor that does not submit college-list columns must not erase a
+  // previously saved list. Only reconcile lists when the caller owns that edit.
+  const collegeKeys = Array.from({ length: 9 }, (_, i) => `college_list_${i + 2}`);
+  if (collegeKeys.some(key => Object.prototype.hasOwnProperty.call(profileUpdates, key))) {
+    next.top_schools = collegeKeys.map(key => profileUpdates[key])
+      .filter(v => typeof v === "string" && v.trim() !== "");
+  }
   return next;
 }
