@@ -92,8 +92,16 @@ try {
   assert(finalRow.data.status==='sent' && finalRow.data.sent_at,'Recovered notification not marked delivered');
   console.log('Synthetic Brand Partner submit, reviewer scope, audit and delivery failure/retry PASS');
 } finally {
+  // The decision-audit reviewer FK intentionally preserves audit history in production.
+  // Remove synthetic records explicitly before deleting disposable auth users.
+  const auditCleanup = await admin.from('brand_partner_review_audit').delete().in('reviewer_id', fixtures);
+  if (auditCleanup.error) throw new Error('Synthetic audit cleanup failed: '+auditCleanup.error.message);
+  const requestCleanup = await admin.from('brand_partner_verification_requests').delete().in('brand_user_id', fixtures);
+  if (requestCleanup.error) throw new Error('Synthetic request cleanup failed: '+requestCleanup.error.message);
+  const grantCleanup = await admin.from('brand_partner_reviewer_grants').delete().in('reviewer_id', fixtures);
+  if (grantCleanup.error) throw new Error('Synthetic grant cleanup failed: '+grantCleanup.error.message);
   for(const id of fixtures.reverse()) {
     const deleted=await admin.auth.admin.deleteUser(id);
-    if(deleted.error) throw new Error('Synthetic user cleanup failed');
+    if(deleted.error) throw new Error('Synthetic user cleanup failed: '+deleted.error.message);
   }
 }
