@@ -51,7 +51,7 @@ export default function SupportNetworkMap() {
               </div>
               <strong style={{ fontSize: 13, overflowWrap: "anywhere" }}>{person.supporter_name || person.supporter_email}</strong>
               <small>{person.relationship.replaceAll("_", " ")}</small>
-              <Link href="/messages" style={{ fontSize: 12 }}>Open messages</Link>
+              <Link href={`/messages?peer=${encodeURIComponent(person.supporter_id || "")}`} style={{ fontSize: 12 }}>Message supporter</Link>
             </div>
           ))}
           {!error && userId && network.length === 0 && <p>No active supporters yet. Start by inviting someone to your network.</p>}
