@@ -19,6 +19,7 @@ const RELATIONSHIP_KINDS = new Set<RelationshipKind>([
   "college_recruiter",
   "college_admissions",
   "community_partner",
+  "brand_partner",
   "employer_partner",
 ]);
 
