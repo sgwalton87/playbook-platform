@@ -46,6 +46,9 @@ describe("Brand Partner OS authority gate", () => {
     expect(api).toContain("sycoywalton@playbookseriesinc.org");
     expect(api).toContain("sendPlaybookEmail");
     expect(api).toContain("if (existing.data) return NextResponse.json");
+    expect(api).toContain(".insert({");
+    expect(api).not.toContain(".upsert({");
+    expect(api).toContain('result.error.code === "23505"');
     expect(api).toContain("No campaign or NIL authority has been activated.");
   });
 
