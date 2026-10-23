@@ -17,7 +17,7 @@ const INVITABLE_RELATIONSHIPS = [
   { value: "employer_partner", label: "Employer / Workforce Partner" },
 ] as const;
 
-type ManagedInvitation = { id: string; invitee_name: string; invitee_email: string; relationship: string; status: string };
+type ManagedInvitation = { id: string; invitee_name: string; invitee_email: string; relationship: string; status: string; invite_code?: string | null };
 type InviteResult = {
   invitation?: { id: string; inviteeName: string; inviteeEmail: string };
   email?: { url?: string };
@@ -124,6 +124,7 @@ export default function InvitationCenter() {
             <div key={invitation.id} style={{ padding: 14, border: "1px solid #36506E", borderRadius: 12, marginTop: 10 }}>
               <strong>{invitation.invitee_name}</strong>
               <p style={{ overflowWrap: "anywhere" }}>{invitation.invitee_email} · {invitation.relationship.replaceAll("_", " ")} · {invitation.status}</p>
+              {invitation.status === "pending" && invitation.invite_code && <p>Private invite code: <strong style={{ fontFamily: "monospace", letterSpacing: 2 }}>{invitation.invite_code}</strong> · Give only to the intended recipient. Their signed-in email must match.</p>}
               {invitation.status === "pending" && <button type="button" style={button} onClick={() => void withdrawInvitation(invitation.id)}>Withdraw pending request</button>}
             </div>
           ))}
@@ -132,6 +133,7 @@ export default function InvitationCenter() {
         {result && <div role="status" style={{ marginTop: 24, padding: 18, borderRadius: 14, background: "#1C3551" }}>
           <strong>Invitation created for {result.invitation?.inviteeName}.</strong>
           <p>{result.deliveryStatus === "sent" ? "The invitation email was sent." : "Email delivery was not confirmed. Use the secure invitation link below to share it privately with the invited person."}</p>
+          {result.invitation?.inviteCode && <p>Private invite code: <strong style={{ fontFamily: "monospace", letterSpacing: 2 }}>{result.invitation.inviteCode}</strong> · Acceptance requires the exact invited email.</p>}
           {result.email?.url && <p><a style={{ color: "#FFC28C", overflowWrap: "anywhere" }} href={result.email.url}>Open invitation link</a> — share only with the intended recipient.</p>}
         </div>}
         <p style={{ marginTop: 22, fontSize: 13, color: "#ABBED2" }}>The Family relationship grants only progress, deadlines and support-task permissions. Access can be revoked.</p>
