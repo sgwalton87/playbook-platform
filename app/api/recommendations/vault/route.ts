@@ -13,7 +13,7 @@ export async function GET() {
         .eq("scholar_id",user.id).order("created_at",{ascending:false}).limit(50)
     ]);
     if(vault.error||workspaces.error)throw new Error(vault.error?.message??workspaces.error?.message);
-    const letters=(vault.data??[]).map(item=>({
+    const letters=(vault.data??[]).map((item: {vault_id:string;title:string;request_id:string;artifact_id:string;confidentiality:string;submitted_at:string})=>({
       vaultId:item.vault_id,title:item.title,requestId:item.request_id,
       artifactId:item.artifact_id,confidentiality:item.confidentiality,createdAt:item.submitted_at
     }));
