@@ -1,15 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireUser } from "@/lib/supabase/server";
+import { requirePlaybookRole } from "@/lib/roles/registry";
 
 export async function GET() {
   try {
     const { supabase, user } = await requireUser();
     if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    const profile = await supabase.from("profiles").select("role,profile_mode").eq("id", user.id).maybeSingle();
+    if (profile.error) throw profile.error;
+    let role: string;
+    try { role = requirePlaybookRole(profile.data?.profile_mode ?? profile.data?.role); }
+    catch { return NextResponse.json({ authorized: false, error: "Your Playbook account type must be completed before inviting supporters." }, { status: 403 }); }
+    if (!["scholar","scholar-athlete","transition-youth"].includes(role)) return NextResponse.json({ authorized: false, error: "Only Scholar, Scholar-Athlete, and Transition Youth accounts can invite supporters." }, { status: 403 });
     const { data, error } = await supabase.from("support_invitations")
       .select("id,invitee_name,invitee_email,relationship,status,created_at")
       .eq("scholar_id", user.id).order("created_at", { ascending: false }).limit(100);
     if (error) throw error;
-    return NextResponse.json({ invitations: data || [] });
+    return NextResponse.json({ authorized: true, invitations: data || [] });
   } catch {
     return NextResponse.json({ error: "Invitations unavailable." }, { status: 400 });
   }
