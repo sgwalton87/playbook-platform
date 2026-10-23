@@ -23,6 +23,8 @@ PPS-009 requires stable canonical identifiers and preserved deprecated aliases. 
 7. **P0 — Incorrect route substring matching (corrected in this branch).** `getRoleHomeRoute` previously used `normalized.includes("athlete")`, misrouting `athlete-abroad` to Scholar-Athlete OS, and sent College Coach and Counselor to Scholar fallback. Now resolves registered role to exact OS route, routes unknown identity to `/start`, and retains explicit platform operator route compatibility.
 8. **P1 — PBOS connector coverage.** PBOS connector identity contract lists seven internal roles while the public registry has fifteen onboarding roles and two provisioned Operating Systems. This may represent an intentional bounded integration; require a documented mapping and a per-role activation audit before claiming all fifteen roles are fully PBOS integrated.
 
+9. **P0 — Unknown-role shell fallback (corrected in this branch).** `getRoleNavigation` used permissive `normalizePlaybookRole` which defaults unsupported stored roles to Scholar UI. It now uses strict canonical resolution and a restricted onboarding navigation for unknown or absent identity. This is not a substitute for server-side authorization.
+
 ## Guardrails
 - Use `requirePlaybookRole` whenever persisted role affects permissions, activation, routing or invitations; handle invalid/missing role explicitly.
 - Keep `normalizePlaybookRole` confined to intentionally non-authoritative legacy/display compatibility.
