@@ -33,15 +33,20 @@ export async function POST() {
     if (existing.error) throw new Error(existing.error.message);
     if (existing.data) return NextResponse.json({ ok: true, request: existing.data, activationState: "pending_verification", message: "Your Brand Partner verification request has already been received. Independent review remains pending." }, { status: 202 });
     const evidence = buildBrandVerificationEvidence((profile.data.onboarding_data ?? {}) as Record<string, unknown>);
-    const result = await supabase.from("brand_partner_verification_requests").upsert({
+    const result = await supabase.from("brand_partner_verification_requests").insert({
       brand_user_id: user.id, organization_name: evidence.organizationName, partner_title: evidence.partnerTitle,
       brand_category: evidence.brandCategory, partnership_goals: evidence.partnershipGoals, target_audience: evidence.targetAudience,
       monthly_budget_range: evidence.monthlyBudgetRange, nil_acknowledgement: evidence.nilAcknowledgement,
       campaign_types: evidence.campaignTypes, approval_contact: evidence.approvalContact,
       campaign_scope_approved: false, compliance_scope_approved: false, status: "pending",
       reviewed_at: null, review_notes: null, updated_at: new Date().toISOString(),
-    }, { onConflict: "brand_user_id" }).select("id,status,submitted_at,campaign_scope_approved,compliance_scope_approved").single();
-    if (result.error) throw new Error(result.error.message);
+    }).select("id,status,submitted_at,campaign_scope_approved,compliance_scope_approved").single();
+    if (result.error) {
+      // A concurrent submission may have won the unique brand_user_id constraint.
+      // Never overwrite approval state when that happens.
+      if (result.error.code === "23505") return NextResponse.json({ ok: true, activationState: "pending_verification", message: "Your verification request has already been received." }, { status: 202 });
+      throw new Error(result.error.message);
+    }
     // Notification only: possession of this mailbox never grants reviewer or approval authority.
     // Do not put personal onboarding answers or a privileged approval link in the email.
     try {
