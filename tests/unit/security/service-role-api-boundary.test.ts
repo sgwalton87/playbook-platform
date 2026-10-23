@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 const apiRoot = path.join(process.cwd(), "app/api");
 const allowedPrivilegedRoutes = new Set([
   path.normalize("mail-gateway/hostinger/route.ts"),
+  path.normalize("internal/brand-partner-notifications/route.ts"),
 ]);
 
 function collectRouteFiles(directory: string): string[] {
@@ -25,7 +26,17 @@ describe("service-role API boundary", () => {
     expect(offenders, `Unexpected privileged API routes: ${offenders.join(", ")}`).toEqual([]);
   });
 
-  it("keeps the one privileged webhook fail-closed", () => {
+  it("requires a timing-safe secret and server configuration before notification service access", () => {
+    const worker = fs.readFileSync(path.join(apiRoot, "internal/brand-partner-notifications/route.ts"), "utf8");
+    expect(worker).toContain("BRAND_NOTIFICATION_WORKER_SECRET");
+    expect(worker).toContain("timingSafeEqual");
+    expect(worker).toContain('if (!secret || !url || !key');
+    expect(worker).toContain('if (!authorized)');
+    expect(worker.indexOf('if (!authorized)')).toBeLessThan(worker.indexOf('createClient(url, key'));
+    expect(worker).toContain('SUPABASE_SERVICE_ROLE_KEY');
+  });
+
+  it("keeps the original privileged webhook fail-closed", () => {
     const hostinger = fs.readFileSync(path.join(apiRoot, "mail-gateway/hostinger/route.ts"), "utf8");
     expect(hostinger).toContain("MAIL_GATEWAY_SECRET");
     expect(hostinger).toContain("timingSafeEqual");
