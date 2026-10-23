@@ -18,7 +18,7 @@ type SavedProfile = {
   onboarding_data: Record<string, OnboardingValue> | null;
 };
 
-const shell: React.CSSProperties = { minHeight: "100vh", background: "#eef2f8", padding: "28px 18px 100px", color: "#0f172a", fontFamily: "system-ui, sans-serif" };
+const shell: React.CSSProperties = { minHeight: "100vh", background: "linear-gradient(160deg, #06172d 0%, #102d50 220px, #f5f7fc 220px)", padding: "clamp(16px, 4vw, 32px) 16px 140px", color: "#0f172a", fontFamily: "\'Hanken Grotesk\', system-ui, sans-serif" };
 const inputStyle: React.CSSProperties = { width: "100%", padding: "13px 14px", borderRadius: 12, border: "1px solid #cbd5e1", background: "#fff", color: "#0f172a", fontSize: 16, boxSizing: "border-box" };
 const labelStyle: React.CSSProperties = { display: "block", fontSize: 13, fontWeight: 700, marginBottom: 8 };
 
@@ -44,7 +44,6 @@ export default function RoleProfilePage() {
       let canonical: PlaybookRole;
       try { canonical = requirePlaybookRole(p.profile_mode || p.role); }
       catch { setNotice("Your registered pathway needs verification. Please contact Playbook support."); setPending(false); return; }
-      if (canonical === "scholar" || canonical === "scholar-athlete") { router.replace("/profile"); return; }
       const record = p as SavedProfile;
       const saved = record.onboarding_data && typeof record.onboarding_data === "object" && !Array.isArray(record.onboarding_data)
         ? record.onboarding_data : {};
@@ -91,21 +90,21 @@ export default function RoleProfilePage() {
     setNotice("Saved. Your onboarding answers and profile are synchronized.");
   }
 
-  if (pending) return <main style={shell}>Loading your profile…</main>;
+  if (pending) return <main style={shell} role="status">Loading your profile…</main>;
   if (!profile || !role) return <main style={shell} role="alert">{notice || "Profile unavailable."}</main>;
 
   return <main style={shell}>
-    <div style={{ maxWidth: 760, margin: "0 auto" }}>
+    <div style={{ maxWidth: 980, margin: "0 auto" }}>
       <button onClick={() => router.push(PLAYBOOK_ROLES[role].osRoute)} style={{ ...inputStyle, width: "auto", marginBottom: 16 }}>← Back to {PLAYBOOK_ROLES[role].osLabel}</button>
-      <header style={{ background: "#101c34", color: "#fff", borderRadius: 20, padding: 24, marginBottom: 20 }}>
+      <header style={{ background: "linear-gradient(135deg, #07182e, #183c62)", color: "#fff", borderRadius: 24, padding: "clamp(22px, 4vw, 40px)", marginBottom: 22, boxShadow: "0 20px 54px rgba(4, 18, 39, .20)" }}>
         <p style={{ color: "#fd923d", margin: 0, fontWeight: 800, letterSpacing: 2, fontSize: 12 }}>YOUR PRIVATE PLAYBOOK ACCOUNT</p>
-        <h1 style={{ marginBottom: 8 }}>{PLAYBOOK_ROLES[role].label} Profile</h1>
+        <h1 style={{ marginBottom: 8, fontSize: "clamp(30px, 5vw, 48px)", lineHeight: 1.1 }}>{PLAYBOOK_ROLES[role].osLabel} · My Profile</h1>
         <p style={{ lineHeight: 1.6, marginBottom: 0 }}>Update the same information you entered during onboarding. Background answers stay private; public visibility is managed separately.</p>
       </header>
       {steps.map(step => {
         const stepFields = fields.filter(field => field.stepId === step.id);
         if (!stepFields.length) return null;
-        return <section key={step.id} style={{ background: "#fff", borderRadius: 20, padding: 22, marginBottom: 18 }}>
+        return <section key={step.id} style={{ background: "#fff", borderRadius: 20, padding: "clamp(18px, 3vw, 28px)", marginBottom: 18, border: "1px solid #e2e8f0", boxShadow: "0 8px 24px rgba(15, 23, 42, .05)" }}>
           <h2 style={{ fontSize: 21, marginTop: 0 }}>{step.title}</h2>
           <p style={{ color: "#475569", fontSize: 14 }}>{step.body}</p>
           {stepFields.map(field => {
