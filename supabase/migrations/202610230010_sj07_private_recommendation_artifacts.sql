@@ -110,3 +110,28 @@ begin
 end; $$;
 revoke all on function public.attach_recommendation_to_application(uuid,uuid) from public, anon;
 grant execute on function public.attach_recommendation_to_application(uuid,uuid) to authenticated;
+
+-- Only a real recommender-submitted artifact is eligible for the Vault folder.
+-- Never trust editable scholar_vault_items metadata as proof of submission.
+create or replace function public.list_submitted_recommendation_vault()
+returns table (vault_id uuid,artifact_id uuid,request_id uuid,title text,confidentiality text,submitted_at timestamptz)
+language plpgsql security definer set search_path=''
+as $$
+begin
+  if auth.uid() is null then
+    raise exception 'Authentication required' using errcode='42501';
+  end if;
+  return query
+    select v.id,a.id,a.request_id,v.title,a.confidentiality,a.submitted_at
+    from public.recommendation_letter_artifacts a
+    join public.recommender_requests r on r.id=a.request_id
+    join public.playbook_records pr on pr.profile_id=a.scholar_id and pr.deleted_at is null
+    join public.scholar_vault_items v on v.record_id=pr.id
+      and v.deleted_at is null and v.item_type='recommendation'
+      and v.metadata->>'artifact_id'=a.id::text
+      and v.metadata->>'request_id'=a.request_id::text
+    where a.scholar_id=auth.uid()
+    order by a.submitted_at desc;
+end; $$;
+revoke all on function public.list_submitted_recommendation_vault() from public, anon;
+grant execute on function public.list_submitted_recommendation_vault() to authenticated;
