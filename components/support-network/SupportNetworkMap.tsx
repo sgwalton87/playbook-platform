@@ -1,37 +1,60 @@
 "use client";
 
-import { getSupportNetwork } from "@/lib/support-network";
+import { useEffect, useState } from "react";
+
+type Relationship = {
+  id: string;
+  scholar_id: string;
+  supporter_id: string | null;
+  supporter_name: string | null;
+  supporter_email: string;
+  relationship: string;
+  status: string;
+  perspective: "scholar" | "supporter";
+};
 
 export default function SupportNetworkMap() {
-  const network = getSupportNetwork();
+  const [relationships, setRelationships] = useState<Relationship[]>([]);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    let mounted = true;
+    void fetch("/api/support-relationships", { cache: "no-store" })
+      .then(async (response) => {
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || "Cannot load Support Network.");
+        if (mounted) {
+          setUserId(result.userId);
+          setRelationships((result.relationships || []).filter((item: Relationship) => item.status === "active" && item.supporter_id));
+        }
+      })
+      .catch((failure) => { if (mounted) setError(failure instanceof Error ? failure.message : "Support Network unavailable."); });
+    return () => { mounted = false; };
+  }, []);
 
+  const network = relationships.filter((item) => item.scholar_id === userId);
   return (
-    <main style={page}>
-      <section style={hero}>
-        <p style={eyebrow}>Support Network Map</p>
-        <h1 style={title}>Everyone around {network.scholar} is connected.</h1>
-        <p style={sub}>The Scholar Record becomes the shared center of coordination.</p>
-      </section>
-
-      <section style={map}>
-        <div style={center}>{network.center}</div>
-        {network.nodes.map((node, i) => (
-          <article key={node.role} style={{...card, transform:`rotate(${i*51}deg) translate(190px) rotate(-${i*51}deg)`}}>
-            <p style={eyebrow}>{node.role}</p>
-            <strong>{node.name}</strong>
-            <span>{node.connection}</span>
-          </article>
-        ))}
-      </section>
-    </main>
+    <section style={{ padding: "20px 16px 170px", background: "#F8F7F4", color: "#0F172A" }} data-testid="live-support-network-map">
+      <div style={{ maxWidth: 900, margin: "0 auto" }}>
+        <h1 style={{ fontSize: "clamp(28px,6vw,44px)", overflowWrap: "anywhere" }}>Your Support Network</h1>
+        <p>Only accepted, active connections appear here. Pending invitations and restricted relationships do not grant access.</p>
+        {error && <p role="alert">{error}</p>}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 18, alignItems: "center", justifyContent: "center", padding: 24, background: "#EAF1F9", borderRadius: 24 }}>
+          <div style={{ width: 118, height: 118, borderRadius: "50%", background: "#0F172A", color: "white", display: "grid", placeItems: "center", textAlign: "center", fontWeight: 800 }}>Scholar Record</div>
+          {network.map((person) => (
+            <div key={person.id} style={{ width: 128, display: "grid", justifyItems: "center", gap: 6, textAlign: "center" }}>
+              <div role="img" aria-label={person.supporter_name || "Supporter"} style={{ width: 72, height: 72, borderRadius: "50%", background: "#F97316", color: "white", display: "grid", placeItems: "center", fontWeight: 800, fontSize: 24 }}>
+                {(person.supporter_name || person.supporter_email).trim().slice(0, 1).toUpperCase()}
+              </div>
+              <strong style={{ fontSize: 13, overflowWrap: "anywhere" }}>{person.supporter_name || person.supporter_email}</strong>
+              <small>{person.relationship.replaceAll("_", " ")}</small>
+            </div>
+          ))}
+          {!error && userId && network.length === 0 && <p>No active supporters yet. Start by inviting someone to your network.</p>}
+        </div>
+        <a href="/invitations" style={{ display: "inline-block", marginTop: 18, padding: 12, background: "#F97316", color: "white", borderRadius: 10, textDecoration: "none", fontWeight: 800 }}>Invite a supporter</a>
+        <p style={{ fontSize: 13 }}>A connection becomes available for direct messaging only when its relationship is active and the messaging authority contract permits it.</p>
+      </div>
+    </section>
   );
 }
-
-const page: React.CSSProperties = {minHeight:"100vh",background:"#F8F7F4",padding:32,fontFamily:"system-ui, sans-serif"};
-const hero: React.CSSProperties = {maxWidth:1120,margin:"0 auto 18px",background:"#0F172A",color:"#fff",borderRadius:30,padding:34};
-const eyebrow: React.CSSProperties = {fontSize:11,letterSpacing:".14em",textTransform:"uppercase",fontWeight:950,color:"#F97316",margin:0};
-const title: React.CSSProperties = {fontSize:50,lineHeight:1,margin:"12px 0"};
-const sub: React.CSSProperties = {fontSize:17,color:"#CBD5E1"};
-const map: React.CSSProperties = {maxWidth:900,height:620,margin:"0 auto",position:"relative",display:"grid",placeItems:"center"};
-const center: React.CSSProperties = {width:150,height:150,borderRadius:999,background:"#0F172A",color:"#fff",display:"grid",placeItems:"center",textAlign:"center",fontWeight:950,boxShadow:"0 24px 70px rgba(15,23,42,.25)",zIndex:2};
-const card: React.CSSProperties = {position:"absolute",width:190,background:"#fff",border:"1px solid #E2E8F0",borderRadius:18,padding:16,boxShadow:"0 16px 40px rgba(15,23,42,.08)",display:"grid",gap:5,color:"#0F172A",fontSize:13};
