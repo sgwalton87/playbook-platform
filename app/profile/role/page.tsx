@@ -76,7 +76,7 @@ export default function RoleProfilePage() {
     const firstName = String(answers.first_name ?? "").trim();
     const lastName = String(answers.last_name ?? "").trim();
     const fullName = [firstName, lastName].filter(Boolean).join(" ") || String(answers.full_name ?? "").trim();
-    const updatedAnswers = { ...answers, first_name: firstName, last_name: lastName, full_name: fullName };
+    const updatedAnswers: Record<string, OnboardingValue> = { ...answers, first_name: firstName, last_name: lastName, full_name: fullName };
     // Keep compatible persisted profile columns in sync with the private draft.
     // Only fields submitted by the member are written; never write authorization state.
     const writableLegacyFields: Record<string, string> = {
