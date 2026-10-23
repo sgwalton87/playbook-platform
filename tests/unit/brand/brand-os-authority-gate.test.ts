@@ -50,6 +50,8 @@ describe("Brand Partner OS authority gate", () => {
     expect(worker).toContain("BRAND_NOTIFICATION_WORKER_SECRET");
     expect(outbox).toContain("create trigger brand_partner_request_notify");
     expect(outbox).toContain("for update skip locked");
+    expect(outbox).toContain("and attempt_count = p_attempt_count");
+    expect(worker).toContain("p_attempt_count: item.attempt_count");
     expect(outbox).toContain("revoke all on public.brand_partner_notification_outbox");
     expect(api).not.toContain("sendPlaybookEmail");
     expect(api).toContain("if (existing.data) return NextResponse.json");
