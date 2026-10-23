@@ -126,6 +126,9 @@ export default function RoleProfilePage() {
           <button type="button" onClick={() => router.push("/profile/advanced")} style={{ border: 0, borderRadius: 10, padding: "12px 16px", background: "#0f2c4b", color: "#fff", fontWeight: 800, cursor: "pointer" }}>Open advanced profile tools →</button>
         </aside>
       )}
+      <datalist id="profile-college-options"><option value="University of California, Berkeley" /><option value="University of California, Los Angeles" /><option value="Stanford University" /></datalist>
+      <datalist id="profile-career-options"><option value="Education" /><option value="Engineering" /><option value="Healthcare" /><option value="Entrepreneurship" /></datalist>
+      <datalist id="profile-district-options"><option value="Oakland Unified School District" /><option value="Los Angeles Unified School District" /></datalist>
       {steps.map(step => {
         const stepFields = fields.filter(field => field.stepId === step.id);
         if (!stepFields.length) return null;
@@ -147,6 +150,8 @@ export default function RoleProfilePage() {
                 ? <SportPositionField sport={String(answers.primary_sport ?? "")} value={String(value ?? "")} onChange={next => update(field.key, next)} inputStyle={inputStyle} labelStyle={labelStyle} />
                 : field.key === "date_of_birth"
                 ? <input id={field.key} type="date" style={inputStyle} value={String(value ?? "")} onChange={e => update(field.key, e.target.value)} />
+                : field.type === "college" || field.type === "career" || field.type === "district"
+                ? <input id={field.key} style={inputStyle} list={field.type === "college" ? "profile-college-options" : field.type === "career" ? "profile-career-options" : "profile-district-options"} value={String(value ?? "")} placeholder={field.placeholder || ""} onChange={e => update(field.key, e.target.value)} />
                 : field.type === "textarea"
                 ? <textarea id={field.key} rows={4} style={inputStyle} value={String(value ?? "")} onChange={e => update(field.key, e.target.value)} />
                 : field.type === "multi-select"
