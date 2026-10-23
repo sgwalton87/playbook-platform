@@ -6,7 +6,7 @@ const source = (path: string) => readFileSync(resolve(process.cwd(), path), "utf
 describe("Governed invitation journey", () => {
   it("offers explicit relationship types without silently reassigning account roles", () => {
     const ui = source("components/invitations/InvitationCenter.tsx");
-    for (const relationship of ["parent_guardian", "mentor", "educator", "counselor", "coach", "college_recruiter", "college_admissions", "district_admin", "community_partner", "employer_partner"]) {
+    for (const relationship of ["parent_guardian", "mentor", "educator", "counselor", "coach", "college_recruiter", "college_admissions", "district_admin", "community_partner", "brand_partner", "employer_partner"]) {
       expect(ui).toContain('value: "' + relationship + '"');
     }
     expect(ui).toContain('setRelationship');
