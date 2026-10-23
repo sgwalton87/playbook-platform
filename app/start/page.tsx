@@ -34,6 +34,7 @@ function StartContent() {
   const [saving, setSaving] = useState(false);
   const [creating, setCreating] = useState(false);
   const [created, setCreated] = useState(false);
+  const [activationPending, setActivationPending] = useState(false);
   const [journeyError, setJourneyError] = useState<string | null>(null);
   const [autosaveStatus, setAutosaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const autosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -314,11 +315,12 @@ function StartContent() {
             goalTitle: String(form.dream_school || form.ideal_profession || "Complete my scholar journey"),
           }),
         });
-        const result = await response.json() as { error?: string; destination?: string };
+        const result = await response.json() as { error?: string; destination?: string; activationState?: string };
         if (!response.ok) throw new Error(result.error || "PBOS role onboarding could not be completed.");
         if (result.destination && result.destination !== destination) {
           throw new Error("PBOS role onboarding destination does not match the canonical client contract.");
         }
+        setActivationPending(response.status === 202 || (result.activationState != null && result.activationState !== "active"));
         setCreating(false);
         setCreated(true);
         setTimeout(() => { router.replace(result.destination || destination); }, 1500);
@@ -354,8 +356,8 @@ function StartContent() {
       {created && (
         <div style={overlay}>
           <div style={confetti}>🎉 ✨ 🏆 🎓 🧭 🎉<br />🎉 ✨ 🏆 🎓 🧭 🎉<br />🎉 ✨ 🏆 🎓 🧭 🎉</div>
-          <h1 style={overlayTitle}>Congratulations, {form.full_name || "Scholar"}!</h1>
-          <p style={overlayText}>Your Playbook profile is ready. Taking you to your dashboard...</p>
+          <h1 style={overlayTitle}>{activationPending ? "Your profile answers are saved." : `Congratulations, ${form.full_name || "Scholar"}!`}</h1>
+          <p style={overlayText}>{activationPending ? "Your Playbook profile is ready, but PBOS activation is still pending. No additional role permissions have been granted. Taking you to your dashboard..." : "Your Playbook profile is ready. Taking you to your dashboard..."}</p>
         </div>
       )}
 
