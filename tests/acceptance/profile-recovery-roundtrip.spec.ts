@@ -29,7 +29,7 @@ test("synthetic profile data survives edit and reload", async ({ page }) => {
       onboarding_completed: true, verification_status: "email_confirmed",
       first_name: "Historical", last_name: "Profile", school: "Old Academy",
       onboarding_data: { full_name: "Recovery Scholar", school: "Recovery Academy",
-        primary_sport: "Basketball", current_team: "Recovery Club",
+        primary_sport: "Basketball", current_team: "Recovery Club Updated",
         activities: [{ activity: "Service learning", category: "Service", hours: "15", supervisor: "Advisor", description: "Community tutoring" }], top_schools: ["Princeton"] } }, { onConflict: "id" });
     if (seed.error) throw seed.error;
     await page.goto("/login");
@@ -65,6 +65,18 @@ test("synthetic profile data survives edit and reload", async ({ page }) => {
     await expect(page.getByLabel("Description").first()).toHaveValue("Community tutoring");
     await expect(page.getByLabel("Current high school / institution", { exact: true })).toHaveValue("Recovery Institute");
     await expect(page.getByLabel("1. College", { exact: true })).toHaveValue("Stanford University");
+    // The athlete and recruiting fields now live in their dedicated modern
+    // module, but must share the exact same canonical onboarding snapshot.
+    await page.goto("/profile/athlete");
+    await expect(page.getByLabel("Primary sport", { exact: true })).toHaveValue("Basketball");
+    await expect(page.getByLabel("Current team / club", { exact: true })).toHaveValue("Recovery Club");
+    await page.getByLabel("Current team / club", { exact: true }).fill("Recovery Club Updated");
+    await page.getByRole("button", { name: "Save Changes", exact: true }).click();
+    await expect(page.getByText(/Saved and verified/)).toBeVisible();
+    await page.reload();
+    await expect(page.getByLabel("Current team / club", { exact: true })).toHaveValue("Recovery Club Updated");
+    await page.goto("/profile");
+    await expect(page.getByLabel("Current high school / institution", { exact: true })).toHaveValue("Recovery Institute");
     await stalePage.getByLabel("Current high school / institution", { exact: true }).fill("Stale Academy");
     await stalePage.getByRole("button", { name: /save changes/i }).first().click();
     await expect(stalePage.getByText("Your profile was updated elsewhere. Reload to review those changes before saving.")).toBeVisible();
