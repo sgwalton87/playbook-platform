@@ -4,6 +4,19 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { requirePlaybookRole } from "@/lib/roles/registry";
 
+const INVITABLE_RELATIONSHIPS = [
+  { value: "parent_guardian", label: "Parent / Guardian" },
+  { value: "mentor", label: "Mentor (requires validation)" },
+  { value: "educator", label: "Educator / Teacher" },
+  { value: "counselor", label: "High School Counselor" },
+  { value: "coach", label: "High School Coach" },
+  { value: "college_recruiter", label: "College Coach / Recruiter" },
+  { value: "college_admissions", label: "College Admissions" },
+  { value: "district_admin", label: "District / School Administrator" },
+  { value: "community_partner", label: "Community Partner" },
+  { value: "employer_partner", label: "Employer / Workforce Partner" },
+] as const;
+
 type InviteResult = {
   invitation?: { id: string; inviteeName: string; inviteeEmail: string };
   email?: { url?: string };
@@ -15,6 +28,7 @@ type InviteResult = {
 export default function InvitationCenter() {
   const [authorized, setAuthorized] = useState<boolean | null>(null);
   const [name, setName] = useState("");
+  const [relationship, setRelationship] = useState<string>("parent_guardian");
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -49,7 +63,7 @@ export default function InvitationCenter() {
       const response = await fetch("/api/invitations/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ inviteeName: name.trim(), inviteeEmail: email.trim(), relationship: "parent_guardian" }),
+        body: JSON.stringify({ inviteeName: name.trim(), inviteeEmail: email.trim(), relationship }),
       });
       const payload: InviteResult = await response.json();
       if (!response.ok) throw new Error(payload.error || "Unable to create invitation.");
@@ -63,17 +77,22 @@ export default function InvitationCenter() {
     <main style={{ minHeight: "100vh", padding: "clamp(20px,4vw,52px)", background: "#07182D", color: "#fff" }}>
       <section style={{ maxWidth: 720, margin: "0 auto", padding: "clamp(24px,4vw,42px)", background: "#102540", border: "1px solid #36506E", borderRadius: 24 }}>
         <p style={{ color: "#FF9A6C", fontWeight: 800, letterSpacing: 2, fontSize: 12 }}>SCHOLAR SUPPORT NETWORK</p>
-        <h1 style={{ fontSize: "clamp(30px,4vw,48px)", lineHeight: 1.12 }}>Invite a Parent or Guardian</h1>
+        <h1 style={{ fontSize: "clamp(30px,4vw,48px)", lineHeight: 1.12 }}>Invite someone to your Support Network</h1>
         <p style={{ lineHeight: 1.6, color: "#D2DEEF" }}>You decide who can support your journey. An invitation never gives someone ownership of your record. The invited adult must sign in using the exact invited email and accept before their Family OS access is activated.</p>
         {authorized === null && <p role="status">Checking your Scholar account…</p>}
         {authorized === false && <p role="alert">Only a signed-in Scholar, Scholar-Athlete, or Transition Youth account can create a Parent/Guardian invitation. Sign into the Scholar account to continue.</p>}
         {authorized && (
           <form onSubmit={sendInvitation} style={{ display: "grid", gap: 16, marginTop: 24 }}>
-            <label htmlFor="guardian-name">Parent/Guardian name</label>
+            <label htmlFor="support-role">Proposed supporter account type</label>
+            <select id="support-role" value={relationship} onChange={(event) => setRelationship(event.target.value)} style={field}>
+              {INVITABLE_RELATIONSHIPS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+            </select>
+            <p style={{ color: "#D2DEEF", margin: 0 }}>The invited person must use exactly this email to accept. The proposed relationship type cannot be changed after sending. To choose a different type, revoke the pending invitation and send a new one. Existing account roles are not automatically changed.</p>
+            <label htmlFor="guardian-name">Invitee name</label>
             <input id="guardian-name" required value={name} onChange={event => setName(event.target.value)} autoComplete="name" style={field} />
-            <label htmlFor="guardian-email">Parent/Guardian email</label>
+            <label htmlFor="guardian-email">Invitee email</label>
             <input id="guardian-email" required type="email" value={email} onChange={event => setEmail(event.target.value)} autoComplete="email" style={field} />
-            <button disabled={busy} type="submit" style={button}>{busy ? "Creating invitation…" : "Send Parent/Guardian invitation"}</button>
+            <button disabled={busy} type="submit" style={button}>{busy ? "Creating invitation…" : "Send Support Network invitation"}</button>
           </form>
         )}
         {error && <p role="alert" style={{ color: "#FFC1AD" }}>{error}</p>}
