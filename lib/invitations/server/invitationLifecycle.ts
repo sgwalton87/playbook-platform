@@ -8,6 +8,8 @@ import {
 
 import type { RelationshipKind } from "@/lib/permissions";
 
+export function generateInviteCode() { return crypto.randomBytes(9).toString("base64url").toUpperCase(); }
+
 export function generateInviteToken() {
   return crypto.randomBytes(32).toString("hex");
 }
@@ -27,6 +29,7 @@ export function buildInvitationRecord(input: {
     scholarId: input.scholarId,
     scholarName: input.scholarName,
     token: generateInviteToken(),
+    inviteCode: generateInviteCode(),
     destination: destinationForRelationship(input.relationship),
   };
 }

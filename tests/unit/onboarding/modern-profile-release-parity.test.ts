@@ -5,7 +5,7 @@ import { getOnboardingSteps } from "@/lib/onboarding/engine";
 import { getRoleEditableFields } from "@/lib/onboarding/editableFields";
 
 const entry = readFileSync("app/profile/page.tsx", "utf8");
-const editor = readFileSync("app/profile/role/page.tsx", "utf8");
+const editor = readFileSync("components/profile/RoleProfileEditor.tsx", "utf8");
 const advanced = readFileSync("app/profile/advanced/page.tsx", "utf8");
 
 describe("modern profile release parity", () => {
@@ -27,7 +27,8 @@ describe("modern profile release parity", () => {
     expect(advanced).toContain('requirePlaybookRole');
     expect(advanced).toContain('supabase.storage.from("avatars")');
     expect(advanced).toContain('reconcileProfileSave');
-    expect(editor).toContain('router.push("/profile/advanced")');
+    expect(editor).toContain('"/profile/advanced"');
+    expect(editor).toContain('"/profile/athlete"');
     expect(editor).toContain('role === "scholar" || role === "scholar-athlete"');
   });
 
@@ -53,7 +54,8 @@ describe("modern profile release parity", () => {
     expect(editor).toContain('field.type === "activity-list"');
     expect(editor).toContain("<ActivityProfileField");
     expect(component).toContain("entry.activity");
-    expect(component).toContain("...texts");
+    expect(component).toContain('typeof entry === "string"');
+    expect(component).toContain("onChange(entries.map");
     expect(component).toContain("entry.description");
     expect(component).toContain("entry.supervisor");
   });
@@ -73,10 +75,10 @@ describe("modern profile release parity", () => {
   });
 
   it("blocks stale modern and advanced editor saves before replacing private answers", () => {
-    expect(editor).toContain('JSON.stringify(latest.onboarding_data ?? {})');
-    expect(editor).toContain('JSON.stringify(profile.onboarding_data ?? {})');
+    expect(editor).toContain('stableProfileSnapshot(latest.onboarding_data)');
+    expect(editor).toContain('stableProfileSnapshot(profile.onboarding_data)');
     expect(editor).toContain("Your profile was updated elsewhere.");
-    expect(advanced).toContain('JSON.stringify(latest.onboarding_data ?? {})');
+    expect(advanced).toContain('stableProfileSnapshot(latest.onboarding_data)');
     expect(advanced).toContain("Your profile was updated elsewhere.");
   });
 

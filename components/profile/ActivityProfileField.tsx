@@ -1,43 +1,48 @@
 "use client";
-import { useState } from "react";
 import type { OnboardingActivity } from "@/lib/onboarding/types";
 
 const input: React.CSSProperties = { width: "100%", border: "1px solid #cbd5e1", borderRadius: 10, padding: 12, color: "#0f172a", fontSize: 16, background: "#fff", boxSizing: "border-box" };
-const empty = (): OnboardingActivity => ({ activity: "", category: "", description: "", hours: "", supervisor: "" });
+const newActivity = (): OnboardingActivity => ({ activity: "", category: "", description: "", hours: "", supervisor: "" });
+const categories = ["Sports", "School club", "Community service", "Work", "Leadership", "Family responsibilities", "Arts", "Other"];
 
 export default function ActivityProfileField({ value, onChange }: {
   value: unknown;
   onChange: (entries: Array<OnboardingActivity | string>) => void;
 }) {
-  const [draft, setDraft] = useState<OnboardingActivity>(empty);
-  const records: OnboardingActivity[] = Array.isArray(value) ? value.filter((entry): entry is OnboardingActivity =>
-    entry !== null && typeof entry === "object" && !Array.isArray(entry) && typeof entry.activity === "string"
-  ).map(entry => ({ ...empty(), ...entry })) : [];
-  // Legacy free-text entries are preserved and remain editable rather than discarded.
-  const texts = Array.isArray(value) ? value.filter((entry): entry is string => typeof entry === "string") : [];
-  const add = () => {
-    if (!draft.activity.trim()) return;
-    onChange([...records, ...texts, { ...draft, activity: draft.activity.trim() }]);
-    setDraft(empty());
+  // No component-local draft: every edit updates the owner profile's canonical
+  // onboarding state so the parent Save Changes action includes that edit.
+  const entries: Array<OnboardingActivity | string> = Array.isArray(value)
+    ? value.filter((x): x is OnboardingActivity | string =>
+        typeof x === "string" || Boolean(x && typeof x === "object" && !Array.isArray(x)))
+    : [];
+  const change = (index: number, key: keyof OnboardingActivity, next: string) => {
+    onChange(entries.map((item, i) => i === index && typeof item !== "string"
+      ? { ...newActivity(), ...item, [key]: next } : item));
   };
   return <div style={{ display: "grid", gap: 12 }}>
-    {records.map((entry, index) => <div key={index} style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 12, display: "grid", gap: 8 }}>
-      <label>Activity<input style={input} value={entry.activity} onChange={e => onChange([...records.map((x, i) => i === index ? { ...x, activity: e.target.value } : x), ...texts])} /></label>
-      <label>Category<input style={input} value={entry.category} onChange={e => onChange([...records.map((x, i) => i === index ? { ...x, category: e.target.value } : x), ...texts])} /></label>
-      <label>Hours<input style={input} value={entry.hours} onChange={e => onChange([...records.map((x, i) => i === index ? { ...x, hours: e.target.value } : x), ...texts])} /></label>
-      <label>Mentor / Supervisor<input style={input} value={entry.supervisor} onChange={e => onChange([...records.map((x, i) => i === index ? { ...x, supervisor: e.target.value } : x), ...texts])} /></label>
-      <label>Description<textarea style={input} value={entry.description} onChange={e => onChange([...records.map((x, i) => i === index ? { ...x, description: e.target.value } : x), ...texts])} /></label>
-      <button type="button" onClick={() => onChange([...records.filter((_, i) => i !== index), ...texts])}>Remove activity</button>
-    </div>)}
-    {texts.length > 0 && <p>Legacy entries: {texts.join(", ")}. They remain preserved until you add or edit an entry.</p>}
-    <fieldset style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 12, display: "grid", gap: 10 }}>
-      <legend>Add activity</legend>
-      <label>Activity<input style={input} value={draft.activity} onChange={e => setDraft(x => ({ ...x, activity: e.target.value }))} /></label>
-      <label>Category<input style={input} value={draft.category} onChange={e => setDraft(x => ({ ...x, category: e.target.value }))} /></label>
-      <label>Hours<input style={input} value={draft.hours} onChange={e => setDraft(x => ({ ...x, hours: e.target.value }))} /></label>
-      <label>Mentor / Supervisor<input style={input} value={draft.supervisor} onChange={e => setDraft(x => ({ ...x, supervisor: e.target.value }))} /></label>
-      <label>Description<textarea style={input} value={draft.description} onChange={e => setDraft(x => ({ ...x, description: e.target.value }))} /></label>
-      <button type="button" disabled={!draft.activity.trim()} onClick={add}>Add activity entry</button>
-    </fieldset>
+    {entries.map((entry, index) => typeof entry === "string" ? (
+      <div key={index} style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 12 }}>
+        <label>Legacy activity (editable)
+          <input style={input} value={entry} onChange={event =>
+            onChange(entries.map((item,i)=>i===index?event.target.value:item))} />
+        </label>
+        <button type="button" onClick={() => onChange(entries.filter((_,i)=>i!==index))}>Remove activity</button>
+      </div>
+    ) : (
+      <fieldset key={index} style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 12, display: "grid", gap: 10 }}>
+        <legend>Activity {index + 1} · saved with your profile</legend>
+        <label>Activity<input style={input} value={entry.activity || ""} onChange={e => change(index, "activity", e.target.value)} /></label>
+        <label>Category
+          <input style={input} list="playbook-activity-category-options" value={entry.category || ""} onChange={e => change(index, "category", e.target.value)} />
+        </label>
+        <label>Hours<input style={input} inputMode="decimal" value={entry.hours || ""} onChange={e => change(index, "hours", e.target.value)} /></label>
+        <label>Mentor / Supervisor<input style={input} value={entry.supervisor || ""} onChange={e => change(index, "supervisor", e.target.value)} /></label>
+        <label>Description<textarea style={input} value={entry.description || ""} onChange={e => change(index, "description", e.target.value)} /></label>
+        <button type="button" onClick={() => onChange(entries.filter((_,i)=>i!==index))}>Remove activity</button>
+      </fieldset>
+    ))}
+    <datalist id="playbook-activity-category-options">{categories.map(c=><option key={c} value={c}/>)}</datalist>
+    <button type="button" style={{ background: "#0f2c4b", border:0, color:"white", padding:14, borderRadius:12, fontWeight:800 }} onClick={() => onChange([...entries, newActivity()])}>+ Add activity row</button>
+    <p style={{ color:"#475569", fontSize:13, margin:0 }}>Activity edits are included when you select Save & verify. You do not need to press a separate Add Entry button after typing.</p>
   </div>;
 }

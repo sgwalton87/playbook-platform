@@ -5,7 +5,7 @@ import {
   buildInvitationRecord,
 } from "@/lib/invitations/server";
 import type { RelationshipKind } from "@/lib/permissions";
-import { buildSupportInvitationEmail, sendPlaybookEmail } from "@/lib/email";
+import { buildSupportInvitationEmail, buildScholarInvitationReceipt, sendPlaybookEmail } from "@/lib/email";
 import { requirePlaybookRole } from "@/lib/roles/registry";
 import { requireUser } from "@/lib/supabase/server";
 
@@ -101,6 +101,7 @@ export async function POST(req: NextRequest) {
         relationship: record.relationship,
         status: record.status,
         token: record.token,
+        invite_code: record.inviteCode,
         permissions: record.permissions,
         destination: record.destination,
       });
@@ -122,35 +123,43 @@ export async function POST(req: NextRequest) {
       scholarName: record.scholarName,
       relationship: record.relationship,
       url: email.url,
+      inviteCode: record.inviteCode,
     });
 
-    try {
-      await sendPlaybookEmail({
-        to: record.inviteeEmail,
-        subject: invitationEmail.subject,
-        text: invitationEmail.text,
-        html: invitationEmail.html,
-        fromType: "onboarding",
-      });
-    } catch (deliveryError) {
-      return NextResponse.json(
-        {
-          ok: true,
-          invitation: record,
-          email,
-          deliveryStatus: "failed",
-          deliveryError: deliveryError instanceof Error ? deliveryError.message : "Invitation delivery failed.",
-        },
-        { status: 202 }
-      );
+    // The durable invitation is created first. Each email delivery is independent
+    // so a failed recipient delivery does not suppress the Scholar's copy.
+    let deliveryStatus: "sent" | "failed" = "failed";
+    let scholarReceiptStatus: "sent" | "failed" = "failed";
+    const emailConfigured = Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
+    if (emailConfigured) {
+      try {
+        await sendPlaybookEmail({
+          to: record.inviteeEmail, subject: invitationEmail.subject,
+          text: invitationEmail.text, html: invitationEmail.html, fromType: "onboarding",
+        });
+        deliveryStatus = "sent";
+      } catch { /* Invitation remains recoverable through the code/inbox. */ }
+      if (user.email) {
+        try {
+          const receipt = buildScholarInvitationReceipt({
+            scholarName, inviteeName, inviteeEmail, relationship,
+            url: email.url, inviteCode: record.inviteCode,
+          });
+          await sendPlaybookEmail({
+            to: user.email, subject: receipt.subject,
+            text: receipt.text, html: receipt.html, fromType: "notifications",
+          });
+          scholarReceiptStatus = "sent";
+        } catch { /* Scholar copy failure does not roll back the invitation. */ }
+      }
     }
-
     return NextResponse.json({
-      ok: true,
-      invitation: record,
-      email,
-      deliveryStatus: "sent",
-    });
+      ok: true, invitation: record, email, deliveryStatus, scholarReceiptStatus,
+      ...(emailConfigured ? {} : {
+        deliveryError: "Email service is not configured. The invitee can sign in using the exact email and enter their invitation code at /invitations/received.",
+      }),
+    }, { status: deliveryStatus === "sent" ? 200 : 202 });
+
   } catch {
     return NextResponse.json(
       { error: "Unable to create invitation." },

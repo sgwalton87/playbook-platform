@@ -13,7 +13,7 @@ export async function GET() {
     catch { return NextResponse.json({ authorized: false, error: "Your Playbook account type must be completed before inviting supporters." }, { status: 403 }); }
     if (!["scholar","scholar-athlete","transition-youth"].includes(role)) return NextResponse.json({ authorized: false, error: "Only Scholar, Scholar-Athlete, and Transition Youth accounts can invite supporters." }, { status: 403 });
     const { data, error } = await supabase.from("support_invitations")
-      .select("id,invitee_name,invitee_email,relationship,status,created_at")
+      .select("id,invitee_name,invitee_email,relationship,status,invite_code,created_at")
       .eq("scholar_id", user.id).order("created_at", { ascending: false }).limit(100);
     if (error) throw error;
     return NextResponse.json({ authorized: true, invitations: data || [] });
