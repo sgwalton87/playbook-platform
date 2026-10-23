@@ -101,6 +101,7 @@ export async function POST(req: NextRequest) {
         relationship: record.relationship,
         status: record.status,
         token: record.token,
+        invite_code: record.inviteCode,
         permissions: record.permissions,
         destination: record.destination,
       });
