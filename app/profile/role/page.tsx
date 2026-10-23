@@ -1,5 +1,5 @@
-import { stableProfileSnapshot } from "@/lib/onboarding/stableSnapshot";
 "use client";
+import { stableProfileSnapshot } from "@/lib/onboarding/stableSnapshot";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
