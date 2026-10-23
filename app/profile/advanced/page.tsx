@@ -187,6 +187,18 @@ export default function AdvancedScholarProfilePage() {
     const mergedOnboarding = reconcileProfileSave(profile.onboarding_data, profileUpdates);
     // This sensitive answer is stored in the private onboarding snapshot; no profiles.race column exists.
     mergedOnboarding.race = race || null;
+    const { data: latest, error: freshnessError } = await supabase.from("profiles")
+      .select("onboarding_data").eq("id", profile.id).maybeSingle();
+    if (freshnessError || !latest) {
+      setSaving(false);
+      setSaveError("Unable to check for newer changes. Reload before saving.");
+      return;
+    }
+    if (JSON.stringify(latest.onboarding_data ?? {}) !== JSON.stringify(profile.onboarding_data ?? {})) {
+      setSaving(false);
+      setSaveError("Your profile was updated elsewhere. Reload to review those changes before saving.");
+      return;
+    }
     const { data: updated, error } = await supabase.from("profiles").update({
       ...profileUpdates,
       onboarding_data: mergedOnboarding,
