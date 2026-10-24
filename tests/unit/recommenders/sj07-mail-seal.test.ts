@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 const read=(path:string)=>readFileSync(join(process.cwd(),path),"utf8");
 
@@ -19,7 +19,9 @@ describe("SJ-07 LOR sender and confidential seal contract",()=>{
     expect(seal).toContain("CONFIDENTIAL");
   });
   it("does not make the visual seal a security boundary",()=>{
-    const migration=read("supabase/migrations/202610230010_sj07_private_recommendation_artifacts.sql");
+    const migrationFile=readdirSync(join(process.cwd(),"supabase/migrations")).find(name=>name.endsWith("_sj07_private_recommendation_artifacts.sql"));
+    if(!migrationFile)throw new Error("SJ-07 recommendation migration is missing");
+    const migration=read("supabase/migrations/"+migrationFile);
     expect(migration).toContain("a.confidentiality='open'");
     expect(migration).toContain("revoke all on public.recommendation_letter_artifacts from public, anon, authenticated");
   });
