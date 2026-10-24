@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
+import "@/components/recommenders/lor-portal.css";
 import RecommendationLearnerGate from "@/components/recommenders/RecommendationLearnerGate";
 
 type Row = {id:string;recommender_name:string;recommender_email:string;recommender_role:string;opportunity_name:string;status:string;created_at:string};
@@ -44,7 +45,7 @@ function RecommendationForm() {
     }catch(error){setNotice(error instanceof Error?error.message:"Request could not be sent.");}
     finally{setBusy(false);}
   }
-  return <main style={{maxWidth:880,margin:"auto",padding:"24px",fontFamily:"system-ui"}}>
+  return <main className="lor-shell" style={{maxWidth:880,margin:"auto",padding:"24px",fontFamily:"system-ui"}}>
     <nav><Link href="/dashboard">Scholar Dashboard</Link> · <Link href="/scholar/resume">Résumé</Link></nav>
     <p style={{letterSpacing:3,fontSize:12,color:"#886524"}}>PLAYBOOK SERIES · SCHOLAR APPLICATION TOOLKIT</p>
     <h1>My Recommendation Requests</h1>
