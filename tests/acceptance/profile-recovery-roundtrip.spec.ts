@@ -60,8 +60,9 @@ test("synthetic profile data survives edit and reload", async ({ page }) => {
     }).toBe("Recovery Institute");
     await page.reload();
     await expect(page.getByRole("heading", { name: "Map your academic path." })).toBeVisible();
-    await expect(page.getByLabel("Activity").first()).toHaveValue("Service learning");
-    await expect(page.getByLabel("Mentor / Supervisor").first()).toHaveValue("Advisor");
+    await page.getByRole("button", { name: /Service learning/ }).first().click();
+    await expect(page.getByLabel("Activity", { exact: true }).first()).toHaveValue("Service learning");
+    await expect(page.getByLabel("Activity Supervisor", { exact: true }).first()).toHaveValue("Advisor");
     await expect(page.getByLabel("Description").first()).toHaveValue("Community tutoring");
     await expect(page.getByLabel("Current high school / institution", { exact: true })).toHaveValue("Recovery Institute");
     await expect(page.getByLabel("1. College", { exact: true })).toHaveValue("Stanford University");
