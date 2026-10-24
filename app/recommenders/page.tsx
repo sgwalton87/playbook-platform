@@ -74,6 +74,6 @@ function RecommendationForm() {
     </form>
     <h2>My requests</h2>
     {rows.length===0?<p>No recommendation requests are available yet.</p>:<ul>{rows.map(r=><li key={r.id} style={{padding:"12px 0",borderBottom:"1px solid #ddd"}}><strong>{r.recommender_name}</strong> — {r.opportunity_name} <span style={{color:"#806221"}}>({r.status})</span></li>)}</ul>}
-    <p style={{fontSize:13,color:"#666"}}>Letters and application attachments will become available after the secure recommendation Vault release is certified.</p>
+    <p style={{fontSize:13,color:"#666"}}>Submitted letters appear in your private Scholar Vault. Application attachment saves a private reference and does not send a letter to an institution.</p>
   </main>;
 }
