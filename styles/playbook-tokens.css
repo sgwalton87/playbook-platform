@@ -226,12 +226,41 @@
     z-index: 25;
     align-items: center;
     justify-content: space-between;
+    gap: 10px;
+    min-width: 0;
     padding: calc(12px + env(safe-area-inset-top)) 16px 12px;
     background:
       radial-gradient(circle at 85% 0%, rgba(249,115,22,.22), transparent 12rem),
       linear-gradient(135deg, var(--pb-navy), var(--pb-navy-dark));
     color: var(--pb-white);
     box-shadow: var(--pb-shadow-soft);
+  }
+  /* Keep each of the 15 role headers inside narrow mobile viewports. */
+  .playbook-mobile-header > .playbook-brand {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .playbook-mobile-header > .playbook-brand > span {
+    min-width: 0;
+    overflow: hidden;
+  }
+  .playbook-mobile-header > .playbook-brand strong,
+  .playbook-mobile-header > .playbook-brand small {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .playbook-mobile-header > .playbook-brand img { max-width: 44px; height: auto; }
+  .playbook-mobile-header > a[aria-label$="items need attention"],
+  .playbook-mobile-header > .playbook-signout { flex: 0 0 auto; }
+  .playbook-mobile-header > .playbook-signout {
+    width: auto;
+    max-width: 88px;
+    padding: 8px 10px;
+    font-size: 12px;
+    white-space: nowrap;
   }
   .playbook-mobile-bottom-nav {
     display: grid;
@@ -263,6 +292,7 @@
   }
   .playbook-mobile-bottom-nav a span:last-child { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .playbook-mobile-bottom-nav a[data-active="true"] { background: var(--pb-orange); color: var(--pb-white); }
+  .playbook-main > main { padding-bottom: calc(var(--pb-mobile-nav-height) + 32px + env(safe-area-inset-bottom)); }
 }
 .playbook-button--secondary { background: var(--pb-white); color: var(--pb-navy); border: 1px solid var(--pb-border); }
 .playbook-button--ghost { background: transparent; color: var(--pb-navy); border: 1px solid var(--pb-border); }
