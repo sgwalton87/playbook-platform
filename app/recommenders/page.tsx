@@ -2,13 +2,13 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
-import { CanonicalRoleAuthorityGate } from "@/components/role-os/RoleAuthorityGate";
+import RecommendationLearnerGate from "@/components/recommenders/RecommendationLearnerGate";
 
 type Row = {id:string;recommender_name:string;recommender_email:string;recommender_role:string;opportunity_name:string;status:string;created_at:string};
 const roles=["educator","mentor","coach","family","employer"] as const;
 type InnerCircle={id:string;name:string;email:string;relationship:string};
 export default function RecommendationWorkspace() {
-  return <CanonicalRoleAuthorityGate role="scholar"><RecommendationForm /></CanonicalRoleAuthorityGate>;
+  return <RecommendationLearnerGate><RecommendationForm /></RecommendationLearnerGate>;
 }
 function RecommendationForm() {
   const [rows,setRows]=useState<Row[]>([]);
