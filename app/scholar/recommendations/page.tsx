@@ -18,13 +18,13 @@ function RecommendationsVault(){
     const response=await fetch("/api/recommendations/vault",{cache:"no-store"});
     if(!response.ok){setStatus("We could not load recommendations. No files were shared.");return;}
     const data=await response.json();
-    setLetters(data.letters??[]);setWorkspaces(data.workspaces??[]);setStatus("");
+    setLetters(data.letters??[]);setWorkspaces(data.workspaces??[]);setStatus(data.workspaceUnavailable?"Recommendations are available, but application attachment is temporarily unavailable. Your letters remain private.":"");
   }
   useEffect(()=>{
     void fetch("/api/recommendations/vault",{cache:"no-store"}).then(async response=>{
       if(!response.ok)return;
       const data=await response.json();
-      setLetters(data.letters??[]);setWorkspaces(data.workspaces??[]);setStatus("");
+      setLetters(data.letters??[]);setWorkspaces(data.workspaces??[]);setStatus(data.workspaceUnavailable?"Recommendations are available, but application attachment is temporarily unavailable. Your letters remain private.":"");
     }).catch(()=>{});
   },[]);
   async function open(letter:Letter){
