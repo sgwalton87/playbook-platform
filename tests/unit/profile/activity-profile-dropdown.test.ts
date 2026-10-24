@@ -15,6 +15,14 @@ describe("Activity profile onboarding UX and persistence contract",()=>{
     expect(source).toContain('Previously saved category:');
     expect(source).not.toContain('list="playbook-activity-category-options"');
   });
+  it("preserves supervisor contact fields as optional data",()=>{
+    const schema=readFileSync("lib/onboarding/types.ts","utf8");
+    expect(schema).toContain("supervisor_email?: string");
+    expect(schema).toContain("supervisor_telephone?: string");
+    for(const label of ["# Hours","Activity Supervisor","Supervisor Email (optional)","Supervisor Telephone (optional)"])expect(source).toContain(label);
+    expect(source).toContain('type="email"');
+    expect(source).toContain('type="tel"');
+  });
   it("keeps the canonical parent-managed save process and removal",()=>{
     expect(source).toContain('onChange(entries.map(');
     expect(source).toContain('onChange(entries.filter(');
