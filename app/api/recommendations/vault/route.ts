@@ -12,12 +12,15 @@ export async function GET() {
       supabase.from("application_workspaces").select("id,opportunity_name,status,recommendation_request_ids")
         .eq("scholar_id",user.id).order("created_at",{ascending:false}).limit(50)
     ]);
-    if(vault.error||workspaces.error)throw new Error(vault.error?.message??workspaces.error?.message);
+    if(vault.error)throw new Error(vault.error.message);
+    // Letter metadata must remain available when legacy application workspace
+    // authorization is unavailable. Never weaken RLS or expose workspace data.
+    const workspaceUnavailable=Boolean(workspaces.error);
     const letters=(vault.data??[]).map((item: {vault_id:string;title:string;request_id:string;artifact_id:string;confidentiality:string;submitted_at:string})=>({
       vaultId:item.vault_id,title:item.title,requestId:item.request_id,
       artifactId:item.artifact_id,confidentiality:item.confidentiality,createdAt:item.submitted_at
     }));
-    return NextResponse.json({letters,workspaces:workspaces.data??[]});
+    return NextResponse.json({letters,workspaces:workspaceUnavailable?[]:(workspaces.data??[]),workspaceUnavailable},{headers:{"Cache-Control":"private, no-store"}});
   }catch{
     return NextResponse.json({error:"Unable to read Scholar recommendation Vault."},{status:503});
   }
