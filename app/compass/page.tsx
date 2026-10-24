@@ -24,7 +24,8 @@ export default function CompassPage() {
       setCourses((data || []).map((record) => ({
         name: record.current_course || record.subject_name || record.subject,
         subject: record.subject,
-        // Reported years are not equivalent to verified credits.\n        credits: 0,
+        // Reported years are not equivalent to verified credits.
+        credits: 0,
         completed: false,
       })));
       setDataState("ready");
