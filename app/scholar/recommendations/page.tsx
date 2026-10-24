@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import "@/components/recommenders/lor-portal.css";
 import ConfidentialPlaybookSeal from "@/components/recommenders/ConfidentialPlaybookSeal";
 import RecommendationLearnerGate from "@/components/recommenders/RecommendationLearnerGate";
 
@@ -40,7 +41,7 @@ function RecommendationsVault(){
     setStatus("Recommendation reference attached to the application draft. This does not send it externally.");
     await refresh();
   }
-  return <main style={{maxWidth:920,margin:"auto",padding:24,fontFamily:"system-ui"}}>
+  return <main className="lor-shell" style={{maxWidth:920,margin:"auto",padding:24,fontFamily:"system-ui"}}>
     <nav><Link href="/dashboard">Scholar Dashboard</Link> · <Link href="/recommenders">Request a letter</Link></nav>
     <p style={{color:"#99712b",fontSize:12,letterSpacing:2}}>PLAYBOOK SERIES · SCHOLAR VAULT™</p>
     <h1>Applications & Career / Recommendations</h1>
