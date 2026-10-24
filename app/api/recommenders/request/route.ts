@@ -72,6 +72,21 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Reject malformed or oversized outbound invitations before persistence or SMTP.
+    // The verified-recipient comparison in the submission RPC remains authoritative.
+    const contactName = typeof body.recommenderName==="string"?body.recommenderName.trim():"";
+    const contactEmail = typeof body.recommenderEmail==="string"?body.recommenderEmail.trim().toLowerCase():"";
+    const opportunityName = typeof body.opportunityName==="string"?body.opportunityName.trim():"";
+    if(contactName.length<2||contactName.length>120||
+      opportunityName.length<2||opportunityName.length>180||
+      contactEmail.length>254 || !/^[^\\s@<>]+@[^\\s@<>]+\\.[^\\s@<>]+$/.test(contactEmail)||
+      /[\\r\\n]/.test(contactName+contactEmail+opportunityName)) {
+      return NextResponse.json({error:"Enter a valid recipient name, email and opportunity."},{status:400});
+    }
+    if(user.email && contactEmail===user.email.toLowerCase()){
+      return NextResponse.json({error:"A Scholar cannot request a recommendation from their own account."},{status:400});
+    }
+
     const evidence = Array.isArray(body.evidence)
       ? body.evidence.filter((item): item is string => typeof item === "string").slice(0, 50)
       : [];
@@ -79,10 +94,10 @@ export async function POST(req: NextRequest) {
     const request = buildRecommenderRequest({
       scholarId: user.id,
       scholarName: profile.data.full_name || "Playbook Scholar",
-      recommenderName: String(body.recommenderName ?? ""),
-      recommenderEmail: String(body.recommenderEmail ?? ""),
+      recommenderName: contactName,
+      recommenderEmail: contactEmail,
       recommenderRole: body.recommenderRole,
-      opportunityName: String(body.opportunityName ?? ""),
+      opportunityName: opportunityName,
       evidence,
     });
 
