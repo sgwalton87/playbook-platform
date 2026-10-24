@@ -9,14 +9,14 @@ export default function CompassCoreCard({ courses = [], trustScore = 0, dataStat
   return (
     <section style={{background:"#fff",border:"1px solid #E2E8F0",borderRadius:24,padding:24}}>
       <p style={{fontSize:11,letterSpacing:"0.14em",textTransform:"uppercase",color:"#64748B",fontWeight:800}}>
-        Compass guidance
+        Compass guidance · provisional
       </p>
 
       {dataState === "loading" && <p role="status">Connecting your verified academic record…</p>}
       {dataState === "error" && <p role="alert">Compass could not load your private record. No sample record has been substituted.</p>}
       {dataState === "ready" && courses.length === 0 && (
         <p role="status" style={{color:"#475569",lineHeight:1.6}}>
-          No verified course evidence is connected yet. Add a transcript or academic evidence to generate your guidance.
+          No verified course evidence is connected yet. Add a transcript or academic evidence to start building verified guidance.
         </p>
       )}
 
@@ -26,12 +26,12 @@ export default function CompassCoreCard({ courses = [], trustScore = 0, dataStat
             {report.headline}
           </h1>
           <p style={{fontSize:14,color:"#64748B",lineHeight:1.6}}>
-            {report.summary}
+            This is provisional guidance from recorded course information, not a verified academic score. {report.summary}
           </p>
         </div>
 
         <div style={{fontSize:46,fontWeight:900,color:"#F97316"}}>
-          {report.score}%
+          <span style={{fontSize:14,fontWeight:700,color:"#64748B"}}>Score pending verified evidence</span>
         </div>
       </div>}
 
