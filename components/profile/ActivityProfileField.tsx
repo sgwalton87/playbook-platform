@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { OnboardingActivity } from "@/lib/onboarding/types";
 
 const input: React.CSSProperties = { width: "100%", border: "1px solid #cbd5e1", borderRadius: 10, padding: 12, color: "#0f172a", fontSize: 16, background: "#fff", boxSizing: "border-box" };
@@ -17,6 +17,25 @@ export default function ActivityProfileField({ value, onChange }: {
         typeof x === "string" || Boolean(x && typeof x === "object" && !Array.isArray(x)))
     : [];
   const [expanded, setExpanded] = useState<number | null>(null);
+  const [connections, setConnections] = useState<Array<{id:string;name:string;email:string}>>([]);
+  const [networkState, setNetworkState] = useState<"loading"|"ready"|"unavailable">("loading");
+  useEffect(() => {
+    let active = true;
+    void fetch("/api/support-relationships", { credentials:"same-origin", cache:"no-store" })
+      .then(async res => {
+        if(!res.ok) throw new Error("Network unavailable");
+        const data = await res.json();
+        if(!active) return;
+        const rows = Array.isArray(data.relationships) ? data.relationships : [];
+        setConnections(rows.filter((r: {perspective?:string;status?:string;id?:string;supporter_name?:string;supporter_email?:string}) =>
+          r.perspective === "scholar" && r.status === "active" && typeof r.id === "string" &&
+          typeof r.supporter_name === "string" && r.supporter_name.trim().length > 0)
+          .map((r: {id:string;supporter_name:string;supporter_email?:string}) =>
+            ({id:r.id,name:r.supporter_name,email:r.supporter_email??""})));
+        setNetworkState("ready");
+      }).catch(() => { if(active) setNetworkState("unavailable"); });
+    return () => { active = false; };
+  }, []);
   const change = (index: number, key: keyof OnboardingActivity, next: string) => {
     onChange(entries.map((item, i) => i === index && typeof item !== "string"
       ? { ...newActivity(), ...item, [key]: next } : item));
@@ -58,7 +77,24 @@ export default function ActivityProfileField({ value, onChange }: {
             </label>
             {entry.category && !categories.includes(entry.category) && <p style={{fontSize:12,color:"#475569",margin:0}}>Previously saved category: {entry.category}. Choose a category above to update it.</p>}
             <label># Hours<input style={input} inputMode="decimal" value={entry.hours || ""} onChange={e=>change(index,"hours",e.target.value)} /></label>
-            <label>Activity Supervisor<input style={input} value={entry.supervisor || ""} onChange={e=>change(index,"supervisor",e.target.value)} /></label>
+            <label>Choose Activity Supervisor from My Inner Circle (optional)
+              <select style={input} value={entry.supervisor_relationship_id || ""} onChange={e=>{
+                const connection=connections.find(person=>person.id===e.target.value);
+                onChange(entries.map((item,i)=>i===index && typeof item!=="string"
+                  ? {...newActivity(),...item,supervisor_relationship_id:connection?.id??"",
+                     ...(connection?{supervisor:connection.name,supervisor_email:connection.email}:{})}
+                  :item));
+              }}>
+                <option value="">Enter a supervisor manually</option>
+                {connections.map(person=><option key={person.id} value={person.id}>{person.name}</option>)}
+              </select>
+            </label>
+            {networkState==="unavailable"&&<small>Inner Circle could not load. You can still enter a supervisor manually.</small>}
+            {networkState==="ready"&&connections.length===0&&<small>No active Inner Circle connections yet. You can enter a supervisor manually.</small>}
+            <label>Activity Supervisor<input style={input} value={entry.supervisor || ""} onChange={e=>{
+              onChange(entries.map((item,i)=>i===index && typeof item!=="string"
+                ? {...newActivity(),...item,supervisor:e.target.value,supervisor_relationship_id:""} : item));
+            }} /></label>
             <label>Supervisor Email (optional)<input style={input} type="email" autoComplete="email" value={entry.supervisor_email || ""} onChange={e=>change(index,"supervisor_email",e.target.value)} /></label>
             <label>Supervisor Telephone (optional)<input style={input} type="tel" autoComplete="tel" value={entry.supervisor_telephone || ""} onChange={e=>change(index,"supervisor_telephone",e.target.value)} /></label>
             <label>Description<textarea style={input} value={entry.description || ""} onChange={e=>change(index,"description",e.target.value)} /></label>
