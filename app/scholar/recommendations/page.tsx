@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import ConfidentialPlaybookSeal from "@/components/recommenders/ConfidentialPlaybookSeal";
-import { CanonicalRoleAuthorityGate } from "@/components/role-os/RoleAuthorityGate";
+import RecommendationLearnerGate from "@/components/recommenders/RecommendationLearnerGate";
 
 type Letter={vaultId:string;title:string;requestId:string;artifactId:string;confidentiality:"open"|"confidential";createdAt:string};
 type Workspace={id:string;opportunity_name:string;status:string;recommendation_request_ids?:string[]};
@@ -71,5 +71,5 @@ function RecommendationsVault(){
   </main>;
 }
 export default function ScholarRecommendationsPage(){
-  return <CanonicalRoleAuthorityGate role="scholar"><RecommendationsVault/></CanonicalRoleAuthorityGate>;
+  return <RecommendationLearnerGate><RecommendationsVault/></RecommendationLearnerGate>;
 }
