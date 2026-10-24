@@ -128,7 +128,8 @@ for(const id of [openId,confidentialId,openId]){
   assert(!attached.error,"Owner attachment failed: "+attached.error?.message);
 }
 // Admin verifies stored references without conflating this isolated attachment
-// test with the pre-existing Scholar workspace SELECT authorization defect.\nconst result=await admin.from("application_workspaces")
+// test with the pre-existing Scholar workspace SELECT authorization defect.
+const result=await admin.from("application_workspaces")
   .select("recommendation_request_ids").eq("id",workspace.data.id).single();
 assert(!result.error&&Array.isArray(result.data?.recommendation_request_ids)&&result.data.recommendation_request_ids.length===2,
   "Application reference attachment must be idempotent and exclude letter content; actual="+JSON.stringify({error:result.error?.message,ids:result.data?.recommendation_request_ids}));
