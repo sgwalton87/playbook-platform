@@ -70,7 +70,14 @@ export default function UnifiedAppShell({ children }: { children: React.ReactNod
   }
 
   const displayName = profile?.full_name || `${profile?.first_name || ""} ${profile?.last_name || ""}`.trim() || profile?.username || "Playbook User";
-  const mobileItems = roleNav.items.filter((item) => item.href !== "/profile").slice(0, 4);
+  // Keep the learner toolkit visible on mobile: only four primary slots render.
+  const eligibleMobileItems = roleNav.items.filter((item) => item.href !== "/profile");
+  const learnerTools = eligibleMobileItems.find((item) => item.href === "/scholar/tools");
+  const mobileItems = learnerTools
+    ? [eligibleMobileItems[0], learnerTools, ...eligibleMobileItems.filter((item) =>
+        item.href !== eligibleMobileItems[0]?.href && item.href !== learnerTools.href
+      ).slice(0, 2)]
+    : eligibleMobileItems.slice(0, 4);
   const profileItem: NavItem = { label: "Profile", href: "/profile", icon: "👤" };
   const attentionTotal = context.unreadAttentionCount + context.pendingVerificationCount;
   let journeyRole: PlaybookRole | null = null;
