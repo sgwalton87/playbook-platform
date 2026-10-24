@@ -2,6 +2,7 @@
 
 import { use, useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
+import "@/components/recommenders/lor-portal.css";
 
 type Request = {id:string;scholarName:string;opportunityName:string;recommenderName:string;status:string};
 export default function RecommenderLetterPage({params}:{params:Promise<{requestId:string}>}) {
@@ -37,7 +38,7 @@ export default function RecommenderLetterPage({params}:{params:Promise<{requestI
       setLetter("");setState("submitted");setMessage("Your letter was submitted to the Scholar's private recommendation Vault.");
     }catch(error){setState("ready");setMessage(error instanceof Error?error.message:"Submission failed");}
   }
-  return <main style={{maxWidth:760,margin:"auto",padding:24,fontFamily:"system-ui"}}>
+  return <main className="lor-shell" style={{maxWidth:760,margin:"auto",padding:24,fontFamily:"system-ui"}}>
     <p style={{fontSize:12,letterSpacing:2,color:"#98763c"}}>PLAYBOOK SERIES · RECOMMENDATION LETTER</p>
     <h1>Write a recommendation</h1>
     <p>To protect Scholars, sign in with the verified email address that received the request. This invitation does not disclose the Scholar&apos;s private records.</p>
