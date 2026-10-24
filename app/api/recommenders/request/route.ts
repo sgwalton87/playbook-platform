@@ -79,8 +79,8 @@ export async function POST(req: NextRequest) {
     const opportunityName = typeof body.opportunityName==="string"?body.opportunityName.trim():"";
     if(contactName.length<2||contactName.length>120||
       opportunityName.length<2||opportunityName.length>180||
-      contactEmail.length>254 || !/^[^\\s@<>]+@[^\\s@<>]+\\.[^\\s@<>]+$/.test(contactEmail)||
-      /[\\r\\n]/.test(contactName+contactEmail+opportunityName)) {
+      contactEmail.length>254 || !/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(contactEmail)||
+      /[\r\n]/.test(contactName+contactEmail+opportunityName)) {
       return NextResponse.json({error:"Enter a valid recipient name, email and opportunity."},{status:400});
     }
     if(user.email && contactEmail===user.email.toLowerCase()){
