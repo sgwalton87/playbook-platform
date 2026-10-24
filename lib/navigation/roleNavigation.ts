@@ -4,6 +4,7 @@ export type NavItem = { label: string; href: string; icon: string };
 export type RoleNavigation = { home: string; label: string; items: NavItem[] };
 
 const SCHOLAR_TOOLS: NavItem[] = [
+  { label: "Playbook Tutorial", href: "/tutorial", icon: "🧩" },
   { label: "My Tools", href: "/scholar/tools", icon: "🧰" },
   { label: "Recommendation Requests", href: "/recommenders", icon: "✉️" },
   { label: "Recommendation Vault", href: "/scholar/recommendations", icon: "🔒" },
