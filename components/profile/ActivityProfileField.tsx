@@ -3,7 +3,7 @@ import { useState } from "react";
 import type { OnboardingActivity } from "@/lib/onboarding/types";
 
 const input: React.CSSProperties = { width: "100%", border: "1px solid #cbd5e1", borderRadius: 10, padding: 12, color: "#0f172a", fontSize: 16, background: "#fff", boxSizing: "border-box" };
-const newActivity = (): OnboardingActivity => ({ activity: "", category: "", description: "", hours: "", supervisor: "" });
+const newActivity = (): OnboardingActivity => ({ activity: "", category: "", description: "", hours: "", supervisor: "", supervisor_email: "", supervisor_telephone: "" });
 const categories = ["Sports", "School club", "Community service", "Work", "Leadership", "Family responsibilities", "Arts", "Other"];
 
 export default function ActivityProfileField({ value, onChange }: {
@@ -57,8 +57,10 @@ export default function ActivityProfileField({ value, onChange }: {
               </select>
             </label>
             {entry.category && !categories.includes(entry.category) && <p style={{fontSize:12,color:"#475569",margin:0}}>Previously saved category: {entry.category}. Choose a category above to update it.</p>}
-            <label>Hours<input style={input} inputMode="decimal" value={entry.hours || ""} onChange={e=>change(index,"hours",e.target.value)} /></label>
-            <label>Mentor / Supervisor<input style={input} value={entry.supervisor || ""} onChange={e=>change(index,"supervisor",e.target.value)} /></label>
+            <label># Hours<input style={input} inputMode="decimal" value={entry.hours || ""} onChange={e=>change(index,"hours",e.target.value)} /></label>
+            <label>Activity Supervisor<input style={input} value={entry.supervisor || ""} onChange={e=>change(index,"supervisor",e.target.value)} /></label>
+            <label>Supervisor Email (optional)<input style={input} type="email" autoComplete="email" value={entry.supervisor_email || ""} onChange={e=>change(index,"supervisor_email",e.target.value)} /></label>
+            <label>Supervisor Telephone (optional)<input style={input} type="tel" autoComplete="tel" value={entry.supervisor_telephone || ""} onChange={e=>change(index,"supervisor_telephone",e.target.value)} /></label>
             <label>Description<textarea style={input} value={entry.description || ""} onChange={e=>change(index,"description",e.target.value)} /></label>
           </>}
           <button type="button" onClick={() => remove(index)}
