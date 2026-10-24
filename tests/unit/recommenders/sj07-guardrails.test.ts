@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
 const root=process.cwd();
 const source=(path:string)=>readFileSync(join(root,path),"utf8");
-const migration=source("supabase/migrations/202610230010_sj07_private_recommendation_artifacts.sql");
+const migrationFile = readdirSync(join(root,"supabase/migrations")).find(name=>name.endsWith("_sj07_private_recommendation_artifacts.sql"));
+if(!migrationFile)throw new Error("SJ-07 recommendation migration is missing");
+const migration=source("supabase/migrations/"+migrationFile);
 const requestRoute=source("app/api/recommenders/request/route.ts");
 const vaultRoute=source("app/api/recommendations/vault/route.ts");
 const recommenderRoute=source("app/api/recommenders/[requestId]/letter/route.ts");
