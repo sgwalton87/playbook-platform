@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 const tools = [
+  {title:"Playbook Tutorial",href:"/tutorial",detail:"Explore the platform in five guided modules; choose the part you want to learn."},
   {title:"Compass",href:"/compass",detail:"Personalized guidance from available academic signals; unavailable data is not invented."},
   {title:"Transcript",href:"/transcript",detail:"Add and review academic evidence."},
   {title:"Academic Readiness",href:"/academic-readiness",detail:"See readiness assessments and missing information."},
