@@ -24,7 +24,7 @@ export function buildCompassReport(input: {
 
   const reasoning = buildCompassReasoning({
     academicScore: academic.score,
-    trustScore: input.trustScore || 40,
+    trustScore: input.trustScore ?? 0,
     opportunityScore: opportunities.score,
   });
 

@@ -9,6 +9,29 @@ import {
 } from "@/lib/recommenders";
 import { requireUser } from "@/lib/supabase/server";
 
+export async function GET() {
+  try {
+    const { supabase, user } = await requireUser();
+    if (!user) return NextResponse.json({error:"Authentication required."},{status:401});
+    await requireLearnerAuthority(supabase,user.id,{requireOnboarding:true});
+    const {data,error}=await supabase.from("recommender_requests")
+      .select("id,recommender_name,recommender_email,recommender_role,opportunity_name,status,created_at")
+      .eq("scholar_id",user.id).order("created_at",{ascending:false}).limit(100);
+    if(error) throw new Error(error.message);
+    const relationships=await supabase.from("support_relationships")
+      .select("id,supporter_name,supporter_email,relationship,permissions,status")
+      .eq("scholar_id",user.id).eq("status","active");
+    if(relationships.error) throw new Error(relationships.error.message);
+    const innerCircle=(relationships.data??[]).filter(x =>
+      Array.isArray(x.permissions) && x.permissions.includes("support_tasks")
+    ).map(x=>({id:x.id,name:x.supporter_name??"Connected supporter",
+      email:x.supporter_email,relationship:x.relationship}));
+    return NextResponse.json({requests:data??[],innerCircle});
+  } catch {
+    return NextResponse.json({error:"Unable to load recommendation requests."},{status:503});
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { supabase, user } = await requireUser();
@@ -31,6 +54,39 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const source=body.source;
+    if(source!=="inner-circle" && source!=="outside") {
+      return NextResponse.json({error:"Choose Inner Circle or outside recommender."},{status:400});
+    }
+    if(source==="inner-circle"){
+      if(typeof body.relationshipId!=="string") {
+        return NextResponse.json({error:"Select a verified Inner Circle relationship."},{status:400});
+      }
+      const connected=await supabase.from("support_relationships")
+        .select("supporter_name,supporter_email,permissions")
+        .eq("id",body.relationshipId).eq("scholar_id",user.id).eq("status","active").maybeSingle();
+      if(connected.error||!connected.data || !Array.isArray(connected.data.permissions) ||
+          !connected.data.permissions.includes("support_tasks") ||
+          connected.data.supporter_email.toLowerCase() !== String(body.recommenderEmail??"").trim().toLowerCase()) {
+        return NextResponse.json({error:"Recommender must have an active authorized Inner Circle relationship."},{status:403});
+      }
+    }
+
+    // Reject malformed or oversized outbound invitations before persistence or SMTP.
+    // The verified-recipient comparison in the submission RPC remains authoritative.
+    const contactName = typeof body.recommenderName==="string"?body.recommenderName.trim():"";
+    const contactEmail = typeof body.recommenderEmail==="string"?body.recommenderEmail.trim().toLowerCase():"";
+    const opportunityName = typeof body.opportunityName==="string"?body.opportunityName.trim():"";
+    if(contactName.length<2||contactName.length>120||
+      opportunityName.length<2||opportunityName.length>180||
+      contactEmail.length>254 || !/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(contactEmail)||
+      /[\r\n]/.test(contactName+contactEmail+opportunityName)) {
+      return NextResponse.json({error:"Enter a valid recipient name, email and opportunity."},{status:400});
+    }
+    if(user.email && contactEmail===user.email.toLowerCase()){
+      return NextResponse.json({error:"A Scholar cannot request a recommendation from their own account."},{status:400});
+    }
+
     const evidence = Array.isArray(body.evidence)
       ? body.evidence.filter((item): item is string => typeof item === "string").slice(0, 50)
       : [];
@@ -38,14 +94,14 @@ export async function POST(req: NextRequest) {
     const request = buildRecommenderRequest({
       scholarId: user.id,
       scholarName: profile.data.full_name || "Playbook Scholar",
-      recommenderName: String(body.recommenderName ?? ""),
-      recommenderEmail: String(body.recommenderEmail ?? ""),
+      recommenderName: contactName,
+      recommenderEmail: contactEmail,
       recommenderRole: body.recommenderRole,
-      opportunityName: String(body.opportunityName ?? ""),
+      opportunityName: opportunityName,
       evidence,
     });
 
-    const sent = updateRecommenderRequestStatus(request, "sent");
+    const draft = updateRecommenderRequestStatus(request, "draft");
     const { data, error } = await supabase
       .from("recommender_requests")
       .insert({
@@ -56,7 +112,7 @@ export async function POST(req: NextRequest) {
         recommender_role: request.recommenderRole,
         opportunity_name: request.opportunityName,
         evidence: request.evidence,
-        status: sent.status,
+        status: draft.status,
       })
       .select("id,scholar_id,scholar_name,recommender_name,recommender_email,recommender_role,opportunity_name,status,created_at")
       .single();
@@ -73,12 +129,15 @@ export async function POST(req: NextRequest) {
       to: request.recommenderEmail,
       subject: email.subject,
       text: email.text,
-      fromType: "onboarding",
+      fromType: "lor",
     });
+
+    const marked = await supabase.from("recommender_requests").update({status:"sent"}).eq("id",data.id).eq("scholar_id",user.id);
+    if(marked.error) return NextResponse.json({error:"Email accepted but status synchronization failed; check requests before retrying."},{status:503});
 
     return NextResponse.json({
       ok: true,
-      request: data,
+      request: {...data,status:"sent"},
       email,
       deliveryStatus: "sent",
       eventState: "governed_event_publisher_pending",

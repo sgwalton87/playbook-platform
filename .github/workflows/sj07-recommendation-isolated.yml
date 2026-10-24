@@ -1,0 +1,88 @@
+name: Isolated Scholar Recommendation QA
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "app/recommenders/**"
+      - "app/api/recommenders/**"
+      - "app/scholar/recommendations/**"
+      - "app/api/recommendations/**"
+      - "supabase/migrations/**"
+      - "scripts/qa/verify-sj07-recommendations.mjs"
+      - "tests/unit/recommenders/**"
+      - ".github/workflows/sj07-recommendation-isolated.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  disposable-recommendation-db:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Verify pinned disposable Supabase CLI
+        run: npx --yes supabase@2.122.0 --version
+      - name: Normalize migration versions for disposable runner only
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          folder = Path("supabase/migrations")
+          scripts = sorted(p for p in folder.glob("*.sql") if re.match(r"^\d+_", p.name))
+          for i, p in enumerate(scripts, 1):
+              p.rename(folder / f"20260101{i:06d}_{p.name.split('_', 1)[1]}")
+          print(f"Prepared {len(scripts)} isolated migrations")
+          PY
+      - name: Assert local and email settings
+        run: |
+          grep -q '^enable_confirmations = true$' supabase/config.toml
+          grep -q 'port = 54322' supabase/config.toml
+          grep -q 'shadow_port = 54320' supabase/config.toml
+      - name: Reserve disposable ports
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path("supabase/config.toml")
+          s=p.read_text().replace("port = 54322","port = 55422",1).replace("shadow_port = 54320","shadow_port = 55420",1)
+          p.write_text(s)
+          PY
+      - name: Start temporary local Supabase and replay migrations
+        run: npx supabase start
+      - name: Prepare local-only credentials
+        shell: bash
+        run: |
+          npx supabase status -o env > /tmp/pbos-sj07-local.env
+          node <<'NODE'
+          const fs=require('fs');
+          const input=fs.readFileSync('/tmp/pbos-sj07-local.env','utf8');
+          const pairs={};
+          for(const line of input.split('\n')) {
+            const m=line.match(/^([A-Z_]+)=(.*)$/);
+            if(m) pairs[m[1]]=m[2].replace(/^["']|["']$/g,'');
+          }
+          if(!pairs.API_URL || !/^https?:\/\/(127\.0\.0\.1|localhost)(:|\/)/.test(pairs.API_URL)) throw Error('Refusing nonlocal target');
+          for(const key of ['ANON_KEY','SERVICE_ROLE_KEY']) if(!pairs[key]) throw Error('Disposable key missing: '+key);
+          fs.appendFileSync(process.env.GITHUB_ENV, [
+            'NEXT_PUBLIC_SUPABASE_URL='+pairs.API_URL,
+            'NEXT_PUBLIC_SUPABASE_ANON_KEY='+pairs.ANON_KEY,
+            'SUPABASE_SERVICE_ROLE_KEY='+pairs.SERVICE_ROLE_KEY
+          ].join('\n')+'\n');
+          NODE
+      - name: Certify recommendation identity, confidentiality and Vault attachment
+        run: node scripts/qa/verify-sj07-recommendations.mjs
+      - name: Run Scholar Recommendation static and authority tests
+        run: npx vitest run tests/unit/recommenders/sj07-guardrails.test.ts
+      - name: Always destroy disposable stack
+        if: always()
+        run: npx supabase stop --no-backup || true

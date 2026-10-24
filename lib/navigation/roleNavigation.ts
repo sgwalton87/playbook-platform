@@ -3,6 +3,12 @@ import { requirePlaybookRole, type PlaybookRole } from "@/lib/roles/registry";
 export type NavItem = { label: string; href: string; icon: string };
 export type RoleNavigation = { home: string; label: string; items: NavItem[] };
 
+const SCHOLAR_TOOLS: NavItem[] = [
+  { label: "Playbook Tutorial", href: "/tutorial", icon: "🧩" },
+  { label: "My Tools", href: "/scholar/tools", icon: "🧰" },
+  { label: "Recommendation Requests", href: "/recommenders", icon: "✉️" },
+  { label: "Recommendation Vault", href: "/scholar/recommendations", icon: "🔒" },
+];
 const SHARED_PROFILE: NavItem = { label: "Profile", href: "/profile", icon: "👤" };
 const SHARED_MESSAGES: NavItem = { label: "Messages", href: "/messages", icon: "💬" };
 const SHARED_COURSES: NavItem = { label: "Courses", href: "/courses", icon: "🎓" };
@@ -18,7 +24,7 @@ export const ROLE_NAVIGATION: Record<string, RoleNavigation> = {
       { label: "Transcript", href: "/transcript", icon: "📄" },
       { label: "Academic Readiness", href: "/academic-readiness", icon: "📚" },
       { label: "Compass", href: "/compass", icon: "🧭" },
-      SHARED_OPPORTUNITIES, SHARED_COURSES, SHARED_MESSAGES, SHARED_PROFILE,
+      ...SCHOLAR_TOOLS, SHARED_OPPORTUNITIES, SHARED_COURSES, SHARED_MESSAGES, SHARED_PROFILE,
     ],
   },
   "scholar-athlete": {
@@ -66,7 +72,7 @@ export const ROLE_NAVIGATION: Record<string, RoleNavigation> = {
   },
   "transition-youth": {
     home: "/transition-youth-os", label: "TAY OS",
-    items: [{ label: "TAY Dashboard", href: "/transition-youth-os", icon: "🏠" }, { label: "Start Here", href: "/start", icon: "▶️" }, { label: "Compass", href: "/compass", icon: "🧭" }, SHARED_OPPORTUNITIES, SHARED_COURSES, SHARED_MESSAGES, SHARED_PROFILE],
+    items: [{ label: "TAY Dashboard", href: "/transition-youth-os", icon: "🏠" }, { label: "Start Here", href: "/start", icon: "▶️" }, { label: "Compass", href: "/compass", icon: "🧭" }, ...SCHOLAR_TOOLS, SHARED_OPPORTUNITIES, SHARED_COURSES, SHARED_MESSAGES, SHARED_PROFILE],
   },
   employer: {
     home: "/employer-os", label: "Employer OS",
