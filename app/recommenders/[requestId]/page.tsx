@@ -54,7 +54,7 @@ export default function RecommenderLetterPage({params}:{params:Promise<{requestI
         </label>
         <p style={{fontSize:12}}>100–20,000 characters. Your letter is not generated or endorsed by Playbook.</p>
         <fieldset><legend>Confidentiality</legend>
-          <label><input type="radio" checked={confidentiality==="open"} onChange={()=>setConfidentiality("open")}/> Open: Scholar can view and download</label>
+          <label><input type="radio" checked={confidentiality==="open"} onChange={()=>setConfidentiality("open")}/> Open: Scholar can view this letter in their account</label>
           <div><label><input type="radio" checked={confidentiality==="confidential"} onChange={()=>setConfidentiality("confidential")}/> Confidential: Scholar sees submission status only, not the content</label></div>
         </fieldset>
         <button disabled={state!=="ready"||letter.trim().length<100} type="submit"
