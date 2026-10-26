@@ -69,16 +69,17 @@ export default function ActivityProfileField({ value, onChange }: {
           </label> : <>
             <label>Activity<input style={input} value={entry.activity || ""} onChange={e=>change(index,"activity",e.target.value)} /></label>
             <label>Category
-              <select style={input} value={categories.includes(entry.category||"") ? entry.category : entry.category ? "Other" : ""}
+              <select style={input} value={entry.category || ""}
                 onChange={e=>change(index,"category",e.target.value)}>
                 <option value="">Choose a category</option>
+                {entry.category && !categories.includes(entry.category) && <option value={entry.category}>{entry.category} (saved)</option>}
                 {categories.map(c=><option key={c} value={c}>{c}</option>)}
               </select>
             </label>
-            {entry.category && !categories.includes(entry.category) && <p style={{fontSize:12,color:"#475569",margin:0}}>Previously saved category: {entry.category}. Choose a category above to update it.</p>}
+            
             <label># Hours<input style={input} inputMode="decimal" value={entry.hours || ""} onChange={e=>change(index,"hours",e.target.value)} /></label>
             <label>Choose Activity Supervisor from My Inner Circle (optional)
-              <select style={input} value={entry.supervisor_relationship_id || ""} onChange={e=>{
+              <select style={input} value={connections.some(person=>person.id===entry.supervisor_relationship_id) ? entry.supervisor_relationship_id : ""} onChange={e=>{
                 const connection=connections.find(person=>person.id===e.target.value);
                 onChange(entries.map((item,i)=>i===index && typeof item!=="string"
                   ? {...newActivity(),...item,supervisor_relationship_id:connection?.id??"",
@@ -95,7 +96,7 @@ export default function ActivityProfileField({ value, onChange }: {
               onChange(entries.map((item,i)=>i===index && typeof item!=="string"
                 ? {...newActivity(),...item,supervisor:e.target.value,supervisor_relationship_id:""} : item));
             }} /></label>
-            <label>Supervisor Email (optional)<input style={input} type="email" autoComplete="email" value={entry.supervisor_email || ""} onChange={e=>change(index,"supervisor_email",e.target.value)} /></label>
+            <label>Supervisor Email (optional)<input style={input} type="email" autoComplete="email" value={entry.supervisor_email || ""} onChange={e=>onChange(entries.map((item,i)=>i===index && typeof item!=="string" ? {...newActivity(),...item,supervisor_email:e.target.value,supervisor_relationship_id:""} : item))} /></label>
             <label>Supervisor Telephone (optional)<input style={input} type="tel" autoComplete="tel" value={entry.supervisor_telephone || ""} onChange={e=>change(index,"supervisor_telephone",e.target.value)} /></label>
             <label>Description<textarea style={input} value={entry.description || ""} onChange={e=>change(index,"description",e.target.value)} /></label>
           </>}
