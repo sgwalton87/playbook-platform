@@ -5,7 +5,7 @@ import VerifiedRoleActivationBridge from "@/components/role-os/VerifiedRoleActiv
 
 export default function DistrictOSPage() {
   return (
-    <VerifiedRoleActivationBridge roleOS="district" verificationEndpoint="/api/district-verification">
+    <VerifiedRoleActivationBridge role="district" roleOS="district" verificationEndpoint="/api/district-verification">
       <DistrictVerificationExperience />
     </VerifiedRoleActivationBridge>
   );

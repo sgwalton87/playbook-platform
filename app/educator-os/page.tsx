@@ -5,7 +5,7 @@ import VerifiedRoleActivationBridge from "@/components/role-os/VerifiedRoleActiv
 
 export default function EducatorOSPage() {
   return (
-    <VerifiedRoleActivationBridge roleOS="educator" verificationEndpoint="/api/educator-verification" requiredRelationship="educator">
+    <VerifiedRoleActivationBridge role="educator" roleOS="educator" verificationEndpoint="/api/educator-verification" requiredRelationship="educator">
       <EducatorVerificationExperience />
     </VerifiedRoleActivationBridge>
   );

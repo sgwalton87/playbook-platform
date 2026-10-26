@@ -5,7 +5,7 @@ import VerifiedRoleActivationBridge from "@/components/role-os/VerifiedRoleActiv
 
 export default function AdmissionsOSPage() {
   return (
-    <VerifiedRoleActivationBridge roleOS="admissions" verificationEndpoint="/api/admissions-verification">
+    <VerifiedRoleActivationBridge role="college-admissions" roleOS="admissions" verificationEndpoint="/api/admissions-verification">
       <AdmissionsVerificationExperience />
     </VerifiedRoleActivationBridge>
   );

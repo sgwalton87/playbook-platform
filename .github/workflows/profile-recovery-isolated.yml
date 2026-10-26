@@ -5,6 +5,9 @@ on:
     branches: [main]
     paths:
       - "app/profile/**"
+      - "app/*-os/**"
+      - "app/dashboard/**"
+      - "components/role-os/**"
       - "app/auth/callback/**"
       - "lib/onboarding/**"
       - "lib/roles/**"

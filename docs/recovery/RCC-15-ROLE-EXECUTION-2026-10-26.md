@@ -50,7 +50,10 @@ Browser and data results below must be updated from actual execution. PENDING me
 - New behavioral outage route/transport tests: 19 passed.
 - `npm audit --audit-level=high`: 0 vulnerabilities after lockfile update.
 - Lint: 0 errors, two existing hook dependency warnings in unchanged files.
-- Full test/build and 15-role isolated browser execution: pending at commit preparation.
+- Optimized production build: PASS locally. Exact-revision e95b716 CI validate and dependency audit: PASS; Vercel preview dpl_CzeSZMBZbL4AjruriASaMT3FyT9x READY.
+- e95b716 isolated provisioning step: PASS, including own reads for 15 profiles, 210 cross-role private read/update targets, marker integrity and fixture cleanup. Browser phase pending Chromium installation at observation.
+- Follow-up route repair: eight specialized verification OS pages previously rendered their verification UI on another role's URL (their APIs deny data). VerifiedRoleActivationBridge now mounts inside CanonicalRoleIdentityBoundary with explicit canonical role, so no verification UI or fetch starts before durable role and onboarding checks succeed. Matching-role authority workflow is unchanged.
+- Expanded browser assertions also reject every other role's completion endpoint: 210 directed cross-role API requests expected HTTP 403. This does not certify all feature-specific endpoints.
 
 ## Release decision
 

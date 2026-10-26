@@ -5,7 +5,7 @@ import VerifiedRoleActivationBridge from "@/components/role-os/VerifiedRoleActiv
 
 export default function CommunityPartnerOSPage() {
   return (
-    <VerifiedRoleActivationBridge roleOS="community" verificationEndpoint="/api/community-partner-verification" requiredRelationship="community_partner">
+    <VerifiedRoleActivationBridge role="other" roleOS="community" verificationEndpoint="/api/community-partner-verification" requiredRelationship="community_partner">
       <CommunityPartnerVerificationExperience />
     </VerifiedRoleActivationBridge>
   );

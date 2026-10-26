@@ -128,6 +128,14 @@ test(`${role}: registration, email verification, onboarding, profile, logout and
       expect(completed.data?.onboarding_completed_at).toBeTruthy();
       await page.reload();
       await expect(page).toHaveURL(destination);
+      // All 14 wrong-role completion endpoints must reject before any completion.
+      for (const otherRole of roles.filter(other => other !== role)) {
+        const endpoint = otherRole === "other" ? "community-partner" : otherRole;
+        const denied = await page.request.post(`/api/pbos/onboarding/${endpoint}`, {
+          data: { displayName: "Must not apply", goalTitle: "Must not apply" },
+        });
+        expect(denied.status(), `${role} must not complete ${otherRole}`).toBe(403);
+      }
       // Each role probes another role's protected dashboard, then must return to its own.
       const neighbor = roles[(roles.indexOf(role) + 1) % roles.length];
       await page.goto(PLAYBOOK_ROLES[neighbor].osRoute);
