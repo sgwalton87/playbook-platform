@@ -12,7 +12,7 @@ describe("Activity profile onboarding UX and persistence contract",()=>{
   it("provides a real category dropdown without mutating legacy categories until chosen",()=>{
     expect(source).toContain('<select style={input}');
     expect(source).toContain('Choose a category');
-    expect(source).toContain('Previously saved category:');
+    expect(source).toContain('{entry.category} (saved)');
     expect(source).not.toContain('list="playbook-activity-category-options"');
   });
   it("preserves supervisor contact fields as optional data",()=>{
