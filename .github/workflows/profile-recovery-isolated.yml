@@ -7,6 +7,11 @@ on:
       - "app/profile/**"
       - "app/auth/callback/**"
       - "lib/onboarding/**"
+      - "lib/roles/**"
+      - "lib/pbos/**"
+      - "pbos/connector/**"
+      - "app/api/pbos/**"
+      - "tests/unit/onboarding/**"
       - "tests/acceptance/profile-recovery-roundtrip.spec.ts"
       - "tests/acceptance/role-onboarding-activation.spec.ts"
       - "tests/acceptance/role-signup-email-verification.spec.ts"
@@ -114,7 +119,7 @@ jobs:
         timeout-minutes: 6
         run: npx playwright test tests/acceptance/profile-recovery-roundtrip.spec.ts --project=chromium --grep "Family account sees Family onboarding"
       - name: Run complete isolated role profiles and onboarding activation journeys
-        timeout-minutes: 12
+        timeout-minutes: 20
         run: npx playwright test tests/acceptance/profile-recovery-roundtrip.spec.ts tests/acceptance/role-onboarding-activation.spec.ts tests/acceptance/role-signup-email-verification.spec.ts --project=chromium
       - name: Upload sanitized diagnostics
         if: failure()

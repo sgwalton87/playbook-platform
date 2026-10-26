@@ -8,7 +8,7 @@ import { getMissingPbosActivationConfiguration } from "@/lib/pbos/activation-con
 import { requireUser } from "@/lib/supabase/server";
 import { PlaybookConnector } from "@/pbos/connector/playbook-connector";
 import { PlaybookPbosRuntimeClient } from "@/pbos/connector/pbos-runtime-client";
-import { SignedPlaybookPbosTransport } from "@/pbos/connector/signed-server-transport";
+import { PbosRuntimeUnavailableError, SignedPlaybookPbosTransport } from "@/pbos/connector/signed-server-transport";
 
 function required(name: string): string {
   const value = process.env[name];
@@ -278,7 +278,9 @@ export async function POST(request: NextRequest) {
     });
 
     const approvals = approvalsFor(pbosRole);
-    const output = await service.complete({
+    let output: Awaited<ReturnType<ScholarOnboardingService["complete"]>>;
+    try {
+      output = await service.complete({
       actorId: user.id,
       ownerId: user.id,
       displayName,
@@ -288,6 +290,23 @@ export async function POST(request: NextRequest) {
       exchangeApprovalId: approvals.exchangeApprovalId,
       idempotencyKey,
     });
+    } catch (error) {
+      // A transport outage cannot grant PBOS authority. Preserve self-owned
+      // onboarding through the same governed completion RPC, then allow retry
+      // with the unchanged role/user idempotency key. Never swallow denial,
+      // correlation, persistence, or role mismatch failures.
+      if (!(error instanceof PbosRuntimeUnavailableError)) throw error;
+      const completedAt = await finalizeProfileCompletion(supabase, user.id, normalizedRole, true);
+      return NextResponse.json({
+        ok: true,
+        role: contract.role,
+        onboardingSubmitted: true,
+        onboardingCompletedAt: completedAt,
+        activationState: "pending-pbos-activation",
+        destination: contract.destination,
+        message: "Your Playbook profile is ready. PBOS activation remains pending and grants no additional authority.",
+      }, { status: 202 });
+    }
     const completedAt = await finalizeProfileCompletion(
       supabase,
       user.id,

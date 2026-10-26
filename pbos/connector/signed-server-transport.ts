@@ -3,6 +3,14 @@ import type { PbosRequest, PbosResponse, PbosTransport } from "./contracts";
 
 export interface PlaybookServerCredentials { organizationId: string; connectorId: string; keyId: string; secretBase64: string }
 
+/** Only transport outages are recoverable; authorization and protocol failures are not. */
+export class PbosRuntimeUnavailableError extends Error {
+  constructor() {
+    super("PBOS activation is temporarily unavailable.");
+    this.name = "PbosRuntimeUnavailableError";
+  }
+}
+
 export class SignedPlaybookPbosTransport implements PbosTransport {
   constructor(private readonly endpoint: string, private readonly credentials: PlaybookServerCredentials, private readonly fetcher: typeof fetch = fetch) {
     if (!endpoint || !credentials.organizationId || !credentials.connectorId || !credentials.keyId || !credentials.secretBase64) {
@@ -19,11 +27,23 @@ export class SignedPlaybookPbosTransport implements PbosTransport {
     const canonical = ["POST", path, this.credentials.organizationId, this.credentials.connectorId,
       this.credentials.keyId, timestamp, nonce, digest].join("\n");
     const signature = createHmac("sha256", Buffer.from(this.credentials.secretBase64, "base64")).update(canonical).digest("hex");
-    const response = await this.fetcher(this.endpoint, { method: "POST", cache: "no-store", body, headers: {
+    let response: Response;
+    try {
+      response = await this.fetcher(this.endpoint, { method: "POST", cache: "no-store", body, headers: {
       "content-type": "application/json", "x-pbos-api-version": "v1", "x-pbos-organization-id": this.credentials.organizationId,
       "x-pbos-connector-id": this.credentials.connectorId, "x-pbos-key-id": this.credentials.keyId,
       "x-pbos-timestamp": timestamp, "x-pbos-nonce": nonce, "x-pbos-signature": signature
     }, signal: AbortSignal.timeout(15_000) });
+    } catch (error) {
+      if (error instanceof TypeError || (error instanceof Error &&
+          ["AbortError", "TimeoutError"].includes(error.name))) {
+        throw new PbosRuntimeUnavailableError();
+      }
+      throw error;
+    }
+    if ([502, 503, 504].includes(response.status)) {
+      throw new PbosRuntimeUnavailableError();
+    }
     const contentType = response.headers.get("content-type") ?? "";
     if (!contentType.includes("application/json")) {
       throw new Error("PBOS v1 transport returned non-JSON HTTP " + response.status + ".");
