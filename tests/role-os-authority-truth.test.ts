@@ -9,9 +9,14 @@ describe("role OS authority and truth audit", () => {
   it("gates Scholar, Scholar-Athlete, and Athlete Abroad by canonical role", () => {
     expect(read("app/dashboard/page.tsx")).toContain('CanonicalRoleAuthorityGate role="scholar"');
     expect(read("app/scholar-athlete-os/page.tsx")).toContain('CanonicalRoleAuthorityGate role="scholar-athlete"');
-    const athleteAbroad = read("app/athlete-abroad-os/page.tsx");
-    expect(athleteAbroad).toContain('CanonicalRoleAuthorityGate role="athlete-abroad"');
-    expect(athleteAbroad).toContain("<AthleteAbroadReadinessGate>");
+    const athleteAbroad = read("app/athlete-abroad-os/layout.tsx");
+    const identity = athleteAbroad.indexOf('CanonicalRoleIdentityBoundary role="athlete-abroad"');
+    const readiness = athleteAbroad.indexOf("<AthleteAbroadReadinessGate>");
+    expect(identity).toBeGreaterThan(-1);
+    expect(readiness).toBeGreaterThan(identity);
+    expect(read("app/athlete-abroad-os/page.tsx")).not.toContain("<CanonicalRoleAuthorityGate");
+    const approval = read("components/athlete-abroad/AthleteAbroadReadinessGate.tsx");
+    expect(approval).toContain('review.review_status === "approved" && review.jurisdiction_scope_status === "approved"');
   });
 
   it("uses canonical recruiting visits instead of deriving visits from target stage", () => {
