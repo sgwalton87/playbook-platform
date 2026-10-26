@@ -7,5 +7,7 @@ describe("Application workspace onboarding error clarity",()=>{
   expect(s).toContain('action: "complete_onboarding"');
   expect(s).toContain('next: "/start"');
   expect(s).toContain('status = message === "Complete learner onboarding before using this capability." ? 403 : 500');
+  const ui=readFileSync("components/application-workspace/ApplicationWorkspaceDashboard.tsx","utf8");
+  expect(ui).toContain('href="/start"');
  });
 });
