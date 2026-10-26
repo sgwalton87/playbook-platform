@@ -53,6 +53,15 @@ export default function ApplicationWorkspaceDashboard() {
     }).catch(value => { if (active) setError(value instanceof Error ? value.message : "Unable to load application workspaces."); });
     return () => { active = false; window.clearTimeout(initialize); }; }, []);
 
+  async function retryLoading() {
+    if (busy) return;
+    setBusy(true);
+    setError(null);
+    try { await refresh(); }
+    catch (value) { setError(value instanceof Error ? value.message : "Unable to load application workspaces."); }
+    finally { setBusy(false); }
+  }
+
   async function refresh() { const [body, shareRows] = await Promise.all([fetchWorkspaces(), fetchMarketplaceShares()]); setWorkspaces(body.workspaces ?? []); setShares(shareRows.available ? shareRows.shares : {}); setSharingAvailable(shareRows.available);
     setMessage((body.workspaces ?? []).length ? "Application workspaces loaded." : "No application workspace yet. Start with an opportunity below."); }
 
@@ -96,6 +105,7 @@ export default function ApplicationWorkspaceDashboard() {
   return <PlaybookPage>
     <PlaybookHero eyebrow="Application Workspace" title="Turn opportunity into action" subtitle="Track deadlines, tasks, private documents, status, and PBOS-governed progress in one durable workspace. Published Marketplace opportunity identity and deadline flow into this workspace without duplicate entry." />
     <div role="status" aria-live="polite" style={status}>{message}</div>{error && <div role="alert" aria-live="assertive" style={alert}>{error}{error === "Complete learner onboarding before using this capability." && <p><a href="/start">Review saved profile and finish activation →</a></p>}</div>}
+    {error && <button type="button" disabled={busy} onClick={() => void retryLoading()} style={{marginBottom:16,padding:"10px 16px",borderRadius:10,border:"1px solid #a88742",background:"#15120c",color:"#f5e6bf"}}>{busy ? "Retrying…" : "Retry loading application workspaces"}</button>}
     {sharingAvailable === false && <div role="status" style={alert}>Applicant sharing is currently unavailable. Your application workspaces remain accessible. Sharing status could not be verified; existing access may still be active. <button disabled={busy} onClick={() => { setBusy(true); void refresh().catch(() => setError("Unable to refresh application workspaces.")).finally(() => setBusy(false)); }}>Retry sharing status</button></div>}
     <PlaybookCard eyebrow="New application" title="Start from an opportunity">
       <form onSubmit={create} aria-label="Create application workspace" style={form}>
