@@ -24,25 +24,25 @@ Related: [PR #288](https://github.com/sgwalton87/playbook-platform/pull/288), [P
 
 ## Role matrix
 
-Browser and data results below must be updated from actual execution. PENDING means not certified.
+At c156ee1, isolated run [40353496954](https://github.com/sgwalton87/playbook-platform/actions/runs/40353496954) executed 33 tests: 32 passed, 1 failed. All 15 actual signup/email/onboarding flows and 210 wrong-role completion API denials passed; District failed when visiting Athlete Abroad OS, before its profile/logout/return checks. Fourteen full browser journeys passed. All 15 private-profile RLS rows passed. This failure is repaired in the follow-up layout ordering change; rerun required. Pending PBOS/relationship/role authority is expected and is not privileged activation certification.
 
 | Role | Canonical route | Browser journey | Profile RLS | Independent activation |
 | --- | --- | --- | --- | --- |
-| Scholar | /dashboard | PENDING | PENDING | PBOS pending |
-| Scholar-Athlete | /scholar-athlete-os | PENDING | PENDING | PBOS pending |
-| Transition-Aged Youth | /transition-youth-os | PENDING | PENDING | PBOS pending |
-| Parent / Guardian | /family-os | PENDING | PENDING | Relationship gated |
-| Mentor | /mentor-os | PENDING | PENDING | Relationship gated |
-| Teacher / Educator | /educator-os | PENDING | PENDING | Authority pending |
-| High School Counselor | /counselor-os | PENDING | PENDING | Authority pending |
-| High School Coach | /coach-os | PENDING | PENDING | Authority pending |
-| College Coach / Recruiter | /recruiting-os | PENDING | PENDING | Authority pending |
-| College Admissions | /admissions-os | PENDING | PENDING | Authority pending |
-| Brand Partner | /brand-partner-os | PENDING | PENDING | Authority pending |
-| Employer | /employer-os | PENDING | PENDING | Authority pending |
-| District Administrator | /district-os | PENDING | PENDING | Authority pending |
-| Athlete Abroad | /athlete-abroad-os | PENDING | PENDING | Authority pending |
-| Community Partner | /community-partner-os | PENDING | PENDING | Authority pending |
+| Scholar | /dashboard | PASS at c156ee1 | PASS at c156ee1 | PBOS pending |
+| Scholar-Athlete | /scholar-athlete-os | PASS at c156ee1 | PASS at c156ee1 | PBOS pending |
+| Transition-Aged Youth | /transition-youth-os | PASS at c156ee1 | PASS at c156ee1 | PBOS pending |
+| Parent / Guardian | /family-os | PASS at c156ee1 | PASS at c156ee1 | Relationship gated |
+| Mentor | /mentor-os | PASS at c156ee1 | PASS at c156ee1 | Relationship gated |
+| Teacher / Educator | /educator-os | PASS at c156ee1 | PASS at c156ee1 | Authority pending |
+| High School Counselor | /counselor-os | PASS at c156ee1 | PASS at c156ee1 | Authority pending |
+| High School Coach | /coach-os | PASS at c156ee1 | PASS at c156ee1 | Authority pending |
+| College Coach / Recruiter | /recruiting-os | PASS at c156ee1 | PASS at c156ee1 | Authority pending |
+| College Admissions | /admissions-os | PASS at c156ee1 | PASS at c156ee1 | Authority pending |
+| Brand Partner | /brand-partner-os | PASS at c156ee1 | PASS at c156ee1 | Authority pending |
+| Employer | /employer-os | PASS at c156ee1 | PASS at c156ee1 | Authority pending |
+| District Administrator | /district-os | FAIL — wrong-role Athlete Abroad URL; later checks not reached | PASS at c156ee1 | Authority pending |
+| Athlete Abroad | /athlete-abroad-os | PASS at c156ee1 | PASS at c156ee1 | Authority pending |
+| Community Partner | /community-partner-os | PASS at c156ee1 | PASS at c156ee1 | Authority pending |
 
 ## Verification so far
 
@@ -58,3 +58,7 @@ Browser and data results below must be updated from actual execution. PENDING me
 ## Release decision
 
 NOT PRODUCTION READY. Do not merge or promote without founder approval. Require exact-revision CI, isolated browser and RLS evidence, real hosted isolated PBOS signed health/integration, per-feature cross-role authorization, complete field/mobile acceptance, constitutional role alignment, and rollback verification. Local SMTP receipt is not production email deliverability. Unit mocks are not live PBOS certification.
+
+## Athlete Abroad gate-order repair
+
+The layout previously mounted readiness before any role check; an unapproved wrong-role user never reached the page's identity gate. The layout now checks canonical identity and completed onboarding before readiness. Removed duplicate inner readiness and generic pending-authority gates from the page; the existing readiness gate still requires both readiness and jurisdiction approval before mounting the workspace. Tests reproduce District redirect before fetch and preserve all pending/rejected approval locks. No database or approval mutations.

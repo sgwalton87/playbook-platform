@@ -1,7 +1,5 @@
 "use client";
 
-import AthleteAbroadReadinessGate from "@/components/athlete-abroad/AthleteAbroadReadinessGate";
-import { CanonicalRoleAuthorityGate } from "@/components/role-os/RoleAuthorityGate";
 import {
   PlaybookButton,
   PlaybookCard,
@@ -33,13 +31,8 @@ const pathways = [
 ] as const;
 
 export default function AthleteAbroadOSPage() {
-  return (
-    <CanonicalRoleAuthorityGate role="athlete-abroad">
-      <AthleteAbroadReadinessGate>
-        <AthleteAbroadWorkspace />
-      </AthleteAbroadReadinessGate>
-    </CanonicalRoleAuthorityGate>
-  );
+  // The route layout proves identity/onboarding, then both readiness approvals.
+  return <AthleteAbroadWorkspace />;
 }
 
 function AthleteAbroadWorkspace() {
