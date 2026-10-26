@@ -11,13 +11,13 @@ type Document = { id: string; file_name: string; media_type: string; size_bytes:
 type Workspace = { id: string; opportunity_id: string; opportunity_name: string; opportunity_type: string; deadline: string | null;
   status: "building" | "ready" | "submitted"; delivery_state: "PENDING" | "DELIVERED";
   application_workspace_tasks: Task[]; application_workspace_documents: Document[] };
-type WorkspaceResponse = { workspaces?: Workspace[]; error?: string };
+type WorkspaceResponse = { workspaces?: Workspace[]; error?: string; action?: string; next?: string };
 type ShareState = { workspace_id: string; consent_status: "active" | "revoked"; outcome_status: string | null };
 
 async function fetchWorkspaces(): Promise<WorkspaceResponse> {
   const response = await fetch("/api/application-workspaces", { cache: "no-store" });
   const body = await response.json() as WorkspaceResponse;
-  if (!response.ok) throw new Error(body.error || "Unable to load application workspaces.");
+  if (!response.ok) throw new Error(body.action === "complete_onboarding" ? "Complete learner onboarding before using this capability." : body.error || "Unable to load application workspaces.");
   return body;
 }
 
@@ -95,7 +95,7 @@ export default function ApplicationWorkspaceDashboard() {
 
   return <PlaybookPage>
     <PlaybookHero eyebrow="Application Workspace" title="Turn opportunity into action" subtitle="Track deadlines, tasks, private documents, status, and PBOS-governed progress in one durable workspace. Published Marketplace opportunity identity and deadline flow into this workspace without duplicate entry." />
-    <div role="status" aria-live="polite" style={status}>{message}</div>{error && <div role="alert" aria-live="assertive" style={alert}>{error}</div>}
+    <div role="status" aria-live="polite" style={status}>{message}</div>{error && <div role="alert" aria-live="assertive" style={alert}>{error}{error === "Complete learner onboarding before using this capability." && <p><a href="/start">Review saved profile and finish activation →</a></p>}</div>}
     {sharingAvailable === false && <div role="status" style={alert}>Applicant sharing is currently unavailable. Your application workspaces remain accessible. Sharing status could not be verified; existing access may still be active. <button disabled={busy} onClick={() => { setBusy(true); void refresh().catch(() => setError("Unable to refresh application workspaces.")).finally(() => setBusy(false)); }}>Retry sharing status</button></div>}
     <PlaybookCard eyebrow="New application" title="Start from an opportunity">
       <form onSubmit={create} aria-label="Create application workspace" style={form}>
