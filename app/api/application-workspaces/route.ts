@@ -87,7 +87,9 @@ export async function GET() {
       .eq("scholar_id", user.id).order("updated_at", { ascending: false });
     if (result.error) throw new Error(result.error.message);
     return NextResponse.json({ workspaces: result.data ?? [] });
-  } catch (error) { return NextResponse.json({ error: error instanceof Error ? error.message : "Unable to load application workspaces." }, { status: 500 }); }
+  } catch (error) { const message = error instanceof Error ? error.message : "Unable to load application workspaces.";
+    const status = message === "Complete learner onboarding before using this capability." ? 403 : 500;
+    return NextResponse.json({ error: message, ...(status === 403 ? { action: "complete_onboarding", next: "/start" } : {}) }, { status }); }
 }
 
 export async function POST(request: NextRequest) {

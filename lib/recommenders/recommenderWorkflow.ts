@@ -57,7 +57,7 @@ ${input.scholarName} requested a recommendation letter for ${input.opportunityNa
 Open the request:
 ${input.requestUrl}
 
-Playbook includes the scholar's brag sheet and verified evidence to help you write a strong letter.
+To protect the Scholar, this invitation does not include private records. Sign in to Playbook using this email address and verify it before submitting an independent recommendation. Please do not forward the invitation. If you do not wish to provide a recommendation, you may decline by contacting the requester.
 
 - Playbook`,
   };

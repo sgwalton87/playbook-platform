@@ -6,7 +6,8 @@ export async function sendPlaybookEmail(input: {
   subject: string;
   text: string;
   html?: string;
-  fromType?: "onboarding" | "support" | "notifications" | "hello" | "noreply";
+  replyTo?: string;
+  fromType?: "onboarding" | "support" | "notifications" | "hello" | "noreply" | "lor";
 }) {
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
@@ -24,6 +25,6 @@ export async function sendPlaybookEmail(input: {
     subject: input.subject,
     text: input.text,
     html: input.html,
-    replyTo: getEmailSender("support"),
+    replyTo: input.replyTo ?? (input.fromType === "noreply" ? undefined : input.fromType === "lor" ? getEmailSender("lor") : getEmailSender("support")),
   });
 }
