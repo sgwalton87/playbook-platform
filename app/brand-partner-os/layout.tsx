@@ -1,12 +1,11 @@
 "use client";
 
 import BrandPartnerVerificationGate from "@/components/brand/BrandPartnerVerificationGate";
-import { CanonicalRoleAuthorityGate } from "@/components/role-os/RoleAuthorityGate";
 
+// The Brand Partner page enforces its own canonical role identity and onboarding
+// boundary. Verification status is displayed inside the workspace; it must not
+// replace the dashboard. Backend endpoints and RLS continue to enforce scoped
+// organization, campaign, NIL, and applicant permissions independently.
 export default function BrandPartnerOSLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <CanonicalRoleAuthorityGate role="brand-partner">
-      <BrandPartnerVerificationGate>{children}</BrandPartnerVerificationGate>
-    </CanonicalRoleAuthorityGate>
-  );
+  return <BrandPartnerVerificationGate>{children}</BrandPartnerVerificationGate>;
 }
