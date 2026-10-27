@@ -75,8 +75,11 @@ export function RoleProfileEditor({ mode = "standard" }: { mode?: "standard" | "
   }, [router]);
 
   const steps = useMemo(() => role ? getOnboardingSteps(role) : [], [role]);
-  const athleteSteps = new Set(["athlete-profile", "athlete-recruiting"]);
-  const visibleSteps = useMemo(() => steps.filter(step => role === "scholar-athlete" && mode === "athlete" ? athleteSteps.has(step.id) : !athleteSteps.has(step.id)), [steps, role, mode]);
+  const visibleSteps = useMemo(() => {
+    if (role !== "scholar-athlete") return steps;
+    const athleteSteps = new Set(["athlete-profile", "athlete-recruiting"]);
+    return steps.filter(step => mode === "athlete" ? athleteSteps.has(step.id) : !athleteSteps.has(step.id));
+  }, [steps, role, mode]);
   const fields = useMemo(() => getRoleEditableFields(visibleSteps), [visibleSteps]);
 
   const update = (key: string, value: OnboardingValue) => {
