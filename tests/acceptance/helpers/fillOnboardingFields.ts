@@ -8,6 +8,15 @@ export async function fillOnboardingField(page: Page, field: OnboardingField, un
     await expect(page.getByLabel(field.label, { exact: true })).toHaveValue("");
     return undefined;
   }
+  if (field.key === "approval_contact") {
+    const name = "QA Compliance Contact";
+    const email = "compliance@example.com";
+    const phone = "202-555-0100";
+    await page.getByRole("textbox", { name: "Approval contact name" }).fill(name);
+    await page.getByRole("textbox", { name: "Approval contact email" }).fill(email);
+    await page.getByRole("textbox", { name: "Approval contact phone" }).fill(phone);
+    return [name, email, phone].join(" | ");
+  }
   if (field.type === "safety-agreement") {
     await page.getByRole("checkbox", { name: field.label, exact: true }).check();
     return true;
