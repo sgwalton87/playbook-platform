@@ -1,3 +1,4 @@
+import { assertLocalSyntheticAuthTarget } from "./helpers/assertLocalSyntheticAuthTarget.mjs";
 import AxeBuilder from "@axe-core/playwright";
 import { createClient } from "@supabase/supabase-js";
 import { randomBytes, randomUUID } from "node:crypto";
@@ -52,6 +53,7 @@ test("Scholar completes governed onboarding and receives a durable dashboard", a
   try {
     const email = `pbos-scholar-${randomUUID()}@example.com`;
     const password = `${randomBytes(24).toString("base64url")}Aa1!`;
+    assertLocalSyntheticAuthTarget();
     const admin = createClient(required("NEXT_PUBLIC_SUPABASE_URL"), required("SUPABASE_SERVICE_ROLE_KEY"), {
       auth: { autoRefreshToken: false, persistSession: false }
     });

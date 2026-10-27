@@ -1,3 +1,4 @@
+import { assertLocalSyntheticAuthTarget } from "./helpers/assertLocalSyntheticAuthTarget.mjs";
 import AxeBuilder from "@axe-core/playwright";
 import { createClient } from "@supabase/supabase-js";
 import { mkdir, writeFile } from "node:fs/promises";
@@ -21,6 +22,7 @@ test("APPLICATION-TO-AUTHORIZED-SUPPORT produces exact-revision functional evide
   await page.getByRole("button", { name: "Log In", exact: true }).click();
   await page.waitForURL(/\/dashboard/);
   const email = required("PBOS_ACCEPTANCE_EMAIL");
+  assertLocalSyntheticAuthTarget();
   const admin = createClient(required("NEXT_PUBLIC_SUPABASE_URL"), required("SUPABASE_SERVICE_ROLE_KEY"), {
     auth: { autoRefreshToken: false, persistSession: false }
   });

@@ -1,3 +1,4 @@
+import { assertLocalSyntheticAuthTarget } from "./helpers/assertLocalSyntheticAuthTarget.mjs";
 import AxeBuilder from "@axe-core/playwright";
 import { createClient } from "@supabase/supabase-js";
 import { expect, test, type Page } from "@playwright/test";
@@ -36,6 +37,7 @@ test("Session Timeout protects an idle authenticated session on desktop and mobi
   const email = required("PBOS_ACCEPTANCE_EMAIL");
   const password = required("PBOS_ACCEPTANCE_PASSWORD");
   const commit = required("PBOS_ACCEPTANCE_COMMIT");
+  assertLocalSyntheticAuthTarget();
   const admin = createClient(
     required("NEXT_PUBLIC_SUPABASE_URL"),
     required("SUPABASE_SERVICE_ROLE_KEY"),

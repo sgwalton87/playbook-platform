@@ -53,24 +53,23 @@ export default function BrandPartnerVerificationGate({ children }: { children: R
   if (loading) return <Surface title="Preparing Brand Partner verification…" body="Checking organization, campaign, and compliance authority." />;
   if (!onboardingCompleted) return <Surface title="Complete Brand Partner onboarding first" body="Finish Brand Partner onboarding before organization and compliance evidence can be submitted."><PlaybookButton href="/start?first=1&role=brand-partner">Return to Brand Partner onboarding</PlaybookButton></Surface>;
 
-  if (request && brandAuthorityReady({ verificationStatus: request.status, hasApprovedCampaignScope: request.campaign_scope_approved, hasApprovedComplianceScope: request.compliance_scope_approved })) {
-    return <>{children}</>;
-  }
+  const approved = Boolean(request && brandAuthorityReady({ verificationStatus: request.status, hasApprovedCampaignScope: request.campaign_scope_approved, hasApprovedComplianceScope: request.compliance_scope_approved }));
+  // The role workspace is not a privileged capability: backend authorization remains
+  // responsible for every scoped campaign, applicant, publishing and NIL operation.
+  // Do not hide the entire dashboard while independent approval is pending.
+  if (approved) return <>{children}</>;
+  return <>
+    <section aria-label="Brand Partner verification status" role="status" style={noticeStyle}>
+      <strong>Brand Partner verification {request?.status?.replaceAll("_", " ") ?? "not submitted"}</strong>
+      <p>Organization and campaign approval are separate from dashboard access. Restricted operations remain unavailable until explicitly approved.</p>
+      {message && <p>{message}</p>}
+      {!request && <button onClick={() => void submit()} disabled={submitting} style={buttonStyle}>{submitting ? "Submitting…" : "Submit verification evidence"}</button>}
+      {request && <p>Campaign scope: {request.campaign_scope_approved ? "approved" : "pending"} · Compliance scope: {request.compliance_scope_approved ? "approved" : "pending"}</p>}
+    </section>
+    {children}
+  </>;
 
-  if (!request) return <Surface title="Submit Brand Partner verification" body="Verify organization identity, requested campaign types, and NIL/compliance acknowledgement before entering the Brand Partner workspace." message={message}><button onClick={() => void submit()} disabled={submitting} style={buttonStyle}>{submitting ? "Submitting…" : "Submit verification evidence"}</button></Surface>;
 
-  const rejected = request.status === "rejected";
-  return <Surface
-    title={rejected ? "Brand Partner verification needs attention" : request.status === "under_review" ? "Brand Partner verification is under review" : request.status === "approved" ? "Organization verified · scopes still pending" : "Brand Partner verification is pending"}
-    body="The existing Brand Partner workspace remains preserved, but campaign creation, opportunities, scholar interactions, and NIL activity stay locked until organization identity, campaign scope, and compliance scope are all approved."
-    message={rejected ? request.review_notes : message}>
-    <PlaybookCard eyebrow="Submitted evidence" title={request.organization_name}>
-      {request.brand_category && <p style={bodyStyle}>Category: {request.brand_category}</p>}
-      <p style={bodyStyle}>Campaign scope: {request.campaign_scope_approved ? "approved" : "pending"}</p>
-      <p style={bodyStyle}>Compliance scope: {request.compliance_scope_approved ? "approved" : "pending"}</p>
-      <p style={metaStyle}>Status: {request.status.replaceAll("_", " ")} · Submitted {new Date(request.submitted_at).toLocaleDateString()}</p>
-    </PlaybookCard>
-  </Surface>;
 }
 
 function Surface({ title, body, message, children }: { title: string; body: string; message?: string | null; children?: React.ReactNode }) {

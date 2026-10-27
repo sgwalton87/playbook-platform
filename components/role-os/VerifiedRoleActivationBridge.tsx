@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import CanonicalRoleIdentityBoundary from "@/components/role-os/CanonicalRoleIdentityBoundary";
+import type { PlaybookRole } from "@/lib/roles/registry";
 import RoleDashboardExperience from "@/components/role-os/dashboards/RoleDashboardExperience";
 import type { PlaybookRoleOS } from "@/lib/role-os";
 import { supabase } from "@/lib/supabaseClient";
@@ -9,17 +11,23 @@ type VerificationEnvelope = {
   request?: { status?: string } | null;
 };
 
-export default function VerifiedRoleActivationBridge({
-  roleOS,
-  verificationEndpoint,
-  requiredRelationship,
-  children,
-}: {
+type ActivationBridgeProps = {
+  role: PlaybookRole;
   roleOS: PlaybookRoleOS;
   verificationEndpoint: string;
   requiredRelationship?: string;
   children: React.ReactNode;
-}) {
+};
+
+export default function VerifiedRoleActivationBridge({ role, ...props }: ActivationBridgeProps) {
+  return <CanonicalRoleIdentityBoundary role={role}>
+    <VerifiedRoleActivationContent {...props} />
+  </CanonicalRoleIdentityBoundary>;
+}
+
+function VerifiedRoleActivationContent({
+  roleOS, verificationEndpoint, requiredRelationship, children,
+}: Omit<ActivationBridgeProps, "role">) {
   const [active, setActive] = useState(false);
 
   useEffect(() => {

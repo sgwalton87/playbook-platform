@@ -5,7 +5,7 @@ import VerifiedRoleActivationBridge from "@/components/role-os/VerifiedRoleActiv
 
 export default function CounselorOSPage() {
   return (
-    <VerifiedRoleActivationBridge roleOS="counselor" verificationEndpoint="/api/counselor-verification" requiredRelationship="counselor">
+    <VerifiedRoleActivationBridge role="high-school-counselor" roleOS="counselor" verificationEndpoint="/api/counselor-verification" requiredRelationship="counselor">
       <CounselorVerificationExperience />
     </VerifiedRoleActivationBridge>
   );

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { SignedPlaybookPbosTransport } from "./signed-server-transport";
+import { PbosRuntimeUnavailableError, SignedPlaybookPbosTransport } from "./signed-server-transport";
 
 const credentials = {
   organizationId: "PLAYBOOK-ORG-001",
@@ -9,6 +9,52 @@ const credentials = {
 };
 
 describe("signed Playbook PBOS transport", () => {
+  const request = { apiVersion: "v1" as const, operation: "REGISTER_IDENTITY" as const,
+    correlationId: "identity-correlation", payload: {} };
+
+  it.each([502, 503, 504])("classifies HTTP %i as a recoverable outage", async status => {
+    const transport = new SignedPlaybookPbosTransport("https://pbos.example.com/pbos/v1", credentials,
+      (async () => new Response("Unavailable", { status })) as typeof fetch);
+    await expect(transport.send(request)).rejects.toBeInstanceOf(PbosRuntimeUnavailableError);
+  });
+
+  it("classifies a network failure without exposing its internal message", async () => {
+    const transport = new SignedPlaybookPbosTransport("https://pbos.example.com/pbos/v1", credentials,
+      (async () => { throw new TypeError("private network detail"); }) as typeof fetch);
+    await expect(transport.send(request)).rejects.toThrow("PBOS activation is temporarily unavailable.");
+  });
+
+  it.each([400, 401, 403, 409, 500])("does not turn HTTP %i into successful pending activation", async status => {
+    const transport = new SignedPlaybookPbosTransport("https://pbos.example.com/pbos/v1", credentials,
+      (async () => new Response("Rejected", { status })) as typeof fetch);
+    await expect(transport.send(request)).rejects.not.toBeInstanceOf(PbosRuntimeUnavailableError);
+  });
+
+  it("keeps a response correlation mismatch nonrecoverable", async () => {
+    const transport = new SignedPlaybookPbosTransport("https://pbos.example.com/pbos/v1", credentials,
+      (async () => Response.json({ success: true, correlationId: "wrong" })) as typeof fetch);
+    await expect(transport.send(request)).rejects.toThrow("correlation mismatch");
+  });
+
+  it.each([
+    { title: "unsupported API version", status: 200, body: { success: true, apiVersion: "v2", correlationId: "identity-correlation", output: {}, provenance: [] } },
+    { title: "missing provenance", status: 200, body: { success: true, apiVersion: "v1", correlationId: "identity-correlation", output: {} } },
+    { title: "non-string provenance", status: 200, body: { success: true, apiVersion: "v1", correlationId: "identity-correlation", output: {}, provenance: [42] } },
+    { title: "missing output", status: 200, body: { success: true, apiVersion: "v1", correlationId: "identity-correlation", provenance: [] } },
+    { title: "success on forbidden response", status: 403, body: { success: true, apiVersion: "v1", correlationId: "identity-correlation", output: {}, provenance: [] } },
+    { title: "invalid rejection", status: 400, body: { success: false, apiVersion: "v1", correlationId: "identity-correlation", error: { code: 5 } } },
+  ])("fails closed for $title", async ({ status, body }) => {
+    const transport = new SignedPlaybookPbosTransport("https://pbos.example.com/pbos/v1", credentials,
+      (async () => new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } })) as typeof fetch);
+    await expect(transport.send(request)).rejects.toThrow();
+  });
+
+  it("accepts a well-formed signed success envelope", async () => {
+    const transport = new SignedPlaybookPbosTransport("https://pbos.example.com/pbos/v1", credentials,
+      (async () => Response.json({ success: true, apiVersion: "v1", correlationId: "identity-correlation", output: { accepted: true }, provenance: ["pbos"] })) as typeof fetch);
+    await expect(transport.send(request)).resolves.toMatchObject({ success: true, output: { accepted: true } });
+  });
+
   it("preserves structured PBOS rejection evidence instead of masking HTTP 400", async () => {
     const fetcher = async () => new Response(JSON.stringify({
       success: false,

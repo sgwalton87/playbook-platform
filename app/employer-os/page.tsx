@@ -5,7 +5,7 @@ import VerifiedRoleActivationBridge from "@/components/role-os/VerifiedRoleActiv
 
 export default function EmployerOSPage() {
   return (
-    <VerifiedRoleActivationBridge roleOS="employer" verificationEndpoint="/api/employer-verification">
+    <VerifiedRoleActivationBridge role="employer" roleOS="employer" verificationEndpoint="/api/employer-verification">
       <EmployerVerificationExperience />
     </VerifiedRoleActivationBridge>
   );

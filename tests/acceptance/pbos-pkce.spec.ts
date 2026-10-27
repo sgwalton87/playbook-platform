@@ -1,3 +1,4 @@
+import { assertLocalSyntheticAuthTarget } from "./helpers/assertLocalSyntheticAuthTarget.mjs";
 import AxeBuilder from "@axe-core/playwright";
 import { createClient } from "@supabase/supabase-js";
 import { expect, test } from "@playwright/test";
@@ -29,6 +30,7 @@ test("PKCE binds a one-time verifier to auth callback exchange", async ({ page, 
   const commit = required("PBOS_ACCEPTANCE_COMMIT");
   const password = required("PBOS_ACCEPTANCE_PASSWORD");
   const email = exactRevisionEmail(required("PBOS_ACCEPTANCE_EMAIL"), commit);
+  assertLocalSyntheticAuthTarget();
   const admin = createClient(
     required("NEXT_PUBLIC_SUPABASE_URL"),
     required("SUPABASE_SERVICE_ROLE_KEY"),

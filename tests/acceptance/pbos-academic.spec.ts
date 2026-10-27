@@ -1,3 +1,4 @@
+import { assertLocalSyntheticAuthTarget } from "./helpers/assertLocalSyntheticAuthTarget.mjs";
 import AxeBuilder from "@axe-core/playwright";
 import { createClient } from "@supabase/supabase-js";
 import { mkdir, writeFile } from "node:fs/promises";
@@ -58,6 +59,7 @@ test("Scholar transcript produces durable academic readiness, decision, and outc
   await context.tracing.start({ screenshots: true, snapshots: true, sources: true });
   const email = required("PBOS_ACCEPTANCE_EMAIL");
   const password = required("PBOS_ACCEPTANCE_PASSWORD");
+  assertLocalSyntheticAuthTarget();
   const admin = createClient(required("NEXT_PUBLIC_SUPABASE_URL"), required("SUPABASE_SERVICE_ROLE_KEY"), {
     auth: { autoRefreshToken: false, persistSession: false }
   });

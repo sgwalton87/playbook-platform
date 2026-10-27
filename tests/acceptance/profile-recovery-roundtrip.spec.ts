@@ -1,3 +1,4 @@
+import { assertLocalSyntheticAuthTarget } from "./helpers/assertLocalSyntheticAuthTarget.mjs";
 import { PLAYBOOK_ROLES } from "@/lib/roles/registry";
 import { randomBytes, randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
@@ -15,6 +16,7 @@ test("synthetic profile data survives edit and reload", async ({ page }) => {
   if (supabaseUrl.hostname === "oexgxnybeixwadgtdtzp.supabase.co") {
     throw new Error("Production Supabase project is forbidden for this synthetic test");
   }
+  assertLocalSyntheticAuthTarget();
   const admin = createClient(supabaseUrl.toString(), need("SUPABASE_SERVICE_ROLE_KEY"), {
     auth: { autoRefreshToken: false, persistSession: false }
   });
@@ -103,6 +105,7 @@ test("Family account sees Family onboarding and edits its own saved profile with
       db.hostname === "oexgxnybeixwadgtdtzp.supabase.co") {
     throw Error("Family synthetic test requires isolated local environment");
   }
+  assertLocalSyntheticAuthTarget();
   const admin = createClient(db.toString(), need("SUPABASE_SERVICE_ROLE_KEY"), {
     auth: { autoRefreshToken: false, persistSession: false },
   });
@@ -185,6 +188,7 @@ for (const role of nonScholarRoles) {
       db.hostname === "oexgxnybeixwadgtdtzp.supabase.co") {
     throw Error("Role journey requires isolated local QA");
   }
+  assertLocalSyntheticAuthTarget();
   const admin = createClient(db.toString(), need("SUPABASE_SERVICE_ROLE_KEY"), {
     auth: { autoRefreshToken: false, persistSession: false },
   });
@@ -249,6 +253,7 @@ test("Family and Brand Partner cannot read or modify each other's private profil
       db.hostname === "oexgxnybeixwadgtdtzp.supabase.co") {
     throw Error("Cross-account RLS test may run only against isolated local Supabase");
   }
+  assertLocalSyntheticAuthTarget();
   const admin = createClient(db.toString(), need("SUPABASE_SERVICE_ROLE_KEY"), {
     auth: { autoRefreshToken: false, persistSession: false },
   });

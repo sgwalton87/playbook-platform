@@ -5,11 +5,20 @@ on:
     branches: [main]
     paths:
       - "app/profile/**"
+      - "app/*-os/**"
+      - "app/dashboard/**"
+      - "components/role-os/**"
       - "app/auth/callback/**"
       - "lib/onboarding/**"
+      - "lib/roles/**"
+      - "lib/pbos/**"
+      - "pbos/connector/**"
+      - "app/api/pbos/**"
+      - "tests/unit/onboarding/**"
       - "tests/acceptance/profile-recovery-roundtrip.spec.ts"
       - "tests/acceptance/role-onboarding-activation.spec.ts"
       - "tests/acceptance/role-signup-email-verification.spec.ts"
+      - "tests/acceptance/helpers/**"
       - "supabase/**"
       - ".github/workflows/profile-recovery-isolated.yml"
   workflow_dispatch:
@@ -20,7 +29,7 @@ permissions:
 jobs:
   isolated-profile-recovery:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 55
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -50,19 +59,26 @@ jobs:
         run: |
           grep -q "^\\[auth.email\\]$" supabase/config.toml
           grep -q "^enable_confirmations = true$" supabase/config.toml
-      - name: Reserve nondefault disposable database ports
+      - name: Reserve nondefault disposable Supabase ports
         shell: bash
         run: |
           python3 - <<'PY'
           from pathlib import Path
           p = Path("supabase/config.toml")
           contents = p.read_text()
-          if "port = 54322" not in contents or "shadow_port = 54320" not in contents:
-              raise SystemExit("Unexpected local Supabase port configuration")
-          contents = contents.replace("port = 54322", "port = 55422", 1)
-          contents = contents.replace("shadow_port = 54320", "shadow_port = 55420", 1)
+          import re
+          import socket
+          # Rewrite only the runner's disposable config, never a hosted project.
+          for old_port in range(54320, 54327):
+              new_port = old_port + 1100
+              contents, count = re.subn(rf"(?m)^(port|shadow_port|smtp_port|pop3_port) = {old_port}$",
+                                       lambda match: f"{match[1]} = {new_port}", contents)
+              if count != 1:
+                  raise SystemExit(f"Unexpected local port configuration for {old_port}")
+              with socket.socket() as listener:
+                  listener.bind(("127.0.0.1", new_port))
           p.write_text(contents)
-          print("Disposable isolated QA DB uses 55422, shadow 55420")
+          print("Disposable Supabase ports 55420–55426 checked available")
           PY
       - name: Start isolated local Supabase stack
         run: npx supabase start
@@ -91,6 +107,7 @@ jobs:
             'SUPABASE_SERVICE_ROLE_KEY='+pairs.SERVICE_ROLE_KEY,
             'PLAYWRIGHT_BASE_URL=http://127.0.0.1:3000',
             'PBOS_ALLOW_SYNTHETIC_AUTH_WRITE=YES',
+            'PBOS_QA_MAIL_URL=http://127.0.0.1:55424',
             'NEXT_PUBLIC_HCAPTCHA_SITE_KEY=10000000-ffff-ffff-ffff-000000000001'
           ].join('\n')+'\n');
           NODE
@@ -113,9 +130,20 @@ jobs:
       - name: Certify Family onboarding profile save and reload first
         timeout-minutes: 6
         run: npx playwright test tests/acceptance/profile-recovery-roundtrip.spec.ts --project=chromium --grep "Family account sees Family onboarding"
+      - name: Run all 15 full-field onboarding persistence journeys
+        timeout-minutes: 15
+        env:
+          PBOS_QA_FULL_ONBOARDING: "YES"
+        run: npx playwright test tests/acceptance/role-signup-email-verification.spec.ts --project=chromium --max-failures=1
       - name: Run complete isolated role profiles and onboarding activation journeys
-        timeout-minutes: 12
+        timeout-minutes: 20
         run: npx playwright test tests/acceptance/profile-recovery-roundtrip.spec.ts tests/acceptance/role-onboarding-activation.spec.ts tests/acceptance/role-signup-email-verification.spec.ts --project=chromium
+      - name: Run all 15 mobile core role journeys
+        timeout-minutes: 12
+        run: npx playwright test tests/acceptance/role-signup-email-verification.spec.ts --project=mobile
+      - name: Run all 15 tablet core role journeys
+        timeout-minutes: 12
+        run: npx playwright test tests/acceptance/role-signup-email-verification.spec.ts --project=tablet
       - name: Upload sanitized diagnostics
         if: failure()
         uses: actions/upload-artifact@v4

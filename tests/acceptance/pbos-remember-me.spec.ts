@@ -1,3 +1,4 @@
+import { assertLocalSyntheticAuthTarget } from "./helpers/assertLocalSyntheticAuthTarget.mjs";
 import AxeBuilder from "@axe-core/playwright";
 import { createClient } from "@supabase/supabase-js";
 import { expect, test } from "@playwright/test";
@@ -42,6 +43,7 @@ test("Remember Me creates an explicit durable session without retaining identity
   const email = required("PBOS_ACCEPTANCE_EMAIL");
   const password = required("PBOS_ACCEPTANCE_PASSWORD");
   const commit = required("PBOS_ACCEPTANCE_COMMIT");
+  assertLocalSyntheticAuthTarget();
   const admin = createClient(
     required("NEXT_PUBLIC_SUPABASE_URL"),
     required("SUPABASE_SERVICE_ROLE_KEY"),

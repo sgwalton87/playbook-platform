@@ -1,3 +1,4 @@
+import { assertLocalSyntheticAuthTarget } from "./helpers/assertLocalSyntheticAuthTarget.mjs";
 import { randomBytes, randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { expect, test } from "@playwright/test";
@@ -12,9 +13,10 @@ for (const role of ["family", "brand-partner"] as const) {
     const db = new URL(need("NEXT_PUBLIC_SUPABASE_URL"));
     if (need("PBOS_ALLOW_SYNTHETIC_AUTH_WRITE") !== "YES" ||
       !["localhost", "127.0.0.1"].includes(base.hostname) ||
-      db.hostname === "oexgxnybeixwadgtdtzp.supabase.co") {
+      !["localhost", "127.0.0.1"].includes(db.hostname)) {
       throw Error("Activation acceptance test requires isolated local environment");
     }
+    assertLocalSyntheticAuthTarget();
     const admin = createClient(db.toString(), need("SUPABASE_SERVICE_ROLE_KEY"), {
       auth: { persistSession: false, autoRefreshToken: false },
     });
@@ -58,6 +60,28 @@ for (const role of ["family", "brand-partner"] as const) {
       expect(saved.data).toMatchObject({ role, profile_mode: role, onboarding_completed: true,
         onboarding_data: { private_test_marker: `saved-${role}`, community_safety_agreed: true } });
       expect(saved.data?.onboarding_completed_at).toBeTruthy();
+      await page.reload();
+      await expect(page).toHaveURL(new URL(PLAYBOOK_ROLES[role].osRoute, base).toString());
+      // A completed private profile is editable while restricted authority stays pending.
+      await page.goto("/profile");
+      const firstName = page.getByLabel("First name", { exact: true });
+      await expect(firstName).toHaveValue("Journey");
+      await firstName.fill("Returned");
+      await page.getByRole("button", { name: "Save & verify now", exact: true }).click();
+      await expect(page.getByText("Saved and verified.", { exact: false })).toBeVisible();
+      await page.reload();
+      await expect(firstName).toHaveValue("Returned");
+      await page.getByRole("button", { name: "Sign out", exact: true }).filter({ visible: true }).first().click();
+      await expect(page).toHaveURL(/\/login/);
+      await page.goto(PLAYBOOK_ROLES[role].osRoute);
+      await expect(page).toHaveURL(/\/login/);
+      await page.getByLabel("Email", { exact: true }).fill(email);
+      await page.getByLabel("Password", { exact: true }).fill(password);
+      await solveLocalCaptcha(page);
+      await page.getByRole("button", { name: "Log In", exact: true }).click();
+      await expect(page).toHaveURL(new URL(PLAYBOOK_ROLES[role].osRoute, base).toString());
+      await page.goto("/profile");
+      await expect(firstName).toHaveValue("Returned");
     } finally {
       const cleanup = await admin.auth.admin.deleteUser(id);
       if (cleanup.error) console.warn("Synthetic activation account cleanup needs review");
