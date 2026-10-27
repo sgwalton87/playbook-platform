@@ -493,6 +493,22 @@ function FieldRenderer({ field, value, onChange, onBlur, primarySport }: LegacyV
   }
 
 
+  if (field.key === "approval_contact") {
+    const parts = String(value || "").split(" | ");
+    const name = parts[0] || "";
+    const email = parts[1] || "";
+    const phone = parts[2] || "";
+    const change = (n: string, e: string, p: string) => onChange([n, e, p].join(" | "));
+    return <div style={group}>
+      <div style={sectionLabel}>Compliance / approval contact</div>
+      <div style={miniGrid}>
+        <label style={label}>Contact name<input aria-label="Approval contact name" value={name} onChange={event => change(event.target.value, email, phone)} style={input} /></label>
+        <label style={label}>Contact email<input aria-label="Approval contact email" type="email" value={email} onChange={event => change(name, event.target.value, phone)} style={input} /></label>
+        <label style={label}>Contact phone (optional)<input aria-label="Approval contact phone" type="tel" value={phone} onChange={event => change(name, email, event.target.value)} style={input} /></label>
+      </div>
+    </div>;
+  }
+
   if (field.type === "safety-agreement") {
     return (
       <div style={group}>
@@ -811,6 +827,7 @@ const safetyBox: React.CSSProperties = {
 };
 
 const agreeRow: React.CSSProperties = {
+  color: "#17263A",
   display: "flex",
   gap: 12,
   alignItems: "center",
