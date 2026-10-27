@@ -48,7 +48,7 @@ describe("synthetic authentication isolation", () => {
     expect(inline).not.toBeNull();
     const target = "https://oexgxnybeixwadgtdtzp.supabase.co";
     const result = spawnSync(process.execPath, ["-e", inline![1]], {
-      env: { ...local, NEXT_PUBLIC_SUPABASE_URL: production ? target : local.NEXT_PUBLIC_SUPABASE_URL },
+      env: { NODE_ENV: "test", ...local, NEXT_PUBLIC_SUPABASE_URL: production ? target : local.NEXT_PUBLIC_SUPABASE_URL },
       encoding: "utf8",
     });
     expect(result.status).toBe(production ? 1 : 0);
