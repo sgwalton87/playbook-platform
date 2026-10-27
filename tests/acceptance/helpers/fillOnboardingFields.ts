@@ -17,7 +17,7 @@ export async function fillOnboardingField(page: Page, field: OnboardingField, un
   if (field.type === "select") {
     const value = field.options?.[0];
     if (!value) throw Error(`Missing options: ${field.key}`);
-    await page.getByLabel(field.label, { exact: true }).selectOption(value);
+    await page.getByRole("combobox", { name: field.label, exact: true }).selectOption(value);
     return value;
   }
   if (field.type === "sport-position") {

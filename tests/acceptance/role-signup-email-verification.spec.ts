@@ -14,6 +14,7 @@ const roles = Object.keys(PLAYBOOK_ROLES) as PlaybookRole[];
 for (const role of roles) {
 test(`${role}: ${fullFields ? "full-field" : "core"} registration, email verification, onboarding, profile, logout and return login`, async ({ page }) => {
   test.setTimeout(120_000);
+  page.setDefaultTimeout(15_000);
   const need = (key: string) => { const value = process.env[key]; if (!value) throw Error(`Missing ${key}`); return value; };
   const appUrl = new URL(need("PLAYWRIGHT_BASE_URL"));
   const supabaseUrl = new URL(need("NEXT_PUBLIC_SUPABASE_URL"));
