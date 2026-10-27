@@ -36,6 +36,25 @@ describe("signed Playbook PBOS transport", () => {
     await expect(transport.send(request)).rejects.toThrow("correlation mismatch");
   });
 
+  it.each([
+    { title: "unsupported API version", status: 200, body: { success: true, apiVersion: "v2", correlationId: "identity-correlation", output: {}, provenance: [] } },
+    { title: "missing provenance", status: 200, body: { success: true, apiVersion: "v1", correlationId: "identity-correlation", output: {} } },
+    { title: "non-string provenance", status: 200, body: { success: true, apiVersion: "v1", correlationId: "identity-correlation", output: {}, provenance: [42] } },
+    { title: "missing output", status: 200, body: { success: true, apiVersion: "v1", correlationId: "identity-correlation", provenance: [] } },
+    { title: "success on forbidden response", status: 403, body: { success: true, apiVersion: "v1", correlationId: "identity-correlation", output: {}, provenance: [] } },
+    { title: "invalid rejection", status: 400, body: { success: false, apiVersion: "v1", correlationId: "identity-correlation", error: { code: 5 } } },
+  ])("fails closed for $title", async ({ status, body }) => {
+    const transport = new SignedPlaybookPbosTransport("https://pbos.example.com/pbos/v1", credentials,
+      (async () => new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } })) as typeof fetch);
+    await expect(transport.send(request)).rejects.toThrow();
+  });
+
+  it("accepts a well-formed signed success envelope", async () => {
+    const transport = new SignedPlaybookPbosTransport("https://pbos.example.com/pbos/v1", credentials,
+      (async () => Response.json({ success: true, apiVersion: "v1", correlationId: "identity-correlation", output: { accepted: true }, provenance: ["pbos"] })) as typeof fetch);
+    await expect(transport.send(request)).resolves.toMatchObject({ success: true, output: { accepted: true } });
+  });
+
   it("preserves structured PBOS rejection evidence instead of masking HTTP 400", async () => {
     const fetcher = async () => new Response(JSON.stringify({
       success: false,
