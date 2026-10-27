@@ -22,9 +22,9 @@ Related: [PR #288](https://github.com/sgwalton87/playbook-platform/pull/288), [P
 - Optional onboarding questions are skipped after first/last name. This does not certify every field widget or mobile fidelity.
 - Disposable profile provisioning additionally signs in all 15 ordinary users, checks own private answers, denies reads/updates targeting all 14 other profiles, and independently verifies all original private markers remain intact. This covers profile RLS only, not every feature's data model.
 
-## Role matrix
+## Historical role matrix — c156ee1 (superseded)
 
-At c156ee1, isolated run [40353496954](https://github.com/sgwalton87/playbook-platform/actions/runs/40353496954) executed 33 tests: 32 passed, 1 failed. All 15 actual signup/email/onboarding flows and 210 wrong-role completion API denials passed; District failed when visiting Athlete Abroad OS, before its profile/logout/return checks. Fourteen full browser journeys passed. All 15 private-profile RLS rows passed. This failure is repaired in the follow-up layout ordering change; rerun required. Pending PBOS/relationship/role authority is expected and is not privileged activation certification.
+At c156ee1, isolated run [40353496954](https://github.com/sgwalton87/playbook-platform/actions/runs/40353496954) executed 33 tests: 32 passed, 1 failed. All 15 actual signup/email/onboarding flows and 210 wrong-role completion API denials passed; District failed when visiting Athlete Abroad OS, before its profile/logout/return checks. Fourteen full browser journeys passed. All 15 private-profile RLS rows passed. This failure was repaired in the follow-up layout ordering change; passing reruns are recorded below. Pending PBOS/relationship/role authority is expected and is not privileged activation certification.
 
 | Role | Canonical route | Browser journey | Profile RLS | Independent activation |
 | --- | --- | --- | --- | --- |
@@ -62,3 +62,9 @@ NOT PRODUCTION READY. Do not merge or promote without founder approval. Require 
 ## Athlete Abroad gate-order repair
 
 The layout previously mounted readiness before any role check; an unapproved wrong-role user never reached the page's identity gate. The layout now checks canonical identity and completed onboarding before readiness. Removed duplicate inner readiness and generic pending-authority gates from the page; the existing readiness gate still requires both readiness and jurisdiction approval before mounting the workspace. Tests reproduce District redirect before fetch and preserve all pending/rejected approval locks. No database or approval mutations.
+
+## Exact-head desktop closure and responsive continuation
+
+At 70c090f, [isolated run 40355822043](https://github.com/sgwalton87/playbook-platform/actions/runs/40355822043) passed 33/33 browser tests, all 15 core journeys, 210 foreign-profile read/update targets and 210 wrong-role completion requests. Disposable fixture cleanup passed. [CI 40355822452](https://github.com/sgwalton87/playbook-platform/actions/runs/40355822452) passed 1,046 tests, lint, TypeScript, build and dependency audit. This supersedes all earlier pending desktop statuses above. Trusted hosted tests were skipped, not passed.
+
+The next isolated run adds the same 15 core journeys for the existing mobile (390 × 844) and tablet (834 × 1194) Chromium projects, with signup/profile horizontal-overflow checks. Each viewport gets fresh disposable accounts, local email verification, save/reload/logout/return login and negative role API assertions. Mobile/tablet results are pending until their actual jobs finish. These are responsive browser emulations, not physical-device or complete visual certification. Optional onboarding fields still require separate coverage. Production release remains on hold.

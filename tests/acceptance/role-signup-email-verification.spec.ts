@@ -33,6 +33,7 @@ test(`${role}: registration, email verification, onboarding, profile, logout and
       const pathway = USER_PATHWAYS.find(item => item.role === role);
       if (!pathway) throw Error("Missing registered signup pathway");
       await page.getByRole("button").filter({ has: page.locator("strong").getByText(pathway.label, { exact: true }) }).click();
+      await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), { message: "Signup must fit the viewport" }).toBe(true);
       await page.getByLabel("Email", { exact: true }).fill(email);
       await page.getByLabel("Password", { exact: true }).fill(password);
       await solveLocalCaptcha(page);
@@ -143,6 +144,7 @@ test(`${role}: registration, email verification, onboarding, profile, logout and
       await page.goto("/profile");
       const firstName = page.getByLabel("First name", { exact: true });
       await expect(firstName).toHaveValue("Journey");
+      await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), { message: "Profile editor must fit the viewport" }).toBe(true);
       await firstName.fill("Returned");
       await page.getByRole("button", { name: "Save & verify now", exact: true }).click();
       await expect(page.getByRole("status").filter({ hasText: "Saved and verified." })).toBeVisible();
