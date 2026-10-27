@@ -3,6 +3,11 @@ import type { OnboardingField, OnboardingValue } from "@/lib/onboarding/types";
 
 /** Enter disposable values through real widgets; never send supporter invitations. */
 export async function fillOnboardingField(page: Page, field: OnboardingField, unique: string): Promise<OnboardingValue> {
+  if (field.key === "child_invite_code") {
+    // No invitation credential or relationship authority is provisioned here.
+    await expect(page.getByLabel(field.label, { exact: true })).toHaveValue("");
+    return undefined;
+  }
   if (field.type === "safety-agreement") {
     await page.getByRole("checkbox", { name: field.label, exact: true }).check();
     return true;
@@ -51,7 +56,6 @@ export async function fillOnboardingField(page: Page, field: OnboardingField, un
     dream_school: "Stanford University", college_name: "Stanford University",
     ideal_profession: "Software Engineer", direct_phone: "202-555-0100",
     organization_website: "https://example.com", highlight_link: "https://example.com/highlights",
-    child_invite_code: "", // No relationship or authority is requested by this fixture.
   };
   const value = values[field.key] ?? (field.key.includes("email")
     ? "disposable@example.com" : `QA ${field.key.replaceAll("_", " ")}`);

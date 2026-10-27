@@ -120,7 +120,8 @@ test(`${role}: ${fullFields ? "full-field" : "core"} registration, email verific
       for (const [index, step] of steps.entries()) {
         if (fullFields) {
           for (const field of step.fields) {
-            expectedAnswers[field.key] = await fillOnboardingField(page, field, userId.replaceAll("-", ""));
+            const entered = await fillOnboardingField(page, field, userId.replaceAll("-", ""));
+            if (entered !== undefined) expectedAnswers[field.key] = entered;
           }
         }
         if (index < steps.length - 1) {
@@ -143,7 +144,10 @@ test(`${role}: ${fullFields ? "full-field" : "core"} registration, email verific
       expect(completed.data).toMatchObject({ role, onboarding_completed: true,
         onboarding_data: { first_name: "Journey", last_name: "Example", community_safety_agreed: true } });
       expect(completed.data?.onboarding_completed_at).toBeTruthy();
-      if (fullFields) expect(completed.data?.onboarding_data).toMatchObject(expectedAnswers);
+      if (fullFields) {
+        expect(completed.data?.onboarding_data).toMatchObject(expectedAnswers);
+        if (role === "family") expect(completed.data?.onboarding_data?.child_invite_code ?? "").toBe("");
+      }
       await page.reload();
       await expect(page).toHaveURL(destination);
       // All 14 wrong-role completion endpoints must reject before any completion.
@@ -182,6 +186,7 @@ test(`${role}: ${fullFields ? "full-field" : "core"} registration, email verific
         const returned = await admin.from("profiles").select("onboarding_data").eq("id", userId).single();
         expect(returned.error).toBeNull();
         expect(returned.data?.onboarding_data).toMatchObject({ ...expectedAnswers, first_name: "Returned" });
+        if (role === "family") expect(returned.data?.onboarding_data?.child_invite_code ?? "").toBe("");
         console.log(`[full-field-confirmation] Verified ${role}: ${Object.keys(expectedAnswers).length} configured fields survived profile edit and return login`);
       }
       console.log(`[role-confirmation] Verified ${role}`);
