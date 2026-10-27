@@ -21,7 +21,7 @@ afterEach(cleanup);
 it("shows Athlete Abroad athletic and recruiting answers in its standard editor", async () => {
   render(<RoleProfileEditor />);
   expect(await screen.findByLabelText("Primary sport", { exact: true })).toHaveProperty("value", "Basketball");
-  expect(screen.getByRole("combobox", { name: "Position", exact: true })).toHaveProperty("value", "Point Guard");
+  expect(screen.getByRole("combobox", { name: "Position" })).toHaveProperty("value", "Point Guard");
   expect(screen.getByLabelText("Current team / club", { exact: true })).toHaveProperty("value", "Saved Club");
   expect(screen.getByLabelText("Target major", { exact: true })).toHaveProperty("value", "Biology");
 });
