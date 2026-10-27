@@ -4,12 +4,15 @@ import { expect, test } from "@playwright/test";
 import { PLAYBOOK_ROLES, type PlaybookRole } from "@/lib/roles/registry";
 import { USER_PATHWAYS } from "@/lib/auth/userPathways";
 import { getOnboardingSteps } from "@/lib/onboarding/engine";
+import { fillOnboardingField } from "./helpers/fillOnboardingFields";
+import type { OnboardingData } from "@/lib/onboarding/types";
 import { solveLocalCaptcha } from "./helpers/solveLocalCaptcha";
 
+const fullFields = process.env.PBOS_QA_FULL_ONBOARDING === "YES";
 const roles = Object.keys(PLAYBOOK_ROLES) as PlaybookRole[];
 
 for (const role of roles) {
-test(`${role}: registration, email verification, onboarding, profile, logout and return login`, async ({ page }) => {
+test(`${role}: ${fullFields ? "full-field" : "core"} registration, email verification, onboarding, profile, logout and return login`, async ({ page }) => {
   test.setTimeout(120_000);
   const need = (key: string) => { const value = process.env[key]; if (!value) throw Error(`Missing ${key}`); return value; };
   const appUrl = new URL(need("PLAYWRIGHT_BASE_URL"));
@@ -22,7 +25,10 @@ test(`${role}: registration, email verification, onboarding, profile, logout and
   const admin = createClient(supabaseUrl.toString(), need("SUPABASE_SERVICE_ROLE_KEY"), {
     auth: { persistSession: false, autoRefreshToken: false },
   });
-  const mailBase = new URL("http://127.0.0.1:54324");
+  const mailBase = new URL(process.env.PBOS_QA_MAIL_URL || "http://127.0.0.1:54324");
+  if (!["127.0.0.1", "localhost"].includes(mailBase.hostname) || mailBase.protocol !== "http:") {
+    throw Error("Only disposable local mail inboxes are supported");
+  }
   const ids: string[] = [];
   try {
     {
@@ -105,11 +111,20 @@ test(`${role}: registration, email verification, onboarding, profile, logout and
       const profile = await admin.from("profiles").select("role,profile_mode").eq("id", userId).single();
       expect(profile.error).toBeNull();
       expect(profile.data).toMatchObject({ role, profile_mode: role });
-      // Fill the actual first step, then exercise each optional step transition.
+      const expectedAnswers: OnboardingData = {};
+      // Full-field mode uses the real widgets; core mode retains optional-step coverage.
       await page.getByLabel("First name", { exact: true }).fill("Journey");
       await page.getByLabel("Last name", { exact: true }).fill("Example");
-      for (let index = 0; index < getOnboardingSteps(role).length - 1; index++) {
-        await page.getByRole("button", { name: "Skip for now", exact: true }).click();
+      const steps = getOnboardingSteps(role);
+      for (const [index, step] of steps.entries()) {
+        if (fullFields) {
+          for (const field of step.fields) {
+            expectedAnswers[field.key] = await fillOnboardingField(page, field, userId.replaceAll("-", ""));
+          }
+        }
+        if (index < steps.length - 1) {
+          await page.getByRole("button", { name: fullFields ? "Next Play →" : "Skip for now", exact: true }).click();
+        }
       }
       await page.getByRole("checkbox", { name: /I have read and agree/i }).check();
       const completionResponse = page.waitForResponse(response =>
@@ -127,6 +142,7 @@ test(`${role}: registration, email verification, onboarding, profile, logout and
       expect(completed.data).toMatchObject({ role, onboarding_completed: true,
         onboarding_data: { first_name: "Journey", last_name: "Example", community_safety_agreed: true } });
       expect(completed.data?.onboarding_completed_at).toBeTruthy();
+      if (fullFields) expect(completed.data?.onboarding_data).toMatchObject(expectedAnswers);
       await page.reload();
       await expect(page).toHaveURL(destination);
       // All 14 wrong-role completion endpoints must reject before any completion.
@@ -161,6 +177,12 @@ test(`${role}: registration, email verification, onboarding, profile, logout and
       await expect(page).toHaveURL(destination);
       await page.goto("/profile");
       await expect(firstName).toHaveValue("Returned");
+      if (fullFields) {
+        const returned = await admin.from("profiles").select("onboarding_data").eq("id", userId).single();
+        expect(returned.error).toBeNull();
+        expect(returned.data?.onboarding_data).toMatchObject({ ...expectedAnswers, first_name: "Returned" });
+        console.log(`[full-field-confirmation] Verified ${role}: ${Object.keys(expectedAnswers).length} configured fields survived profile edit and return login`);
+      }
       console.log(`[role-confirmation] Verified ${role}`);
     }
   } finally {
