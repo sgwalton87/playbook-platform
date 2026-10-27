@@ -5,6 +5,7 @@ import { expect, test } from "@playwright/test";
 import { PLAYBOOK_ROLES, type PlaybookRole } from "@/lib/roles/registry";
 import { USER_PATHWAYS } from "@/lib/auth/userPathways";
 import { getOnboardingSteps } from "@/lib/onboarding/engine";
+import { assertProfileWidgets } from "./helpers/assertProfileWidgets";
 import { fillOnboardingField } from "./helpers/fillOnboardingFields";
 import type { OnboardingData } from "@/lib/onboarding/types";
 import { solveLocalCaptcha } from "./helpers/solveLocalCaptcha";
@@ -189,6 +190,7 @@ test(`${role}: ${fullFields ? "full-field" : "core"} registration, email verific
         expect(returned.error).toBeNull();
         expect(returned.data?.onboarding_data).toMatchObject({ ...expectedAnswers, first_name: "Returned" });
         if (role === "family") expect(returned.data?.onboarding_data?.child_invite_code ?? "").toBe("");
+        await assertProfileWidgets(page, role, { ...expectedAnswers, first_name: "Returned" });
         console.log(`[full-field-confirmation] Verified ${role}: ${Object.keys(expectedAnswers).length} configured fields survived profile edit and return login`);
       }
       console.log(`[role-confirmation] Verified ${role}`);
