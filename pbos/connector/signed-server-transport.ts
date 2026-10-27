@@ -54,6 +54,19 @@ export class SignedPlaybookPbosTransport implements PbosTransport {
       throw new Error(detail + " (HTTP " + response.status + ").");
     }
     if (result.correlationId !== request.correlationId) throw new Error("PBOS v1 response correlation mismatch.");
+    // A malformed or contradictory transport envelope must never certify authority.
+    if (result.apiVersion !== "v1" || typeof result.success !== "boolean") {
+      throw new Error("PBOS v1 response contract mismatch.");
+    }
+    if (result.success) {
+      if (!response.ok || !("output" in result) || !Array.isArray(result.provenance) ||
+          !result.provenance.every(value => typeof value === "string")) {
+        throw new Error("PBOS v1 success envelope invalid.");
+      }
+    } else if (!("error" in result) || !result.error || typeof result.error !== "object" ||
+        typeof result.error.code !== "string" || typeof result.error.message !== "string") {
+      throw new Error("PBOS v1 rejection envelope invalid.");
+    }
     return result as PbosResponse<T>;
   }
 }
