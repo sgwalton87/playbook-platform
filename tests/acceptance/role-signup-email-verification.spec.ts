@@ -141,6 +141,14 @@ test(`${role}: ${fullFields ? "full-field" : "core"} registration, email verific
       expect(outcome.activationState).not.toBe("active");
       const destination = new URL(PLAYBOOK_ROLES[role].osRoute, appUrl).toString();
       await expect(page).toHaveURL(destination, { timeout: 20000 });
+      // Route correctness alone did not catch the outer BRAND_AUTHORITY dead-end.
+      // An unapproved Brand Partner must see a dashboard, not a holding screen;
+      // restricted campaign/NIL/applicant authority is still enforced server-side.
+      if (role === "brand-partner") {
+        await expect(page.getByTestId("brand-partner-os")).toBeVisible();
+        await expect(page.getByRole("heading", { name: "Power opportunity. Protect the scholar." })).toBeVisible();
+        await expect(page.getByText("Brand Partner OS is awaiting authority")).toHaveCount(0);
+      }
       const completed = await admin.from("profiles").select("role,onboarding_completed,onboarding_completed_at,onboarding_data")
         .eq("id", userId).single();
       expect(completed.error).toBeNull();
