@@ -1,3 +1,4 @@
+import { assertLocalSyntheticAuthTarget } from "./helpers/assertLocalSyntheticAuthTarget.mjs";
 import { randomBytes, randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { expect, test } from "@playwright/test";
@@ -23,6 +24,7 @@ test(`${role}: ${fullFields ? "full-field" : "core"} registration, email verific
     !["127.0.0.1", "localhost"].includes(supabaseUrl.hostname)) {
     throw Error("Only disposable local signup environments are supported");
   }
+  assertLocalSyntheticAuthTarget();
   const admin = createClient(supabaseUrl.toString(), need("SUPABASE_SERVICE_ROLE_KEY"), {
     auth: { persistSession: false, autoRefreshToken: false },
   });

@@ -1,3 +1,4 @@
+import { assertLocalSyntheticAuthTarget } from "./helpers/assertLocalSyntheticAuthTarget.mjs";
 import { expect, test } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
 
@@ -10,6 +11,7 @@ const required = (name: string): string => {
 test("PGSL-007 matches the approved responsive Scholar Dashboard", async ({ page }) => {
   const email = required("PBOS_ACCEPTANCE_EMAIL");
   const password = required("PBOS_ACCEPTANCE_PASSWORD");
+  assertLocalSyntheticAuthTarget();
   const admin = createClient(required("NEXT_PUBLIC_SUPABASE_URL"), required("SUPABASE_SERVICE_ROLE_KEY"), {
     auth: { autoRefreshToken: false, persistSession: false },
   });

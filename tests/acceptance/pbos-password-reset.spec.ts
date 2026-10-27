@@ -1,3 +1,4 @@
+import { assertLocalSyntheticAuthTarget } from "./helpers/assertLocalSyntheticAuthTarget.mjs";
 import AxeBuilder from "@axe-core/playwright";
 import { createClient } from "@supabase/supabase-js";
 import { expect, test } from "@playwright/test";
@@ -38,6 +39,7 @@ test("Password Reset securely changes credentials while preserving profile autho
   const originalPassword = required("PBOS_ACCEPTANCE_PASSWORD");
   const commit = required("PBOS_ACCEPTANCE_COMMIT");
   const resetPassword = `${originalPassword}-${commit.slice(0, 8)}-reset`;
+  assertLocalSyntheticAuthTarget();
   const admin = createClient(
     required("NEXT_PUBLIC_SUPABASE_URL"),
     required("SUPABASE_SERVICE_ROLE_KEY"),

@@ -1,3 +1,4 @@
+import { assertLocalSyntheticAuthTarget } from "./helpers/assertLocalSyntheticAuthTarget.mjs";
 import { assertIsolatedMentorTargets } from "../helpers/isolated-mentor-targets";
 import { createClient } from "@supabase/supabase-js";
 import { test, expect, type BrowserContext, type Page } from "@playwright/test";
@@ -43,6 +44,7 @@ test.beforeAll(async ({}, testInfo) => {
 });
 
 test("Scholar-invited mentor requires governed support-system validation", async ({ page, context }) => {
+  assertLocalSyntheticAuthTarget();
   const admin = createClient(required("NEXT_PUBLIC_SUPABASE_URL"), required("SUPABASE_SERVICE_ROLE_KEY"), {
     auth: { autoRefreshToken: false, persistSession: false },
   });

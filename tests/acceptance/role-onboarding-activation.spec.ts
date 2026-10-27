@@ -1,3 +1,4 @@
+import { assertLocalSyntheticAuthTarget } from "./helpers/assertLocalSyntheticAuthTarget.mjs";
 import { randomBytes, randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { expect, test } from "@playwright/test";
@@ -15,6 +16,7 @@ for (const role of ["family", "brand-partner"] as const) {
       !["localhost", "127.0.0.1"].includes(db.hostname)) {
       throw Error("Activation acceptance test requires isolated local environment");
     }
+    assertLocalSyntheticAuthTarget();
     const admin = createClient(db.toString(), need("SUPABASE_SERVICE_ROLE_KEY"), {
       auth: { persistSession: false, autoRefreshToken: false },
     });

@@ -1,3 +1,4 @@
+import { assertLocalSyntheticAuthTarget } from "./helpers/assertLocalSyntheticAuthTarget.mjs";
 import { createClient } from "@supabase/supabase-js";
 import { mkdir, writeFile } from "node:fs/promises";
 import { test, expect } from "@playwright/test";
@@ -15,6 +16,7 @@ test("Transition-Aged Youth completes a self-owned governed Scholar Record journ
 
   const email = required("PBOS_ACCEPTANCE_TAY_EMAIL");
   const password = required("PBOS_ACCEPTANCE_TAY_PASSWORD");
+  assertLocalSyntheticAuthTarget();
   const admin = createClient(required("NEXT_PUBLIC_SUPABASE_URL"), required("SUPABASE_SERVICE_ROLE_KEY"), {
     auth: { autoRefreshToken: false, persistSession: false }
   });

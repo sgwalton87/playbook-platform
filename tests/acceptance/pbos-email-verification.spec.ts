@@ -1,3 +1,4 @@
+import { assertLocalSyntheticAuthTarget } from "./helpers/assertLocalSyntheticAuthTarget.mjs";
 import AxeBuilder from "@axe-core/playwright";
 import { createClient } from "@supabase/supabase-js";
 import { expect, test } from "@playwright/test";
@@ -37,6 +38,7 @@ test("Email verification confirms durable identity and preserves role authority"
   const commit = required("PBOS_ACCEPTANCE_COMMIT");
   const password = required("PBOS_ACCEPTANCE_PASSWORD");
   const email = exactRevisionEmail(required("PBOS_ACCEPTANCE_EMAIL"), commit);
+  assertLocalSyntheticAuthTarget();
   const admin = createClient(
     required("NEXT_PUBLIC_SUPABASE_URL"),
     required("SUPABASE_SERVICE_ROLE_KEY"),
