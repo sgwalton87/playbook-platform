@@ -32,7 +32,7 @@ export async function assertProfileWidgets(page: Page, role: PlaybookRole, answe
             if (!entry || typeof entry !== "object") throw Error("Expected structured activity fixture");
             const row = section.getByRole("group", { name: `Activity ${index + 1} · saved with your profile`, exact: true });
             for (const [key, label] of Object.entries({ activity: "Activity", category: "Category", hours: "Hours", supervisor: "Mentor / Supervisor", description: "Description" })) {
-              await expect(row.getByLabel(label, { exact: true })).toHaveValue(String(entry[key as keyof typeof entry]));
+              await expect(row.getByRole(key === "category" ? "combobox" : "textbox", { name: label, exact: true })).toHaveValue(String(entry[key as keyof typeof entry]));
             }
           }
         } else if (field.type === "sport-position") {
