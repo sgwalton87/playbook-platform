@@ -22,7 +22,7 @@ export async function fillOnboardingField(page: Page, field: OnboardingField, un
   }
   if (field.type === "sport-position") {
     // The configured primary-sport fixture chooses Basketball.
-    await page.getByLabel("Position", { exact: true }).selectOption("Point Guard");
+    await page.getByRole("combobox", { name: "Position", exact: true }).selectOption("Point Guard");
     return "Point Guard";
   }
   if (field.type === "college-list" || field.type === "invite-list") {
@@ -37,7 +37,7 @@ export async function fillOnboardingField(page: Page, field: OnboardingField, un
   if (field.type === "activity-list") {
     const entry = { activity: "Service learning", category: "Service", hours: "15", supervisor: "QA Advisor", description: "Disposable community tutoring record" };
     await page.getByLabel("Activity", { exact: true }).fill(entry.activity);
-    await page.getByLabel("Category", { exact: true }).selectOption(entry.category);
+    await page.getByRole("combobox", { name: "Category", exact: true }).selectOption(entry.category);
     await page.getByLabel("Hours", { exact: true }).fill(entry.hours);
     await page.getByLabel("Mentor / Supervisor", { exact: true }).fill(entry.supervisor);
     await page.getByLabel("Description", { exact: true }).fill(entry.description);
