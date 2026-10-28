@@ -347,16 +347,16 @@ function StartContent() {
       {creating && (
         <div style={overlay}>
           <div style={confetti}>✨ 🧭 📚</div>
-          <h1 style={overlayTitle}>Hold tight, {form.full_name || "Scholar"}.</h1>
+          <h1 style={overlayTitle}>Creating your {PLAYBOOK_ROLES[role].osLabel} profile…</h1>
           <p style={overlayText}>We are creating your profile...</p>
         </div>
       )}
 
       {created && (
         <div style={overlay}>
-          <div style={confetti}>🎉 ✨ 🏆 🎓 🧭 🎉<br />🎉 ✨ 🏆 🎓 🧭 🎉<br />🎉 ✨ 🏆 🎓 🧭 🎉</div>
-          <h1 style={overlayTitle}>Congratulations, {form.full_name || "Scholar"}!</h1>
-          <p style={overlayText}>Your Playbook profile is ready. Taking you to your dashboard...</p>
+          <div aria-hidden="true" style={confetti}>🎉 ✨ 🏆</div>
+          <h1 style={overlayTitle}>Welcome to {PLAYBOOK_ROLES[role].osLabel}!</h1>
+          <p style={overlayText}>Your {PLAYBOOK_ROLES[role].osLabel} profile is ready. Opening your workspace…</p>
         </div>
       )}
 
@@ -780,9 +780,9 @@ const avatar: React.CSSProperties = { width: 86, height: 86, borderRadius: 999, 
 const avatarImg: React.CSSProperties = { width: "100%", height: "100%", objectFit: "cover" };
 const uploadButton: React.CSSProperties = { border: "1px solid #CBD5E1", borderRadius: 999, padding: "12px 18px", fontWeight: 950, cursor: "pointer" };
 const overlay: React.CSSProperties = { position: "fixed", inset: 0, zIndex: 9999, background: "rgba(15,23,42,.94)", color: "#F8F7F4", display: "grid", placeItems: "center", textAlign: "center", padding: 24 };
-const overlayTitle: React.CSSProperties = { fontFamily: "'Anton', sans-serif", fontSize: "clamp(44px,7vw,86px)", textTransform: "uppercase", margin: 0 };
+const overlayTitle: React.CSSProperties = { fontFamily: "'Anton', sans-serif", fontSize: "clamp(28px,7vw,66px)", lineHeight: 1.08, overflowWrap: "anywhere", maxWidth: "min(90vw,800px)", textTransform: "uppercase", margin: 0 };
 const overlayText: React.CSSProperties = { fontSize: 22, color: "rgba(248,247,244,.75)" };
-const confetti: React.CSSProperties = { fontSize: 38, marginBottom: 16 };
+const confetti: React.CSSProperties = { fontSize: "clamp(22px,6vw,38px)", marginBottom: 16, maxWidth: "100%", overflow: "hidden" };
 
 const summaryList: React.CSSProperties = {
   display: "grid",
