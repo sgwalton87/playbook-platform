@@ -46,32 +46,31 @@ using (bucket_id='brand-organization-logos' and (storage.foldername(name))[1]=(s
 create policy "brand_logo_owner_delete" on storage.objects for delete to authenticated
 using (bucket_id='brand-organization-logos' and (storage.foldername(name))[1]=(select auth.uid())::text);
 
--- Preserve Scholar ownership and onboarding gates directly in storage RLS.
--- Avoid calling private helper functions from a global storage.objects policy;
--- PostgreSQL can evaluate unrelated ALL policies for other buckets.
+-- An unexposed storage-schema helper verifies the authenticated learner and
+-- workspace lineage without evaluating public workspace RLS from storage.objects.
+-- No direct EXECUTE grants are added to private constitutional helpers.
+create or replace function storage.is_owned_application_document_path(requested_path text)
+returns boolean
+language sql stable security definer set search_path = ''
+as $$
+  select (select auth.uid()) is not null
+    and split_part(requested_path,'/',1) = (select auth.uid())::text
+    and exists (
+      select 1 from public.profiles p
+      join public.application_workspaces w on w.scholar_id = p.id
+      where p.id = (select auth.uid())
+        and coalesce(p.profile_mode,p.role) in ('scholar','scholar-athlete','transition-youth')
+        and p.onboarding_completed is true
+        and w.id::text = split_part(requested_path,'/',2)
+    );
+$$;
+revoke all on function storage.is_owned_application_document_path(text) from public,anon,authenticated;
+grant execute on function storage.is_owned_application_document_path(text) to authenticated;
 drop policy if exists "application-document-storage-own" on storage.objects;
 create policy "application-document-storage-own" on storage.objects
 for all to authenticated
-using (
- bucket_id='application-documents'
- and (storage.foldername(name))[1]=(select auth.uid())::text
- and exists (select 1 from public.profiles p where p.id=(select auth.uid())
-   and coalesce(p.profile_mode,p.role) in ('scholar','scholar-athlete','transition-youth')
-   and p.onboarding_completed is true)
- and exists (select 1 from public.application_workspaces w
-   where w.id::text=(storage.foldername(name))[2]
-   and w.scholar_id=(select auth.uid()))
-)
-with check (
- bucket_id='application-documents'
- and (storage.foldername(name))[1]=(select auth.uid())::text
- and exists (select 1 from public.profiles p where p.id=(select auth.uid())
-   and coalesce(p.profile_mode,p.role) in ('scholar','scholar-athlete','transition-youth')
-   and p.onboarding_completed is true)
- and exists (select 1 from public.application_workspaces w
-   where w.id::text=(storage.foldername(name))[2]
-   and w.scholar_id=(select auth.uid()))
-);
+using (bucket_id='application-documents' and (select storage.is_owned_application_document_path(name)))
+with check (bucket_id='application-documents' and (select storage.is_owned_application_document_path(name)));
 -- Reviewer reads require an authenticated founder/admin subject; direct review
 -- decisions continue to be checked by governed review functions.
 -- Fail closed at the database boundary: no direct reviewer RPC or alternate
