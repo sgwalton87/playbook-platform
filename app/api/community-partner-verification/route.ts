@@ -36,6 +36,10 @@ export async function POST() {
     if (!profile.data.onboarding_completed) {
       return NextResponse.json({ error: "Complete Community Partner onboarding before submitting verification." }, { status: 409 });
     }
+    const docs = await supabase.rpc("get_own_community_verification_documents");
+    if (docs.error) return NextResponse.json({ error: "Unable to check your saved verification documents. Please try again." }, { status: 503 });
+    const hasEvidence = ((docs.data ?? []) as {name:string}[]).some(d => /^[-a-f0-9]{36}\/organization-[-a-f0-9]{36}\.(pdf|png|jpg|webp)$/.test(d.name));
+    if (!hasEvidence) return NextResponse.json({ error: "Upload supporting organization documentation before submitting Community Partner verification." }, { status: 422 });
     const evidence = buildCommunityPartnerEvidence((profile.data.onboarding_data ?? {}) as Record<string, unknown>);
     const result = await supabase.from("community_partner_verification_requests").upsert({
       partner_user_id: user.id,
