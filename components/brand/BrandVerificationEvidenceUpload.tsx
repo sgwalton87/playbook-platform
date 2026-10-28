@@ -20,7 +20,7 @@ export default function BrandVerificationEvidenceUpload({ onEvidenceChange }: { 
     setDocuments(entries.map(item => ({ name: item.name, type: item.name.startsWith("letterhead-") ? "Company letterhead" : "Business card" })));
     onEvidenceChange?.(entries.length > 0);
   }, [onEvidenceChange]);
-  useEffect(() => { void refresh(); }, [refresh]);
+  useEffect(() => { const handle = window.setTimeout(() => { void refresh(); }, 0); return () => window.clearTimeout(handle); }, [refresh]);
 
   async function upload(file: File | undefined, type: "letterhead" | "business-card") {
     if (!file) return;
