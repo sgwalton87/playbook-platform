@@ -48,6 +48,18 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "A decision reason is required to approve or reject verification." }, { status: 400 });
   }
 
+  if (requestType === "brand-partner" && decision === "approved") {
+    const queue = await supabase.rpc("get_verification_review_queue");
+    if (queue.error) return NextResponse.json({ error: "Verification reviewer access required." }, { status: 403 });
+    const rows = (queue.data ?? []) as Array<{ request_type: string; request_id: string; subject_user_id: string }>;
+    const reviewable = rows.find(row => row.request_type === "brand-partner" && row.request_id === requestId);
+    if (!reviewable) return NextResponse.json({ error: "Brand Partner verification request not reviewable." }, { status: 404 });
+    const result = await supabase.storage.from("brand-verification-evidence").list(reviewable.subject_user_id, { limit: 100 });
+    if (result.error) return NextResponse.json({ error: "Business evidence could not be checked." }, { status: 503 });
+    const hasDocument = (result.data ?? []).some(file => /^(letterhead|business-card)-[0-9a-f-]+\.(pdf|png|jpg|webp)$/i.test(file.name));
+    if (!hasDocument) return NextResponse.json({ error: "A company letterhead document or business card is required before approval." }, { status: 422 });
+  }
+
   const { data, error } = await supabase.rpc("review_verification_request", {
     requested_type: requestType,
     requested_id: requestId,
