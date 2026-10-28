@@ -52,3 +52,8 @@ using (bucket_id='brand-organization-logos' and (storage.foldername(name))[1]=(s
 -- EXECUTE reveals only whether the *caller* is an onboarded learner and does
 -- not grant access to learner workspaces, documents, or other users' data.
 grant execute on function private.current_user_is_onboarded_learner() to authenticated;
+
+-- The private evidence SELECT policy invokes a current-user-only reviewer
+-- boolean. Permit predicate evaluation without granting review decisions or
+-- unrestricted access to any verification records.
+grant execute on function private.current_user_is_verification_reviewer() to authenticated;
