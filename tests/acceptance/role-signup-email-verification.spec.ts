@@ -165,11 +165,6 @@ test(`${role}: ${fullFields ? "full-field" : "core"} registration, email verific
         await expect(page.getByText("Private organization draft")).toBeVisible();
         const summary = page.getByLabel("Organization summary");
         await summary.fill("Verified disposable Brand Partner draft survives reload.");
-        await page.getByLabel("Main contact full name").fill("QA Primary Contact");
-        await page.getByLabel("Main contact email").fill("primary-contact@example.com");
-        await page.getByLabel("Main contact telephone").fill("+1 202-555-0141");
-        await page.getByRole("button", { name: "Save Private Draft" }).click();
-        await expect(page.getByRole("status").filter({ hasText: "Private draft saved and confirmed" })).toBeVisible();
         const logoBytes = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScL/nwAAAABJRU5ErkJggg==", "base64");
         await page.getByLabel("Upload company logo").setInputFiles({ name: "brand-logo.png", mimeType: "image/png", buffer: logoBytes });
         await expect.poll(async () => {
@@ -179,6 +174,12 @@ test(`${role}: ${fullFields ? "full-field" : "core"} registration, email verific
           if (alert.length) return "error: " + alert.join(" | ");
           return "pending";
         }, { timeout: 15000 }).toBe("saved");
+        await page.getByLabel("Main contact full name").fill("QA Primary Contact");
+        await page.getByLabel("Main contact email").fill("primary-contact@example.com");
+        await page.getByLabel("Main contact telephone").fill("+1 202-555-0141");
+        await page.getByRole("button", { name: "Save Private Draft" }).click();
+        await expect(page.getByRole("status").filter({ hasText: "Private draft saved and confirmed" })).toBeVisible();
+
         await page.reload();
         await expect(page.getByLabel("Organization summary")).toHaveValue("Verified disposable Brand Partner draft survives reload.");
         const stored = await admin.from("profiles").select("onboarding_data").eq("id", userId).single();
