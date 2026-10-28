@@ -62,3 +62,37 @@ grant execute on function private.current_user_is_verification_reviewer() to aut
 -- propagation. This helper returns a boolean only for auth.uid(), which is null
 -- for anon, so anonymous callers cannot acquire learner authority.
 grant execute on function private.current_user_is_onboarded_learner() to anon;
+
+-- Fail closed at the database boundary: no direct reviewer RPC or alternate
+-- application code path may approve a Brand Partner without stored evidence.
+-- This trigger does not alter or downgrade already-approved historical rows.
+create or replace function private.require_brand_partner_evidence_before_approval()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  if new.status = 'approved'
+     and (TG_OP = 'INSERT' or old.status is distinct from 'approved') then
+    if not exists (
+      select 1 from storage.objects evidence
+       where evidence.bucket_id = 'brand-verification-evidence'
+         and evidence.name ~ (
+           '^' || new.brand_user_id::text ||
+           '/(letterhead|business-card)-[0-9a-f-]+\\.(pdf|png|jpg|webp)$'
+         )
+    ) then
+      raise exception 'Company letterhead or a business card is required before Brand Partner approval'
+        using errcode = '23514';
+    end if;
+  end if;
+  return new;
+end;
+$$;
+revoke all on function private.require_brand_partner_evidence_before_approval()
+  from public, anon, authenticated;
+drop trigger if exists brand_evidence_before_approval on public.brand_partner_verification_requests;
+create trigger brand_evidence_before_approval
+before insert or update of status on public.brand_partner_verification_requests
+for each row execute function private.require_brand_partner_evidence_before_approval();
