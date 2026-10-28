@@ -28,6 +28,10 @@ export async function POST() {
     if (!profile.data) return NextResponse.json({ error: "Brand Partner profile not found." }, { status: 404 });
     if (requirePlaybookRole(profile.data.profile_mode ?? profile.data.role) !== "brand-partner") return NextResponse.json({ error: "Brand verification is restricted to Brand Partner accounts." }, { status: 403 });
     if (!profile.data.onboarding_completed) return NextResponse.json({ error: "Complete Brand Partner onboarding before submitting verification." }, { status: 409 });
+    const uploaded = await supabase.storage.from("brand-verification-evidence").list(user.id, { limit: 100 });
+    if (uploaded.error) return NextResponse.json({ error: "Business documentation could not be verified. Try again." }, { status: 503 });
+    const hasEvidence = (uploaded.data ?? []).some(item => /^(letterhead|business-card)-[a-f0-9-]+\\.(pdf|png|jpg|webp)$/.test(item.name));
+    if (!hasEvidence) return NextResponse.json({ error: "Upload company letterhead or a business card before submitting verification." }, { status: 422 });
     const evidence = buildBrandVerificationEvidence((profile.data.onboarding_data ?? {}) as Record<string, unknown>);
     const result = await supabase.from("brand_partner_verification_requests").upsert({
       brand_user_id: user.id, organization_name: evidence.organizationName, partner_title: evidence.partnerTitle,
