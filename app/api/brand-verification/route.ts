@@ -1,3 +1,4 @@
+import { parseRegistration } from "@/lib/verification/registration";
 import { NextResponse } from "next/server";
 import { buildBrandVerificationEvidence } from "@/lib/brand-verification/policy";
 import { requirePlaybookRole } from "@/lib/roles/registry";
@@ -13,7 +14,12 @@ export async function GET() {
     if (requirePlaybookRole(profile.data.profile_mode ?? profile.data.role) !== "brand-partner") return NextResponse.json({ error: "Brand verification is restricted to Brand Partner accounts." }, { status: 403 });
     const request = await supabase.from("brand_partner_verification_requests").select("id,organization_name,partner_title,brand_category,partnership_goals,target_audience,monthly_budget_range,nil_acknowledgement,campaign_types,approval_contact,campaign_scope_approved,compliance_scope_approved,status,submitted_at,reviewed_at,review_notes").eq("brand_user_id", user.id).maybeSingle();
     if (request.error) throw new Error(request.error.message);
-    return NextResponse.json({ ok: true, onboardingCompleted: Boolean(profile.data.onboarding_completed), request: request.data ?? null });
+    const [details, workflow] = await Promise.all([
+      supabase.from("brand_partner_registration_details").select("formation_state,entity_type,entity_number,safety_answers,safeguarding_accepted").eq("brand_user_id", user.id).maybeSingle(),
+      request.data ? supabase.from("brand_partner_review_context").select("outcome,reason_code,public_message,updated_at").eq("request_id", request.data.id).maybeSingle() : Promise.resolve({ data: null, error: null }),
+    ]);
+    if (details.error || workflow.error) throw new Error("Verification details are temporarily unavailable.");
+    return NextResponse.json({ ok: true, onboardingCompleted: Boolean(profile.data.onboarding_completed), request: request.data ?? null, registrationDetails: details.data, workflow: workflow.data }, { headers: { "Cache-Control": "no-store, private" } });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Brand verification could not be loaded." }, { status: 400 });
   }
@@ -48,10 +54,15 @@ export async function POST(request: Request) {
     if (!contactName || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail) || !/^[+0-9() .-]{7,40}$/.test(contactPhone)) {
       return NextResponse.json({ error: "Save the main business contact name, email and telephone number before submitting verification." }, { status: 422 });
     }
-    const input = await request.json().catch(() => ({})) as { organizationName?: unknown; nilAcknowledged?: unknown };
+    const input = await request.json().catch(() => ({})) as { organizationName?: unknown; nilAcknowledged?: unknown; registration?: unknown };
     const organizationName = typeof input.organizationName === "string" ? input.organizationName.trim().slice(0, 240) : "";
     if (!organizationName) return NextResponse.json({ error: "Enter the legal organization name before submitting verification." }, { status: 422 });
     if (input.nilAcknowledged !== true) return NextResponse.json({ error: "Explicit NIL and compliance acknowledgement is required." }, { status: 422 });
+    let registration;
+    try { registration = parseRegistration(input.registration); }
+    catch (cause) { return NextResponse.json({ error: cause instanceof Error ? cause.message : "Business and safeguarding declarations required." }, { status: 422 }); }
+    const savedDetails = await supabase.from("brand_partner_registration_details").upsert({ brand_user_id: user.id, formation_state: registration.formationState, entity_type: registration.entityType, entity_number: registration.entityNumber, safety_answers: registration.safetyAnswers, safeguarding_accepted: registration.safeguardingAccepted, updated_at: new Date().toISOString() }, { onConflict: "brand_user_id" });
+    if (savedDetails.error) throw new Error("Business and safeguarding declarations could not be saved.");
     const evidence = buildBrandVerificationEvidence({
       ...onboarding,
       organization_name: organizationName,

@@ -25,14 +25,7 @@ create policy brand_document_events_admin_read on public.brand_verification_docu
 for select to authenticated using (exists (select 1 from public.profiles p where p.id=(select auth.uid()) and p.role in ('founder','admin')));
 
 -- A restrictive policy also closes any unrelated permissive bucket policies.
-drop policy if exists brand_evidence_owner_read on storage.objects;
 drop policy if exists brand_evidence_owner_delete on storage.objects;
-create policy brand_evidence_admin_only_read on storage.objects as restrictive
-for select to authenticated using (
- bucket_id <> 'brand-verification-evidence' or exists (
-  select 1 from public.profiles p where p.id=(select auth.uid()) and p.role in ('founder','admin')
- )
-);
 create policy brand_evidence_no_user_delete on storage.objects as restrictive
 for delete to authenticated using (bucket_id <> 'brand-verification-evidence');
 create policy brand_evidence_no_user_replace on storage.objects as restrictive

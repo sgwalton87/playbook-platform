@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import BrandReviewWorkflow from "@/components/brand/BrandReviewWorkflow";
+import VerificationCommunicationLog from "@/components/brand/VerificationCommunicationLog";
 import BrandVerificationDocumentLibrary from "@/components/brand/BrandVerificationDocumentLibrary";
 import { brandReviewDueAt } from "@/lib/brand-verification/documents";
 import BrandEvidenceReviewPanel from "@/components/brand/BrandEvidenceReviewPanel";
@@ -52,6 +54,7 @@ function displayValue(value: unknown) {
 
 export default function AdminPage() {
   const router = useRouter();
+  const [reviewNotice, setReviewNotice] = useState("");
   const [requests, setRequests] = useState<ReviewRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [forbidden, setForbidden] = useState(false);
@@ -170,6 +173,8 @@ export default function AdminPage() {
         <PlaybookMetric label="Role types" value={loading ? "…" : String(counts.roles)} />
       </PlaybookMetrics>
 
+      {reviewNotice && <p role="status" style={copy}>{reviewNotice}</p>}
+      <VerificationCommunicationLog />
       {error ? <div style={errorBox} role="alert">{error}</div> : null}
 
       {loading ? (
@@ -210,6 +215,7 @@ export default function AdminPage() {
 
                 {request.request_type === "brand-partner" && <BrandEvidenceReviewPanel requestId={request.request_id} onReviewed={reviewed => setReviewedDocuments(previous => ({ ...previous, [request.request_id]: reviewed }))} />}
 
+                {request.request_type === "brand-partner" ? <BrandReviewWorkflow requestId={request.request_id} documentsReviewed={Boolean(reviewedDocuments[request.request_id])} onComplete={message => { setReviewNotice(message); void load(); }} /> : <>
                 <label style={notesLabel}>
                   Decision reason
                   <textarea
@@ -231,6 +237,7 @@ export default function AdminPage() {
                   <button type="button" disabled={finalDecisionDisabled} onClick={() => void review(request, "rejected")} style={{ ...dangerButton, opacity: finalDecisionDisabled ? 0.55 : 1 }}>Reject</button>
                   <button type="button" disabled={approvalDisabled} onClick={() => void review(request, "approved")} style={{ ...primaryButton, opacity: approvalDisabled ? 0.55 : 1 }}>Approve</button>
                 </div>
+                </>}
               </PlaybookCard>
             );
           })}

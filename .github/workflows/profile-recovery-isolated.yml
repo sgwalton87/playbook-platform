@@ -69,16 +69,27 @@ jobs:
           import re
           import socket
           # Rewrite only the runner's disposable config, never a hosted project.
-          for old_port in range(54320, 54327):
-              new_port = old_port + 1100
-              contents, count = re.subn(rf"(?m)^(port|shadow_port|smtp_port|pop3_port) = {old_port}$",
-                                       lambda match: f"{match[1]} = {new_port}", contents)
-              if count != 1:
-                  raise SystemExit(f"Unexpected local port configuration for {old_port}")
-              with socket.socket() as listener:
-                  listener.bind(("127.0.0.1", new_port))
-          p.write_text(contents)
-          print("Disposable Supabase ports 55420–55426 checked available")
+          # SMTP/POP3 exposure must not collide with another service on the runner.
+          # Hold every probe open until all ports are chosen and check wildcard binds,
+          # matching Docker's host binding instead of checking loopback alone.
+          probes = []
+          chosen = []
+          try:
+              for old_port in range(54320, 54327):
+                  listener = socket.socket()
+                  listener.bind(("0.0.0.0", 0 if old_port in (54325, 54326) else old_port + 1100))
+                  probes.append(listener)
+                  new_port = listener.getsockname()[1]
+                  chosen.append(new_port)
+                  contents, count = re.subn(rf"(?m)^(port|shadow_port|smtp_port|pop3_port) = {old_port}$",
+                                           lambda match: f"{match[1]} = {new_port}", contents)
+                  if count != 1:
+                      raise SystemExit(f"Unexpected local port configuration for {old_port}")
+              p.write_text(contents)
+              print("Disposable Supabase ports checked available:", chosen)
+          finally:
+              for listener in probes:
+                  listener.close()
           PY
       - name: Start isolated local Supabase stack
         run: npx supabase start

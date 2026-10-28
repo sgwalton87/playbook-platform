@@ -1,0 +1,21 @@
+// @vitest-environment node
+import { beforeEach,afterEach,describe,expect,it,vi } from "vitest";
+import { ADDITIONAL_VERIFICATION_REASONS,DECLINE_REASONS,buildReviewMessage,buildVerificationEmail } from "@/lib/verification/templates";
+import { parseRegistration } from "@/lib/verification/registration";
+const mocks=vi.hoisted(()=>({send:vi.fn(),rpc:vi.fn()}));
+vi.mock("@/lib/email/emailService",()=>({sendPlaybookEmail:mocks.send}));
+import { dispatchReviewEmail } from "@/lib/verification/delivery";
+import type { createServerSupabaseClient } from "@/lib/supabase/server";
+const client={rpc:mocks.rpc} as unknown as Awaited<ReturnType<typeof createServerSupabaseClient>>;
+beforeEach(()=>{vi.resetAllMocks();for(const key of ["SMTP_HOST","SMTP_USER","SMTP_PASS"])vi.stubEnv(key,"test-only");mocks.rpc.mockImplementation(async(name:string)=>({data:name==="claim_brand_review_email"?{id:"message-id",claim_token:"lease",recipient_email:"partner@example.invalid",organization_name:"Example",outcome:"approved",public_message:"Public message"}:null,error:null}));mocks.send.mockResolvedValue({accepted:["partner@example.invalid"],messageId:"smtp-id"});});
+afterEach(()=>vi.unstubAllEnvs());
+describe("verification notification templates and delivery",()=>{
+ it("has exactly ten distinct additional-information reasons with useful corrective messages",()=>{expect(ADDITIONAL_VERIFICATION_REASONS).toHaveLength(10);expect(new Set(ADDITIONAL_VERIFICATION_REASONS.map(x=>x.id)).size).toBe(10);for(const reason of ADDITIONAL_VERIFICATION_REASONS)expect(buildReviewMessage("needs_information",reason.id,"")).toContain(reason.message);});
+ it("requires a real reason and includes a correction route in every decline",()=>{expect(()=>buildReviewMessage("needs_information","invalid","")).toThrow();for(const row of DECLINE_REASONS){const email=buildVerificationEmail({outcome:"rejected",organizationName:"Example",publicMessage:buildReviewMessage("rejected",row.id,"Verified issue"),communicationId:"id"});expect(email.text).toContain("reconsideration");expect(email.text).toContain("onboarding@playbookseriesinc.org");}});
+ it("escapes applicant content and links only to authenticated role entry",()=>{const email=buildVerificationEmail({outcome:"approved",organizationName:"<script>bad</script>",publicMessage:"Approved <img onerror=bad>",communicationId:"id"});expect(email.html).not.toContain("<script>");expect(email.html).toContain("&lt;img");expect(email.url).toBe("https://app.playbookseriesinc.org/login?next=%2Fbrand-partner-os");expect(email.text).not.toContain("admin rights");});
+ it("accepts a private-review declaration without automatically denying a business",()=>{const value=parseRegistration({formationState:"California",entityType:"Sole proprietor",entityNumber:"",safetyAnswers:{minors:"private_review",financial:"no",violence:"yes",pending:"private_review",restrictions:"no"},safeguardingAccepted:true});expect(value.safetyAnswers.pending).toBe("private_review");expect(()=>parseRegistration({})).toThrow();});
+ it("sends to the derived account recipient and records SMTP acceptance",async()=>{expect((await dispatchReviewEmail(client,"message-id")).status).toBe("sent");expect(mocks.send).toHaveBeenCalledWith(expect.objectContaining({to:"partner@example.invalid",fromType:"onboarding",replyToType:"onboarding",messageId:"<verification-message-id@playbookseriesinc.org>"}));expect(mocks.rpc).toHaveBeenCalledWith("finish_brand_review_email",expect.objectContaining({requested_status:"sent",requested_claim:"lease"}));});
+ it("keeps uncertain SMTP outcomes from being treated as safe automatic retries",async()=>{mocks.send.mockRejectedValue({code:"ETIMEDOUT"});expect((await dispatchReviewEmail(client,"message-id")).status).toBe("delivery_unknown");});
+ it("records a configuration failure without sending or undoing approval",async()=>{vi.stubEnv("SMTP_HOST","");expect((await dispatchReviewEmail(client,"message-id")).status).toBe("failed");expect(mocks.send).not.toHaveBeenCalled();});
+ it("does not resend a leased or sent message",async()=>{mocks.rpc.mockResolvedValue({data:null,error:null});expect((await dispatchReviewEmail(client,"message-id")).status).toBe("unchanged");expect(mocks.send).not.toHaveBeenCalled();});
+});
