@@ -4,10 +4,10 @@
 Implementation decision for the independent Brand Partner pathway.
 
 ## Role invariant
-Brand Partner remains a first-class `/brand-partner-os` experience. The existing Brand Partner workspace is preserved, but it is inaccessible until authority is proven.
+Brand Partner remains a first-class `/brand-partner-os` experience. The existing Brand Partner workspace is preserved, with a visible verification status while restricted capabilities await authority.
 
 ## Authority model
-Workspace activation requires all three:
+Restricted Brand Partner capabilities require all three:
 1. approved organization identity;
 2. approved campaign scope; and
 3. approved compliance scope.
@@ -21,14 +21,14 @@ Onboarding evidence includes organization, title/category, partnership goals, ta
 Organization identity review is governed by the stored Founder/Admin role and the canonical `/api/admin/verification` reviewer functions. Self-approval is denied. Campaign and compliance scopes remain separate approvals; organization identity review does not grant either scope.
 
 ## Protected capabilities
-Until all three gates are satisfied, the preserved Brand Partner workspace does not render. Campaign creation, opportunity publication, Scholar interaction, athlete-facing NIL activity, application review, and partner messaging remain unavailable from Brand Partner OS.
+The role dashboard remains visible while verification is pending. Until all three gates are satisfied, restricted operations remain unavailable. Campaign creation, opportunity publication, Scholar interaction, athlete-facing NIL activity, application review, and partner messaging remain unavailable from Brand Partner OS.
 
 ## Definition of done for this package
 - Brand evidence persists in an owner-scoped request.
 - Campaign and compliance approvals are stored separately from identity status.
 - Only the authenticated Brand Partner can submit/read/update pending evidence and cannot set approval fields.
-- Existing Brand Partner UI is preserved behind the specialized gate.
-- All three authority gates are required before workspace rendering.
+- Existing Brand Partner UI is preserved with verification status and independent backend capability checks.
+- All three authority gates are required before restricted role operations.
 
 ## Admin document review wiring — October 28, 2026
 
@@ -38,7 +38,7 @@ Stored `profiles.role` values `founder` and `admin` establish platform reviewer 
 
 From Founder Dashboard → Open Verification Review, or Verification Review in navigation, select **Open submitted evidence** on a Brand Partner request. The API uses the guarded admin document library and lists retained private files in `brand-verification-evidence`. File links use a stable authenticated dashboard endpoint with private/no-store responses. Every open checks the current admin role; documents and links have no review-time expiration. Public organization profiles do not expose these documents.
 
-Approval requires a document review acknowledgement and decision reason in the dashboard. The API and database independently require stored evidence before identity approval; identity approval does not approve campaign or compliance scopes. Queue and decision authorization, self-review denial, and decision audit history remain governed by the existing reviewer functions.
+Approval requires a document review acknowledgement and decision reason in the dashboard. The API and database independently require stored evidence before identity approval; the combined approval action additionally requires explicit campaign and compliance scope acknowledgements before activating those flags. Queue and decision authorization, self-review denial, and decision audit history remain governed by the existing reviewer functions.
 
 Hosted inspection on October 28 found one private document associated with a pending Brand Partner request and no accounts whose stored role was `admin` or `founder`. A specifically designated reviewer account must be provisioned before a real signed-in reviewer acceptance run can be completed. No roles are granted by this change. The new retention migration must be released with the matching application APIs.
 

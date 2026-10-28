@@ -1,13 +1,13 @@
 import { generateText, isStepCount } from "ai";
 import { gateway } from "@ai-sdk/gateway";
 import { registryForState } from "./stateRegistries";
-export type RegistryLookup = { status: "candidates_found" | "research_available" | "no_match" | "unavailable"; source: string; checkedAt: string; summary: string; candidates: Array<{ name: string; entityNumber: string; standing: string }>; sources: Array<{ url: string; title: string }>; humanReviewRequired: true };
+export type RegistryLookup = { status: "candidates_found" | "research_available" | "no_match" | "unavailable"; source: string; checkedAt: string; summary: string; candidates: Array<{ name: string; entityNumber: string; standing: string }>; sources: Array<{ url: string; title: string }>; humanReviewRequired: true; confidenceScore: number; confidenceBasis: string; model: string | null };
 function allowedUrl(value: string, host: string) {
  try { const u = new URL(value); return u.protocol === "https:" && (u.hostname === host || u.hostname.endsWith(`.${host}`)); } catch { return false; }
 }
 export async function lookupBusiness(input: { organizationName: string; formationState: string; entityNumber: string }) : Promise<RegistryLookup> {
  const office = registryForState(input.formationState);
- const base: RegistryLookup = { status: "unavailable", source: office?.url ?? "https://www.nass.org/business-services/corporate-registration", checkedAt: new Date().toISOString(), summary: "Open the official state registry and verify the legal name, entity number and current status. Search availability does not determine approval.", candidates: [], sources: [], humanReviewRequired: true };
+ const base: RegistryLookup = { status: "unavailable", source: office?.url ?? "https://www.nass.org/business-services/corporate-registration", checkedAt: new Date().toISOString(), summary: "Open the official state registry and verify the legal name, entity number and current status. Search availability does not determine approval.", candidates: [], sources: [], humanReviewRequired: true, confidenceScore: 0, confidenceBasis: "No usable record evidence; human verification required. Scores are conservative evidence-quality indicators, not calibrated probabilities or approval recommendations.", model: null };
  if (!office) return { ...base, summary: "This jurisdiction requires a manual official-registry or alternative-evidence review." };
  if (input.formationState === "California" && process.env.CA_SOS_API_KEY) {
   try {
@@ -18,7 +18,7 @@ export async function lookupBusiness(input: { organizationName: string; formatio
    const raw = await response.json() as Record<string, unknown>;
    const data = Array.isArray(raw.EntityData) ? raw.EntityData : typeof raw.EntityID === "string" ? [raw] : [];
    const candidates = data.filter((row): row is Record<string, unknown> => Boolean(row && typeof row === "object")).slice(0, 20).map(row => ({ name: String(row.EntityName ?? ""), entityNumber: String(row.EntityID ?? ""), standing: String(row.StatusDescription ?? "Unknown") }));
-   return { ...base, status: candidates.length ? "candidates_found" : "no_match", candidates, summary: candidates.length ? "Official California API candidates found. Compare the exact legal name, identifier and current status before recording a human determination." : "No match returned. Check spelling, jurisdiction and whether this business structure uses local filings instead.", sources: [{ url: url.toString(), title: "California Secretary of State public search API" }] };
+   return { ...base, status: candidates.length ? "candidates_found" : "no_match", confidenceScore: candidates.length ? 0.6 : 0, confidenceBasis: "Official API candidate facts; identity, current standing, authority and suitability still require human verification. Not an approval probability.", candidates, summary: candidates.length ? "Official California API candidates found. Compare the exact legal name, identifier and current status before recording a human determination." : "No match returned. Check spelling, jurisdiction and whether this business structure uses local filings instead.", sources: [{ url: url.toString(), title: "California Secretary of State public search API" }] };
   } catch { return base; }
  }
  if (!process.env.AI_GATEWAY_API_KEY && !process.env.VERCEL_OIDC_TOKEN) return { ...base, summary: "AI search is unavailable in this environment. Use the official registry link. California's documented API also requires a subscription key." };
@@ -41,6 +41,6 @@ export async function lookupBusiness(input: { organizationName: string; formatio
     if (!sources.some(s => s.url === candidate.url)) sources.push({ url: candidate.url, title: "title" in candidate && typeof candidate.title === "string" ? candidate.title : "Official source" });
    }
   }
-  return sources.length ? { ...base, status: "research_available", sources: sources.slice(0,10), summary: `AI research aid — human confirmation required.\n${result.text.slice(0,6000)}` } : { ...base, summary: "No usable official-source evidence was returned. Open the state registry and complete a manual check. This is not a finding of nonregistration." };
+  return sources.length ? { ...base, status: "research_available", confidenceScore: 0.25, confidenceBasis: "Unverified AI summary with official-domain sources. Low provisional evidence confidence; not a registration or safety determination.", model: process.env.REGISTRY_AI_MODEL || "openai/gpt-5.4-mini", sources: sources.slice(0,10), summary: `AI research aid — human confirmation required.\n${result.text.slice(0,6000)}` } : { ...base, summary: "No usable official-source evidence was returned. Open the state registry and complete a manual check. This is not a finding of nonregistration." };
  } catch { return { ...base, summary: "AI search could not complete. Open the official registry; access, credits, rate limits or search restrictions may require manual review." }; }
 }

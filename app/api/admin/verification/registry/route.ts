@@ -14,6 +14,8 @@ export async function POST(request: NextRequest) {
  if (body.action === "lookup") {
   if (!details.registration) return NextResponse.json({ error: "The applicant must provide registration details first." }, { status: 422 });
   const result = await lookupBusiness({ organizationName: details.organizationName, formationState: details.registration.formation_state, entityNumber: details.registration.entity_number });
+  const recorded = await supabase.rpc("record_brand_registry_research",{requested_id:body.requestId,requested_result:result});
+  if(recorded.error)return NextResponse.json({error:"Research could not be recorded. Use the official registry and record a human determination."},{status:503});
   return NextResponse.json(result, { headers: { "Cache-Control": "no-store, private" } });
  }
  if (!["needs_review", "matched_active", "alternative_verified", "confirmed_issue"].includes(String(body.humanOutcome)) || typeof body.sourceUrl !== "string" || typeof body.note !== "string" || !body.note.trim() || body.note.length > 4000) return NextResponse.json({ error: "Human outcome, official source and review note required." }, { status: 400 });

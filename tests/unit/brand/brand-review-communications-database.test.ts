@@ -38,6 +38,7 @@ afterAll(async()=>{await db.close();});
 describe.sequential('governed review decisions and durable communication outbox',()=>{
  it('rejects owners and spoofed admin profile modes before exposing private notes or comms',async()=>{
   await actor(1);await expect(db.query('select public.get_brand_review_context($1)',[id(30)])).rejects.toThrow('reviewer authority');
+  await expect(db.query('select public.record_brand_registry_research($1,$2)',[id(30),{status:'unavailable'}])).rejects.toThrow('reviewer authority');
   await expect(decide('approved','',40)).rejects.toThrow('reviewer authority');
   await expect(db.query('select * from public.verification_communications')).rejects.toThrow('permission');
   await actor(3);await expect(db.query('select public.list_brand_review_communications()')).rejects.toThrow('reviewer authority');

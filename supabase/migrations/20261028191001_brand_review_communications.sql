@@ -276,3 +276,22 @@ begin
 end;$$;
 revoke all on function private.guard_brand_registration_change() from public,anon,authenticated;
 create trigger brand_registration_change_guard before insert or update on public.brand_partner_registration_details for each row execute function private.guard_brand_registration_change();
+
+-- Derived registry research is traceable and separate from the human determination.
+create table public.brand_registry_research_events (
+ id uuid primary key default gen_random_uuid(),request_id uuid not null references public.brand_partner_verification_requests(id),
+ actor_id uuid not null references public.profiles(id),result jsonb not null,created_at timestamptz not null default now()
+);
+alter table public.brand_registry_research_events enable row level security;
+revoke all on public.brand_registry_research_events from public,anon,authenticated;
+grant select on public.brand_registry_research_events to authenticated;
+create policy brand_research_reviewer_read on public.brand_registry_research_events for select to authenticated using(private.current_user_is_verification_reviewer());
+create function private.record_brand_registry_research(requested_id uuid,requested_result jsonb) returns void language plpgsql security definer set search_path='' as $$
+begin
+ if not private.current_user_is_verification_reviewer() or exists(select 1 from public.brand_partner_verification_requests where id=requested_id and brand_user_id=auth.uid()) then raise exception 'Independent reviewer authority required' using errcode='42501'; end if;
+ if pg_column_size(requested_result)>50000 or jsonb_typeof(requested_result)<>'object' then raise exception 'Bounded research object required' using errcode='22023'; end if;
+ insert into public.brand_registry_research_events(request_id,actor_id,result) values(requested_id,auth.uid(),requested_result);
+end;$$;
+create function public.record_brand_registry_research(requested_id uuid,requested_result jsonb) returns void language sql security invoker set search_path='' as $$select private.record_brand_registry_research(requested_id,requested_result);$$;
+revoke all on function private.record_brand_registry_research(uuid,jsonb),public.record_brand_registry_research(uuid,jsonb) from public,anon,authenticated;
+grant execute on function private.record_brand_registry_research(uuid,jsonb),public.record_brand_registry_research(uuid,jsonb) to authenticated;

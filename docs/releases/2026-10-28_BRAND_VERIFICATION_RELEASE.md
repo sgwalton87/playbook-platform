@@ -22,7 +22,7 @@ Reviewer determinations bind to the exact registration timestamp reviewed; appli
 
 ## Official registry and AI assistance
 
-California's documented CALICO public search API uses `CA_SOS_API_KEY` and fixed official endpoints. The state directory derives from NASS corporate-registration links. Optional Vercel AI Gateway research uses official-domain search, a bounded two-step call and public business name/jurisdiction/entity number only. The UI presents official links, candidate facts, a timestamp and human-review requirement. No usable source, missing credentials, provider errors, no search match or an inaccessible registry never becomes an adverse finding.
+California's documented CALICO public search API uses `CA_SOS_API_KEY` and fixed official endpoints. The state directory derives from NASS corporate-registration links. Optional Vercel AI Gateway research uses official-domain search, a bounded two-step call and public business name/jurisdiction/entity number only. The UI presents official links, candidate facts, a timestamp and human-review requirement. Derived research is logged separately with model, timestamp, source URLs and a conservative internal evidence-confidence score (not a calibrated approval probability), as required by PPS-005. No usable source, missing credentials, provider errors, no search match or an inaccessible registry never becomes an adverse finding.
 
 Official API onboarding/key: https://calicodev.sos.ca.gov/content/California%20SOS%20BE%20Public%20Search%20API%20Guide%20v1.0.4.pdf
 Registry scope and alternative California records: https://www.sos.ca.gov/business-programs/business-entities/information-requests
