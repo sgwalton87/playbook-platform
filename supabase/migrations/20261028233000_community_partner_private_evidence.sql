@@ -45,6 +45,7 @@ begin
  end if;
  return new;
 end $$;
+revoke all on function private.require_community_partner_evidence_before_approval() from public, anon, authenticated;
 drop trigger if exists require_community_partner_evidence_before_approval on public.community_partner_verification_requests;
 create trigger require_community_partner_evidence_before_approval
 before update of status,service_scope_status on public.community_partner_verification_requests
