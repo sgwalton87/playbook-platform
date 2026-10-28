@@ -39,7 +39,7 @@ export async function PUT(request: Request) {
     for (const url of [draft.website, draft.logo]) {
       if (url && !/^https?:\/\//i.test(url)) return NextResponse.json({ error: "URLs must begin with https:// or http://" }, { status: 400 });
     }
-    if (!draft.contactName || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(draft.contactEmail) || !/^[+0-9() .-]{7,40}$/.test(draft.contactPhone)) return NextResponse.json({ error: "Main contact name, valid email address, and telephone number are required." }, { status: 422 });
+    // Partial profile drafts must remain saveable even when the contact section is unfinished.\n    // Completion is enforced when evidence is submitted for verification.\n    if ((draft.contactEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(draft.contactEmail)) ||\n        (draft.contactPhone && !/^[+0-9() .-]{7,40}$/.test(draft.contactPhone))) return NextResponse.json({ error: "Enter a valid contact email and telephone number." }, { status: 422 });
     const existing = (ctx.profile!.onboarding_data ?? {}) as Record<string, unknown>;
     const savedAt = new Date().toISOString();
     const updated = await ctx.supabase!.from("profiles").update({
