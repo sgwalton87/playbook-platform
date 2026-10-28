@@ -272,6 +272,11 @@ test(`${role}: ${fullFields ? "full-field" : "core"} registration, email verific
     }
   } finally {
     for (const id of ids) {
+      // Retained verification acknowledgements deliberately block account deletion.
+      // This test is hard-limited above to a disposable localhost stack. Keep this
+      // fixture until the workflow destroys that entire stack; never weaken the
+      // production retention constraints to make synthetic cleanup succeed.
+      if (role === "brand-partner") continue;
       const result = await admin.auth.admin.deleteUser(id);
       if (result.error) throw Error("Isolated signup test account cleanup failed");
     }
