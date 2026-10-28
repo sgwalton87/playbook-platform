@@ -18,3 +18,22 @@ create policy "brand_evidence_owner_read" on storage.objects for select to authe
 using (bucket_id='brand-verification-evidence' and (storage.foldername(name))[1]=(select auth.uid())::text);
 create policy "brand_evidence_owner_delete" on storage.objects for delete to authenticated
 using (bucket_id='brand-verification-evidence' and (storage.foldername(name))[1]=(select auth.uid())::text);
+
+-- Public-facing organization logos are distinct from private verification evidence.
+insert into storage.buckets (id,name,public,file_size_limit,allowed_mime_types)
+values ('brand-organization-logos','brand-organization-logos',true,3145728,
+  array['image/png','image/jpeg','image/webp'])
+on conflict (id) do update set public=true,file_size_limit=3145728,
+  allowed_mime_types=excluded.allowed_mime_types;
+
+create policy "brand_logo_owner_insert" on storage.objects for insert to authenticated
+with check (
+ bucket_id='brand-organization-logos'
+ and (storage.foldername(name))[1]=(select auth.uid())::text
+ and exists (select 1 from public.profiles p where p.id=(select auth.uid())
+   and coalesce(p.profile_mode,p.role::text)='brand-partner')
+);
+create policy "brand_logo_owner_read" on storage.objects for select to authenticated
+using (bucket_id='brand-organization-logos' and (storage.foldername(name))[1]=(select auth.uid())::text);
+create policy "brand_logo_owner_delete" on storage.objects for delete to authenticated
+using (bucket_id='brand-organization-logos' and (storage.foldername(name))[1]=(select auth.uid())::text);
