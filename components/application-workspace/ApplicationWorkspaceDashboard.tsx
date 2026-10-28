@@ -59,7 +59,7 @@ export default function ApplicationWorkspaceDashboard() {
     return () => { live = false; };
   }, []);
 
-  useEffect(() => { const query = new URLSearchParams(window.location.search); const selectedId = query.get("opportunityId"); const selectedName = query.get("opportunityName");
+  useEffect(() => { if (access !== "allowed") return; const query = new URLSearchParams(window.location.search); const selectedId = query.get("opportunityId"); const selectedName = query.get("opportunityName");
     const selectedType = query.get("opportunityType"); const selectedDeadline = query.get("deadline"); const initialize = window.setTimeout(() => {
       if (selectedName) setName(selectedName); if (selectedId) setOpportunityId(selectedId); if (selectedDeadline && /^\d{4}-\d{2}-\d{2}$/.test(selectedDeadline)) setDeadline(selectedDeadline);
       if (selectedType && ["college", "scholarship", "internship", "job", "recruiting", "nil", "mentor", "mentorship", "sponsorship", "career", "summer_program", "competition", "grant", "volunteer", "research"].includes(selectedType)) setType(selectedType);
@@ -68,7 +68,7 @@ export default function ApplicationWorkspaceDashboard() {
     void Promise.all([fetchWorkspaces(), fetchMarketplaceShares()]).then(([body, shareRows]) => { if (!active) return; setWorkspaces(body.workspaces ?? []); setShares(shareRows.available ? shareRows.shares : {}); setSharingAvailable(shareRows.available);
       setMessage((body.workspaces ?? []).length ? "Application workspaces loaded." : "No application workspace yet. Start with an opportunity below.");
     }).catch(value => { if (active) setError(value instanceof Error ? value.message : "Unable to load application workspaces."); });
-    return () => { active = false; window.clearTimeout(initialize); }; }, []);
+    return () => { active = false; window.clearTimeout(initialize); }; }, [access]);
 
   async function refresh() { const [body, shareRows] = await Promise.all([fetchWorkspaces(), fetchMarketplaceShares()]); setWorkspaces(body.workspaces ?? []); setShares(shareRows.available ? shareRows.shares : {}); setSharingAvailable(shareRows.available);
     setMessage((body.workspaces ?? []).length ? "Application workspaces loaded." : "No application workspace yet. Start with an opportunity below."); }
