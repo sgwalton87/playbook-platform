@@ -85,8 +85,17 @@ export async function POST() {
           requested_message_id: null,
         });
       }
+    } else if (!claim.error && claim.data) {
+      notificationStatus = "failed";
+      await supabase.rpc("finish_own_community_verification_notice", {
+        requested_id: result.data.id, requested_claim: claim.data, requested_status: "failed",
+        requested_error: "SMTP transport not configured; reviewer queue remains available.",
+        requested_message_id: null,
+      });
     } else if (claim.error) {
       notificationStatus = "queue_unavailable";
+    } else {
+      notificationStatus = "unchanged";
     }
     return NextResponse.json({
       ok: true,
