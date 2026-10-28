@@ -24,6 +24,7 @@ beforeAll(async () => {
     create policy broad_legacy_mutation on storage.objects for all to authenticated using(true) with check(true);
     create table public.brand_partner_verification_requests(id uuid primary key,brand_user_id uuid,organization_name text,status text,submitted_at timestamptz);
   `);
+  await db.exec("create table public.verification_community_consents(user_id uuid,policy_version text);grant select on public.verification_community_consents to authenticated;");
   await db.exec(migration);
  await db.exec(readFileSync('supabase/migrations/20261028192445_brand_document_admin_read_cutover.sql','utf8'));
   await db.exec(`create trigger brand_evidence_before_approval before insert or update of status on public.brand_partner_verification_requests for each row execute function private.require_brand_partner_evidence_before_approval();

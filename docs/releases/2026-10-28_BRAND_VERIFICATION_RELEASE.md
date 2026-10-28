@@ -14,6 +14,12 @@ Reviewers select one of ten additional-information reasons, or a decline reason,
 
 A sender lease prevents concurrent duplicate sends; repeated action IDs replay the same committed communication. SMTP acceptance is logged separately from verified inbox delivery. Known failures can be retried by admins; uncertain acceptance is not blindly retried. Notes and communication history remain available after review closes. No existing constituent is approved and no live email is sent as a deployment test.
 
+## Community introduction and consent
+
+Four progressive modules explain vetting, future Scholar/Scholar-Athlete/family/institution connections, review steps and the ongoing community standard. Before document upload the applicant explicitly acknowledges `playbook-safety-v2-20261028`; the server records an append-only timestamp and the upload policy and approval trigger enforce it. The shared all-role onboarding agreement and terms also explain suspension, removal and tool-access revocation for harmful conduct. Existing approved partners are not silently re-decided. This notice reserves enforcement rights; it does not introduce a new universal account-ban service.
+
+Reviewer determinations bind to the exact registration timestamp reviewed; applicant edits serialize with approval and invalidate earlier eligibility. The isolated Brand Partner journey completes all modules, declarations and acknowledgement before submission.
+
 ## Official registry and AI assistance
 
 California's documented CALICO public search API uses `CA_SOS_API_KEY` and fixed official endpoints. The state directory derives from NASS corporate-registration links. Optional Vercel AI Gateway research uses official-domain search, a bounded two-step call and public business name/jurisdiction/entity number only. The UI presents official links, candidate facts, a timestamp and human-review requirement. No usable source, missing credentials, provider errors, no search match or an inaccessible registry never becomes an adverse finding.

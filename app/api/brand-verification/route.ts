@@ -1,3 +1,4 @@
+import { COMMUNITY_POLICY_VERSION } from "@/lib/trust/communityStandards";
 import { parseRegistration } from "@/lib/verification/registration";
 import { NextResponse } from "next/server";
 import { buildBrandVerificationEvidence } from "@/lib/brand-verification/policy";
@@ -41,6 +42,9 @@ export async function POST(request: Request) {
     if (previous.data?.status === "approved") {
       return NextResponse.json({ error: "Approved verification cannot be replaced by self-service resubmission." }, { status: 409 });
     }
+    const consent = await supabase.from("verification_community_consents").select("accepted_at").eq("user_id",user.id).eq("policy_version",COMMUNITY_POLICY_VERSION).maybeSingle();
+    if (consent.error) return NextResponse.json({error:"Community agreement status unavailable."},{status:503});
+    if (!consent.data) return NextResponse.json({error:"Review and acknowledge the community standards before submitting documents."},{status:422});
     const uploaded = await supabase.rpc("get_own_brand_verification_documents");
     if (uploaded.error) return NextResponse.json({ error: "Business documentation could not be verified. Try again." }, { status: 503 });
     const hasEvidence = (uploaded.data ?? []).some((item: { name: string; archived: boolean }) => !item.archived && /^(letterhead|business-card)-[a-f0-9-]+\.(pdf|png|jpg|webp)$/.test(item.name));

@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ADDITIONAL_VERIFICATION_REASONS, DECLINE_REASONS, buildReviewMessage, type ReviewOutcome } from "@/lib/verification/templates";
 import { SAFEGUARDING_QUESTIONS } from "@/lib/verification/safeguarding";
 import type { RegistryLookup } from "@/lib/verification/registry";
-type Context = { registration?: { formation_state: string; entity_type: string; entity_number: string; safety_answers: Record<string,string> }; registry?: { human_outcome: string; source_url: string; review_note: string; safety_reviewed: boolean } };
+type Context = { registration?: { updated_at?: string; formation_state: string; entity_type: string; entity_number: string; safety_answers: Record<string,string> }; registry?: { human_outcome: string; source_url: string; review_note: string; safety_reviewed: boolean } };
 export default function BrandReviewWorkflow({ requestId, documentsReviewed, onComplete }: { requestId: string; documentsReviewed: boolean; onComplete: (message: string) => void }) {
  const [context, setContext] = useState<Context | null>(null);
  const [outcome, setOutcome] = useState<ReviewOutcome>("needs_information");
@@ -27,7 +27,7 @@ export default function BrandReviewWorkflow({ requestId, documentsReviewed, onCo
  async function registryAction(action: "lookup" | "save") {
   setBusy(true); setNotice("");
   try {
-   const response = await fetch("/api/admin/verification/registry", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action, requestId, humanOutcome, sourceUrl, note: registryNote, safetyReviewed }) });
+   const response = await fetch("/api/admin/verification/registry", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action, requestId, humanOutcome, sourceUrl, note: registryNote, safetyReviewed, expectedRegistrationUpdatedAt: context?.registration?.updated_at }) });
    const body = await response.json(); if (!response.ok) throw new Error(body.error || "Registry operation failed.");
    if (action === "lookup") { setLookup(body); if (!sourceUrl) setSourceUrl(body.source || ""); }
    else { await load(); setNotice("Human registration and safeguarding review saved."); }

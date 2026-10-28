@@ -1,3 +1,26 @@
+-- Versioned, append-only acknowledgement: never inferred from an upload or role.
+create table public.verification_community_consents (
+ user_id uuid not null references public.profiles(id), policy_version text not null,
+ accepted_at timestamptz not null default now(), primary key(user_id,policy_version)
+);
+alter table public.verification_community_consents enable row level security;
+revoke all on public.verification_community_consents from public,anon,authenticated;
+grant select on public.verification_community_consents to authenticated;
+create policy community_consent_own_read on public.verification_community_consents for select to authenticated using(user_id=(select auth.uid()));
+create function private.accept_verification_community_policy(requested_version text) returns timestamptz language plpgsql security definer set search_path='' as $$
+declare recorded_at timestamptz;
+begin
+ if auth.uid() is null or not exists(select 1 from public.profiles where id=auth.uid()) then raise exception 'Registered account required' using errcode='42501'; end if;
+ if requested_version is distinct from 'playbook-safety-v2-20261028' then raise exception 'Current policy acknowledgement required' using errcode='22023'; end if;
+ insert into public.verification_community_consents(user_id,policy_version) values(auth.uid(),requested_version) on conflict do nothing;
+ select accepted_at into recorded_at from public.verification_community_consents where user_id=auth.uid() and policy_version=requested_version;
+ return recorded_at;
+end;$$;
+create function public.accept_verification_community_policy(requested_version text) returns timestamptz language sql security invoker set search_path='' as $$select private.accept_verification_community_policy(requested_version);$$;
+revoke all on function private.accept_verification_community_policy(text) from public,anon,authenticated;
+revoke all on function public.accept_verification_community_policy(text) from public,anon,authenticated;
+grant execute on function private.accept_verification_community_policy(text),public.accept_verification_community_policy(text) to authenticated;
+
 -- Human verification decisions, private notes and durable communication outbox.
 create table public.brand_partner_registration_details (
  brand_user_id uuid primary key references public.profiles(id) on delete cascade,
@@ -85,10 +108,15 @@ end;$$;
 create function private.record_brand_registry_review(requested_id uuid, requested_result jsonb) returns void language plpgsql security definer set search_path='' as $$
 begin
  if auth.uid() is null or not private.current_user_is_verification_reviewer() then raise exception 'Verification reviewer authority required' using errcode='42501'; end if;
- if not exists(select 1 from public.brand_partner_verification_requests r where r.id=requested_id) then raise exception 'Request not found' using errcode='P0002'; end if;
+ perform 1 from public.brand_partner_verification_requests r where r.id=requested_id for update;
+ if not found then raise exception 'Request not found' using errcode='P0002'; end if;
  if coalesce(requested_result->>'human_outcome','') not in ('needs_review','matched_active','alternative_verified','confirmed_issue')
  or length(coalesce(requested_result->>'source_url','')) not between 8 and 2000
  or length(coalesce(requested_result->>'review_note','')) not between 1 and 4000 then raise exception 'Official source and human review note required' using errcode='22023'; end if;
+ if (requested_result->>'human_outcome' in ('matched_active','alternative_verified') or requested_result->>'safety_reviewed'='true') and not exists(
+  select 1 from public.brand_partner_registration_details d join public.brand_partner_verification_requests r on r.brand_user_id=d.brand_user_id
+  where r.id=requested_id and d.updated_at=(requested_result->>'registration_updated_at')::timestamptz
+ ) then raise exception 'Declarations changed; reload and review the current answers' using errcode='23514'; end if;
  insert into public.verification_internal_notes(request_id,actor_id,note) values(requested_id,auth.uid(),'Registration/safeguarding determination: '||(requested_result->>'human_outcome')||E'\n'||(requested_result->>'review_note'));
  insert into public.brand_partner_registry_reviews(request_id,result,reviewer_id) values(requested_id,requested_result,auth.uid())
  on conflict(request_id) do update set result=excluded.result,reviewer_id=auth.uid(),updated_at=now();
@@ -102,6 +130,7 @@ begin
    and d.safety_answers->>'financial' in ('no','yes','private_review') and d.safety_answers->>'violence' in ('no','yes','private_review')
    and d.safety_answers->>'pending' in ('no','yes','private_review') and d.safety_answers->>'restrictions' in ('no','yes','private_review')) then
    raise exception 'Business registration and safeguarding declarations are required before approval' using errcode='23514'; end if;
+  if not exists(select 1 from public.verification_community_consents c where c.user_id=new.brand_user_id and c.policy_version='playbook-safety-v2-20261028') then raise exception 'Current community standards acknowledgement required before approval' using errcode='23514'; end if;
   if not exists(select 1 from public.brand_partner_registry_reviews v where v.request_id=new.id
    and v.result->>'human_outcome' in ('matched_active','alternative_verified') and v.result->>'safety_reviewed'='true') then
    raise exception 'Human registration and safeguarding review are required before approval' using errcode='23514'; end if;
@@ -129,8 +158,8 @@ begin
  if subject_id=auth.uid() then raise exception 'Self review is not permitted' using errcode='42501'; end if;
  if requested_outcome not in ('under_review','needs_information','approved','rejected') or length(trim(coalesce(requested_message,''))) not between 1 and 4000
  or length(coalesce(requested_private_note,''))>4000 then raise exception 'Invalid review message' using errcode='22023'; end if;
- if requested_outcome='needs_information' and requested_reason not in ('missing_document','unreadable_document','legal_name_mismatch','registration_details','registry_not_matched','standing_clarification','representative_authority','contact_mismatch','safeguarding_clarification','campaign_scope') then raise exception 'Additional verification reason required' using errcode='22023'; end if;
- if requested_outcome='rejected' and requested_reason not in ('registration_not_established','identity_not_established','authority_not_established','safeguarding_not_met','unsupported_activity','material_inconsistency') then raise exception 'Decline reason required' using errcode='22023'; end if;
+ if requested_outcome='needs_information' and coalesce(requested_reason,'') not in ('missing_document','unreadable_document','legal_name_mismatch','registration_details','registry_not_matched','standing_clarification','representative_authority','contact_mismatch','safeguarding_clarification','campaign_scope') then raise exception 'Additional verification reason required' using errcode='22023'; end if;
+ if requested_outcome='rejected' and coalesce(requested_reason,'') not in ('registration_not_established','identity_not_established','authority_not_established','safeguarding_not_met','unsupported_activity','material_inconsistency') then raise exception 'Decline reason required' using errcode='22023'; end if;
  if requested_outcome='approved' and not(coalesce(requested_documents_reviewed,false) and coalesce(requested_campaign_scope,false) and coalesce(requested_compliance_scope,false)) then raise exception 'Explicit document, campaign and compliance review required' using errcode='23514'; end if;
  select u.email into recipient from auth.users u where u.id=subject_id;
  if recipient is null then raise exception 'Verified account email unavailable' using errcode='23514'; end if;
@@ -235,3 +264,15 @@ end;$$;
 revoke all on function private.invalidate_brand_review_eligibility() from public,anon,authenticated;
 create trigger brand_declarations_changed after update on public.brand_partner_registration_details for each row execute function private.invalidate_brand_review_eligibility();
 create trigger brand_submission_changed after update of submitted_at on public.brand_partner_verification_requests for each row execute function private.invalidate_brand_review_eligibility();
+
+-- Serialize applicant edits with reviewer decisions. A stale owner write cannot
+-- commit after approval merely because its RLS snapshot was taken earlier.
+create function private.guard_brand_registration_change() returns trigger language plpgsql security definer set search_path='' as $$
+declare current_status text;
+begin
+ select r.status into current_status from public.brand_partner_verification_requests r where r.brand_user_id=new.brand_user_id for update;
+ if current_status='approved' then raise exception 'Approved registration requires a new governed review before changes' using errcode='23514'; end if;
+ return new;
+end;$$;
+revoke all on function private.guard_brand_registration_change() from public,anon,authenticated;
+create trigger brand_registration_change_guard before insert or update on public.brand_partner_registration_details for each row execute function private.guard_brand_registration_change();

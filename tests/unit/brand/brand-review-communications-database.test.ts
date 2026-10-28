@@ -29,9 +29,10 @@ beforeAll(async()=>{
  const legacy=readFileSync('supabase/migrations/202608160052_verification_review_definer_surface_hardening.sql','utf8');
  const start=legacy.indexOf('create or replace function private.review_verification_request(');await db.exec(legacy.slice(start,legacy.indexOf('$$;',start)+3));
  await db.exec(readFileSync('supabase/migrations/20261028184949_brand_verification_admin_archive.sql','utf8'));
- await db.exec(readFileSync('supabase/migrations/20261028192445_brand_document_admin_read_cutover.sql','utf8'));
  await db.exec(`create trigger brand_evidence_before_approval before insert or update of status on public.brand_partner_verification_requests for each row execute function private.require_brand_partner_evidence_before_approval();`);
  await db.exec(readFileSync('supabase/migrations/20261028191001_brand_review_communications.sql','utf8'));
+ await db.exec(readFileSync('supabase/migrations/20261028192445_brand_document_admin_read_cutover.sql','utf8'));
+
 },30000);
 afterAll(async()=>{await db.close();});
 describe.sequential('governed review decisions and durable communication outbox',()=>{
@@ -44,6 +45,10 @@ describe.sequential('governed review decisions and durable communication outbox'
  it('requires declarations and human resolution before approval, without changing role or sending mail',async()=>{
   await actor(2);await expect(decide('approved','',40)).rejects.toThrow('declarations');
   await actor(1);await db.query(`insert into public.brand_partner_registration_details values($1,'California','LLC','123','{"minors":"no","financial":"no","violence":"yes","pending":"private_review","restrictions":"no"}',true,now())`,[id(1)]);
+  await actor(2);await expect(decide('approved','',40)).rejects.toThrow('community standards');
+  await actor(1);await expect(db.query("select public.accept_verification_community_policy('old')")).rejects.toThrow('Current policy');
+  await db.query("select public.accept_verification_community_policy('playbook-safety-v2-20261028')");
+  await expect(db.query("delete from public.verification_community_consents")).rejects.toThrow('permission');
   await actor(2);await expect(decide('approved','',40)).rejects.toThrow('Human registration');
  });
  it('records a specific additional-information message and separate private notes atomically; retries are idempotent',async()=>{
@@ -57,7 +62,8 @@ describe.sequential('governed review decisions and durable communication outbox'
  });
  it('requires explicit document and scope checks, then activates only the existing role and queues invitation',async()=>{
   await actor(2);
-  await db.query('select public.record_brand_registry_review($1,$2)',[id(30),{human_outcome:'matched_active',source_url:'https://bizfileonline.sos.ca.gov/search/business',review_note:'Exact entity and safety reviewed individually.',safety_reviewed:true}]);
+  const current=(await db.query<{data:{registration:{updated_at:string}}}>('select public.get_brand_review_context($1) as data',[id(30)])).rows[0].data;
+  await db.query('select public.record_brand_registry_review($1,$2)',[id(30),{registration_updated_at:current.registration.updated_at,human_outcome:'matched_active',source_url:'https://bizfileonline.sos.ca.gov/search/business',review_note:'Exact entity and safety reviewed individually.',safety_reviewed:true}]);
   await expect(decide('approved','',42,false)).rejects.toThrow('Explicit document');
   expect((await decide('approved','',42)).rows[0].result.deliveryStatus).toBe('queued');
   await db.exec('reset role');const request=(await db.query<{status:string;campaign_scope_approved:boolean;compliance_scope_approved:boolean}>('select status,campaign_scope_approved,compliance_scope_approved from public.brand_partner_verification_requests')).rows[0];

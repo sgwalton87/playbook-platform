@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import CommunityVettingJourney from "@/components/trust/CommunityVettingJourney";
 import BrandRegistrationFields from "@/components/brand/BrandRegistrationFields";
 import { EMPTY_REGISTRATION, parseRegistration, type BrandRegistration } from "@/lib/verification/registration";
 import { PlaybookButton, PlaybookPage } from "@/components/ui";
@@ -22,6 +23,8 @@ type VerificationRequest = {
 type LoadResult = { registrationDetails?: { formation_state: string; entity_type: string; entity_number: string; safety_answers: BrandRegistration["safetyAnswers"]; safeguarding_accepted: boolean }; workflow?: { outcome: string; public_message: string } | null; error?: string; onboardingCompleted?: boolean; request?: VerificationRequest | null };
 
 export default function BrandPartnerVerificationGate({ children }: { children: React.ReactNode }) {
+  const [communityAccepted,setCommunityAccepted] = useState(false);
+  const acceptCommunity = useCallback(() => setCommunityAccepted(true), []);
   const [registration, setRegistration] = useState<BrandRegistration>(EMPTY_REGISTRATION);
   const [reviewMessage, setReviewMessage] = useState("");
   const [loading, setLoading] = useState(true);
@@ -54,6 +57,7 @@ export default function BrandPartnerVerificationGate({ children }: { children: R
     setOnboardingCompleted(Boolean(result.onboardingCompleted)); setRequest(result.request ?? null);
   }
   async function submit() {
+    if (!communityAccepted) { setMessage("Acknowledge the community standards before submitting documents."); return; }
     try { parseRegistration(registration); } catch (cause) { setMessage(cause instanceof Error ? cause.message : "Complete the required declarations."); return; }
     setSubmitting(true); setMessage(null);
     const response = await fetch("/api/brand-verification", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ organizationName, nilAcknowledged, registration }) }); const result = await response.json() as { error?: string; message?: string };
@@ -75,6 +79,8 @@ export default function BrandPartnerVerificationGate({ children }: { children: R
       <p>Organization and campaign approval are separate from dashboard access. Restricted operations remain unavailable until explicitly approved.</p>
       {message && <p>{message}</p>}
       {reviewMessage && <p><strong>Latest reviewer message:</strong> {reviewMessage}</p>}
+      <CommunityVettingJourney onAccepted={acceptCommunity} />
+      {communityAccepted && <>
       <div style={{ display: "grid", gap: 12, padding: "12px 0" }}>
         <label style={{ fontWeight: 700 }}>Legal organization name
           <input aria-label="Legal organization name" type="text" maxLength={240} value={organizationName} onChange={event => setOrganizationName(event.target.value)} style={{ display: "block", width: "100%", padding: 12, borderRadius: 8, border: "1px solid #9CA3AF", color: "#111827", background: "#FFFFFF" }} />
@@ -88,6 +94,7 @@ export default function BrandPartnerVerificationGate({ children }: { children: R
       <BrandVerificationEvidenceUpload onEvidenceChange={setHasEvidence} />
       {(!request || request.status === "pending" || request.status === "under_review" || request.status === "rejected") && <button onClick={() => void submit()} disabled={submitting || !hasEvidence || !organizationName.trim() || !nilAcknowledged} style={buttonStyle}>{submitting ? "Submitting…" : request ? "Submit updated verification evidence" : "Submit verification evidence"}</button>}
       {!hasEvidence && <p>Upload at least one supporting document before submitting verification.</p>}
+      </>}
       {request && <p>Campaign scope: {request.campaign_scope_approved ? "approved" : "pending"} · Compliance scope: {request.compliance_scope_approved ? "approved" : "pending"}</p>}
     </section>
     {children}

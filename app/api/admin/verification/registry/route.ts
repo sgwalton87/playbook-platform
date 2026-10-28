@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
  }
  if (!["needs_review", "matched_active", "alternative_verified", "confirmed_issue"].includes(String(body.humanOutcome)) || typeof body.sourceUrl !== "string" || typeof body.note !== "string" || !body.note.trim() || body.note.length > 4000) return NextResponse.json({ error: "Human outcome, official source and review note required." }, { status: 400 });
  try { const url = new URL(body.sourceUrl); if (url.protocol !== "https:" || url.username || url.password || body.sourceUrl.length > 2000) throw new Error(); } catch { return NextResponse.json({ error: "A valid HTTPS official record or alternative evidence URL is required." }, { status: 400 }); }
- const saved = await supabase.rpc("record_brand_registry_review", { requested_id: body.requestId, requested_result: { human_outcome: body.humanOutcome, source_url: body.sourceUrl, review_note: body.note.trim(), safety_reviewed: body.safetyReviewed === true, checked_at: new Date().toISOString() } });
+ const saved = await supabase.rpc("record_brand_registry_review", { requested_id: body.requestId, requested_result: { human_outcome: body.humanOutcome, source_url: body.sourceUrl, review_note: body.note.trim(), safety_reviewed: body.safetyReviewed === true, registration_updated_at: typeof body.expectedRegistrationUpdatedAt === "string" ? body.expectedRegistrationUpdatedAt : null, checked_at: new Date().toISOString() } });
  if (saved.error) return NextResponse.json({ error: "Human registry review could not be saved." }, { status: 422 });
  return NextResponse.json({ saved: true }, { headers: { "Cache-Control": "no-store, private" } });
 }
