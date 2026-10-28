@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import BrandEvidenceReviewPanel from "@/components/brand/BrandEvidenceReviewPanel";
 import {
   PlaybookCard,
   PlaybookGrid,
@@ -55,6 +56,7 @@ export default function AdminPage() {
   const [error, setError] = useState("");
   const [busyId, setBusyId] = useState("");
   const [notes, setNotes] = useState<Record<string, string>>({});
+  const [reviewedDocuments, setReviewedDocuments] = useState<Record<string, boolean>>({});
 
   const load = useCallback(async () => {
     const { data: userData } = await supabase.auth.getUser();
@@ -172,6 +174,7 @@ export default function AdminPage() {
           {requests.map((request) => {
             const decisionReason = (notes[request.request_id] || "").trim();
             const finalDecisionDisabled = busyId === request.request_id || !decisionReason;
+            const approvalDisabled = finalDecisionDisabled || (request.request_type === "brand-partner" && !reviewedDocuments[request.request_id]);
             return (
               <PlaybookCard
                 key={`${request.request_type}-${request.request_id}`}
@@ -192,6 +195,8 @@ export default function AdminPage() {
                   ))}
                 </div>
 
+                {request.request_type === "brand-partner" && <BrandEvidenceReviewPanel requestId={request.request_id} onReviewed={reviewed => setReviewedDocuments(previous => ({ ...previous, [request.request_id]: reviewed }))} />}
+
                 <label style={notesLabel}>
                   Decision reason
                   <textarea
@@ -211,7 +216,7 @@ export default function AdminPage() {
                 <div style={actions}>
                   <button type="button" disabled={busyId === request.request_id} onClick={() => void review(request, "under_review")} style={secondaryButton}>Mark reviewing</button>
                   <button type="button" disabled={finalDecisionDisabled} onClick={() => void review(request, "rejected")} style={{ ...dangerButton, opacity: finalDecisionDisabled ? 0.55 : 1 }}>Reject</button>
-                  <button type="button" disabled={finalDecisionDisabled} onClick={() => void review(request, "approved")} style={{ ...primaryButton, opacity: finalDecisionDisabled ? 0.55 : 1 }}>Approve</button>
+                  <button type="button" disabled={approvalDisabled} onClick={() => void review(request, "approved")} style={{ ...primaryButton, opacity: approvalDisabled ? 0.55 : 1 }}>Approve</button>
                 </div>
               </PlaybookCard>
             );

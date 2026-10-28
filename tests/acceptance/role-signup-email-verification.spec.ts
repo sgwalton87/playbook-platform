@@ -165,13 +165,52 @@ test(`${role}: ${fullFields ? "full-field" : "core"} registration, email verific
         await expect(page.getByText("Private organization draft")).toBeVisible();
         const summary = page.getByLabel("Organization summary");
         await summary.fill("Verified disposable Brand Partner draft survives reload.");
+        const logoBytes = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScL/nwAAAABJRU5ErkJggg==", "base64");
+        await page.getByLabel("Upload company logo").setInputFiles({ name: "brand-logo.png", mimeType: "image/png", buffer: logoBytes });
+        await expect.poll(async () => {
+          const success = await page.getByRole("status").filter({ hasText: "Logo uploaded and saved" }).isVisible();
+          if (success) return "saved";
+          const alert = await page.getByRole("alert").allTextContents();
+          if (alert.length) return "error: " + alert.join(" | ");
+          return "pending";
+        }, { timeout: 15000 }).toBe("saved");
+        await page.getByLabel("Main contact full name").fill("QA Primary Contact");
+        await page.getByLabel("Main contact email").fill("primary-contact@example.com");
+        await page.getByLabel("Main contact telephone").fill("+1 202-555-0141");
         await page.getByRole("button", { name: "Save Private Draft" }).click();
         await expect(page.getByRole("status").filter({ hasText: "Private draft saved and confirmed" })).toBeVisible();
+
         await page.reload();
         await expect(page.getByLabel("Organization summary")).toHaveValue("Verified disposable Brand Partner draft survives reload.");
         const stored = await admin.from("profiles").select("onboarding_data").eq("id", userId).single();
         expect(stored.error).toBeNull();
         expect(stored.data?.onboarding_data?.brand_organization_draft?.summary).toBe("Verified disposable Brand Partner draft survives reload.");
+        expect(stored.data?.onboarding_data?.brand_organization_draft?.logo).toContain("/brand-organization-logos/");
+        expect(stored.data?.onboarding_data?.brand_organization_draft).toMatchObject({ contactName: "QA Primary Contact", contactEmail: "primary-contact@example.com", contactPhone: "+1 202-555-0141" });
+        await expect(page.getByLabel("Main contact telephone")).toHaveValue("+1 202-555-0141");
+        // Evidence is private and human-reviewed. Verify existing pending requests
+        // can submit new documents without receiving campaign authority.
+        await page.getByLabel("Upload business card").setInputFiles({
+          name: "disposable-business-card.png", mimeType: "image/png", buffer: logoBytes,
+        });
+        await expect(page.getByText("Document uploaded privately.")).toBeVisible({ timeout: 15000 });
+        await page.getByLabel("Legal organization name").fill("Disposable QA Brand Partner LLC");
+        await page.getByLabel("Acknowledge NIL and compliance responsibilities").check();
+        const submitVerification = page.getByRole("button", { name: /Submit (updated )?verification evidence/i });
+        await expect(submitVerification).toBeEnabled();
+        const verificationResponse = page.waitForResponse(response =>
+          new URL(response.url()).pathname === "/api/brand-verification" && response.request().method() === "POST");
+        await submitVerification.click();
+        const submittedResponse = await verificationResponse;
+        expect(submittedResponse.status(), await submittedResponse.text()).toBe(202);
+        const verification = await admin.from("brand_partner_verification_requests")
+          .select("status,campaign_scope_approved,compliance_scope_approved")
+          .eq("brand_user_id", userId).single();
+        expect(verification.error).toBeNull();
+        expect(verification.data).toMatchObject({
+          status: "pending", campaign_scope_approved: false, compliance_scope_approved: false,
+        });
+
         await page.goto(destination);
       }
       await page.reload();

@@ -3,11 +3,11 @@ import { requireUser } from "@/lib/supabase/server";
 import { requirePlaybookRole } from "@/lib/roles/registry";
 
 const DRAFT_KEY = "brand_organization_draft";
-type Draft = { summary: string; website: string; logo: string; location: string; focus: string };
+type Draft = { summary: string; website: string; logo: string; location: string; focus: string; contactName: string; contactEmail: string; contactPhone: string };
 function clean(value: unknown, max: number): string { return typeof value === "string" ? value.trim().slice(0, max) : ""; }
 function normalize(data: Record<string, unknown>): Draft {
   return { summary: clean(data.summary, 2000), website: clean(data.website, 500),
-    logo: clean(data.logo, 500), location: clean(data.location, 240), focus: clean(data.focus, 1500) };
+    logo: clean(data.logo, 500), location: clean(data.location, 240), focus: clean(data.focus, 1500), contactName: clean(data.contactName, 160), contactEmail: clean(data.contactEmail, 254), contactPhone: clean(data.contactPhone, 40) };
 }
 async function getOwnProfile() {
   const { supabase, user } = await requireUser();
@@ -39,6 +39,7 @@ export async function PUT(request: Request) {
     for (const url of [draft.website, draft.logo]) {
       if (url && !/^https?:\/\//i.test(url)) return NextResponse.json({ error: "URLs must begin with https:// or http://" }, { status: 400 });
     }
+    // Partial profile drafts must remain saveable even when the contact section is unfinished.\n    // Completion is enforced when evidence is submitted for verification.\n    if ((draft.contactEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(draft.contactEmail)) ||\n        (draft.contactPhone && !/^[+0-9() .-]{7,40}$/.test(draft.contactPhone))) return NextResponse.json({ error: "Enter a valid contact email and telephone number." }, { status: 422 });
     const existing = (ctx.profile!.onboarding_data ?? {}) as Record<string, unknown>;
     const savedAt = new Date().toISOString();
     const updated = await ctx.supabase!.from("profiles").update({

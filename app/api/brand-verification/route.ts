@@ -19,7 +19,7 @@ export async function GET() {
   }
 }
 
-export async function POST() {
+export async function POST(request: Request) {
   try {
     const { supabase, user } = await requireUser();
     if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
@@ -28,7 +28,35 @@ export async function POST() {
     if (!profile.data) return NextResponse.json({ error: "Brand Partner profile not found." }, { status: 404 });
     if (requirePlaybookRole(profile.data.profile_mode ?? profile.data.role) !== "brand-partner") return NextResponse.json({ error: "Brand verification is restricted to Brand Partner accounts." }, { status: 403 });
     if (!profile.data.onboarding_completed) return NextResponse.json({ error: "Complete Brand Partner onboarding before submitting verification." }, { status: 409 });
-    const evidence = buildBrandVerificationEvidence((profile.data.onboarding_data ?? {}) as Record<string, unknown>);
+    const previous = await supabase.from("brand_partner_verification_requests")
+      .select("status,organization_name,nil_acknowledgement,campaign_scope_approved,compliance_scope_approved")
+      .eq("brand_user_id", user.id).maybeSingle();
+    if (previous.error) throw new Error(previous.error.message);
+    if (previous.data?.status === "approved") {
+      return NextResponse.json({ error: "Approved verification cannot be replaced by self-service resubmission." }, { status: 409 });
+    }
+    const uploaded = await supabase.storage.from("brand-verification-evidence").list(user.id, { limit: 100 });
+    if (uploaded.error) return NextResponse.json({ error: "Business documentation could not be verified. Try again." }, { status: 503 });
+    const hasEvidence = (uploaded.data ?? []).some(item => /^(letterhead|business-card)-[a-f0-9-]+\.(pdf|png|jpg|webp)$/.test(item.name));
+    if (!hasEvidence) return NextResponse.json({ error: "Upload company letterhead or a business card before submitting verification." }, { status: 422 });
+    const onboarding = (profile.data.onboarding_data ?? {}) as Record<string, unknown>;
+    const privateDraft = onboarding.brand_organization_draft && typeof onboarding.brand_organization_draft === "object"
+      ? onboarding.brand_organization_draft as Record<string, unknown> : {};
+    const contactName = typeof privateDraft.contactName === "string" ? privateDraft.contactName.trim() : "";
+    const contactEmail = typeof privateDraft.contactEmail === "string" ? privateDraft.contactEmail.trim() : "";
+    const contactPhone = typeof privateDraft.contactPhone === "string" ? privateDraft.contactPhone.trim() : "";
+    if (!contactName || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail) || !/^[+0-9() .-]{7,40}$/.test(contactPhone)) {
+      return NextResponse.json({ error: "Save the main business contact name, email and telephone number before submitting verification." }, { status: 422 });
+    }
+    const input = await request.json().catch(() => ({})) as { organizationName?: unknown; nilAcknowledged?: unknown };
+    const organizationName = typeof input.organizationName === "string" ? input.organizationName.trim().slice(0, 240) : "";
+    if (!organizationName) return NextResponse.json({ error: "Enter the legal organization name before submitting verification." }, { status: 422 });
+    if (input.nilAcknowledged !== true) return NextResponse.json({ error: "Explicit NIL and compliance acknowledgement is required." }, { status: 422 });
+    const evidence = buildBrandVerificationEvidence({
+      ...onboarding,
+      organization_name: organizationName,
+      nil_acknowledgement: "Acknowledged by authenticated business representative on verification submission",
+    });
     const result = await supabase.from("brand_partner_verification_requests").upsert({
       brand_user_id: user.id, organization_name: evidence.organizationName, partner_title: evidence.partnerTitle,
       brand_category: evidence.brandCategory, partnership_goals: evidence.partnershipGoals, target_audience: evidence.targetAudience,

@@ -34,8 +34,12 @@ function OrganizationWorkspace() {
   const [summary, setSummary] = useState("");
   const [website, setWebsite] = useState("");
   const [logo, setLogo] = useState("");
+  const [uploadingLogo, setUploadingLogo] = useState(false);
   const [location, setLocation] = useState("");
   const [focus, setFocus] = useState("");
+  const [contactName, setContactName] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -54,10 +58,10 @@ function OrganizationWorkspace() {
       try {
         const response = await fetch("/api/brand-partner-profile-draft", { cache: "no-store" });
         if (!response.ok) throw new Error("Private draft could not be loaded.");
-        const payload = await response.json() as { draft: { summary: string; website: string; logo: string; location: string; focus: string }; savedAt: string | null };
+        const payload = await response.json() as { draft: { summary: string; website: string; logo: string; location: string; focus: string; contactName: string; contactEmail: string; contactPhone: string }; savedAt: string | null };
         setSummary(payload.draft.summary); setWebsite(payload.draft.website);
         setLogo(payload.draft.logo); setLocation(payload.draft.location);
-        setFocus(payload.draft.focus); setSavedAt(payload.savedAt);
+        setFocus(payload.draft.focus); setContactName(payload.draft.contactName); setContactEmail(payload.draft.contactEmail); setContactPhone(payload.draft.contactPhone); setSavedAt(payload.savedAt);
       } catch (error) { setError(error instanceof Error ? error.message : "Private draft could not be loaded."); }
       setLoading(false); return;
     }
@@ -70,10 +74,63 @@ function OrganizationWorkspace() {
     setLogo(row.logo_url || "");
     setLocation(row.location || "");
     setFocus(Array.isArray(row.partnership_focus) ? row.partnership_focus.join("\n") : "");
+    // Approved organizations retain a private owner-scoped primary contact record.
+    // Do not overwrite verification evidence or privileged organization identity.
+    try {
+      const response = await fetch("/api/brand-partner-profile-draft", { cache: "no-store" });
+      if (response.ok) {
+        const payload = await response.json() as { draft: { contactName: string; contactEmail: string; contactPhone: string }; savedAt: string | null };
+        setContactName(payload.draft.contactName || "");
+        setContactEmail(payload.draft.contactEmail || "");
+        setContactPhone(payload.draft.contactPhone || "");
+      }
+    } catch { /* Profile details remain visible when optional contact read fails. */ }
     setLoading(false);
   }, []);
 
   useEffect(() => { const timer = window.setTimeout(() => { void load(); }, 0); return () => window.clearTimeout(timer); }, [load]);
+
+  async function uploadLogo(file?: File) {
+    if (!file) return;
+    setError(""); setMessage("");
+    if (file.size > 3 * 1024 * 1024 || !["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
+      setError("Choose a JPG, PNG, or WEBP logo smaller than 3 MB."); return;
+    }
+    setUploadingLogo(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Log in to upload your organization logo.");
+      const extension = file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg";
+      const path = `${user.id}/logo-${crypto.randomUUID()}.${extension}`;
+      const result = await supabase.storage.from("brand-organization-logos").upload(path, file, { contentType: file.type, upsert: false });
+      if (result.error) throw new Error(result.error.message);
+      const uploaded = supabase.storage.from("brand-organization-logos").getPublicUrl(path).data.publicUrl;
+      if (!uploaded) throw new Error("The logo URL could not be resolved.");
+      // The logo must be stored with the organization draft/record before saying saved.
+      setLogo(uploaded);
+      if (draftMode) {
+        const response = await fetch("/api/brand-partner-profile-draft", {
+          method: "PUT", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ summary, website, logo: uploaded, location, focus, contactName, contactEmail, contactPhone }),
+        });
+        const saved = await response.json() as { saved?: boolean; savedAt?: string; error?: string };
+        if (!response.ok || !saved.saved || !saved.savedAt) throw new Error(saved.error || "Logo uploaded but profile save could not be confirmed.");
+        setSavedAt(saved.savedAt);
+      } else {
+        const result = await supabase.rpc("update_brand_partner_organization", {
+          requested_summary: summary.trim() || null,
+          requested_website_url: website.trim() || null,
+          requested_logo_url: uploaded,
+          requested_location: location.trim() || null,
+          requested_partnership_focus: focus.split("\n").map(value => value.trim()).filter(Boolean).slice(0, 20),
+        });
+        if (result.error) throw new Error("Logo uploaded but organization update failed: " + result.error.message);
+        setSavedAt(new Date().toISOString());
+      }
+      setMessage("Logo uploaded and saved to your organization profile.");
+    } catch (error) { setError(error instanceof Error ? error.message : "Logo upload failed."); }
+    finally { setUploadingLogo(false); }
+  }
 
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -82,7 +139,7 @@ function OrganizationWorkspace() {
       try {
         const response = await fetch("/api/brand-partner-profile-draft", {
           method: "PUT", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ summary, website, logo, location, focus }),
+          body: JSON.stringify({ summary, website, logo, location, focus, contactName, contactEmail, contactPhone }),
         });
         const result = await response.json() as { error?: string; saved?: boolean; savedAt?: string };
         if (!response.ok || !result.saved || !result.savedAt) throw new Error(result.error || "Save was not confirmed.");
@@ -101,7 +158,20 @@ function OrganizationWorkspace() {
       requested_partnership_focus: partnershipFocus,
     });
     if (result.error) { setError(result.error.message); setSaving(false); return; }
-    setMessage("Organization Profile updated. Verification evidence and approval scopes were not changed.");
+    // Save primary contact via the owner-scoped draft boundary, not the
+    // authority-controlled organization RPC which has no contact columns.
+    try {
+      const response = await fetch("/api/brand-partner-profile-draft", {
+        method: "PUT", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ summary, website, logo, location, focus, contactName, contactEmail, contactPhone }),
+      });
+      const data = await response.json() as { saved?: boolean; savedAt?: string; error?: string };
+      if (!response.ok || !data.saved) throw new Error(data.error || "Primary contact was not saved.");
+    } catch (error) {
+      setError("Organization updated, but contact confirmation failed: " + (error instanceof Error ? error.message : "Unknown error"));
+      setSaving(false); return;
+    }
+    setMessage("Organization Profile and primary contact saved. Verification authority was not changed.");
     setSavedAt(new Date().toISOString());
     await load();
     setSaving(false);
@@ -140,10 +210,21 @@ function OrganizationWorkspace() {
             <form onSubmit={save} style={form}>
               <label style={field}>Organization summary<textarea maxLength={2000} value={summary} onChange={(e) => setSummary(e.target.value)} style={textarea} placeholder="Mission, community focus, and how you support scholars…" /></label>
               <label style={field}>Website URL<input type="url" value={website} onChange={(e) => setWebsite(e.target.value)} style={input} placeholder="https://…" /></label>
-              <label style={field}>Logo URL<input type="url" value={logo} onChange={(e) => setLogo(e.target.value)} style={input} placeholder="https://…" /></label>
+              <label style={field}>Company logo
+                <input aria-label="Upload company logo" type="file" accept=".png,.jpg,.jpeg,.webp" disabled={uploadingLogo || saving} onChange={event => void uploadLogo(event.target.files?.[0])} style={input} />
+                <span style={muted}>Upload a JPG, PNG or WEBP image, maximum 3 MB. No logo URL required.</span>
+                {uploadingLogo && <span role="status">Uploading your logo…</span>}
+              </label>
+              {logo && <div style={{ display: "flex", alignItems: "center", gap: 12 }}><img alt="Current organization logo" src={logo} style={{ height: 72, width: 72, objectFit: "contain", borderRadius: 12, background: "#FFF", border: "1px solid #CBD5E1" }} /><span style={muted}>Current uploaded logo</span></div>}
               <label style={field}>Location<input maxLength={240} value={location} onChange={(e) => setLocation(e.target.value)} style={input} placeholder="Oakland, CA or Remote" /></label>
+              <fieldset style={{ border: "1px solid #CBD5E1", borderRadius: 12, padding: 14, display: "grid", gap: 12 }}>
+                <legend style={{ fontWeight: 900 }}>Main point of contact</legend>
+                <label style={field}>Full name<input aria-label="Main contact full name" required maxLength={160} value={contactName} onChange={e => setContactName(e.target.value)} style={input} /></label>
+                <label style={field}>Email address<input aria-label="Main contact email" required type="email" maxLength={254} value={contactEmail} onChange={e => setContactEmail(e.target.value)} style={input} /></label>
+                <label style={field}>Telephone number<input aria-label="Main contact telephone" required type="tel" maxLength={40} value={contactPhone} onChange={e => setContactPhone(e.target.value)} style={input} /></label>
+              </fieldset>
               <label style={field}>Partnership focus <span style={muted}>One focus area per line.</span><textarea value={focus} onChange={(e) => setFocus(e.target.value)} style={textarea} placeholder={"Internships\nFinancial literacy\nScholar-athlete development"} /></label>
-              <button type="submit" disabled={saving} style={primaryButton}>{saving ? "Saving…" : draftMode ? "Save Private Draft" : "Save Organization Profile"}</button>
+              <button type="submit" disabled={saving || uploadingLogo} style={primaryButton}>{saving ? "Saving…" : draftMode ? "Save Private Draft" : "Save Organization Profile"}</button>
             </form>
           </PlaybookCard>
         </PlaybookGrid>

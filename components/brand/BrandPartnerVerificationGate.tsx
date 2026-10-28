@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { PlaybookButton, PlaybookCard, PlaybookPage } from "@/components/ui";
 import { brandAuthorityReady } from "@/lib/brand-verification/policy";
+import BrandVerificationEvidenceUpload from "@/components/brand/BrandVerificationEvidenceUpload";
 
 type VerificationRequest = {
   id: string;
@@ -24,6 +25,9 @@ export default function BrandPartnerVerificationGate({ children }: { children: R
   const [request, setRequest] = useState<VerificationRequest | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [hasEvidence, setHasEvidence] = useState(false);
+  const [organizationName, setOrganizationName] = useState("");
+  const [nilAcknowledged, setNilAcknowledged] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -32,7 +36,7 @@ export default function BrandPartnerVerificationGate({ children }: { children: R
       .then(({ response, result }) => {
         if (cancelled) return;
         if (!response.ok) { setMessage(result.error ?? "Brand verification could not be loaded."); setLoading(false); return; }
-        setOnboardingCompleted(Boolean(result.onboardingCompleted)); setRequest(result.request ?? null); setMessage(null); setLoading(false);
+        setOnboardingCompleted(Boolean(result.onboardingCompleted)); setRequest(result.request ?? null); setOrganizationName(result.request?.organization_name ?? ""); setMessage(null); setLoading(false);
       })
       .catch((error: unknown) => { if (!cancelled) { setMessage(error instanceof Error ? error.message : "Brand verification could not be loaded."); setLoading(false); } });
     return () => { cancelled = true; };
@@ -45,7 +49,7 @@ export default function BrandPartnerVerificationGate({ children }: { children: R
   }
   async function submit() {
     setSubmitting(true); setMessage(null);
-    const response = await fetch("/api/brand-verification", { method: "POST" }); const result = await response.json() as { error?: string; message?: string };
+    const response = await fetch("/api/brand-verification", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ organizationName, nilAcknowledged }) }); const result = await response.json() as { error?: string; message?: string };
     setSubmitting(false); if (!response.ok) { setMessage(result.error ?? "Brand verification could not be submitted."); return; }
     setMessage(result.message ?? "Brand verification submitted."); await reloadAfterMutation();
   }
@@ -63,7 +67,18 @@ export default function BrandPartnerVerificationGate({ children }: { children: R
       <strong>Brand Partner verification {request?.status?.replaceAll("_", " ") ?? "not submitted"}</strong>
       <p>Organization and campaign approval are separate from dashboard access. Restricted operations remain unavailable until explicitly approved.</p>
       {message && <p>{message}</p>}
-      {!request && <button onClick={() => void submit()} disabled={submitting} style={buttonStyle}>{submitting ? "Submitting…" : "Submit verification evidence"}</button>}
+      <div style={{ display: "grid", gap: 12, padding: "12px 0" }}>
+        <label style={{ fontWeight: 700 }}>Legal organization name
+          <input aria-label="Legal organization name" type="text" maxLength={240} value={organizationName} onChange={event => setOrganizationName(event.target.value)} style={{ display: "block", width: "100%", padding: 12, borderRadius: 8, border: "1px solid #9CA3AF", color: "#111827", background: "#FFFFFF" }} />
+        </label>
+        <label style={{ display: "flex", alignItems: "start", gap: 10 }}>
+          <input type="checkbox" checked={nilAcknowledged} onChange={event => setNilAcknowledged(event.target.checked)} aria-label="Acknowledge NIL and compliance responsibilities" />
+          I acknowledge that NIL, student protection, campaign and legal compliance requirements apply, and that submitting evidence does not grant approval.
+        </label>
+      </div>
+      <BrandVerificationEvidenceUpload onEvidenceChange={setHasEvidence} />
+      {(!request || request.status === "pending" || request.status === "under_review" || request.status === "rejected") && <button onClick={() => void submit()} disabled={submitting || !hasEvidence || !organizationName.trim() || !nilAcknowledged} style={buttonStyle}>{submitting ? "Submitting…" : request ? "Submit updated verification evidence" : "Submit verification evidence"}</button>}
+      {!hasEvidence && <p>Upload at least one supporting document before submitting verification.</p>}
       {request && <p>Campaign scope: {request.campaign_scope_approved ? "approved" : "pending"} · Compliance scope: {request.compliance_scope_approved ? "approved" : "pending"}</p>}
     </section>
     {children}
