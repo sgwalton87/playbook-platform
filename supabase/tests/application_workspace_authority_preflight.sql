@@ -20,7 +20,8 @@ begin
     select 1 from pg_policies
      where schemaname = 'public' and tablename = 'application_workspaces'
        and policyname = 'application-workspaces-own'
-       and coalesce(with_check, '') like '%current_user_is_onboarded_learner%'
+       and coalesce(with_check, '') like '%onboarding_completed%' 
+       and coalesce(with_check, '') like '%profile_mode%'
   ) then
     raise exception 'Application workspace policy is not learner-gated.';
   end if;
