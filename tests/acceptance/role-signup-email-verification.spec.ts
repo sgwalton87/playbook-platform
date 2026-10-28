@@ -159,6 +159,21 @@ test(`${role}: ${fullFields ? "full-field" : "core"} registration, email verific
         expect(completed.data?.onboarding_data).toMatchObject(expectedAnswers);
         if (role === "family") expect(completed.data?.onboarding_data?.child_invite_code ?? "").toBe("");
       }
+      if (role === "brand-partner") {
+        await page.goto("/brand-partner-os/organization");
+        await expect(page.getByTestId("brand-organization-profile")).toBeVisible();
+        await expect(page.getByText("Private organization draft")).toBeVisible();
+        const summary = page.getByLabel("Organization summary");
+        await summary.fill("Verified disposable Brand Partner draft survives reload.");
+        await page.getByRole("button", { name: "Save Private Draft" }).click();
+        await expect(page.getByRole("status").filter({ hasText: "Private draft saved and confirmed" })).toBeVisible();
+        await page.reload();
+        await expect(page.getByLabel("Organization summary")).toHaveValue("Verified disposable Brand Partner draft survives reload.");
+        const stored = await admin.from("profiles").select("onboarding_data").eq("id", userId).single();
+        expect(stored.error).toBeNull();
+        expect(stored.data?.onboarding_data?.brand_organization_draft?.summary).toBe("Verified disposable Brand Partner draft survives reload.");
+        await page.goto(destination);
+      }
       await page.reload();
       await expect(page).toHaveURL(destination);
       // All 14 wrong-role completion endpoints must reject before any completion.
