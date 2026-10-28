@@ -43,7 +43,8 @@ const COMMUNITY_PARTNER_CONTEXT: OnboardingStep = {
       type: "multi-select",
       options: ["Mentoring", "Academic support", "Arts and media", "Athletics", "Mental wellness", "Housing support", "Food access", "Career readiness", "Financial education", "Family services", "Other"],
     },
-    { key: "service_area", label: "Geographic service area", placeholder: "Neighborhood, city, county, state, or national" },
+    { key: "service_area", label: "Geographic service area", type: "select", options: ["Bay Area, CA", "Oakland / East Bay, CA", "San Francisco, CA", "Northern California", "Southern California", "California statewide", "United States nationwide", "International", "Other"] },
+    { key: "service_area_details", label: "Service area details (city, county, or neighborhoods)", placeholder: "Add the specific areas your organization serves" },
   ],
 };
 
