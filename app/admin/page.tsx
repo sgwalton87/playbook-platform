@@ -8,6 +8,7 @@ import VerificationCommunicationLog from "@/components/brand/VerificationCommuni
 import BrandVerificationDocumentLibrary from "@/components/brand/BrandVerificationDocumentLibrary";
 import { brandReviewDueAt } from "@/lib/brand-verification/documents";
 import BrandEvidenceReviewPanel from "@/components/brand/BrandEvidenceReviewPanel";
+import SosVerificationTutorial from "@/components/brand/SosVerificationTutorial";
 import {
   PlaybookCard,
   PlaybookGrid,
@@ -164,6 +165,7 @@ export default function AdminPage() {
         subtitle="Review role evidence without bypassing Scholar ownership, relationship consent, or downstream scope gates."
       />
 
+      <SosVerificationTutorial />
       <BrandVerificationDocumentLibrary />
 
       <PlaybookMetrics>
