@@ -199,7 +199,8 @@ test(`${role}: ${fullFields ? "full-field" : "core"} registration, email verific
         const verificationResponse = page.waitForResponse(response =>
           new URL(response.url()).pathname === "/api/brand-verification" && response.request().method() === "POST");
         await submitVerification.click();
-        expect((await verificationResponse).status()).toBe(202);
+        const submittedResponse = await verificationResponse;
+        expect(submittedResponse.status(), await submittedResponse.text()).toBe(202);
         const verification = await admin.from("brand_partner_verification_requests")
           .select("status,campaign_scope_approved,compliance_scope_approved")
           .eq("brand_user_id", userId).single();
