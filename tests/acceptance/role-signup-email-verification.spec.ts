@@ -188,6 +188,26 @@ test(`${role}: ${fullFields ? "full-field" : "core"} registration, email verific
         expect(stored.data?.onboarding_data?.brand_organization_draft?.logo).toContain("/brand-organization-logos/");
         expect(stored.data?.onboarding_data?.brand_organization_draft).toMatchObject({ contactName: "QA Primary Contact", contactEmail: "primary-contact@example.com", contactPhone: "+1 202-555-0141" });
         await expect(page.getByLabel("Main contact telephone")).toHaveValue("+1 202-555-0141");
+        // Evidence is private and human-reviewed. Verify existing pending requests
+        // can submit new documents without receiving campaign authority.
+        await page.getByLabel("Upload business card").setInputFiles({
+          name: "disposable-business-card.png", mimeType: "image/png", buffer: logoBytes,
+        });
+        await expect(page.getByText("Document uploaded privately.")).toBeVisible({ timeout: 15000 });
+        const submitVerification = page.getByRole("button", { name: /Submit (updated )?verification evidence/i });
+        await expect(submitVerification).toBeEnabled();
+        const verificationResponse = page.waitForResponse(response =>
+          new URL(response.url()).pathname === "/api/brand-verification" && response.request().method() === "POST");
+        await submitVerification.click();
+        expect((await verificationResponse).status()).toBe(202);
+        const verification = await admin.from("brand_partner_verification_requests")
+          .select("status,campaign_scope_approved,compliance_scope_approved")
+          .eq("brand_user_id", userId).single();
+        expect(verification.error).toBeNull();
+        expect(verification.data).toMatchObject({
+          status: "pending", campaign_scope_approved: false, compliance_scope_approved: false,
+        });
+
         await page.goto(destination);
       }
       await page.reload();
