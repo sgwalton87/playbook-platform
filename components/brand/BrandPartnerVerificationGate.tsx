@@ -10,7 +10,6 @@ type VerificationRequest = {
   organization_name: string;
   brand_category: string | null;
   nil_acknowledgement: string;
-  organization_name: string;
   campaign_types: string[];
   campaign_scope_approved: boolean;
   compliance_scope_approved: boolean;
