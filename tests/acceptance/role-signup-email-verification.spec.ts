@@ -165,6 +165,9 @@ test(`${role}: ${fullFields ? "full-field" : "core"} registration, email verific
         await expect(page.getByText("Private organization draft")).toBeVisible();
         const summary = page.getByLabel("Organization summary");
         await summary.fill("Verified disposable Brand Partner draft survives reload.");
+        await page.getByLabel("Main contact full name").fill("QA Primary Contact");
+        await page.getByLabel("Main contact email").fill("primary-contact@example.com");
+        await page.getByLabel("Main contact telephone").fill("+1 202-555-0141");
         await page.getByRole("button", { name: "Save Private Draft" }).click();
         await expect(page.getByRole("status").filter({ hasText: "Private draft saved and confirmed" })).toBeVisible();
         const logoBytes = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScL/nwAAAABJRU5ErkJggg==", "base64");
@@ -176,6 +179,8 @@ test(`${role}: ${fullFields ? "full-field" : "core"} registration, email verific
         expect(stored.error).toBeNull();
         expect(stored.data?.onboarding_data?.brand_organization_draft?.summary).toBe("Verified disposable Brand Partner draft survives reload.");
         expect(stored.data?.onboarding_data?.brand_organization_draft?.logo).toContain("/brand-organization-logos/");
+        expect(stored.data?.onboarding_data?.brand_organization_draft).toMatchObject({ contactName: "QA Primary Contact", contactEmail: "primary-contact@example.com", contactPhone: "+1 202-555-0141" });
+        await expect(page.getByLabel("Main contact telephone")).toHaveValue("+1 202-555-0141");
         await page.goto(destination);
       }
       await page.reload();
