@@ -27,7 +27,7 @@ export default function BrandEvidenceReviewPanel({ requestId, onReviewed }: {
 
   return <section aria-label="Private Brand Partner business evidence" style={{ padding: 14, border: "1px solid #CBD5E1", background: "#F8FAFC", borderRadius: 12, color: "#0F172A" }}>
     <strong>Private business verification documents</strong>
-    <p>Review the organization's letterhead or business card before approving. Links expire after two minutes and must not be shared.</p>
+    <p>Review the organization&apos;s letterhead or business card before approving. Links expire after two minutes and must not be shared.</p>
     <button type="button" disabled={busy} onClick={() => void load()}>{busy ? "Loading…" : "Open submitted evidence"}</button>
     {error && <p role="alert" style={{ color: "#991B1B" }}>{error}</p>}
     {documents && (documents.length
