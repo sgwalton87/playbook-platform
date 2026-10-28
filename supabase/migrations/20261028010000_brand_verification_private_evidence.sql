@@ -46,10 +46,10 @@ using (bucket_id='brand-organization-logos' and (storage.foldername(name))[1]=(s
 create policy "brand_logo_owner_delete" on storage.objects for delete to authenticated
 using (bucket_id='brand-organization-logos' and (storage.foldername(name))[1]=(select auth.uid())::text);
 
--- An unexposed storage-schema helper verifies the authenticated learner and
+-- An authenticated owner-scoped application helper verifies the authenticated learner and
 -- workspace lineage without evaluating public workspace RLS from storage.objects.
 -- No direct EXECUTE grants are added to private constitutional helpers.
-create or replace function storage.is_owned_application_document_path(requested_path text)
+create or replace function public.is_owned_application_document_path(requested_path text)
 returns boolean
 language sql stable security definer set search_path = ''
 as $$
@@ -64,13 +64,13 @@ as $$
         and w.id::text = split_part(requested_path,'/',2)
     );
 $$;
-revoke all on function storage.is_owned_application_document_path(text) from public,anon,authenticated;
-grant execute on function storage.is_owned_application_document_path(text) to authenticated;
+revoke all on function public.is_owned_application_document_path(text) from public,anon,authenticated;
+grant execute on function public.is_owned_application_document_path(text) to authenticated;
 drop policy if exists "application-document-storage-own" on storage.objects;
 create policy "application-document-storage-own" on storage.objects
 for all to authenticated
-using (bucket_id='application-documents' and (select storage.is_owned_application_document_path(name)))
-with check (bucket_id='application-documents' and (select storage.is_owned_application_document_path(name)));
+using (bucket_id='application-documents' and (select public.is_owned_application_document_path(name)))
+with check (bucket_id='application-documents' and (select public.is_owned_application_document_path(name)));
 -- Reviewer reads require an authenticated founder/admin subject; direct review
 -- decisions continue to be checked by governed review functions.
 -- Fail closed at the database boundary: no direct reviewer RPC or alternate
