@@ -37,6 +37,9 @@ function OrganizationWorkspace() {
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [location, setLocation] = useState("");
   const [focus, setFocus] = useState("");
+  const [contactName, setContactName] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -55,10 +58,10 @@ function OrganizationWorkspace() {
       try {
         const response = await fetch("/api/brand-partner-profile-draft", { cache: "no-store" });
         if (!response.ok) throw new Error("Private draft could not be loaded.");
-        const payload = await response.json() as { draft: { summary: string; website: string; logo: string; location: string; focus: string }; savedAt: string | null };
+        const payload = await response.json() as { draft: { summary: string; website: string; logo: string; location: string; focus: string; contactName: string; contactEmail: string; contactPhone: string }; savedAt: string | null };
         setSummary(payload.draft.summary); setWebsite(payload.draft.website);
         setLogo(payload.draft.logo); setLocation(payload.draft.location);
-        setFocus(payload.draft.focus); setSavedAt(payload.savedAt);
+        setFocus(payload.draft.focus); setContactName(payload.draft.contactName); setContactEmail(payload.draft.contactEmail); setContactPhone(payload.draft.contactPhone); setSavedAt(payload.savedAt);
       } catch (error) { setError(error instanceof Error ? error.message : "Private draft could not be loaded."); }
       setLoading(false); return;
     }
@@ -97,7 +100,7 @@ function OrganizationWorkspace() {
       if (draftMode) {
         const response = await fetch("/api/brand-partner-profile-draft", {
           method: "PUT", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ summary, website, logo: uploaded, location, focus }),
+          body: JSON.stringify({ summary, website, logo: uploaded, location, focus, contactName, contactEmail, contactPhone }),
         });
         const saved = await response.json() as { saved?: boolean; savedAt?: string; error?: string };
         if (!response.ok || !saved.saved || !saved.savedAt) throw new Error(saved.error || "Logo uploaded but profile save could not be confirmed.");
@@ -125,7 +128,7 @@ function OrganizationWorkspace() {
       try {
         const response = await fetch("/api/brand-partner-profile-draft", {
           method: "PUT", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ summary, website, logo, location, focus }),
+          body: JSON.stringify({ summary, website, logo, location, focus, contactName, contactEmail, contactPhone }),
         });
         const result = await response.json() as { error?: string; saved?: boolean; savedAt?: string };
         if (!response.ok || !result.saved || !result.savedAt) throw new Error(result.error || "Save was not confirmed.");
@@ -190,6 +193,12 @@ function OrganizationWorkspace() {
               </label>
               {logo && <div style={{ display: "flex", alignItems: "center", gap: 12 }}><img alt="Current organization logo" src={logo} style={{ height: 72, width: 72, objectFit: "contain", borderRadius: 12, background: "#FFF", border: "1px solid #CBD5E1" }} /><span style={muted}>Current uploaded logo</span></div>}
               <label style={field}>Location<input maxLength={240} value={location} onChange={(e) => setLocation(e.target.value)} style={input} placeholder="Oakland, CA or Remote" /></label>
+              <fieldset style={{ border: "1px solid #CBD5E1", borderRadius: 12, padding: 14, display: "grid", gap: 12 }}>
+                <legend style={{ fontWeight: 900 }}>Main point of contact</legend>
+                <label style={field}>Full name<input aria-label="Main contact full name" required maxLength={160} value={contactName} onChange={e => setContactName(e.target.value)} style={input} /></label>
+                <label style={field}>Email address<input aria-label="Main contact email" required type="email" maxLength={254} value={contactEmail} onChange={e => setContactEmail(e.target.value)} style={input} /></label>
+                <label style={field}>Telephone number<input aria-label="Main contact telephone" required type="tel" maxLength={40} value={contactPhone} onChange={e => setContactPhone(e.target.value)} style={input} /></label>
+              </fieldset>
               <label style={field}>Partnership focus <span style={muted}>One focus area per line.</span><textarea value={focus} onChange={(e) => setFocus(e.target.value)} style={textarea} placeholder={"Internships\nFinancial literacy\nScholar-athlete development"} /></label>
               <button type="submit" disabled={saving || uploadingLogo} style={primaryButton}>{saving ? "Saving…" : draftMode ? "Save Private Draft" : "Save Organization Profile"}</button>
             </form>
