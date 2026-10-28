@@ -44,12 +44,16 @@ begin
   end if;
 
   if not exists (
+    select 1 from pg_proc p join pg_namespace n on n.oid=p.pronamespace
+      where n.nspname='storage' and p.proname='is_owned_application_document_path'
+        and p.prosecdef
+  ) then raise exception 'Guarded application storage ownership helper missing.'; end if;
+
+  if not exists (
     select 1 from pg_policies
      where schemaname = 'storage' and tablename = 'objects'
        and policyname = 'application-document-storage-own'
-       and coalesce(with_check, '') like '%onboarding_completed%'
-       and coalesce(with_check, '') like '%profile_mode%'
-       and coalesce(with_check, '') like '%application_workspaces%'
+       and coalesce(with_check, '') like '%storage.is_owned_application_document_path%'
   ) then
     raise exception 'Application document storage policy is not learner and workspace gated.';
   end if;
