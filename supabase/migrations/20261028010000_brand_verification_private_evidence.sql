@@ -57,3 +57,8 @@ grant execute on function private.current_user_is_onboarded_learner() to authent
 -- boolean. Permit predicate evaluation without granting review decisions or
 -- unrestricted access to any verification records.
 grant execute on function private.current_user_is_verification_reviewer() to authenticated;
+
+-- Storage listing may evaluate global ALL policies through anon before JWT role
+-- propagation. This helper returns a boolean only for auth.uid(), which is null
+-- for anon, so anonymous callers cannot acquire learner authority.
+grant execute on function private.current_user_is_onboarded_learner() to anon;
