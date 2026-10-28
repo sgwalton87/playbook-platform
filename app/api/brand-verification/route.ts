@@ -38,7 +38,7 @@ export async function POST() {
     const contactName = typeof privateDraft.contactName === "string" ? privateDraft.contactName.trim() : "";
     const contactEmail = typeof privateDraft.contactEmail === "string" ? privateDraft.contactEmail.trim() : "";
     const contactPhone = typeof privateDraft.contactPhone === "string" ? privateDraft.contactPhone.trim() : "";
-    if (!contactName || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(contactEmail) || !/^[+0-9() .-]{7,40}$/.test(contactPhone)) {
+    if (!contactName || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail) || !/^[+0-9() .-]{7,40}$/.test(contactPhone)) {
       return NextResponse.json({ error: "Save the main business contact name, email and telephone number before submitting verification." }, { status: 422 });
     }
     const evidence = buildBrandVerificationEvidence((profile.data.onboarding_data ?? {}) as Record<string, unknown>);
