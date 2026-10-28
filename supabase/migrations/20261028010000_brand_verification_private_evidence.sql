@@ -16,6 +16,14 @@ with check (
 );
 create policy "brand_evidence_owner_read" on storage.objects for select to authenticated
 using (bucket_id='brand-verification-evidence' and (storage.foldername(name))[1]=(select auth.uid())::text);
+-- Reviewers may read submitted evidence through the existing narrowly governed
+-- verification-reviewer authority; they cannot upload, replace or delete it.
+create policy "brand_evidence_reviewer_read" on storage.objects for select to authenticated
+using (
+  bucket_id='brand-verification-evidence'
+  and (select private.current_user_is_verification_reviewer())
+);
+
 create policy "brand_evidence_owner_delete" on storage.objects for delete to authenticated
 using (bucket_id='brand-verification-evidence' and (storage.foldername(name))[1]=(select auth.uid())::text);
 
