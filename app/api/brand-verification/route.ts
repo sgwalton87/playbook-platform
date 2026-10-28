@@ -32,6 +32,15 @@ export async function POST() {
     if (uploaded.error) return NextResponse.json({ error: "Business documentation could not be verified. Try again." }, { status: 503 });
     const hasEvidence = (uploaded.data ?? []).some(item => /^(letterhead|business-card)-[a-f0-9-]+\.(pdf|png|jpg|webp)$/.test(item.name));
     if (!hasEvidence) return NextResponse.json({ error: "Upload company letterhead or a business card before submitting verification." }, { status: 422 });
+    const onboarding = (profile.data.onboarding_data ?? {}) as Record<string, unknown>;
+    const privateDraft = onboarding.brand_organization_draft && typeof onboarding.brand_organization_draft === "object"
+      ? onboarding.brand_organization_draft as Record<string, unknown> : {};
+    const contactName = typeof privateDraft.contactName === "string" ? privateDraft.contactName.trim() : "";
+    const contactEmail = typeof privateDraft.contactEmail === "string" ? privateDraft.contactEmail.trim() : "";
+    const contactPhone = typeof privateDraft.contactPhone === "string" ? privateDraft.contactPhone.trim() : "";
+    if (!contactName || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(contactEmail) || !/^[+0-9() .-]{7,40}$/.test(contactPhone)) {
+      return NextResponse.json({ error: "Save the main business contact name, email and telephone number before submitting verification." }, { status: 422 });
+    }
     const evidence = buildBrandVerificationEvidence((profile.data.onboarding_data ?? {}) as Record<string, unknown>);
     const result = await supabase.from("brand_partner_verification_requests").upsert({
       brand_user_id: user.id, organization_name: evidence.organizationName, partner_title: evidence.partnerTitle,
