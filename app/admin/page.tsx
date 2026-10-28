@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import BrandVerificationDocumentLibrary from "@/components/brand/BrandVerificationDocumentLibrary";
+import { brandReviewDueAt } from "@/lib/brand-verification/documents";
 import BrandEvidenceReviewPanel from "@/components/brand/BrandEvidenceReviewPanel";
 import {
   PlaybookCard,
@@ -91,6 +93,12 @@ export default function AdminPage() {
     return () => window.clearTimeout(timer);
   }, [load]);
 
+  useEffect(() => {
+    const invalidate = () => setReviewedDocuments({});
+    window.addEventListener("brand-verification-documents-changed", invalidate);
+    return () => window.removeEventListener("brand-verification-documents-changed", invalidate);
+  }, []);
+
   const counts = useMemo(() => ({
     total: requests.length,
     pending: requests.filter((request) => request.status === "pending").length,
@@ -128,6 +136,7 @@ export default function AdminPage() {
 
     setNotes((current) => ({ ...current, [request.request_id]: "" }));
     await load();
+    window.dispatchEvent(new Event("brand-verification-review-completed"));
     setBusyId("");
   }
 
@@ -151,6 +160,8 @@ export default function AdminPage() {
         title="Verification Review Center"
         subtitle="Review role evidence without bypassing Scholar ownership, relationship consent, or downstream scope gates."
       />
+
+      <BrandVerificationDocumentLibrary />
 
       <PlaybookMetrics>
         <PlaybookMetric label="Open reviews" value={loading ? "…" : String(counts.total)} />
@@ -185,6 +196,8 @@ export default function AdminPage() {
                   <PlaybookPill>{request.status.replace("_", " ")}</PlaybookPill>
                   <span style={dateText}>{new Date(request.submitted_at).toLocaleString()}</span>
                 </div>
+
+                {request.request_type === "brand-partner" && <p style={copy}>Review target: {brandReviewDueAt(request.submitted_at) ? new Date(brandReviewDueAt(request.submitted_at)!).toLocaleString() : "Submission date unavailable"} (72 hours). Documents remain available after this target.</p>}
 
                 <div style={evidenceGrid}>
                   {Object.entries(request.evidence || {}).map(([key, value]) => (

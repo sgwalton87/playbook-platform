@@ -1,4 +1,5 @@
 import { requirePlaybookRole, type PlaybookRole } from "@/lib/roles/registry";
+import { isPlatformOperatorRole } from "@/lib/auth/platformOperator";
 
 export type NavItem = { label: string; href: string; icon: string };
 export type RoleNavigation = { home: string; label: string; items: NavItem[] };
@@ -101,6 +102,20 @@ const UNRESOLVED_NAVIGATION: RoleNavigation = {
 };
 
 export function getRoleNavigation(profileMode?: string | null, role?: string | null): RoleNavigation {
+  // Operator access comes from the stored platform role, never profile_mode.
+  // Keep review reachable from every screen, including Profile and mobile.
+  if (isPlatformOperatorRole(role)) {
+    return {
+      home: role?.trim().toLowerCase() === "founder" ? "/founder" : "/admin",
+      label: "Platform Administration",
+      items: [
+        { label: "Verification Review", href: "/admin", icon: "✓" },
+        { label: "Verification Documents", href: "/admin#brand-verification-documents", icon: "▤" },
+        { label: "Founder Dashboard", href: "/founder", icon: "◉" },
+        SHARED_MESSAGES, SHARED_PROFILE, SHARED_EXPLORE,
+      ],
+    };
+  }
   const normalized = normalizeNavigationRole(profileMode, role);
   const navigation = normalized ? ROLE_NAVIGATION[normalized] : UNRESOLVED_NAVIGATION;
   return { ...navigation, items: [...navigation.items, SHARED_EXPLORE] };

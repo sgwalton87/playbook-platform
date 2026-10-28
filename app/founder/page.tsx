@@ -1,5 +1,6 @@
 "use client";
 
+import EmailDirectory from "@/components/founder/EmailDirectory";
 import {
   PlaybookButton,
   PlaybookCard,
@@ -40,6 +41,7 @@ export default function FounderPage() {
             <PlaybookButton href="/studio" variant="secondary">Open Studio</PlaybookButton>
             <PlaybookButton href="/studio/beta-34-audit" variant="secondary">Open Platform Audit</PlaybookButton>
             <PlaybookButton href="/admin" variant="secondary">Open Admin Center</PlaybookButton>
+            <PlaybookButton href="/admin#brand-verification-documents" variant="secondary">Verification Documents</PlaybookButton>
           </div>
         </PlaybookHero>
 
@@ -48,6 +50,8 @@ export default function FounderPage() {
           <h2 style={governanceTitle}>Founder visibility does not create founder-owned copies of platform data.</h2>
           <p style={governanceCopy}>Every metric, review, release decision, architecture view, and operational signal must resolve to its canonical service or repository evidence. This command center is a governed lens over those owners.</p>
         </section>
+
+        <EmailDirectory />
 
         <PlaybookMetrics>
           <PlaybookMetric label="Founder capabilities" value={String(founderCapabilities.length)} />

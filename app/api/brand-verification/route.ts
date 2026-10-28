@@ -35,9 +35,9 @@ export async function POST(request: Request) {
     if (previous.data?.status === "approved") {
       return NextResponse.json({ error: "Approved verification cannot be replaced by self-service resubmission." }, { status: 409 });
     }
-    const uploaded = await supabase.storage.from("brand-verification-evidence").list(user.id, { limit: 100 });
+    const uploaded = await supabase.rpc("get_own_brand_verification_documents");
     if (uploaded.error) return NextResponse.json({ error: "Business documentation could not be verified. Try again." }, { status: 503 });
-    const hasEvidence = (uploaded.data ?? []).some(item => /^(letterhead|business-card)-[a-f0-9-]+\.(pdf|png|jpg|webp)$/.test(item.name));
+    const hasEvidence = (uploaded.data ?? []).some((item: { name: string; archived: boolean }) => !item.archived && /^(letterhead|business-card)-[a-f0-9-]+\.(pdf|png|jpg|webp)$/.test(item.name));
     if (!hasEvidence) return NextResponse.json({ error: "Upload company letterhead or a business card before submitting verification." }, { status: 422 });
     const onboarding = (profile.data.onboarding_data ?? {}) as Record<string, unknown>;
     const privateDraft = onboarding.brand_organization_draft && typeof onboarding.brand_organization_draft === "object"
@@ -62,7 +62,7 @@ export async function POST(request: Request) {
       brand_category: evidence.brandCategory, partnership_goals: evidence.partnershipGoals, target_audience: evidence.targetAudience,
       monthly_budget_range: evidence.monthlyBudgetRange, nil_acknowledgement: evidence.nilAcknowledgement,
       campaign_types: evidence.campaignTypes, approval_contact: evidence.approvalContact,
-      campaign_scope_approved: false, compliance_scope_approved: false, status: "pending",
+      campaign_scope_approved: false, compliance_scope_approved: false, status: "pending", submitted_at: new Date().toISOString(),
       reviewed_at: null, review_notes: null, updated_at: new Date().toISOString(),
     }, { onConflict: "brand_user_id" }).select("id,status,submitted_at,campaign_scope_approved,compliance_scope_approved").single();
     if (result.error) throw new Error(result.error.message);

@@ -14,9 +14,9 @@ export default function BrandVerificationEvidenceUpload({ onEvidenceChange }: { 
   const refresh = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setError("Sign in to manage business evidence."); onEvidenceChange?.(false); return; }
-    const result = await supabase.storage.from(BUCKET).list(user.id, { limit: 100 });
+    const result = await supabase.rpc<{ name: string; archived: boolean }>("get_own_brand_verification_documents");
     if (result.error) { setError("Could not check saved business evidence."); onEvidenceChange?.(false); return; }
-    const entries = (result.data ?? []).filter(item => item.name.startsWith("letterhead-") || item.name.startsWith("business-card-"));
+    const entries = (result.data ?? []).filter(item => !item.archived);
     setDocuments(entries.map(item => ({ name: item.name, type: item.name.startsWith("letterhead-") ? "Company letterhead" : "Business card" })));
     onEvidenceChange?.(entries.length > 0);
   }, [onEvidenceChange]);
@@ -44,10 +44,10 @@ export default function BrandVerificationEvidenceUpload({ onEvidenceChange }: { 
 
   return <section aria-label="Business verification documents" style={{ marginTop: 16, padding: 16, border: "1px solid #CBD5E1", background: "#FFFFFF", borderRadius: 14, color: "#15243A" }}>
     <strong>Business verification documents</strong>
-    <p>Upload at least one supporting document showing your organization identity: a company-letterhead document with your business name or a business card showing your business name and contact information. Uploads are private and reviewed before any approval.</p>
+    <p>Upload at least one supporting document showing your organization identity: a company-letterhead document with your business name or a business card showing your business name and contact information. Files are retained in a private admin-only review folder. Review target: 72 hours. Uploading does not approve your organization.</p>
     <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-      <label>Company letterhead <input aria-label="Upload company letterhead" disabled={busy} type="file" accept=".pdf,.png,.jpg,.jpeg,.webp" onChange={event => void upload(event.target.files?.[0], "letterhead")} /></label>
-      <label>Business card <input aria-label="Upload business card" disabled={busy} type="file" accept=".pdf,.png,.jpg,.jpeg,.webp" onChange={event => void upload(event.target.files?.[0], "business-card")} /></label>
+      <label style={{ minWidth: 0, width: "100%" }}>Company letterhead <input style={{ width: "100%", minWidth: 0, maxWidth: "100%", boxSizing: "border-box" }} aria-label="Upload company letterhead" disabled={busy} type="file" accept=".pdf,.png,.jpg,.jpeg,.webp" onChange={event => void upload(event.target.files?.[0], "letterhead")} /></label>
+      <label style={{ minWidth: 0, width: "100%" }}>Business card <input style={{ width: "100%", minWidth: 0, maxWidth: "100%", boxSizing: "border-box" }} aria-label="Upload business card" disabled={busy} type="file" accept=".pdf,.png,.jpg,.jpeg,.webp" onChange={event => void upload(event.target.files?.[0], "business-card")} /></label>
     </div>
     {documents.length ? <ul>{documents.map(item => <li key={item.name}>{item.type} — securely uploaded</li>)}</ul> : <p>No supporting documents uploaded yet.</p>}
     {message && <p role="status" style={{ color: "#166534" }}>{message}</p>}

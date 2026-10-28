@@ -251,3 +251,13 @@ Material architecture decisions must be recorded in [DECISIONS.md](./DECISIONS.m
 Owner: Playbook OS Engineering. Related: `lib/events/bus.ts`, `lib/playbook-record/services/achievements.ts`, database handbook.
 
 The synchronous event bus awaits derived writers and propagates their database failures. A failed canonical achievement read must not generate a zero-score Trust report. Repository inserts for Trust, Timeline, Portfolio, Opportunity and Compass now reject failed persistence rather than return an ignored error object. This does not roll back earlier browser/API writes and does not authorize automatic event replay. The staged atomic SQL command and durable, idempotent downstream delivery must replace the sequential form path before the whole achievement journey is certified.
+
+## Admin verification documents and email directory — October 28, 2026
+
+Owner: Playbook OS Engineering. Purpose: connect durable private evidence and operational mailbox purposes to the existing Founder/Admin surfaces.
+
+`/admin#brand-verification-documents` is the retained Brand Partner document folder, with Active and Archived views, archive reasons, and authenticated file opens. `/api/admin/verification/brand-evidence` lists metadata through the guarded database library; `/file?documentId=…` rechecks admin authority on every open and streams the authenticated Storage download. Dashboard links have no timed bearer token. `/archive` records archival metadata without deleting the file. Public profiles and notification emails do not contain document contents or access tokens.
+
+The Founder Command Center at `/founder` renders the ten-address purpose registry in `lib/email/directory.ts`. `lib/email/emailConfig.ts` provides sender configuration for the same mailbox keys, with explicit environment overrides. The Brand Partner review folder identifies `onboarding@playbookseriesinc.org` as its operational inbox and displays a 72-hour target from the current submission. The directory does not provision provider mailboxes, forward mail, grant account roles, or claim notification delivery. Existing SMTP sending is unchanged; no email is sent by this change.
+
+Related: [Database retention](DATABASE.md#retained-brand-partner-document-folder--october-28-2026), [Brand Partner authority](GOVERNANCE/DECISIONS/BRAND_PARTNER_VERIFICATION_AUTHORITY.md).

@@ -54,9 +54,9 @@ export async function PATCH(req: NextRequest) {
     const rows = (queue.data ?? []) as Array<{ request_type: string; request_id: string; subject_user_id: string }>;
     const reviewable = rows.find(row => row.request_type === "brand-partner" && row.request_id === requestId);
     if (!reviewable) return NextResponse.json({ error: "Brand Partner verification request not reviewable." }, { status: 404 });
-    const result = await supabase.storage.from("brand-verification-evidence").list(reviewable.subject_user_id, { limit: 100 });
+    const result = await supabase.rpc("get_brand_verification_documents", { requested_request_id: requestId, requested_archived: false, requested_offset: 0 });
     if (result.error) return NextResponse.json({ error: "Business evidence could not be checked." }, { status: 503 });
-    const hasDocument = (result.data ?? []).some(file => /^(letterhead|business-card)-[0-9a-f-]+\.(pdf|png|jpg|webp)$/i.test(file.name));
+    const hasDocument = (result.data ?? []).length > 0;
     if (!hasDocument) return NextResponse.json({ error: "A company letterhead document or business card is required before approval." }, { status: 422 });
   }
 
