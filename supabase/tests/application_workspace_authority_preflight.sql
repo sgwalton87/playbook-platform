@@ -20,8 +20,7 @@ begin
     select 1 from pg_policies
      where schemaname = 'public' and tablename = 'application_workspaces'
        and policyname = 'application-workspaces-own'
-       and coalesce(with_check, '') like '%onboarding_completed%' 
-       and coalesce(with_check, '') like '%profile_mode%'
+       and coalesce(with_check, '') like '%current_user_is_onboarded_learner%'
   ) then
     raise exception 'Application workspace policy is not learner-gated.';
   end if;
@@ -48,7 +47,8 @@ begin
     select 1 from pg_policies
      where schemaname = 'storage' and tablename = 'objects'
        and policyname = 'application-document-storage-own'
-       and coalesce(with_check, '') like '%current_user_is_onboarded_learner%'
+       and coalesce(with_check, '') like '%onboarding_completed%'
+       and coalesce(with_check, '') like '%profile_mode%'
        and coalesce(with_check, '') like '%application_workspaces%'
   ) then
     raise exception 'Application document storage policy is not learner and workspace gated.';
