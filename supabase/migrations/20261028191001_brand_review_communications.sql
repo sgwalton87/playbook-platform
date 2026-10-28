@@ -295,3 +295,15 @@ end;$$;
 create function public.record_brand_registry_research(requested_id uuid,requested_result jsonb) returns void language sql security invoker set search_path='' as $$select private.record_brand_registry_research(requested_id,requested_result);$$;
 revoke all on function private.record_brand_registry_research(uuid,jsonb),public.record_brand_registry_research(uuid,jsonb) from public,anon,authenticated;
 grant execute on function private.record_brand_registry_research(uuid,jsonb),public.record_brand_registry_research(uuid,jsonb) to authenticated;
+
+-- The older public RPC must not bypass required messaging and scope checks.
+-- Preserve the athlete-evidence dispatch and every other role's existing path.
+create or replace function public.review_verification_request(requested_type text,requested_id uuid,requested_decision text,requested_notes text default null)
+returns jsonb language plpgsql security invoker set search_path='' as $$
+begin
+ if requested_type='brand-partner' then raise exception 'Use the Brand Partner review and communication workflow' using errcode='42501'; end if;
+ if requested_type='athlete-evidence' then return private.review_athlete_evidence_request(requested_id,requested_decision,requested_notes); end if;
+ return private.review_verification_request(requested_type,requested_id,requested_decision,requested_notes);
+end;$$;
+revoke all on function public.review_verification_request(text,uuid,text,text) from public,anon,authenticated;
+grant execute on function public.review_verification_request(text,uuid,text,text) to authenticated;

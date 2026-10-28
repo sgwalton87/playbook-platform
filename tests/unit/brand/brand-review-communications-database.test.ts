@@ -44,7 +44,8 @@ describe.sequential('governed review decisions and durable communication outbox'
   await actor(3);await expect(db.query('select public.list_brand_review_communications()')).rejects.toThrow('reviewer authority');
  });
  it('requires declarations and human resolution before approval, without changing role or sending mail',async()=>{
-  await actor(2);await expect(decide('approved','',40)).rejects.toThrow('declarations');
+  await actor(2);await expect(db.query("select public.review_verification_request('brand-partner',$1,'approved','Legacy bypass')",[id(30)])).rejects.toThrow('communication workflow');
+  await expect(decide('approved','',40)).rejects.toThrow('declarations');
   await actor(1);await db.query(`insert into public.brand_partner_registration_details values($1,'California','LLC','123','{"minors":"no","financial":"no","violence":"yes","pending":"private_review","restrictions":"no"}',true,now())`,[id(1)]);
   await actor(2);await expect(decide('approved','',40)).rejects.toThrow('community standards');
   await actor(1);await expect(db.query("select public.accept_verification_community_policy('old')")).rejects.toThrow('Current policy');
