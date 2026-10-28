@@ -363,7 +363,7 @@ function StartContent() {
       <section style={hero}>
         <div style={heroText}>
           <PlaybookLogo size={108} priority />
-          <p style={eyebrow}>Start Here · {role}</p>
+          <p style={eyebrow}>Start Here · {PLAYBOOK_ROLES[role].osLabel}</p>
           <h1 style={heroTitle}>Welcome to {PLAYBOOK_ROLES[role].osLabel}.</h1>
           <p style={heroBody}>
             Your answers autosave to your private Playbook profile for this role. Any sharing or public visibility is managed separately.
