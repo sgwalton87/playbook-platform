@@ -5,6 +5,7 @@ import ApplicationSupportRequestPanel from "@/components/application-workspace/A
 import { FormEvent, useEffect, useState } from "react";
 import { PlaybookCard, PlaybookGrid, PlaybookHero, PlaybookMetric, PlaybookMetrics, PlaybookPage, PlaybookPill } from "@/components/ui";
 import { supabase } from "@/lib/supabaseClient";
+import { requirePlaybookRole } from "@/lib/roles/registry";
 
 type Task = { id: string; title: string; due_at: string | null; status: "TODO" | "COMPLETE" };
 type Document = { id: string; file_name: string; media_type: string; size_bytes: number; created_at: string };
@@ -34,6 +35,7 @@ async function fetchMarketplaceShares(): Promise<SharingResult> {
 }
 
 export default function ApplicationWorkspaceDashboard() {
+  const [access, setAccess] = useState<"checking" | "allowed" | "restricted">("checking");
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]); const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("Loading your application workspaces…"); const [error, setError] = useState<string | null>(null);
   const [opportunityId, setOpportunityId] = useState(""); const [name, setName] = useState("");
@@ -41,6 +43,21 @@ export default function ApplicationWorkspaceDashboard() {
   const [shares, setShares] = useState<Record<string, ShareState>>({});
   const [consent, setConsent] = useState<Record<string, boolean>>({});
   const [sharingAvailable, setSharingAvailable] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    let live = true;
+    void (async () => {
+      const { data: auth } = await supabase.auth.getUser();
+      if (!auth.user) { if (live) setAccess("restricted"); return; }
+      const result = await supabase.from("profiles").select("role,profile_mode").eq("id", auth.user.id).maybeSingle();
+      if (!live) return;
+      try {
+        const role = requirePlaybookRole(result.data?.profile_mode ?? result.data?.role);
+        setAccess(["scholar", "scholar-athlete", "transition-youth"].includes(role) ? "allowed" : "restricted");
+      } catch { setAccess("restricted"); }
+    })();
+    return () => { live = false; };
+  }, []);
 
   useEffect(() => { const query = new URLSearchParams(window.location.search); const selectedId = query.get("opportunityId"); const selectedName = query.get("opportunityName");
     const selectedType = query.get("opportunityType"); const selectedDeadline = query.get("deadline"); const initialize = window.setTimeout(() => {
@@ -92,6 +109,14 @@ export default function ApplicationWorkspaceDashboard() {
     } catch { setError("Unable to update applicant sharing. Refresh sharing status and try again."); }
     finally { setBusy(false); }
   }
+
+  if (access !== "allowed") return <PlaybookPage>
+    <section style={{ maxWidth: 900, margin: "42px auto", padding: 28, background: "#FFFFFF", borderRadius: 20, color: "#0F172A" }} role={access === "restricted" ? "alert" : "status"}>
+      <h1>{access === "checking" ? "Checking application workspace access…" : "Scholar-owned application workspaces"}</h1>
+      <p>{access === "checking" ? "Confirming your registered role." : "These application workspaces belong to Scholar, Scholar-Athlete, and Transition-Aged Youth accounts. Brand Partners should review only applications explicitly shared through their Applicants dashboard."}</p>
+      {access === "restricted" && <a href="/brand-partner-os/applicants">Return to Brand Partner Applicants</a>}
+    </section>
+  </PlaybookPage>;
 
   return <PlaybookPage>
     <PlaybookHero eyebrow="Application Workspace" title="Turn opportunity into action" subtitle="Track deadlines, tasks, private documents, status, and PBOS-governed progress in one durable workspace. Published Marketplace opportunity identity and deadline flow into this workspace without duplicate entry." />
