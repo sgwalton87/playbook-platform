@@ -74,6 +74,17 @@ function OrganizationWorkspace() {
     setLogo(row.logo_url || "");
     setLocation(row.location || "");
     setFocus(Array.isArray(row.partnership_focus) ? row.partnership_focus.join("\n") : "");
+    // Approved organizations retain a private owner-scoped primary contact record.
+    // Do not overwrite verification evidence or privileged organization identity.
+    try {
+      const response = await fetch("/api/brand-partner-profile-draft", { cache: "no-store" });
+      if (response.ok) {
+        const payload = await response.json() as { draft: { contactName: string; contactEmail: string; contactPhone: string }; savedAt: string | null };
+        setContactName(payload.draft.contactName || "");
+        setContactEmail(payload.draft.contactEmail || "");
+        setContactPhone(payload.draft.contactPhone || "");
+      }
+    } catch { /* Profile details remain visible when optional contact read fails. */ }
     setLoading(false);
   }, []);
 
@@ -147,7 +158,20 @@ function OrganizationWorkspace() {
       requested_partnership_focus: partnershipFocus,
     });
     if (result.error) { setError(result.error.message); setSaving(false); return; }
-    setMessage("Organization Profile updated. Verification evidence and approval scopes were not changed.");
+    // Save primary contact via the owner-scoped draft boundary, not the
+    // authority-controlled organization RPC which has no contact columns.
+    try {
+      const response = await fetch("/api/brand-partner-profile-draft", {
+        method: "PUT", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ summary, website, logo, location, focus, contactName, contactEmail, contactPhone }),
+      });
+      const data = await response.json() as { saved?: boolean; savedAt?: string; error?: string };
+      if (!response.ok || !data.saved) throw new Error(data.error || "Primary contact was not saved.");
+    } catch (error) {
+      setError("Organization updated, but contact confirmation failed: " + (error instanceof Error ? error.message : "Unknown error"));
+      setSaving(false); return;
+    }
+    setMessage("Organization Profile and primary contact saved. Verification authority was not changed.");
     setSavedAt(new Date().toISOString());
     await load();
     setSaving(false);
