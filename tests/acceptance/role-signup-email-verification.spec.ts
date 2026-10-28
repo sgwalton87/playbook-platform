@@ -167,11 +167,15 @@ test(`${role}: ${fullFields ? "full-field" : "core"} registration, email verific
         await summary.fill("Verified disposable Brand Partner draft survives reload.");
         await page.getByRole("button", { name: "Save Private Draft" }).click();
         await expect(page.getByRole("status").filter({ hasText: "Private draft saved and confirmed" })).toBeVisible();
+        const logoBytes = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScL/nwAAAABJRU5ErkJggg==", "base64");
+        await page.getByLabel("Upload company logo").setInputFiles({ name: "brand-logo.png", mimeType: "image/png", buffer: logoBytes });
+        await expect(page.getByRole("status").filter({ hasText: "Logo uploaded and saved" })).toBeVisible();
         await page.reload();
         await expect(page.getByLabel("Organization summary")).toHaveValue("Verified disposable Brand Partner draft survives reload.");
         const stored = await admin.from("profiles").select("onboarding_data").eq("id", userId).single();
         expect(stored.error).toBeNull();
         expect(stored.data?.onboarding_data?.brand_organization_draft?.summary).toBe("Verified disposable Brand Partner draft survives reload.");
+        expect(stored.data?.onboarding_data?.brand_organization_draft?.logo).toContain("/brand-organization-logos/");
         await page.goto(destination);
       }
       await page.reload();
