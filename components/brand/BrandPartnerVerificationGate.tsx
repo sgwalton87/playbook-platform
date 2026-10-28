@@ -66,7 +66,7 @@ export default function BrandPartnerVerificationGate({ children }: { children: R
       <p>Organization and campaign approval are separate from dashboard access. Restricted operations remain unavailable until explicitly approved.</p>
       {message && <p>{message}</p>}
       <BrandVerificationEvidenceUpload onEvidenceChange={setHasEvidence} />
-      {!request && <button onClick={() => void submit()} disabled={submitting || !hasEvidence} style={buttonStyle}>{submitting ? "Submitting…" : "Submit verification evidence"}</button>}
+      {(!request || request.status === "pending" || request.status === "under_review" || request.status === "rejected") && <button onClick={() => void submit()} disabled={submitting || !hasEvidence} style={buttonStyle}>{submitting ? "Submitting…" : request ? "Submit updated verification evidence" : "Submit verification evidence"}</button>}
       {!hasEvidence && <p>Upload at least one supporting document before submitting verification.</p>}
       {request && <p>Campaign scope: {request.campaign_scope_approved ? "approved" : "pending"} · Compliance scope: {request.compliance_scope_approved ? "approved" : "pending"}</p>}
     </section>
