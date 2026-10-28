@@ -108,7 +108,7 @@ function OrganizationWorkspace() {
           requested_website_url: website.trim() || null,
           requested_logo_url: uploaded,
           requested_location: location.trim() || null,
-          requested_partnership_focus: focus.split("\\n").map(value => value.trim()).filter(Boolean).slice(0, 20),
+          requested_partnership_focus: focus.split("\n").map(value => value.trim()).filter(Boolean).slice(0, 20),
         });
         if (result.error) throw new Error("Logo uploaded but organization update failed: " + result.error.message);
         setSavedAt(new Date().toISOString());
