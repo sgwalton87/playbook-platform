@@ -34,6 +34,7 @@ function OrganizationWorkspace() {
   const [summary, setSummary] = useState("");
   const [website, setWebsite] = useState("");
   const [logo, setLogo] = useState("");
+  const [uploadingLogo, setUploadingLogo] = useState(false);
   const [location, setLocation] = useState("");
   const [focus, setFocus] = useState("");
   const [loading, setLoading] = useState(true);
@@ -74,6 +75,29 @@ function OrganizationWorkspace() {
   }, []);
 
   useEffect(() => { const timer = window.setTimeout(() => { void load(); }, 0); return () => window.clearTimeout(timer); }, [load]);
+
+  async function uploadLogo(file?: File) {
+    if (!file) return;
+    setError(""); setMessage("");
+    if (file.size > 3 * 1024 * 1024 || !["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
+      setError("Choose a JPG, PNG, or WEBP logo smaller than 3 MB."); return;
+    }
+    setUploadingLogo(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Log in to upload your organization logo.");
+      const extension = file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg";
+      const path = `${user.id}/logo-${crypto.randomUUID()}.${extension}`;
+      const result = await supabase.storage.from("brand-organization-logos").upload(path, file, { contentType: file.type, upsert: false });
+      if (result.error) throw new Error(result.error.message);
+      const uploaded = supabase.storage.from("brand-organization-logos").getPublicUrl(path).data.publicUrl;
+      if (!uploaded) throw new Error("The logo URL could not be resolved.");
+      // The logo must be stored with the organization draft/record before saying saved.
+      setLogo(uploaded);
+      setMessage("Logo uploaded. Select Save Organization Profile or Save Private Draft to preserve it with your business information.");
+    } catch (error) { setError(error instanceof Error ? error.message : "Logo upload failed."); }
+    finally { setUploadingLogo(false); }
+  }
 
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -140,10 +164,15 @@ function OrganizationWorkspace() {
             <form onSubmit={save} style={form}>
               <label style={field}>Organization summary<textarea maxLength={2000} value={summary} onChange={(e) => setSummary(e.target.value)} style={textarea} placeholder="Mission, community focus, and how you support scholars…" /></label>
               <label style={field}>Website URL<input type="url" value={website} onChange={(e) => setWebsite(e.target.value)} style={input} placeholder="https://…" /></label>
-              <label style={field}>Logo URL<input type="url" value={logo} onChange={(e) => setLogo(e.target.value)} style={input} placeholder="https://…" /></label>
+              <label style={field}>Company logo
+                <input aria-label="Upload company logo" type="file" accept=".png,.jpg,.jpeg,.webp" disabled={uploadingLogo || saving} onChange={event => void uploadLogo(event.target.files?.[0])} style={input} />
+                <span style={muted}>Upload a JPG, PNG or WEBP image, maximum 3 MB. No logo URL required.</span>
+                {uploadingLogo && <span role="status">Uploading your logo…</span>}
+              </label>
+              {logo && <div style={{ display: "flex", alignItems: "center", gap: 12 }}><img alt="Current organization logo" src={logo} style={{ height: 72, width: 72, objectFit: "contain", borderRadius: 12, background: "#FFF", border: "1px solid #CBD5E1" }} /><span style={muted}>Current uploaded logo</span></div>}
               <label style={field}>Location<input maxLength={240} value={location} onChange={(e) => setLocation(e.target.value)} style={input} placeholder="Oakland, CA or Remote" /></label>
               <label style={field}>Partnership focus <span style={muted}>One focus area per line.</span><textarea value={focus} onChange={(e) => setFocus(e.target.value)} style={textarea} placeholder={"Internships\nFinancial literacy\nScholar-athlete development"} /></label>
-              <button type="submit" disabled={saving} style={primaryButton}>{saving ? "Saving…" : draftMode ? "Save Private Draft" : "Save Organization Profile"}</button>
+              <button type="submit" disabled={saving || uploadingLogo} style={primaryButton}>{saving ? "Saving…" : draftMode ? "Save Private Draft" : "Save Organization Profile"}</button>
             </form>
           </PlaybookCard>
         </PlaybookGrid>
