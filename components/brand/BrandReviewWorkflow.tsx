@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ADDITIONAL_VERIFICATION_REASONS, DECLINE_REASONS, buildReviewMessage, type ReviewOutcome } from "@/lib/verification/templates";
 import { SAFEGUARDING_QUESTIONS } from "@/lib/verification/safeguarding";
 import type { RegistryLookup } from "@/lib/verification/registry";
+import SosVerificationTutorial from "@/components/brand/SosVerificationTutorial";
 type Context = { registration?: { updated_at?: string; formation_state: string; entity_type: string; entity_number: string; safety_answers: Record<string,string> }; registry?: { human_outcome: string; source_url: string; review_note: string; safety_reviewed: boolean } };
 export default function BrandReviewWorkflow({ requestId, documentsReviewed, onComplete }: { requestId: string; documentsReviewed: boolean; onComplete: (message: string) => void }) {
  const [context, setContext] = useState<Context | null>(null);
@@ -45,6 +46,7 @@ export default function BrandReviewWorkflow({ requestId, documentsReviewed, onCo
  }
  return <section aria-label="Brand Partner review and communication" style={{ display: "grid", gap: 12, marginTop: 18 }}>
   <h3>Business and safeguarding review</h3>
+  <SosVerificationTutorial />
   {context?.registration ? <>
    <p>{context.registration.formation_state} · {context.registration.entity_type} · Entity number: {context.registration.entity_number || "Not supplied"}</p>
    <details><summary>Private student-safety declarations</summary>{SAFEGUARDING_QUESTIONS.map(q => <p key={q.id}><strong>{q.label}</strong><br />{context.registration?.safety_answers[q.id] || "Not answered"}</p>)}<p>A charge is not a conviction. Confirm identity, relevance, lawful reportability and any correction before making an individual decision. Do not send these declarations to AI.</p></details>
@@ -52,6 +54,7 @@ export default function BrandReviewWorkflow({ requestId, documentsReviewed, onCo
   </> : <p>Registration and safeguarding declarations have not yet been supplied. Request additional verification before approval.</p>}
   {lookup && <section aria-label="Registry research aid"><p>{lookup.summary}</p><a href={lookup.source} target="_blank" rel="noopener noreferrer">Open official registry</a>{lookup.candidates.map(row => <p key={row.entityNumber}>{row.name} · {row.entityNumber} · {row.standing}</p>)}<ul>{lookup.sources.map(row => <li key={row.url}><a href={row.url} target="_blank" rel="noopener noreferrer">{row.title}</a></li>)}</ul></section>}
   <label>Human registration determination<select value={humanOutcome} onChange={e => { setHumanOutcome(e.target.value); }} style={input}><option value="needs_review">Not yet resolved</option><option value="matched_active">Official entity matched and current standing confirmed</option><option value="alternative_verified">Alternative establishment evidence verified</option><option value="confirmed_issue">Verified issue requires clarification or decline</option></select></label>
+  <p>After the official SOS search, return here, paste the record URL, write the matching details and select the human determination. Select <strong>Save human review</strong> to persist this case; leaving the page before saving does not save draft text.</p>
   <label>Official record or alternative evidence URL<input type="url" value={sourceUrl} maxLength={2000} onChange={e => setSourceUrl(e.target.value)} style={input} /></label>
   <label>Registration and safeguarding review note<textarea value={registryNote} maxLength={4000} onChange={e => setRegistryNote(e.target.value)} style={input} /></label>
   <label><input type="checkbox" checked={safetyReviewed} onChange={e => setSafetyReviewed(e.target.checked)} /> I completed an individual human safeguarding review, including any requested private discussion, and resolved the student-safety requirements for this proposed scope.</label>
