@@ -8,6 +8,7 @@ import VerificationCommunicationLog from "@/components/brand/VerificationCommuni
 import BrandVerificationDocumentLibrary from "@/components/brand/BrandVerificationDocumentLibrary";
 import { brandReviewDueAt } from "@/lib/brand-verification/documents";
 import BrandEvidenceReviewPanel from "@/components/brand/BrandEvidenceReviewPanel";
+import CommunityEvidenceReviewPanel from "@/components/community/CommunityEvidenceReviewPanel";
 import {
   PlaybookCard,
   PlaybookGrid,
@@ -190,7 +191,7 @@ export default function AdminPage() {
           {requests.map((request) => {
             const decisionReason = (notes[request.request_id] || "").trim();
             const finalDecisionDisabled = busyId === request.request_id || !decisionReason;
-            const approvalDisabled = finalDecisionDisabled || (request.request_type === "brand-partner" && !reviewedDocuments[request.request_id]);
+            const approvalDisabled = finalDecisionDisabled || (["brand-partner", "community-partner"].includes(request.request_type) && !reviewedDocuments[request.request_id]);
             return (
               <PlaybookCard
                 key={`${request.request_type}-${request.request_id}`}
@@ -212,6 +213,8 @@ export default function AdminPage() {
                     </div>
                   ))}
                 </div>
+
+                {request.request_type === "community-partner" && <CommunityEvidenceReviewPanel requestId={request.request_id} onReviewed={reviewed => setReviewedDocuments(previous => ({ ...previous, [request.request_id]: reviewed }))} />}
 
                 {request.request_type === "brand-partner" && <BrandEvidenceReviewPanel requestId={request.request_id} onReviewed={reviewed => setReviewedDocuments(previous => ({ ...previous, [request.request_id]: reviewed }))} />}
 
