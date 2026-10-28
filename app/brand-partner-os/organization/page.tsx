@@ -94,7 +94,26 @@ function OrganizationWorkspace() {
       if (!uploaded) throw new Error("The logo URL could not be resolved.");
       // The logo must be stored with the organization draft/record before saying saved.
       setLogo(uploaded);
-      setMessage("Logo uploaded. Select Save Organization Profile or Save Private Draft to preserve it with your business information.");
+      if (draftMode) {
+        const response = await fetch("/api/brand-partner-profile-draft", {
+          method: "PUT", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ summary, website, logo: uploaded, location, focus }),
+        });
+        const saved = await response.json() as { saved?: boolean; savedAt?: string; error?: string };
+        if (!response.ok || !saved.saved || !saved.savedAt) throw new Error(saved.error || "Logo uploaded but profile save could not be confirmed.");
+        setSavedAt(saved.savedAt);
+      } else {
+        const result = await supabase.rpc("update_brand_partner_organization", {
+          requested_summary: summary.trim() || null,
+          requested_website_url: website.trim() || null,
+          requested_logo_url: uploaded,
+          requested_location: location.trim() || null,
+          requested_partnership_focus: focus.split("\\n").map(value => value.trim()).filter(Boolean).slice(0, 20),
+        });
+        if (result.error) throw new Error("Logo uploaded but organization update failed: " + result.error.message);
+        setSavedAt(new Date().toISOString());
+      }
+      setMessage("Logo uploaded and saved to your organization profile.");
     } catch (error) { setError(error instanceof Error ? error.message : "Logo upload failed."); }
     finally { setUploadingLogo(false); }
   }
