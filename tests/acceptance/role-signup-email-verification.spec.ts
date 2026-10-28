@@ -196,8 +196,6 @@ test(`${role}: ${fullFields ? "full-field" : "core"} registration, email verific
         await expect(page.getByText("Document uploaded privately.")).toBeVisible({ timeout: 15000 });
         await page.getByLabel("Legal organization name").fill("Disposable QA Brand Partner LLC");
         await page.getByLabel("Acknowledge NIL and compliance responsibilities").check();
-        await page.getByLabel("Legal organization name").fill("Disposable Brand Partner QA LLC");
-        await page.getByLabel("Acknowledge NIL and compliance responsibilities").check();
         const submitVerification = page.getByRole("button", { name: /Submit (updated )?verification evidence/i });
         await expect(submitVerification).toBeEnabled();
         const verificationResponse = page.waitForResponse(response =>
