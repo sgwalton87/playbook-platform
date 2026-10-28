@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { PlaybookButton, PlaybookCard, PlaybookPage } from "@/components/ui";
 import { brandAuthorityReady } from "@/lib/brand-verification/policy";
+import BrandVerificationEvidenceUpload from "@/components/brand/BrandVerificationEvidenceUpload";
 
 type VerificationRequest = {
   id: string;
@@ -24,6 +25,7 @@ export default function BrandPartnerVerificationGate({ children }: { children: R
   const [request, setRequest] = useState<VerificationRequest | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [hasEvidence, setHasEvidence] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -63,7 +65,9 @@ export default function BrandPartnerVerificationGate({ children }: { children: R
       <strong>Brand Partner verification {request?.status?.replaceAll("_", " ") ?? "not submitted"}</strong>
       <p>Organization and campaign approval are separate from dashboard access. Restricted operations remain unavailable until explicitly approved.</p>
       {message && <p>{message}</p>}
-      {!request && <button onClick={() => void submit()} disabled={submitting} style={buttonStyle}>{submitting ? "Submitting…" : "Submit verification evidence"}</button>}
+      <BrandVerificationEvidenceUpload onEvidenceChange={setHasEvidence} />
+      {!request && <button onClick={() => void submit()} disabled={submitting || !hasEvidence} style={buttonStyle}>{submitting ? "Submitting…" : "Submit verification evidence"}</button>}
+      {!hasEvidence && <p>Upload at least one supporting document before submitting verification.</p>}
       {request && <p>Campaign scope: {request.campaign_scope_approved ? "approved" : "pending"} · Compliance scope: {request.compliance_scope_approved ? "approved" : "pending"}</p>}
     </section>
     {children}
