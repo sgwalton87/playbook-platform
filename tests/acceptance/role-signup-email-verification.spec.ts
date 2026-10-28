@@ -172,7 +172,13 @@ test(`${role}: ${fullFields ? "full-field" : "core"} registration, email verific
         await expect(page.getByRole("status").filter({ hasText: "Private draft saved and confirmed" })).toBeVisible();
         const logoBytes = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScL/nwAAAABJRU5ErkJggg==", "base64");
         await page.getByLabel("Upload company logo").setInputFiles({ name: "brand-logo.png", mimeType: "image/png", buffer: logoBytes });
-        await expect(page.getByRole("status").filter({ hasText: "Logo uploaded and saved" })).toBeVisible();
+        await expect.poll(async () => {
+          const success = await page.getByRole("status").filter({ hasText: "Logo uploaded and saved" }).isVisible();
+          if (success) return "saved";
+          const alert = await page.getByRole("alert").allTextContents();
+          if (alert.length) return "error: " + alert.join(" | ");
+          return "pending";
+        }, { timeout: 15000 }).toBe("saved");
         await page.reload();
         await expect(page.getByLabel("Organization summary")).toHaveValue("Verified disposable Brand Partner draft survives reload.");
         const stored = await admin.from("profiles").select("onboarding_data").eq("id", userId).single();
