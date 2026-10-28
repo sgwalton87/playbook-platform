@@ -80,7 +80,7 @@ begin
        where evidence.bucket_id = 'brand-verification-evidence'
          and evidence.name ~ (
            '^' || new.brand_user_id::text ||
-           '/(letterhead|business-card)-[0-9a-f-]+\\.(pdf|png|jpg|webp)$'
+           '/(letterhead|business-card)-[0-9a-f-]+\.(pdf|png|jpg|webp)$'
          )
     ) then
       raise exception 'Company letterhead or a business card is required before Brand Partner approval'
