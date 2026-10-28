@@ -45,3 +45,10 @@ create policy "brand_logo_owner_read" on storage.objects for select to authentic
 using (bucket_id='brand-organization-logos' and (storage.foldername(name))[1]=(select auth.uid())::text);
 create policy "brand_logo_owner_delete" on storage.objects for delete to authenticated
 using (bucket_id='brand-organization-logos' and (storage.foldername(name))[1]=(select auth.uid())::text);
+
+-- A pre-existing application-document storage RLS policy references this
+-- current-user-only boolean helper. PostgreSQL must be able to evaluate all
+-- applicable RLS predicates when any authenticated user accesses storage.
+-- EXECUTE reveals only whether the *caller* is an onboarded learner and does
+-- not grant access to learner workspaces, documents, or other users' data.
+grant execute on function private.current_user_is_onboarded_learner() to authenticated;
