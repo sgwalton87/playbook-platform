@@ -4,7 +4,19 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import Dashboard from "@/components/application-workspace/ApplicationWorkspaceDashboard";
 
 const { rpc } = vi.hoisted(() => ({ rpc: vi.fn() }));
-vi.mock("@/lib/supabaseClient", () => ({ supabase: { rpc } }));
+vi.mock("@/lib/supabaseClient", () => ({
+  supabase: {
+    rpc,
+    auth: { getUser: async () => ({ data: { user: { id: "test-scholar" } } }) },
+    from: () => ({
+      select: () => ({
+        eq: () => ({
+          maybeSingle: async () => ({ data: { profile_mode: "scholar", role: "scholar" }, error: null }),
+        }),
+      }),
+    }),
+  },
+}));
 vi.mock("@/components/application-workspace/ApplicationSupportRequestPanel", () => ({ default: () => null }));
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.resetAllMocks(); });
 

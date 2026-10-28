@@ -40,11 +40,28 @@ function OrganizationWorkspace() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [draftMode, setDraftMode] = useState(false);
+  const [savedAt, setSavedAt] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true); setError("");
     const result = await supabase.rpc("ensure_brand_partner_organization");
-    if (result.error) { setError(result.error.message); setLoading(false); return; }
+    if (result.error) {
+      // Organization authority is deliberately restricted. An owner may still
+      // maintain a private draft without materializing a verified organization.
+      setDraftMode(true);
+      setPartner(null);
+      try {
+        const response = await fetch("/api/brand-partner-profile-draft", { cache: "no-store" });
+        if (!response.ok) throw new Error("Private draft could not be loaded.");
+        const payload = await response.json() as { draft: { summary: string; website: string; logo: string; location: string; focus: string }; savedAt: string | null };
+        setSummary(payload.draft.summary); setWebsite(payload.draft.website);
+        setLogo(payload.draft.logo); setLocation(payload.draft.location);
+        setFocus(payload.draft.focus); setSavedAt(payload.savedAt);
+      } catch (error) { setError(error instanceof Error ? error.message : "Private draft could not be loaded."); }
+      setLoading(false); return;
+    }
+    setDraftMode(false);
     const row = firstPartner(result.data);
     if (!row) { setError("Verified organization could not be resolved."); setLoading(false); return; }
     setPartner(row);
@@ -61,6 +78,20 @@ function OrganizationWorkspace() {
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSaving(true); setError(""); setMessage("");
+    if (draftMode) {
+      try {
+        const response = await fetch("/api/brand-partner-profile-draft", {
+          method: "PUT", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ summary, website, logo, location, focus }),
+        });
+        const result = await response.json() as { error?: string; saved?: boolean; savedAt?: string };
+        if (!response.ok || !result.saved || !result.savedAt) throw new Error(result.error || "Save was not confirmed.");
+        setSavedAt(result.savedAt);
+        setMessage("Private draft saved and confirmed. Your verified organization record is unchanged.");
+      } catch (error) { setError(error instanceof Error ? error.message : "Your draft could not be saved."); }
+      finally { setSaving(false); }
+      return;
+    }
     const partnershipFocus = focus.split("\n").map((item) => item.trim()).filter(Boolean).slice(0, 20);
     const result = await supabase.rpc("update_brand_partner_organization", {
       requested_summary: summary.trim() || null,
@@ -71,6 +102,7 @@ function OrganizationWorkspace() {
     });
     if (result.error) { setError(result.error.message); setSaving(false); return; }
     setMessage("Organization Profile updated. Verification evidence and approval scopes were not changed.");
+    setSavedAt(new Date().toISOString());
     await load();
     setSaving(false);
   }
@@ -84,7 +116,9 @@ function OrganizationWorkspace() {
           <div style={actions}><PlaybookButton href="/brand-partner-os">Brand Partner OS</PlaybookButton><PlaybookButton href="/brand-partner-os/campaigns" variant="secondary">Campaign Builder</PlaybookButton></div>
         </PlaybookHero>
         {error ? <div role="alert" style={alert}>{error}</div> : null}
+        {draftMode && <div role="status" style={status}><strong>Private organization draft</strong> — you can save this profile now. Marketplace publishing and campaign permissions remain locked until verification is approved.</div>}
         {message ? <div role="status" aria-live="polite" style={status}>{message}</div> : null}
+        {savedAt && <p role="status" style={{ ...muted, maxWidth: 1180, margin: "0 auto 14px", color: "#14532D", fontWeight: 800 }}>Last saved: {new Date(savedAt).toLocaleString()}</p>}
 
         <PlaybookMetrics>
           <PlaybookMetric label="Organization" value={partner?.name || "Not resolved"} />
@@ -96,7 +130,7 @@ function OrganizationWorkspace() {
         <section style={trustPanel}><PlaybookPill>Canonical ownership</PlaybookPill><h2 style={trustTitle}>Profile edits do not rewrite verification.</h2><p style={trustCopy}>Organization identity is materialized only after independent Brand Partner verification approves both campaign and compliance scope. This screen extends the operational organization record with marketplace-facing context.</p></section>
 
         <PlaybookGrid min={340}>
-          <PlaybookCard eyebrow="Verified identity" title={partner?.name || "Organization"}>
+          <PlaybookCard eyebrow="Verified identity" title={partner?.name || "Bulletproof Group LLC · unverified draft"}>
             <p style={copy}>Category: <strong>{partner?.category || "Not set"}</strong></p>
             <p style={copy}>Status: <strong>{partner?.active ? "Active" : "Inactive"}</strong></p>
             <p style={muted}>Name/category originate from approved verification evidence and are refreshed by the governed organization bootstrap.</p>
@@ -109,7 +143,7 @@ function OrganizationWorkspace() {
               <label style={field}>Logo URL<input type="url" value={logo} onChange={(e) => setLogo(e.target.value)} style={input} placeholder="https://…" /></label>
               <label style={field}>Location<input maxLength={240} value={location} onChange={(e) => setLocation(e.target.value)} style={input} placeholder="Oakland, CA or Remote" /></label>
               <label style={field}>Partnership focus <span style={muted}>One focus area per line.</span><textarea value={focus} onChange={(e) => setFocus(e.target.value)} style={textarea} placeholder={"Internships\nFinancial literacy\nScholar-athlete development"} /></label>
-              <button type="submit" disabled={saving} style={primaryButton}>{saving ? "Saving…" : "Save Organization Profile"}</button>
+              <button type="submit" disabled={saving} style={primaryButton}>{saving ? "Saving…" : draftMode ? "Save Private Draft" : "Save Organization Profile"}</button>
             </form>
           </PlaybookCard>
         </PlaybookGrid>
