@@ -72,7 +72,10 @@ export default function CommunityPartnerVerificationExperience() {
       : "You are in the correct Community Partner OS, but student records, support actions, referrals, and service delivery remain locked until organization identity and service scope are approved."}
     message={rejected ? request.review_notes : message}
   >
-    {!identityApproved && !rejected && <><CommunityPartnerEvidenceUpload onEvidenceChange={setHasEvidence} />\n      <button type="button" onClick={() => void submit()} disabled={submitting || !hasEvidence} style={{...buttonStyle,opacity:hasEvidence?1:0.5}}>{submitting ? "Updating…" : "Confirm documents and notify verification team"}</button>\n      <p style={bodyStyle}>A submitted organization profile is not proof that supporting documents were uploaded. Upload the evidence above and confirm to notify onboarding@playbookseriesinc.org.</p></>}\n    <PlaybookCard eyebrow="Organization information submitted" title={request.organization_name}>
+    {!identityApproved && !rejected && <><CommunityPartnerEvidenceUpload onEvidenceChange={setHasEvidence} />
+      <button type="button" onClick={() => void submit()} disabled={submitting || !hasEvidence} style={{...buttonStyle,opacity:hasEvidence?1:0.5}}>{submitting ? "Updating…" : "Confirm documents and notify verification team"}</button>
+      <p style={bodyStyle}>A submitted organization profile is not proof that supporting documents were uploaded. Upload the evidence above and confirm to notify onboarding@playbookseriesinc.org.</p></>}
+    <PlaybookCard eyebrow="Organization information submitted" title={request.organization_name}>
       <p style={bodyStyle}>{request.organization_type} · {request.service_area}</p>
       <p style={bodyStyle}>Official email: {request.official_email}</p>
       {request.community_services?.length > 0 && <p style={bodyStyle}>Services: {request.community_services.join(", ")}</p>}
