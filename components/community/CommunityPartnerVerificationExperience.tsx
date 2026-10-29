@@ -40,7 +40,7 @@ export default function CommunityPartnerVerificationExperience() {
     let active = true;
     void (async () => {
       const response = await fetch("/api/community-partner-verification", { cache: "no-store" });
-      const result = await response.json() as { error?: string; onboardingCompleted?: boolean; request?: VerificationRequest | null };
+      const result = await response.json() as { error?: string; onboardingCompleted?: boolean; request?: VerificationRequest | null; notification?: { status: string; updatedAt: string } | null };
       if (!active) return;
       if (!response.ok) setMessage(result.error ?? "Verification could not be loaded.");
       else { setOnboardingCompleted(Boolean(result.onboardingCompleted)); setRequest(result.request ?? null); setNotification(result.notification ?? null); }
