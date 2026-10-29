@@ -25,13 +25,15 @@ export default function CommunityPartnerVerificationExperience() {
   const [message, setMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [hasEvidence, setHasEvidence] = useState(false);
+  const [notification, setNotification] = useState<{status:string;updatedAt:string}|null>(null);
 
   async function reload() {
     const response = await fetch("/api/community-partner-verification", { cache: "no-store" });
-    const result = await response.json() as { error?: string; onboardingCompleted?: boolean; request?: VerificationRequest | null };
+    const result = await response.json() as { error?: string; onboardingCompleted?: boolean; request?: VerificationRequest | null; notification?: {status:string;updatedAt:string}|null };
     if (!response.ok) { setMessage(result.error ?? "Verification could not be loaded."); return; }
     setOnboardingCompleted(Boolean(result.onboardingCompleted));
     setRequest(result.request ?? null);
+    setNotification(result.notification ?? null);
   }
 
   useEffect(() => {
@@ -41,7 +43,7 @@ export default function CommunityPartnerVerificationExperience() {
       const result = await response.json() as { error?: string; onboardingCompleted?: boolean; request?: VerificationRequest | null };
       if (!active) return;
       if (!response.ok) setMessage(result.error ?? "Verification could not be loaded.");
-      else { setOnboardingCompleted(Boolean(result.onboardingCompleted)); setRequest(result.request ?? null); }
+      else { setOnboardingCompleted(Boolean(result.onboardingCompleted)); setRequest(result.request ?? null); setNotification(result.notification ?? null); }
       setLoading(false);
     })();
     return () => { active = false; };
@@ -81,7 +83,7 @@ export default function CommunityPartnerVerificationExperience() {
     message={rejected ? request.review_notes : message}
   >
     {!identityApproved && !rejected && <><CommunityPartnerEvidenceUpload onEvidenceChange={setHasEvidence} />
-      <button type="button" onClick={() => void submit()} disabled={submitting || !hasEvidence} style={{...buttonStyle,opacity:hasEvidence?1:0.5}}>{submitting ? "Updating…" : "Confirm documents and notify verification team"}</button>
+      {notification ? <p role="status" style={noticeStyle}>{notification.status === "sent" ? "Submission recorded. SMTP accepted a notification, but inbox delivery is not verified." : notification.status === "failed" ? "Submission recorded. Email delivery failed; the review team must retry the notification." : notification.status === "delivery_unknown" ? "Submission recorded. Email acceptance is uncertain; do not resubmit." : "Submission recorded. Notification status: " + notification.status + "."}</p> : <button type="button" onClick={() => void submit()} disabled={submitting || !hasEvidence} style={{...buttonStyle,opacity:hasEvidence?1:0.5}}>{submitting ? "Updating…" : "Confirm documents and notify verification team"}</button>}
       <p style={bodyStyle}>Your submitted documents remain private. Notification delivery is tracked separately from review approval.</p></>}
     <PlaybookCard eyebrow="Organization information submitted" title={request.organization_name}>
       <p style={bodyStyle}>{request.organization_type} · {request.service_area}</p>
