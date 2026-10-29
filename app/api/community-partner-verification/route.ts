@@ -19,7 +19,9 @@ export async function GET() {
       .select("id,organization_name,organization_type,official_email,organization_website,community_services,service_area,status,service_scope_status,submitted_at,reviewed_at,review_notes")
       .eq("partner_user_id", user.id).maybeSingle();
     if (request.error) throw new Error(request.error.message);
-    return NextResponse.json({ ok: true, onboardingCompleted: Boolean(profile.data.onboarding_completed), request: request.data ?? null });
+    const receipt = request.data ? await supabase.rpc("get_own_community_verification_notification_status") : null;
+    const notification = receipt && !receipt.error ? (receipt.data?.[0] ?? null) : null;
+    return NextResponse.json({ ok: true, onboardingCompleted: Boolean(profile.data.onboarding_completed), request: request.data ?? null, notification: notification ? { status: notification.status, updatedAt: notification.updated_at } : null });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Community Partner verification could not be loaded." }, { status: 400 });
   }
