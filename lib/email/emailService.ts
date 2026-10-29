@@ -1,3 +1,4 @@
+import type { PlaybookEmailType } from "./directory";
 import nodemailer from "nodemailer";
 import { getEmailSender } from "./emailConfig";
 
@@ -6,7 +7,9 @@ export async function sendPlaybookEmail(input: {
   subject: string;
   text: string;
   html?: string;
-  fromType?: "onboarding" | "support" | "notifications" | "hello" | "noreply";
+  fromType?: PlaybookEmailType;
+  replyToType?: PlaybookEmailType;
+  messageId?: string;
 }) {
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
@@ -24,6 +27,7 @@ export async function sendPlaybookEmail(input: {
     subject: input.subject,
     text: input.text,
     html: input.html,
-    replyTo: getEmailSender("support"),
+    replyTo: getEmailSender(input.replyToType || "support"),
+    messageId: input.messageId,
   });
 }

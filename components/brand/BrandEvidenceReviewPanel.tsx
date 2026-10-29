@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type Document = { name: string; type: string; url: string };
 export default function BrandEvidenceReviewPanel({ requestId, onReviewed }: {
@@ -9,6 +9,12 @@ export default function BrandEvidenceReviewPanel({ requestId, onReviewed }: {
   const [documents, setDocuments] = useState<Document[] | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const invalidate = () => setDocuments(null);
+    window.addEventListener("brand-verification-documents-changed", invalidate);
+    return () => window.removeEventListener("brand-verification-documents-changed", invalidate);
+  }, []);
 
   async function load() {
     setBusy(true);
@@ -27,7 +33,7 @@ export default function BrandEvidenceReviewPanel({ requestId, onReviewed }: {
 
   return <section aria-label="Private Brand Partner business evidence" style={{ padding: 14, border: "1px solid #CBD5E1", background: "#F8FAFC", borderRadius: 12, color: "#0F172A" }}>
     <strong>Private business verification documents</strong>
-    <p>Review the organization&apos;s letterhead or business card before approving. Links expire after two minutes and must not be shared.</p>
+    <p>Review the organization&apos;s letterhead or business card before approving. Review target: 72 hours. Documents stay available in the admin folder after review. Each file open requires an authorized admin session.</p>
     <button type="button" disabled={busy} onClick={() => void load()}>{busy ? "Loading…" : "Open submitted evidence"}</button>
     {error && <p role="alert" style={{ color: "#991B1B" }}>{error}</p>}
     {documents && (documents.length

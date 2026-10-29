@@ -3,7 +3,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import BrandReviewWorkflow from "@/components/brand/BrandReviewWorkflow";
+import VerificationCommunicationLog from "@/components/brand/VerificationCommunicationLog";
+import BrandVerificationDocumentLibrary from "@/components/brand/BrandVerificationDocumentLibrary";
+import { brandReviewDueAt } from "@/lib/brand-verification/documents";
 import BrandEvidenceReviewPanel from "@/components/brand/BrandEvidenceReviewPanel";
+import CommunityEvidenceReviewPanel from "@/components/community/CommunityEvidenceReviewPanel";
 import {
   PlaybookCard,
   PlaybookGrid,
@@ -50,6 +55,7 @@ function displayValue(value: unknown) {
 
 export default function AdminPage() {
   const router = useRouter();
+  const [reviewNotice, setReviewNotice] = useState("");
   const [requests, setRequests] = useState<ReviewRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [forbidden, setForbidden] = useState(false);
@@ -91,6 +97,12 @@ export default function AdminPage() {
     return () => window.clearTimeout(timer);
   }, [load]);
 
+  useEffect(() => {
+    const invalidate = () => setReviewedDocuments({});
+    window.addEventListener("brand-verification-documents-changed", invalidate);
+    return () => window.removeEventListener("brand-verification-documents-changed", invalidate);
+  }, []);
+
   const counts = useMemo(() => ({
     total: requests.length,
     pending: requests.filter((request) => request.status === "pending").length,
@@ -128,6 +140,7 @@ export default function AdminPage() {
 
     setNotes((current) => ({ ...current, [request.request_id]: "" }));
     await load();
+    window.dispatchEvent(new Event("brand-verification-review-completed"));
     setBusyId("");
   }
 
@@ -152,6 +165,8 @@ export default function AdminPage() {
         subtitle="Review role evidence without bypassing Scholar ownership, relationship consent, or downstream scope gates."
       />
 
+      <BrandVerificationDocumentLibrary />
+
       <PlaybookMetrics>
         <PlaybookMetric label="Open reviews" value={loading ? "…" : String(counts.total)} />
         <PlaybookMetric label="Pending" value={loading ? "…" : String(counts.pending)} />
@@ -159,6 +174,8 @@ export default function AdminPage() {
         <PlaybookMetric label="Role types" value={loading ? "…" : String(counts.roles)} />
       </PlaybookMetrics>
 
+      {reviewNotice && <p role="status" style={copy}>{reviewNotice}</p>}
+      <VerificationCommunicationLog />
       {error ? <div style={errorBox} role="alert">{error}</div> : null}
 
       {loading ? (
@@ -174,7 +191,7 @@ export default function AdminPage() {
           {requests.map((request) => {
             const decisionReason = (notes[request.request_id] || "").trim();
             const finalDecisionDisabled = busyId === request.request_id || !decisionReason;
-            const approvalDisabled = finalDecisionDisabled || (request.request_type === "brand-partner" && !reviewedDocuments[request.request_id]);
+            const approvalDisabled = finalDecisionDisabled || (["brand-partner", "community-partner"].includes(request.request_type) && !reviewedDocuments[request.request_id]);
             return (
               <PlaybookCard
                 key={`${request.request_type}-${request.request_id}`}
@@ -186,6 +203,8 @@ export default function AdminPage() {
                   <span style={dateText}>{new Date(request.submitted_at).toLocaleString()}</span>
                 </div>
 
+                {request.request_type === "brand-partner" && <p style={copy}>Review target: {brandReviewDueAt(request.submitted_at) ? new Date(brandReviewDueAt(request.submitted_at)!).toLocaleString() : "Submission date unavailable"} (72 hours). Documents remain available after this target.</p>}
+
                 <div style={evidenceGrid}>
                   {Object.entries(request.evidence || {}).map(([key, value]) => (
                     <div key={key} style={evidenceRow}>
@@ -195,8 +214,11 @@ export default function AdminPage() {
                   ))}
                 </div>
 
+                {request.request_type === "community-partner" && <CommunityEvidenceReviewPanel requestId={request.request_id} onReviewed={reviewed => setReviewedDocuments(previous => ({ ...previous, [request.request_id]: reviewed }))} />}
+
                 {request.request_type === "brand-partner" && <BrandEvidenceReviewPanel requestId={request.request_id} onReviewed={reviewed => setReviewedDocuments(previous => ({ ...previous, [request.request_id]: reviewed }))} />}
 
+                {request.request_type === "brand-partner" ? <BrandReviewWorkflow requestId={request.request_id} documentsReviewed={Boolean(reviewedDocuments[request.request_id])} onComplete={message => { setReviewNotice(message); void load(); }} /> : <>
                 <label style={notesLabel}>
                   Decision reason
                   <textarea
@@ -218,6 +240,7 @@ export default function AdminPage() {
                   <button type="button" disabled={finalDecisionDisabled} onClick={() => void review(request, "rejected")} style={{ ...dangerButton, opacity: finalDecisionDisabled ? 0.55 : 1 }}>Reject</button>
                   <button type="button" disabled={approvalDisabled} onClick={() => void review(request, "approved")} style={{ ...primaryButton, opacity: approvalDisabled ? 0.55 : 1 }}>Approve</button>
                 </div>
+                </>}
               </PlaybookCard>
             );
           })}

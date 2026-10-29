@@ -61,11 +61,13 @@
     "postinstall": "node scripts/pbos/patch-next-eslint-glob.mjs"
   },
   "dependencies": {
+    "@ai-sdk/gateway": "4.0.129",
     "@hcaptcha/react-hcaptcha": "^2.0.2",
     "@react-pdf/renderer": "^4.5.1",
     "@stripe/stripe-js": "^9.8.0",
     "@supabase/ssr": "^0.12.0",
     "@supabase/supabase-js": "^2.108.2",
+    "ai": "7.0.156",
     "canvas-confetti": "^1.9.4",
     "next": "16.4.2",
     "nodemailer": "10.1.7",

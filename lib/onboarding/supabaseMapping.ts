@@ -1,3 +1,4 @@
+import { COMMUNITY_POLICY_VERSION } from "@/lib/trust/communityStandards";
 import type { OnboardingData } from "./types";
 
 export function mapOnboardingToProfilePayload(input: {
@@ -44,7 +45,7 @@ export function mapOnboardingToProfilePayload(input: {
       ? new Date().toISOString()
       : null,
     community_safety_policy_version: input.data.community_safety_agreed
-      ? "playbook-safety-v1"
+      ? COMMUNITY_POLICY_VERSION
       : null,
   };
 }

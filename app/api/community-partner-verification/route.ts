@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { sendPlaybookEmail } from "@/lib/email/emailService";
+import { playbookEmails } from "@/lib/email/emailConfig";
 import { buildCommunityPartnerEvidence } from "@/lib/community-partner-verification/policy";
 import { requirePlaybookRole } from "@/lib/roles/registry";
 import { requireUser } from "@/lib/supabase/server";
@@ -36,6 +38,10 @@ export async function POST() {
     if (!profile.data.onboarding_completed) {
       return NextResponse.json({ error: "Complete Community Partner onboarding before submitting verification." }, { status: 409 });
     }
+    const docs = await supabase.rpc("get_own_community_verification_documents");
+    if (docs.error) return NextResponse.json({ error: "Unable to check your saved verification documents. Please try again." }, { status: 503 });
+    const hasEvidence = ((docs.data ?? []) as {name:string}[]).some(d => /^[-a-f0-9]{36}\/organization-[-a-f0-9]{36}\.(pdf|png|jpg|webp)$/.test(d.name));
+    if (!hasEvidence) return NextResponse.json({ error: "Upload supporting organization documentation before submitting Community Partner verification." }, { status: 422 });
     const evidence = buildCommunityPartnerEvidence((profile.data.onboarding_data ?? {}) as Record<string, unknown>);
     const result = await supabase.from("community_partner_verification_requests").upsert({
       partner_user_id: user.id,
@@ -52,9 +58,49 @@ export async function POST() {
       updated_at: new Date().toISOString(),
     }, { onConflict: "partner_user_id" }).select("id,status,service_scope_status,submitted_at").single();
     if (result.error) throw new Error(result.error.message);
+    // The durable outbox prevents duplicate messages on repeated submit.
+    const claim = await supabase.rpc("claim_own_community_verification_notice", { requested_id: result.data.id });
+    let notificationStatus = "queued";
+    if (!claim.error && claim.data && process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+      try {
+        const receipt = await sendPlaybookEmail({
+          to: playbookEmails.onboarding,
+          subject: "Playbook Community Partner verification submitted",
+          text: "A Community Partner verification request is pending human review. Open the governed Admin Review Center at https://app.playbookseriesinc.org/admin to examine the request and private evidence. Do not forward sensitive evidence by email.",
+          fromType: "onboarding",
+          replyToType: "onboarding",
+          messageId: `<community-verification-${result.data.id}@playbookseriesinc.org>`,
+        });
+        notificationStatus = receipt.accepted?.length ? "sent" : "failed";
+        await supabase.rpc("finish_own_community_verification_notice", {
+          requested_id: result.data.id, requested_claim: claim.data, requested_status: notificationStatus,
+          requested_error: notificationStatus === "sent" ? null : "Email server did not accept onboarding mailbox.",
+          requested_message_id: receipt.messageId || null,
+        });
+      } catch {
+        notificationStatus = "delivery_unknown";
+        await supabase.rpc("finish_own_community_verification_notice", {
+          requested_id: result.data.id, requested_claim: claim.data, requested_status: "delivery_unknown",
+          requested_error: "SMTP acceptance uncertain; do not retry without reviewing mail logs.",
+          requested_message_id: null,
+        });
+      }
+    } else if (!claim.error && claim.data) {
+      notificationStatus = "failed";
+      await supabase.rpc("finish_own_community_verification_notice", {
+        requested_id: result.data.id, requested_claim: claim.data, requested_status: "failed",
+        requested_error: "SMTP transport not configured; reviewer queue remains available.",
+        requested_message_id: null,
+      });
+    } else if (claim.error) {
+      notificationStatus = "queue_unavailable";
+    } else {
+      notificationStatus = "unchanged";
+    }
     return NextResponse.json({
       ok: true,
       request: result.data,
+      reviewNotification: notificationStatus,
       activationState: "pending_verification",
       message: "Community Partner evidence was submitted. No Scholar access or service-delivery authority has been activated.",
     }, { status: 202 });

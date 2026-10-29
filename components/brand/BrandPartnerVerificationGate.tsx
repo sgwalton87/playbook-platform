@@ -1,7 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { PlaybookButton, PlaybookCard, PlaybookPage } from "@/components/ui";
+import { useCallback, useEffect, useState } from "react";
+import CommunityVettingJourney from "@/components/trust/CommunityVettingJourney";
+import BrandRegistrationFields from "@/components/brand/BrandRegistrationFields";
+import { EMPTY_REGISTRATION, parseRegistration, type BrandRegistration } from "@/lib/verification/registration";
+import { PlaybookButton, PlaybookPage } from "@/components/ui";
 import { brandAuthorityReady } from "@/lib/brand-verification/policy";
 import BrandVerificationEvidenceUpload from "@/components/brand/BrandVerificationEvidenceUpload";
 
@@ -17,9 +20,13 @@ type VerificationRequest = {
   submitted_at: string;
   review_notes: string | null;
 };
-type LoadResult = { error?: string; onboardingCompleted?: boolean; request?: VerificationRequest | null };
+type LoadResult = { registrationDetails?: { formation_state: string; entity_type: string; entity_number: string; safety_answers: BrandRegistration["safetyAnswers"]; safeguarding_accepted: boolean }; workflow?: { outcome: string; public_message: string } | null; error?: string; onboardingCompleted?: boolean; request?: VerificationRequest | null };
 
 export default function BrandPartnerVerificationGate({ children }: { children: React.ReactNode }) {
+  const [communityAccepted,setCommunityAccepted] = useState(false);
+  const acceptCommunity = useCallback(() => setCommunityAccepted(true), []);
+  const [registration, setRegistration] = useState<BrandRegistration>(EMPTY_REGISTRATION);
+  const [reviewMessage, setReviewMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [onboardingCompleted, setOnboardingCompleted] = useState(false);
   const [request, setRequest] = useState<VerificationRequest | null>(null);
@@ -36,6 +43,8 @@ export default function BrandPartnerVerificationGate({ children }: { children: R
       .then(({ response, result }) => {
         if (cancelled) return;
         if (!response.ok) { setMessage(result.error ?? "Brand verification could not be loaded."); setLoading(false); return; }
+        if (result.registrationDetails) { const d = result.registrationDetails; setRegistration({ formationState: d.formation_state, entityType: d.entity_type, entityNumber: d.entity_number, safetyAnswers: d.safety_answers, safeguardingAccepted: d.safeguarding_accepted }); }
+        setReviewMessage(result.workflow?.public_message ?? "");
         setOnboardingCompleted(Boolean(result.onboardingCompleted)); setRequest(result.request ?? null); setOrganizationName(result.request?.organization_name ?? ""); setMessage(null); setLoading(false);
       })
       .catch((error: unknown) => { if (!cancelled) { setMessage(error instanceof Error ? error.message : "Brand verification could not be loaded."); setLoading(false); } });
@@ -48,8 +57,10 @@ export default function BrandPartnerVerificationGate({ children }: { children: R
     setOnboardingCompleted(Boolean(result.onboardingCompleted)); setRequest(result.request ?? null);
   }
   async function submit() {
+    if (!communityAccepted) { setMessage("Acknowledge the community standards before submitting documents."); return; }
+    try { parseRegistration(registration); } catch (cause) { setMessage(cause instanceof Error ? cause.message : "Complete the required declarations."); return; }
     setSubmitting(true); setMessage(null);
-    const response = await fetch("/api/brand-verification", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ organizationName, nilAcknowledged }) }); const result = await response.json() as { error?: string; message?: string };
+    const response = await fetch("/api/brand-verification", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ organizationName, nilAcknowledged, registration }) }); const result = await response.json() as { error?: string; message?: string };
     setSubmitting(false); if (!response.ok) { setMessage(result.error ?? "Brand verification could not be submitted."); return; }
     setMessage(result.message ?? "Brand verification submitted."); await reloadAfterMutation();
   }
@@ -67,6 +78,9 @@ export default function BrandPartnerVerificationGate({ children }: { children: R
       <strong>Brand Partner verification {request?.status?.replaceAll("_", " ") ?? "not submitted"}</strong>
       <p>Organization and campaign approval are separate from dashboard access. Restricted operations remain unavailable until explicitly approved.</p>
       {message && <p>{message}</p>}
+      {reviewMessage && <p><strong>Latest reviewer message:</strong> {reviewMessage}</p>}
+      <CommunityVettingJourney onAccepted={acceptCommunity} />
+      {communityAccepted && <>
       <div style={{ display: "grid", gap: 12, padding: "12px 0" }}>
         <label style={{ fontWeight: 700 }}>Legal organization name
           <input aria-label="Legal organization name" type="text" maxLength={240} value={organizationName} onChange={event => setOrganizationName(event.target.value)} style={{ display: "block", width: "100%", padding: 12, borderRadius: 8, border: "1px solid #9CA3AF", color: "#111827", background: "#FFFFFF" }} />
@@ -76,9 +90,11 @@ export default function BrandPartnerVerificationGate({ children }: { children: R
           I acknowledge that NIL, student protection, campaign and legal compliance requirements apply, and that submitting evidence does not grant approval.
         </label>
       </div>
+      <BrandRegistrationFields value={registration} onChange={setRegistration} />
       <BrandVerificationEvidenceUpload onEvidenceChange={setHasEvidence} />
       {(!request || request.status === "pending" || request.status === "under_review" || request.status === "rejected") && <button onClick={() => void submit()} disabled={submitting || !hasEvidence || !organizationName.trim() || !nilAcknowledged} style={buttonStyle}>{submitting ? "Submitting…" : request ? "Submit updated verification evidence" : "Submit verification evidence"}</button>}
       {!hasEvidence && <p>Upload at least one supporting document before submitting verification.</p>}
+      </>}
       {request && <p>Campaign scope: {request.campaign_scope_approved ? "approved" : "pending"} · Compliance scope: {request.compliance_scope_approved ? "approved" : "pending"}</p>}
     </section>
     {children}
@@ -93,5 +109,5 @@ function Surface({ title, body, message, children }: { title: string; body: stri
 const surfaceStyle: React.CSSProperties = { maxWidth: 900, margin: "40px auto", padding: "clamp(28px,5vw,52px)", borderRadius: 28, background: "#071A33", color: "#FFFFFF" };
 const eyebrowStyle: React.CSSProperties = { margin: 0, fontSize: 11, fontWeight: 900, letterSpacing: ".14em", textTransform: "uppercase", color: "#FF9A6C" };
 const titleStyle: React.CSSProperties = { margin: "12px 0", fontSize: "clamp(34px,6vw,62px)", lineHeight: 1 }; const bodyStyle: React.CSSProperties = { color: "#C7D5E5", lineHeight: 1.65 };
-const metaStyle: React.CSSProperties = { color: "#94A3B8", fontSize: 13 }; const noticeStyle: React.CSSProperties = { margin: "14px auto 18px", maxWidth: 1180, padding: 18, borderRadius: 14, color: "#7C2D12", background: "#FFF7ED", border: "1px solid #FDBA74", lineHeight: 1.55 };
+const noticeStyle: React.CSSProperties = { margin: "14px auto 18px", maxWidth: 1180, padding: 18, borderRadius: 14, color: "#7C2D12", background: "#FFF7ED", border: "1px solid #FDBA74", lineHeight: 1.55 };
 const routeStyle: React.CSSProperties = { marginTop: 20, color: "#94A3B8", fontSize: 12 }; const buttonStyle: React.CSSProperties = { border: 0, borderRadius: 12, padding: "12px 18px", fontWeight: 800, cursor: "pointer", background: "#F97316", color: "#FFFFFF" };

@@ -91,7 +91,7 @@ export default function UnifiedAppShell({ children }: { children: React.ReactNod
         <div style={contextGrid}>
           <ContextLink href="/notifications" label="Attention" value={attentionTotal} emphasis={attentionTotal > 0} />
           <ContextLink href="/transcript" label="Evidence" value={context.evidenceCount} />
-          <ContextLink href="/profile" label="Pending review" value={context.pendingVerificationCount} emphasis={context.pendingVerificationCount > 0} />
+          <ContextLink href={isPlatformOperatorRole(profile?.role) ? "/admin" : "/profile"} label="Pending review" value={context.pendingVerificationCount} emphasis={context.pendingVerificationCount > 0} />
           <ContextLink href="/support-network" label="Support team" value={context.activeSupportCount} />
         </div>
       </section>}

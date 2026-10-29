@@ -188,6 +188,19 @@ test(`${role}: ${fullFields ? "full-field" : "core"} registration, email verific
         expect(stored.data?.onboarding_data?.brand_organization_draft?.logo).toContain("/brand-organization-logos/");
         expect(stored.data?.onboarding_data?.brand_organization_draft).toMatchObject({ contactName: "QA Primary Contact", contactEmail: "primary-contact@example.com", contactPhone: "+1 202-555-0141" });
         await expect(page.getByLabel("Main contact telephone")).toHaveValue("+1 202-555-0141");
+        const introduction = page.getByRole("region", {name:"Before you submit verification documents"});
+        await expect(introduction).toBeVisible();
+        for(let step=0;step<3;step++) await introduction.getByRole("button",{name:"Continue",exact:true}).click();
+        await introduction.getByRole("checkbox").check();
+        await introduction.getByRole("button",{name:"Agree and continue to verification"}).click();
+        await expect(page.getByRole("region",{name:"Community standards acknowledged"})).toBeVisible();
+        await page.getByLabel("Formation state or jurisdiction").selectOption("California");
+        await page.getByLabel("Business structure",{exact:true}).selectOption("LLC");
+        const safety = page.getByRole("region",{name:"Business registration and student safety"});
+        for(const select of await safety.locator("select").all()) {
+          if(await select.locator('option[value="no"]').count()) await select.selectOption("no");
+        }
+        await safety.getByRole("checkbox").check();
         // Evidence is private and human-reviewed. Verify existing pending requests
         // can submit new documents without receiving campaign authority.
         await page.getByLabel("Upload business card").setInputFiles({
@@ -259,6 +272,11 @@ test(`${role}: ${fullFields ? "full-field" : "core"} registration, email verific
     }
   } finally {
     for (const id of ids) {
+      // Retained verification acknowledgements deliberately block account deletion.
+      // This test is hard-limited above to a disposable localhost stack. Keep this
+      // fixture until the workflow destroys that entire stack; never weaken the
+      // production retention constraints to make synthetic cleanup succeed.
+      if (role === "brand-partner") continue;
       const result = await admin.auth.admin.deleteUser(id);
       if (result.error) throw Error("Isolated signup test account cleanup failed");
     }

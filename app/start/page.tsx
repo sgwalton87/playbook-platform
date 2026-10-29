@@ -1,5 +1,6 @@
 "use client";
 
+import CommunitySafetyAgreement from "@/components/trust/CommunitySafetyAgreement";
 import Image from "next/image";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -346,23 +347,23 @@ function StartContent() {
       {creating && (
         <div style={overlay}>
           <div style={confetti}>✨ 🧭 📚</div>
-          <h1 style={overlayTitle}>Hold tight, {form.full_name || "Scholar"}.</h1>
+          <h1 style={overlayTitle}>Creating your {PLAYBOOK_ROLES[role].osLabel} profile…</h1>
           <p style={overlayText}>We are creating your profile...</p>
         </div>
       )}
 
       {created && (
         <div style={overlay}>
-          <div style={confetti}>🎉 ✨ 🏆 🎓 🧭 🎉<br />🎉 ✨ 🏆 🎓 🧭 🎉<br />🎉 ✨ 🏆 🎓 🧭 🎉</div>
-          <h1 style={overlayTitle}>Congratulations, {form.full_name || "Scholar"}!</h1>
-          <p style={overlayText}>Your Playbook profile is ready. Taking you to your dashboard...</p>
+          <div aria-hidden="true" style={confetti}>🎉 ✨ 🏆</div>
+          <h1 style={overlayTitle}>Welcome to {PLAYBOOK_ROLES[role].osLabel}!</h1>
+          <p style={overlayText}>Your {PLAYBOOK_ROLES[role].osLabel} profile is ready. Opening your workspace…</p>
         </div>
       )}
 
       <section style={hero}>
         <div style={heroText}>
           <PlaybookLogo size={108} priority />
-          <p style={eyebrow}>Start Here · {role}</p>
+          <p style={eyebrow}>Start Here · {PLAYBOOK_ROLES[role].osLabel}</p>
           <h1 style={heroTitle}>Welcome to {PLAYBOOK_ROLES[role].osLabel}.</h1>
           <p style={heroBody}>
             Your answers autosave to your private Playbook profile for this role. Any sharing or public visibility is managed separately.
@@ -513,13 +514,7 @@ function FieldRenderer({ field, value, onChange, onBlur, primarySport }: LegacyV
     return (
       <div style={group}>
         <div style={safetyBox}>
-          <h3 style={{ marginTop: 0 }}>The Playbook Community Safety Agreement</h3>
-          <p>The Playbook is a community built for learning, opportunity, growth, mentorship, and connection. Every member deserves to participate without being bullied, harassed, threatened, humiliated, excluded, or targeted.</p>
-          <p>By joining The Playbook, I agree that I will not participate in bullying, harassment, intimidation, discrimination, threats, unwanted sexual conduct, cyberbullying, coordinated targeting, or retaliation in any form.</p>
-          <p>This applies to posts, comments, messages, groups, events, courses, mentoring relationships, athletic spaces, and other interactions connected to The Playbook.</p>
-          <p>Harmful conduct may include repeated unwanted contact, spreading harmful rumors, sharing private or embarrassing information without permission, encouraging others to target someone, discriminatory harassment, threatening language, or using Playbook features to isolate, shame, or intimidate another person.</p>
-          <p>I agree to treat other community members with dignity, report serious safety concerns through the appropriate reporting tools, and cooperate with reasonable safety reviews when necessary.</p>
-          <p>I understand that violating this agreement may result in content removal, feature restrictions, temporary suspension, removal from a program or event, or account termination, depending on the circumstances and severity of the conduct.</p>
+          <CommunitySafetyAgreement />
         </div>
 
         <label style={agreeRow}>
@@ -785,9 +780,9 @@ const avatar: React.CSSProperties = { width: 86, height: 86, borderRadius: 999, 
 const avatarImg: React.CSSProperties = { width: "100%", height: "100%", objectFit: "cover" };
 const uploadButton: React.CSSProperties = { border: "1px solid #CBD5E1", borderRadius: 999, padding: "12px 18px", fontWeight: 950, cursor: "pointer" };
 const overlay: React.CSSProperties = { position: "fixed", inset: 0, zIndex: 9999, background: "rgba(15,23,42,.94)", color: "#F8F7F4", display: "grid", placeItems: "center", textAlign: "center", padding: 24 };
-const overlayTitle: React.CSSProperties = { fontFamily: "'Anton', sans-serif", fontSize: "clamp(44px,7vw,86px)", textTransform: "uppercase", margin: 0 };
+const overlayTitle: React.CSSProperties = { fontFamily: "'Anton', sans-serif", fontSize: "clamp(28px,7vw,66px)", lineHeight: 1.08, overflowWrap: "anywhere", maxWidth: "min(90vw,800px)", textTransform: "uppercase", margin: 0 };
 const overlayText: React.CSSProperties = { fontSize: 22, color: "rgba(248,247,244,.75)" };
-const confetti: React.CSSProperties = { fontSize: 38, marginBottom: 16 };
+const confetti: React.CSSProperties = { fontSize: "clamp(22px,6vw,38px)", marginBottom: 16, maxWidth: "100%", overflow: "hidden" };
 
 const summaryList: React.CSSProperties = {
   display: "grid",

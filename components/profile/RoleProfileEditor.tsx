@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import SportPositionField from "@/components/profile/SportPositionField";
+import AuthorizedAdminAccess from "@/components/profile/AuthorizedAdminAccess";
 import ActivityProfileField from "@/components/profile/ActivityProfileField";
 import { getOnboardingSteps } from "@/lib/onboarding/engine";
 import { ALL_COLLEGE_OPTIONS, CAREER_OPTIONS, CALIFORNIA_DISTRICTS } from "@/lib/onboarding";
@@ -173,6 +174,7 @@ export function RoleProfileEditor({ mode = "standard" }: { mode?: "standard" | "
         <h1 style={{ marginBottom: 8, fontSize: "clamp(30px, 5vw, 48px)", lineHeight: 1.1 }}>{PLAYBOOK_ROLES[role].osLabel} · {mode === "athlete" ? "Athlete & Recruiting Profile" : "My Profile"}</h1>
         <p style={{ lineHeight: 1.6, marginBottom: 0 }}>Update the same information you entered during onboarding. Background answers stay private; public visibility is managed separately.</p>
       </header>
+      <AuthorizedAdminAccess />
       {mode === "standard" && (role === "scholar" || role === "scholar-athlete") && (
         <aside style={{ border: "1px solid #fed7aa", background: "#fff7ed", borderRadius: 16, padding: 18, marginBottom: 20 }}>
           <strong>{role === "scholar-athlete" ? "Your Athlete & Recruiting Profile" : "Additional Scholar profile tools"}</strong>

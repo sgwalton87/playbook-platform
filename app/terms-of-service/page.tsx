@@ -8,7 +8,7 @@ export default function TermsOfService() {
     <article style={{ maxWidth: 850, margin: "0 auto", padding: "clamp(24px,5vw,52px)", background: "#FFFFFF", borderRadius: 20, borderTop: "6px solid #F97316" }}>
       <p style={{ color: "#B45309", fontWeight: 800, letterSpacing: 2 }}>PLAYBOOK SERIES INC.</p>
       <h1 style={{ color: "#10213A", fontSize: "clamp(32px,5vw,46px)" }}>Terms of Service</h1>
-      <p style={paragraph}><strong>Effective date:</strong> October 23, 2026</p>
+      <p style={paragraph}><strong>Effective date:</strong> October 28, 2026</p>
       <p style={paragraph}>These terms describe the rules for accessing and using Playbook Series Inc.’s websites, educational programs, accounts, courses, mentoring, networking and opportunity services. By using a service, you agree to follow these terms and the Community Safety Agreement presented during onboarding where applicable.</p>
       <h2 style={heading}>1. Eligibility and accounts</h2>
       <p style={paragraph}>Provide accurate registration details, maintain the confidentiality of account credentials, and use only accounts and roles you are authorized to hold. Playbook offers services for young people, families, mentors, educators and organizations. Minors must participate through the applicable age, parent or guardian consent, and program safety requirements. Under-13 access requires a separately authorized parental-consent process where applicable.</p>
@@ -21,13 +21,13 @@ export default function TermsOfService() {
       <h2 style={heading}>5. Content and intellectual property</h2>
       <p style={paragraph}>You retain rights to original materials you submit, subject to rights held by others. You grant Playbook a limited license to store, process and display the materials as needed to operate features you choose, administer safety and comply with law. Do not upload content you lack permission to share, including another person’s private information or protected media. Playbook’s branding and platform materials remain protected by applicable rights.</p>
       <h2 style={heading}>6. Service availability and enforcement</h2>
-      <p style={paragraph}>Features may be introduced, modified, limited or interrupted during platform development and operations. We may investigate potential violations and take proportionate action such as restricting features, removing content, suspending access or terminating accounts, subject to applicable law and safety obligations.</p>
+      <p style={paragraph}>Features may be introduced, modified, limited or interrupted during platform development and operations. We place the highest regard on community safety. These standards apply to every person, organization, brand and other entity participating in Playbook. If conduct harms a student, a family, an educational institution or anyone in the Playbook community, or otherwise violates our standards, we may investigate, restrict tools, immediately suspend access while reviewing a safety concern, remove the participant or entity from the app, and revoke access to platform tools, including account termination, subject to applicable law and safety obligations. Approved status does not prevent later enforcement. Verification and safety records may be retained under the applicable privacy and retention policy.</p>
       <h2 style={heading}>7. Privacy and external services</h2>
       <p style={paragraph}>Please read our <Link href="/privacy-policy">Privacy Policy</Link> to understand personal information practices. External providers, including Google sign-in and meeting platforms, may apply their own terms and privacy policies when you choose to use them.</p>
       <h2 style={heading}>8. Legal limitations</h2>
       <p style={paragraph}>Services are provided subject to applicable law. Nothing in these terms limits nonwaivable consumer, child-protection or privacy rights. Playbook does not provide individualized legal, medical or regulated financial advice merely by making educational materials available. Specific paid programs may have additional disclosed terms.</p>
       <h2 style={heading}>9. Questions and updates</h2>
-      <p style={paragraph}>We may revise these terms and will post an updated effective date. For questions or account support contact <a href="mailto:connect@playbookseriesinc.org">connect@playbookseriesinc.org</a>. Organization: Playbook Series Inc., Oakland, California.</p>
+      <p style={paragraph}>We may revise these terms and will post an updated effective date. For questions or account support contact <a href="mailto:support@playbookseriesinc.org">support@playbookseriesinc.org</a>. Organization: Playbook Series Inc., Oakland, California.</p>
       <p style={{ marginTop: 38 }}><Link href="/privacy-policy">Privacy Policy</Link> · <a href="https://playbookseriesinc.org">Playbook home</a></p>
     </article>
   </main>;
