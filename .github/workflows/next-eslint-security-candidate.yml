@@ -40,8 +40,38 @@ jobs:
           npm audit --json > security-evidence/baseline.json || true
       - name: Simulate compatible Next and ESLint patches locally
         run: npm install --package-lock-only --ignore-scripts --save-exact --no-audit next@16.4.6 eslint-config-next@16.4.6
-      - name: Validate patched lockfile clean install
-        run: npm ci
+      - name: Validate patched candidate dependency install without executing unknown scripts
+        run: npm ci --ignore-scripts
+      - name: Inspect the ESLint plugin compatibility source before temporary trial
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import { createHash } from 'node:crypto';
+          import { readFileSync } from 'node:fs';
+          import { createRequire } from 'node:module';
+          import { dirname, join } from 'node:path';
+          const require=createRequire(import.meta.url);
+          const root=dirname(require.resolve('@next/eslint-plugin-next/package.json'));
+          const plugin=require(join(root,'package.json'));
+          const source=readFileSync(join(root,'dist/utils/get-root-dirs.js'),'utf8');
+          const original=source.replace('onlyDirectories: true,\\n        expandDirectories: false','onlyDirectories: true');
+          const digest=createHash('sha256').update(original).digest('hex');
+          const expected='886677432990a735e5ebdfb345ff1cbd40e264f9947a8432eeeb254b3a926bde';
+          console.log(JSON.stringify({pluginVersion:plugin.version,sourceHash:digest,compatibleWithExistingGuard:digest===expected}));
+          if(plugin.version!=='16.4.6'||digest!==expected) process.exitCode=1;
+          NODE
+      - name: Run existing compatibility patch with a temporary 16.4.6 allowance
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync, writeFileSync } from 'node:fs';
+          const p='scripts/pbos/patch-next-eslint-glob.mjs';
+          const text=readFileSync(p,'utf8');
+          const old="if (plugin.version !== '16.4.2') throw new Error('Review ESLint glob compatibility before upgrading Next');";
+          if(!text.includes(old))throw Error('Original compatibility guard changed; stop candidate');
+          writeFileSync(p,text.replace(old,"if (plugin.version !== '16.4.6') throw new Error('Review ESLint glob compatibility before upgrading Next');"));
+          NODE
+          npm run postinstall
       - name: Capture new complete and runtime-only audits
         shell: bash
         run: |
