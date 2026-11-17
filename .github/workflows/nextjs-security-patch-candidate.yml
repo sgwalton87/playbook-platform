@@ -1,0 +1,88 @@
+name: Next.js Security Patch Candidate (No Writes)
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/nextjs-security-patch-candidate.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-nextjs-candidate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  assess-nextjs-patch:
+    name: Isolated candidate audit, tests and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      CI: "true"
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - name: Checkout exact candidate
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Configure Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Install current locked baseline
+        run: npm ci
+      - name: Capture current security audit (no bypass)
+        shell: bash
+        run: |
+          mkdir -p security-candidate
+          npm audit --json > security-candidate/baseline-audit.json || true
+      - name: Prepare only Next.js 16.4.6 patch candidate locally
+        run: npm install --package-lock-only --ignore-scripts --save-exact --no-audit next@16.4.6
+      - name: Reinstall from patched candidate lock
+        run: npm ci
+      - name: Capture candidate security audit (report findings, do not suppress production gate)
+        shell: bash
+        run: npm audit --json > security-candidate/candidate-audit.json || true
+      - name: Assert Next.js advisory no longer reported
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const fs = require("node:fs");
+          const before = JSON.parse(fs.readFileSync("security-candidate/baseline-audit.json", "utf8"));
+          const after = JSON.parse(fs.readFileSync("security-candidate/candidate-audit.json", "utf8"));
+          const nextBefore = before.vulnerabilities?.next;
+          const nextAfter = after.vulnerabilities?.next;
+          const summary = {
+            requestedNextVersion: "16.4.6",
+            nextWasReportedBefore: Boolean(nextBefore),
+            nextStillReportedAfter: Boolean(nextAfter),
+            before: before.metadata?.vulnerabilities,
+            after: after.metadata?.vulnerabilities,
+            note: "Other dependency findings are NOT waived; this is an evidence-only candidate."
+          };
+          fs.writeFileSync("security-candidate/summary.json", JSON.stringify(summary, null, 2) + "\n");
+          console.log(summary);
+          if (nextAfter) process.exitCode = 1;
+          NODE
+      - name: Lint candidate
+        run: npm run lint
+      - name: Unit tests candidate
+        run: npm test
+      - name: Build candidate
+        run: npm run build
+      - name: Preserve candidate patch for separate code review
+        if: always()
+        shell: bash
+        run: |
+          git diff -- package.json package-lock.json > security-candidate/nextjs-only.patch
+          sha256sum security-candidate/nextjs-only.patch > security-candidate/patch.sha256
+      - name: Upload evidence artifact (not promoted or committed)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nextjs-patch-candidate-evidence
+          path: security-candidate/
+          if-no-files-found: warn
+          retention-days: 7
