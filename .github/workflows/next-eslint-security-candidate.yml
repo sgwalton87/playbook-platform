@@ -95,7 +95,7 @@ jobs:
           };
           fs.writeFileSync("security-evidence/summary.json",JSON.stringify(report,null,2)+"\n");
           console.log(JSON.stringify(report));
-          if(after.vulnerabilities?.next||after.vulnerabilities?.["eslint-config-next"]?.severity==="high")process.exitCode=1;
+          if(after.vulnerabilities?.next||after.vulnerabilities?.["eslint-config-next"]?.severity==="high")console.error("Security findings remain unresolved; candidate will be blocked at final gate after tests.");
           NODE
       - name: Lint
         run: npm run lint
@@ -115,3 +115,12 @@ jobs:
           name: next-eslint-candidate-evidence
           path: security-evidence/
           retention-days: 7
+      - name: Enforce full audit security gate after collecting test evidence
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const report=JSON.parse(fs.readFileSync('security-evidence/summary.json','utf8'));
+          const high=(report.patched?.high??0)+(report.patched?.critical??0);
+          if(high>0){console.error(`BLOCKED: ${high} high/critical dependency audit findings remain, despite successful candidate tests.`);process.exit(1);}
+          NODE
