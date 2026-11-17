@@ -25,24 +25,25 @@ export default function CommunityPartnerVerificationExperience() {
   const [message, setMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [hasEvidence, setHasEvidence] = useState(false);
+  const [notification, setNotification] = useState<{status:string;updatedAt:string}|null>(null);
 
   async function reload() {
     const response = await fetch("/api/community-partner-verification", { cache: "no-store" });
-    const result = await response.json() as { error?: string; onboardingCompleted?: boolean; request?: VerificationRequest | null };
+    const result = await response.json() as { error?: string; onboardingCompleted?: boolean; request?: VerificationRequest | null; notification?: {status:string;updatedAt:string}|null };
     if (!response.ok) { setMessage(result.error ?? "Verification could not be loaded."); return; }
     setOnboardingCompleted(Boolean(result.onboardingCompleted));
     setRequest(result.request ?? null);
-    setMessage(null);
+    setNotification(result.notification ?? null);
   }
 
   useEffect(() => {
     let active = true;
     void (async () => {
       const response = await fetch("/api/community-partner-verification", { cache: "no-store" });
-      const result = await response.json() as { error?: string; onboardingCompleted?: boolean; request?: VerificationRequest | null };
+      const result = await response.json() as { error?: string; onboardingCompleted?: boolean; request?: VerificationRequest | null; notification?: { status: string; updatedAt: string } | null };
       if (!active) return;
       if (!response.ok) setMessage(result.error ?? "Verification could not be loaded.");
-      else { setOnboardingCompleted(Boolean(result.onboardingCompleted)); setRequest(result.request ?? null); }
+      else { setOnboardingCompleted(Boolean(result.onboardingCompleted)); setRequest(result.request ?? null); setNotification(result.notification ?? null); }
       setLoading(false);
     })();
     return () => { active = false; };
@@ -50,12 +51,21 @@ export default function CommunityPartnerVerificationExperience() {
 
   async function submit() {
     setSubmitting(true); setMessage(null);
-    const response = await fetch("/api/community-partner-verification", { method: "POST" });
-    const result = await response.json() as { error?: string; message?: string };
+    let result: { error?: string; message?: string; reviewNotification?: string } = {};
+    let response: Response;
+    try {
+      response = await fetch("/api/community-partner-verification", { method: "POST" });
+      result = await response.json();
+    } catch {
+      setSubmitting(false);
+      setMessage("We could not confirm the submission response. Your uploaded document is still saved. Please refresh and check status before trying again.");
+      return;
+    }
     setSubmitting(false);
     if (!response.ok) { setMessage(result.error ?? "Verification could not be submitted."); return; }
-    setMessage(result.message ?? "Verification submitted.");
     await reload();
+    const emailNotice = result.reviewNotification === "sent" ? "The mail server accepted the notification, but inbox delivery is not confirmed." : result.reviewNotification === "delivery_unknown" ? "Email delivery is uncertain. The reviewer queue still contains your request." : result.reviewNotification === "failed" || result.reviewNotification === "queue_unavailable" ? "The reviewer notification could not be delivered. Your request remains saved for review." : "The reviewer queue retains your request; email delivery has not been confirmed.";
+    setMessage(`Your organization evidence is recorded and review is pending. ${emailNotice}`);
   }
 
   if (loading) return <Surface title="Preparing Community Partner verification…" body="Checking your organization and service-area evidence." />;
@@ -73,11 +83,11 @@ export default function CommunityPartnerVerificationExperience() {
     message={rejected ? request.review_notes : message}
   >
     {!identityApproved && !rejected && <><CommunityPartnerEvidenceUpload onEvidenceChange={setHasEvidence} />
-      <button type="button" onClick={() => void submit()} disabled={submitting || !hasEvidence} style={{...buttonStyle,opacity:hasEvidence?1:0.5}}>{submitting ? "Updating…" : "Confirm documents and notify verification team"}</button>
-      <p style={bodyStyle}>A submitted organization profile is not proof that supporting documents were uploaded. Upload the evidence above and confirm to notify onboarding@playbookseriesinc.org.</p></>}
+      {notification ? <p role="status" style={noticeStyle}>{notification.status === "sent" ? "Submission recorded. SMTP accepted a notification, but inbox delivery is not verified." : notification.status === "failed" ? "Submission recorded. Email delivery failed; the review team must retry the notification." : notification.status === "delivery_unknown" ? "Submission recorded. Email acceptance is uncertain; do not resubmit." : "Submission recorded. Notification status: " + notification.status + "."}</p> : <button type="button" onClick={() => void submit()} disabled={submitting || !hasEvidence} style={{...buttonStyle,opacity:hasEvidence?1:0.5}}>{submitting ? "Updating…" : "Confirm documents and notify verification team"}</button>}
+      <p style={bodyStyle}>Your submitted documents remain private. Notification delivery is tracked separately from review approval.</p></>}
     <PlaybookCard eyebrow="Organization information submitted" title={request.organization_name}>
       <p style={bodyStyle}>{request.organization_type} · {request.service_area}</p>
-      <p style={bodyStyle}>Official email: {request.official_email}</p>
+      <p style={{...bodyStyle,overflowWrap:"anywhere"}}>Official email: {request.official_email}</p>
       {request.community_services?.length > 0 && <p style={bodyStyle}>Services: {request.community_services.join(", ")}</p>}
       <p style={metaStyle}>Identity: {request.status.replaceAll("_", " ")} · Service scope: {request.service_scope_status.replaceAll("_", " ")}</p>
     </PlaybookCard>
@@ -85,7 +95,7 @@ export default function CommunityPartnerVerificationExperience() {
 }
 
 function Surface({ title, body, message, children }: { title: string; body: string; message?: string | null; children?: React.ReactNode }) {
-  return <PlaybookPage><section style={surfaceStyle} data-testid="community-partner-verification-gate"><p style={eyebrowStyle}>Community Partner OS · Independent verification</p><h1 style={titleStyle}>{title}</h1><p style={bodyStyle}>{body}</p>{message && <div style={noticeStyle}>{message}</div>}<div style={{ marginTop: 22 }}>{children}</div><div style={routeStyle}>Canonical destination: <strong>/community-partner-os</strong></div></section></PlaybookPage>;
+  return <PlaybookPage><section style={surfaceStyle} data-testid="community-partner-verification-gate"><p style={eyebrowStyle}>Community Partner OS · Independent verification</p><h1 style={titleStyle}>{title}</h1><p style={bodyStyle}>{body}</p>{message && <div style={noticeStyle} role="status" aria-live="polite">{message}</div>}<div style={{ marginTop: 22 }}>{children}</div><div style={routeStyle}>Canonical destination: <strong>/community-partner-os</strong></div></section></PlaybookPage>;
 }
 
 const surfaceStyle: React.CSSProperties = { maxWidth: 900, margin: "40px auto", padding: "clamp(28px,5vw,52px)", borderRadius: 28, background: "#F8FAFC", color: "#0F2342", border: "1px solid #D9E3ED" };
