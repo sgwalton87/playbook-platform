@@ -1,7 +1,7 @@
 -- Reviewer-provided evidence snapshots are private and supplementary, never an approval.
 -- No scraping or automatic attestation of external page contents.
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-VALUES ('brand-registry-review-evidence','brand-registry-review-evidence',false,5242880,ARRAY['image/png','image/jpeg'])
+VALUES ('brand-registry-review-evidence','brand-registry-review-evidence',false,4194304,ARRAY['image/png','image/jpeg'])
 ON CONFLICT (id) DO NOTHING;
 
 CREATE TABLE IF NOT EXISTS public.brand_registry_review_snapshots (
