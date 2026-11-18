@@ -23,9 +23,7 @@ AS $function$
   SELECT private.current_user_is_platform_operator();
 $function$;
 
--- RLS policies invoke these boolean helpers as authenticated. Grant only
--- authenticated EXECUTE; untrusted/anonymous clients retain no access.
-REVOKE EXECUTE ON FUNCTION private.current_user_is_platform_operator() FROM PUBLIC, anon;
-REVOKE EXECUTE ON FUNCTION private.current_user_is_verification_reviewer() FROM PUBLIC, anon;
-GRANT EXECUTE ON FUNCTION private.current_user_is_platform_operator() TO authenticated;
-GRANT EXECUTE ON FUNCTION private.current_user_is_verification_reviewer() TO authenticated;
+-- Keep operator and reviewer predicates confined to trusted definer functions.
+-- Existing community and reviewer security certification forbids direct API execution.
+REVOKE EXECUTE ON FUNCTION private.current_user_is_platform_operator() FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION private.current_user_is_verification_reviewer() FROM PUBLIC, anon, authenticated;
