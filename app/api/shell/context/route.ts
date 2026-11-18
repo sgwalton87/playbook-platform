@@ -7,9 +7,9 @@ export async function GET() {
     const { supabase, user } = await requireUser();
     if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
 
-    const profile = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
+    const profile = await supabase.from("profiles").select("role,is_admin,is_active").eq("id", user.id).maybeSingle();
     if (profile.error) throw new Error("Account context could not be loaded.");
-    const isReviewer = isPlatformOperatorRole(profile.data?.role);
+    const isReviewer = isPlatformOperatorRole(profile.data?.role) || (profile.data?.is_admin === true && profile.data?.is_active === true);
 
     const [evidence, pendingVerification, unreadAttention, support] = await Promise.all([
       supabase.from("evidence").select("id", { count: "exact", head: true }).is("deleted_at", null),
