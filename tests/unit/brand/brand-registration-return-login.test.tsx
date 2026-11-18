@@ -14,13 +14,13 @@ const state = vi.hoisted(() => ({
 }));
 
 vi.mock("@/components/trust/CommunityVettingJourney", () => ({
-  default: ({ onAccepted }: { onAccepted: () => void }) => {
+  default: function MockCommunityVettingJourney({ onAccepted }: { onAccepted: () => void }) {
     useEffect(() => { onAccepted(); }, [onAccepted]);
     return <p>Community standards acknowledged</p>;
   },
 }));
 vi.mock("@/components/brand/BrandVerificationEvidenceUpload", () => ({
-  default: ({ onEvidenceChange }: { onEvidenceChange?: (value: boolean) => void }) => {
+  default: function MockBrandVerificationEvidenceUpload({ onEvidenceChange }: { onEvidenceChange?: (value: boolean) => void }) {
     useEffect(() => { onEvidenceChange?.(true); }, [onEvidenceChange]);
     return <p>3 previously uploaded documents remain on file</p>;
   },
