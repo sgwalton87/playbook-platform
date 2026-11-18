@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
  if (!UUID.test(requestId)) return NextResponse.json({error:"Valid request ID required."},{status:400,headers:denyCache});
  const context=await authorizedContext(supabase,requestId);
  if(context.error||!context.data) return NextResponse.json({error:"Reviewer authority or request unavailable."},{status:context.error?.code==="42501"?403:404,headers:denyCache});
- const result=await supabase.from("brand_registry_review_snapshots").select("id,source_url,captured_at,source_label").eq("request_id",requestId).order("captured_at",{ascending:false}).limit(20);
+ const result=await supabase.from("brand_registry_review_snapshots").select("id,source_url,captured_at,source_label,reviewer_id").eq("request_id",requestId).order("captured_at",{ascending:false}).limit(20);
  if(result.error) return NextResponse.json({error:"Evidence audit records unavailable."},{status:503,headers:denyCache});
  return NextResponse.json({ snapshots:result.data??[] },{headers:denyCache});
 }
