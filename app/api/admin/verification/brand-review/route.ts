@@ -24,6 +24,7 @@ export async function POST(request: NextRequest) {
   if (saved.error) return NextResponse.json({ error: "Private note could not be saved." }, { status: saved.error.code === "42501" ? 403 : 400 });
   return NextResponse.json({ saved: true }, { headers });
  }
+ if (body.emailPreviewConfirmed !== true) return NextResponse.json({ error: "Review the applicant email preview and confirm its wording before sending." }, { status: 400 });
  if (typeof body.actionId !== "string" || !UUID.test(body.actionId) || !["under_review", "needs_information", "approved", "rejected"].includes(String(body.outcome)) || typeof body.extraMessage !== "string" || body.extraMessage.length > 2000 || typeof body.privateNote !== "string" || body.privateNote.length > 4000) return NextResponse.json({ error: "Valid outcome, action ID and bounded messages are required." }, { status: 400 });
  if (body.outcome === "rejected" && !body.extraMessage.trim()) return NextResponse.json({ error: "Explain the specific verified reason for declining." }, { status: 400 });
  let publicMessage: string;
