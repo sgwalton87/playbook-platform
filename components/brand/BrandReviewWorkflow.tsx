@@ -11,6 +11,7 @@ export default function BrandReviewWorkflow({ requestId, documentsReviewed, onCo
  const [outcome, setOutcome] = useState<ReviewOutcome>("needs_information");
  const [reason, setReason] = useState(""); const [extra, setExtra] = useState(""); const [privateNote, setPrivateNote] = useState("");
  const [campaignScope, setCampaignScope] = useState(false); const [complianceScope, setComplianceScope] = useState(false);
+ const [hasRegistryScreenshot,setHasRegistryScreenshot]=useState(false);
  const [humanOutcome, setHumanOutcome] = useState("needs_review"); const [sourceUrl, setSourceUrl] = useState(""); const [registryNote, setRegistryNote] = useState(""); const [safetyReviewed, setSafetyReviewed] = useState(false);
  const [lookup, setLookup] = useState<RegistryLookup | null>(null); const [busy, setBusy] = useState(false); const [notice, setNotice] = useState("");
  const actionId = useRef<string | null>(null);
@@ -25,7 +26,7 @@ export default function BrandReviewWorkflow({ requestId, documentsReviewed, onCo
  const reasons = outcome === "needs_information" ? ADDITIONAL_VERIFICATION_REASONS : outcome === "rejected" ? DECLINE_REASONS : [];
  let preview = "Select a reason to preview the applicant's message.";
  try { preview = buildReviewMessage(outcome, reason, extra); } catch { /* The dropdown supplies the required reason. */ }
- const ready = Boolean(context?.registry && ["matched_active","alternative_verified"].includes(context.registry.human_outcome) && context.registry.safety_reviewed);
+ const ready = Boolean(context?.registry && ["matched_active","alternative_verified"].includes(context.registry.human_outcome) && context.registry.safety_reviewed && (context?.registration?.formation_state !== "California" || hasRegistryScreenshot));
  async function registryAction(action: "lookup" | "save") {
   setBusy(true); setNotice("");
   try {
@@ -48,7 +49,7 @@ export default function BrandReviewWorkflow({ requestId, documentsReviewed, onCo
  return <section aria-label="Brand Partner review and communication" style={{ display: "grid", gap: 12, marginTop: 18, padding: 18, borderRadius: 12, background: "#FFFFFF", color: "#0F172A", border: "1px solid #CBD5E1" }}>
   <h3>Business and safeguarding review</h3>
   <SosVerificationTutorial />
-  <SosEvidenceSnapshot requestId={requestId} />
+  <SosEvidenceSnapshot requestId={requestId} onEvidenceChange={setHasRegistryScreenshot} />
   {context?.registration ? <>
    <p>{context.registration.formation_state} · {context.registration.entity_type} · Entity number: {context.registration.entity_number || "Not supplied"}</p>
    <details><summary>Private student-safety declarations</summary>{SAFEGUARDING_QUESTIONS.map(q => <p key={q.id}><strong>{q.label}</strong><br />{context.registration?.safety_answers[q.id] || "Not answered"}</p>)}<p>A charge is not a conviction. Confirm identity, relevance, lawful reportability and any correction before making an individual decision. Do not send these declarations to AI.</p></details>
@@ -72,7 +73,7 @@ export default function BrandReviewWorkflow({ requestId, documentsReviewed, onCo
    <label><input type="checkbox" checked={campaignScope} onChange={e => setCampaignScope(e.target.checked)} /> Approve the requested Brand Partner campaign scope after review.</label>
    <label><input type="checkbox" checked={complianceScope} onChange={e => setComplianceScope(e.target.checked)} /> Approve the requested student-protection and NIL/compliance scope after review.</label>
    <p>Approval unlocks this role&apos;s authorized workspace and operations. It does not grant admin rights or unrestricted student-record access.</p>
-   {!ready && <p>Save a resolved human registration and safeguarding review before approval.</p>}
+   {!ready && <p>Save a resolved human registration and safeguarding review and, for California businesses, attach SOS screenshot evidence before approval.</p>}
   </>}
   <div aria-label="Email preview" style={{ whiteSpace: "pre-wrap", padding: 14, background: "#F8FAFC", border: "1px solid #CBD5E1", borderRadius: 10 }}><strong>Email preview</strong><p>{preview}</p><p>{outcome === "approved" ? "Button: Open your Brand Partner dashboard" : "Button: Review and update your profile"}</p><small>From and reply-to: onboarding@playbookseriesinc.org</small></div>
   <button type="button" disabled={busy || !context || (reasons.length > 0 && !reason) || (outcome === "rejected" && !extra.trim()) || (outcome === "approved" && (!ready || !documentsReviewed || !campaignScope || !complianceScope))} onClick={() => void submit()}>{busy ? "Working…" : outcome === "approved" ? "Approve and send invitation" : outcome === "rejected" ? "Decline and send explanation" : "Save review and send message"}</button>
