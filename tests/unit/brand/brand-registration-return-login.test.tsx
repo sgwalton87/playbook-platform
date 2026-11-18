@@ -123,8 +123,8 @@ describe("Brand Partner return-login registration persistence", () => {
     fireEvent.click(save);
     await waitFor(() => expect((screen.getByRole("button", { name: "Saving registration…" }) as HTMLButtonElement).disabled).toBe(true));
     expect(submit.disabled).toBe(true);
-    expect((screen.getByLabelText("Formation state or jurisdiction") as HTMLSelectElement).disabled).toBe(true);
-    expect((screen.getByLabelText("Business structure") as HTMLSelectElement).disabled).toBe(true);
+    expect((screen.getByLabelText("Formation state or jurisdiction") as HTMLSelectElement).matches(":disabled")).toBe(true);
+    expect((screen.getByLabelText("Business structure") as HTMLSelectElement).matches(":disabled")).toBe(true);
     fireEvent.click(submit);
     expect(state.fetch.mock.calls.some(([,init]) => init?.method === "POST")).toBe(false);
     releaseSave?.();
