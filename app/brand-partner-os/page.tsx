@@ -22,10 +22,11 @@ const pathways = [
   { label: "Applicants", title: "Review only consented submissions", body: "See submitted applications only when a Scholar explicitly shares a narrow applicant projection. Consent remains revocable and does not expose the broader Scholar Record.", href: "/brand-partner-os/applicants", action: "Opportunity Applicants" },
   { label: "Rewards", title: "Inherit the shared Rewards economy", body: "Marketplace outcomes may participate in Playbook's shared reward policy, but Brand Partners never mint XP, coins, badges, or certificates directly from campaign or applicant decisions.", href: "/reward-economy", action: "View shared Rewards" },
   { label: "Scholar Marketplace", title: "See the Scholar-facing catalog", body: "Review the same published catalog Scholars see, separated clearly from PBOS readiness guidance.", href: "/opportunities", action: "Open Scholar Marketplace" },
-  { label: "Communication", title: "Coordinate with the right people", body: "Keep partner, scholar, guardian, and support-team decisions inside governed conversations.", href: "/messages", action: "Open messages" },
+{ label: "Partner Sharing", title: "Grow your Playbook circle", body: "Choose one of three verified partnership posts, use your organization logo if saved, and invite your community to discover Playbook. Sharing never exposes private Scholar records.", href: "/brand-partner-os/share", action: "Create partnership posts" },
+    { label: "Communication", title: "Coordinate with the right people", body: "Keep partner, scholar, guardian, and support-team decisions inside governed conversations.", href: "/messages", action: "Open messages" },
 ] as const;
 
-type Partner = { name: string; category: string; active: boolean };
+type Partner = { name: string; category: string; active: boolean; logo_url: string | null };
 
 type DashboardState = {
   partner: Partner | null;
@@ -131,7 +132,11 @@ function BrandPartnerWorkspace() {
         <section style={identityRail} aria-live="polite">
           <div>
             <PlaybookPill>{state === "ready" ? "Verified operational partner" : state === "loading" ? "Connecting marketplace record" : "Marketplace record unavailable"}</PlaybookPill>
-            <h2 style={identityTitle}>{organization}</h2>
+            <div style={{display:"flex",alignItems:"center",gap:14,flexWrap:"wrap",marginTop:12}}>
+              {dashboard.partner?.logo_url && <img src={dashboard.partner.logo_url} alt={organization+" company logo"} style={{width:84,height:84,objectFit:"contain",background:"#FFFFFF",border:"1px solid #CBD5E1",borderRadius:12,padding:5}} />}
+              <h2 style={{...identityTitle,margin:0}}>{organization}</h2>
+            </div>
+            {state==="ready"&&!dashboard.partner?.logo_url&&<p style={{color:"#F8FAFC",margin:"12px 0 0"}}>Company logo not yet added. <a href="/brand-partner-os/organization" style={{color:"#FDBA74",textDecoration:"underline",fontWeight:800}}>Add your organization logo</a></p>}
           </div>
           <p style={identityCopy}>{state === "error" ? (error || "Your marketplace record could not be loaded. No Scholar data is being displayed.") : "Organization verification, campaign planning, opportunity publication, consented applications, outcomes, rewards, and consequential decisions remain separate governed records."}</p>
         </section>
