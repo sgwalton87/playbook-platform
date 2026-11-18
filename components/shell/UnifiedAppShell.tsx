@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { shouldUseAppShell } from "@/lib/app-shell";
-import { getNavigationForRole } from "@/lib/core-journey/navigation";
+import { FOUNDER_NAV } from "@/lib/core-journey/navigation";
 import { getRoleNavigation, type NavItem } from "@/lib/navigation";
 import PlaybookLogo from "@/components/brand/PlaybookLogo";
 import ProfileAvatar from "@/components/ProfileAvatar";
@@ -55,7 +55,7 @@ export default function UnifiedAppShell({ children }: { children: React.ReactNod
   const roleNav = useMemo(() => getRoleNavigation(profile?.profile_mode, profile?.role, profile?.is_admin === true && profile?.is_active === true), [profile?.profile_mode, profile?.role, profile?.is_admin, profile?.is_active]);
   const founderNav = useMemo(() => {
     if (!(isPlatformOperatorRole(profile?.role) || (profile?.is_admin === true && profile?.is_active === true))) return [];
-    return getNavigationForRole(profile?.role).founder;
+    return FOUNDER_NAV;
   }, [profile?.role, profile?.is_admin, profile?.is_active]);
 
   if (!shouldUseAppShell(pathname || "/")) return <>{children}</>;
