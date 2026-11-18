@@ -96,4 +96,41 @@ describe("Brand Partner return-login registration persistence", () => {
     expect(screen.getByText("3 previously uploaded documents remain on file")).toBeTruthy();
     expect(screen.getByText(/Brand Partner verification pending/)).toBeTruthy();
   });
+  it("serializes an in-flight registration save against verification submission and field edits", async () => {
+    state.saved = {
+      formation_state: "California", entity_type: "LLC", entity_number: "",
+      safety_answers: { minors: "no", financial: "no", violence: "no", pending: "no", restrictions: "no" },
+      safeguarding_accepted: true,
+    };
+    let releaseSave: (() => void) | undefined;
+    const pending = new Promise<void>(resolve => { releaseSave = resolve; });
+    state.fetch.mockImplementation(async (url: string, init?: RequestInit) => {
+      if (url !== "/api/brand-verification") throw new Error("Unexpected endpoint");
+      if (init?.method === "POST") throw new Error("POST must not occur while PATCH is in flight");
+      if (init?.method === "PATCH") {
+        await pending;
+        return Response.json({ ok: true, savedAt: "2026-11-17T14:00:00Z", message: "Business registration details saved." });
+      }
+      return Response.json({
+        ok: true, onboardingCompleted: true, request: state.request,
+        registrationDetails: state.saved, workflow: null,
+      });
+    });
+    render(<BrandPartnerVerificationGate><p>Brand Partner workspace</p></BrandPartnerVerificationGate>);
+    const save = await screen.findByRole("button", { name: "Save registration details" });
+    const submit = screen.getByRole("button", { name: "Submit updated verification evidence" }) as HTMLButtonElement;
+    await waitFor(() => expect(submit.disabled).toBe(false));
+    fireEvent.click(save);
+    await waitFor(() => expect((screen.getByRole("button", { name: "Saving registration…" }) as HTMLButtonElement).disabled).toBe(true));
+    expect(submit.disabled).toBe(true);
+    expect((screen.getByLabelText("Formation state or jurisdiction") as HTMLSelectElement).disabled).toBe(true);
+    expect((screen.getByLabelText("Business structure") as HTMLSelectElement).disabled).toBe(true);
+    fireEvent.click(submit);
+    expect(state.fetch.mock.calls.some(([,init]) => init?.method === "POST")).toBe(false);
+    releaseSave?.();
+    await screen.findByText("Business registration details saved.");
+    await waitFor(() => expect((screen.getByRole("button", { name: "Save registration details" }) as HTMLButtonElement).disabled).toBe(false));
+    expect(submit.disabled).toBe(false);
+  });
+
 });
