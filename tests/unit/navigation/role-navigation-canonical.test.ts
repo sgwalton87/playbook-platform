@@ -12,6 +12,13 @@ describe("Canonical role navigation", () => {
     expect(getRoleNavigation("admin", "brand-partner").items.some(item => item.href === "/admin")).toBe(false);
     expect(getRoleNavigation("founder", "scholar").items.some(item => item.href === "/admin")).toBe(false);
   });
+  it("preserves learner home while showing review access for a separately authorized admin", () => {
+    const nav = getRoleNavigation(null, "scholar_athlete", true);
+    expect(nav.home).toBe("/scholar-athlete-os");
+    expect(nav.items.some(item => item.href === "/admin")).toBe(true);
+    expect(nav.items.some(item => item.href === "/founder")).toBe(true);
+    expect(getRoleNavigation(null, "scholar_athlete", false).items.some(item => item.href === "/admin")).toBe(false);
+  });
   it("routes stored underscore role aliases to their correct OS", () => {
     expect(getRoleNavigation(null, "scholar_athlete").home).toBe("/scholar-athlete-os");
     expect(getRoleNavigation(null, "athlete-abroad").home).toBe("/athlete-abroad-os");

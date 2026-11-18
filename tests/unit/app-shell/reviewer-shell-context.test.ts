@@ -1,18 +1,20 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-const mocks = vi.hoisted(() => ({ requireUser: vi.fn(), rpc: vi.fn(), from: vi.fn(), role: "admin", profileError: false }));
+const mocks = vi.hoisted(() => ({ requireUser: vi.fn(), rpc: vi.fn(), from: vi.fn(), role: "admin", isAdmin: false, isActive: true, profileError: false }));
 vi.mock("@/lib/supabase/server", () => ({ requireUser: mocks.requireUser }));
 import { GET } from "@/app/api/shell/context/route";
 
 beforeEach(() => {
   vi.resetAllMocks();
   mocks.role = "admin";
+  mocks.isAdmin = false;
+  mocks.isActive = true;
   mocks.profileError = false;
   mocks.rpc.mockResolvedValue({ data: [{ request_type: "brand-partner" }, { request_type: "coach" }], error: null });
   mocks.from.mockImplementation((table: string) => {
     const result = { data: null, count: 3, error: null };
     const query = {
       select: vi.fn().mockReturnThis(), eq: vi.fn().mockReturnThis(), is: vi.fn().mockReturnThis(),
-      maybeSingle: async () => ({ data: { role: mocks.role }, error: mocks.profileError ? { message: "denied" } : null }),
+      maybeSingle: async () => ({ data: { role: mocks.role, is_admin: mocks.isAdmin, is_active: mocks.isActive }, error: mocks.profileError ? { message: "denied" } : null }),
       then: (resolve: (value: unknown) => unknown) => Promise.resolve(table === "profiles" ? null : result).then(resolve),
     };
     return query;
@@ -35,6 +37,19 @@ describe("reviewer dashboard attention counts", () => {
     expect(await response.json()).toMatchObject({ pendingVerificationCount: 3 });
     expect(mocks.rpc).not.toHaveBeenCalled();
     expect(mocks.from).toHaveBeenCalledWith("verifications");
+  });
+  it("uses the review queue for an existing active admin marked Scholar-Athlete", async () => {
+    mocks.role = "scholar_athlete"; mocks.isAdmin = true;
+    const response = await GET();
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({ pendingVerificationCount: 2 });
+    expect(mocks.rpc).toHaveBeenCalledWith("get_verification_review_queue");
+  });
+  it("does not elevate inactive flagged profiles", async () => {
+    mocks.role = "scholar_athlete"; mocks.isAdmin = true; mocks.isActive = false;
+    const response = await GET();
+    expect(await response.json()).toMatchObject({ pendingVerificationCount: 3 });
+    expect(mocks.rpc).not.toHaveBeenCalled();
   });
   it("does not report an empty queue when reviewer access fails", async () => {
     mocks.rpc.mockResolvedValue({ data: null, error: { message: "Reviewer authority unavailable" } });

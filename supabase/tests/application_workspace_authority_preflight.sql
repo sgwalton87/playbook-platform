@@ -6,14 +6,13 @@ begin
     raise exception 'Missing private learner authority helper.';
   end if;
 
-  if exists (
-    select 1 from information_schema.routine_privileges
-     where specific_schema = 'private'
-       and routine_name = 'current_user_is_onboarded_learner'
-       and grantee in ('PUBLIC', 'anon', 'authenticated')
-       and privilege_type = 'EXECUTE'
-  ) then
-    raise exception 'Private learner helper must not be directly executable by API roles.';
+  -- RLS calls this no-argument boolean helper as the authenticated actor.
+  -- Its body is bound to auth.uid(), returns only own onboarding eligibility,
+  -- and all six data policies still require scholar_id = auth.uid().
+  if not has_function_privilege('authenticated','private.current_user_is_onboarded_learner()','EXECUTE')
+     or has_function_privilege('anon','private.current_user_is_onboarded_learner()','EXECUTE')
+  then
+    raise exception 'Authenticated learner predicate must be callable, anonymous denied.';
   end if;
 
   if not exists (

@@ -101,7 +101,7 @@ const UNRESOLVED_NAVIGATION: RoleNavigation = {
   items: [{ label: "Set up account", href: "/start", icon: "▶️" }, SHARED_PROFILE],
 };
 
-export function getRoleNavigation(profileMode?: string | null, role?: string | null): RoleNavigation {
+export function getRoleNavigation(profileMode?: string | null, role?: string | null, isAdmin = false): RoleNavigation {
   // Operator access comes from the stored platform role, never profile_mode.
   // Keep review reachable from every screen, including Profile and mobile.
   if (isPlatformOperatorRole(role)) {
@@ -118,5 +118,11 @@ export function getRoleNavigation(profileMode?: string | null, role?: string | n
   }
   const normalized = normalizeNavigationRole(profileMode, role);
   const navigation = normalized ? ROLE_NAVIGATION[normalized] : UNRESOLVED_NAVIGATION;
-  return { ...navigation, items: [...navigation.items, SHARED_EXPLORE] };
+  // An independently authorized reviewer retains the primary learner workspace.
+  // isAdmin must originate from the protected profile column, never user metadata.
+  const operatorItems: NavItem[] = isAdmin ? [
+    { label: "Verification Review", href: "/admin", icon: "✓" },
+    { label: "Founder Dashboard", href: "/founder", icon: "◉" },
+  ] : [];
+  return { ...navigation, items: [...navigation.items, ...operatorItems, SHARED_EXPLORE] };
 }

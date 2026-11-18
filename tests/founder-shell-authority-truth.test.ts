@@ -22,7 +22,8 @@ describe("Founder and shell authority audit", () => {
     const shell = read("components/shell/UnifiedAppShell.tsx");
     expect(shell).not.toContain("ROUTE_ROLE_PREVIEWS");
     expect(shell).not.toContain("previewRole");
-    expect(shell).toContain("getRoleNavigation(profile?.profile_mode, profile?.role)");
+    expect(shell).toContain("getRoleNavigation(profile?.profile_mode, profile?.role, profile?.is_admin === true");
+    expect(shell).toContain("avatar_url,role,profile_mode,is_admin,is_active");
     expect(shell).toContain("isPlatformOperatorRole(profile?.role)");
   });
 
