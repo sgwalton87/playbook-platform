@@ -44,9 +44,9 @@ export default function SosEvidenceSnapshot({requestId,organizationName,onEviden
    const canvas=document.createElement("canvas");canvas.width=video.videoWidth;canvas.height=video.videoHeight;
    const context=canvas.getContext("2d");if(!context)throw new Error("Screenshot canvas is unavailable.");
    context.drawImage(video,0,0);
-   const blob=await new Promise<Blob|null>(resolve=>canvas.toBlob(resolve,"image/png"));
+   const blob=await new Promise<Blob|null>(resolve=>canvas.toBlob(resolve,"image/jpeg",0.82));
    if(!blob)throw new Error("Could not create the screenshot.");
-   await upload(new File([blob],`sos-review-${Date.now()}.png`,{type:"image/png"}));
+   await upload(new File([blob],`sos-review-${Date.now()}.jpg`,{type:"image/jpeg"}));
   }catch(e){setNotice(e instanceof Error?e.message:"Capture cancelled or unavailable.");}
   finally{stream?.getTracks().forEach(track=>track.stop());}
  }
@@ -64,7 +64,7 @@ export default function SosEvidenceSnapshot({requestId,organizationName,onEviden
     <input type="file" accept="image/png,image/jpeg" disabled={busy} onChange={e=>{const f=e.currentTarget.files?.[0];e.currentTarget.value="";if(f)void upload(f);}} />
    </label>
   </div>
-  <p style={{margin:0,fontSize:14,color:"#334155"}}>Desktop browsers ask which tab to share. Phones and browsers that block tab capture can upload a screenshot. Each saved image is private and attributed to the signed-in reviewer, with time and SHA-256 integrity digest.</p>
+  <p style={{margin:0,fontSize:14,color:"#334155"}}>Desktop browsers ask which tab to share. Phones and browsers that block tab capture can upload a screenshot. Screenshots must be under 4 MB. Each saved image is private and attributed to the signed-in reviewer, with time and SHA-256 integrity digest.</p>
   {notice&&<p role="status" style={{margin:0,padding:12,background:"#EFF6FF",color:"#1E3A8A",borderRadius:8}}>{notice}</p>}
   <div><strong>Stored evidence snapshots: {snapshots.length}</strong>
    {snapshots.length>0&&<ul>{snapshots.map(snapshot=><li key={snapshot.id} style={{marginTop:8}}>
