@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ADDITIONAL_VERIFICATION_REASONS, DECLINE_REASONS, buildReviewMessage, type ReviewOutcome } from "@/lib/verification/templates";
+import { ADDITIONAL_VERIFICATION_REASONS, DECLINE_REASONS, APPROVAL_MESSAGE_PRESETS, buildReviewMessage, type ReviewOutcome } from "@/lib/verification/templates";
 import { SAFEGUARDING_QUESTIONS } from "@/lib/verification/safeguarding";
 import type { RegistryLookup } from "@/lib/verification/registry";
 import SosVerificationTutorial from "@/components/brand/SosVerificationTutorial";
@@ -15,6 +15,8 @@ export default function BrandReviewWorkflow({ requestId, documentsReviewed, onCo
  const [hasRegistryScreenshot,setHasRegistryScreenshot]=useState(false);
  const [humanOutcome, setHumanOutcome] = useState("needs_review"); const [sourceUrl, setSourceUrl] = useState(""); const [registryNote, setRegistryNote] = useState(""); const [safetyReviewed, setSafetyReviewed] = useState(false);
  const [lookup, setLookup] = useState<RegistryLookup | null>(null); const [busy, setBusy] = useState(false); const [notice, setNotice] = useState("");
+ const [registrySaveState,setRegistrySaveState]=useState<"idle"|"saving"|"saved"|"error">("idle");
+ const [savedAt,setSavedAt]=useState(""); const [approvalPreset,setApprovalPreset]=useState("");
  const actionId = useRef<string | null>(null);
  const load = useCallback(async () => {
   const response = await fetch(`/api/admin/verification/brand-review?requestId=${encodeURIComponent(requestId)}`, { cache: "no-store" });
@@ -30,12 +32,13 @@ export default function BrandReviewWorkflow({ requestId, documentsReviewed, onCo
  const ready = Boolean(context?.registry && ["matched_active","alternative_verified"].includes(context.registry.human_outcome) && context.registry.safety_reviewed && (context?.registration?.formation_state !== "California" || hasRegistryScreenshot));
  async function registryAction(action: "lookup" | "save") {
   setBusy(true); setNotice("");
+  if(action==="save")setRegistrySaveState("saving");
   try {
    const response = await fetch("/api/admin/verification/registry", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action, requestId, humanOutcome, sourceUrl, note: registryNote, safetyReviewed, expectedRegistrationUpdatedAt: context?.registration?.updated_at }) });
    const body = await response.json(); if (!response.ok) throw new Error(body.error || "Registry operation failed.");
    if (action === "lookup") { setLookup(body); if (!sourceUrl) setSourceUrl(body.source || ""); }
-   else { await load(); setNotice("Human registration and safeguarding review saved."); }
-  } catch (cause) { setNotice(cause instanceof Error ? cause.message : "Registry operation failed."); } finally { setBusy(false); }
+   else { await load(); setSavedAt(new Date().toLocaleString()); setRegistrySaveState("saved"); setNotice("Human review saved successfully. This did not send an email."); }
+  } catch (cause) { if(action==="save")setRegistrySaveState("error"); setNotice(cause instanceof Error ? cause.message : "Registry operation failed."); } finally { setBusy(false); }
  }
  async function submit() {
   setBusy(true); setNotice("");
@@ -58,15 +61,17 @@ export default function BrandReviewWorkflow({ requestId, documentsReviewed, onCo
    <p style={{margin:0,color:"#334155"}}>This is an optional research aid, not an automatic SOS verification. If AI or the California registry API is unavailable, use the official business search above and save a screenshot.</p>
   </> : <p>Registration and safeguarding declarations have not yet been supplied. Request additional verification before approval.</p>}
   {lookup && <section aria-label="Registry research aid" role="status" style={{padding:16,background:"#EFF6FF",color:"#102A43",border:"1px solid #93C5FD",borderRadius:12}}><h4 style={{color:"#102A43"}}>Research result: {lookup.status.replaceAll("_"," ")}</h4><p style={{color:"#102A43"}}>{lookup.summary}</p><a href={lookup.source} target="_blank" rel="noopener noreferrer">Open official registry</a>{lookup.candidates.map(row => <p key={row.entityNumber}>{row.name} · {row.entityNumber} · {row.standing}</p>)}<ul>{lookup.sources.map(row => <li key={row.url}><a href={row.url} target="_blank" rel="noopener noreferrer">{row.title}</a></li>)}</ul></section>}
-  <label>Human registration determination<select value={humanOutcome} onChange={e => { setHumanOutcome(e.target.value); }} style={input}><option value="needs_review">Not yet resolved</option><option value="matched_active">Official entity matched and current standing confirmed</option><option value="alternative_verified">Alternative establishment evidence verified</option><option value="confirmed_issue">Verified issue requires clarification or decline</option></select></label>
+  <label>Human registration determination<select value={humanOutcome} onChange={e => { setHumanOutcome(e.target.value); setRegistrySaveState("idle"); }} style={input}><option value="needs_review">Not yet resolved</option><option value="matched_active">Official entity matched and current standing confirmed</option><option value="alternative_verified">Alternative establishment evidence verified</option><option value="confirmed_issue">Verified issue requires clarification or decline</option></select></label>
   <p style={{color:"#334155",lineHeight:1.65}}>After the official SOS search, save the screenshot above, enter the entity number and status in your review note, and select the human determination. Choose <strong>Save human review</strong> to retain this case; leaving the page does not save draft text.</p>
-  <label>Official record or alternative evidence URL<input type="url" value={sourceUrl} maxLength={2000} onChange={e => setSourceUrl(e.target.value)} style={input} /></label>
-  <label>Registration and safeguarding review note<textarea value={registryNote} maxLength={4000} onChange={e => setRegistryNote(e.target.value)} style={input} /></label>
-  <label><input type="checkbox" checked={safetyReviewed} onChange={e => setSafetyReviewed(e.target.checked)} /> I completed an individual human safeguarding review, including any requested private discussion, and resolved the student-safety requirements for this proposed scope.</label>
-  <button type="button" disabled={busy || !sourceUrl.trim() || !registryNote.trim()} onClick={() => void registryAction("save")}>Save human review</button>
+  <label>Official record or alternative evidence URL<input type="url" value={sourceUrl} maxLength={2000} onChange={e => {setSourceUrl(e.target.value);setRegistrySaveState("idle");}} style={input} /></label>
+  <label>Registration and safeguarding review note<textarea value={registryNote} maxLength={4000} onChange={e => {setRegistryNote(e.target.value);setRegistrySaveState("idle");}} style={input} /></label>
+  <label><input type="checkbox" checked={safetyReviewed} onChange={e => {setSafetyReviewed(e.target.checked);setRegistrySaveState("idle");}} /> I completed an individual human safeguarding review, including any requested private discussion, and resolved the student-safety requirements for this proposed scope.</label>
+  <div style={{display:"grid",gap:8}}><button type="button" disabled={busy || !sourceUrl.trim() || !registryNote.trim()} onClick={() => void registryAction("save")}>{registrySaveState==="saving" ? "Saving human review…" : "Save human review"}</button>
+  <p role="status" aria-live="polite" style={{margin:0,padding:"12px 14px",borderRadius:8,border:"1px solid #94A3B8",background:registrySaveState==="saved"?"#DCFCE7":registrySaveState==="error"?"#FEE2E2":"#F1F5F9",color:"#0F172A",fontWeight:750}}>{registrySaveState==="saved" ? `✓ Saved and reloaded from Playbook at ${savedAt}. No email sent.` : registrySaveState==="error"?"Save failed — your review was not confirmed.": registrySaveState==="saving"?"Saving your review…":"Not yet saved in this session. Save before leaving this page."}</p></div>
   <h3>Decision and applicant communication</h3>
-  <label>Review outcome<select value={outcome} onChange={e => { setOutcome(e.target.value as ReviewOutcome); setReason(""); actionId.current = null; }} style={input}><option value="needs_information">Need additional verification</option><option value="under_review">Review in progress</option><option value="approved">Approve role access</option><option value="rejected">Decline with reason</option></select></label>
+  <label>Review outcome<select value={outcome} onChange={e => { setOutcome(e.target.value as ReviewOutcome); setReason(""); setExtra(""); setApprovalPreset(""); actionId.current = null; }} style={input}><option value="needs_information">Need additional verification</option><option value="under_review">Review in progress</option><option value="approved">Approve role access</option><option value="rejected">Decline with reason</option></select></label>
   {reasons.length > 0 && <label>Applicant-facing reason<select value={reason} onChange={e => { setReason(e.target.value); actionId.current = null; }} style={input}><option value="">Select a reason</option>{reasons.map(row => <option key={row.id} value={row.id}>{row.label}</option>)}</select></label>}
+  {outcome === "approved" && <label>Approval email message template<select aria-label="Approval email message template" value={approvalPreset} onChange={e => { const selected=APPROVAL_MESSAGE_PRESETS.find(p=>p.id===e.target.value); setApprovalPreset(e.target.value); setExtra(selected?.message??"");actionId.current=null; }} style={input}><option value="">No additional message (standard approval)</option>{APPROVAL_MESSAGE_PRESETS.map(p=><option key={p.id} value={p.id}>{p.label}</option>)}</select><small>Choose a professional message or edit it below. The email preview shows exactly what will be sent.</small></label>}
   <label>Additional message to the applicant<textarea maxLength={2000} value={extra} onChange={e => { setExtra(e.target.value); actionId.current = null; }} style={input} /><small>For a decline, explain the specific verified issue. Keep sensitive history out of email.</small></label>
   <label>Private admin notes<textarea aria-label="Private admin notes" maxLength={4000} value={privateNote} onChange={e => setPrivateNote(e.target.value)} style={input} /><small>Saved separately from applicant messages and never included in email.</small></label>
   <button type="button" disabled={busy || !privateNote.trim()} onClick={() => { setBusy(true); void fetch("/api/admin/verification/brand-review", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "note", requestId, note: privateNote }) }).then(response => { if (!response.ok) throw new Error("Private note could not be saved."); setPrivateNote(""); setNotice("Private note saved. No email was sent."); }).catch(cause => setNotice(cause.message)).finally(() => setBusy(false)); }}>Save private note without email</button>
