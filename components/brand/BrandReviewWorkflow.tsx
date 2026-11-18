@@ -24,6 +24,7 @@ export default function BrandReviewWorkflow({ requestId, documentsReviewed, onCo
   if (!response.ok) throw new Error(body.error || "Review details unavailable.");
   const data = body as Context; setContext(data);
   if (data.registry) { setHumanOutcome(data.registry.human_outcome); setSourceUrl(data.registry.source_url); setRegistryNote(data.registry.review_note); setSafetyReviewed(data.registry.safety_reviewed); }
+  return data;
  }, [requestId]);
  useEffect(() => { const timer = window.setTimeout(() => { void load().catch(cause => setNotice(cause.message)); }, 0); return () => window.clearTimeout(timer); }, [load]);
  const reasons = outcome === "needs_information" ? ADDITIONAL_VERIFICATION_REASONS : outcome === "rejected" ? DECLINE_REASONS : [];
@@ -37,7 +38,7 @@ export default function BrandReviewWorkflow({ requestId, documentsReviewed, onCo
    const response = await fetch("/api/admin/verification/registry", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action, requestId, humanOutcome, sourceUrl, note: registryNote, safetyReviewed, expectedRegistrationUpdatedAt: context?.registration?.updated_at }) });
    const body = await response.json(); if (!response.ok) throw new Error(body.error || "Registry operation failed.");
    if (action === "lookup") { setLookup(body); if (!sourceUrl) setSourceUrl(body.source || ""); }
-   else { await load(); setSavedAt(new Date().toLocaleString()); setRegistrySaveState("saved"); setNotice("Human review saved successfully. This did not send an email."); }
+   else { const verified=await load(); if (!verified.registry || verified.registry.human_outcome!==humanOutcome || verified.registry.review_note!==registryNote.trim() || verified.registry.source_url!==sourceUrl || verified.registry.safety_reviewed!==safetyReviewed) throw new Error("Save was accepted, but the readback does not match your review. Recheck the record before making any decision."); setSavedAt(new Date().toLocaleString()); setRegistrySaveState("saved"); setNotice("Human review saved and verified. This did not send an email."); }
   } catch (cause) { if(action==="save")setRegistrySaveState("error"); setNotice(cause instanceof Error ? cause.message : "Registry operation failed."); } finally { setBusy(false); }
  }
  async function submit() {
