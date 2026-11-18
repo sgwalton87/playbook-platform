@@ -29,7 +29,12 @@ async function makePng(org:Organization,format:Format):Promise<Blob> {
  ctx.fillStyle=format.background;ctx.fillRect(0,0,1080,1080);
  ctx.fillStyle=format.accent;ctx.fillRect(70,70,940,10);ctx.fillRect(70,1000,940,10);
  ctx.strokeStyle="#8195B5";ctx.lineWidth=2;ctx.strokeRect(40,40,1000,1000);
- ctx.fillStyle="#FFFFFF";ctx.font="bold 40px Arial";ctx.fillText("PLAYBOOK SERIES INC.",90,155);
+ try {
+  const brandLogo=new Image();
+  await new Promise<void>((resolve,reject)=>{brandLogo.onload=()=>resolve();brandLogo.onerror=()=>reject(new Error("Playbook mark unavailable"));brandLogo.src="/brand/playbook-logo.png";});
+  ctx.drawImage(brandLogo,90,92,78,78);
+ } catch { /* Keep readable Playbook wordmark if decorative mark cannot load. */ }
+ ctx.fillStyle="#FFFFFF";ctx.font="bold 40px Arial";ctx.fillText("PLAYBOOK SERIES INC.",185,148);
  ctx.fillStyle=format.accent;ctx.font="bold 32px Arial";ctx.fillText(format.title,90,300);
  let logoRendered=false;
  if(org.logo_url){
@@ -116,7 +121,7 @@ function PartnerShareWorkspace(){
      <a href={publicHome} style={{color:"#174EA6"}}>Public Playbook link to share</a>
     </section>
     <section aria-label="Co-branded post preview" style={{aspectRatio:"1/1",background:format.background,color:"#FFF",borderRadius:18,padding:"clamp(22px,4vw,45px)",display:"flex",flexDirection:"column",justifyContent:"space-between",border:"6px solid #C8A96D"}}>
-     <div style={{fontWeight:900,fontSize:20,letterSpacing:2}}>PLAYBOOK SERIES INC.</div>
+     <div style={{fontWeight:900,fontSize:20,letterSpacing:2,display:"flex",gap:12,alignItems:"center"}}><img src="/brand/playbook-logo.png" alt="" width="46" height="46" style={{objectFit:"contain"}} />PLAYBOOK SERIES INC.</div>
      <div><p style={{color:format.accent,fontWeight:900,letterSpacing:2,fontSize:16}}>{format.title}</p>
       {org.logo_url&&<img src={org.logo_url} alt={org.name+" logo"} style={{maxWidth:110,maxHeight:85,objectFit:"contain"}} />}
       <h2 style={{fontSize:"clamp(28px,4vw,52px)",overflowWrap:"anywhere",lineHeight:1.1,margin:"14px 0"}}>{org.name}</h2>
