@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 
 type Snapshot = { id:string; source_url:string; captured_at:string; source_label:string };
 const SEARCH_URL = "https://bizfileonline.sos.ca.gov/search/business";
-export default function SosEvidenceSnapshot({requestId}:{requestId:string}) {
+export default function SosEvidenceSnapshot({requestId,onEvidenceChange}:{requestId:string;onEvidenceChange?:(hasEvidence:boolean)=>void}) {
  const [snapshots,setSnapshots]=useState<Snapshot[]>([]);
  const [sourceUrl,setSourceUrl]=useState(SEARCH_URL);
  const [busy,setBusy]=useState(false);
@@ -13,7 +13,8 @@ export default function SosEvidenceSnapshot({requestId}:{requestId:string}) {
   const body=await r.json();
   if(!r.ok)throw new Error(body.error??"Evidence history unavailable.");
   setSnapshots(body.snapshots??[]);
- },[requestId]);
+  onEvidenceChange?.((body.snapshots??[]).length>0);
+ },[requestId,onEvidenceChange]);
  useEffect(()=>{void load().catch(()=>{});},[load]);
  async function upload(file:File) {
   setBusy(true);setNotice("");
