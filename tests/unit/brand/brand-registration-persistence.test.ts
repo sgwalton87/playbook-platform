@@ -11,7 +11,7 @@ import { GET, PATCH } from "@/app/api/brand-verification/route";
 
 const registration = {
   formationState: "California", entityType: "LLC", entityNumber: "",
-  safetyAnswers: { minors: "no", financial: "no", violence: "no" },
+  safetyAnswers: { minors: "no", financial: "no", violence: "no", pending: "no", restrictions: "no" },
   safeguardingAccepted: true,
 };
 function input(body: unknown) {
