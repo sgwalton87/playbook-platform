@@ -15,7 +15,7 @@ export default function SosEvidenceSnapshot({requestId,onEvidenceChange}:{reques
   setSnapshots(body.snapshots??[]);
   onEvidenceChange?.((body.snapshots??[]).length>0);
  },[requestId,onEvidenceChange]);
- useEffect(()=>{void load().catch(()=>{});},[load]);
+ useEffect(()=>{const timer=window.setTimeout(()=>{void load().catch(()=>{});},0);return()=>window.clearTimeout(timer);},[load]);
  async function upload(file:File) {
   setBusy(true);setNotice("");
   try {
