@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 
-type Snapshot = { id:string; source_url:string; captured_at:string; source_label:string };
+type Snapshot = { id:string; source_url:string; captured_at:string; source_label:string; reviewer_id:string };
 const SEARCH_URL = "https://bizfileonline.sos.ca.gov/search/business";
 export default function SosEvidenceSnapshot({requestId,organizationName,onEvidenceChange}:{requestId:string;organizationName:string;onEvidenceChange?:(hasEvidence:boolean)=>void}) {
  const [snapshots,setSnapshots]=useState<Snapshot[]>([]);
@@ -68,7 +68,7 @@ export default function SosEvidenceSnapshot({requestId,organizationName,onEviden
   {notice&&<p role="status" style={{margin:0,padding:12,background:"#EFF6FF",color:"#1E3A8A",borderRadius:8}}>{notice}</p>}
   <div><strong>Stored evidence snapshots: {snapshots.length}</strong>
    {snapshots.length>0&&<ul>{snapshots.map(snapshot=><li key={snapshot.id} style={{marginTop:8}}>
-    <a href={`/api/admin/verification/registry/snapshot/file?requestId=${encodeURIComponent(requestId)}&id=${encodeURIComponent(snapshot.id)}`} target="_blank" rel="noopener noreferrer" style={{color:"#174EA6",textDecoration:"underline"}}>View saved screenshot — {new Date(snapshot.captured_at).toLocaleString()}</a>
+    <a href={`/api/admin/verification/registry/snapshot/file?requestId=${encodeURIComponent(requestId)}&id=${encodeURIComponent(snapshot.id)}`} target="_blank" rel="noopener noreferrer" style={{color:"#174EA6",textDecoration:"underline"}}>View saved screenshot — {new Date(snapshot.captured_at).toLocaleString()}</a><span style={{display:"block",color:"#475569",fontSize:13}}>Reviewer audit ID: {snapshot.reviewer_id}</span>
    </li>)}</ul>}
   </div>
  </section>;
