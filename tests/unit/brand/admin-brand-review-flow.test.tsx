@@ -11,6 +11,7 @@ beforeEach(()=>{
  vi.resetAllMocks();mocks.noDocuments=false;mocks.getUser.mockResolvedValue({data:{user:{id:"reviewer"}}});
  mocks.fetch.mockImplementation(async(url:string,init?:RequestInit)=>{
   if(url.includes("/communications"))return Response.json({communications:[]});
+  if(url.includes("/registry/snapshot"))return Response.json({snapshots:[{id:"22222222-2222-4222-8222-222222222222",reviewer_id:"33333333-3333-4333-8333-333333333333",source_url:"https://bizfileonline.sos.ca.gov/search/business",captured_at:"2026-11-18T18:00:00Z",source_label:"Reviewer-provided"}]});
   if(url.includes("/brand-review")&&init?.method==="POST")return Response.json({saved:true,delivery:{status:"sent",message:"Accepted by mail server"}});
   if(url.includes("/brand-review"))return Response.json({registry:{human_outcome:"matched_active",source_url:"https://sos.ca.gov",review_note:"Reviewed",safety_reviewed:true},registration:{formation_state:"California",entity_type:"LLC",entity_number:"123",safety_answers:{}}});
   if(url.includes("brand-evidence"))return Response.json({documents:!url.includes("requestId=")||mocks.noDocuments?[]:[{name:"business-card.jpg",type:"Business card",url:"/api/admin/verification/brand-evidence/file?documentId=example"}]});
@@ -27,7 +28,7 @@ describe("admin dashboard review and invitation",()=>{
   expect((await screen.findByRole("link",{name:/Business card — view/})).getAttribute("href")).toContain("/brand-evidence/file");
   fireEvent.click(screen.getByRole("checkbox",{name:/I reviewed the business documentation/}));expect(approve.disabled).toBe(true);
   fireEvent.click(screen.getByRole("checkbox",{name:/Approve the requested Brand Partner campaign/}));
-  fireEvent.click(screen.getByRole("checkbox",{name:/Approve the requested student-protection/}));expect(approve.disabled).toBe(false);
+  fireEvent.click(screen.getByRole("checkbox",{name:/Approve the requested student-protection/}));await waitFor(()=>expect(approve.disabled).toBe(false));
   fireEvent.click(approve);
   await waitFor(()=>expect(mocks.fetch).toHaveBeenCalledWith("/api/admin/verification/brand-review",expect.objectContaining({method:"POST",body:expect.stringContaining('"outcome":"approved"')})));
  });
