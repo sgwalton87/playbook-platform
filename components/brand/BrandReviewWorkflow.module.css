@@ -37,7 +37,7 @@
   opacity: 1 !important;
   cursor: not-allowed;
 }
-.surface a {
+.surface a:not([style*="background"]) {
   color: #174ea6 !important;
   text-decoration: underline;
 }
