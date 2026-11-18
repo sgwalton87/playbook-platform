@@ -45,7 +45,7 @@ export default function BrandReviewWorkflow({ requestId, documentsReviewed, onCo
    window.dispatchEvent(new Event("brand-verification-review-completed")); onComplete(`Review saved. ${body.delivery.message}`);
   } catch (cause) { setNotice(cause instanceof Error ? cause.message : "Review failed. Check the communication log before retrying."); } finally { setBusy(false); }
  }
- return <section aria-label="Brand Partner review and communication" style={{ display: "grid", gap: 12, marginTop: 18 }}>
+ return <section aria-label="Brand Partner review and communication" style={{ display: "grid", gap: 12, marginTop: 18, padding: 18, borderRadius: 12, background: "#FFFFFF", color: "#0F172A", border: "1px solid #CBD5E1" }}>
   <h3>Business and safeguarding review</h3>
   <SosVerificationTutorial />
   <SosEvidenceSnapshot requestId={requestId} />
