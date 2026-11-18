@@ -27,6 +27,15 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
+      - name: Export 107-capability uncertified baseline
+        run: npx tsx scripts/pbos/export-capability-certification.ts
+      - name: Upload governed capability inventory
+        uses: actions/upload-artifact@v4
+        with:
+          name: pbos-capability-ledger-${{ github.sha }}
+          path: artifacts/pbos-capability-audit/capabilities.json
+          if-no-files-found: error
+          retention-days: 30
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: Build application
