@@ -117,7 +117,7 @@ function PartnerShareWorkspace(){
      <button type="button" onClick={()=>void navigator.clipboard.writeText(format.caption(org.name)).then(()=>setStatus("Caption copied.")).catch(()=>setStatus("Copy unavailable in this browser."))} style={primary}>Copy caption</button>
      <button type="button" disabled={busy} onClick={()=>void download()} style={primary}>Download Instagram square image</button>
      <button type="button" disabled={busy} onClick={()=>void share()} style={primary}>Share using my phone or browser</button>
-     <p style={{fontSize:14,lineHeight:1.6,color:"#475569"}}>Sharing uses your device's share sheet when supported. Automated Instagram publishing requires a separately authorized Meta account connection and approved API permissions; this page does not claim to publish on your behalf.</p>
+     <p style={{fontSize:14,lineHeight:1.6,color:"#475569"}}>Sharing uses the device share sheet when supported. Automated Instagram publishing requires a separately authorized Meta account connection and approved API permissions; this page does not claim to publish on your behalf.</p>
      <a href={publicHome} style={{color:"#174EA6"}}>Public Playbook link to share</a>
     </section>
     <section aria-label="Co-branded post preview" style={{aspectRatio:"1/1",background:format.background,color:"#FFF",borderRadius:18,padding:"clamp(22px,4vw,45px)",display:"flex",flexDirection:"column",justifyContent:"space-between",border:"6px solid #C8A96D"}}>
