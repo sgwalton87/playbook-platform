@@ -1,17 +1,17 @@
 import React from "react";
 import { cleanup,fireEvent,render,screen,waitFor } from "@testing-library/react";
 import { afterEach,beforeEach,describe,expect,it,vi } from "vitest";
-const mocks=vi.hoisted(()=>({getUser:vi.fn(),fetch:vi.fn(),replace:vi.fn(),noDocuments:false}));
+const mocks=vi.hoisted(()=>({getUser:vi.fn(),fetch:vi.fn(),replace:vi.fn(),noDocuments:false,noScreenshot:false}));
 vi.mock("next/navigation",()=>({useRouter:()=>({replace:mocks.replace}),usePathname:()=>"/admin"}));
 vi.mock("@/lib/supabaseClient",()=>({supabase:{auth:{getUser:mocks.getUser}}}));
 import AdminPage from "@/app/admin/page";
 const requestId="11111111-1111-4111-8111-111111111111";
 const row={request_type:"brand-partner",request_id:requestId,status:"pending",submitted_at:"2026-10-28T18:25:00Z",evidence:{organization_name:"Example Brand"}};
 beforeEach(()=>{
- vi.resetAllMocks();mocks.noDocuments=false;mocks.getUser.mockResolvedValue({data:{user:{id:"reviewer"}}});
+ vi.resetAllMocks();mocks.noDocuments=false;mocks.noScreenshot=false;mocks.getUser.mockResolvedValue({data:{user:{id:"reviewer"}}});
  mocks.fetch.mockImplementation(async(url:string,init?:RequestInit)=>{
   if(url.includes("/communications"))return Response.json({communications:[]});
-  if(url.includes("/registry/snapshot"))return Response.json({snapshots:[{id:"22222222-2222-4222-8222-222222222222",reviewer_id:"33333333-3333-4333-8333-333333333333",source_url:"https://bizfileonline.sos.ca.gov/search/business",captured_at:"2026-11-18T18:00:00Z",source_label:"Reviewer-provided"}]});
+  if(url.includes("/registry/snapshot"))return Response.json({snapshots:mocks.noScreenshot?[]:[{id:"22222222-2222-4222-8222-222222222222",reviewer_id:"33333333-3333-4333-8333-333333333333",source_url:"https://bizfileonline.sos.ca.gov/search/business",captured_at:"2026-11-18T18:00:00Z",source_label:"Reviewer-provided"}]});
   if(url.includes("/brand-review")&&init?.method==="POST")return Response.json({saved:true,delivery:{status:"sent",message:"Accepted by mail server"}});
   if(url.includes("/brand-review"))return Response.json({registry:{human_outcome:"matched_active",source_url:"https://sos.ca.gov",review_note:"Reviewed",safety_reviewed:true},registration:{formation_state:"California",entity_type:"LLC",entity_number:"123",safety_answers:{}}});
   if(url.includes("brand-evidence"))return Response.json({documents:!url.includes("requestId=")||mocks.noDocuments?[]:[{name:"business-card.jpg",type:"Business card",url:"/api/admin/verification/brand-evidence/file?documentId=example"}]});
@@ -31,6 +31,16 @@ describe("admin dashboard review and invitation",()=>{
   fireEvent.click(screen.getByRole("checkbox",{name:/Approve the requested student-protection/}));await waitFor(()=>expect(approve.disabled).toBe(false));
   fireEvent.click(approve);
   await waitFor(()=>expect(mocks.fetch).toHaveBeenCalledWith("/api/admin/verification/brand-review",expect.objectContaining({method:"POST",body:expect.stringContaining('"outcome":"approved"')})));
+ });
+ it("blocks California approval when no registry screenshot is retained",async()=>{
+  mocks.noScreenshot=true; render(<AdminPage/>);await screen.findByText("Example Brand");
+  fireEvent.change(screen.getByLabelText("Review outcome"),{target:{value:"approved"}});
+  fireEvent.click(screen.getByRole("button",{name:"Open submitted evidence"}));
+  await screen.findByRole("link",{name:/Business card — view/});
+  fireEvent.click(screen.getByRole("checkbox",{name:/I reviewed the business documentation/}));
+  fireEvent.click(screen.getByRole("checkbox",{name:/Approve the requested Brand Partner campaign/}));
+  fireEvent.click(screen.getByRole("checkbox",{name:/Approve the requested student-protection/}));
+  expect((screen.getByRole("button",{name:"Approve and send invitation"}) as HTMLButtonElement).disabled).toBe(true);
  });
  it("blocks approval without supporting documents",async()=>{
   mocks.noDocuments=true;render(<AdminPage/>);await screen.findByText("Example Brand");fireEvent.change(screen.getByLabelText("Review outcome"),{target:{value:"approved"}});
