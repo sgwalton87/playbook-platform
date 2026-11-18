@@ -26,6 +26,61 @@ export async function GET() {
   }
 }
 
+
+/**
+ * Save complete business registration and safeguarding declarations independently
+ * of verification submission. This action never changes reviewer decisions,
+ * the pending request, campaign scope, or compliance scope.
+ */
+export async function PATCH(request: Request) {
+  try {
+    const { supabase, user } = await requireUser();
+    if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+
+    const profile = await supabase.from("profiles")
+      .select("role,profile_mode,onboarding_completed").eq("id", user.id).maybeSingle();
+    if (profile.error) throw new Error(profile.error.message);
+    if (!profile.data) return NextResponse.json({ error: "Brand Partner profile not found." }, { status: 404 });
+    if (requirePlaybookRole(profile.data.profile_mode ?? profile.data.role) !== "brand-partner") {
+      return NextResponse.json({ error: "Brand verification is restricted to Brand Partner accounts." }, { status: 403 });
+    }
+    if (!profile.data.onboarding_completed) {
+      return NextResponse.json({ error: "Complete Brand Partner onboarding before saving registration." }, { status: 409 });
+    }
+
+    const existing = await supabase.from("brand_partner_verification_requests")
+      .select("status").eq("brand_user_id", user.id).maybeSingle();
+    if (existing.error) throw new Error(existing.error.message);
+    if (existing.data?.status === "approved") {
+      return NextResponse.json({ error: "Approved registration cannot be changed through self-service." }, { status: 409 });
+    }
+
+    const input = await request.json().catch(() => ({})) as { registration?: unknown };
+    let registration;
+    try { registration = parseRegistration(input.registration); }
+    catch (cause) { return NextResponse.json({ error: cause instanceof Error ? cause.message : "Complete the business and safeguarding declarations." }, { status: 422 }); }
+
+    const savedAt = new Date().toISOString();
+    const saved = await supabase.from("brand_partner_registration_details").upsert({
+      brand_user_id: user.id,
+      formation_state: registration.formationState,
+      entity_type: registration.entityType,
+      entity_number: registration.entityNumber,
+      safety_answers: registration.safetyAnswers,
+      safeguarding_accepted: registration.safeguardingAccepted,
+      updated_at: savedAt,
+    }, { onConflict: "brand_user_id" });
+    if (saved.error) throw new Error("Registration details could not be saved. No verification decision was changed.");
+
+    return NextResponse.json({
+      ok: true, savedAt,
+      message: "Business registration details saved. Your verification is still awaiting independent review.",
+    }, { headers: { "Cache-Control": "no-store, private" } });
+  } catch {
+    return NextResponse.json({ error: "Registration details could not be saved. Please try again." }, { status: 400 });
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const { supabase, user } = await requireUser();
