@@ -44,7 +44,7 @@ jobs:
       - name: Run desktop tablet mobile accessibility QA
         env:
           PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
-        run: npx playwright test tests/acceptance/phase15-public-platform.spec.ts
+        run: npx playwright test tests/acceptance/phase15-public-platform.spec.ts tests/acceptance/pbos-capability-foundation.spec.ts
 
   scholar-e2e:
     name: Trusted Scholar + Scholar-Athlete + Family E2E
