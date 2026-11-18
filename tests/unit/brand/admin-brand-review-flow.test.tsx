@@ -28,8 +28,8 @@ describe("admin dashboard review and invitation",()=>{
   expect((await screen.findByRole("link",{name:/Business card — view/})).getAttribute("href")).toContain("/brand-evidence/file");
   fireEvent.click(screen.getByRole("checkbox",{name:/I reviewed the business documentation/}));expect(approve.disabled).toBe(true);
   fireEvent.click(screen.getByRole("checkbox",{name:/Approve the requested Brand Partner campaign/}));
-  fireEvent.click(screen.getByRole("checkbox",{name:/Approve the requested student-protection/}));await waitFor(()=>expect(approve.disabled).toBe(false));
-  fireEvent.click(screen.getByRole("checkbox",{name:"Confirm applicant email preview"}));
+  fireEvent.click(screen.getByRole("checkbox",{name:/Approve the requested student-protection/}));expect(approve.disabled).toBe(true);
+  fireEvent.click(screen.getByRole("checkbox",{name:"Confirm applicant email preview"}));await waitFor(()=>expect(approve.disabled).toBe(false));
   fireEvent.click(approve);
   await waitFor(()=>expect(mocks.fetch).toHaveBeenCalledWith("/api/admin/verification/brand-review",expect.objectContaining({method:"POST",body:expect.stringContaining('"outcome":"approved"')})));
  });
@@ -49,7 +49,7 @@ describe("admin dashboard review and invitation",()=>{
   const template=await screen.findByLabelText("Approval email message template");
   fireEvent.change(template,{target:{value:"welcome"}});
   expect(screen.getByLabelText("Email preview").textContent).toContain("Welcome to Playbook!");
-  expect((screen.getByLabelText("Additional message to the applicant") as HTMLTextAreaElement).value).toContain("Welcome to Playbook!");
+  expect((screen.getByLabelText(/Additional message to the applicant/) as HTMLTextAreaElement).value).toContain("Welcome to Playbook!");
   expect(mocks.fetch).not.toHaveBeenCalledWith("/api/admin/verification/brand-review",expect.objectContaining({method:"POST"}));
  });
  it("confirms human-review save only after server readback and never sends an email",async()=>{
