@@ -4,7 +4,7 @@ import { requireUser } from "@/lib/supabase/server";
 import { UUID } from "@/lib/brand-verification/documents";
 
 const BUCKET = "brand-registry-review-evidence";
-const MAX_BYTES = 5 * 1024 * 1024;
+const MAX_BYTES = 4 * 1024 * 1024;
 const denyCache = { "Cache-Control": "no-store, private" };
 function isOfficialSource(value: string) {
  try {
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
  if (typeof requestId !== "string" || !UUID.test(requestId) || typeof rawUrl !== "string" || !isOfficialSource(rawUrl) || !(file instanceof File))
   return NextResponse.json({ error: "A valid request, California SOS URL and screenshot are required." }, { status: 400, headers: denyCache });
  if (file.size < 16 || file.size > MAX_BYTES || !["image/png","image/jpeg"].includes(file.type))
-  return NextResponse.json({ error: "Use a PNG or JPEG screenshot under 5 MB." }, { status: 400, headers: denyCache });
+  return NextResponse.json({ error: "Use a PNG or JPEG screenshot under 4 MB." }, { status: 400, headers: denyCache });
  const buffer = Buffer.from(await file.arrayBuffer());
  const png = file.type === "image/png" && buffer.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10]));
  const jpeg = file.type === "image/jpeg" && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;
