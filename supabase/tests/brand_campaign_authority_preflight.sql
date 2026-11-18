@@ -11,7 +11,7 @@ begin
   -- for policy evaluation, while anon and PUBLIC remain denied.
   if not has_function_privilege('authenticated','private.current_user_has_brand_campaign_authority()','EXECUTE')
      or has_function_privilege('anon','private.current_user_has_brand_campaign_authority()','EXECUTE')
-     or has_function_privilege('PUBLIC','private.current_user_has_brand_campaign_authority()','EXECUTE')
+     or exists (select 1 from pg_proc p cross join lateral aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) acl where p.oid='private.current_user_has_brand_campaign_authority()'::regprocedure and acl.grantee=0 and acl.privilege_type='EXECUTE')
   then
     raise exception 'Brand authority RLS helper must be callable by authenticated only.';
   end if;
