@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 
 type Snapshot = { id:string; source_url:string; captured_at:string; source_label:string };
 const SEARCH_URL = "https://bizfileonline.sos.ca.gov/search/business";
-export default function SosEvidenceSnapshot({requestId,onEvidenceChange}:{requestId:string;onEvidenceChange?:(hasEvidence:boolean)=>void}) {
+export default function SosEvidenceSnapshot({requestId,organizationName,onEvidenceChange}:{requestId:string;organizationName:string;onEvidenceChange?:(hasEvidence:boolean)=>void}) {
  const [snapshots,setSnapshots]=useState<Snapshot[]>([]);
  const [sourceUrl,setSourceUrl]=useState(SEARCH_URL);
  const [busy,setBusy]=useState(false);
@@ -53,6 +53,7 @@ export default function SosEvidenceSnapshot({requestId,onEvidenceChange}:{reques
  return <section aria-label="SOS screenshot evidence" style={{padding:18,border:"1px solid #94A3B8",borderRadius:12,background:"#FFF",color:"#0F172A",display:"grid",gap:12}}>
   <h4 style={{margin:0,fontSize:20,color:"#0F172A"}}>Save the official registry evidence</h4>
   <p style={{margin:0,color:"#334155",lineHeight:1.6}}>Open the California SOS business-search result first. A screenshot provides a retained record of the screen you reviewed, but does not independently authenticate its contents or authorize approval. Select only the SOS tab, not a screen containing private information.</p>
+  {organizationName && <button type="button" onClick={()=>{void navigator.clipboard.writeText(organizationName).then(()=>setNotice("Business name copied for SOS search.")).catch(()=>setNotice("Copy not supported; select the displayed name manually."));}} style={{...buttonStyle,background:"#E2E8F0",color:"#0F172A",justifySelf:"start"}}>Copy legal name: {organizationName}</button>}
   <a href={SEARCH_URL} target="_blank" rel="noopener noreferrer" style={{color:"#174EA6",textDecoration:"underline",fontWeight:800}}>Open California SOS business search</a>
   <label style={{display:"grid",gap:6,fontWeight:700,color:"#0F172A"}}>Official SOS source or record link
    <input value={sourceUrl} type="url" onChange={e=>setSourceUrl(e.target.value)} style={{width:"100%",padding:12,color:"#0F172A",background:"#FFF",border:"1px solid #64748B",borderRadius:8}} />
