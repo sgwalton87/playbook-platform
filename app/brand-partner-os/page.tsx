@@ -22,7 +22,8 @@ const pathways = [
   { label: "Applicants", title: "Review only consented submissions", body: "See submitted applications only when a Scholar explicitly shares a narrow applicant projection. Consent remains revocable and does not expose the broader Scholar Record.", href: "/brand-partner-os/applicants", action: "Opportunity Applicants" },
   { label: "Rewards", title: "Inherit the shared Rewards economy", body: "Marketplace outcomes may participate in Playbook's shared reward policy, but Brand Partners never mint XP, coins, badges, or certificates directly from campaign or applicant decisions.", href: "/reward-economy", action: "View shared Rewards" },
   { label: "Scholar Marketplace", title: "See the Scholar-facing catalog", body: "Review the same published catalog Scholars see, separated clearly from PBOS readiness guidance.", href: "/opportunities", action: "Open Scholar Marketplace" },
-  { label: "Communication", title: "Coordinate with the right people", body: "Keep partner, scholar, guardian, and support-team decisions inside governed conversations.", href: "/messages", action: "Open messages" },
+{ label: "Partner Sharing", title: "Grow your Playbook circle", body: "Choose one of three verified partnership posts, use your organization logo if saved, and invite your community to discover Playbook. Sharing never exposes private Scholar records.", href: "/brand-partner-os/share", action: "Create partnership posts" },
+    { label: "Communication", title: "Coordinate with the right people", body: "Keep partner, scholar, guardian, and support-team decisions inside governed conversations.", href: "/messages", action: "Open messages" },
 ] as const;
 
 type Partner = { name: string; category: string; active: boolean };
