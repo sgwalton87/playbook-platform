@@ -4,6 +4,7 @@ import { ADDITIONAL_VERIFICATION_REASONS, DECLINE_REASONS, buildReviewMessage, t
 import { SAFEGUARDING_QUESTIONS } from "@/lib/verification/safeguarding";
 import type { RegistryLookup } from "@/lib/verification/registry";
 import SosVerificationTutorial from "@/components/brand/SosVerificationTutorial";
+import SosEvidenceSnapshot from "@/components/brand/SosEvidenceSnapshot";
 type Context = { registration?: { updated_at?: string; formation_state: string; entity_type: string; entity_number: string; safety_answers: Record<string,string> }; registry?: { human_outcome: string; source_url: string; review_note: string; safety_reviewed: boolean } };
 export default function BrandReviewWorkflow({ requestId, documentsReviewed, onComplete }: { requestId: string; documentsReviewed: boolean; onComplete: (message: string) => void }) {
  const [context, setContext] = useState<Context | null>(null);
@@ -47,14 +48,16 @@ export default function BrandReviewWorkflow({ requestId, documentsReviewed, onCo
  return <section aria-label="Brand Partner review and communication" style={{ display: "grid", gap: 12, marginTop: 18 }}>
   <h3>Business and safeguarding review</h3>
   <SosVerificationTutorial />
+  <SosEvidenceSnapshot requestId={requestId} />
   {context?.registration ? <>
    <p>{context.registration.formation_state} · {context.registration.entity_type} · Entity number: {context.registration.entity_number || "Not supplied"}</p>
    <details><summary>Private student-safety declarations</summary>{SAFEGUARDING_QUESTIONS.map(q => <p key={q.id}><strong>{q.label}</strong><br />{context.registration?.safety_answers[q.id] || "Not answered"}</p>)}<p>A charge is not a conviction. Confirm identity, relevance, lawful reportability and any correction before making an individual decision. Do not send these declarations to AI.</p></details>
-   <button type="button" disabled={busy} onClick={() => void registryAction("lookup")}>Check official registry / AI research</button>
+   <button type="button" disabled={busy} onClick={() => void registryAction("lookup")} style={{...reviewButton,background:"#17365B",color:"#FFFFFF"}}>{busy ? "Checking research services…" : "Run optional AI / official registry research"}</button>
+   <p style={{margin:0,color:"#334155"}}>This is an optional research aid, not an automatic SOS verification. If AI or the California registry API is unavailable, use the official business search above and save a screenshot.</p>
   </> : <p>Registration and safeguarding declarations have not yet been supplied. Request additional verification before approval.</p>}
-  {lookup && <section aria-label="Registry research aid"><p>{lookup.summary}</p><a href={lookup.source} target="_blank" rel="noopener noreferrer">Open official registry</a>{lookup.candidates.map(row => <p key={row.entityNumber}>{row.name} · {row.entityNumber} · {row.standing}</p>)}<ul>{lookup.sources.map(row => <li key={row.url}><a href={row.url} target="_blank" rel="noopener noreferrer">{row.title}</a></li>)}</ul></section>}
+  {lookup && <section aria-label="Registry research aid" role="status" style={{padding:16,background:"#EFF6FF",color:"#102A43",border:"1px solid #93C5FD",borderRadius:12}}><h4 style={{color:"#102A43"}}>Research result: {lookup.status.replaceAll("_"," ")}</h4><p style={{color:"#102A43"}}>{lookup.summary}</p><a href={lookup.source} target="_blank" rel="noopener noreferrer">Open official registry</a>{lookup.candidates.map(row => <p key={row.entityNumber}>{row.name} · {row.entityNumber} · {row.standing}</p>)}<ul>{lookup.sources.map(row => <li key={row.url}><a href={row.url} target="_blank" rel="noopener noreferrer">{row.title}</a></li>)}</ul></section>}
   <label>Human registration determination<select value={humanOutcome} onChange={e => { setHumanOutcome(e.target.value); }} style={input}><option value="needs_review">Not yet resolved</option><option value="matched_active">Official entity matched and current standing confirmed</option><option value="alternative_verified">Alternative establishment evidence verified</option><option value="confirmed_issue">Verified issue requires clarification or decline</option></select></label>
-  <p>After the official SOS search, return here, paste the record URL, write the matching details and select the human determination. Select <strong>Save human review</strong> to persist this case; leaving the page before saving does not save draft text.</p>
+  <p style={{color:"#334155",lineHeight:1.65}}>After the official SOS search, save the screenshot above, enter the entity number and status in your review note, and select the human determination. Choose <strong>Save human review</strong> to retain this case; leaving the page does not save draft text.</p>
   <label>Official record or alternative evidence URL<input type="url" value={sourceUrl} maxLength={2000} onChange={e => setSourceUrl(e.target.value)} style={input} /></label>
   <label>Registration and safeguarding review note<textarea value={registryNote} maxLength={4000} onChange={e => setRegistryNote(e.target.value)} style={input} /></label>
   <label><input type="checkbox" checked={safetyReviewed} onChange={e => setSafetyReviewed(e.target.checked)} /> I completed an individual human safeguarding review, including any requested private discussion, and resolved the student-safety requirements for this proposed scope.</label>
@@ -73,7 +76,8 @@ export default function BrandReviewWorkflow({ requestId, documentsReviewed, onCo
   </>}
   <div aria-label="Email preview" style={{ whiteSpace: "pre-wrap", padding: 14, background: "#F8FAFC", border: "1px solid #CBD5E1", borderRadius: 10 }}><strong>Email preview</strong><p>{preview}</p><p>{outcome === "approved" ? "Button: Open your Brand Partner dashboard" : "Button: Review and update your profile"}</p><small>From and reply-to: onboarding@playbookseriesinc.org</small></div>
   <button type="button" disabled={busy || !context || (reasons.length > 0 && !reason) || (outcome === "rejected" && !extra.trim()) || (outcome === "approved" && (!ready || !documentsReviewed || !campaignScope || !complianceScope))} onClick={() => void submit()}>{busy ? "Working…" : outcome === "approved" ? "Approve and send invitation" : outcome === "rejected" ? "Decline and send explanation" : "Save review and send message"}</button>
-  {notice && <p role="status">{notice}</p>}
+  {notice && <p role="status" style={{padding:14,background:"#EFF6FF",color:"#102A43",border:"1px solid #93C5FD",borderRadius:8}}>{notice}</p>}
  </section>;
 }
+const reviewButton:React.CSSProperties={padding:"12px 16px",borderRadius:8,border:"1px solid #17365B",fontWeight:800};
 const input: React.CSSProperties = { display: "block", width: "100%", boxSizing: "border-box", padding: 10, border: "1px solid #CBD5E1", borderRadius: 8, color: "#15243A", background: "white", marginTop: 6 };
