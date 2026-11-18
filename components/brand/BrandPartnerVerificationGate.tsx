@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import CommunityVettingJourney from "@/components/trust/CommunityVettingJourney";
 import BrandRegistrationFields from "@/components/brand/BrandRegistrationFields";
 import { EMPTY_REGISTRATION, parseRegistration, type BrandRegistration } from "@/lib/verification/registration";
@@ -32,6 +32,7 @@ export default function BrandPartnerVerificationGate({ children }: { children: R
   const [request, setRequest] = useState<VerificationRequest | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const mutationInFlight = useRef(false);
   const [savingRegistration, setSavingRegistration] = useState(false);
   const [registrationMissing, setRegistrationMissing] = useState(false);
   const [registrationSavedAt, setRegistrationSavedAt] = useState<string | null>(null);
@@ -67,6 +68,8 @@ export default function BrandPartnerVerificationGate({ children }: { children: R
     }
   }
   async function saveRegistration() {
+    if (mutationInFlight.current) return;
+    mutationInFlight.current = true;
     setSavingRegistration(true); setMessage(null);
     try {
       parseRegistration(registration);
@@ -85,15 +88,30 @@ export default function BrandPartnerVerificationGate({ children }: { children: R
       setMessage(cause instanceof Error ? cause.message : "Registration could not be saved.");
     } finally {
       setSavingRegistration(false);
+      mutationInFlight.current = false;
     }
   }
   async function submit() {
+    if (mutationInFlight.current) return;
     if (!communityAccepted) { setMessage("Acknowledge the community standards before submitting documents."); return; }
     try { parseRegistration(registration); } catch (cause) { setMessage(cause instanceof Error ? cause.message : "Complete the required declarations."); return; }
+    mutationInFlight.current = true;
     setSubmitting(true); setMessage(null);
-    const response = await fetch("/api/brand-verification", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ organizationName, nilAcknowledged, registration }) }); const result = await response.json() as { error?: string; message?: string };
-    setSubmitting(false); if (!response.ok) { setMessage(result.error ?? "Brand verification could not be submitted."); return; }
-    setMessage(result.message ?? "Brand verification submitted."); await reloadAfterMutation();
+    try {
+      const response = await fetch("/api/brand-verification", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ organizationName, nilAcknowledged, registration }),
+      });
+      const result = await response.json() as { error?: string; message?: string };
+      if (!response.ok) { setMessage(result.error ?? "Brand verification could not be submitted."); return; }
+      setMessage(result.message ?? "Brand verification submitted.");
+      await reloadAfterMutation();
+    } catch (cause) {
+      setMessage(cause instanceof Error ? cause.message : "Brand verification could not be submitted.");
+    } finally {
+      setSubmitting(false);
+      mutationInFlight.current = false;
+    }
   }
 
   if (loading) return <Surface title="Preparing Brand Partner verification…" body="Checking organization, campaign, and compliance authority." />;
@@ -114,10 +132,10 @@ export default function BrandPartnerVerificationGate({ children }: { children: R
       {communityAccepted && <>
       <div style={{ display: "grid", gap: 12, padding: "12px 0" }}>
         <label style={{ fontWeight: 700 }}>Legal organization name
-          <input aria-label="Legal organization name" type="text" maxLength={240} value={organizationName} onChange={event => setOrganizationName(event.target.value)} style={{ display: "block", width: "100%", padding: 12, borderRadius: 8, border: "1px solid #9CA3AF", color: "#111827", background: "#FFFFFF" }} />
+          <input aria-label="Legal organization name" disabled={savingRegistration || submitting} type="text" maxLength={240} value={organizationName} onChange={event => setOrganizationName(event.target.value)} style={{ display: "block", width: "100%", padding: 12, borderRadius: 8, border: "1px solid #9CA3AF", color: "#111827", background: "#FFFFFF" }} />
         </label>
         <label style={{ display: "flex", alignItems: "start", gap: 10 }}>
-          <input type="checkbox" checked={nilAcknowledged} onChange={event => setNilAcknowledged(event.target.checked)} aria-label="Acknowledge NIL and compliance responsibilities" />
+          <input type="checkbox" disabled={savingRegistration || submitting} checked={nilAcknowledged} onChange={event => setNilAcknowledged(event.target.checked)} aria-label="Acknowledge NIL and compliance responsibilities" />
           I acknowledge that NIL, student protection, campaign and legal compliance requirements apply, and that submitting evidence does not grant approval.
         </label>
       </div>
@@ -125,7 +143,9 @@ export default function BrandPartnerVerificationGate({ children }: { children: R
         Your verification request is saved and pending, but your business registration and safety declarations have no saved record.
         Complete the fields below and select <strong>Save registration details</strong>. Your pending review will not be reset.
       </p>}
-      <BrandRegistrationFields value={registration} onChange={setRegistration} />
+      <fieldset disabled={savingRegistration || submitting} style={{ border: 0, padding: 0, minWidth: 0 }}>
+        <BrandRegistrationFields value={registration} onChange={setRegistration} />
+      </fieldset>
       <div style={{ display: "grid", gap: 8, margin: "10px 0 18px" }}>
         <button type="button" onClick={() => void saveRegistration()}
           disabled={savingRegistration || submitting || request?.status === "approved"}
@@ -135,7 +155,7 @@ export default function BrandPartnerVerificationGate({ children }: { children: R
         </p>}
       </div>
       <BrandVerificationEvidenceUpload onEvidenceChange={setHasEvidence} />
-      {(!request || request.status === "pending" || request.status === "under_review" || request.status === "rejected") && <button onClick={() => void submit()} disabled={submitting || !hasEvidence || !organizationName.trim() || !nilAcknowledged} style={buttonStyle}>{submitting ? "Submitting…" : request ? "Submit updated verification evidence" : "Submit verification evidence"}</button>}
+      {(!request || request.status === "pending" || request.status === "under_review" || request.status === "rejected") && <button onClick={() => void submit()} disabled={submitting || savingRegistration || !hasEvidence || !organizationName.trim() || !nilAcknowledged} style={buttonStyle}>{submitting ? "Submitting…" : request ? "Submit updated verification evidence" : "Submit verification evidence"}</button>}
       {!hasEvidence && <p>Upload at least one supporting document before submitting verification.</p>}
       </>}
       {request && <p>Campaign scope: {request.campaign_scope_approved ? "approved" : "pending"} · Compliance scope: {request.compliance_scope_approved ? "approved" : "pending"}</p>}
