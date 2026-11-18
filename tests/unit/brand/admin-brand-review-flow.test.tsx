@@ -29,6 +29,7 @@ describe("admin dashboard review and invitation",()=>{
   fireEvent.click(screen.getByRole("checkbox",{name:/I reviewed the business documentation/}));expect(approve.disabled).toBe(true);
   fireEvent.click(screen.getByRole("checkbox",{name:/Approve the requested Brand Partner campaign/}));
   fireEvent.click(screen.getByRole("checkbox",{name:/Approve the requested student-protection/}));await waitFor(()=>expect(approve.disabled).toBe(false));
+  fireEvent.click(screen.getByRole("checkbox",{name:"Confirm applicant email preview"}));
   fireEvent.click(approve);
   await waitFor(()=>expect(mocks.fetch).toHaveBeenCalledWith("/api/admin/verification/brand-review",expect.objectContaining({method:"POST",body:expect.stringContaining('"outcome":"approved"')})));
  });
