@@ -6,14 +6,21 @@ begin
     raise exception 'Missing private Brand campaign authority helper.';
   end if;
 
-  if exists (
-    select 1 from information_schema.routine_privileges
-     where specific_schema = 'private'
-       and routine_name = 'current_user_has_brand_campaign_authority'
-       and grantee in ('PUBLIC','anon','authenticated')
-       and privilege_type = 'EXECUTE'
-  ) then
-    raise exception 'Private Brand campaign authority helper must not be directly executable by API roles.';
+  -- This parameter-free, caller-scoped boolean helper runs inside owner-bound
+  -- RLS as the authenticated caller. Direct authenticated EXECUTE is necessary
+  -- for policy evaluation, while anon and PUBLIC remain denied.
+  if not has_function_privilege('authenticated','private.current_user_has_brand_campaign_authority()','EXECUTE')
+     or has_function_privilege('anon','private.current_user_has_brand_campaign_authority()','EXECUTE')
+     or has_function_privilege('PUBLIC','private.current_user_has_brand_campaign_authority()','EXECUTE')
+  then
+    raise exception 'Brand authority RLS helper must be callable by authenticated only.';
+  end if;
+  if (select p.prosecdef from pg_proc p where p.oid='private.current_user_has_brand_campaign_authority()'::regprocedure) is distinct from true
+     or pg_get_functiondef('private.current_user_has_brand_campaign_authority()'::regprocedure) not ilike '%auth.uid()%'
+     or pg_get_functiondef('private.current_user_has_brand_campaign_authority()'::regprocedure) not ilike '%campaign_scope_approved is true%'
+     or pg_get_functiondef('private.current_user_has_brand_campaign_authority()'::regprocedure) not ilike '%compliance_scope_approved is true%'
+  then
+    raise exception 'Brand authority is not restricted to verified caller scopes.';
   end if;
 
   if not exists (
