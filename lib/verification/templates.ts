@@ -18,6 +18,12 @@ export const DECLINE_REASONS = [
  { id: "unsupported_activity", label: "Proposed activity outside permitted scope", message: "The proposed partnership activity does not meet the platform's current permitted partnership and student-protection requirements. You may request reconsideration with a revised scope." },
  { id: "material_inconsistency", label: "Material evidence inconsistency unresolved", message: "A material inconsistency in the submitted information remains unresolved after review. You may provide a correction or additional evidence and request reconsideration." },
 ] as const;
+export const APPROVAL_MESSAGE_PRESETS = [
+ { id: "welcome", label: "Welcome to Playbook", message: "Welcome to Playbook! Your organization verification is approved. Sign in to explore your Brand Partner workspace, review your permitted activities, and keep your organization profile current." },
+ { id: "next_steps", label: "Approved — getting started", message: "Your Brand Partner verification is approved. Your next step is to sign in, confirm your organization profile, and explore the approved partnership opportunities available to your role." },
+ { id: "education", label: "Approved — education partnership", message: "We're pleased to welcome your organization as a verified Brand Partner. Explore education and student-support opportunities in your workspace. Any direct student contact, NIL activity, and campaign permissions remain subject to their respective safeguards." },
+] as const;
+
 export type ReviewOutcome = "under_review" | "needs_information" | "approved" | "rejected";
 export function reasonFor(outcome: ReviewOutcome, reasonId: string) {
  return (outcome === "needs_information" ? ADDITIONAL_VERIFICATION_REASONS : outcome === "rejected" ? DECLINE_REASONS : []).find(row => row.id === reasonId);
