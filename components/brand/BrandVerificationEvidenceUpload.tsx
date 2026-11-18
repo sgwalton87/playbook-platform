@@ -5,7 +5,8 @@ import { supabase } from "@/lib/supabaseClient";
 
 const BUCKET = "brand-verification-evidence";
 const MAX_SIZE = 5 * 1024 * 1024;
-type Document = { name: string; type: string };
+type Document = { name: string; type: "Company letterhead" | "Business card" };
+const countOf = (documents: Document[], type: Document["type"]) => documents.filter(document => document.type === type).length;
 export default function BrandVerificationEvidenceUpload({ onEvidenceChange }: { onEvidenceChange?: (hasEvidence: boolean) => void }) {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [busy, setBusy] = useState(false);
@@ -46,10 +47,10 @@ export default function BrandVerificationEvidenceUpload({ onEvidenceChange }: { 
     <strong>Business verification documents</strong>
     <p>Upload at least one supporting document showing your organization identity: a company-letterhead document with your business name or a business card showing your business name and contact information. Files are retained in a private admin-only review folder. Review target: 72 hours. Uploading does not approve your organization.</p>
     <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-      <label style={{ minWidth: 0, width: "100%" }}>Company letterhead <input style={{ width: "100%", minWidth: 0, maxWidth: "100%", boxSizing: "border-box" }} aria-label="Upload company letterhead" disabled={busy} type="file" accept=".pdf,.png,.jpg,.jpeg,.webp" onChange={event => void upload(event.target.files?.[0], "letterhead")} /></label>
-      <label style={{ minWidth: 0, width: "100%" }}>Business card <input style={{ width: "100%", minWidth: 0, maxWidth: "100%", boxSizing: "border-box" }} aria-label="Upload business card" disabled={busy} type="file" accept=".pdf,.png,.jpg,.jpeg,.webp" onChange={event => void upload(event.target.files?.[0], "business-card")} /></label>
+      <label style={{ minWidth: 0, width: "100%" }}>Company letterhead <input style={{ width: "100%", minWidth: 0, maxWidth: "100%", boxSizing: "border-box" }} aria-label="Upload company letterhead" disabled={busy} type="file" accept=".pdf,.png,.jpg,.jpeg,.webp" onChange={event => { const file = event.currentTarget.files?.[0]; event.currentTarget.value = ""; void upload(file, "letterhead"); }} /></label>
+      <label style={{ minWidth: 0, width: "100%" }}>Business card <input style={{ width: "100%", minWidth: 0, maxWidth: "100%", boxSizing: "border-box" }} aria-label="Upload business card" disabled={busy} type="file" accept=".pdf,.png,.jpg,.jpeg,.webp" onChange={event => { const file = event.currentTarget.files?.[0]; event.currentTarget.value = ""; void upload(file, "business-card"); }} /></label>
     </div>
-    {documents.length ? <ul>{documents.map(item => <li key={item.name}>{item.type} — securely uploaded</li>)}</ul> : <p>No supporting documents uploaded yet.</p>}
+    {documents.length ? <div aria-label="Stored verification evidence" role="status"><p style={{ marginBottom: 6, fontWeight: 700 }}>Saved private evidence ({documents.length} {documents.length === 1 ? "document" : "documents"})</p><ul style={{ marginTop: 4 }}>{(["Company letterhead", "Business card"] as const).map(type => { const count = countOf(documents, type); return count > 0 ? <li key={type}>{type}: {count} {count === 1 ? "file" : "files"} securely stored — awaiting review</li> : null; })}</ul><p style={{ fontSize: 13 }}>These are saved files, not approval decisions. Selecting a file again creates another stored upload.</p></div> : <p>No supporting documents uploaded yet.</p>}
     {message && <p role="status" style={{ color: "#166534" }}>{message}</p>}
     {error && <p role="alert" style={{ color: "#991B1B" }}>{error}</p>}
   </section>;
