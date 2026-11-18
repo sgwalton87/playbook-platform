@@ -209,6 +209,9 @@ jobs:
       - name: Certify active Scholar support context boundary
         if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/active_support_scholar_context_preflight.sql
+      - name: Certify private SOS reviewer screenshot evidence
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
+        run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/brand_registry_snapshot_evidence_preflight.sql
       - name: Certify active Founder private Brand evidence storage boundary
         if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/brand_storage_existing_admin_read_preflight.sql
