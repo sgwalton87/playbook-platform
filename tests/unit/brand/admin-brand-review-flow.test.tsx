@@ -42,6 +42,27 @@ describe("admin dashboard review and invitation",()=>{
   fireEvent.click(screen.getByRole("checkbox",{name:/Approve the requested student-protection/}));
   expect((screen.getByRole("button",{name:"Approve and send invitation"}) as HTMLButtonElement).disabled).toBe(true);
  });
+ it("shows editable approval email templates in the exact preview",async()=>{
+  render(<AdminPage/>);await screen.findByText("Example Brand");
+  fireEvent.change(screen.getByLabelText("Review outcome"),{target:{value:"approved"}});
+  const template=await screen.findByLabelText("Approval email message template");
+  fireEvent.change(template,{target:{value:"welcome"}});
+  expect(screen.getByLabelText("Email preview").textContent).toContain("Welcome to Playbook!");
+  expect((screen.getByLabelText("Additional message to the applicant") as HTMLTextAreaElement).value).toContain("Welcome to Playbook!");
+  expect(mocks.fetch).not.toHaveBeenCalledWith("/api/admin/verification/brand-review",expect.objectContaining({method:"POST"}));
+ });
+ it("confirms human-review save only after server readback and never sends an email",async()=>{
+  render(<AdminPage/>);await screen.findByText("Example Brand");
+  fireEvent.change(screen.getByLabelText("Human registration determination"),{target:{value:"matched_active"}});
+  fireEvent.change(screen.getByLabelText("Official record or alternative evidence URL"),{target:{value:"https://sos.ca.gov"}});
+  fireEvent.change(screen.getByLabelText("Registration and safeguarding review note"),{target:{value:"Reviewed"}});
+  fireEvent.click(screen.getByRole("checkbox",{name:/I completed an individual human safeguarding review/}));
+  mocks.fetch.mockImplementationOnce(async()=>Response.json({saved:true}));
+  fireEvent.click(screen.getByRole("button",{name:"Save human review"}));
+  expect(await screen.findByText(/Saved and reloaded from Playbook/)).toBeTruthy();
+  const posts=mocks.fetch.mock.calls.filter(([,init])=>init?.method==="POST");
+  expect(posts.some(([url])=>url==="/api/admin/verification/brand-review")).toBe(false);
+ });
  it("blocks approval without supporting documents",async()=>{
   mocks.noDocuments=true;render(<AdminPage/>);await screen.findByText("Example Brand");fireEvent.change(screen.getByLabelText("Review outcome"),{target:{value:"approved"}});
   fireEvent.click(screen.getByRole("button",{name:"Open submitted evidence"}));await screen.findByText(/No business documents on file/);
