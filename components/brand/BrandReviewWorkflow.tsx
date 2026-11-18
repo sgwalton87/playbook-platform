@@ -5,6 +5,7 @@ import { SAFEGUARDING_QUESTIONS } from "@/lib/verification/safeguarding";
 import type { RegistryLookup } from "@/lib/verification/registry";
 import SosVerificationTutorial from "@/components/brand/SosVerificationTutorial";
 import SosEvidenceSnapshot from "@/components/brand/SosEvidenceSnapshot";
+import styles from "./BrandReviewWorkflow.module.css";
 type Context = { organizationName?: string; registration?: { updated_at?: string; formation_state: string; entity_type: string; entity_number: string; safety_answers: Record<string,string> }; registry?: { human_outcome: string; source_url: string; review_note: string; safety_reviewed: boolean } };
 export default function BrandReviewWorkflow({ requestId, documentsReviewed, onComplete }: { requestId: string; documentsReviewed: boolean; onComplete: (message: string) => void }) {
  const [context, setContext] = useState<Context | null>(null);
@@ -46,7 +47,7 @@ export default function BrandReviewWorkflow({ requestId, documentsReviewed, onCo
    window.dispatchEvent(new Event("brand-verification-review-completed")); onComplete(`Review saved. ${body.delivery.message}`);
   } catch (cause) { setNotice(cause instanceof Error ? cause.message : "Review failed. Check the communication log before retrying."); } finally { setBusy(false); }
  }
- return <section aria-label="Brand Partner review and communication" style={{ display: "grid", gap: 12, marginTop: 18, padding: 18, borderRadius: 12, background: "#FFFFFF", color: "#0F172A", border: "1px solid #CBD5E1" }}>
+ return <section className={styles.surface} aria-label="Brand Partner review and communication" style={{ display: "grid", gap: 12, marginTop: 18, padding: 18, borderRadius: 12, background: "#FFFFFF", color: "#0F172A", border: "1px solid #CBD5E1" }}>
   <h3>Business and safeguarding review</h3>
   <SosVerificationTutorial />
   <SosEvidenceSnapshot requestId={requestId} organizationName={context?.organizationName ?? ""} onEvidenceChange={setHasRegistryScreenshot} />
