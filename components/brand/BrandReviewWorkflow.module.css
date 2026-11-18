@@ -1,0 +1,51 @@
+/* High-contrast, role-safe admin review controls.
+   Explicit colors avoid inherited dark-surface theme styles. */
+.surface {
+  background: #ffffff !important;
+  color: #0f172a !important;
+}
+.surface :is(h2,h3,h4,p,label,summary,strong,small,li,span,details) {
+  color: #0f172a;
+}
+.surface :is(p,li,small) { line-height: 1.55; }
+.surface label { display: block; font-weight: 700; }
+.surface :is(input:not([type="checkbox"]), textarea, select) {
+  color: #0f172a !important;
+  background: #ffffff !important;
+  border: 1px solid #64748b !important;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 16px;
+  opacity: 1;
+}
+.surface :is(input,textarea)::placeholder { color: #475569 !important; opacity: 1; }
+.surface button:not(:disabled) {
+  color: #ffffff !important;
+  background: #17365b !important;
+  border: 1px solid #17365b;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-weight: 800;
+  opacity: 1 !important;
+}
+.surface button:disabled {
+  color: #475569 !important;
+  background: #e2e8f0 !important;
+  border: 1px solid #94a3b8;
+  border-radius: 8px;
+  padding: 12px 16px;
+  opacity: 1 !important;
+  cursor: not-allowed;
+}
+.surface a {
+  color: #174ea6 !important;
+  text-decoration: underline;
+}
+.surface :is(button,input,textarea,select,a):focus-visible {
+  outline: 3px solid #d97706;
+  outline-offset: 2px;
+}
+@media (max-width: 480px) {
+  .surface { padding: 16px !important; }
+  .surface :is(button,input:not([type="checkbox"]),textarea,select) { width: 100%; }
+}
