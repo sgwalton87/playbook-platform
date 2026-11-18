@@ -18,7 +18,7 @@ const formats:Format[] = [
 const publicHome="https://app.playbookseriesinc.org/";
 
 function wrapLine(ctx:CanvasRenderingContext2D,value:string,max:number):string[] {
- const words=value.split(/\s+/).filter(Boolean),lines:string[];lines=[];let line="";
+ const words=value.split(/\s+/).filter(Boolean);const lines:string[]=[];let line="";
  for(const word of words){const test=line?`${line} ${word}`:word;
   if(ctx.measureText(test).width>max && line){lines.push(line);line=word;}else line=test;}
  if(line)lines.push(line);return lines;
