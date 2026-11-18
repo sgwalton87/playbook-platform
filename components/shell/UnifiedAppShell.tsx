@@ -36,7 +36,7 @@ export default function UnifiedAppShell({ children }: { children: React.ReactNod
       const { data: u } = await supabase.auth.getUser();
       if (!u.user || !active) return;
       const [profileResult, contextResult] = await Promise.all([
-        supabase.from("profiles").select("id,full_name,first_name,last_name,username,avatar_url,role,profile_mode").eq("id", u.user.id).maybeSingle(),
+        supabase.from("profiles").select("id,full_name,first_name,last_name,username,avatar_url,role,profile_mode,is_admin,is_active").eq("id", u.user.id).maybeSingle(),
         fetch("/api/shell/context", { cache: "no-store" }),
       ]);
       if (!active) return;
@@ -52,11 +52,11 @@ export default function UnifiedAppShell({ children }: { children: React.ReactNod
     return () => { active = false; };
   }, [pathname]);
 
-  const roleNav = useMemo(() => getRoleNavigation(profile?.profile_mode, profile?.role), [profile?.profile_mode, profile?.role]);
+  const roleNav = useMemo(() => getRoleNavigation(profile?.profile_mode, profile?.role, profile?.is_admin === true && profile?.is_active === true), [profile?.profile_mode, profile?.role, profile?.is_admin, profile?.is_active]);
   const founderNav = useMemo(() => {
-    if (!isPlatformOperatorRole(profile?.role)) return [];
+    if (!(isPlatformOperatorRole(profile?.role) || (profile?.is_admin === true && profile?.is_active === true))) return [];
     return getNavigationForRole(profile?.role).founder;
-  }, [profile?.role]);
+  }, [profile?.role, profile?.is_admin, profile?.is_active]);
 
   if (!shouldUseAppShell(pathname || "/")) return <>{children}</>;
   if (AUTH_FULLSCREEN_ROUTES.some((route) => pathname === route || pathname.startsWith(route + "/"))) return <>{children}</>;
@@ -91,7 +91,7 @@ export default function UnifiedAppShell({ children }: { children: React.ReactNod
         <div style={contextGrid}>
           <ContextLink href="/notifications" label="Attention" value={attentionTotal} emphasis={attentionTotal > 0} />
           <ContextLink href="/transcript" label="Evidence" value={context.evidenceCount} />
-          <ContextLink href={isPlatformOperatorRole(profile?.role) ? "/admin" : "/profile"} label="Pending review" value={context.pendingVerificationCount} emphasis={context.pendingVerificationCount > 0} />
+          <ContextLink href={isPlatformOperatorRole(profile?.role) || (profile?.is_admin === true && profile?.is_active === true) ? "/admin" : "/profile"} label="Pending review" value={context.pendingVerificationCount} emphasis={context.pendingVerificationCount > 0} />
           <ContextLink href="/support-network" label="Support team" value={context.activeSupportCount} />
         </div>
       </section>}
@@ -106,6 +106,7 @@ export default function UnifiedAppShell({ children }: { children: React.ReactNod
         <Link href={roleNav.home} className="playbook-brand" style={{ marginBottom: 0 }}><PlaybookLogo size={48} priority /><span><strong>Playbook</strong><small>{roleNav.label}</small></span></Link>
         <Link href="/notifications" aria-label={`${attentionTotal} items need attention`} style={mobileAttention}>{attentionTotal > 0 ? attentionTotal : "✓"}</Link>
         <ProfileAvatar src={profile?.avatar_url} name={displayName} size={38} />
+        {(isPlatformOperatorRole(profile?.role) || (profile?.is_admin === true && profile?.is_active === true)) && <Link href="/admin" style={{ color: "#fff", fontSize: 12, fontWeight: 800, textDecoration: "underline" }}>Reviews</Link>}
         <button type="button" onClick={handleSignOut} className="playbook-signout" disabled={signingOut} aria-describedby={signOutError ? "sign-out-error" : undefined}>{signingOut ? "Signing out…" : "Sign out"}</button>
       </header>
       {signOutError && <p id="sign-out-error" role="alert" aria-live="polite" className="playbook-signout-error">{signOutError}</p>}
