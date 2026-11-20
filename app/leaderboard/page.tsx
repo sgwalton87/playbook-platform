@@ -85,8 +85,8 @@ export default function LeaderboardPage() {
           </div>
         )}
         <PlaybookGrid min={300}>
-          <PlaybookCard eyebrow="Public rankings" title="Rankings aren&apos;t published yet">
-            <p>Playbook has not certified a privacy-safe, opt-in public leaderboard. Only your own reward totals are displayed. No other member's identity, school, or progress is exposed here.</p>
+          <PlaybookCard eyebrow="Public rankings" title="Rankings aren't published yet">
+            <p>Playbook has not certified a privacy-safe, opt-in public leaderboard. Only your own reward totals are displayed. No other member&apos;s identity, school, or progress is exposed here.</p>
             <p>When a governed ranking service is approved, it must use real ledger events, explicit member consent, bounded public identity and verified rank computation.</p>
           </PlaybookCard>
           <PlaybookCard eyebrow="Keep building" title="Earn authentic progress">
