@@ -49,6 +49,24 @@ function localKeys(output, expectedUrl) {
   return values;
 }
 
+function safeFailure(error) {
+  const output = [error?.stdout, error?.stderr, error?.message].filter(Boolean).join("\n");
+  const sqlState = output.match(/SQLSTATE[ =:]+([A-Z0-9]{5})/i)?.[1];
+  const lastMigration = [...output.matchAll(/Applying migration (\d+_[\w-]+\.sql)/g)].at(-1)?.[1];
+  const categories = [
+    ["DATABASE_MIGRATION", /SQLSTATE|error applying migration|failed to run migration/i],
+    ["CONTAINER_IMAGE", /failed to pull|manifest unknown|pull access denied|no matching manifest/i],
+    ["DISK_SPACE", /no space left on device/i],
+    ["DOCKER_SOCKET", /docker daemon|docker socket|\/var\/run\/docker\.sock/i],
+    ["PORT_IN_USE", /port is already allocated|address already in use/i],
+    ["INVALID_CONFIG", /failed to parse config|invalid configuration|invalid keys|cannot unmarshal/i],
+    ["CONTAINER_HEALTH", /container.*not ready|not healthy|health check|unhealthy/i],
+    ["TIMEOUT", /ETIMEDOUT|timed? out/i],
+  ];
+  return { category: categories.find(([, pattern]) => pattern.test(output))?.[0] ?? "PROCESS_FAILURE",
+    ...(Number.isInteger(error?.code) ? { exitCode: error.code } : {}), sqlState, lastMigration };
+}
+
 async function assertLocalRevision(env) {
   const url = new URL("/api/deployment", env.PLAYWRIGHT_BASE_URL);
   for (let attempt = 0; attempt < 60; attempt++) {
@@ -172,12 +190,13 @@ async function main() {
         }
       },
     });
-  } catch {
+  } catch (error) {
     report.setup[stage] = stage === "browser" ? "FAIL" : "BLOCKED";
+    report.diagnostic = { stage, ...safeFailure(error) };
     process.exitCode = 1;
   } finally {
     await writeFile(artifact, JSON.stringify(report, null, 2) + "\n");
-    console.log(JSON.stringify({ commit: report.commit, setup: report.setup,
+    console.log(JSON.stringify({ commit: report.commit, setup: report.setup, diagnostic: report.diagnostic,
       steps: Object.fromEntries(Object.entries(report.steps).map(([key, value]) => [key, value.status])) }));
   }
 }

@@ -147,9 +147,11 @@ test("registered Scholar verifies locally and returns to the persisted Scholar p
   } else {
     await record("activation", "FAIL", "The disposable app returned an unexpected activation state without connector authority.");
   }
-  await step("dashboard", "The Scholar dashboard route and its Scholar-specific surface rendered.", async () => {
+  await step("dashboard", "The Scholar dashboard rendered the ready record and displayed the persisted Scholar identity.", async () => {
     await expect(page).toHaveURL(new URL("/dashboard", app).href);
-    await expect(page.getByTestId("scholar-dashboard-canon")).toBeVisible();
+    const dashboard = page.getByTestId("scholar-dashboard-canon");
+    await expect(dashboard).toHaveAttribute("data-record-state", "ready");
+    await expect(dashboard.getByRole("heading", { name: "Welcome back, Journey." })).toBeVisible();
     await page.screenshot({ path: "artifacts/trusted-local-scholar/dashboard.png" });
   });
   await step("cross-role-denial", "All other role completion endpoints returned 403 and the Family OS denied navigation.", async () => {
