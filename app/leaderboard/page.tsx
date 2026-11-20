@@ -58,7 +58,8 @@ export default function LeaderboardPage() {
   }, [router]);
 
   useEffect(() => {
-    void load();
+    // Schedule the initial load after the effect to avoid synchronous state cascades.
+    void Promise.resolve().then(() => load());
   }, [load]);
 
   return (
@@ -84,7 +85,7 @@ export default function LeaderboardPage() {
           </div>
         )}
         <PlaybookGrid min={300}>
-          <PlaybookCard eyebrow="Public rankings" title="Rankings aren't published yet">
+          <PlaybookCard eyebrow="Public rankings" title="Rankings aren&apos;t published yet">
             <p>Playbook has not certified a privacy-safe, opt-in public leaderboard. Only your own reward totals are displayed. No other member's identity, school, or progress is exposed here.</p>
             <p>When a governed ranking service is approved, it must use real ledger events, explicit member consent, bounded public identity and verified rank computation.</p>
           </PlaybookCard>
