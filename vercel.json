@@ -3,7 +3,8 @@
   "git": {
     "deploymentEnabled": {
       "fix/workspace-sharing-recovery": false,
-      "main": false
+      "main": false,
+      "fix/trusted-local-scholar-qa": false
     }
   }
 }
