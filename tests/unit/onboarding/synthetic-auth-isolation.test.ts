@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { readFileSync, readdirSync } from "node:fs";
-import { spawnSync } from "node:child_process";
 import { describe, expect, it } from "vitest";
+import { assertTrustedRunner, runDisposableLifecycle } from "@/scripts/qa/run-trusted-scholar.mjs";
 import { assertLocalSyntheticAuthTarget } from "@/tests/acceptance/helpers/assertLocalSyntheticAuthTarget.mjs";
 
 const local = {
@@ -41,25 +41,51 @@ describe("synthetic authentication isolation", () => {
     }
     expect(guarded).toBeGreaterThan(20);
   });
-  it.each([false, true])("executes the workflow preflight and rejects production even with the write flag: production=%s", production => {
+  const disposable = {
+    ...local,
+    NEXT_PUBLIC_SUPABASE_URL: "http://127.0.0.1:54321",
+    PBOS_QA_MAIL_URL: "http://127.0.0.1:54324",
+    PBOS_ACCEPTANCE_COMMIT: "a".repeat(40),
+    GITHUB_ACTIONS: "true",
+    RUNNER_ENVIRONMENT: "github-hosted",
+    GITHUB_EVENT_NAME: "workflow_dispatch",
+    RUNNER_TEMP: "/tmp/runner",
+  };
+
+  it("only provisions the explicitly opted-in dispatch from a disposable runner", () => {
     const workflow = readFileSync(".github/workflows/platform-qa.yml", "utf8");
-    const section = workflow.slice(workflow.indexOf("- name: Require trusted acceptance configuration"));
-    const inline = section.match(/node <<'NODE'\n([\s\S]*?)\n\s*NODE/);
-    expect(inline).not.toBeNull();
-    const target = "https://oexgxnybeixwadgtdtzp.supabase.co";
-    const result = spawnSync(process.execPath, ["-e", inline![1]], {
-      env: { NODE_ENV: "test", ...local, NEXT_PUBLIC_SUPABASE_URL: production ? target : local.NEXT_PUBLIC_SUPABASE_URL },
-      encoding: "utf8",
-    });
-    expect(result.status).toBe(production ? 1 : 0);
-    expect(result.stderr).not.toContain(target);
+    const trusted = workflow.slice(workflow.indexOf("  scholar-e2e:"));
+    expect(workflow).toMatch(/trusted_local_scholar:[\s\S]*?default: false/);
+    expect(trusted).toContain("github.event_name == 'workflow_dispatch' && inputs.trusted_local_scholar == true");
+    expect(trusted).toContain("persist-credentials: false");
+    expect(trusted).toContain("node scripts/qa/run-trusted-scholar.mjs");
+    expect(trusted).not.toMatch(/secrets\.|https:\/\/[^\s]+supabase|https:\/\/[^\s]+vercel/);
+    expect(() => assertTrustedRunner(disposable)).not.toThrow();
   });
-  it("blocks the old production-targeted main workflow during configuration, before checkout or account creation", () => {
-    const workflow = readFileSync(".github/workflows/platform-qa.yml", "utf8");
-    const section = workflow.slice(workflow.indexOf("- name: Require trusted acceptance configuration"));
-    expect(section.indexOf("explicitly approved localhost")).toBeGreaterThan(0);
-    expect(section.indexOf("explicitly approved localhost")).toBeLessThan(section.indexOf("- name: Check out acceptance revision"));
-    expect(section).toContain("PBOS_ALLOW_SYNTHETIC_AUTH_WRITE !== 'YES'");
-    expect(section).toContain("['localhost', '127.0.0.1'].includes(target.hostname)");
+
+  it.each([
+    { PBOS_ALLOW_SYNTHETIC_AUTH_WRITE: undefined },
+    { NEXT_PUBLIC_SUPABASE_URL: "https://hosted.example" },
+    { PLAYWRIGHT_BASE_URL: "https://hosted.example" },
+    { NEXT_PUBLIC_SUPABASE_URL: "http://name:credential@127.0.0.1:54321" },
+    { PBOS_QA_MAIL_URL: "https://hosted.example" },
+    { PBOS_QA_MAIL_URL: "http://name@127.0.0.1:54324" },
+    { RUNNER_ENVIRONMENT: "self-hosted" },
+    { GITHUB_EVENT_NAME: "pull_request" },
+    { PBOS_ACCEPTANCE_COMMIT: "main" },
+  ])("denies unsafe runner configuration %j", override => {
+    expect(() => assertTrustedRunner({ ...disposable, ...override })).toThrow();
+  });
+
+  it.each(["none", "start", "run"])("tears down after the %s path", async failure => {
+    const phases: string[] = [];
+    const lifecycle = runDisposableLifecycle({
+      start: async () => { phases.push("start"); if (failure === "start") throw new Error("start"); },
+      run: async () => { phases.push("run"); if (failure === "run") throw new Error("run"); },
+      stop: async () => { phases.push("stop"); },
+    });
+    if (failure === "none") await expect(lifecycle).resolves.toBeUndefined();
+    else await expect(lifecycle).rejects.toThrow(failure);
+    expect(phases).toEqual(failure === "start" ? ["start", "stop"] : ["start", "run", "stop"]);
   });
 });
