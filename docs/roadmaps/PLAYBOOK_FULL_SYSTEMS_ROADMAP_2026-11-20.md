@@ -109,7 +109,7 @@ Capture ID, exact route/component, source owner, commit/schema revision, authent
 
 ## 13. Confirmed repair tickets
 - **DYN-001 P0:** fabricated leaderboard; remove invented standings; build consent-safe genuine ranking.
-- **DYN-002 P0:** support-messages demo identity, optimistic false send; relationship-scoped authoritative service.
+- **DYN-002 P2 (corrected after route trace):** `/support-messages` already redirects to the governed `/messages` inbox. Old demo-only support component remains dormant; retire after import verification. Preserve canonical inbox and certify actual message/RLS journeys separately.
 - **DYN-003 P0:** recommender URL ignored, local approve/revise; authenticated durable decision.
 - **DYN-004 P1:** shared dashboards Not connected; real authorized aggregates and tasks.
 - **DYN-005 P1:** Athlete Abroad link directory; real readiness/destination progress.
@@ -123,6 +123,9 @@ Capture ID, exact route/component, source owner, commit/schema revision, authent
 ## 14. Canonical sources and command-center comparison
 PPS-000 through PPS-015; `lib/roles/registry.ts`; `lib/role-os/canonicalOperatingSystems.ts`; `lib/platform/capabilityCatalog.ts`; `lib/platform/capabilityMap.ts`; `lib/navigation/roleNavigation.ts`; `docs/USER_JOURNEYS.md`; `docs/MASTER_CHECKLIST.md`; `docs/ENGINEERING/CAPABILITY_CERTIFICATION_STANDARD.md`; `docs/design/CANONICAL_ROUTE_MAP.md`; static-to-functional source audit in this branch. Recovery source: [PBOS-RCC-001](https://docs.google.com/spreadsheets/d/12ALDMBbQOPIT9lGSzT-RfqY5S_TMdtPO4Wwi00Xo0kI/edit).
 
-**Command-center reconciliation:** aligns on 15 roles, 107 entry inventory, unverified live PBOS and production HOLD. Needs explicit Wave 0–7 crosswalk to RCC recovery items; role-specific meaningful task evidence for every OS beyond onboarding tests; DYN-001/2/3 first; actual navigation owner and 107 capability route-to-workflow mappings; updated exact-commit CI and hosted readiness. Source audits are not full deployed systems audit.
+**Command-center reconciliation:** aligns on 15 roles, 107 entry inventory, unverified live PBOS and production HOLD. Needs explicit Wave 0–7 crosswalk to RCC recovery items; role-specific meaningful task evidence for every OS beyond onboarding tests; DYN-001 and DYN-003 first; DYN-002 is dormant technical debt; actual navigation owner and 107 capability route-to-workflow mappings; updated exact-commit CI and hosted readiness. Source audits are not full deployed systems audit.
 
 **Scope limits:** This roadmap neither merges a PR, applies migrations, modifies original Mac history, provisions production credentials/authority, nor certifies live constituent functions. The PDF is preserved on Drive; this textual companion is versioned in GitHub for implementation review.
+
+### Audit correction to source PDF v1.0 (2026-11-20)
+The printed PDF describes DYN-002 as an active `/support-messages` production defect. Exact main/branch source inspection establishes that `app/support-messages/page.tsx` redirects to `/messages`; the demo component is no longer routed. Treat PDF DYN-002 wording as historical and superseded by this record and the dated source audit. No user-facing messaging rewrite should proceed from that stale diagnosis.
