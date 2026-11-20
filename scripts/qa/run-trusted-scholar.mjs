@@ -154,6 +154,10 @@ async function main() {
         report.setup[stage] = "PASS";
       },
       run: async () => {
+        stage = "chromium-install";
+        await command(process.execPath, ["node_modules/@playwright/test/cli.js", "install", "--with-deps", "--only-shell", "chromium"],
+          { timeout: 240_000 });
+        report.setup[stage] = "PASS";
         stage = "browser";
         const journey = join(project, "journey.json");
         try {
