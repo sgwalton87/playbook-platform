@@ -142,6 +142,12 @@ export async function POST(request: NextRequest) {
     // No PBOS identity, exchange, or relationship authority is granted here.
     const missingActivationConfiguration = getMissingPbosActivationConfiguration(pbosRole);
     if (missingActivationConfiguration.length > 0) {
+      // Server-only diagnostic: names of absent configuration keys, never values.
+      // Keep the constituent response free of infrastructure details.
+      console.error("[PBOS_ACTIVATION_CONFIG_MISSING]", {
+        role: pbosRole,
+        missingKeys: missingActivationConfiguration,
+      });
       const completedAt = await finalizeProfileCompletion(
         supabase,
         user.id,
