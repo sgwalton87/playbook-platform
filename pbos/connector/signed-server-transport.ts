@@ -29,7 +29,7 @@ export class SignedPlaybookPbosTransport implements PbosTransport {
     const signature = createHmac("sha256", Buffer.from(this.credentials.secretBase64, "base64")).update(canonical).digest("hex");
     let response: Response;
     try {
-      response = await this.fetcher(this.endpoint, { method: "POST", cache: "no-store", body, headers: {
+      response = await this.fetcher(this.endpoint, { method: "POST", cache: "no-store", redirect: "manual", body, headers: {
       "content-type": "application/json", "x-pbos-api-version": "v1", "x-pbos-organization-id": this.credentials.organizationId,
       "x-pbos-connector-id": this.credentials.connectorId, "x-pbos-key-id": this.credentials.keyId,
       "x-pbos-timestamp": timestamp, "x-pbos-nonce": nonce, "x-pbos-signature": signature
@@ -40,6 +40,9 @@ export class SignedPlaybookPbosTransport implements PbosTransport {
         throw new PbosRuntimeUnavailableError();
       }
       throw error;
+    }
+    if (response.status >= 300 && response.status < 400) {
+      throw new Error("PBOS v1 endpoint redirected the signed request.");
     }
     if ([502, 503, 504].includes(response.status)) {
       throw new PbosRuntimeUnavailableError();

@@ -4,7 +4,7 @@ import {
   normalizeOnboardingRole,
 } from "@/lib/onboarding";
 import { ScholarOnboardingService, type SupportedScholarRecordRole } from "@/lib/pbos/scholar-onboarding-service";
-import { getMissingPbosActivationConfiguration } from "@/lib/pbos/activation-config";
+import { getMissingPbosActivationConfiguration, getPbosActivationDestinationIssue } from "@/lib/pbos/activation-config";
 import { requireUser } from "@/lib/supabase/server";
 import { PlaybookConnector } from "@/pbos/connector/playbook-connector";
 import { PlaybookPbosRuntimeClient } from "@/pbos/connector/pbos-runtime-client";
@@ -141,13 +141,21 @@ export async function POST(request: NextRequest) {
     // through the governed RPC and keep role authority explicitly pending.
     // No PBOS identity, exchange, or relationship authority is granted here.
     const missingActivationConfiguration = getMissingPbosActivationConfiguration(pbosRole);
-    if (missingActivationConfiguration.length > 0) {
+    const destinationIssue = missingActivationConfiguration.length === 0
+      ? getPbosActivationDestinationIssue()
+      : undefined;
+    if (missingActivationConfiguration.length > 0 || destinationIssue) {
       // Server-only diagnostic: names of absent configuration keys, never values.
       // Keep the constituent response free of infrastructure details.
-      console.error("[PBOS_ACTIVATION_CONFIG_MISSING]", {
-        role: pbosRole,
-        missingKeys: missingActivationConfiguration,
-      });
+      if (missingActivationConfiguration.length > 0) {
+        console.error("[PBOS_ACTIVATION_CONFIG_MISSING]", {
+          role: pbosRole,
+          missingKeys: missingActivationConfiguration,
+        });
+      }
+      if (destinationIssue) {
+        console.error("[PBOS_ACTIVATION_CONFIG_INVALID]", { role: pbosRole, reason: destinationIssue });
+      }
       const completedAt = await finalizeProfileCompletion(
         supabase,
         user.id,

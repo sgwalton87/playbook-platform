@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
-import { getMissingPbosActivationConfiguration } from "@/lib/pbos/activation-config";
+import { getMissingPbosActivationConfiguration, getPbosActivationDestinationIssue } from "@/lib/pbos/activation-config";
 
 const runtime = {
   PBOS_API_URL: "https://pbos.example/pbos/v1",
@@ -46,6 +46,34 @@ describe("PBOS activation configuration", () => {
       PBOS_TRANSITION_YOUTH_IDENTITY_APPROVAL_ID: "identity",
       PBOS_TRANSITION_YOUTH_EXCHANGE_APPROVAL_ID: "exchange",
     })).toEqual(["PBOS_API_URL"]);
+  });
+
+  it.each([
+    "http://127.0.0.1:1234/pbos/v1",
+    "https://localhost/pbos/v1",
+    "https://localhost./pbos/v1",
+    "https://pbos-v1-integration-staging-loii7tzprq-uw.a.run.app/pbos/v1",
+  ])("rejects %s as a production destination", endpoint => {
+    expect(getPbosActivationDestinationIssue({ PBOS_API_URL: endpoint, VERCEL_ENV: "production" }))
+      .toBe("NON_PRODUCTION_DESTINATION");
+  });
+
+  it("rejects copied staging configuration and allows isolated loopback QA", () => {
+    expect(getPbosActivationDestinationIssue({
+      PBOS_API_URL: "https://staging.example/pbos/v1", PBOS_ENVIRONMENT: "staging", VERCEL_ENV: "production",
+    })).toBe("NON_PRODUCTION_DESTINATION");
+    expect(getPbosActivationDestinationIssue({ PBOS_API_URL: "http://127.0.0.1:1234/pbos/v1" })).toBeUndefined();
+    expect(getPbosActivationDestinationIssue({ PBOS_API_URL: "https://runtime.example/pbos/v1", VERCEL_ENV: "production" })).toBeUndefined();
+  });
+
+  it.each([
+    "http://remote.example/pbos/v1",
+    "https://user@remote.example/pbos/v1",
+    "https://remote.example/pbos/v1?next=1",
+    "https://remote.example/pbos/v1#fragment",
+    "https://remote.example/other",
+  ])("rejects an unsafe connector endpoint %s", endpoint => {
+    expect(getPbosActivationDestinationIssue({ PBOS_API_URL: endpoint })).toBe("INVALID_ENDPOINT");
   });
 
   it("logs missing configuration key names only on the server", () => {

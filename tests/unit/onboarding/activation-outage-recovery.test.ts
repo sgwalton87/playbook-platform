@@ -3,10 +3,10 @@ import { NextRequest } from "next/server";
 import { PbosRuntimeUnavailableError } from "@/pbos/connector/signed-server-transport";
 
 const mocks = vi.hoisted(() => ({
-  complete: vi.fn(), rpc: vi.fn(), requireUser: vi.fn(), missing: vi.fn(),
+  complete: vi.fn(), rpc: vi.fn(), requireUser: vi.fn(), missing: vi.fn(), destinationIssue: vi.fn(),
 }));
 vi.mock("@/lib/supabase/server", () => ({ requireUser: mocks.requireUser }));
-vi.mock("@/lib/pbos/activation-config", () => ({ getMissingPbosActivationConfiguration: mocks.missing }));
+vi.mock("@/lib/pbos/activation-config", () => ({ getMissingPbosActivationConfiguration: mocks.missing, getPbosActivationDestinationIssue: mocks.destinationIssue }));
 vi.mock("@/lib/pbos/scholar-onboarding-service", () => ({
   ScholarOnboardingService: class { complete = mocks.complete; },
 }));
@@ -35,6 +35,17 @@ beforeEach(() => {
 });
 
 describe("saved profile versus independent PBOS activation", () => {
+  it("saves only the owned profile when production points at a non-production PBOS destination", async () => {
+    mocks.destinationIssue.mockReturnValue("NON_PRODUCTION_DESTINATION");
+    const response = await POST(request());
+    expect(response.status).toBe(202);
+    expect(await response.json()).toMatchObject({ activationState: "pending-pbos-activation" });
+    expect(mocks.complete).not.toHaveBeenCalled();
+    expect(mocks.rpc).toHaveBeenCalledExactlyOnceWith("complete_playbook_onboarding", {
+      expected_role: "scholar", mark_verification_pending: true,
+    });
+  });
+
   it("reproduces a transport outage and safely completes only the owned profile", async () => {
     mocks.complete.mockRejectedValue(new PbosRuntimeUnavailableError());
     const response = await POST(request());
