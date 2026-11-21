@@ -63,7 +63,21 @@ describe("PBOS activation configuration", () => {
       PBOS_API_URL: "https://staging.example/pbos/v1", PBOS_ENVIRONMENT: "staging", VERCEL_ENV: "production",
     })).toBe("NON_PRODUCTION_DESTINATION");
     expect(getPbosActivationDestinationIssue({ PBOS_API_URL: "http://127.0.0.1:1234/pbos/v1" })).toBeUndefined();
-    expect(getPbosActivationDestinationIssue({ PBOS_API_URL: "https://runtime.example/pbos/v1", VERCEL_ENV: "production" })).toBeUndefined();
+    expect(getPbosActivationDestinationIssue({ PBOS_API_URL: "https://runtime.example/pbos/v1", VERCEL_ENV: "production" }))
+      .toBe("INVOCATION_CONFIG_INVALID");
+  });
+
+  it("requires the exact approved invocation origin before allowing production activation", () => {
+    const audience = "https://pbos-qualification-fixture.run.app";
+    const environment = {
+      VERCEL_ENV: "production",
+      PBOS_GCP_WIF_PROVIDER: "//iam.googleapis.com/projects/123456789/locations/global/workloadIdentityPools/pbos-playbook-production/providers/vercel",
+      PBOS_GCP_INVOKER_SERVICE_ACCOUNT: "pbos-playbook-invoker@pbos-production-fixture.iam.gserviceaccount.com",
+      PBOS_CLOUD_RUN_AUDIENCE: audience,
+    };
+    expect(getPbosActivationDestinationIssue({ ...environment, PBOS_API_URL: audience + "/pbos/v1" })).toBeUndefined();
+    expect(getPbosActivationDestinationIssue({ ...environment, PBOS_API_URL: "https://unapproved.run.app/pbos/v1" }))
+      .toBe("INVOCATION_CONFIG_INVALID");
   });
 
   it.each([

@@ -1,3 +1,4 @@
+import { verifyProductionPbosInvocationTarget } from "./cloud-run-invoker";
 import type { SupportedScholarRecordRole } from "@/lib/pbos/scholar-onboarding-service";
 
 const RUNTIME_KEYS = [
@@ -39,7 +40,7 @@ const LOOPBACK_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]"]);
 
 export function getPbosActivationDestinationIssue(
   environment: Readonly<Record<string, string | undefined>> = process.env
-): "INVALID_ENDPOINT" | "NON_PRODUCTION_DESTINATION" | undefined {
+): "INVALID_ENDPOINT" | "NON_PRODUCTION_DESTINATION" | "INVOCATION_CONFIG_INVALID" | undefined {
   let endpoint: URL;
   try {
     endpoint = new URL(environment.PBOS_API_URL ?? "");
@@ -58,5 +59,12 @@ export function getPbosActivationDestinationIssue(
       (loopback || hostname === STAGING_RUNTIME_HOST ||
         environment.PBOS_ENVIRONMENT?.trim().toLowerCase() === "staging")) {
     return "NON_PRODUCTION_DESTINATION";
+  }
+  if (environment.VERCEL_ENV === "production") {
+    try {
+      verifyProductionPbosInvocationTarget(endpoint.toString(), environment);
+    } catch {
+      return "INVOCATION_CONFIG_INVALID";
+    }
   }
 }
