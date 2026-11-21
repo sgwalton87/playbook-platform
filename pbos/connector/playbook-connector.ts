@@ -47,7 +47,9 @@ export class PlaybookConnector {
     async registerIdentity(userId: string, role: Parameters<PlaybookIdentityMapper["mapSupabaseIdentity"]>[1]): Promise<PlaybookIdentityMapping> {
         const mapping = this.identities.mapSupabaseIdentity(userId, role);
         const correlationId = `playbook-map-${userId}`;
-        const response = await this.client.send("REGISTER_IDENTITY", mapping, correlationId, correlationId);
+        // Each attempt has a fresh mappedAt. PBOS deduplicates by mappingId
+        // and rejects changed authority while preserving the original mapping.
+        const response = await this.client.send("REGISTER_IDENTITY", mapping, correlationId);
         if (!response.success) {
             const legacyDuplicate = response.error.code === "CONFLICT" &&
                 response.error.message === `Identity mapping already registered: ${mapping.mappingId}`;
