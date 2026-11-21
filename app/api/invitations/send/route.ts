@@ -4,6 +4,7 @@ import {
   buildInvitationEmail,
   buildInvitationRecord,
 } from "@/lib/invitations/server";
+import { recordSupportInvitationSmtpReceipt } from "@/lib/invitations/smtp-receipt";
 import type { RelationshipKind } from "@/lib/permissions";
 import { buildSupportInvitationEmail, buildScholarInvitationReceipt, sendPlaybookEmail } from "@/lib/email";
 import { requirePlaybookRole } from "@/lib/roles/registry";
@@ -129,16 +130,25 @@ export async function POST(req: NextRequest) {
     // The durable invitation is created first. Each email delivery is independent
     // so a failed recipient delivery does not suppress the Scholar's copy.
     let deliveryStatus: "sent" | "failed" = "failed";
+    let deliveryReceiptStatus: "recorded" | "unavailable" | "not_sent" = "not_sent";
     let scholarReceiptStatus: "sent" | "failed" = "failed";
     const emailConfigured = Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
     if (emailConfigured) {
       try {
-        await sendPlaybookEmail({
+        const sent = await sendPlaybookEmail({
           to: record.inviteeEmail, subject: invitationEmail.subject,
           text: invitationEmail.text, html: invitationEmail.html, fromType: "onboarding",
         });
-        deliveryStatus = "sent";
-      } catch { /* Invitation remains recoverable through the code/inbox. */ }
+        if (sent.accepted.some(address => typeof address === "string" && address.toLowerCase() === record.inviteeEmail)) {
+          deliveryStatus = "sent";
+          deliveryReceiptStatus = "unavailable";
+          const messageId = sent.messageId?.trim().replace(/^<|>$/g, "");
+          if (messageId && messageId.length <= 1024) {
+            await recordSupportInvitationSmtpReceipt(record.id, messageId);
+            deliveryReceiptStatus = "recorded";
+          }
+        }
+      } catch { /* Preserve the invitation and any confirmed SMTP acceptance if receipt storage fails. */ }
       if (user.email) {
         try {
           const receipt = buildScholarInvitationReceipt({
@@ -154,7 +164,7 @@ export async function POST(req: NextRequest) {
       }
     }
     return NextResponse.json({
-      ok: true, invitation: record, email, deliveryStatus, scholarReceiptStatus,
+      ok: true, invitation: record, email, deliveryStatus, deliveryReceiptStatus, scholarReceiptStatus,
       ...(emailConfigured ? {} : {
         deliveryError: "Email service is not configured. The invitee can sign in using the exact email and enter their invitation code at /invitations/received.",
       }),
