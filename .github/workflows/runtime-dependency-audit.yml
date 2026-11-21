@@ -1,0 +1,40 @@
+name: Production Dependency Security Evidence
+
+on:
+  pull_request:
+    paths:
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/runtime-dependency-audit.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: playbook-runtime-dependency-audit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  runtime-dependency-security:
+    name: Runtime dependency audit (separate from full audit)
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout exact revision
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - name: Configure Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Validate reproducible install
+        run: npm ci
+      - name: Audit production dependency tree
+        run: npm audit --omit=dev --audit-level=high
+      - name: Clarify security gate scope
+        run: |
+          echo "This result covers production dependencies only."
+          echo "The separate full dependency audit is still mandatory and not waived."
