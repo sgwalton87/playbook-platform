@@ -39,9 +39,10 @@ jobs:
       - name: Install application dependencies
         run: npm ci
       - name: Install local Supabase CLI
-        uses: supabase/setup-cli@v1
+        uses: supabase/setup-cli@v2
         with:
           version: latest
+          github-token: ${{ github.token }}
       - name: Normalize duplicate migration version identifiers for disposable QA only
         shell: bash
         run: |

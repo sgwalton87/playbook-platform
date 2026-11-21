@@ -48,6 +48,37 @@ describe("PBOS activation configuration", () => {
     })).toEqual(["PBOS_API_URL"]);
   });
 
+  it("logs missing configuration key names only on the server", () => {
+    const route = fs.readFileSync(
+      path.join(process.cwd(), "app/api/pbos/scholar/onboarding/route.ts"),
+      "utf8"
+    );
+    const diagnosticStart = route.indexOf('console.error("[PBOS_ACTIVATION_CONFIG_MISSING]"');
+    const diagnosticEnd = route.indexOf("});", diagnosticStart);
+    expect(diagnosticStart).toBeGreaterThan(-1);
+    expect(diagnosticEnd).toBeGreaterThan(diagnosticStart);
+    const diagnostic = route.slice(diagnosticStart, diagnosticEnd);
+    expect(diagnostic).toContain("missingKeys: missingActivationConfiguration");
+    expect(diagnostic).toContain("role: pbosRole");
+    expect(diagnostic).not.toContain("process.env");
+    expect(diagnostic).not.toContain("required(");
+    expect(diagnostic).not.toContain("secretBase64");
+  });
+
+  it("emits a sanitized signal when the PBOS transport is unavailable", () => {
+    const route = fs.readFileSync(
+      path.join(process.cwd(), "app/api/pbos/scholar/onboarding/route.ts"),
+      "utf8"
+    );
+    const start = route.indexOf('console.error("[PBOS_ACTIVATION_RUNTIME_UNAVAILABLE]"');
+    expect(start).toBeGreaterThan(-1);
+    const statement = route.slice(start, route.indexOf(";", start));
+    expect(statement).toContain("role: pbosRole");
+    expect(statement).not.toContain("user.id");
+    expect(statement).not.toContain("secret");
+    expect(statement).not.toContain("error.message");
+  });
+
   it("completes the governed profile before returning pending activation", () => {
     const route = fs.readFileSync(
       path.join(process.cwd(), "app/api/pbos/scholar/onboarding/route.ts"),

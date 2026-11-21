@@ -142,6 +142,12 @@ export async function POST(request: NextRequest) {
     // No PBOS identity, exchange, or relationship authority is granted here.
     const missingActivationConfiguration = getMissingPbosActivationConfiguration(pbosRole);
     if (missingActivationConfiguration.length > 0) {
+      // Server-only diagnostic: names of absent configuration keys, never values.
+      // Keep the constituent response free of infrastructure details.
+      console.error("[PBOS_ACTIVATION_CONFIG_MISSING]", {
+        role: pbosRole,
+        missingKeys: missingActivationConfiguration,
+      });
       const completedAt = await finalizeProfileCompletion(
         supabase,
         user.id,
@@ -296,6 +302,9 @@ export async function POST(request: NextRequest) {
       // with the unchanged role/user idempotency key. Never swallow denial,
       // correlation, persistence, or role mismatch failures.
       if (!(error instanceof PbosRuntimeUnavailableError)) throw error;
+      // Preserve the pending state while making transport outages observable.
+      // Do not log request bodies, user identifiers, connector credentials, or error payloads.
+      console.error("[PBOS_ACTIVATION_RUNTIME_UNAVAILABLE]", { role: pbosRole });
       const completedAt = await finalizeProfileCompletion(supabase, user.id, normalizedRole, true);
       return NextResponse.json({
         ok: true,
