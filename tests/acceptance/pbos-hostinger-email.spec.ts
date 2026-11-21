@@ -6,6 +6,9 @@ import { randomUUID } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import { assertLocalHostingerRecoveryTarget } from "./helpers/assertLocalHostingerRecoveryTarget.mjs";
 import { assertLocalSyntheticAuthTarget } from "./helpers/assertLocalSyntheticAuthTarget.mjs";
+import { signInLocalRecoveryBrowser } from "./helpers/signInLocalRecoveryBrowser";
+
+test.use({ serviceWorkers: "block" });
 
 type CapturedMessage = { MessageID: string; To?: { Address: string }[] };
 
@@ -51,11 +54,9 @@ test("rehearses governed invitation delivery and correlates the persisted receip
   if (profile.error) throw new Error("Could not set up the disposable Scholar profile.");
 
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("/login");
-  await page.getByLabel("Email", { exact: true }).fill(scholarEmail);
-  await page.getByLabel("Password").fill(password);
-  await page.getByRole("button", { name: "Log In" }).click();
-  await page.waitForURL(url => !url.pathname.startsWith("/login"));
+  // This receipt test establishes a real session through disposable local Auth.
+  // The separate login journey owns exercising the production CAPTCHA widget.
+  await signInLocalRecoveryBrowser(context, { email: scholarEmail, password });
 
   const self = await page.request.post("/api/invitations/send", {
     data: { ...payload, inviteeEmail: scholarEmail },

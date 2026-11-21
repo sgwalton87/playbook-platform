@@ -1,5 +1,6 @@
 import { readdirSync, renameSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 
 const MIGRATIONS_DIR = join(process.cwd(), "supabase", "migrations");
 const VERSION_PATTERN = /^(\d+)_/;
@@ -45,6 +46,17 @@ export function buildNormalizationPlan(fileNames) {
     });
   }
 
+  const replacementBySource = new Map(plan.map(item => [item.from, item.normalizedVersion]));
+  const normalizedVersions = new Set();
+  for (const [version, files] of groups) {
+    for (const file of files) {
+      const normalized = replacementBySource.get(file) ?? version;
+      if (normalizedVersions.has(normalized)) {
+        throw new Error(`Local migration version collision after normalization: ${normalized}.`);
+      }
+      normalizedVersions.add(normalized);
+    }
+  }
   return plan.sort((a, b) => a.from.localeCompare(b.from));
 }
 
@@ -64,6 +76,10 @@ export function normalizeMigrationFiles(directory = MIGRATIONS_DIR) {
   return plan;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
-  normalizeMigrationFiles();
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  const args = process.argv.slice(2);
+  if (args.length && (args.length !== 2 || args[0] !== "--workdir" || !args[1])) {
+    throw new Error("Usage: node scripts/pbos/prepare-local-supabase-migrations.mjs [--workdir <disposable-project>]");
+  }
+  normalizeMigrationFiles(args.length ? join(resolve(args[1]), "supabase", "migrations") : MIGRATIONS_DIR);
 }
