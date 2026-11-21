@@ -48,6 +48,23 @@ describe("PBOS activation configuration", () => {
     })).toEqual(["PBOS_API_URL"]);
   });
 
+  it("logs missing configuration key names only on the server", () => {
+    const route = fs.readFileSync(
+      path.join(process.cwd(), "app/api/pbos/scholar/onboarding/route.ts"),
+      "utf8"
+    );
+    const diagnosticStart = route.indexOf('console.error("[PBOS_ACTIVATION_CONFIG_MISSING]"');
+    const diagnosticEnd = route.indexOf("});", diagnosticStart);
+    expect(diagnosticStart).toBeGreaterThan(-1);
+    expect(diagnosticEnd).toBeGreaterThan(diagnosticStart);
+    const diagnostic = route.slice(diagnosticStart, diagnosticEnd);
+    expect(diagnostic).toContain("missingKeys: missingActivationConfiguration");
+    expect(diagnostic).toContain("role: pbosRole");
+    expect(diagnostic).not.toContain("process.env");
+    expect(diagnostic).not.toContain("required(");
+    expect(diagnostic).not.toContain("secretBase64");
+  });
+
   it("completes the governed profile before returning pending activation", () => {
     const route = fs.readFileSync(
       path.join(process.cwd(), "app/api/pbos/scholar/onboarding/route.ts"),
