@@ -40,6 +40,17 @@ describe("PLAYBOOK-SYSTEM-001 connector", () => {
             vi.useRealTimers();
         }
     });
+    it.each(["SCHOLAR", "SCHOLAR_ATHLETE", "TRANSITION_YOUTH"] as const)
+        ("transmits the exact independent identity approval and domain for %s", async role => {
+            const transport = new RecordingTransport();
+            const connector = new PlaybookConnector(new PlaybookPbosRuntimeClient(transport));
+            await connector.registerIdentity("synthetic-owner", role, "reviewed-fixture-approval");
+            expect(transport.requests[0].payload).toMatchObject({
+                identityApprovalId: "reviewed-fixture-approval",
+                domainRegistrationId: "PLAYBOOK-SCHOLAR-REGISTRATION-001",
+                pbosIdentity: { role },
+            });
+        });
     it("fails closed when PBOS reports a non-legacy identity conflict", async () => { const transport: PbosTransport = { async send(request: PbosRequest) { return { success: false as const, apiVersion: "v1" as const, correlationId: request.correlationId, error: { code: "CONFLICT", message: "Identity mapping already registered with different authority context." } }; } }; const connector = new PlaybookConnector(new PlaybookPbosRuntimeClient(transport)); await expect(connector.registerIdentity("supabase-user-001", "SCHOLAR")).rejects.toThrow("different authority context"); });
     it("stops activation when PBOS denies certification", async () => { const connector = new PlaybookConnector(new PlaybookPbosRuntimeClient(new RecordingTransport("CERTIFY_SYSTEM"))); await expect(connector.activate(approvals)).rejects.toThrow("AUTHORITY_DENIED"); });
     it("discovers capabilities and sends the governed Scholar onboarding-to-dashboard transaction", async () => { const transport = new RecordingTransport(); const connector = new PlaybookConnector(new PlaybookPbosRuntimeClient(transport)); const identity = await connector.registerIdentity("supabase-user-001", "SCHOLAR"); await connector.discoverCapabilities(["READ_RUNTIME_HEALTH", "PUBLISH_LIFECYCLE_EVENT", "EXCHANGE_APPROVED_DATA"], "playbook-capabilities-001"); await connector.publishScholarOnboarding(identity, { eventType: "SCHOLAR_ONBOARDING_COMPLETED", schemaVersion: "1.0.0", scholarRecordId: "scholar-record-001" }, "playbook-onboarding-001"); await connector.projectScholarDashboard(identity, { schemaVersion: "1.0.0", scholarRecordId: "scholar-record-001", sectionIds: ["identity", "goals"] }, "PLAYBOOK-DASHBOARD-APPROVAL-001", "playbook-dashboard-001"); expect(transport.requests.slice(-3).map(request => request.operation)).toEqual(["DISCOVER_CAPABILITIES", "PUBLISH_LIFECYCLE_EVENT", "EXCHANGE_APPROVED_DATA"]); expect(transport.requests.at(-1)?.idempotencyKey).toBe("playbook-dashboard-001"); expect(transport.requests.at(-1)?.payload).toMatchObject({ dataClassification: "PRIVATE", exchangeApprovalId: "PLAYBOOK-DASHBOARD-APPROVAL-001" }); });

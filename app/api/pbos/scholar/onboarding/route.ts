@@ -195,6 +195,7 @@ export async function POST(request: NextRequest) {
       )
     );
 
+    const approvals = approvalsFor(pbosRole);
     const service = new ScholarOnboardingService({
       async persistOnboarding(input) {
         const profile = await supabase
@@ -254,7 +255,8 @@ export async function POST(request: NextRequest) {
         if (profile.error) throw new Error(profile.error.message);
       },
     }, {
-      registerIdentity: userId => connector.registerIdentity(userId, pbosRole),
+      registerIdentity: userId => connector.registerIdentity(userId, pbosRole,
+        process.env.VERCEL_ENV === "production" ? approvals.identityApprovalId : undefined),
       async verifyReady(identity, correlationId) {
         const response = await connector.health(
           identity,
@@ -291,7 +293,6 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    const approvals = approvalsFor(pbosRole);
     let output: Awaited<ReturnType<ScholarOnboardingService["complete"]>>;
     try {
       output = await service.complete({
