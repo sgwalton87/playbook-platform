@@ -1,0 +1,126 @@
+name: Next and ESLint Security Audit Candidate (No Writes)
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/next-eslint-security-candidate.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: next-eslint-audit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  compare:
+    name: Candidate audit, lint, unit tests and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      CI: "true"
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - name: Checkout exact candidate
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Configure Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Install current baseline
+        run: npm ci
+      - name: Capture unchanged baseline audit
+        shell: bash
+        run: |
+          mkdir -p security-evidence
+          npm audit --json > security-evidence/baseline.json || true
+      - name: Simulate compatible Next and ESLint patches locally
+        run: npm install --package-lock-only --ignore-scripts --save-exact --no-audit next@16.4.6 eslint-config-next@16.4.6
+      - name: Validate patched candidate dependency install without executing unknown scripts
+        run: npm ci --ignore-scripts
+      - name: Inspect the ESLint plugin compatibility source before temporary trial
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import { createHash } from 'node:crypto';
+          import { readFileSync } from 'node:fs';
+          import { createRequire } from 'node:module';
+          import { dirname, join } from 'node:path';
+          const require=createRequire(import.meta.url);
+          const root=dirname(require.resolve('@next/eslint-plugin-next/package.json'));
+          const plugin=require(join(root,'package.json'));
+          const source=readFileSync(join(root,'dist/utils/get-root-dirs.js'),'utf8');
+          const original=source.replace('onlyDirectories: true,\\n        expandDirectories: false','onlyDirectories: true');
+          const digest=createHash('sha256').update(original).digest('hex');
+          const expected='886677432990a735e5ebdfb345ff1cbd40e264f9947a8432eeeb254b3a926bde';
+          console.log(JSON.stringify({pluginVersion:plugin.version,sourceHash:digest,compatibleWithExistingGuard:digest===expected}));
+          if(plugin.version!=='16.4.6'||digest!==expected) process.exitCode=1;
+          NODE
+      - name: Run existing compatibility patch with a temporary 16.4.6 allowance
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync, writeFileSync } from 'node:fs';
+          const p='scripts/pbos/patch-next-eslint-glob.mjs';
+          const text=readFileSync(p,'utf8');
+          const old="if (plugin.version !== '16.4.2') throw new Error('Review ESLint glob compatibility before upgrading Next');";
+          if(!text.includes(old))throw Error('Original compatibility guard changed; stop candidate');
+          writeFileSync(p,text.replace(old,"if (plugin.version !== '16.4.6') throw new Error('Review ESLint glob compatibility before upgrading Next');"));
+          NODE
+          npm run postinstall
+      - name: Capture new complete and runtime-only audits
+        shell: bash
+        run: |
+          npm audit --json > security-evidence/candidate.json || true
+          npm audit --omit=dev --json > security-evidence/candidate-runtime-only.json || true
+      - name: Compare findings without bypassing gate
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const fs=require("node:fs");
+          const before=JSON.parse(fs.readFileSync("security-evidence/baseline.json"));
+          const after=JSON.parse(fs.readFileSync("security-evidence/candidate.json"));
+          const runtime=JSON.parse(fs.readFileSync("security-evidence/candidate-runtime-only.json"));
+          const report={
+            testedPins: {next:"16.4.6",eslintConfigNext:"16.4.6"},
+            baseline:before.metadata?.vulnerabilities,
+            patched:after.metadata?.vulnerabilities,
+            runtimeOnly:runtime.metadata?.vulnerabilities,
+            remainingHigh:Object.entries(after.vulnerabilities||{}).filter(([,v])=>["high","critical"].includes(v.severity)).map(([name,v])=>({name,direct:v.isDirect,fixAvailable:v.fixAvailable})),
+            warning:"Evidence only. A passing experiment does not waive any security failure."
+          };
+          fs.writeFileSync("security-evidence/summary.json",JSON.stringify(report,null,2)+"\n");
+          console.log(JSON.stringify(report));
+          if(after.vulnerabilities?.next||after.vulnerabilities?.["eslint-config-next"]?.severity==="high")console.error("Security findings remain unresolved; candidate will be blocked at final gate after tests.");
+          NODE
+      - name: Lint
+        run: npm run lint
+      - name: Unit tests
+        run: npm test
+      - name: Build
+        run: npm run build
+      - name: Capture exact candidate patch
+        if: always()
+        run: |
+          git diff -- package.json package-lock.json > security-evidence/next-eslint.patch
+          sha256sum security-evidence/next-eslint.patch > security-evidence/patch.sha256
+      - name: Upload audit and patch evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-eslint-candidate-evidence
+          path: security-evidence/
+          retention-days: 7
+      - name: Enforce full audit security gate after collecting test evidence
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const report=JSON.parse(fs.readFileSync('security-evidence/summary.json','utf8'));
+          const high=(report.patched?.high??0)+(report.patched?.critical??0);
+          if(high>0){console.error(`BLOCKED: ${high} high/critical dependency audit findings remain, despite successful candidate tests.`);process.exit(1);}
+          NODE
