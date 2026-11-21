@@ -65,6 +65,20 @@ describe("PBOS activation configuration", () => {
     expect(diagnostic).not.toContain("secretBase64");
   });
 
+  it("emits a sanitized signal when the PBOS transport is unavailable", () => {
+    const route = fs.readFileSync(
+      path.join(process.cwd(), "app/api/pbos/scholar/onboarding/route.ts"),
+      "utf8"
+    );
+    const start = route.indexOf('console.error("[PBOS_ACTIVATION_RUNTIME_UNAVAILABLE]"');
+    expect(start).toBeGreaterThan(-1);
+    const statement = route.slice(start, route.indexOf(";", start));
+    expect(statement).toContain("role: pbosRole");
+    expect(statement).not.toContain("user.id");
+    expect(statement).not.toContain("secret");
+    expect(statement).not.toContain("error.message");
+  });
+
   it("completes the governed profile before returning pending activation", () => {
     const route = fs.readFileSync(
       path.join(process.cwd(), "app/api/pbos/scholar/onboarding/route.ts"),
