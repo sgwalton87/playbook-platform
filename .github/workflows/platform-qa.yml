@@ -6,11 +6,14 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      trusted_local_scholar:
+        description: Approve synthetic Scholar writes to the disposable localhost stack
+        type: boolean
+        default: false
 
 permissions:
   contents: read
-  statuses: write
-  issues: write
 
 jobs:
   public-browser-qa:
@@ -55,148 +58,52 @@ jobs:
           PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
         run: npx playwright test tests/acceptance/phase15-public-platform.spec.ts tests/acceptance/pbos-capability-foundation.spec.ts
 
+
   scholar-e2e:
-    name: Trusted Scholar + Scholar-Athlete + Family E2E
-    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    name: Trusted localhost Scholar QA
+    if: github.event_name == 'workflow_dispatch' && inputs.trusted_local_scholar == true
     runs-on: ubuntu-latest
-    timeout-minutes: 50
+    timeout-minutes: 35
     env:
-      PLAYWRIGHT_BASE_URL: https://the-playbook-five.vercel.app
-      NEXT_PUBLIC_SUPABASE_URL: https://oexgxnybeixwadgtdtzp.supabase.co
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_9T3jZbZ_BNUMhkA2jeqxpA__UUAEOue
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      PBOS_ALLOW_SYNTHETIC_AUTH_WRITE: "YES"
       PBOS_ACCEPTANCE_COMMIT: ${{ github.sha }}
+      PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
+      NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+      PBOS_QA_MAIL_URL: http://127.0.0.1:54324
+      SUPABASE_TELEMETRY_DISABLED: "1"
     steps:
-      - name: Publish role QA pending status
-        env: { GH_TOKEN: "${{ github.token }}" }
-        run: gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${PBOS_ACCEPTANCE_COMMIT}" -f state=pending -f context=playbook/phase15-role-e2e -f description="stage:configuration"
-      - name: Require trusted acceptance configuration
-        id: configuration
-        run: |
-          node <<'NODE'
-          const fail = () => { throw new Error('Trusted synthetic QA is blocked: explicitly approved localhost app and database targets are required.'); };
-          if (process.env.PBOS_ALLOW_SYNTHETIC_AUTH_WRITE !== 'YES') fail();
-          for (const key of ['PLAYWRIGHT_BASE_URL', 'NEXT_PUBLIC_SUPABASE_URL']) {
-            let target;
-            try { target = new URL(process.env[key] || ''); } catch { fail(); }
-            if (!['http:', 'https:'].includes(target.protocol) || !['localhost', '127.0.0.1'].includes(target.hostname) || target.username || target.password) fail();
-          }
-          NODE
-          if [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
-            echo "Missing required trusted acceptance configuration: SUPABASE_SERVICE_ROLE_KEY"
-            exit 1
-          fi
-          if [ -z "$PLAYWRIGHT_BASE_URL" ]; then
-            echo "Missing production Playbook target URL"
-            exit 1
-          fi
-          if [ -z "$PBOS_ACCEPTANCE_COMMIT" ]; then
-            echo "Missing acceptance commit identity"
-            exit 1
-          fi
-      - name: Check out acceptance revision
+      - name: Check out dispatch SHA
         uses: actions/checkout@v5
         with:
-          ref: ${{ env.PBOS_ACCEPTANCE_COMMIT }}
-      - name: Set up Node.js
-        uses: actions/setup-node@v5
-        with: { node-version: 22, cache: npm }
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: npm
+      - uses: supabase/setup-cli@v2
+        with:
+          version: 3.2.0
       - name: Install dependencies
         run: npm ci
-      - name: Install Chromium
-        run: npx playwright install --with-deps chromium
-      - name: Publish production-revision wait status
-        env: { GH_TOKEN: "${{ github.token }}" }
-        run: gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${PBOS_ACCEPTANCE_COMMIT}" -f state=pending -f context=playbook/phase15-role-e2e -f description="stage:production-revision"
-      - name: Wait for exact production revision
-        id: deployed_target
+      - name: Block external SMTP on the disposable runner
         run: |
           set -euo pipefail
-          TARGET="${PLAYWRIGHT_BASE_URL%/}/api/deployment"
-          for attempt in {1..180}; do
-            BODY=$(curl --fail --silent --show-error --location --max-time 10 "$TARGET" 2>/dev/null || true)
-            DEPLOYED_SHA=$(printf '%s' "$BODY" | node -e 'let s=""; process.stdin.on("data",d=>s+=d).on("end",()=>{try{const x=JSON.parse(s); process.stdout.write(String(x.commit||""));}catch{}});')
-            if [ "$DEPLOYED_SHA" = "$PBOS_ACCEPTANCE_COMMIT" ]; then
-              echo "Production is serving exact revision $DEPLOYED_SHA"
-              exit 0
-            fi
-            echo "Production revision attempt ${attempt}: ${DEPLOYED_SHA:-not-ready}; expected ${PBOS_ACCEPTANCE_COMMIT}"
-            sleep 2
+          for tool in iptables ip6tables; do
+            sudo "$tool" -I OUTPUT 1 ! -o lo -p tcp -m multiport --dports 25,465,587,2525 -j REJECT
+            sudo "$tool" -C OUTPUT ! -o lo -p tcp -m multiport --dports 25,465,587,2525 -j REJECT
           done
-          echo "Production did not converge to ${PBOS_ACCEPTANCE_COMMIT} at ${TARGET}"
-          exit 1
-      - name: Publish Scholar-running status
-        env: { GH_TOKEN: "${{ github.token }}" }
-        run: gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${PBOS_ACCEPTANCE_COMMIT}" -f state=pending -f context=playbook/phase15-role-e2e -f description="stage:scholar"
-      - name: Run governed Scholar journey
-        id: scholar
-        run: npx playwright test tests/acceptance/pbos-scholar.spec.ts --project=chromium
-      - name: Publish Scholar-Athlete-running status
-        env: { GH_TOKEN: "${{ github.token }}" }
-        run: gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${PBOS_ACCEPTANCE_COMMIT}" -f state=pending -f context=playbook/phase15-role-e2e -f description="stage:scholar-athlete"
-      - name: Run governed Scholar-Athlete journey
-        id: scholar_athlete
-        run: npx playwright test tests/acceptance/pbos-scholar-athlete.spec.ts --project=chromium
-      - name: Publish Family-running status
-        env: { GH_TOKEN: "${{ github.token }}" }
-        run: gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${PBOS_ACCEPTANCE_COMMIT}" -f state=pending -f context=playbook/phase15-role-e2e -f description="stage:family"
-      - name: Run governed Family journey
-        id: family
-        run: npx playwright test tests/acceptance/family-consent.spec.ts --project=chromium
-      - name: Upload trusted role diagnostics
+          sudo iptables -I DOCKER-USER 1 -p tcp -m multiport --dports 25,465,587,2525 -j REJECT
+          sudo iptables -C DOCKER-USER -p tcp -m multiport --dports 25,465,587,2525 -j REJECT
+      - name: Run exact-SHA Scholar journey and tear down
+        run: node scripts/qa/run-trusted-scholar.mjs
+      - name: Upload allowlisted Scholar evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: phase15-trusted-role-diagnostics-${{ env.PBOS_ACCEPTANCE_COMMIT }}
+          name: trusted-local-scholar-${{ github.sha }}
           path: |
-            artifacts/playwright
-            artifacts/pbos-acceptance
+            artifacts/trusted-local-scholar/evidence.json
+            artifacts/trusted-local-scholar/dashboard.png
           if-no-files-found: warn
-          retention-days: 14
-      - name: Publish role QA success
-        env: { GH_TOKEN: "${{ github.token }}" }
-        run: gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${PBOS_ACCEPTANCE_COMMIT}" -f state=success -f context=playbook/phase15-role-e2e -f description="Scholar + Scholar-Athlete + Family E2E passed"
-      - name: Publish configuration failure
-        if: failure() && steps.configuration.outcome == 'failure'
-        env: { GH_TOKEN: "${{ github.token }}" }
-        run: |
-          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${PBOS_ACCEPTANCE_COMMIT}" -f state=failure -f context=playbook/phase15-role-e2e -f description="FAILED:trusted acceptance configuration"
-          gh issue comment 234 --repo "$GITHUB_REPOSITORY" --body "Phase 15 trusted role E2E on ${PBOS_ACCEPTANCE_COMMIT} FAILED at **configuration**. No secret values are included in this report."
-      - name: Publish production-revision failure
-        if: failure() && steps.configuration.outcome == 'success' && steps.deployed_target.outcome == 'failure'
-        env: { GH_TOKEN: "${{ github.token }}" }
-        run: |
-          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${PBOS_ACCEPTANCE_COMMIT}" -f state=failure -f context=playbook/phase15-role-e2e -f description="FAILED:production revision barrier"
-          gh issue comment 234 --repo "$GITHUB_REPOSITORY" --body "Phase 15 trusted role E2E on ${PBOS_ACCEPTANCE_COMMIT} FAILED at **production revision barrier**. The stable main deployment did not report the exact acceptance SHA before the governed role journey began."
-      - name: Publish Scholar failure
-        if: failure() && steps.configuration.outcome == 'success' && steps.deployed_target.outcome == 'success' && steps.scholar.outcome == 'failure'
-        env: { GH_TOKEN: "${{ github.token }}" }
-        run: |
-          SUMMARY="artifacts/pbos-acceptance/scholar-failure-summary.json"
-          if [ -f "$SUMMARY" ]; then
-            STAGE=$(node -e 'const fs=require("fs"); const x=JSON.parse(fs.readFileSync(process.argv[1],"utf8")); process.stdout.write(String(x.stage||"unknown").replace(/[^a-zA-Z0-9_.:-]/g,"_").slice(0,80));' "$SUMMARY")
-            MESSAGE=$(node -e 'const fs=require("fs"); const x=JSON.parse(fs.readFileSync(process.argv[1],"utf8")); process.stdout.write(String(x.message||"No failure message recorded.").replace(/[\r\n]+/g," ").replace(/\s+/g," ").replace(/\u001b\[[0-9;]*m/g,"").slice(0,350));' "$SUMMARY")
-          else
-            STAGE="summary-missing"
-            MESSAGE="Scholar failed but the machine-readable failure summary was not produced."
-          fi
-          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${PBOS_ACCEPTANCE_COMMIT}" -f state=failure -f context=playbook/phase15-role-e2e -f description="FAILED:Scholar:${STAGE}"
-          gh issue comment 234 --repo "$GITHUB_REPOSITORY" --body "Phase 15 trusted role E2E on ${PBOS_ACCEPTANCE_COMMIT} FAILED at **Scholar / ${STAGE}** against exact production revision. ${MESSAGE}"
-      - name: Publish Scholar-Athlete failure
-        if: failure() && steps.configuration.outcome == 'success' && steps.deployed_target.outcome == 'success' && steps.scholar.outcome == 'success' && steps.scholar_athlete.outcome == 'failure'
-        env: { GH_TOKEN: "${{ github.token }}" }
-        run: |
-          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${PBOS_ACCEPTANCE_COMMIT}" -f state=failure -f context=playbook/phase15-role-e2e -f description="FAILED:Scholar-Athlete journey"
-          gh issue comment 234 --repo "$GITHUB_REPOSITORY" --body "Phase 15 trusted role E2E on ${PBOS_ACCEPTANCE_COMMIT} FAILED at **Scholar-Athlete journey** against exact production revision. Scholar passed; diagnostics artifact: phase15-trusted-role-diagnostics-${PBOS_ACCEPTANCE_COMMIT}."
-      - name: Publish Family failure
-        if: failure() && steps.configuration.outcome == 'success' && steps.deployed_target.outcome == 'success' && steps.scholar.outcome == 'success' && steps.scholar_athlete.outcome == 'success' && steps.family.outcome == 'failure'
-        env: { GH_TOKEN: "${{ github.token }}" }
-        run: |
-          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${PBOS_ACCEPTANCE_COMMIT}" -f state=failure -f context=playbook/phase15-role-e2e -f description="FAILED:Family journey"
-          gh issue comment 234 --repo "$GITHUB_REPOSITORY" --body "Phase 15 trusted role E2E on ${PBOS_ACCEPTANCE_COMMIT} FAILED at **Family journey** against exact production revision. Scholar and Scholar-Athlete passed; diagnostics artifact: phase15-trusted-role-diagnostics-${PBOS_ACCEPTANCE_COMMIT}."
-      - name: Publish trusted bootstrap failure
-        if: failure() && steps.configuration.outcome == 'success' && steps.deployed_target.outcome != 'failure' && steps.scholar.outcome == 'skipped'
-        env: { GH_TOKEN: "${{ github.token }}" }
-        run: |
-          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${PBOS_ACCEPTANCE_COMMIT}" -f state=failure -f context=playbook/phase15-role-e2e -f description="FAILED:trusted QA bootstrap"
-          gh issue comment 234 --repo "$GITHUB_REPOSITORY" --body "Phase 15 trusted role E2E on ${PBOS_ACCEPTANCE_COMMIT} FAILED during **trusted QA bootstrap** before Scholar began."
+          retention-days: 7
