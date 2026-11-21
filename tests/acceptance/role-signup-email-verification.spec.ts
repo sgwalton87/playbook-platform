@@ -223,6 +223,20 @@ test(`${role}: ${fullFields ? "full-field" : "core"} registration, email verific
         expect(verification.data).toMatchObject({
           status: "pending", campaign_scope_approved: false, compliance_scope_approved: false,
         });
+        // Functional readback through the authenticated constituent endpoint:
+        // pending evidence must be visible after submission without minting
+        // either campaign or compliance authority.
+        const pendingResponse = await page.request.get("/api/brand-verification");
+        expect(pendingResponse.status()).toBe(200);
+        const pendingBody = await pendingResponse.json() as {
+          ok?: boolean;
+          request?: { status?: string; campaign_scope_approved?: boolean; compliance_scope_approved?: boolean };
+        };
+        expect(pendingBody.ok).toBe(true);
+        expect(pendingBody.request).toMatchObject({
+          status: "pending", campaign_scope_approved: false, compliance_scope_approved: false,
+        });
+        expect(pendingResponse.headers()["cache-control"]).toContain("no-store");
 
         await page.goto(destination);
       }

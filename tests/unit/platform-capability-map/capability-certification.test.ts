@@ -35,6 +35,19 @@ describe("Constitutional capability certification ledger", () => {
   const broken = buildCapabilityAuditLedger([{...proof,status:"failed" as const}]);
   expect(broken.find((entry)=>entry.id===id)?.certificationStatus).toBe("failed");
  });
+ it("rejects duplicate evidence instead of silently promoting the last status", () => {
+  const id = capabilityId("account", "Onboarding");
+  const proof = {
+   capabilityId:id,status:"failed" as const,verifiedAt:"2026-11-20T12:00:00Z",
+   commitSha:"a".repeat(40),environment:"staging" as const,
+   evidenceUrl:"https://github.com/example/a/actions/runs/123",
+   authorizedJourney:"role onboarding",deniedJourney:"foreign role denied",
+   persistenceProof:"saved record read back",reviewer:"reviewer",
+  };
+  expect(() => buildCapabilityAuditLedger([
+    proof, { ...proof, status:"passed" as const },
+  ])).toThrow(/Duplicate certification evidence/);
+ });
  it("requires approved evidence for actual passed certification", () => {
   const id = capabilityId("account","Onboarding");
   const entry = buildCapabilityAuditLedger([{

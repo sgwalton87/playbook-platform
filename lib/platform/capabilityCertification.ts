@@ -57,7 +57,15 @@ export function buildCapabilityAuditLedger(
   proofs: CapabilityProof[] = [],
   options: { includeFounder?: boolean } = {},
 ): CapabilityAuditEntry[] {
-  const byId = new Map(proofs.map((proof) => [proof.capabilityId, proof]));
+  // A duplicate submitted proof must never silently overwrite a conflicting
+  // result (including a FAILED attempt) and turn a capability green.
+  const byId = new Map<string, CapabilityProof>();
+  for (const proof of proofs) {
+    if (byId.has(proof.capabilityId)) {
+      throw new Error(`Duplicate certification evidence for ${proof.capabilityId}; reconcile before release.`);
+    }
+    byId.set(proof.capabilityId, proof);
+  }
   const entries = getCapabilityCatalog({ includeFounder: Boolean(options.includeFounder) })
     .flatMap((group) => group.items.map((item) => {
       const id = capabilityId(group.id, item.label);
