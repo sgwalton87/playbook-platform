@@ -14,17 +14,37 @@ This integration connects The Playbook's authenticated Scholar onboarding flow t
 ## Runtime flow
 
 1. Supabase authenticates the Scholar.
-2. The server verifies owner authority and the PBOS identity approval.
+2. The server checks owner authority and requires the configured identity approval reference. Runtime-side verification of that approval is a production release gate.
 3. The application durably records the Scholar profile, first goal, and onboarding milestone.
 4. The server signs and publishes the onboarding lifecycle event to PBOS v1.
-5. PBOS v1 authorizes the private identity-and-goals dashboard projection.
+5. PBOS v1 processes the private identity-and-goals exchange. Production release requires independent verification of its scoped approval.
 6. The application persists the projection and marks the dashboard ready.
 
-Every retry uses a stable idempotency key. PBOS denial or unavailable protected configuration fails closed and is surfaced accessibly in the existing onboarding page.
+Lifecycle and exchange retries use stable idempotency keys. Identity registration keeps its stable mapping and correlation IDs, and PBOS preserves the first accepted mapping. When activation configuration is missing or unsafe, the governed RPC saves the owner's profile and the app reports pending activation without granting PBOS authority.
 
 ## Required server configuration
 
-Copy `.env.example` to the environment-specific secret configuration and supply every `PBOS_*` value through the deployment platform's protected secret store. Never commit credential values.
+Configure these seven settings on the application server only, following independent review of the production deployment scope. The deployment platform's protected environment stores the app-side material. Keep credential contents out of source, evidence, and browser configuration.
+
+| Setting | Authoritative source | Verified production status |
+| --- | --- | --- |
+| `PBOS_API_URL` | The approved PBOS Cloud Run service URL with the exact `/pbos/v1` route. | No production endpoint confirmed. |
+| `PBOS_ORGANIZATION_ID` | The certified PBOS organization manifest and the matching runtime environment. | `PLAYBOOK-ORG-001` is the canonical Playbook ID. Its staging binding is verified. |
+| `PBOS_CONNECTOR_ID` | The certified connector registry entry for that organization. | `PLAYBOOK-CONNECTOR-001` is the canonical connector ID. Production registration and activation remain unverified. |
+| `PBOS_CONNECTOR_KEY_ID` | The active credential record issued by PBOS `ConnectorCredentialAuthority` for that organization and connector. | No production issuance or deployment binding verified. |
+| `PBOS_CONNECTOR_SECRET_BASE64` | The matching credential bytes from the approved production Secret Manager handoff, stored in the runtime trust bundle and app's protected environment. | Only staging resource references were verified. Secret values were not accessed. |
+| `PBOS_SCHOLAR_IDENTITY_APPROVAL_ID` | An independent governance record authorizing Scholar identity activation for the production connector, organization, and owner boundary. | No production approval artifact or runtime verifier handoff verified. The app currently checks presence and ownership. |
+| `PBOS_SCHOLAR_EXCHANGE_APPROVAL_ID` | An independent governance record for the production Scholar domain and private identity-and-goals projection. | Historical staging proof exists. No production approval or verifier handoff verified. |
+
+### Infrastructure evidence and release gate
+
+Read-only provider metadata on November 21, 2026 showed that all seven keys are set for Preview only on Vercel project `the-playbook` (`prj_mZ74XbviZKKplwVYPU3FLhFNka73`). Google Cloud listed no Cloud Run services or PBOS Secret Manager resources in the inspected application project `playbook-platform-500403`. The inspected PBOS integration service `pbos-v1-integration-staging` is ready in `pbos-genesis-staging`, with `pbos-connector-trust-bundle-staging` and `playbook-connector-bootstrap-staging` present. Those are staging resources. The canary image registry project supplies neither Playbook activation configuration nor PBOS connector authority.
+
+The [PBOS-PROD-002 Core proposal](https://github.com/sgwalton87/PBOS-CORE/pull/109) verifies the independently sourced identity and exchange records in production before performing the operation, including before returning a cached exchange result. Production requires two independently approved references per role. Scholar uses the seven settings above. Scholar-Athlete and Transition Youth use their existing role-specific `PBOS_SCHOLAR_ATHLETE_*` and `PBOS_TRANSITION_YOUTH_*` identity/exchange settings against the same scoped runtime. No production grant or credential was issued as part of the code review.
+
+The Vercel Production server also requires `PBOS_GCP_WIF_PROVIDER`, `PBOS_GCP_INVOKER_SERVICE_ACCOUNT`, and `PBOS_CLOUD_RUN_AUDIENCE` from the approved Google production deployment. The signed connector transports a short-lived Google ID token for the same approved Cloud Run origin and preserves the PBOS HMAC headers. Preview and localhost continue using their existing isolated transport. The private route and IAM grants need separate independent review and infrastructure authorization.
+
+Promote only after independent approval of the exact production service, certified connector and active Scholar domain, credential scope, and both approval bindings. Exercise the signed journey with disposable identities and confirm the negative cases deny authority before production traffic is enabled. The existing [CIP-045 staging evidence](https://github.com/sgwalton87/PBOS-CORE/blob/96d41042d821da10e6d4e3a40c94acefe53fff95/docs/operations/CIP-045-PLAYBOOK-ACTIVATION.md) and [CIP-047 deployment runbook](https://github.com/sgwalton87/PBOS-CORE/blob/96d41042d821da10e6d4e3a40c94acefe53fff95/docs/operations/CIP-047-CLOUD-RUN-STAGING.md) document the established trust and deployment paths.
 
 ## Data and rollback
 

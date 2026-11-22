@@ -1,3 +1,4 @@
+import { getProductionPbosIdToken, verifyProductionPbosInvocationTarget } from "../../lib/pbos/cloud-run-invoker";
 import { createHash, createHmac, randomUUID } from "crypto";
 import type { PbosRequest, PbosResponse, PbosTransport } from "./contracts";
 
@@ -12,7 +13,12 @@ export class PbosRuntimeUnavailableError extends Error {
 }
 
 export class SignedPlaybookPbosTransport implements PbosTransport {
-  constructor(private readonly endpoint: string, private readonly credentials: PlaybookServerCredentials, private readonly fetcher: typeof fetch = fetch) {
+  constructor(private readonly endpoint: string, private readonly credentials: PlaybookServerCredentials, private readonly fetcher: typeof fetch = fetch,
+    private readonly invokeToken = () => {
+      if (process.env.VERCEL_ENV !== "production") return undefined;
+      verifyProductionPbosInvocationTarget(endpoint);
+      return getProductionPbosIdToken();
+    }) {
     if (!endpoint || !credentials.organizationId || !credentials.connectorId || !credentials.keyId || !credentials.secretBase64) {
       throw new Error("Complete server-only PBOS connector configuration is required.");
     }
@@ -27,9 +33,11 @@ export class SignedPlaybookPbosTransport implements PbosTransport {
     const canonical = ["POST", path, this.credentials.organizationId, this.credentials.connectorId,
       this.credentials.keyId, timestamp, nonce, digest].join("\n");
     const signature = createHmac("sha256", Buffer.from(this.credentials.secretBase64, "base64")).update(canonical).digest("hex");
+    const invocation = await this.invokeToken();
     let response: Response;
     try {
-      response = await this.fetcher(this.endpoint, { method: "POST", cache: "no-store", body, headers: {
+      response = await this.fetcher(this.endpoint, { method: "POST", cache: "no-store", redirect: "manual", body, headers: {
+      ...(invocation ? { Authorization: `Bearer ${invocation}` } : {}),
       "content-type": "application/json", "x-pbos-api-version": "v1", "x-pbos-organization-id": this.credentials.organizationId,
       "x-pbos-connector-id": this.credentials.connectorId, "x-pbos-key-id": this.credentials.keyId,
       "x-pbos-timestamp": timestamp, "x-pbos-nonce": nonce, "x-pbos-signature": signature
@@ -40,6 +48,9 @@ export class SignedPlaybookPbosTransport implements PbosTransport {
         throw new PbosRuntimeUnavailableError();
       }
       throw error;
+    }
+    if (response.status >= 300 && response.status < 400) {
+      throw new Error("PBOS v1 endpoint redirected the signed request.");
     }
     if ([502, 503, 504].includes(response.status)) {
       throw new PbosRuntimeUnavailableError();

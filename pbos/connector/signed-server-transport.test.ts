@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { PbosRuntimeUnavailableError, SignedPlaybookPbosTransport } from "./signed-server-transport";
 
 const credentials = {
@@ -16,6 +16,14 @@ describe("signed Playbook PBOS transport", () => {
     const transport = new SignedPlaybookPbosTransport("https://pbos.example.com/pbos/v1", credentials,
       (async () => new Response("Unavailable", { status })) as typeof fetch);
     await expect(transport.send(request)).rejects.toBeInstanceOf(PbosRuntimeUnavailableError);
+  });
+
+  it("never follows a redirect with a signed PBOS request", async () => {
+    const endpoint = "https://pbos.example.com/pbos/v1";
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(Response.redirect("https://other.example/pbos/v1", 307));
+    const transport = new SignedPlaybookPbosTransport(endpoint, credentials, fetcher);
+    await expect(transport.send(request)).rejects.toThrow("PBOS v1 endpoint redirected the signed request.");
+    expect(fetcher).toHaveBeenCalledExactlyOnceWith(endpoint, expect.objectContaining({ redirect: "manual" }));
   });
 
   it("classifies a network failure without exposing its internal message", async () => {

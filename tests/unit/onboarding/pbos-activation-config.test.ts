@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
-import { getMissingPbosActivationConfiguration } from "@/lib/pbos/activation-config";
+import { getMissingPbosActivationConfiguration, getPbosActivationDestinationIssue } from "@/lib/pbos/activation-config";
 
 const runtime = {
   PBOS_API_URL: "https://pbos.example/pbos/v1",
@@ -46,6 +46,48 @@ describe("PBOS activation configuration", () => {
       PBOS_TRANSITION_YOUTH_IDENTITY_APPROVAL_ID: "identity",
       PBOS_TRANSITION_YOUTH_EXCHANGE_APPROVAL_ID: "exchange",
     })).toEqual(["PBOS_API_URL"]);
+  });
+
+  it.each([
+    "http://127.0.0.1:1234/pbos/v1",
+    "https://localhost/pbos/v1",
+    "https://localhost./pbos/v1",
+    "https://pbos-v1-integration-staging-loii7tzprq-uw.a.run.app/pbos/v1",
+  ])("rejects %s as a production destination", endpoint => {
+    expect(getPbosActivationDestinationIssue({ PBOS_API_URL: endpoint, VERCEL_ENV: "production" }))
+      .toBe("NON_PRODUCTION_DESTINATION");
+  });
+
+  it("rejects copied staging configuration and allows isolated loopback QA", () => {
+    expect(getPbosActivationDestinationIssue({
+      PBOS_API_URL: "https://staging.example/pbos/v1", PBOS_ENVIRONMENT: "staging", VERCEL_ENV: "production",
+    })).toBe("NON_PRODUCTION_DESTINATION");
+    expect(getPbosActivationDestinationIssue({ PBOS_API_URL: "http://127.0.0.1:1234/pbos/v1" })).toBeUndefined();
+    expect(getPbosActivationDestinationIssue({ PBOS_API_URL: "https://runtime.example/pbos/v1", VERCEL_ENV: "production" }))
+      .toBe("INVOCATION_CONFIG_INVALID");
+  });
+
+  it("requires the exact approved invocation origin before allowing production activation", () => {
+    const audience = "https://pbos-qualification-fixture.run.app";
+    const environment = {
+      VERCEL_ENV: "production",
+      PBOS_GCP_WIF_PROVIDER: "//iam.googleapis.com/projects/123456789/locations/global/workloadIdentityPools/pbos-playbook-production/providers/vercel",
+      PBOS_GCP_INVOKER_SERVICE_ACCOUNT: "pbos-playbook-invoker@pbos-production-fixture.iam.gserviceaccount.com",
+      PBOS_CLOUD_RUN_AUDIENCE: audience,
+    };
+    expect(getPbosActivationDestinationIssue({ ...environment, PBOS_API_URL: audience + "/pbos/v1" })).toBeUndefined();
+    expect(getPbosActivationDestinationIssue({ ...environment, PBOS_API_URL: "https://unapproved.run.app/pbos/v1" }))
+      .toBe("INVOCATION_CONFIG_INVALID");
+  });
+
+  it.each([
+    "http://remote.example/pbos/v1",
+    "https://user@remote.example/pbos/v1",
+    "https://remote.example/pbos/v1?next=1",
+    "https://remote.example/pbos/v1#fragment",
+    "https://remote.example/other",
+  ])("rejects an unsafe connector endpoint %s", endpoint => {
+    expect(getPbosActivationDestinationIssue({ PBOS_API_URL: endpoint })).toBe("INVALID_ENDPOINT");
   });
 
   it("logs missing configuration key names only on the server", () => {

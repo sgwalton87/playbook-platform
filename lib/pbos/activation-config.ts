@@ -1,3 +1,4 @@
+import { verifyProductionPbosInvocationTarget } from "./cloud-run-invoker";
 import type { SupportedScholarRecordRole } from "@/lib/pbos/scholar-onboarding-service";
 
 const RUNTIME_KEYS = [
@@ -30,4 +31,40 @@ export function getMissingPbosActivationConfiguration(
   return [...RUNTIME_KEYS, ...APPROVAL_KEYS[role]].filter(
     key => !environment[key]?.trim()
   );
+}
+
+// This service was verified in the isolated PBOS staging project. It is not a
+// valid destination for Playbook production identities or private data.
+const STAGING_RUNTIME_HOST = "pbos-v1-integration-staging-loii7tzprq-uw.a.run.app";
+const LOOPBACK_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]"]);
+
+export function getPbosActivationDestinationIssue(
+  environment: Readonly<Record<string, string | undefined>> = process.env
+): "INVALID_ENDPOINT" | "NON_PRODUCTION_DESTINATION" | "INVOCATION_CONFIG_INVALID" | undefined {
+  let endpoint: URL;
+  try {
+    endpoint = new URL(environment.PBOS_API_URL ?? "");
+  } catch {
+    return "INVALID_ENDPOINT";
+  }
+
+  const hostname = endpoint.hostname.replace(/\.$/, "");
+  const loopback = LOOPBACK_HOSTS.has(hostname);
+  if (endpoint.pathname !== "/pbos/v1" || endpoint.username || endpoint.password ||
+      endpoint.search || endpoint.hash ||
+      (endpoint.protocol !== "https:" && !(loopback && endpoint.protocol === "http:"))) {
+    return "INVALID_ENDPOINT";
+  }
+  if (environment.VERCEL_ENV === "production" &&
+      (loopback || hostname === STAGING_RUNTIME_HOST ||
+        environment.PBOS_ENVIRONMENT?.trim().toLowerCase() === "staging")) {
+    return "NON_PRODUCTION_DESTINATION";
+  }
+  if (environment.VERCEL_ENV === "production") {
+    try {
+      verifyProductionPbosInvocationTarget(endpoint.toString(), environment);
+    } catch {
+      return "INVOCATION_CONFIG_INVALID";
+    }
+  }
 }
