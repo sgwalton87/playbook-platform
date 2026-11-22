@@ -182,6 +182,15 @@ function LoginContent() {
         data.user.user_metadata?.requested_role;
 
       router.replace(getLoginDestination(profile, metadataRole));
+    } catch (error) {
+      // Network failures and unexpected auth/profile exceptions must not leave
+      // a constituent on an indefinitely spinning login or signup form.
+      console.error("Playbook authentication request failed", error);
+      setCaptchaToken(null);
+      setCaptchaKey((current) => current + 1);
+      setStatus(isSignup
+        ? "Playbook could not complete your registration. Please try again."
+        : "Playbook could not complete your login. Please try again.");
     } finally {
       setLoading(false);
     }
