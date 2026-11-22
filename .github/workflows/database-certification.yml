@@ -83,6 +83,9 @@ jobs:
       - name: Certify invitation authority boundary
         if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/support_invitation_authority_preflight.sql
+      - name: Certify invitation SMTP receipt boundary
+        if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
+        run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/support_invitation_smtp_receipts_preflight.sql
       - name: Certify profile authority boundary
         if: ${{ !cancelled() && steps.certify_fail_closed.outcome == 'success' }}
         run: psql "$LOCAL_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f supabase/tests/profile_authority_preflight.sql

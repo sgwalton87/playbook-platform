@@ -3,6 +3,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { describe, expect, it } from "vitest";
 import { assertLocalSyntheticAuthTarget } from "@/tests/acceptance/helpers/assertLocalSyntheticAuthTarget.mjs";
+import { assertLocalHostingerRecoveryTarget } from "@/tests/acceptance/helpers/assertLocalHostingerRecoveryTarget.mjs";
 
 const local = {
   PBOS_ALLOW_SYNTHETIC_AUTH_WRITE: "YES",
@@ -61,5 +62,32 @@ describe("synthetic authentication isolation", () => {
     expect(section.indexOf("explicitly approved localhost")).toBeLessThan(section.indexOf("- name: Check out acceptance revision"));
     expect(section).toContain("PBOS_ALLOW_SYNTHETIC_AUTH_WRITE !== 'YES'");
     expect(section).toContain("['localhost', '127.0.0.1'].includes(target.hostname)");
+  });
+});
+
+
+describe("Hostinger recovery isolation", () => {
+  const approved = {
+    ...local,
+    PBOS_ENABLE_HOSTINGER_RECOVERY: "YES",
+    PBOS_ACCEPTANCE_COMMIT: "a".repeat(40),
+    SMTP_HOST: "127.0.0.1",
+    SMTP_PORT: "54325",
+    SMTP_SECURE: "false",
+  };
+  it("accepts the opt-in local mail capture configuration at a pinned revision", () => {
+    expect(() => assertLocalHostingerRecoveryTarget(approved)).not.toThrow();
+  });
+  it.each([
+    { PBOS_ENABLE_HOSTINGER_RECOVERY: undefined },
+    { PBOS_ALLOW_SYNTHETIC_AUTH_WRITE: undefined },
+    { PBOS_ACCEPTANCE_COMMIT: "deadbee" },
+    { SMTP_HOST: "smtp.hostinger.com" },
+    { SMTP_HOST: "127.0.0.1.example.invalid" },
+    { SMTP_PORT: "465" },
+    { SMTP_SECURE: undefined },
+    { NEXT_PUBLIC_SUPABASE_URL: "https://production.supabase.co" },
+  ])("rejects unauthorized, remote or unpinned configuration: %j", override => {
+    expect(() => assertLocalHostingerRecoveryTarget({ ...approved, ...override })).toThrow();
   });
 });
