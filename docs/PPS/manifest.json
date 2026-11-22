@@ -1,6 +1,6 @@
 {
-  "snapshotDate": "2026-10-20",
-  "source": "Owner-supplied constitutional attachments; exact bytes preserved",
+  "snapshotDate": "2026-11-22",
+  "source": "Versioned owner-supplied constitutional attachments with the PPS-012 hosted signing authority amendment",
   "scope": "Requirements authority snapshot, not implementation or production certification",
   "documents": [
     {
@@ -179,7 +179,7 @@
     {
       "id": "PPS-012",
       "file": "PPS-012_SECURITY_AND_PERMISSIONS.md",
-      "sha256": "3c1a022eea10c18d4cbbeacc38527cbd4b48a743960543e629d636740e233986",
+      "sha256": "6742bb7b9ec6a52067e83bae236ae173a3dad304c3db119fd5d6664f592ecfe7",
       "dependencies": [
         "PPS-000",
         "PPS-001",
