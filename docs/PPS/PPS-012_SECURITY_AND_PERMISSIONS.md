@@ -1,7 +1,7 @@
 ---
 id: PPS-012
 title: Security and Permissions
-version: 1.0.0
+version: 1.1.0
 status: Canonical
 classification: Constitution
 owner: Playbook Platform
@@ -147,6 +147,14 @@ Permissions shall support:
 - Delegate
 
 Future permission types may be added through canonical specifications.
+
+Hosted Signing Authority
+
+The Executive Director may approve hosted PBOS signing identities within the authority granted to that office under Playbook Series Inc.’s governing records. The Senior Technical Engineer may approve within an active, written delegation from the Executive Director that specifies the permitted environments, repositories, and mission types.
+
+Each registration shall record the approver and authority basis, the signer, the private-key custodian, the authorized scope, the public-key fingerprint, and the rotation and revocation procedure. Before activation, a reviewer who is neither the approver nor the key custodian shall verify the registration, fingerprint, and scope.
+
+Registration authorizes the signing identity for its documented scope. Each mission and deployment still requires its own applicable authorization. Existing Genesis HMAC authority remains in effect.
 
 PBOS Responsibilities
 
